@@ -38,6 +38,7 @@ const Index = () => {
   );
 
   const { panels, currentIndex, setCurrent, addPanel, undo, redo } = useComic(initialPanels);
+  const [history, setHistory] = React.useState<string[]>([]);
 
   const speak = useCallback((text: string) => {
     const utter = new SpeechSynthesisUtterance(text);
@@ -51,6 +52,7 @@ const Index = () => {
     (text: string) => {
       const image = images[Math.floor(Math.random() * images.length)];
       addPanel({ id: crypto.randomUUID(), image, text });
+      setHistory((h) => [...h, text]);
     },
     [addPanel, images]
   );
@@ -64,7 +66,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container py-6">
+      <div className="container max-w-6xl py-6">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -72,7 +74,7 @@ const Index = () => {
         <ComicHeader onUndo={undo} onRedo={redo} />
 
         <main className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_240px]" role="main">
-          <section aria-label="Panel strip and main panel" className="flex flex-col">
+          <section aria-label="Panel strip and main panel" className="flex flex-col mx-auto w-full max-w-3xl">
             <PanelStrip panels={panels} currentIndex={currentIndex} onSelect={setCurrent} onAddClick={onAddClick} />
 
             <ComicPanel
@@ -82,7 +84,7 @@ const Index = () => {
               className="aspect-[4/3]"
             />
 
-            <InputBar onGenerate={onGenerate} />
+            <InputBar onGenerate={onGenerate} history={history} />
           </section>
 
           <Sidebar panels={panels} />

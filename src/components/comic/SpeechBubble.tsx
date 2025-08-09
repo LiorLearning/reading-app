@@ -13,7 +13,7 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({ text, className, onSpeak })
   return (
     <div
       className={cn(
-        "relative inline-flex max-w-[80%] items-start gap-2 rounded-xl border-2 border-foreground bg-accent px-4 py-3 text-lg font-semibold text-accent-foreground shadow-sm",
+        "relative inline-flex max-w-[80%] items-start gap-2 rounded-xl border-2 border-foreground bg-accent px-4 py-3 text-lg font-semibold text-accent-foreground",
         className
       )}
       role="note"

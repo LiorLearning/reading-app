@@ -1,15 +1,17 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mic } from "lucide-react";
+import { Mic, ChevronsUpDown } from "lucide-react";
 import { toast } from "sonner";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
+  history?: string[];
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate, history = [] }) => {
   const [text, setText] = useState("");
+  const [expanded, setExpanded] = useState(false);
   const recognitionRef = useRef<any | null>(null);
 
   const startVoice = useCallback(() => {
@@ -42,23 +44,49 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
   );
 
   return (
-    <form onSubmit={submit} className="mt-4 flex items-center gap-2">
-      <button
-        type="button"
-        onClick={startVoice}
-        aria-label="Voice input"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-md border-2 border-foreground bg-secondary text-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <Mic className="h-5 w-5" />
-      </button>
-      <Input
-        aria-label="What happens next?"
-        placeholder="What happens next?"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <Button type="submit" className="font-bold">Generate</Button>
-    </form>
+    <section aria-label="Create next panel" className="mt-4">
+      <form onSubmit={submit} className="flex items-stretch gap-2">
+        <Button
+          type="button"
+          variant="comic"
+          size="icon"
+          onClick={() => setExpanded((e) => !e)}
+          aria-label={expanded ? "Collapse history" : "Expand to show history"}
+        >
+          <ChevronsUpDown />
+        </Button>
+        <button
+          type="button"
+          onClick={startVoice}
+          aria-label="Voice input"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border-2 border-foreground bg-accent text-accent-foreground shadow-solid active:translate-y-0.5 active:shadow-none"
+        >
+          <Mic className="h-5 w-5" />
+        </button>
+        <Input
+          aria-label="What happens next?"
+          placeholder="What happens next?"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="rounded-xl border-2"
+        />
+        <Button type="submit" variant="comic" className="font-extrabold px-6">Generate</Button>
+      </form>
+
+      {expanded && (
+        <div className="mt-3 max-h-40 overflow-auto rounded-xl border-2 border-foreground bg-secondary p-3">
+          {history.length === 0 ? (
+            <p className="text-sm text-foreground/80">No messages yet. Try saying or typing what happens next.</p>
+          ) : (
+            <ol className="space-y-2 text-sm">
+              {history.map((h, i) => (
+                <li key={`${i}-${h.slice(0,6)}`} className="rounded-md bg-card p-2">{i + 1}. {h}</li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
+    </section>
   );
 };
 

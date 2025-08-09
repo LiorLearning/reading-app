@@ -93,6 +93,11 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-kids;
   }
+}
+
+@layer utilities {
+  .shadow-solid { box-shadow: 0 4px 0 hsl(var(--foreground)); }
+  .shadow-solid-primary { box-shadow: 0 4px 0 hsl(var(--primary)); }
 }

@@ -12,7 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ panels }) => {
     <aside className="flex w-full max-w-[220px] flex-col items-center gap-4">
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline" className="w-full font-bold">View Whole Comic</Button>
+          <Button variant="comic" className="w-full font-bold">View Whole Comic</Button>
         </DialogTrigger>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
