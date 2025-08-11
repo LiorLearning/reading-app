@@ -1,17 +1,15 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mic, ChevronsUpDown } from "lucide-react";
+import { Mic, Send } from "lucide-react";
 import { toast } from "sonner";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
-  history?: string[];
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate, history = [] }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
   const [text, setText] = useState("");
-  const [expanded, setExpanded] = useState(false);
   const recognitionRef = useRef<any | null>(null);
 
   const startVoice = useCallback(() => {
@@ -44,48 +42,29 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, history = [] }) => {
   );
 
   return (
-    <section aria-label="Create next panel" className="mt-4">
+    <section aria-label="Create next panel">
       <form onSubmit={submit} className="flex items-stretch gap-2">
         <Button
           type="button"
-          variant="comic"
+          variant="outline"
           size="icon"
-          onClick={() => setExpanded((e) => !e)}
-          aria-label={expanded ? "Collapse history" : "Expand to show history"}
-        >
-          <ChevronsUpDown />
-        </Button>
-        <button
-          type="button"
           onClick={startVoice}
           aria-label="Voice input"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border-2 border-foreground bg-accent text-accent-foreground shadow-solid active:translate-y-0.5 active:shadow-none"
+          className="h-10 w-10 border-2 border-foreground shadow-solid bg-background flex-shrink-0 btn-animate"
         >
           <Mic className="h-5 w-5" />
-        </button>
+        </Button>
         <Input
           aria-label="What happens next?"
           placeholder="What happens next?"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="rounded-xl border-2"
+          className="rounded-xl border-2 flex-1"
         />
-        <Button type="submit" variant="comic" className="font-extrabold px-6">Generate</Button>
+        <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
+          <Send className="h-4 w-4" />
+        </Button>
       </form>
-
-      {expanded && (
-        <div className="mt-3 max-h-40 overflow-auto rounded-xl border-2 border-foreground bg-secondary p-3">
-          {history.length === 0 ? (
-            <p className="text-sm text-foreground/80">No messages yet. Try saying or typing what happens next.</p>
-          ) : (
-            <ol className="space-y-2 text-sm">
-              {history.map((h, i) => (
-                <li key={`${i}-${h.slice(0,6)}`} className="rounded-md bg-card p-2">{i + 1}. {h}</li>
-              ))}
-            </ol>
-          )}
-        </div>
-      )}
     </section>
   );
 };

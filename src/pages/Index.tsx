@@ -1,9 +1,11 @@
 import React, { useCallback, useMemo } from "react";
 import ComicHeader from "@/components/comic/ComicHeader";
-import PanelStrip from "@/components/comic/PanelStrip";
 import ComicPanel from "@/components/comic/ComicPanel";
-import Sidebar from "@/components/comic/Sidebar";
 import InputBar from "@/components/comic/InputBar";
+import MessengerChat from "@/components/comic/MessengerChat";
+import ChatAvatar from "@/components/comic/ChatAvatar";
+import { cn } from "@/lib/utils";
+
 import { useComic } from "@/hooks/use-comic";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
@@ -38,57 +40,260 @@ const Index = () => {
   );
 
   const { panels, currentIndex, setCurrent, addPanel, undo, redo } = useComic(initialPanels);
-  const [history, setHistory] = React.useState<string[]>([]);
+  
+  interface ChatMessage {
+    type: 'user' | 'ai';
+    content: string;
+    timestamp: number;
+  }
+  
+  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [sidebarAnimatingOut, setSidebarAnimatingOut] = React.useState(false);
+  const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
+  const [lastMessageCount, setLastMessageCount] = React.useState(0);
+  const messagesScrollRef = React.useRef<HTMLDivElement>(null);
+  
+  // Chat panel resize functionality
+  const [chatPanelWidth, setChatPanelWidth] = React.useState(320); // 320px = w-80
+  const [isResizing, setIsResizing] = React.useState(false);
+  const resizeRef = React.useRef<HTMLDivElement>(null);
 
-  const speak = useCallback((text: string) => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 1;
-    utter.pitch = 1;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utter);
+  // Resize handlers
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
   }, []);
+
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    
+    const newWidth = e.clientX;
+    const minWidth = 320; // Minimum width (w-80)
+    const maxWidth = Math.min(800, window.innerWidth * 0.6); // Max 60% of screen or 800px
+    
+    if (newWidth >= minWidth && newWidth <= maxWidth) {
+      setChatPanelWidth(newWidth);
+    }
+  }, [isResizing]);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Add global mouse events for resize
+  React.useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
+
+  const generateAIResponse = useCallback((userText: string): string => {
+    const responses = [
+      "Great idea! 🚀 That sounds exciting! What happens next?",
+      "Wow! 🌟 That's a fantastic twist! Keep the story going!",
+      "Amazing! ✨ I love where this story is heading!",
+      "Cool! 🎯 That's a great addition to your adventure!",
+      "Awesome! 🎭 Your story is getting more exciting!",
+      "Nice! 🌈 What a wonderful way to continue the tale!",
+      "Brilliant! 💫 I can't wait to see what happens next!",
+      "Super! 🎪 You're such a creative storyteller!",
+      "Perfect! 🎨 That adds great action to your comic!",
+      "Excellent! 🎊 Your adventure is becoming amazing!"
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
+  }, []);
+
+
 
   const onGenerate = useCallback(
     (text: string) => {
       const image = images[Math.floor(Math.random() * images.length)];
-      addPanel({ id: crypto.randomUUID(), image, text });
-      setHistory((h) => [...h, text]);
+      const newPanelId = crypto.randomUUID();
+      addPanel({ id: newPanelId, image, text });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      // Clear the new panel indicator after animation
+      setTimeout(() => setNewlyCreatedPanelId(null), 2000);
+      
+      // Add user message
+      const userMessage: ChatMessage = {
+        type: 'user',
+        content: text,
+        timestamp: Date.now()
+      };
+      
+      // Add user message immediately
+      setChatMessages(prev => {
+        setLastMessageCount(prev.length + 1);
+        return [...prev, userMessage];
+      });
+      
+      // Generate AI response with delay for natural feel
+      setTimeout(() => {
+        const aiResponse = generateAIResponse(text);
+        const aiMessage: ChatMessage = {
+          type: 'ai',
+          content: aiResponse,
+          timestamp: Date.now()
+        };
+        setChatMessages(prev => {
+          setLastMessageCount(prev.length + 1);
+          return [...prev, aiMessage];
+        });
+      }, 800);
     },
-    [addPanel, images]
+    [addPanel, images, generateAIResponse]
   );
 
-  const onAddClick = useCallback(() => {
-    const image = images[Math.floor(Math.random() * images.length)];
-    addPanel({ id: crypto.randomUUID(), image, text: "A new twist begins..." });
-  }, [addPanel, images]);
+  // Auto-scroll to bottom when new messages arrive
+  React.useEffect(() => {
+    if (messagesScrollRef.current) {
+      messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
+
 
   const current = panels[currentIndex] ?? initialPanels[0];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-6xl py-6">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <ComicHeader onUndo={undo} onRedo={redo} />
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="w-full px-4 py-2 flex-1 flex flex-col min-h-0">
+        <div className="flex-shrink-0 pb-2">
+          <ComicHeader 
+            onUndo={undo} 
+            onRedo={redo} 
+            panels={panels}
+            sidebarCollapsed={sidebarCollapsed}
+            onToggleSidebar={() => {
+              if (!sidebarCollapsed) {
+                setSidebarAnimatingOut(true);
+                // Start the width transition immediately
+                setTimeout(() => {
+                  setSidebarCollapsed(true);
+                  setSidebarAnimatingOut(false);
+                }, 300);
+              } else {
+                setSidebarCollapsed(false);
+                setSidebarAnimatingOut(false);
+              }
+            }}
+          />
+        </div>
 
-        <main className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_240px]" role="main">
-          <section aria-label="Panel strip and main panel" className="flex flex-col mx-auto w-full max-w-3xl">
-            <PanelStrip panels={panels} currentIndex={currentIndex} onSelect={setCurrent} onAddClick={onAddClick} />
-
-            <ComicPanel
-              image={current.image}
-              text={current.text}
-              onSpeak={() => speak(current.text)}
-              className="aspect-[4/3]"
-            />
-
-            <InputBar onGenerate={onGenerate} history={history} />
+        <main className="flex-1 flex min-h-0 overflow-hidden" role="main">
+          {/* Left Sidebar with Avatar, Messages and Input */}
+          {(!sidebarCollapsed || sidebarAnimatingOut) && (
+            <aside 
+              ref={resizeRef}
+              className={`flex flex-col bg-chat-container border-r-2 border-foreground min-h-0 max-h-full z-10 relative overflow-hidden ${
+                sidebarAnimatingOut ? 'animate-slide-out-left' : 'animate-slide-in-left'
+              } ${isResizing ? 'chat-panel-resizing' : ''}`}
+              style={{ 
+                width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
+                transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+              }}
+            >
+              {/* Avatar Section */}
+              <div className="flex-shrink-0 border-b-2 border-foreground bg-chat-container">
+                <ChatAvatar />
+              </div>
+              
+              {/* Messages */}
+              <div className="flex-1 min-h-0 relative">
+                {/* Messages Container */}
+                <div 
+                  ref={messagesScrollRef}
+                  className="h-full overflow-y-auto space-y-3 p-3 bg-chat-panel"
+                >
+                  {chatMessages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                      <p>💬 Start chatting with Krafty!</p>
+                    </div>
+                  ) : (
+                    chatMessages.map((message, index) => (
+                      <div
+                        key={`${message.timestamp}-${index}`}
+                        className={cn(
+                          "flex animate-slide-up-smooth",
+                          message.type === 'user' ? "justify-end" : "justify-start"
+                        )}
+                        style={{ 
+                          animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
+                        }}
+                      >
+                        <div
+                          className={cn(
+                            "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                            message.type === 'user' 
+                              ? "bg-primary text-primary-foreground" 
+                              : "bg-card border-2 border-foreground"
+                          )}
+                        >
+                          <div className="font-medium text-xs mb-1 opacity-70">
+                            {message.type === 'user' ? 'You' : '🤖 Krafty'}
+                          </div>
+                          <div>{message.content}</div>
+                        </div>
+                      </div>
+                    )                )
+                  )}
+                </div>
+              </div>
+              
+              {/* Input Bar */}
+              <div className="flex-shrink-0 bg-chat-container p-3">
+                <InputBar onGenerate={onGenerate} />
+              </div>
+              
+              {/* Resize Handle */}
+              <div
+                className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group"
+                onMouseDown={handleResizeStart}
+                title="Drag to resize chat panel"
+              >
+                <div className="absolute top-1/2 -translate-y-1/2 right-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
+              </div>
+            </aside>
+          )}
+          
+          {/* Main Comic Panel */}
+          <section 
+            aria-label="Main comic panel" 
+            className="flex-1 flex flex-col min-h-0 overflow-hidden relative"
+          >
+            <div className="flex-1 min-h-0 overflow-hidden p-3">
+              <ComicPanel
+                image={current.image}
+                className="h-full w-full"
+                isNew={current.id === newlyCreatedPanelId}
+              />
+            </div>
           </section>
-
-          <Sidebar panels={panels} />
         </main>
+
+        {/* Messenger Chat when sidebar is collapsed */}
+        {sidebarCollapsed && (
+          <MessengerChat 
+            messages={chatMessages} 
+            onGenerate={onGenerate} 
+          />
+        )}
       </div>
     </div>
   );
