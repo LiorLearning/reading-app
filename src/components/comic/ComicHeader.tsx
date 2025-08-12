@@ -20,7 +20,7 @@ const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels, sideb
           variant="outline"
           size="icon"
           onClick={onToggleSidebar}
-          className="border-2 border-foreground shadow-solid bg-background btn-animate"
+          className="border-2 border-foreground shadow-solid bg-white btn-animate"
           aria-label={sidebarCollapsed ? "Open sidebar" : "Close sidebar"}
         >
           {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
@@ -46,15 +46,15 @@ const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels, sideb
             </div>
           </DialogContent>
         </Dialog>
-        <Button variant="outline" size="icon" onClick={onUndo} aria-label="Undo" className="border-2 border-foreground shadow-solid bg-background btn-animate">
+        <Button variant="outline" size="icon" onClick={onUndo} aria-label="Undo" className="border-2 border-foreground shadow-solid bg-white btn-animate">
           <Undo2 />
         </Button>
-        <Button variant="outline" size="icon" onClick={onRedo} aria-label="Redo" className="border-2 border-foreground shadow-solid bg-background btn-animate">
+        <Button variant="outline" size="icon" onClick={onRedo} aria-label="Redo" className="border-2 border-foreground shadow-solid bg-white btn-animate">
           <Redo2 />
         </Button>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="icon" aria-label="Help" className="border-2 border-foreground shadow-solid bg-background btn-animate">
+            <Button variant="outline" size="icon" aria-label="Help" className="border-2 border-foreground shadow-solid bg-white btn-animate">
               <HelpCircle />
             </Button>
           </DialogTrigger>

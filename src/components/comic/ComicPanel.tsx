@@ -16,7 +16,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
   ], [isNew]);
   return (
     <div className={cn(
-      "relative w-full h-full flex flex-col overflow-hidden rounded-xl border-4 border-foreground bg-card",
+      "relative w-full h-full flex flex-col overflow-hidden book-container",
       className
     )}>
       <div className="flex-1 min-h-0 relative">

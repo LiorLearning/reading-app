@@ -50,7 +50,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
           size="icon"
           onClick={startVoice}
           aria-label="Voice input"
-          className="h-10 w-10 border-2 border-foreground shadow-solid bg-background flex-shrink-0 btn-animate"
+          className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
         >
           <Mic className="h-5 w-5" />
         </Button>
@@ -59,7 +59,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
           placeholder="What happens next?"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="rounded-xl border-2 flex-1"
+          className="rounded-xl border-2 flex-1 bg-white"
         />
         <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
           <Send className="h-4 w-4" />

@@ -168,49 +168,53 @@ const Index = () => {
   const current = panels[currentIndex] ?? initialPanels[0];
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden">
+    <div className="h-screen bg-pattern flex flex-col overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="w-full px-4 py-2 flex-1 flex flex-col min-h-0">
-        <div className="flex-shrink-0 pb-2">
-          <ComicHeader 
-            onUndo={undo} 
-            onRedo={redo} 
-            panels={panels}
-            sidebarCollapsed={sidebarCollapsed}
-            onToggleSidebar={() => {
-              if (!sidebarCollapsed) {
-                setSidebarAnimatingOut(true);
-                // Start the width transition immediately
-                setTimeout(() => {
-                  setSidebarCollapsed(true);
+        <div className="flex-shrink-0 pb-1 pt-1">
+          <div className="px-4">
+            <ComicHeader 
+              onUndo={undo} 
+              onRedo={redo} 
+              panels={panels}
+              sidebarCollapsed={sidebarCollapsed}
+              onToggleSidebar={() => {
+                if (!sidebarCollapsed) {
+                  setSidebarAnimatingOut(true);
+                  // Start the width transition immediately
+                  setTimeout(() => {
+                    setSidebarCollapsed(true);
+                    setSidebarAnimatingOut(false);
+                  }, 300);
+                } else {
+                  setSidebarCollapsed(false);
                   setSidebarAnimatingOut(false);
-                }, 300);
-              } else {
-                setSidebarCollapsed(false);
-                setSidebarAnimatingOut(false);
-              }
-            }}
-          />
+                }
+              }}
+            />
+          </div>
         </div>
 
-        <main className="flex-1 flex min-h-0 overflow-hidden" role="main">
+        <main className="flex-1 flex min-h-0 overflow-hidden gap-4 p-1" role="main">
           {/* Left Sidebar with Avatar, Messages and Input */}
           {(!sidebarCollapsed || sidebarAnimatingOut) && (
             <aside 
               ref={resizeRef}
-              className={`flex flex-col bg-chat-container border-r-2 border-foreground min-h-0 max-h-full z-10 relative overflow-hidden ${
+              className={`flex flex-col bg-chat-container border-2 border-foreground rounded-3xl min-h-0 z-10 relative overflow-hidden mb-2 ${
                 sidebarAnimatingOut ? 'animate-slide-out-left' : 'animate-slide-in-left'
               } ${isResizing ? 'chat-panel-resizing' : ''}`}
               style={{ 
                 width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
-                transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                height: 'calc(100vh - 100px)',
+                transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                boxShadow: '0 4px 0 hsl(var(--foreground))'
               }}
             >
               {/* Avatar Section */}
-              <div className="flex-shrink-0 border-b-2 border-foreground bg-chat-container">
+              <div className="flex-shrink-0 bg-chat-container">
                 <ChatAvatar />
               </div>
               
@@ -275,9 +279,10 @@ const Index = () => {
           {/* Main Comic Panel */}
           <section 
             aria-label="Main comic panel" 
-            className="flex-1 flex flex-col min-h-0 overflow-hidden relative"
+            className="flex-1 flex flex-col min-h-0 relative"
+            style={{ height: 'calc(100vh - 100px)' }}
           >
-            <div className="flex-1 min-h-0 overflow-hidden p-3">
+            <div className="flex-1 min-h-0">
               <ComicPanel
                 image={current.image}
                 className="h-full w-full"

@@ -76,7 +76,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
         <Button
           variant="outline"
           onClick={() => setIsHidden(false)}
-          className="h-12 w-12 rounded-full border-2 border-foreground shadow-solid bg-background btn-animate"
+          className="h-12 w-12 rounded-full border-2 border-foreground shadow-solid bg-white btn-animate"
           aria-label="Show chat"
         >
           <MessageCircle className="h-6 w-6" />
@@ -122,7 +122,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
               size="icon"
               onClick={startVoice}
               aria-label="Voice input"
-              className="h-10 w-10 border-2 border-foreground shadow-solid bg-background flex-shrink-0 btn-animate"
+              className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
             >
               <Mic className="h-4 w-4" />
             </Button>
@@ -131,7 +131,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
               placeholder="Doubts? Ask me!"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className="rounded-xl border-2 flex-1 min-w-48"
+              className="rounded-xl border-2 flex-1 min-w-48 bg-white"
             />
             <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
               <Send className="h-4 w-4" />
@@ -235,7 +235,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
             size="icon"
             onClick={startVoice}
             aria-label="Voice input"
-            className="h-10 w-10 border-2 border-foreground shadow-solid bg-background flex-shrink-0 btn-animate"
+            className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
           >
             <Mic className="h-4 w-4" />
           </Button>
@@ -244,7 +244,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
             placeholder="What happens next?"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="rounded-xl border-2 flex-1"
+            className="rounded-xl border-2 flex-1 bg-white"
           />
           <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
             <Send className="h-4 w-4" />
