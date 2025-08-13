@@ -18,7 +18,7 @@ const PanelThumbnail: React.FC<PanelThumbnailProps> = ({ index, image, active, o
         active ? "border-foreground border-4" : "border-border"
       )}
     >
-      <img src={image} alt={`Panel ${index + 1} thumbnail`} className="h-full w-full object-cover" loading="lazy" />
+      <img src={image} alt={`Panel ${index + 1} thumbnail`} className="absolute inset-0 w-full h-full object-cover border-2 border-foreground rounded-md" loading="lazy" />
       <span className="absolute left-1 top-1 rounded-md bg-secondary px-1 text-xs font-bold text-secondary-foreground">
         {index + 1}
       </span>

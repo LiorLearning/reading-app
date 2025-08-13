@@ -178,7 +178,6 @@ const Index = () => {
           <div className="px-4">
             <ComicHeader 
               onUndo={undo} 
-              onRedo={redo} 
               panels={panels}
               sidebarCollapsed={sidebarCollapsed}
               onToggleSidebar={() => {

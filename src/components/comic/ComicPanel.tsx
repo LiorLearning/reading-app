@@ -80,7 +80,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
             <img 
               src={image} 
               alt="Current comic scene" 
-              className="absolute inset-0 w-full h-full object-cover opacity-0" 
+              className="absolute inset-0 w-full h-full object-cover opacity-0 border-2 border-foreground rounded-2xl" 
               loading="lazy" 
               style={{ 
                 animation: 'image-factory-improved 1.5s ease-out forwards',
@@ -92,7 +92,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
           <img 
             src={image} 
             alt="Current comic scene" 
-            className="absolute inset-0 w-full h-full object-cover" 
+            className="absolute inset-0 w-full h-full object-cover border-2 border-foreground rounded-2xl" 
             loading="lazy" 
           />
         )}

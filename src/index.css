@@ -308,7 +308,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Light pink base with strategic #EB4762 pink accents */
-    --background: 350 40% 94%; /* Light pink background */
+    --background: 350 30% 97%; /* Very light pink background with reduced saturation and increased lightness */
     --foreground: 0 0% 15%; /* Dark gray text */
 
     --card: 0 0% 100%; /* Pure white cards */
@@ -364,6 +364,10 @@ All colors MUST be HSL.
     
     /* CHAT PANEL COLOR - Light gray for contrast */
     --chat-panel-bg: 0 0% 97%; /* Very light gray for chat messages area */
+    
+    /* Background pattern colors - default to pink theme */
+    --pattern-primary: 350 50% 90%;
+    --pattern-secondary: 350 40% 88%;
   }
 
   .dark {
@@ -419,6 +423,10 @@ All colors MUST be HSL.
     
     /* CHAT PANEL COLOR - Slightly lighter dark gray */
     --chat-panel-bg: 0 0% 18%; /* Dark gray for chat messages area */
+    
+    /* Background pattern colors - default to pink theme for dark mode */
+    --pattern-primary: 350 30% 20%;
+    --pattern-secondary: 350 25% 18%;
   }
 }
 
@@ -436,21 +444,16 @@ All colors MUST be HSL.
   .shadow-solid { box-shadow: 0 4px 0 hsl(var(--foreground)); }
   .shadow-solid-primary { box-shadow: 0 4px 0 hsl(var(--primary)); }
   
-  /* Playful background pattern */
+  /* Visible geometric background pattern with dynamic colors based on theme */
   .bg-pattern {
-    background-color: hsl(var(--background));
+    background-color: hsl(var(--background)); /* Use the theme background variable */
     background-image: 
-      radial-gradient(circle at 20px 20px, hsl(350 60% 85%) 3px, transparent 3px),
-      radial-gradient(circle at 60px 60px, hsl(350 55% 80%) 2px, transparent 2px),
-      radial-gradient(circle at 100px 20px, hsl(350 50% 75%) 1.5px, transparent 1.5px);
-    background-size: 
-      80px 80px,
-      120px 120px,
-      60px 60px;
-    background-position:
-      0 0,
-      40px 40px,
-      20px 10px;
+      linear-gradient(45deg, hsl(var(--pattern-primary) / 0.4) 25%, transparent 25%),
+      linear-gradient(-45deg, hsl(var(--pattern-primary) / 0.4) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, hsl(var(--pattern-secondary) / 0.3) 75%),
+      linear-gradient(-45deg, transparent 75%, hsl(var(--pattern-secondary) / 0.3) 75%);
+    background-size: 40px 40px;
+    background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
   }
   
   /* Ensure buttons have white backgrounds */
