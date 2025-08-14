@@ -188,13 +188,20 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
               <div
                 key={`${message.timestamp}-${index}`}
                 className={cn(
-                  "flex animate-slide-up-smooth",
-                  message.type === 'user' ? "justify-end" : "justify-start"
+                  "flex animate-slide-up-smooth items-start gap-2",
+                  message.type === 'user' ? "justify-end flex-row-reverse" : "justify-start"
                 )}
                 style={{ 
                   animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.05, 0.3)}s` : "0s"
                 }}
               >
+                {/* Avatar for AI messages */}
+                {message.type === 'ai' && (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-foreground bg-white flex items-center justify-center text-sm">
+                    👨‍🚀
+                  </div>
+                )}
+                
                 <div
                   className={cn(
                     "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
@@ -204,16 +211,21 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
                   )}
                 >
                   <div className="font-medium text-xs mb-1 opacity-70">
-                    {message.type === 'user' ? 'You' : '🤖 Krafty'}
+                    {message.type === 'user' ? 'You' : 'Krafty'}
                   </div>
                   <div>{message.content}</div>
                 </div>
               </div>
             ))}
             {isTyping && (
-              <div className="flex justify-start animate-slide-up-smooth">
+              <div className="flex justify-start animate-slide-up-smooth items-start gap-2">
+                {/* Avatar for typing indicator */}
+                <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-foreground bg-white flex items-center justify-center text-sm">
+                  👨‍🚀
+                </div>
+                
                 <div className="bg-card border-2 border-foreground rounded-lg px-3 py-2 text-sm">
-                  <div className="font-medium text-xs mb-1 opacity-70">🤖 Krafty</div>
+                  <div className="font-medium text-xs mb-1 opacity-70">Krafty</div>
                   <div className="flex items-center gap-1">
                     <div className="typing-dot w-2 h-2 bg-muted-foreground rounded-full"></div>
                     <div className="typing-dot w-2 h-2 bg-muted-foreground rounded-full"></div>

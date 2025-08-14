@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, memo } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,64 +18,6 @@ interface ChatOverlayProps {
   onToggleVisibility: () => void;
 }
 
-// Memoized Speech Bubble Component to prevent glitching
-const SpeechBubble = memo(({ message, messageIndex }: { message: ChatMessage, messageIndex: number }) => {
-  const isUser = message.type === 'user';
-
-  // Simple consistent positioning: User bubbles on right, AI on left
-  // Stack them vertically based on their order
-  const baseTop = 15; // Start at 15% from top
-  const verticalSpacing = 25; // 25% spacing between bubbles
-  const topPosition = baseTop + (messageIndex * verticalSpacing);
-
-  const position = isUser ? 
-    { top: `${Math.min(topPosition, 65)}%`, right: '5%' } : // User on right
-    { top: `${Math.min(topPosition, 65)}%`, left: '5%' };   // AI on left
-
-  return (
-    <div
-      className={cn(
-        "absolute z-20 max-w-[280px]",
-        isUser ? "speech-bubble-user" : "speech-bubble-ai"
-      )}
-      style={position}
-    >
-      <div
-        className={cn(
-          "px-4 py-3 text-sm font-medium rounded-2xl border-2 border-foreground shadow-solid relative",
-          isUser 
-            ? "bg-primary text-primary-foreground" 
-            : "bg-white text-foreground"
-        )}
-      >
-        {/* Speech bubble tail */}
-        <div
-          className={cn(
-            "absolute w-0 h-0",
-            isUser 
-              ? "bottom-[-8px] right-6 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-primary"
-              : "bottom-[-8px] left-6 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"
-          )}
-        />
-        <div
-          className={cn(
-            "absolute w-0 h-0",
-            isUser 
-              ? "bottom-[-10px] right-6 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-foreground"
-              : "bottom-[-10px] left-6 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-foreground"
-          )}
-        />
-        
-        <div className="font-bold text-xs mb-1 opacity-70">
-          {isUser ? 'You' : '🤖 Krafty'}
-        </div>
-        <div>{message.content}</div>
-      </div>
-    </div>
-  );
-});
-
-SpeechBubble.displayName = 'SpeechBubble';
 
 const ChatOverlay: React.FC<ChatOverlayProps> = ({ 
   messages, 
@@ -120,10 +62,15 @@ const ChatOverlay: React.FC<ChatOverlayProps> = ({
     setText("");
   };
 
-  // Get the most recent messages for display - memoized to prevent glitching
-  const recentMessages = React.useMemo(() => {
-    return messages.slice(-3); // Show only last 3 messages
-  }, [messages]);
+  // Scroll ref for chat area
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (scrollRef.current && isVisible) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isVisible]);
 
   return (
     <>
@@ -135,10 +82,59 @@ const ChatOverlay: React.FC<ChatOverlayProps> = ({
         />
       )}
 
-      {/* Speech Bubbles - only show when input is visible */}
-      {isVisible && recentMessages.map((message, index) => (
-        <SpeechBubble key={message.timestamp} message={message} messageIndex={index} />
-      ))}
+      {/* Scrollable Chat Area - only show when input is visible */}
+      {isVisible && (
+        <div className="absolute inset-0 bottom-16 z-20">
+          <div 
+            ref={scrollRef}
+            className="h-full overflow-y-auto p-4 space-y-3 bg-black bg-opacity-10 backdrop-blur-sm"
+          >
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-white text-sm">
+                <p>💬 Start your adventure!</p>
+              </div>
+            ) : (
+              messages.map((message, index) => (
+                <div
+                  key={message.timestamp}
+                  className={cn(
+                    "flex items-start gap-2 animate-slide-up-smooth",
+                    message.type === 'user' ? "justify-end" : "justify-start"
+                  )}
+                >
+                  {/* Avatar for AI messages - only on left side */}
+                  {message.type === 'ai' && (
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-foreground bg-white flex items-center justify-center text-sm">
+                      👨‍🚀
+                    </div>
+                  )}
+                  
+                  <div
+                    className={cn(
+                      "max-w-[75%] rounded-2xl px-4 py-3 text-sm font-medium border-2 border-foreground shadow-solid",
+                      message.type === 'user' 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-white text-foreground"
+                    )}
+                  >
+                    <div className="font-bold text-xs mb-1 opacity-70">
+                      {message.type === 'user' ? 'You' : 'Krafty'}
+                    </div>
+                    <div>{message.content}</div>
+                  </div>
+
+                  {/* Avatar for user messages - only on right side */}
+                  {message.type === 'user' && (
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-foreground bg-primary flex items-center justify-center text-sm text-primary-foreground font-bold">
+                      U
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Floating Show Chat Button - appears when input is hidden */}
       {!isVisible && (

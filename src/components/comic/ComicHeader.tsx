@@ -22,7 +22,7 @@ const colorThemes = [
 const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, panels }) => {
   const [selectedTheme, setSelectedTheme] = useState(colorThemes[0]); // Default to pink
   
-  const changeTheme = (theme: typeof colorThemes[0]) => {
+  const changeTheme = React.useCallback((theme: typeof colorThemes[0]) => {
     setSelectedTheme(theme);
     
     // Update CSS variables on the document root
@@ -43,12 +43,12 @@ const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, panels }) => {
     // Light mode pattern colors
     root.style.setProperty('--pattern-primary', `${theme.hue} 50% 90%`);
     root.style.setProperty('--pattern-secondary', `${theme.hue} 40% 88%`);
-  };
+  }, []);
   
   // Initialize theme on component mount
   useEffect(() => {
     changeTheme(selectedTheme);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedTheme, changeTheme]);
   
   return (
     <header className="mb-2 flex items-center justify-between">

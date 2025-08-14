@@ -30,8 +30,8 @@ const Index = () => {
 
   const initialPanels = useMemo(
     () => [
-      { id: crypto.randomUUID(), image: rocket1, text: "The brave astronaut climbs into ROCKET!" },
-      { id: crypto.randomUUID(), image: alien3, text: "Clouds drift by as the engines warm up." },
+      { id: "panel-1", image: rocket1, text: "The brave astronaut climbs into ROCKET!" },
+      { id: "panel-2", image: alien3, text: "Clouds drift by as the engines warm up." },
     ],
     []
   );
@@ -48,9 +48,7 @@ const Index = () => {
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [isInputVisible, setIsInputVisible] = React.useState(true);
   
-  // Comic panel resize functionality
-  const [comicPanelWidth, setComicPanelWidth] = React.useState(80); // 80% of screen width
-  const [isResizing, setIsResizing] = React.useState(false);
+
 
 
 
@@ -115,44 +113,7 @@ const Index = () => {
     [addPanel, images, generateAIResponse, setIsInputVisible]
   );
 
-  // Resize handlers
-  const handleResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  }, []);
 
-  const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!isResizing) return;
-    
-    const newWidthPercent = (e.clientX / window.innerWidth) * 100;
-    const minWidth = 30; // Minimum 30% of screen width
-    const maxWidth = 95; // Maximum 95% of screen width
-    
-    if (newWidthPercent >= minWidth && newWidthPercent <= maxWidth) {
-      setComicPanelWidth(newWidthPercent);
-    }
-  }, [isResizing]);
-
-  const handleResizeEnd = useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  // Add global mouse events for resize
-  React.useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleResizeMove);
-      document.addEventListener('mouseup', handleResizeEnd);
-      document.body.style.cursor = 'ew-resize';
-      document.body.style.userSelect = 'none';
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-  }, [isResizing, handleResizeMove, handleResizeEnd]);
 
 
 
@@ -167,8 +128,8 @@ const Index = () => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="w-full px-4 py-2 flex-1 flex flex-col min-h-0">
-        <div className="flex-shrink-0 pb-1 pt-1">
-          <div className="px-4">
+        <div className="flex-shrink-0 pb-1 pt-1 flex justify-center">
+          <div className="w-full max-w-7xl px-4">
             <ComicHeader 
               onUndo={undo} 
               panels={panels}
@@ -176,15 +137,13 @@ const Index = () => {
           </div>
         </div>
 
-        <main className="flex-1 flex min-h-0 overflow-hidden p-1" role="main">
-          {/* Main Comic Panel with Chat Overlay - Resizable */}
+        <main className="flex-1 flex justify-center items-center min-h-0 overflow-hidden p-1" role="main">
+          {/* Main Comic Panel with Chat Overlay - Centered */}
           <section 
             aria-label="Main comic panel" 
-            className="flex flex-col min-h-0 relative"
+            className="flex flex-col min-h-0 relative w-full max-w-7xl"
             style={{ 
-              width: `${comicPanelWidth}%`,
-              height: 'calc(100vh - 100px)',
-              transition: isResizing ? 'none' : 'width 0.2s ease-out'
+              height: 'calc(100vh - 100px)'
             }}
           >
             <div className="flex-1 min-h-0 relative">
@@ -197,42 +156,8 @@ const Index = () => {
                 isInputVisible={isInputVisible}
                 onToggleInput={() => setIsInputVisible(!isInputVisible)}
               />
-              
-              {/* Resize Handle */}
-              <div
-                className="absolute top-0 right-0 w-2 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group z-40"
-                onMouseDown={handleResizeStart}
-                title="Drag to resize comic panel"
-              >
-                <div className="absolute top-1/2 -translate-y-1/2 right-0 w-1 h-16 bg-foreground/30 group-hover:bg-foreground/60 transition-colors duration-200 rounded-l" />
-              </div>
             </div>
           </section>
-
-          {/* Side Info Panel - shows when comic panel is resized smaller */}
-          {comicPanelWidth < 90 && (
-            <aside 
-              className="flex-1 min-h-0 p-4 bg-pattern-light border-l-2 border-foreground"
-              style={{ height: 'calc(100vh - 100px)' }}
-            >
-              <div className="h-full flex flex-col items-center justify-center text-center">
-                <h3 className="text-lg font-bold mb-2">Story Details</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Panel {currentIndex + 1} of {panels.length}
-                </p>
-                <div className="text-sm bg-card border-2 border-foreground p-3 rounded-lg">
-                  <p className="font-medium mb-1">Current Scene:</p>
-                  <p className="italic">"{current.text}"</p>
-                </div>
-                {panels.length > 1 && (
-                  <div className="mt-4 text-xs text-muted-foreground">
-                    <p>📖 {panels.length} panels created</p>
-                    <p>💬 {chatMessages.length} messages exchanged</p>
-                  </div>
-                )}
-              </div>
-            </aside>
-          )}
         </main>
       </div>
     </div>

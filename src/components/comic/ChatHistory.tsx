@@ -65,10 +65,17 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
                 <div
                   key={`${message.timestamp}-${index}`}
                   className={cn(
-                    "flex",
-                    message.type === 'user' ? "justify-end" : "justify-start"
+                    "flex items-start gap-2",
+                    message.type === 'user' ? "justify-end flex-row-reverse" : "justify-start"
                   )}
                 >
+                  {/* Avatar for AI messages */}
+                  {message.type === 'ai' && (
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full border border-foreground bg-white flex items-center justify-center text-xs">
+                      👨‍🚀
+                    </div>
+                  )}
+                  
                   <div
                     className={cn(
                       "max-w-[80%] rounded-lg px-3 py-2 text-sm",
@@ -78,7 +85,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
                     )}
                   >
                     <div className="font-medium text-xs mb-1 opacity-70">
-                      {message.type === 'user' ? 'You' : '🤖 AI Helper'}
+                      {message.type === 'user' ? 'You' : 'Krafty'}
                     </div>
                     <div>{message.content}</div>
                   </div>
