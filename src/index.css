@@ -301,6 +301,12 @@
   animation-delay: 0.4s;
 }
 
+/* Speech bubble styles */
+.speech-bubble-user,
+.speech-bubble-ai {
+  filter: drop-shadow(2px 2px 0px hsl(var(--foreground)));
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

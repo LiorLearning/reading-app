@@ -1,13 +1,32 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import ChatOverlay from "./ChatOverlay";
+
+interface ChatMessage {
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: number;
+}
 
 interface ComicPanelProps {
   image: string;
   className?: string;
   isNew?: boolean;
+  chatMessages?: ChatMessage[];
+  onGenerate?: (text: string) => void;
+  isInputVisible?: boolean;
+  onToggleInput?: () => void;
 }
 
-const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
+const ComicPanel: React.FC<ComicPanelProps> = ({ 
+  image, 
+  className, 
+  isNew,
+  chatMessages = [],
+  onGenerate = () => {},
+  isInputVisible = true,
+  onToggleInput = () => {}
+}) => {
   // Generate random colors for boxes each time
   const boxColors = React.useMemo(() => [
     ['bg-red-500', 'bg-blue-500', 'bg-green-500'][Math.floor(Math.random() * 3)],
@@ -96,6 +115,14 @@ const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
             loading="lazy" 
           />
         )}
+        
+        {/* Chat Overlay */}
+        <ChatOverlay
+          messages={chatMessages}
+          onGenerate={onGenerate}
+          isVisible={isInputVisible}
+          onToggleVisibility={onToggleInput}
+        />
       </div>
     </div>
   );
