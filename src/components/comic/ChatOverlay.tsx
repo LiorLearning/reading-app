@@ -178,7 +178,7 @@ const ChatOverlay: React.FC<ChatOverlayProps> = ({
               onChange={(e) => setText(e.target.value)}
               className="rounded-xl border-2 flex-1 bg-white"
             />
-            <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
+            <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate" disableClickSound={true}>
               <Send className="h-4 w-4" />
             </Button>
           </form>
@@ -190,6 +190,7 @@ const ChatOverlay: React.FC<ChatOverlayProps> = ({
             onClick={generateImage}
             aria-label="Generate new image"
             className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
+            disableClickSound={true}
           >
             <Image className="h-4 w-4" />
           </Button>

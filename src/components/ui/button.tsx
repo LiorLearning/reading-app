@@ -38,16 +38,19 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+asChild?: boolean
+disableClickSound?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, onClick, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, disableClickSound = false, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      // Play click sound for all button interactions
-      playClickSound();
+      // Play click sound for button interactions (unless disabled)
+      if (!disableClickSound) {
+        playClickSound();
+      }
       
       // Call the original onClick handler if provided
       if (onClick) {
