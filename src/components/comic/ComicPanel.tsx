@@ -27,6 +27,9 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   isInputVisible = true,
   onToggleInput = () => {}
 }) => {
+  // State to control zoom effect timing
+  const [showZoomEffect, setShowZoomEffect] = React.useState(false);
+  
   // Generate stable random colors for boxes when isNew changes
   const boxColors = React.useMemo(() => {
     const colorSets = [
@@ -38,9 +41,32 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
     const seed = isNew ? Date.now() : 0;
     return colorSets.map((colors, index) => colors[(seed + index) % colors.length]);
   }, [isNew]);
+  
+  // Track previous isNew state to detect when image becomes visible
+  const prevIsNew = React.useRef(isNew);
+  
+  React.useEffect(() => {
+    // Trigger zoom effect when isNew changes from true to false (image appears)
+    if (prevIsNew.current === true && isNew === false) {
+      // Image appeared! Triggering zoom AND shimmer effect
+      setShowZoomEffect(true);
+      
+      // Remove zoom effect after animation completes (0.8s)
+      const removeTimer = setTimeout(() => {
+        // Removing zoom and shimmer effect
+        setShowZoomEffect(false);
+      }, 800);
+      
+      return () => clearTimeout(removeTimer);
+    }
+    
+    // Update previous state
+    prevIsNew.current = isNew;
+  }, [isNew]);
   return (
     <div className={cn(
       "relative w-full h-full flex flex-col overflow-hidden book-container",
+      showZoomEffect && "zoom-in-effect",
       className
     )}>
       <div className="flex-1 min-h-0 relative">
@@ -101,24 +127,34 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             </div>
             
             {/* Image with improved animation - starts hidden */}
+            <div className={cn(
+              "absolute inset-0 w-full h-full border-2 border-foreground rounded-2xl overflow-hidden",
+              showZoomEffect && "shimmer-sweep"
+            )}>
+              <img 
+                src={image} 
+                alt="Current comic scene" 
+                className="absolute inset-0 w-full h-full object-cover opacity-0" 
+                loading="lazy" 
+                style={{ 
+                  animation: 'image-factory-improved 1.5s ease-out forwards',
+                  animationDelay: '12s'
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className={cn(
+            "absolute inset-0 w-full h-full border-2 border-foreground rounded-2xl overflow-hidden",
+            showZoomEffect && "shimmer-sweep"
+          )}>
             <img 
               src={image} 
               alt="Current comic scene" 
-              className="absolute inset-0 w-full h-full object-cover opacity-0 border-2 border-foreground rounded-2xl" 
+              className="absolute inset-0 w-full h-full object-cover" 
               loading="lazy" 
-              style={{ 
-                animation: 'image-factory-improved 1.5s ease-out forwards',
-                animationDelay: '12s'
-              }}
             />
           </div>
-        ) : (
-          <img 
-            src={image} 
-            alt="Current comic scene" 
-            className="absolute inset-0 w-full h-full object-cover border-2 border-foreground rounded-2xl" 
-            loading="lazy" 
-          />
         )}
         
         {/* Chat Overlay */}

@@ -554,4 +554,83 @@ All colors MUST be HSL.
       #fbbf24 16px
     );
   }
+  
+  /* Zoom-in effect for new content */
+  .zoom-in-effect {
+    animation: zoom-in-with-shadow 0.8s ease-out forwards;
+  }
+  
+  @keyframes zoom-in-with-shadow {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 
+        inset 0 4px 12px rgba(255, 255, 255, 0.4),
+        inset 0 -4px 12px rgba(0, 0, 0, 0.15),
+        0 12px 0 hsl(var(--foreground));
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 
+        inset 0 4px 12px rgba(255, 255, 255, 0.4),
+        inset 0 -4px 12px rgba(0, 0, 0, 0.15),
+        0 4px 0 hsl(var(--foreground));
+    }
+  }
+  
+  /* Enhanced shadow for before pseudo-element during zoom */
+  .zoom-in-effect::before {
+    animation: zoom-in-before-shadow 0.8s ease-out forwards;
+  }
+  
+  @keyframes zoom-in-before-shadow {
+    0% {
+      box-shadow: 0 8px 0 hsl(var(--foreground));
+    }
+    50% {
+      box-shadow: 0 16px 0 hsl(var(--foreground));
+    }
+    100% {
+      box-shadow: 0 8px 0 hsl(var(--foreground));
+    }
+  }
+  
+  /* Shimmer sweep effect for new images */
+  .shimmer-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.7) 30%,
+      rgba(255, 255, 255, 0.9) 50%,
+      rgba(255, 255, 255, 0.7) 70%,
+      transparent 100%
+    );
+    animation: shimmer-sweep-animation 0.8s ease-out forwards;
+    z-index: 50;
+    pointer-events: none;
+    border-radius: inherit;
+    /* Shimmer effect is working perfectly */
+  }
+  
+  @keyframes shimmer-sweep-animation {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
 }
