@@ -258,23 +258,7 @@ const Index = () => {
           <Menu className="h-4 w-4" />
         </Button>
 
-        {/* Expand Chat Button - Top Right Corner (only when sidebar is collapsed) */}
-        {sidebarCollapsed && (
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => {
-              playClickSound();
-              // Open the right sidebar panel
-              setSidebarCollapsed(false);
-              setSidebarAnimatingOut(false);
-            }}
-            aria-label="Open chat panel"
-            className="fixed top-4 right-4 z-50 border-2 border-foreground shadow-solid bg-white btn-animate"
-          >
-            <MessageCircle className="h-4 w-4" />
-          </Button>
-        )}
+
 
         <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-1 gap-6" role="main">
           {/* Main Comic Panel - Centered */}
@@ -488,6 +472,11 @@ const Index = () => {
             messages={chatMessages} 
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
+            onExpandChat={() => {
+              playClickSound();
+              setSidebarCollapsed(false);
+              setSidebarAnimatingOut(false);
+            }}
           />
         )}
       </div>

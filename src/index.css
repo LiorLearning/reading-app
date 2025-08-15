@@ -39,11 +39,27 @@
     transform-origin: bottom;
   }
   80% {
-    transform: translateY(0) scaleY(1.02);
+    transform: translateY(0) scaleY(1.01);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+@keyframes roll-down {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    transform-origin: bottom;
+  }
+  20% {
+    transform: translateY(0) scaleY(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%) scaleY(0.3);
     transform-origin: bottom;
   }
 }
@@ -247,7 +263,11 @@
 }
 
 .animate-roll-up {
-  animation: roll-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: roll-up 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.animate-roll-down {
+  animation: roll-down 0.6s ease-in forwards;
 }
 
 .animate-slide-in-left {

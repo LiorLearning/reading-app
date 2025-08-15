@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, Send, X, Square, Image as ImageIcon } from "lucide-react";
+import { Mic, Send, X, Square, Image as ImageIcon, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 
@@ -16,17 +16,54 @@ interface MessengerChatProps {
   messages: ChatMessage[];
   onGenerate: (text: string) => void;
   onGenerateImage: () => void;
+  onExpandChat: () => void; // Function to expand chat to full panel
 }
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage }) => {
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat }) => {
   const [isHidden, setIsHidden] = useState(true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const recognitionRef = useRef<any | null>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // No need for message count or scroll management in hover chatbox
+
+  // Hover handlers for message area
+  const handleMouseEnter = () => {
+    // Clear any pending hide timeout
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setIsAnimatingOut(false);
+    setShowMessages(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Set a 1-second timeout to start hide animation
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsAnimatingOut(true);
+      // After animation completes, actually hide the element
+      setTimeout(() => {
+        setShowMessages(false);
+        setIsAnimatingOut(false);
+      }, 600); // Match animation duration
+      hideTimeoutRef.current = null;
+    }, 1000);
+  };
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Waveform Visualizer Component
   const WaveformVisualizer = () => {
@@ -172,44 +209,85 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   const lastTwoMessages = messages.slice(-2);
     
     return (
-      <div className="fixed bottom-4 right-4 z-50 animate-roll-up">
-        {/* Last two messages display */}
-        {lastTwoMessages.length > 0 && (
-          <div className="mb-4 space-y-3 w-80">
-            {lastTwoMessages.map((message, index) => (
-              <div
-                key={`recent-${message.timestamp}-${index}`}
-                className="flex animate-slide-up-smooth gap-2"
-              >
-                {/* Avatar for all messages (left side) */}
-                <div className="flex-shrink-0 self-end">
-                  <div className={cn(
-                    "w-8 h-8 rounded-full border border-foreground flex items-center justify-center text-sm",
-                    message.type === 'user'
-                      ? "bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500"
-                      : "bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500"
-                  )}>
-                    {message.type === 'user' ? '👤' : '👨‍🚀'}
-                  </div>
-                </div>
-                
-                <div
-                  className={cn(
-                    "max-w-64 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-[0_4px_0_black]",
-                    message.type === 'user' 
-                      ? "bg-primary text-primary-foreground border-2 border-black" 
-                      : "bg-card border-2 border-foreground"
-                  )}
-                >
-                  <div className="break-words">{message.content}</div>
-                </div>
-              </div>
-            ))}
+      <div 
+        className="fixed bottom-6 right-8 z-50 animate-roll-up"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Expand Chat Button and Close Button - Above messages */}
+        {(lastTwoMessages.length === 0 || showMessages || isAnimatingOut) && (
+          <div className={cn(
+            "mb-2 flex justify-end gap-2",
+            lastTwoMessages.length > 0 && (isAnimatingOut ? "animate-roll-down" : "animate-roll-up")
+          )}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onExpandChat}
+              aria-label="Open full chat panel"
+              className="bg-white/60 backdrop-blur-sm border border-foreground/30 px-2 py-1 h-7 shadow-sm hover:bg-primary hover:text-primary-foreground transition-all"
+            >
+              <ArrowUpRight className="h-3 w-3" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsHidden(true)}
+              aria-label="Hide chat"
+              className="bg-white/60 backdrop-blur-sm border border-foreground/30 px-2 py-1 h-7 shadow-sm hover:bg-primary hover:text-primary-foreground transition-all"
+            >
+              <X className="h-3 w-3" />
+            </Button>
           </div>
         )}
         
-        {/* Main chatbox with new layout */}
-        <div className="bg-white/80 backdrop-blur-sm border-2 border-foreground rounded-2xl shadow-solid overflow-hidden">
+        {/* Container with unified background */}
+        <div className="relative overflow-hidden rounded-2xl">
+          {/* Translucent background that extends from hover bar to cover messages */}
+          {(showMessages || isAnimatingOut) && lastTwoMessages.length > 0 && (
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-2xl border border-foreground/20 -z-10"></div>
+          )}
+          
+          {/* Last two messages display - animated show/hide */}
+          {(showMessages || isAnimatingOut) && lastTwoMessages.length > 0 && (
+            <div className={cn(
+              "mb-0 space-y-3 p-3 pt-3 overflow-hidden",
+              isAnimatingOut ? "animate-roll-down" : "animate-roll-up"
+            )}>
+              {lastTwoMessages.map((message, index) => (
+                <div
+                  key={`recent-${message.timestamp}-${index}`}
+                  className="flex animate-slide-up-smooth gap-2"
+                >
+                  {/* Avatar for all messages (left side) */}
+                  <div className="flex-shrink-0 self-end">
+                    <div className={cn(
+                      "w-8 h-8 rounded-full border-2 border-black flex items-center justify-center text-sm shadow-[0_2px_0_black]",
+                      message.type === 'user'
+                        ? "bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500"
+                        : "bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500"
+                    )}>
+                      {message.type === 'user' ? '👤' : '👨‍🚀'}
+                    </div>
+                  </div>
+                  
+                  <div
+                    className={cn(
+                      "max-w-56 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-[0_4px_0_black]",
+                      message.type === 'user' 
+                        ? "bg-primary text-primary-foreground border-2 border-black backdrop-blur-sm" 
+                        : "bg-white/95 text-black border-2 border-black backdrop-blur-sm"
+                    )}
+                  >
+                    <div className="break-words font-medium">{message.content}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+           
+          {/* Main chatbox with new layout - always visible */}
+          <div className="bg-white/60 backdrop-blur-md border-2 border-foreground rounded-2xl shadow-solid overflow-hidden relative z-10">
           {/* Main input area with integrated controls */}
           <div className="p-2">
             <form onSubmit={submit} className="flex items-center gap-2">
@@ -241,6 +319,11 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                 />
               )}
               
+              {/* Send Button */}
+              <Button type="submit" variant="outline" size="icon" className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate">
+                <Send className="h-4 w-4" />
+              </Button>
+              
               {/* Image Generation Button */}
               <Button 
                 type="button"
@@ -255,25 +338,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               >
                 <ImageIcon className="h-4 w-4" />
               </Button>
-              
-              {/* Send Button */}
-              <Button type="submit" variant="outline" size="icon" className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate">
-                <Send className="h-4 w-4" />
-              </Button>
-              
-              {/* Close Button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsHidden(true)}
-                className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground btn-animate"
-                title="Hide chat"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </form>
           </div>
+        </div>
         </div>
       </div>
     );
