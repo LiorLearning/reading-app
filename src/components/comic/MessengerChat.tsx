@@ -245,7 +245,10 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
         <div className="relative overflow-hidden rounded-2xl">
           {/* Translucent background that extends from hover bar to cover messages */}
           {(showMessages || isAnimatingOut) && lastTwoMessages.length > 0 && (
-            <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-2xl border border-foreground/20 -z-10"></div>
+            <div className={cn(
+              "absolute inset-0 bg-black/20 backdrop-blur-sm rounded-2xl border border-foreground/20 -z-10",
+              isAnimatingOut ? "animate-roll-down" : "animate-roll-up"
+            )}></div>
           )}
           
           {/* Last two messages display - animated show/hide */}
