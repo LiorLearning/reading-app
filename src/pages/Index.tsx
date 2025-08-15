@@ -1,12 +1,14 @@
-import React, { useCallback, useMemo } from "react";
-import ComicHeader from "@/components/comic/ComicHeader";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import ComicPanel from "@/components/comic/ComicPanel";
 import InputBar from "@/components/comic/InputBar";
 import MessengerChat from "@/components/comic/MessengerChat";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { X, Palette, HelpCircle, BookOpen, Eye, EyeOff, Undo2, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
@@ -32,6 +34,19 @@ const Index = () => {
   );
 
   const images = useMemo(() => [rocket1, spaceport2, alien3, cockpit4], []);
+  
+  // Background images for dynamic background selection
+  const backgroundImages = useMemo(() => [
+    '/backgrounds/cats.png',
+    '/backgrounds/random.png', 
+    '/backgrounds/random2.png'
+  ], []);
+  
+  // Set random background on component mount
+  useEffect(() => {
+    const randomBg = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
+    document.documentElement.style.setProperty('--dynamic-background', `url('${randomBg}')`);
+  }, [backgroundImages]);
 
   const initialPanels = useMemo(
     () => [
@@ -55,6 +70,47 @@ const Index = () => {
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
+  const [buttonsVisible, setButtonsVisible] = React.useState(false);
+  
+  // Color theme options
+  const colorThemes = [
+    { name: "Pink", primary: "350 81% 60%", background: "350 30% 97%", accent: "350 81% 60%", hue: "350" },
+    { name: "Blue", primary: "220 91% 60%", background: "220 30% 97%", accent: "220 91% 60%", hue: "220" },
+    { name: "Green", primary: "142 76% 36%", background: "142 30% 97%", accent: "142 76% 36%", hue: "142" },
+    { name: "Purple", primary: "262 73% 60%", background: "262 30% 97%", accent: "262 73% 60%", hue: "262" },
+    { name: "Orange", primary: "25 95% 53%", background: "25 30% 97%", accent: "25 95% 53%", hue: "25" },
+  ];
+  
+  const [selectedTheme, setSelectedTheme] = useState(colorThemes[0]);
+  
+  const changeTheme = useCallback((theme: typeof colorThemes[0]) => {
+    playClickSound();
+    setSelectedTheme(theme);
+    
+    // Update CSS variables on the document root
+    const root = document.documentElement;
+    root.style.setProperty('--primary', theme.primary);
+    root.style.setProperty('--background', theme.background);
+    root.style.setProperty('--accent', theme.accent);
+    root.style.setProperty('--ring', theme.primary);
+    root.style.setProperty('--sidebar-primary', theme.primary);
+    root.style.setProperty('--sidebar-ring', theme.primary);
+    
+    // Update book border colors to match the theme
+    root.style.setProperty('--book-border', theme.primary);
+    root.style.setProperty('--book-border-deep', theme.primary.replace(/60%/, '50%'));
+    root.style.setProperty('--book-border-shadow', theme.primary.replace(/60%/, '40%'));
+    
+    // Update background pattern colors to match the theme
+    // Light mode pattern colors
+    root.style.setProperty('--pattern-primary', `${theme.hue} 50% 90%`);
+    root.style.setProperty('--pattern-secondary', `${theme.hue} 40% 88%`);
+  }, []);
+  
+  // Initialize theme on component mount
+  useEffect(() => {
+    changeTheme(selectedTheme);
+  }, [selectedTheme, changeTheme]);
   
   // Chat panel resize functionality
   const [chatPanelWidth, setChatPanelWidth] = React.useState(320); // 320px = w-80
@@ -118,15 +174,41 @@ const Index = () => {
 
 
 
+  // Generate new image panel only (no text message)
+  const onGenerateImage = useCallback(() => {
+    // Play loading sound when generation starts
+    playImageLoadingSound();
+    
+    const image = images[Math.floor(Math.random() * images.length)];
+    const newPanelId = crypto.randomUUID();
+    addPanel({ id: newPanelId, image, text: "New adventure continues..." });
+    setNewlyCreatedPanelId(newPanelId);
+    
+    // Play completion sound and clear the new panel indicator after animation
+    setTimeout(() => {
+      stopImageLoadingSound();
+      playImageCompleteSound();
+      setNewlyCreatedPanelId(null);
+    }, 2000);
+  }, [addPanel, images]);
+
+  // Generate new panel with text and add to chat
   const onGenerate = useCallback(
     (text: string) => {
+      // Play loading sound when generation starts
+      playImageLoadingSound();
+      
       const image = images[Math.floor(Math.random() * images.length)];
       const newPanelId = crypto.randomUUID();
       addPanel({ id: newPanelId, image, text });
       setNewlyCreatedPanelId(newPanelId);
       
-      // Clear the new panel indicator after animation
-      setTimeout(() => setNewlyCreatedPanelId(null), 2000);
+      // Play completion sound and clear the new panel indicator after animation
+      setTimeout(() => {
+        stopImageLoadingSound();
+        playImageCompleteSound();
+        setNewlyCreatedPanelId(null);
+      }, 2000);
       
       // Add user message
       const userMessage: ChatMessage = {
@@ -135,9 +217,10 @@ const Index = () => {
         timestamp: Date.now()
       };
       
-      // Add user message immediately
+      // Add user message immediately with sound
       setChatMessages(prev => {
         setLastMessageCount(prev.length + 1);
+        playMessageSound();
         return [...prev, userMessage];
       });
       
@@ -151,6 +234,7 @@ const Index = () => {
         };
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
+          playMessageSound();
           return [...prev, aiMessage];
         });
       }, 800);
@@ -175,25 +259,34 @@ const Index = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="w-full px-4 py-2 flex-1 flex flex-col min-h-0">
-        <div className="flex-shrink-0 pb-1 pt-1">
-          <div className="px-4">
-            <ComicHeader 
-              onUndo={undo} 
-              onRedo={redo} 
-              panels={panels}
-            />
-          </div>
-        </div>
+      <div className="w-full flex-1 flex flex-col min-h-0">
+        {/* Eye Toggle Button - Top Left Corner */}
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={() => {
+            playClickSound();
+            setButtonsVisible(!buttonsVisible);
+          }}
+          aria-label={buttonsVisible ? "Hide controls" : "Show controls"}
+          className="fixed top-4 left-4 z-50 border-2 border-foreground shadow-solid bg-white btn-animate"
+        >
+          {buttonsVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </Button>
 
-        <main className="flex-1 flex min-h-0 overflow-hidden gap-4 p-1" role="main">
-          {/* Main Comic Panel */}
+        <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-1 gap-6" role="main">
+          {/* Main Comic Panel - Centered */}
           <section 
             aria-label="Main comic panel" 
-            className="flex-1 flex flex-col min-h-0 relative"
-            style={{ height: 'calc(100vh - 100px)' }}
+            className="flex flex-col min-h-0 relative"
+            style={{ 
+              width: sidebarCollapsed ? '85vw' : '65vw',
+              height: '90vh',
+              maxHeight: 'calc(100vh - 60px)',
+              transition: 'width 0.3s ease-in-out'
+            }}
           >
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 relative">
               <ComicPanel
                 image={current.image}
                 className="h-full w-full"
@@ -201,17 +294,103 @@ const Index = () => {
               />
             </div>
           </section>
+
+          {/* Control Buttons Panel - positioned to the left, only when visible */}
+          {buttonsVisible && (
+            <aside className="fixed top-20 left-4 z-40 flex flex-col gap-3">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="View whole comic" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+                    <BookOpen className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle>Your Adventure (All Panels)</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    {panels.map((p, i) => (
+                      <figure key={p.id} className="rounded-lg border-2 border-foreground bg-card">
+                        <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 border-foreground rounded-t-lg" />
+                        <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => { 
+                  playClickSound(); 
+                  undo(); 
+                }} 
+                aria-label="Undo" 
+                className="border-2 border-foreground shadow-solid bg-white btn-animate"
+              >
+                <Undo2 />
+              </Button>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+                    <Palette className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2" align="end">
+                  <div className="grid grid-cols-5 gap-2">
+                    {colorThemes.map((theme) => (
+                      <Button
+                        key={theme.name}
+                        variant="comic"
+                        size="sm"
+                        onClick={() => changeTheme(theme)}
+                        className={`h-12 w-12 btn-animate flex flex-col items-center justify-center gap-1 ${
+                          selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
+                        }`}
+                        aria-label={`Change theme to ${theme.name}`}
+                        style={{
+                          backgroundColor: `hsl(${theme.primary})`,
+                          color: 'white'
+                        }}
+                      >
+                        <span className="text-[10px] font-bold">{theme.name}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+                    <HelpCircle />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>How to use</DialogTitle>
+                    <DialogDescription>
+                      Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            </aside>
+          )}
           
           {/* Right Sidebar with Avatar, Messages and Input */}
           {(!sidebarCollapsed || sidebarAnimatingOut) && (
             <aside 
               ref={resizeRef}
-              className={`flex flex-col bg-chat-container border-2 border-foreground rounded-3xl min-h-0 z-10 relative overflow-hidden mb-2 ${
+              className={`flex flex-col bg-chat-container border-2 border-foreground rounded-3xl min-h-0 z-10 relative overflow-hidden ${
                 sidebarAnimatingOut ? 'animate-slide-out-right' : 'animate-slide-in-right'
               } ${isResizing ? 'chat-panel-resizing' : ''}`}
               style={{ 
                 width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
-                height: 'calc(100vh - 100px)',
+                height: '90vh',
+                maxHeight: 'calc(100vh - 60px)',
                 transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 boxShadow: '0 4px 0 hsl(var(--foreground))'
               }}
@@ -223,6 +402,7 @@ const Index = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
+                    playClickSound();
                     setSidebarAnimatingOut(true);
                     setTimeout(() => {
                       setSidebarCollapsed(true);
@@ -285,7 +465,7 @@ const Index = () => {
               
               {/* Input Bar */}
               <div className="flex-shrink-0 bg-chat-container p-3">
-                <InputBar onGenerate={onGenerate} />
+                <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
               </div>
               
               {/* Resize Handle */}
@@ -305,7 +485,9 @@ const Index = () => {
           <MessengerChat 
             messages={chatMessages} 
             onGenerate={onGenerate}
+            onGenerateImage={onGenerateImage}
             onExpandChat={() => {
+              playClickSound();
               // Open the right sidebar panel
               setSidebarCollapsed(false);
               setSidebarAnimatingOut(false);

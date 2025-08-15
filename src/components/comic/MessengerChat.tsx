@@ -2,8 +2,9 @@ import React, { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, Send, MessageCircle, X, Maximize2, Square } from "lucide-react";
+import { Mic, Send, MessageCircle, X, Maximize2, Square, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import { playClickSound } from "@/lib/sounds";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -14,10 +15,11 @@ interface ChatMessage {
 interface MessengerChatProps {
   messages: ChatMessage[];
   onGenerate: (text: string) => void;
+  onGenerateImage: () => void;
   onExpandChat?: () => void; // Callback to open right sidebar panel
 }
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onExpandChat }) => {
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat }) => {
   const [isHidden, setIsHidden] = useState(false);
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
@@ -47,6 +49,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
   };
 
   const startVoice = () => {
+    playClickSound();
     if (isMicActive) {
       // Stop recording manually - user clicked cancel
       if (recognitionRef.current) {
@@ -118,6 +121,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
     
     if (!text.trim()) return;
     
+    playClickSound();
     // Set submitting flag to prevent onresult from overwriting
     setIsSubmitting(true);
     
@@ -228,6 +232,21 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
                   className="rounded-xl border border-foreground/30 flex-1 bg-white text-sm h-9 focus:border-foreground/60"
                 />
               )}
+              
+              {/* Image Generation Button */}
+              <Button 
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  playClickSound();
+                  onGenerateImage();
+                }}
+                aria-label="Generate new image"
+                className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate"
+              >
+                <ImageIcon className="h-4 w-4" />
+              </Button>
               
               {/* Send Button */}
               <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate h-9 w-9">

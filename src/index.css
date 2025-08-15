@@ -579,4 +579,16 @@ All colors MUST be HSL.
       #fbbf24 16px
     );
   }
+  
+  /* Background with themed color film overlay */
+  .bg-pattern {
+    background-color: hsl(var(--background));
+    background-image: 
+      linear-gradient(hsla(var(--pattern-primary) / 0.85), hsla(var(--pattern-primary) / 0.85)),
+      var(--dynamic-background, url('/backgrounds/random2.png'));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
 }

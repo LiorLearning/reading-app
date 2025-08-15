@@ -1,18 +1,21 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mic, Send } from "lucide-react";
+import { Mic, Send, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import { playClickSound } from "@/lib/sounds";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
+  onGenerateImage: () => void;
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const [text, setText] = useState("");
   const recognitionRef = useRef<any | null>(null);
 
   const startVoice = useCallback(() => {
+    playClickSound();
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition not supported in this browser.");
@@ -35,6 +38,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
     (e?: React.FormEvent) => {
       e?.preventDefault();
       if (!text.trim()) return;
+      playClickSound();
       onGenerate(text.trim());
       setText("");
     },
@@ -61,6 +65,19 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate }) => {
           onChange={(e) => setText(e.target.value)}
           className="rounded-xl border-2 flex-1 bg-white"
         />
+        <Button 
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => {
+            playClickSound();
+            onGenerateImage();
+          }}
+          aria-label="Generate new image"
+          className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
+        >
+          <ImageIcon className="h-4 w-4" />
+        </Button>
         <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
           <Send className="h-4 w-4" />
         </Button>

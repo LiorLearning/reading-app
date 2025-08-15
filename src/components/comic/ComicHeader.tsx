@@ -1,16 +1,21 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Undo2, Redo2, HelpCircle } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Undo2, Redo2, HelpCircle, Palette } from "lucide-react";
 import { ComicPanel } from "@/hooks/use-comic";
+import { playClickSound } from "@/lib/sounds";
 
 interface ComicHeaderProps {
   onUndo: () => void;
   onRedo: () => void;
   panels: ComicPanel[];
+  selectedTheme?: { name: string; primary: string; background: string; accent: string; hue: string };
+  colorThemes?: { name: string; primary: string; background: string; accent: string; hue: string }[];
+  onChangeTheme?: (theme: { name: string; primary: string; background: string; accent: string; hue: string }) => void;
 }
 
-const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels }) => {
+const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels, selectedTheme, colorThemes, onChangeTheme }) => {
   return (
     <header className="mb-2 flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -35,12 +40,46 @@ const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels }) => 
             </div>
           </DialogContent>
         </Dialog>
-        <Button variant="outline" size="icon" onClick={onUndo} aria-label="Undo" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+        <Button variant="outline" size="icon" onClick={() => { playClickSound(); onUndo(); }} aria-label="Undo" className="border-2 border-foreground shadow-solid bg-white btn-animate">
           <Undo2 />
         </Button>
-        <Button variant="outline" size="icon" onClick={onRedo} aria-label="Redo" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+        <Button variant="outline" size="icon" onClick={() => { playClickSound(); onRedo(); }} aria-label="Redo" className="border-2 border-foreground shadow-solid bg-white btn-animate">
           <Redo2 />
         </Button>
+        
+        {/* Color Theme Picker */}
+        {colorThemes && selectedTheme && onChangeTheme && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+                <Palette className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-2" align="end">
+              <div className="grid grid-cols-5 gap-2">
+                {colorThemes.map((theme) => (
+                  <Button
+                    key={theme.name}
+                    variant="comic"
+                    size="sm"
+                    onClick={() => onChangeTheme(theme)}
+                    className={`h-12 w-12 btn-animate flex flex-col items-center justify-center gap-1 ${
+                      selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
+                    }`}
+                    aria-label={`Change theme to ${theme.name}`}
+                    style={{
+                      backgroundColor: `hsl(${theme.primary})`,
+                      color: 'white'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold">{theme.name}</span>
+                  </Button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+        
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" size="icon" aria-label="Help" className="border-2 border-foreground shadow-solid bg-white btn-animate">
