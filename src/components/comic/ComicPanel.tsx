@@ -1,13 +1,28 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { playClickSound } from "@/lib/sounds";
 
 interface ComicPanelProps {
   image: string;
   className?: string;
   isNew?: boolean;
+  onPreviousPanel?: () => void;
+  onNextPanel?: () => void;
+  hasPrevious?: boolean;
+  hasNext?: boolean;
 }
 
-const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
+const ComicPanel: React.FC<ComicPanelProps> = ({ 
+  image, 
+  className, 
+  isNew,
+  onPreviousPanel,
+  onNextPanel,
+  hasPrevious = false,
+  hasNext = false
+}) => {
   // Generate random colors for boxes each time
   const boxColors = React.useMemo(() => [
     ['bg-red-500', 'bg-blue-500', 'bg-green-500'][Math.floor(Math.random() * 3)],
@@ -95,6 +110,43 @@ const ComicPanel: React.FC<ComicPanelProps> = ({ image, className, isNew }) => {
             className="absolute inset-0 w-full h-full object-cover" 
             loading="lazy" 
           />
+        )}
+        
+        {/* Navigation Hover Zones - Only visible on edge hover */}
+        {/* Left Edge Hover Zone */}
+        {hasPrevious && onPreviousPanel && (
+          <div className="absolute left-0 top-0 w-20 h-full z-20 flex items-center justify-start pl-4 group">
+            <ChevronLeft 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                playClickSound();
+                onPreviousPanel();
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                       h-12 w-12 text-white drop-shadow-lg cursor-pointer
+                       hover:scale-110 hover:text-gray-200 transition-all duration-200"
+              aria-label="Previous panel"
+            />
+          </div>
+        )}
+        
+        {/* Right Edge Hover Zone */}
+        {hasNext && onNextPanel && (
+          <div className="absolute right-0 top-0 w-20 h-full z-20 flex items-center justify-end pr-4 group">
+            <ChevronRight 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                playClickSound();
+                onNextPanel();
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                       h-12 w-12 text-white drop-shadow-lg cursor-pointer
+                       hover:scale-110 hover:text-gray-200 transition-all duration-200"
+              aria-label="Next panel"
+            />
+          </div>
         )}
       </div>
     </div>

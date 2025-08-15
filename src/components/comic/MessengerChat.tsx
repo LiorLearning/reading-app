@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, Send, MessageCircle, X, Maximize2, Square, Image as ImageIcon } from "lucide-react";
+import { Mic, Send, X, Square, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 
@@ -16,11 +16,10 @@ interface MessengerChatProps {
   messages: ChatMessage[];
   onGenerate: (text: string) => void;
   onGenerateImage: () => void;
-  onExpandChat?: () => void; // Callback to open right sidebar panel
 }
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat }) => {
-  const [isHidden, setIsHidden] = useState(false);
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage }) => {
+  const [isHidden, setIsHidden] = useState(true);
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -149,10 +148,14 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
         <Button
           variant="outline"
           onClick={() => setIsHidden(false)}
-          className="h-12 w-12 rounded-full border-2 border-foreground shadow-solid bg-white btn-animate"
+          className="h-12 w-12 rounded-full border-2 border-foreground shadow-solid bg-white btn-animate p-1"
           aria-label="Show chat"
         >
-          <MessageCircle className="h-6 w-6" />
+          <img 
+            src="/avatars/krafty.png" 
+            alt="Krafty" 
+            className="w-full h-full rounded-full object-cover"
+          />
         </Button>
       </div>
     );
@@ -206,15 +209,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               {/* Mic/Cancel Button (Primary Input) */}
               <Button
                 type="button"
-                variant="outline"
+                variant="comic"
                 size="icon"
                 onClick={startVoice}
                 aria-label={isMicActive ? "Cancel recording" : "Voice input"}
                 className={cn(
-                  "h-9 w-9 border-2 shadow-sm flex-shrink-0 btn-animate",
-                  isMicActive
-                    ? "bg-red-500 text-white border-red-600 hover:bg-red-600"
-                    : "border-foreground/30 bg-white hover:border-foreground/60"
+                  "h-9 w-9 flex-shrink-0 btn-animate",
+                  isMicActive && "bg-red-500 text-white border-red-600 hover:bg-red-600"
                 )}
               >
                 {isMicActive ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
@@ -249,24 +250,8 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               </Button>
               
               {/* Send Button */}
-              <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate h-9 w-9">
+              <Button type="submit" variant="outline" size="icon" className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate">
                 <Send className="h-4 w-4" />
-              </Button>
-              
-              {/* Expand Button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  if (onExpandChat) {
-                    onExpandChat(); // Open right sidebar panel
-                  }
-                }}
-                className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground btn-animate"
-                title="Expand chat history"
-              >
-                <Maximize2 className="h-4 w-4" />
               </Button>
               
               {/* Close Button */}

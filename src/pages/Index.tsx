@@ -6,7 +6,7 @@ import ChatAvatar from "@/components/comic/ChatAvatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Eye, EyeOff, Undo2, Image as ImageIcon } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Eye, EyeOff, Undo2, Image as ImageIcon, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -51,7 +51,6 @@ const Index = () => {
   const initialPanels = useMemo(
     () => [
       { id: crypto.randomUUID(), image: rocket1, text: "The brave astronaut climbs into ROCKET!" },
-      { id: crypto.randomUUID(), image: alien3, text: "Clouds drift by as the engines warm up." },
     ],
     []
   );
@@ -192,24 +191,9 @@ const Index = () => {
     }, 2000);
   }, [addPanel, images]);
 
-  // Generate new panel with text and add to chat
+  // Handle text messages only (no image generation)
   const onGenerate = useCallback(
     (text: string) => {
-      // Play loading sound when generation starts
-      playImageLoadingSound();
-      
-      const image = images[Math.floor(Math.random() * images.length)];
-      const newPanelId = crypto.randomUUID();
-      addPanel({ id: newPanelId, image, text });
-      setNewlyCreatedPanelId(newPanelId);
-      
-      // Play completion sound and clear the new panel indicator after animation
-      setTimeout(() => {
-        stopImageLoadingSound();
-        playImageCompleteSound();
-        setNewlyCreatedPanelId(null);
-      }, 2000);
-      
       // Add user message
       const userMessage: ChatMessage = {
         type: 'user',
@@ -239,7 +223,7 @@ const Index = () => {
         });
       }, 800);
     },
-    [addPanel, images, generateAIResponse]
+    [generateAIResponse]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -274,6 +258,24 @@ const Index = () => {
           {buttonsVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </Button>
 
+        {/* Expand Chat Button - Top Right Corner (only when sidebar is collapsed) */}
+        {sidebarCollapsed && (
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => {
+              playClickSound();
+              // Open the right sidebar panel
+              setSidebarCollapsed(false);
+              setSidebarAnimatingOut(false);
+            }}
+            aria-label="Open chat panel"
+            className="fixed top-4 right-4 z-50 border-2 border-foreground shadow-solid bg-white btn-animate"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        )}
+
         <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-1 gap-6" role="main">
           {/* Main Comic Panel - Centered */}
           <section 
@@ -291,6 +293,18 @@ const Index = () => {
                 image={current.image}
                 className="h-full w-full"
                 isNew={current.id === newlyCreatedPanelId}
+                onPreviousPanel={() => {
+                  if (currentIndex > 0) {
+                    setCurrent(currentIndex - 1);
+                  }
+                }}
+                onNextPanel={() => {
+                  if (currentIndex < panels.length - 1) {
+                    setCurrent(currentIndex + 1);
+                  }
+                }}
+                hasPrevious={currentIndex > 0}
+                hasNext={currentIndex < panels.length - 1}
               />
             </div>
           </section>
@@ -486,12 +500,6 @@ const Index = () => {
             messages={chatMessages} 
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
-            onExpandChat={() => {
-              playClickSound();
-              // Open the right sidebar panel
-              setSidebarCollapsed(false);
-              setSidebarAnimatingOut(false);
-            }}
           />
         )}
       </div>
