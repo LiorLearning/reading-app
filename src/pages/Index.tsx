@@ -4,6 +4,8 @@ import ComicPanel from "@/components/comic/ComicPanel";
 import InputBar from "@/components/comic/InputBar";
 import MessengerChat from "@/components/comic/MessengerChat";
 import ChatAvatar from "@/components/comic/ChatAvatar";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useComic } from "@/hooks/use-comic";
@@ -48,7 +50,7 @@ const Index = () => {
   }
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
   const [sidebarAnimatingOut, setSidebarAnimatingOut] = React.useState(false);
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
@@ -180,31 +182,32 @@ const Index = () => {
               onUndo={undo} 
               onRedo={redo} 
               panels={panels}
-              sidebarCollapsed={sidebarCollapsed}
-              onToggleSidebar={() => {
-                if (!sidebarCollapsed) {
-                  setSidebarAnimatingOut(true);
-                  // Start the width transition immediately
-                  setTimeout(() => {
-                    setSidebarCollapsed(true);
-                    setSidebarAnimatingOut(false);
-                  }, 300);
-                } else {
-                  setSidebarCollapsed(false);
-                  setSidebarAnimatingOut(false);
-                }
-              }}
             />
           </div>
         </div>
 
         <main className="flex-1 flex min-h-0 overflow-hidden gap-4 p-1" role="main">
-          {/* Left Sidebar with Avatar, Messages and Input */}
+          {/* Main Comic Panel */}
+          <section 
+            aria-label="Main comic panel" 
+            className="flex-1 flex flex-col min-h-0 relative"
+            style={{ height: 'calc(100vh - 100px)' }}
+          >
+            <div className="flex-1 min-h-0">
+              <ComicPanel
+                image={current.image}
+                className="h-full w-full"
+                isNew={current.id === newlyCreatedPanelId}
+              />
+            </div>
+          </section>
+          
+          {/* Right Sidebar with Avatar, Messages and Input */}
           {(!sidebarCollapsed || sidebarAnimatingOut) && (
             <aside 
               ref={resizeRef}
               className={`flex flex-col bg-chat-container border-2 border-foreground rounded-3xl min-h-0 z-10 relative overflow-hidden mb-2 ${
-                sidebarAnimatingOut ? 'animate-slide-out-left' : 'animate-slide-in-left'
+                sidebarAnimatingOut ? 'animate-slide-out-right' : 'animate-slide-in-right'
               } ${isResizing ? 'chat-panel-resizing' : ''}`}
               style={{ 
                 width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
@@ -213,6 +216,26 @@ const Index = () => {
                 boxShadow: '0 4px 0 hsl(var(--foreground))'
               }}
             >
+              {/* Panel Header with Close Button */}
+              <div className="flex-shrink-0 flex items-center justify-between p-3 bg-chat-container border-b border-foreground/20">
+                <h3 className="font-semibold text-sm">Chat with Krafty</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSidebarAnimatingOut(true);
+                    setTimeout(() => {
+                      setSidebarCollapsed(true);
+                      setSidebarAnimatingOut(false);
+                    }, 300);
+                  }}
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground btn-animate"
+                  aria-label="Close chat panel"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
               {/* Avatar Section */}
               <div className="flex-shrink-0 bg-chat-container">
                 <ChatAvatar />
@@ -267,36 +290,26 @@ const Index = () => {
               
               {/* Resize Handle */}
               <div
-                className="absolute top-0 right-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group"
+                className="absolute top-0 left-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group"
                 onMouseDown={handleResizeStart}
                 title="Drag to resize chat panel"
               >
-                <div className="absolute top-1/2 -translate-y-1/2 right-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
               </div>
             </aside>
           )}
-          
-          {/* Main Comic Panel */}
-          <section 
-            aria-label="Main comic panel" 
-            className="flex-1 flex flex-col min-h-0 relative"
-            style={{ height: 'calc(100vh - 100px)' }}
-          >
-            <div className="flex-1 min-h-0">
-              <ComicPanel
-                image={current.image}
-                className="h-full w-full"
-                isNew={current.id === newlyCreatedPanelId}
-              />
-            </div>
-          </section>
         </main>
 
         {/* Messenger Chat when sidebar is collapsed */}
         {sidebarCollapsed && (
           <MessengerChat 
             messages={chatMessages} 
-            onGenerate={onGenerate} 
+            onGenerate={onGenerate}
+            onExpandChat={() => {
+              // Open the right sidebar panel
+              setSidebarCollapsed(false);
+              setSidebarAnimatingOut(false);
+            }}
           />
         )}
       </div>

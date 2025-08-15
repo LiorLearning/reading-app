@@ -1,30 +1,19 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Undo2, Redo2, HelpCircle, PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { Undo2, Redo2, HelpCircle } from "lucide-react";
 import { ComicPanel } from "@/hooks/use-comic";
 
 interface ComicHeaderProps {
   onUndo: () => void;
   onRedo: () => void;
   panels: ComicPanel[];
-  sidebarCollapsed: boolean;
-  onToggleSidebar: () => void;
 }
 
-const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels, sidebarCollapsed, onToggleSidebar }) => {
+const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels }) => {
   return (
     <header className="mb-2 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onToggleSidebar}
-          className="border-2 border-foreground shadow-solid bg-white btn-animate"
-          aria-label={sidebarCollapsed ? "Open sidebar" : "Close sidebar"}
-        >
-          {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </Button>
         <h1 className="text-2xl font-extrabold tracking-tight">YOUR ADVENTURE <span className="sr-only">— AI Reading Learning App</span></h1>
       </div>
       <div className="flex items-center gap-2">

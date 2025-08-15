@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, Send, MessageCircle, Minimize2, X, Plus } from "lucide-react";
+import { Mic, Send, MessageCircle, X, Maximize2, Square } from "lucide-react";
 import { toast } from "sonner";
 
 interface ChatMessage {
@@ -14,59 +14,128 @@ interface ChatMessage {
 interface MessengerChatProps {
   messages: ChatMessage[];
   onGenerate: (text: string) => void;
+  onExpandChat?: () => void; // Callback to open right sidebar panel
 }
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onExpandChat }) => {
   const [isHidden, setIsHidden] = useState(false);
   const [text, setText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [lastMessageCount, setLastMessageCount] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isMicActive, setIsMicActive] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const recognitionRef = useRef<any | null>(null);
 
-  // Update message count when messages change
-  useEffect(() => {
-    setLastMessageCount(messages.length);
-  }, [messages.length]);
+  // No need for message count or scroll management in hover chatbox
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (scrollRef.current && isExpanded) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isExpanded]);
+  // Waveform Visualizer Component
+  const WaveformVisualizer = () => {
+    return (
+      <div className="flex items-center justify-center gap-1 h-9 px-4 bg-white rounded-xl border border-foreground/30">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="w-1 bg-red-500 rounded-full animate-pulse"
+            style={{
+              height: `${Math.random() * 20 + 8}px`,
+              animationDelay: `${i * 0.1}s`,
+              animationDuration: `${0.5 + Math.random() * 0.5}s`
+            }}
+          />
+        ))}
+        <span className="ml-2 text-sm text-muted-foreground">Recording...</span>
+      </div>
+    );
+  };
 
   const startVoice = () => {
+    if (isMicActive) {
+      // Stop recording manually - user clicked cancel
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+      setIsMicActive(false);
+      setIsSubmitting(false); // Reset submitting flag when manually stopping
+      return;
+    }
+
+    // Start recording
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition not supported in this browser.");
       return;
     }
+    
     const rec = new SpeechRecognition();
     rec.lang = "en-US";
-    rec.interimResults = false;
+    rec.interimResults = true; // Enable interim results for continuous recognition
     rec.maxAlternatives = 1;
+    rec.continuous = true; // Keep recording until manually stopped
+    
+    rec.onstart = () => {
+      setIsMicActive(true);
+    };
+    
     rec.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript;
-      if (transcript) {
-        setText(transcript);
-        // Auto-expand when voice input is detected
-        setIsExpanded(true);
+      // Don't update text if we're in the process of submitting
+      if (isSubmitting) return;
+      
+      let finalTranscript = '';
+      let interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      
+      // Update text field with the current transcript (don't auto-send)
+      setText(finalTranscript + interimTranscript);
+    };
+    
+    rec.onerror = () => {
+      toast.error("Microphone error – please try again.");
+      setIsMicActive(false);
+      setIsSubmitting(false); // Reset submitting flag on error
+    };
+    
+    rec.onend = () => {
+      // Only stop if not manually stopped (prevents auto-restart)
+      if (isMicActive) {
+        setIsMicActive(false);
+        setIsSubmitting(false); // Reset submitting flag when recording ends
       }
     };
-    rec.onerror = () => toast.error("Microphone error – please try again.");
+    
     rec.start();
     recognitionRef.current = rec;
   };
 
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
+    
     if (!text.trim()) return;
+    
+    // Set submitting flag to prevent onresult from overwriting
+    setIsSubmitting(true);
+    
+    // If recording is active, stop it first
+    if (isMicActive) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+      setIsMicActive(false);
+    }
+    
+    // Send the message
     onGenerate(text.trim());
+    
+    // Clear the text field and reset submitting flag
     setText("");
-    // Auto-expand when message is sent
-    setIsExpanded(true);
+    setIsSubmitting(false);
   };
 
   // Show floating button when hidden
@@ -85,174 +154,118 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate }) =
     );
   }
 
-  if (!isExpanded) {
-    // Compact messenger tab with direct input
+  // New hover chatbox layout with Krafty focus - never expands
+  const lastTwoMessages = messages.slice(-2);
+    
     return (
       <div className="fixed bottom-4 right-4 z-50 animate-roll-up">
-        <div className="bg-chat-container border-2 border-foreground rounded-2xl shadow-solid overflow-hidden">
-          {/* Header with expand and hide options */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-chat-container">
-            <div className="flex items-center gap-2">
-              {messages.length > 0 && (
-                <button
-                  onClick={() => setIsExpanded(true)}
-                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <MessageCircle className="h-3 w-3" />
-                  <span>{messages.length} message{messages.length !== 1 ? 's' : ''}</span>
-                </button>
-              )}
-              {messages.length === 0 && (
-                <span className="text-xs text-muted-foreground">Ask me anything!</span>
-              )}
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsHidden(true)}
-              className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground btn-animate"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-          <form onSubmit={submit} className="flex items-center gap-2 p-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={startVoice}
-              aria-label="Voice input"
-              className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
-            >
-              <Mic className="h-4 w-4" />
-            </Button>
-            <Input
-              aria-label="Ask your doubts"
-              placeholder="Doubts? Ask me!"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="rounded-xl border-2 flex-1 min-w-48 bg-white"
-            />
-            <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // Expanded messenger interface
-  return (
-    <div className="fixed bottom-4 right-4 z-50 w-80 bg-chat-container border-2 border-foreground rounded-2xl shadow-solid overflow-hidden animate-roll-up">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b-2 border-foreground bg-chat-container">
-        <div className="flex items-center gap-2">
-          <div className="bg-accent text-accent-foreground rounded-lg p-1.5">
-            <MessageCircle className="h-4 w-4" />
-          </div>
-          <span className="font-semibold text-sm">Krafty</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsHidden(true)}
-            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground btn-animate"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(false)}
-            className="h-7 w-7 p-0 btn-animate"
-          >
-            <Minimize2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div 
-        ref={scrollRef}
-        className="h-64 overflow-y-auto p-4 space-y-3 bg-chat-panel"
-      >
-        {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-            <p>💬 Start a conversation!</p>
-          </div>
-        ) : (
-          <>
-            {messages.map((message, index) => (
+        {/* Last two messages display */}
+        {lastTwoMessages.length > 0 && (
+          <div className="mb-4 space-y-3 w-80">
+            {lastTwoMessages.map((message, index) => (
               <div
-                key={`${message.timestamp}-${index}`}
-                className={cn(
-                  "flex animate-slide-up-smooth",
-                  message.type === 'user' ? "justify-end" : "justify-start"
-                )}
-                style={{ 
-                  animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.05, 0.3)}s` : "0s"
-                }}
+                key={`recent-${message.timestamp}-${index}`}
+                className="flex animate-slide-up-smooth gap-2"
               >
+                {/* Avatar for all messages (left side) */}
+                <div className="flex-shrink-0 self-end">
+                  <div className={cn(
+                    "w-8 h-8 rounded-full border border-foreground flex items-center justify-center text-sm",
+                    message.type === 'user'
+                      ? "bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500"
+                      : "bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500"
+                  )}>
+                    {message.type === 'user' ? '👤' : '👨‍🚀'}
+                  </div>
+                </div>
+                
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                    "max-w-64 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-[0_4px_0_black]",
                     message.type === 'user' 
-                      ? "bg-primary text-primary-foreground" 
+                      ? "bg-primary text-primary-foreground border-2 border-black" 
                       : "bg-card border-2 border-foreground"
                   )}
                 >
-                  <div className="font-medium text-xs mb-1 opacity-70">
-                    {message.type === 'user' ? 'You' : '🤖 Krafty'}
-                  </div>
-                  <div>{message.content}</div>
+                  <div className="break-words">{message.content}</div>
                 </div>
               </div>
             ))}
-            {isTyping && (
-              <div className="flex justify-start animate-slide-up-smooth">
-                <div className="bg-card border-2 border-foreground rounded-lg px-3 py-2 text-sm">
-                  <div className="font-medium text-xs mb-1 opacity-70">🤖 Krafty</div>
-                  <div className="flex items-center gap-1">
-                    <div className="typing-dot w-2 h-2 bg-muted-foreground rounded-full"></div>
-                    <div className="typing-dot w-2 h-2 bg-muted-foreground rounded-full"></div>
-                    <div className="typing-dot w-2 h-2 bg-muted-foreground rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+          </div>
         )}
+        
+        {/* Main chatbox with new layout */}
+        <div className="bg-white/80 backdrop-blur-sm border-2 border-foreground rounded-2xl shadow-solid overflow-hidden">
+          {/* Main input area with integrated controls */}
+          <div className="p-2">
+            <form onSubmit={submit} className="flex items-center gap-2">
+              {/* Mic/Cancel Button (Primary Input) */}
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={startVoice}
+                aria-label={isMicActive ? "Cancel recording" : "Voice input"}
+                className={cn(
+                  "h-9 w-9 border-2 shadow-sm flex-shrink-0 btn-animate",
+                  isMicActive
+                    ? "bg-red-500 text-white border-red-600 hover:bg-red-600"
+                    : "border-foreground/30 bg-white hover:border-foreground/60"
+                )}
+              >
+                {isMicActive ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </Button>
+              
+              {/* Text Input or Waveform */}
+              {isMicActive ? (
+                <WaveformVisualizer />
+              ) : (
+                <Input
+                  aria-label="What happens next?"
+                  placeholder="What happens next?"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  className="rounded-xl border border-foreground/30 flex-1 bg-white text-sm h-9 focus:border-foreground/60"
+                />
+              )}
+              
+              {/* Send Button */}
+              <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate h-9 w-9">
+                <Send className="h-4 w-4" />
+              </Button>
+              
+              {/* Expand Button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  if (onExpandChat) {
+                    onExpandChat(); // Open right sidebar panel
+                  }
+                }}
+                className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground btn-animate"
+                title="Expand chat history"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+              
+              {/* Close Button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsHidden(true)}
+                className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground btn-animate"
+                title="Hide chat"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </form>
+          </div>
+        </div>
       </div>
-
-      {/* Input */}
-      <div className="p-4 border-t-2 border-foreground bg-chat-container">
-        <form onSubmit={submit} className="flex items-stretch gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={startVoice}
-            aria-label="Voice input"
-            className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
-          >
-            <Mic className="h-4 w-4" />
-          </Button>
-          <Input
-            aria-label="What happens next?"
-            placeholder="What happens next?"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="rounded-xl border-2 flex-1 bg-white"
-          />
-          <Button type="submit" variant="comic" size="icon" className="flex-shrink-0 btn-animate">
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default MessengerChat;
