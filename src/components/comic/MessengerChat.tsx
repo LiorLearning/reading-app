@@ -210,7 +210,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     
     return (
       <div 
-        className="fixed bottom-6 right-8 z-50 animate-roll-up"
+        className="fixed bottom-6 right-8 z-50 animate-roll-out-from-avatar"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -232,7 +232,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setIsHidden(true)}
+              onClick={() => {
+                setIsHidden(true);
+              }}
               aria-label="Hide chat"
               className="bg-white/60 backdrop-blur-sm border border-foreground/30 px-2 py-1 h-7 shadow-sm hover:bg-primary hover:text-primary-foreground transition-all"
             >

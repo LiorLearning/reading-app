@@ -67,6 +67,7 @@ const Index = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
   const [sidebarAnimatingOut, setSidebarAnimatingOut] = React.useState(false);
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
+  const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
   const [buttonsVisible, setButtonsVisible] = React.useState(false);
@@ -183,11 +184,17 @@ const Index = () => {
     addPanel({ id: newPanelId, image, text: "New adventure continues..." });
     setNewlyCreatedPanelId(newPanelId);
     
-    // Play completion sound and clear the new panel indicator after animation
+    // Play completion sound and trigger zoom animation after 2 seconds
     setTimeout(() => {
       stopImageLoadingSound();
       playImageCompleteSound();
+      setZoomingPanelId(newPanelId); // Trigger zoom animation
       setNewlyCreatedPanelId(null);
+      
+      // Clear zoom animation after it completes (0.6s duration)
+      setTimeout(() => {
+        setZoomingPanelId(null);
+      }, 600);
     }, 2000);
   }, [addPanel, images]);
 
@@ -277,6 +284,7 @@ const Index = () => {
                 image={current.image}
                 className="h-full w-full"
                 isNew={current.id === newlyCreatedPanelId}
+                shouldZoom={current.id === zoomingPanelId}
                 onPreviousPanel={() => {
                   if (currentIndex > 0) {
                     setCurrent(currentIndex - 1);

@@ -8,6 +8,7 @@ interface ComicPanelProps {
   image: string;
   className?: string;
   isNew?: boolean;
+  shouldZoom?: boolean;
   onPreviousPanel?: () => void;
   onNextPanel?: () => void;
   hasPrevious?: boolean;
@@ -18,6 +19,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   image, 
   className, 
   isNew,
+  shouldZoom = false,
   onPreviousPanel,
   onNextPanel,
   hasPrevious = false,
@@ -32,6 +34,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   return (
     <div className={cn(
       "relative w-full h-full flex flex-col overflow-hidden book-container",
+      shouldZoom && "animate-comic-panel-zoom",
       className
     )}>
       <div className="flex-1 min-h-0 relative">
