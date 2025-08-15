@@ -591,4 +591,20 @@ All colors MUST be HSL.
     background-repeat: no-repeat;
     background-attachment: fixed;
   }
+  
+  /* Krafty button pulsating highlight animation */
+  .krafty-highlight {
+    animation: krafty-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes krafty-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 0 black;
+    }
+    50% {
+      transform: scale(1.1);
+      box-shadow: 0 5px 0 black;
+    }
+  }
 }

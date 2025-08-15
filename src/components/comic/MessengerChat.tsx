@@ -20,6 +20,7 @@ interface MessengerChatProps {
 
 const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage }) => {
   const [isHidden, setIsHidden] = useState(true);
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -147,14 +148,20 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
       <div className="fixed bottom-4 right-4 z-50 animate-slide-up-smooth">
         <Button
           variant="outline"
-          onClick={() => setIsHidden(false)}
-          className="h-12 w-12 rounded-full border-2 border-foreground shadow-solid bg-white btn-animate p-1"
+          onClick={() => {
+            setIsHidden(false);
+            setHasBeenClicked(true);
+          }}
+          className={cn(
+            "h-16 w-16 rounded-full border-2 border-foreground bg-white btn-animate p-0 relative",
+            !hasBeenClicked ? "krafty-highlight" : "shadow-solid"
+          )}
           aria-label="Show chat"
         >
           <img 
             src="/avatars/krafty.png" 
             alt="Krafty" 
-            className="w-full h-full rounded-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover scale-125"
           />
         </Button>
       </div>

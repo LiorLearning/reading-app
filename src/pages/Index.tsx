@@ -6,7 +6,7 @@ import ChatAvatar from "@/components/comic/ChatAvatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Eye, EyeOff, Undo2, Image as ImageIcon, MessageCircle } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Menu, Image as ImageIcon, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -55,7 +55,7 @@ const Index = () => {
     []
   );
 
-  const { panels, currentIndex, setCurrent, addPanel, undo, redo } = useComic(initialPanels);
+  const { panels, currentIndex, setCurrent, addPanel, redo } = useComic(initialPanels);
   
   interface ChatMessage {
     type: 'user' | 'ai';
@@ -244,7 +244,7 @@ const Index = () => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="w-full flex-1 flex flex-col min-h-0">
-        {/* Eye Toggle Button - Top Left Corner */}
+        {/* Menu Toggle Button - Top Left Corner */}
         <Button 
           variant="outline" 
           size="icon" 
@@ -255,7 +255,7 @@ const Index = () => {
           aria-label={buttonsVisible ? "Hide controls" : "Show controls"}
           className="fixed top-4 left-4 z-50 border-2 border-foreground shadow-solid bg-white btn-animate"
         >
-          {buttonsVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          <Menu className="h-4 w-4" />
         </Button>
 
         {/* Expand Chat Button - Top Right Corner (only when sidebar is collapsed) */}
@@ -333,19 +333,7 @@ const Index = () => {
                 </DialogContent>
               </Dialog>
               
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={() => { 
-                  playClickSound(); 
-                  undo(); 
-                }} 
-                aria-label="Undo" 
-                className="border-2 border-foreground shadow-solid bg-white btn-animate"
-              >
-                <Undo2 />
-              </Button>
-              
+
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 border-foreground shadow-solid bg-white btn-animate">
