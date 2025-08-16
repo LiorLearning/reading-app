@@ -252,9 +252,14 @@ const Index = () => {
       />
       <div className="w-full flex-1 flex flex-col min-h-0">
         {/* Header Panel */}
-        <header className="flex items-center justify-between px-6 py-4 bg-pattern border-b-2 border-foreground/10">
+                 <header 
+           className="flex items-center justify-between px-6 py-4 border-b-2 border-foreground/10 bg-white/30 backdrop-blur-md"
+           style={{
+             boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.1)'
+           }}
+         >
           {/* Left Tools Group */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1">
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 border-foreground shadow-solid bg-white btn-animate">
@@ -302,10 +307,18 @@ const Index = () => {
             </Dialog>
           </div>
           
+          {/* Center Title */}
+          <div className="flex-1 flex justify-center items-center">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
+              YOUR ADVENTURE
+            </h1>
+          </div>
+          
           {/* View Whole Comic Button - Right */}
+          <div className="flex-1 flex justify-end">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" aria-label="View whole comic" className="border-2 border-foreground shadow-solid bg-white btn-animate px-4">
+              <Button variant="default" aria-label="View whole comic" className="border-2 border-primary bg-primary text-primary-foreground shadow-solid btn-animate px-4 hover:bg-primary/90">
                 View Whole Comic
               </Button>
             </DialogTrigger>
@@ -323,20 +336,32 @@ const Index = () => {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </header>
 
 
 
-        <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-6" role="main">
+        <main 
+          className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-6 bg-primary/60 relative" 
+          style={{
+            backgroundImage: `url('/backgrounds/random.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundBlendMode: 'multiply'
+          }}
+          role="main"
+        >
+          {/* Glass blur overlay to soften the background */}
+          <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
           {/* Unified Container - Comic Panel + Sidebar */}
           <div 
-            className="flex rounded-3xl overflow-hidden border-4 border-primary/20 shadow-xl"
+            className="flex rounded-3xl overflow-hidden border-4 border-black shadow-xl relative z-10"
             style={{ 
               width: sidebarCollapsed ? '88vw' : `calc(75vw + ${chatPanelWidth}px)`,
               height: 'calc(100vh - 120px)',
               maxHeight: 'calc(100vh - 120px)',
               transition: 'width 0.3s ease-in-out',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 8px 0 #EB4762, 0 0 0 1px hsla(var(--primary), 0.1)'
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px hsla(var(--primary), 0.1)'
             }}
           >
             {/* Main Comic Panel - Left Side */}
@@ -368,7 +393,7 @@ const Index = () => {
 
                           {/* Vertical Separator */}
               {(!sidebarCollapsed || sidebarAnimatingOut) && (
-                <div className="w-1 bg-primary/20"></div>
+                <div className="w-1 bg-black"></div>
               )}
 
               {/* Right Sidebar with Avatar, Messages and Input */}
