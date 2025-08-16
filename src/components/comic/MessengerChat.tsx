@@ -68,19 +68,18 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   // Waveform Visualizer Component
   const WaveformVisualizer = () => {
     return (
-      <div className="flex items-center justify-center gap-1 h-9 px-4 bg-white rounded-xl border border-foreground/30">
-        {[...Array(8)].map((_, i) => (
+      <div className="rounded-xl border border-foreground/30 w-full bg-white text-sm h-9 focus:border-foreground/60 flex items-center justify-center gap-1 px-4">
+        {[...Array(10)].map((_, i) => (
           <div
             key={i}
-            className="w-1 bg-red-500 rounded-full animate-pulse"
+            className="w-1 bg-primary rounded-full animate-pulse"
             style={{
-              height: `${Math.random() * 20 + 8}px`,
+              height: `${Math.random() * 16 + 6}px`,
               animationDelay: `${i * 0.1}s`,
               animationDuration: `${0.5 + Math.random() * 0.5}s`
             }}
           />
         ))}
-        <span className="ml-2 text-sm text-muted-foreground">Recording...</span>
       </div>
     );
   };
@@ -305,24 +304,26 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                 aria-label={isMicActive ? "Cancel recording" : "Voice input"}
                 className={cn(
                   "h-9 w-9 flex-shrink-0 btn-animate",
-                  isMicActive && "bg-red-500 text-white border-red-600 hover:bg-red-600"
+                  isMicActive && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
                 )}
               >
                 {isMicActive ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
               
-              {/* Text Input or Waveform */}
-              {isMicActive ? (
-                <WaveformVisualizer />
-              ) : (
-                <Input
-                  aria-label="What happens next?"
-                  placeholder="What happens next?"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  className="rounded-xl border border-foreground/30 flex-1 bg-white text-sm h-9 focus:border-foreground/60"
-                />
-              )}
+              {/* Text Input or Waveform - Container with fixed flex */}
+              <div className="flex-1">
+                {isMicActive ? (
+                  <WaveformVisualizer />
+                ) : (
+                  <Input
+                    aria-label="What happens next?"
+                    placeholder="What happens next?"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    className="rounded-xl border border-foreground/30 w-full bg-white text-sm h-9 focus:border-foreground/60"
+                  />
+                )}
+              </div>
               
               {/* Send Button */}
               <Button type="submit" variant="outline" size="icon" className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate">

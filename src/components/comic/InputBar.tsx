@@ -1,9 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mic, Send, Image as ImageIcon } from "lucide-react";
+import { Mic, Send, Image as ImageIcon, Square } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
+import { cn } from "@/lib/utils";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
@@ -12,37 +13,116 @@ interface InputBarProps {
 
 const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const [text, setText] = useState("");
+  const [isMicActive, setIsMicActive] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const recognitionRef = useRef<any | null>(null);
+
+  // Waveform Visualizer Component
+  const WaveformVisualizer = () => {
+    return (
+      <div className="flex items-center justify-center gap-1 h-10 px-4 bg-white rounded-xl border-2 flex-1">
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="w-1 bg-primary rounded-full animate-pulse"
+            style={{
+              height: `${Math.random() * 20 + 8}px`,
+              animationDelay: `${i * 0.1}s`,
+              animationDuration: `${0.5 + Math.random() * 0.5}s`
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const startVoice = useCallback(() => {
     playClickSound();
+    if (isMicActive) {
+      // Stop recording manually - user clicked cancel
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+      setIsMicActive(false);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Start recording
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition not supported in this browser.");
       return;
     }
+    
     const rec = new SpeechRecognition();
     rec.lang = "en-US";
-    rec.interimResults = false;
+    rec.interimResults = true;
     rec.maxAlternatives = 1;
-    rec.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript;
-      if (transcript) setText(transcript);
+    rec.continuous = true;
+    
+    rec.onstart = () => {
+      setIsMicActive(true);
     };
-    rec.onerror = () => toast.error("Microphone error – please try again.");
+    
+    rec.onresult = (event: any) => {
+      if (isSubmitting) return;
+      
+      let finalTranscript = '';
+      let interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      
+      setText(finalTranscript + interimTranscript);
+    };
+    
+    rec.onerror = () => {
+      toast.error("Microphone error – please try again.");
+      setIsMicActive(false);
+      setIsSubmitting(false);
+    };
+    
+    rec.onend = () => {
+      if (isMicActive) {
+        setIsMicActive(false);
+        setIsSubmitting(false);
+      }
+    };
+    
     rec.start();
     recognitionRef.current = rec;
-  }, []);
+  }, [isMicActive, isSubmitting]);
 
   const submit = useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault();
       if (!text.trim()) return;
+      
       playClickSound();
+      setIsSubmitting(true);
+      
+      // If recording is active, stop it first
+      if (isMicActive) {
+        if (recognitionRef.current) {
+          recognitionRef.current.stop();
+          recognitionRef.current = null;
+        }
+        setIsMicActive(false);
+      }
+      
       onGenerate(text.trim());
       setText("");
+      setIsSubmitting(false);
     },
-    [onGenerate, text]
+    [onGenerate, text, isMicActive]
   );
 
   return (
@@ -53,18 +133,25 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           variant="comic"
           size="icon"
           onClick={startVoice}
-          aria-label="Voice input"
-          className="flex-shrink-0 btn-animate"
+          aria-label={isMicActive ? "Cancel recording" : "Voice input"}
+          className={cn(
+            "flex-shrink-0 btn-animate",
+            isMicActive && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
+          )}
         >
-          <Mic className="h-5 w-5" />
+          {isMicActive ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
         </Button>
-        <Input
-          aria-label="What happens next?"
-          placeholder="What happens next?"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="rounded-xl border-2 flex-1 bg-white"
-        />
+        {isMicActive ? (
+          <WaveformVisualizer />
+        ) : (
+          <Input
+            aria-label="What happens next?"
+            placeholder="What happens next?"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="rounded-xl border-2 flex-1 bg-white"
+          />
+        )}
         <Button 
           type="button"
           variant="outline"

@@ -6,7 +6,7 @@ import ChatAvatar from "@/components/comic/ChatAvatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Menu, Image as ImageIcon, MessageCircle } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -64,13 +64,13 @@ const Index = () => {
   }
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [sidebarAnimatingOut, setSidebarAnimatingOut] = React.useState(false);
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
-  const [buttonsVisible, setButtonsVisible] = React.useState(false);
+
   
   // Color theme options
   const colorThemes = [
@@ -113,7 +113,7 @@ const Index = () => {
   }, [selectedTheme, changeTheme]);
   
   // Chat panel resize functionality
-  const [chatPanelWidth, setChatPanelWidth] = React.useState(320); // 320px = w-80
+  const [chatPanelWidth, setChatPanelWidth] = React.useState(320); // 320px more compact
   const [isResizing, setIsResizing] = React.useState(false);
   const resizeRef = React.useRef<HTMLDivElement>(null);
 
@@ -127,8 +127,8 @@ const Index = () => {
     if (!isResizing) return;
     
     const newWidth = e.clientX;
-    const minWidth = 320; // Minimum width (w-80)
-    const maxWidth = Math.min(800, window.innerWidth * 0.6); // Max 60% of screen or 800px
+    const minWidth = 300; // Minimum width reduced for compactness
+    const maxWidth = Math.min(450, window.innerWidth * 0.4); // Max 40% of screen or 450px
     
     if (newWidth >= minWidth && newWidth <= maxWidth) {
       setChatPanelWidth(newWidth);
@@ -251,31 +251,91 @@ const Index = () => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="w-full flex-1 flex flex-col min-h-0">
-        {/* Menu Toggle Button - Top Left Corner */}
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={() => {
-            playClickSound();
-            setButtonsVisible(!buttonsVisible);
-          }}
-          aria-label={buttonsVisible ? "Hide controls" : "Show controls"}
-          className="fixed top-4 left-4 z-50 border-2 border-foreground shadow-solid bg-white btn-animate"
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
+        {/* Header Panel */}
+        <header className="flex items-center justify-between px-6 py-4 bg-pattern border-b-2 border-foreground/10">
+          {/* Left Tools Group */}
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+                  <Palette className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2" align="start">
+                <div className="grid grid-cols-5 gap-2">
+                  {colorThemes.map((theme) => (
+                    <Button
+                      key={theme.name}
+                      variant="comic"
+                      size="sm"
+                      onClick={() => changeTheme(theme)}
+                      className={`h-12 w-12 btn-animate flex flex-col items-center justify-center gap-1 ${
+                        selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
+                      }`}
+                      aria-label={`Change theme to ${theme.name}`}
+                      style={{
+                        backgroundColor: `hsl(${theme.primary})`,
+                        color: 'white'
+                      }}
+                    >
+                      <span className="text-[10px] font-bold">{theme.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Help" className="border-2 border-foreground shadow-solid bg-white btn-animate">
+                  <HelpCircle className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>How to use</DialogTitle>
+                  <DialogDescription>
+                    Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          {/* View Whole Comic Button - Right */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" aria-label="View whole comic" className="border-2 border-foreground shadow-solid bg-white btn-animate px-4">
+                View Whole Comic
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Your Adventure (All Panels)</DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {panels.map((p, i) => (
+                  <figure key={p.id} className="rounded-lg border-2 border-foreground bg-card">
+                    <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 border-foreground rounded-t-lg" />
+                    <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </header>
 
 
 
-        <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-1 gap-6" role="main">
+        <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-6 gap-6" role="main">
           {/* Main Comic Panel - Centered */}
           <section 
             aria-label="Main comic panel" 
             className="flex flex-col min-h-0 relative"
             style={{ 
-              width: sidebarCollapsed ? '85vw' : '65vw',
-              height: '90vh',
-              maxHeight: 'calc(100vh - 60px)',
+              width: sidebarCollapsed ? '88vw' : '75vw',
+              height: 'calc(100vh - 120px)',
+              maxHeight: 'calc(100vh - 120px)',
               transition: 'width 0.3s ease-in-out'
             }}
           >
@@ -301,78 +361,7 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Control Buttons Panel - positioned to the left, only when visible */}
-          {buttonsVisible && (
-            <aside className="fixed top-20 left-4 z-40 flex flex-col gap-3">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="View whole comic" className="border-2 border-foreground shadow-solid bg-white btn-animate">
-                    <BookOpen className="h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-3xl">
-                  <DialogHeader>
-                    <DialogTitle>Your Adventure (All Panels)</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                    {panels.map((p, i) => (
-                      <figure key={p.id} className="rounded-lg border-2 border-foreground bg-card">
-                        <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 border-foreground rounded-t-lg" />
-                        <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
-                      </figure>
-                    ))}
-                  </div>
-                </DialogContent>
-              </Dialog>
-              
 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 border-foreground shadow-solid bg-white btn-animate">
-                    <Palette className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-2" align="end">
-                  <div className="grid grid-cols-5 gap-2">
-                    {colorThemes.map((theme) => (
-                      <Button
-                        key={theme.name}
-                        variant="comic"
-                        size="sm"
-                        onClick={() => changeTheme(theme)}
-                        className={`h-12 w-12 btn-animate flex flex-col items-center justify-center gap-1 ${
-                          selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
-                        }`}
-                        aria-label={`Change theme to ${theme.name}`}
-                        style={{
-                          backgroundColor: `hsl(${theme.primary})`,
-                          color: 'white'
-                        }}
-                      >
-                        <span className="text-[10px] font-bold">{theme.name}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-              
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 border-foreground shadow-solid bg-white btn-animate">
-                    <HelpCircle />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>How to use</DialogTitle>
-                    <DialogDescription>
-                      Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </aside>
-          )}
           
           {/* Right Sidebar with Avatar, Messages and Input */}
           {(!sidebarCollapsed || sidebarAnimatingOut) && (
@@ -383,8 +372,8 @@ const Index = () => {
               } ${isResizing ? 'chat-panel-resizing' : ''}`}
               style={{ 
                 width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
-                height: '90vh',
-                maxHeight: 'calc(100vh - 60px)',
+                height: 'calc(100vh - 120px)',
+                maxHeight: 'calc(100vh - 120px)',
                 transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 boxShadow: '0 4px 0 hsl(var(--foreground))'
               }}
