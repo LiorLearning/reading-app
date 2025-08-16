@@ -20,7 +20,7 @@ const PanelStrip: React.FC<PanelStripProps> = ({ panels, currentIndex, onSelect,
           <PanelThumbnail key={p.id} index={i} image={p.image} active={i === currentIndex} onClick={() => onSelect(i)} />
         ))}
         {panels.length < 8 && (
-          <Button variant="comic" size="icon" onClick={onAddClick} aria-label="Add panel" className="self-center btn-animate">
+          <Button variant="comic" size="icon" onClick={onAddClick} aria-label="Add panel" className="self-center">
             <Plus />
           </Button>
         )}

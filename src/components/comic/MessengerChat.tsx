@@ -157,7 +157,6 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     
     if (!text.trim()) return;
     
-    playClickSound();
     // Set submitting flag to prevent onresult from overwriting
     setIsSubmitting(true);
     
@@ -185,6 +184,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
         <Button
           variant="outline"
           onClick={() => {
+            playClickSound();
             setIsHidden(false);
             setHasBeenClicked(true);
           }}
@@ -222,7 +222,10 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={onExpandChat}
+              onClick={() => {
+                playClickSound();
+                onExpandChat();
+              }}
               aria-label="Open full chat panel"
               className="bg-white/60 backdrop-blur-sm border border-foreground/30 px-2 py-1 h-7 shadow-sm hover:bg-primary hover:text-primary-foreground transition-all"
             >
@@ -232,6 +235,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               variant="outline" 
               size="sm" 
               onClick={() => {
+                playClickSound();
                 setIsHidden(true);
               }}
               aria-label="Hide chat"
@@ -336,7 +340,6 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                 variant="outline"
                 size="icon"
                 onClick={() => {
-                  playClickSound();
                   onGenerateImage();
                 }}
                 aria-label="Generate new image"

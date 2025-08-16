@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { playClickSound } from "@/lib/sounds";
 
 interface PanelThumbnailProps {
   index: number;
@@ -11,7 +12,10 @@ interface PanelThumbnailProps {
 const PanelThumbnail: React.FC<PanelThumbnailProps> = ({ index, image, active, onClick }) => {
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        playClickSound();
+        onClick?.();
+      }}
       aria-label={`Go to panel ${index + 1}`}
       className={cn(
         "relative aspect-[4/3] w-full overflow-hidden rounded-md border-2 bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring btn-animate",

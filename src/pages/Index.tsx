@@ -74,11 +74,16 @@ const Index = () => {
   
   // Color theme options
   const colorThemes = [
-    { name: "Pink", primary: "350 81% 60%", background: "350 30% 97%", accent: "350 81% 60%", hue: "350" },
-    { name: "Blue", primary: "220 91% 60%", background: "220 30% 97%", accent: "220 91% 60%", hue: "220" },
-    { name: "Green", primary: "142 76% 36%", background: "142 30% 97%", accent: "142 76% 36%", hue: "142" },
     { name: "Purple", primary: "262 73% 60%", background: "262 30% 97%", accent: "262 73% 60%", hue: "262" },
-    { name: "Orange", primary: "25 95% 53%", background: "25 30% 97%", accent: "25 95% 53%", hue: "25" },
+    { name: "Pink", primary: "350 81% 55%", background: "350 30% 97%", accent: "350 81% 55%", hue: "350" },
+    { name: "Blue", primary: "220 91% 55%", background: "220 30% 97%", accent: "220 91% 55%", hue: "220" },
+    { name: "Green", primary: "142 76% 36%", background: "142 30% 97%", accent: "142 76% 36%", hue: "142" },
+    { name: "Orange", primary: "25 85% 45%", background: "25 30% 97%", accent: "25 85% 45%", hue: "25" },
+    { name: "Teal", primary: "180 83% 35%", background: "180 30% 97%", accent: "180 83% 35%", hue: "180" },
+    { name: "Red", primary: "0 84% 55%", background: "0 30% 97%", accent: "0 84% 55%", hue: "0" },
+    { name: "Indigo", primary: "240 85% 55%", background: "240 30% 97%", accent: "240 85% 55%", hue: "240" },
+    { name: "Navy", primary: "210 100% 40%", background: "210 30% 97%", accent: "210 100% 40%", hue: "210" },
+    { name: "Emerald", primary: "160 84% 39%", background: "160 30% 97%", accent: "160 84% 39%", hue: "160" },
   ];
   
   const [selectedTheme, setSelectedTheme] = useState(colorThemes[0]);
@@ -262,7 +267,7 @@ const Index = () => {
           <div className="flex items-center gap-2 flex-1">
             <Popover>
               <PopoverTrigger asChild>
-                                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }}>
+                                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
                   <Palette className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
@@ -274,16 +279,14 @@ const Index = () => {
                       variant="comic"
                       size="sm"
                       onClick={() => changeTheme(theme)}
-                      className={`h-12 w-12 btn-animate flex flex-col items-center justify-center gap-1 ${
+                      className={`h-8 w-8 btn-animate rounded-full ${
                         selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
                       }`}
                       aria-label={`Change theme to ${theme.name}`}
                       style={{
-                        backgroundColor: `hsl(${theme.primary})`,
-                        color: 'white'
+                        backgroundColor: `hsl(${theme.primary})`
                       }}
                     >
-                      <span className="text-[10px] font-bold">{theme.name}</span>
                     </Button>
                   ))}
                 </div>
@@ -292,7 +295,7 @@ const Index = () => {
             
             <Dialog>
               <DialogTrigger asChild>
-                                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }}>
+                                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
                   <HelpCircle className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -318,7 +321,7 @@ const Index = () => {
           <div className="flex-1 flex justify-end">
           <Dialog>
             <DialogTrigger asChild>
-                              <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }}>
+                              <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
                 View Whole Comic
               </Button>
             </DialogTrigger>
@@ -328,8 +331,8 @@ const Index = () => {
               </DialogHeader>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 {panels.map((p, i) => (
-                                      <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)' }}>
-                                          <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)' }} />
+                                      <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+                                          <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
                     <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
                   </figure>
                 ))}
@@ -355,14 +358,14 @@ const Index = () => {
           <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
           {/* Unified Container - Comic Panel + Sidebar */}
           <div 
-            className="flex rounded-3xl overflow-hidden border-4 shadow-xl relative z-10"
+            className="flex rounded-3xl overflow-hidden relative z-10"
             style={{ 
               width: sidebarCollapsed ? '88vw' : `calc(75vw + ${chatPanelWidth}px)`,
               height: 'calc(100vh - 120px)',
               maxHeight: 'calc(100vh - 120px)',
               transition: 'width 0.3s ease-in-out',
-              borderColor: 'hsl(from hsl(var(--primary)) h s 25%)',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px hsla(var(--primary), 0.1)'
+              border: '4px solid hsl(var(--primary) / 0.9)',
+              boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)'
             }}
           >
             {/* Main Comic Panel - Left Side */}
@@ -394,7 +397,7 @@ const Index = () => {
 
                           {/* Vertical Separator */}
               {(!sidebarCollapsed || sidebarAnimatingOut) && (
-                <div className="w-1" style={{ backgroundColor: 'hsl(from hsl(var(--primary)) h s 25%)' }}></div>
+                <div className="w-1" style={{ backgroundColor: 'hsla(var(--primary), 0.9)' }}></div>
               )}
 
               {/* Right Sidebar with Avatar, Messages and Input */}
@@ -480,7 +483,7 @@ const Index = () => {
                               ? "bg-primary text-primary-foreground" 
                               : "bg-card border-2"
                           )}
-                          style={message.type === 'ai' ? { borderColor: 'hsl(from hsl(var(--primary)) h s 25%)' } : {}}
+                          style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
                         >
                           <div className="font-medium text-xs mb-1 opacity-70">
                             {message.type === 'user' ? 'You' : '🤖 Krafty'}

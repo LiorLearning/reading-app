@@ -1,6 +1,7 @@
 import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { playClickSound } from "@/lib/sounds";
 import React from "react";
 
 interface SpeechBubbleProps {
@@ -20,7 +21,7 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({ text, className, onSpeak })
       aria-label="speech-bubble"
     >
       <p className="pr-1 leading-snug">{text}</p>
-      <Button aria-label="Play speech" variant="comic" size="icon" onClick={onSpeak} className="btn-animate">
+      <Button aria-label="Play speech" variant="comic" size="icon" onClick={() => { playClickSound(); onSpeak?.(); }} className="btn-animate">
         <Volume2 />
       </Button>
       <span className="pointer-events-none absolute -bottom-2 left-6 h-4 w-4 rotate-45 border-b-2 border-r-2 border-foreground bg-accent" />

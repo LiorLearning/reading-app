@@ -106,7 +106,6 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       e?.preventDefault();
       if (!text.trim()) return;
       
-      playClickSound();
       setIsSubmitting(true);
       
       // If recording is active, stop it first
@@ -157,7 +156,6 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           variant="outline"
           size="icon"
           onClick={() => {
-            playClickSound();
             onGenerateImage();
           }}
           aria-label="Generate new image"
