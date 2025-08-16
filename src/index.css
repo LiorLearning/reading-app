@@ -665,4 +665,20 @@ All colors MUST be HSL.
       box-shadow: 0 5px 0 black;
     }
   }
+
+  /* Responsive Layout Utilities - Simplified */
+  @media (min-width: 1700px) {
+    /* Large screens: Prevent excessive stretching */
+    .responsive-max-width {
+      max-width: 100rem; /* 1600px max */
+      margin: 0 auto;
+    }
+  }
+
+  @media (min-width: 2000px) {
+    /* Ultra-wide screens: Further constraint */
+    .responsive-max-width {
+      max-width: 120rem; /* 1920px equivalent */
+    }
+  }
 }

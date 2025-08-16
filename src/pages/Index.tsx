@@ -70,6 +70,34 @@ const Index = () => {
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
+  
+  // Responsive aspect ratio management
+  const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
+  
+  React.useEffect(() => {
+    const updateScreenSize = () => {
+      if (window.innerWidth <= 640) {
+        setScreenSize('mobile');
+      } else if (window.innerWidth <= 1024) {
+        setScreenSize('tablet');
+      } else {
+        setScreenSize('desktop');
+      }
+    };
+    
+    updateScreenSize();
+    window.addEventListener('resize', updateScreenSize);
+    return () => window.removeEventListener('resize', updateScreenSize);
+  }, []);
+  
+  const getAspectRatio = React.useMemo(() => {
+    // Conservative aspect ratios that maintain original proportions
+    if (sidebarCollapsed) {
+      return screenSize === 'mobile' ? '4/3' : '16/9';
+    } else {
+      return screenSize === 'mobile' ? '4/3' : '2.1/1'; // Original proportions
+    }
+  }, [screenSize, sidebarCollapsed]);
 
   
   // Color theme options
@@ -117,10 +145,11 @@ const Index = () => {
     changeTheme(selectedTheme);
   }, [selectedTheme, changeTheme]);
   
-  // Chat panel resize functionality
-  const [chatPanelWidth, setChatPanelWidth] = React.useState(320); // 320px more compact
+  // Chat panel resize functionality - now proportional
+  const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(25); // 25% of container width (smaller default)
   const [isResizing, setIsResizing] = React.useState(false);
   const resizeRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Resize handlers
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
@@ -129,14 +158,18 @@ const Index = () => {
   }, []);
 
   const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!isResizing) return;
+    if (!isResizing || !containerRef.current || !resizeRef.current) return;
     
-    const newWidth = e.clientX;
-    const minWidth = 300; // Minimum width reduced for compactness
-    const maxWidth = Math.min(450, window.innerWidth * 0.4); // Max 40% of screen or 450px
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const relativeX = e.clientX - containerRect.left;
+    const newWidthPercent = ((containerRect.width - relativeX) / containerRect.width) * 100;
     
-    if (newWidth >= minWidth && newWidth <= maxWidth) {
-      setChatPanelWidth(newWidth);
+    // Constrain between 20% and 40% of container width
+    const minPercent = 20;
+    const maxPercent = 40;
+    
+    if (newWidthPercent >= minPercent && newWidthPercent <= maxPercent) {
+      setChatPanelWidthPercent(newWidthPercent);
     }
   }, [isResizing]);
 
@@ -257,14 +290,14 @@ const Index = () => {
       />
       <div className="w-full flex-1 flex flex-col min-h-0">
         {/* Header Panel */}
-                 <header 
-           className="flex items-center justify-between px-6 py-4 border-b-2 border-foreground/10 bg-white/30 backdrop-blur-md"
-           style={{
-             boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.1)'
-           }}
-         >
+        <header 
+          className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-4 border-b-2 border-foreground/10 bg-white/30 backdrop-blur-md"
+          style={{
+            boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.1)'
+          }}
+        >
           {/* Left Tools Group */}
-          <div className="flex items-center gap-2 flex-1">
+          <div className="flex items-center gap-1 lg:gap-2 flex-1">
             <Popover>
               <PopoverTrigger asChild>
                                   <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
@@ -312,7 +345,7 @@ const Index = () => {
           
           {/* Center Title */}
           <div className="flex-1 flex justify-center items-center">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
+            <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
               YOUR ADVENTURE
             </h1>
           </div>
@@ -345,7 +378,7 @@ const Index = () => {
 
 
         <main 
-          className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-6 bg-primary/60 relative" 
+          className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-6 lg:px-6 bg-primary/60 relative" 
           style={{
             backgroundImage: `url('/backgrounds/random.png')`,
             backgroundSize: 'cover',
@@ -358,12 +391,14 @@ const Index = () => {
           <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
           {/* Unified Container - Comic Panel + Sidebar */}
           <div 
-            className="flex rounded-3xl overflow-hidden relative z-10"
+            ref={containerRef}
+            className="flex rounded-3xl overflow-hidden relative z-10 w-full responsive-max-width"
             style={{ 
-              width: sidebarCollapsed ? '88vw' : `calc(75vw + ${chatPanelWidth}px)`,
-              height: 'calc(100vh - 120px)',
+              maxWidth: '1600px', // Increased max width for larger screens
+              aspectRatio: getAspectRatio,
               maxHeight: 'calc(100vh - 120px)',
-              transition: 'width 0.3s ease-in-out',
+              minHeight: '400px',
+              transition: 'all 0.3s ease-in-out',
               border: '4px solid hsl(var(--primary) / 0.9)',
               boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)'
             }}
@@ -408,7 +443,9 @@ const Index = () => {
                     sidebarAnimatingOut ? 'animate-slide-out-right' : 'animate-slide-in-right'
                   } ${isResizing ? 'chat-panel-resizing' : ''}`}
                   style={{ 
-                    width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
+                    width: sidebarAnimatingOut ? '0px' : `${chatPanelWidthPercent}%`,
+                    minWidth: sidebarAnimatingOut ? '0px' : '320px',
+                    maxWidth: sidebarAnimatingOut ? '0px' : '450px',
                     height: '100%',
                     backgroundImage: `url('/backgrounds/random.png')`,
                     backgroundSize: 'cover',
@@ -501,9 +538,9 @@ const Index = () => {
                 <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
               </div>
               
-              {/* Resize Handle */}
+              {/* Resize Handle - Hidden on mobile */}
               <div
-                className="absolute top-0 left-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group"
+                className="absolute top-0 left-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group hidden sm:block"
                 onMouseDown={handleResizeStart}
                 title="Drag to resize chat panel"
               >
