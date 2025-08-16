@@ -266,7 +266,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                   {/* Avatar for all messages (left side) */}
                   <div className="flex-shrink-0 self-end">
                     <div className={cn(
-                      "w-8 h-8 rounded-full border-2 border-black flex items-center justify-center text-sm shadow-[0_2px_0_black]",
+                      "w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-lg",
                       message.type === 'user'
                         ? "bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500"
                         : "bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500"
@@ -277,10 +277,10 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                   
                   <div
                     className={cn(
-                      "max-w-56 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-[0_4px_0_black]",
+                      "max-w-56 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-lg",
                       message.type === 'user' 
-                        ? "bg-primary text-primary-foreground border-2 border-black backdrop-blur-sm" 
-                        : "bg-white/95 text-black border-2 border-black backdrop-blur-sm"
+                        ? "bg-primary text-primary-foreground backdrop-blur-sm" 
+                        : "bg-white/95 text-black backdrop-blur-sm border border-foreground/20"
                     )}
                   >
                     <div className="break-words font-medium">{message.content}</div>
@@ -291,7 +291,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
           )}
            
           {/* Main chatbox with new layout - always visible */}
-          <div className="bg-white/60 backdrop-blur-md border-2 border-foreground rounded-2xl shadow-solid overflow-hidden relative z-10">
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden relative z-10">
           {/* Main input area with integrated controls */}
           <div className="p-2">
             <form onSubmit={submit} className="flex items-center gap-2">
@@ -320,13 +320,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                     placeholder="What happens next?"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    className="rounded-xl border border-foreground/30 w-full bg-white text-sm h-9 focus:border-foreground/60"
+                    className="rounded-xl w-full bg-white/90 text-sm h-9 border-0 shadow-sm focus:shadow-md transition-shadow"
                   />
                 )}
               </div>
               
               {/* Send Button */}
-              <Button type="submit" variant="outline" size="icon" className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate">
+              <Button type="submit" variant="outline" size="icon" className="h-9 w-9 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0">
                 <Send className="h-4 w-4" />
               </Button>
               
@@ -340,7 +340,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                   onGenerateImage();
                 }}
                 aria-label="Generate new image"
-                className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate"
+                className="h-9 w-9 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0"
               >
                 <ImageIcon className="h-4 w-4" />
               </Button>

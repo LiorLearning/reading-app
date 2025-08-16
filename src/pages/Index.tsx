@@ -327,60 +327,76 @@ const Index = () => {
 
 
 
-        <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-6 gap-6" role="main">
-          {/* Main Comic Panel - Centered */}
-          <section 
-            aria-label="Main comic panel" 
-            className="flex flex-col min-h-0 relative"
+        <main className="flex-1 flex items-center justify-center min-h-0 overflow-hidden p-6" role="main">
+          {/* Unified Container - Comic Panel + Sidebar */}
+          <div 
+            className="flex rounded-3xl overflow-hidden border-4 border-primary/20 shadow-xl"
             style={{ 
-              width: sidebarCollapsed ? '88vw' : '75vw',
+              width: sidebarCollapsed ? '88vw' : `calc(75vw + ${chatPanelWidth}px)`,
               height: 'calc(100vh - 120px)',
               maxHeight: 'calc(100vh - 120px)',
-              transition: 'width 0.3s ease-in-out'
+              transition: 'width 0.3s ease-in-out',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 8px 0 #EB4762, 0 0 0 1px hsla(var(--primary), 0.1)'
             }}
           >
-            <div className="flex-1 min-h-0 relative">
-              <ComicPanel
-                image={current.image}
-                className="h-full w-full"
-                isNew={current.id === newlyCreatedPanelId}
-                shouldZoom={current.id === zoomingPanelId}
-                onPreviousPanel={() => {
-                  if (currentIndex > 0) {
-                    setCurrent(currentIndex - 1);
-                  }
-                }}
-                onNextPanel={() => {
-                  if (currentIndex < panels.length - 1) {
-                    setCurrent(currentIndex + 1);
-                  }
-                }}
-                hasPrevious={currentIndex > 0}
-                hasNext={currentIndex < panels.length - 1}
-              />
-            </div>
-          </section>
-
-
-          
-          {/* Right Sidebar with Avatar, Messages and Input */}
-          {(!sidebarCollapsed || sidebarAnimatingOut) && (
-            <aside 
-              ref={resizeRef}
-              className={`flex flex-col bg-chat-container border-2 border-foreground rounded-3xl min-h-0 z-10 relative overflow-hidden ${
-                sidebarAnimatingOut ? 'animate-slide-out-right' : 'animate-slide-in-right'
-              } ${isResizing ? 'chat-panel-resizing' : ''}`}
-              style={{ 
-                width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
-                height: 'calc(100vh - 120px)',
-                maxHeight: 'calc(100vh - 120px)',
-                transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                boxShadow: '0 4px 0 hsl(var(--foreground))'
-              }}
+            {/* Main Comic Panel - Left Side */}
+            <section 
+              aria-label="Main comic panel" 
+              className="flex flex-col min-h-0 relative flex-1 bg-white"
             >
-              {/* Panel Header with Close Button */}
-              <div className="flex-shrink-0 flex items-center justify-between p-3 bg-chat-container border-b border-foreground/20">
-                <h3 className="font-semibold text-sm">Chat with Krafty</h3>
+              <div className="flex-1 min-h-0 relative">
+                <ComicPanel
+                  image={current.image}
+                  className="h-full w-full"
+                  isNew={current.id === newlyCreatedPanelId}
+                  shouldZoom={current.id === zoomingPanelId}
+                  onPreviousPanel={() => {
+                    if (currentIndex > 0) {
+                      setCurrent(currentIndex - 1);
+                    }
+                  }}
+                  onNextPanel={() => {
+                    if (currentIndex < panels.length - 1) {
+                      setCurrent(currentIndex + 1);
+                    }
+                  }}
+                  hasPrevious={currentIndex > 0}
+                  hasNext={currentIndex < panels.length - 1}
+                />
+              </div>
+            </section>
+
+                          {/* Vertical Separator */}
+              {(!sidebarCollapsed || sidebarAnimatingOut) && (
+                <div className="w-1 bg-primary/20"></div>
+              )}
+
+              {/* Right Sidebar with Avatar, Messages and Input */}
+              {(!sidebarCollapsed || sidebarAnimatingOut) && (
+                <aside 
+                  ref={resizeRef}
+                  className={`flex flex-col min-h-0 z-10 relative ${
+                    sidebarAnimatingOut ? 'animate-slide-out-right' : 'animate-slide-in-right'
+                  } ${isResizing ? 'chat-panel-resizing' : ''}`}
+                  style={{ 
+                    width: sidebarAnimatingOut ? '0px' : `${chatPanelWidth}px`,
+                    height: '100%',
+                    backgroundImage: `url('/backgrounds/random.png')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                  }}
+                >
+                {/* Glass Film Overlay - Between pattern and content */}
+                <div 
+                  className="absolute inset-0 backdrop-blur-sm bg-gradient-to-b from-primary/15 via-white/40 to-primary/10"
+                  style={{ zIndex: 1 }}
+                ></div>
+                
+                {/* Content Container - Above the glass film */}
+                <div className="relative z-10 flex flex-col h-full">
+                              {/* Close Button - Top Right */}
+                <div className="absolute top-3 right-3 z-20">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -392,24 +408,28 @@ const Index = () => {
                       setSidebarAnimatingOut(false);
                     }, 300);
                   }}
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground btn-animate"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground btn-animate bg-white/20 backdrop-blur-sm rounded-full"
                   aria-label="Close chat panel"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
               
-              {/* Avatar Section */}
-              <div className="flex-shrink-0 bg-chat-container">
-                <ChatAvatar />
-              </div>
+                              {/* Avatar Section */}
+                <div className="flex-shrink-0 relative">
+                  {/* Darker theme film for avatar section */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
+                  <div className="relative z-10">
+                    <ChatAvatar />
+                  </div>
+                </div>
               
-              {/* Messages */}
+                            {/* Messages */}
               <div className="flex-1 min-h-0 relative">
                 {/* Messages Container */}
                 <div 
                   ref={messagesScrollRef}
-                  className="h-full overflow-y-auto space-y-3 p-3 bg-chat-panel"
+                  className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
                 >
                   {chatMessages.length === 0 ? (
                     <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
@@ -446,8 +466,8 @@ const Index = () => {
                 </div>
               </div>
               
-              {/* Input Bar */}
-              <div className="flex-shrink-0 bg-chat-container p-3">
+                              {/* Input Bar */}
+                <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
                 <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
               </div>
               
@@ -459,8 +479,10 @@ const Index = () => {
               >
                 <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
               </div>
+                </div>
             </aside>
-          )}
+            )}
+          </div>
         </main>
 
         {/* Messenger Chat when sidebar is collapsed */}

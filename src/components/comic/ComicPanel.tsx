@@ -33,7 +33,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   ], [isNew]);
   return (
     <div className={cn(
-      "relative w-full h-full flex flex-col overflow-hidden book-container",
+      "relative w-full h-full flex flex-col overflow-hidden",
       shouldZoom && "animate-comic-panel-zoom",
       className
     )}>

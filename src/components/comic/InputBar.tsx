@@ -20,7 +20,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   // Waveform Visualizer Component
   const WaveformVisualizer = () => {
     return (
-      <div className="flex items-center justify-center gap-1 h-10 px-4 bg-white rounded-xl border-2 flex-1">
+      <div className="flex items-center justify-center gap-1 h-10 px-4 bg-white/90 rounded-xl shadow-sm flex-1 backdrop-blur-sm">
         {[...Array(12)].map((_, i) => (
           <div
             key={i}
@@ -126,8 +126,8 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   );
 
   return (
-    <section aria-label="Create next panel">
-      <form onSubmit={submit} className="flex items-stretch gap-2">
+    <section aria-label="Create next panel" className="bg-transparent">
+      <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
         <Button
           type="button"
           variant="comic"
@@ -149,7 +149,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
             placeholder="What happens next?"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="rounded-xl border-2 flex-1 bg-white"
+            className="rounded-xl flex-1 bg-white/90 border-0 shadow-sm focus:shadow-md transition-shadow backdrop-blur-sm"
           />
         )}
         <Button 
@@ -161,11 +161,11 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
             onGenerateImage();
           }}
           aria-label="Generate new image"
-          className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate"
+          className="h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm"
         >
           <ImageIcon className="h-4 w-4" />
         </Button>
-        <Button type="submit" variant="outline" size="icon" className="h-10 w-10 border-2 border-foreground shadow-solid bg-white flex-shrink-0 btn-animate">
+        <Button type="submit" variant="outline" size="icon" className="h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm">
           <Send className="h-4 w-4" />
         </Button>
       </form>
