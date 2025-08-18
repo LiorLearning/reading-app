@@ -290,13 +290,18 @@ const Index = () => {
       <div className="w-full flex-1 flex flex-col min-h-0">
         {/* Header Panel */}
         <header 
-          className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-4 border-b-2 border-foreground/10 bg-white/30 backdrop-blur-md"
+          className="flex items-center justify-center py-3 lg:py-4 border-b-2 border-foreground/10 bg-white/30 backdrop-blur-md relative"
           style={{
             boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.1)'
           }}
         >
-          {/* Left Tools Group */}
-          <div className="flex items-center gap-1 lg:gap-2 flex-1">
+          {/* Left Tools Group - Positioned to align with purple container */}
+          <div 
+            className="absolute left-0 flex items-center gap-1 lg:gap-2"
+            style={{
+              marginLeft: `calc((100% - 92%) / 2)` // Align with left edge of purple container
+            }}
+          >
             <Popover>
               <PopoverTrigger asChild>
                                   <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
@@ -349,28 +354,33 @@ const Index = () => {
             </h1>
           </div>
           
-          {/* View Whole Comic Button - Right */}
-          <div className="flex-1 flex justify-end">
-          <Dialog>
-            <DialogTrigger asChild>
-                              <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                View Whole Comic
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <DialogHeader>
-                <DialogTitle>Your Adventure (All Panels)</DialogTitle>
-              </DialogHeader>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                {panels.map((p, i) => (
-                                      <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
-                                          <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
-                    <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
-                  </figure>
-                ))}
-              </div>
-            </DialogContent>
-          </Dialog>
+          {/* View Whole Comic Button - Right - Positioned to align with purple container */}
+          <div 
+            className="absolute right-0 flex"
+            style={{
+              marginRight: `calc((100% - 92%) / 2)` // Align with right edge of purple container
+            }}
+          >
+            <Dialog>
+              <DialogTrigger asChild>
+                                <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
+                  View Whole Comic
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Your Adventure (All Panels)</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {panels.map((p, i) => (
+                                        <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+                                            <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
+                      <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </header>
 
@@ -388,41 +398,44 @@ const Index = () => {
         >
           {/* Glass blur overlay to soften the background */}
           <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
-          {/* Background Container with Border and Fill */}
+          {/* Wrapper for both background and content to scale together */}
           <div 
-            className="absolute rounded-3xl z-0"
+            className="relative responsive-max-width"
             style={{ 
-              top: '8px',
-              left: '18px', 
-              right: '18px',
-              bottom: '8px',
-              border: '4px solid hsl(var(--primary) / 0.9)',
-              boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
-              backgroundColor: 'hsl(var(--primary) / 0.9)'
-            }}
-          ></div>
-          
-          {/* Content Container - Comic Panel + Sidebar */}
-          <div 
-            ref={containerRef}
-            className="flex relative z-10 w-full responsive-max-width"
-            style={{ 
-              maxWidth: '1600px',
+              width: '95%', // 5% reduction from full width
+              maxWidth: '1520px',
               aspectRatio: getAspectRatio,
               maxHeight: 'calc(100vh - 100px)',
               minHeight: '500px',
-              transition: 'all 0.3s ease-in-out',
-              paddingTop: '6px',
-              paddingBottom: '6px',
-              paddingLeft: '4px',
-              paddingRight: '4px'
+              transition: 'all 0.3s ease-in-out'
             }}
+          >
+            {/* Background Container with Border and Fill */}
+            <div 
+              className="absolute inset-0 rounded-3xl z-0"
+              style={{ 
+                border: '4px solid hsl(var(--primary) / 0.9)',
+                boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
+                backgroundColor: 'hsl(var(--primary) / 0.9)'
+              }}
+            ></div>
+            
+            {/* Content Container - Comic Panel + Sidebar */}
+            <div 
+              ref={containerRef}
+              className="flex relative z-10 h-full w-full"
+              style={{ 
+                paddingTop: '8px',
+                paddingBottom: '8px',
+                paddingLeft: '8px',
+                paddingRight: '8px'
+              }}
           >
             {/* Main Comic Panel - Left Side */}
             <section 
               aria-label="Main comic panel" 
               className="flex flex-col min-h-0 relative flex-1 bg-white rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-in-out"
-              style={{ marginRight: sidebarCollapsed ? '0px' : '6px' }}
+              style={{ marginRight: sidebarCollapsed ? '0px' : '5px' }}
             >
               <div className="flex-1 min-h-0 relative">
                 <ComicPanel
@@ -461,7 +474,7 @@ const Index = () => {
                   backgroundImage: `url('/backgrounds/random.png')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  marginLeft: sidebarCollapsed ? '0px' : '6px',
+                                     marginLeft: sidebarCollapsed ? '0px' : '5px',
                   pointerEvents: sidebarCollapsed ? 'none' : 'auto'
                 }}
                 >
@@ -564,7 +577,8 @@ const Index = () => {
                 </div>
               )}
                 </div>
-            </aside>
+                         </aside>
+            </div>
           </div>
         </main>
 
