@@ -525,8 +525,8 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .shadow-solid { box-shadow: 0 4px 0 hsl(var(--foreground)); }
-  .shadow-solid-primary { box-shadow: 0 4px 0 hsl(var(--primary)); }
+  .shadow-solid { box-shadow: 0 4px 0 black; }
+  .shadow-solid-primary { box-shadow: 0 4px 0 black; }
   
   /* Playful background pattern */
   .bg-pattern {

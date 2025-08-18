@@ -65,7 +65,6 @@ const Index = () => {
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
-  const [sidebarAnimatingOut, setSidebarAnimatingOut] = React.useState(false);
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
@@ -91,11 +90,11 @@ const Index = () => {
   }, []);
   
   const getAspectRatio = React.useMemo(() => {
-    // Conservative aspect ratios that maintain original proportions
+    // Consistent height across both states - both give 1000px height at 1600px width
     if (sidebarCollapsed) {
-      return screenSize === 'mobile' ? '4/3' : '16/9';
+      return screenSize === 'mobile' ? '4/3' : '16/10'; // 1600px width = 1000px height
     } else {
-      return screenSize === 'mobile' ? '4/3' : '2.1/1'; // Original proportions
+      return screenSize === 'mobile' ? '4/3' : '16/10'; // Same height as collapsed for consistency
     }
   }, [screenSize, sidebarCollapsed]);
 
@@ -146,7 +145,7 @@ const Index = () => {
   }, [selectedTheme, changeTheme]);
   
   // Chat panel resize functionality - now proportional
-  const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(25); // 25% of container width (smaller default)
+  const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(20); // 20% of container width (smaller default)
   const [isResizing, setIsResizing] = React.useState(false);
   const resizeRef = React.useRef<HTMLDivElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -158,7 +157,7 @@ const Index = () => {
   }, []);
 
   const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!isResizing || !containerRef.current || !resizeRef.current) return;
+    if (!isResizing || !containerRef.current || !resizeRef.current || sidebarCollapsed) return;
     
     const containerRect = containerRef.current.getBoundingClientRect();
     const relativeX = e.clientX - containerRect.left;
@@ -171,7 +170,7 @@ const Index = () => {
     if (newWidthPercent >= minPercent && newWidthPercent <= maxPercent) {
       setChatPanelWidthPercent(newWidthPercent);
     }
-  }, [isResizing]);
+  }, [isResizing, sidebarCollapsed]);
 
   const handleResizeEnd = useCallback(() => {
     setIsResizing(false);
@@ -300,7 +299,7 @@ const Index = () => {
           <div className="flex items-center gap-1 lg:gap-2 flex-1">
             <Popover>
               <PopoverTrigger asChild>
-                                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
+                                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
                   <Palette className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
@@ -328,7 +327,7 @@ const Index = () => {
             
             <Dialog>
               <DialogTrigger asChild>
-                                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
+                                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
                   <HelpCircle className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -354,7 +353,7 @@ const Index = () => {
           <div className="flex-1 flex justify-end">
           <Dialog>
             <DialogTrigger asChild>
-                              <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 hsl(from hsl(var(--primary)) h s 25%)' }} onClick={() => playClickSound()}>
+                              <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
                 View Whole Comic
               </Button>
             </DialogTrigger>
@@ -378,7 +377,7 @@ const Index = () => {
 
 
         <main 
-          className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-6 lg:px-6 bg-primary/60 relative" 
+          className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
           style={{
             backgroundImage: `url('/backgrounds/random.png')`,
             backgroundSize: 'cover',
@@ -389,24 +388,41 @@ const Index = () => {
         >
           {/* Glass blur overlay to soften the background */}
           <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
-          {/* Unified Container - Comic Panel + Sidebar */}
+          {/* Background Container with Border and Fill */}
+          <div 
+            className="absolute rounded-3xl z-0"
+            style={{ 
+              top: '8px',
+              left: '18px', 
+              right: '18px',
+              bottom: '8px',
+              border: '4px solid hsl(var(--primary) / 0.9)',
+              boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
+              backgroundColor: 'hsl(var(--primary) / 0.9)'
+            }}
+          ></div>
+          
+          {/* Content Container - Comic Panel + Sidebar */}
           <div 
             ref={containerRef}
-            className="flex rounded-3xl overflow-hidden relative z-10 w-full responsive-max-width"
+            className="flex relative z-10 w-full responsive-max-width"
             style={{ 
-              maxWidth: '1600px', // Increased max width for larger screens
+              maxWidth: '1600px',
               aspectRatio: getAspectRatio,
-              maxHeight: 'calc(100vh - 120px)',
-              minHeight: '400px',
+              maxHeight: 'calc(100vh - 100px)',
+              minHeight: '500px',
               transition: 'all 0.3s ease-in-out',
-              border: '4px solid hsl(var(--primary) / 0.9)',
-              boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)'
+              paddingTop: '6px',
+              paddingBottom: '6px',
+              paddingLeft: '4px',
+              paddingRight: '4px'
             }}
           >
             {/* Main Comic Panel - Left Side */}
             <section 
               aria-label="Main comic panel" 
-              className="flex flex-col min-h-0 relative flex-1 bg-white"
+              className="flex flex-col min-h-0 relative flex-1 bg-white rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-in-out"
+              style={{ marginRight: sidebarCollapsed ? '0px' : '6px' }}
             >
               <div className="flex-1 min-h-0 relative">
                 <ComicPanel
@@ -430,28 +446,24 @@ const Index = () => {
               </div>
             </section>
 
-                          {/* Vertical Separator */}
-              {(!sidebarCollapsed || sidebarAnimatingOut) && (
-                <div className="w-1" style={{ backgroundColor: 'hsla(var(--primary), 0.9)' }}></div>
-              )}
+                          {/* No separator needed with rounded design */}
 
               {/* Right Sidebar with Avatar, Messages and Input */}
-              {(!sidebarCollapsed || sidebarAnimatingOut) && (
-                <aside 
-                  ref={resizeRef}
-                  className={`flex flex-col min-h-0 z-10 relative ${
-                    sidebarAnimatingOut ? 'animate-slide-out-right' : 'animate-slide-in-right'
-                  } ${isResizing ? 'chat-panel-resizing' : ''}`}
-                  style={{ 
-                    width: sidebarAnimatingOut ? '0px' : `${chatPanelWidthPercent}%`,
-                    minWidth: sidebarAnimatingOut ? '0px' : '320px',
-                    maxWidth: sidebarAnimatingOut ? '0px' : '450px',
-                    height: '100%',
-                    backgroundImage: `url('/backgrounds/random.png')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    transition: isResizing ? 'none' : sidebarAnimatingOut ? 'width 0.3s ease-in' : 'width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                  }}
+              <aside 
+                ref={resizeRef}
+                className={`flex flex-col min-h-0 z-10 relative rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-in-out ${isResizing ? 'chat-panel-resizing' : ''}`}
+                style={{ 
+                  width: sidebarCollapsed ? '0%' : `${chatPanelWidthPercent}%`,
+                  minWidth: sidebarCollapsed ? '0px' : '320px',
+                  maxWidth: sidebarCollapsed ? '0px' : '450px',
+                  opacity: sidebarCollapsed ? 0 : 1,
+                  height: '100%',
+                  backgroundImage: `url('/backgrounds/random.png')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  marginLeft: sidebarCollapsed ? '0px' : '6px',
+                  pointerEvents: sidebarCollapsed ? 'none' : 'auto'
+                }}
                 >
                 {/* Glass Film Overlay - Between pattern and content */}
                 <div 
@@ -462,93 +474,97 @@ const Index = () => {
                 {/* Content Container - Above the glass film */}
                 <div className="relative z-10 flex flex-col h-full">
                               {/* Close Button - Top Right */}
-                <div className="absolute top-3 right-3 z-20">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    playClickSound();
-                    setSidebarAnimatingOut(true);
-                    setTimeout(() => {
-                      setSidebarCollapsed(true);
-                      setSidebarAnimatingOut(false);
-                    }, 300);
-                  }}
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground btn-animate bg-white/20 backdrop-blur-sm rounded-full"
-                  aria-label="Close chat panel"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              
-                              {/* Avatar Section */}
-                <div className="flex-shrink-0 relative">
-                  {/* Darker theme film for avatar section */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
-                  <div className="relative z-10">
-                    <ChatAvatar />
+                {!sidebarCollapsed && (
+                  <div className="absolute top-3 right-3 z-20">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        playClickSound();
+                        setSidebarCollapsed(true);
+                      }}
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground btn-animate bg-white/20 backdrop-blur-sm rounded-full"
+                      aria-label="Close chat panel"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
+                )}
               
-                            {/* Messages */}
-              <div className="flex-1 min-h-0 relative">
-                {/* Messages Container */}
-                <div 
-                  ref={messagesScrollRef}
-                  className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
-                >
-                  {chatMessages.length === 0 ? (
-                    <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-                      <p>💬 Start chatting with Krafty!</p>
-                    </div>
-                  ) : (
-                    chatMessages.map((message, index) => (
-                      <div
-                        key={`${message.timestamp}-${index}`}
-                        className={cn(
-                          "flex animate-slide-up-smooth",
-                          message.type === 'user' ? "justify-end" : "justify-start"
-                        )}
-                        style={{ 
-                          animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
-                        }}
-                      >
-                        <div
-                          className={cn(
-                            "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
-                            message.type === 'user' 
-                              ? "bg-primary text-primary-foreground" 
-                              : "bg-card border-2"
-                          )}
-                          style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
-                        >
-                          <div className="font-medium text-xs mb-1 opacity-70">
-                            {message.type === 'user' ? 'You' : '🤖 Krafty'}
-                          </div>
-                          <div>{message.content}</div>
-                        </div>
+                              {/* Content only shown when not collapsed */}
+                {!sidebarCollapsed && (
+                  <>
+                    {/* Avatar Section */}
+                    <div className="flex-shrink-0 relative">
+                      {/* Darker theme film for avatar section */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
+                      <div className="relative z-10">
+                        <ChatAvatar />
                       </div>
-                    )                )
-                  )}
+                    </div>
+                  
+                    {/* Messages */}
+                    <div className="flex-1 min-h-0 relative">
+                      {/* Messages Container */}
+                      <div 
+                        ref={messagesScrollRef}
+                        className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
+                      >
+                        {chatMessages.length === 0 ? (
+                          <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                            <p>💬 Start chatting with Krafty!</p>
+                          </div>
+                        ) : (
+                          chatMessages.map((message, index) => (
+                            <div
+                              key={`${message.timestamp}-${index}`}
+                              className={cn(
+                                "flex animate-slide-up-smooth",
+                                message.type === 'user' ? "justify-end" : "justify-start"
+                              )}
+                              style={{ 
+                                animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
+                              }}
+                            >
+                              <div
+                                className={cn(
+                                  "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                                  message.type === 'user' 
+                                    ? "bg-primary text-primary-foreground" 
+                                    : "bg-card border-2"
+                                )}
+                                style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
+                              >
+                                <div className="font-medium text-xs mb-1 opacity-70">
+                                  {message.type === 'user' ? 'You' : '🤖 Krafty'}
+                                </div>
+                                <div>{message.content}</div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Input Bar */}
+                    <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+                      <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
+                    </div>
+                  </>
+                )}
+              
+              {/* Resize Handle - Hidden on mobile and when collapsed */}
+              {!sidebarCollapsed && (
+                <div
+                  className="absolute top-0 left-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group hidden sm:block"
+                  onMouseDown={handleResizeStart}
+                  title="Drag to resize chat panel"
+                >
+                  <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
                 </div>
-              </div>
-              
-                              {/* Input Bar */}
-                <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
-              </div>
-              
-              {/* Resize Handle - Hidden on mobile */}
-              <div
-                className="absolute top-0 left-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group hidden sm:block"
-                onMouseDown={handleResizeStart}
-                title="Drag to resize chat panel"
-              >
-                <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
-              </div>
+              )}
                 </div>
             </aside>
-            )}
           </div>
         </main>
 
@@ -561,7 +577,6 @@ const Index = () => {
             onExpandChat={() => {
               playClickSound();
               setSidebarCollapsed(false);
-              setSidebarAnimatingOut(false);
             }}
           />
         )}
