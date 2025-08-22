@@ -15,9 +15,10 @@ import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
 import cockpit4 from "@/assets/comic-cockpit-4.jpg";
+import QuestionScreenTypeA from "./QuestionScreenTypeA";
 
-// Screen 2 Component - Derives UI/UX from Screen 1
-const Screen2 = ({ 
+// Old Screen2 component - to be removed
+const OldScreen2 = ({ 
   getAspectRatio, 
   sidebarCollapsed, 
   setSidebarCollapsed, 
@@ -255,6 +256,13 @@ const Screen2 = ({
         </div>
       </div>
     </main>
+  );
+};
+
+// Screen 2 Component - Question Screen Type A
+const Screen2 = (props: any) => {
+  return (
+    <QuestionScreenTypeA {...props} />
   );
 };
 
