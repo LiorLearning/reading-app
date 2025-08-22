@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Mic, Volume2 } from "lucide-react";
+import { Mic, Volume2, Square } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
@@ -42,6 +42,25 @@ interface QuestionScreenTypeAProps {
   lastMessageCount: number;
   handleResizeStart: (e: React.MouseEvent) => void;
 }
+
+// Waveform Visualizer Component (same as hover chatbox)
+const WaveformVisualizer = () => {
+  return (
+    <div className="rounded-xl border-2 border-black w-48 bg-white text-sm h-9 flex items-center justify-center gap-1 px-4" style={{ boxShadow: '0 4px 0 black' }}>
+      {[...Array(10)].map((_, i) => (
+        <div
+          key={i}
+          className="w-1 bg-primary rounded-full animate-pulse"
+          style={{
+            height: `${Math.random() * 16 + 6}px`,
+            animationDelay: `${i * 0.1}s`,
+            animationDuration: `${0.5 + Math.random() * 0.5}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
   getAspectRatio,
@@ -442,21 +461,20 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
               className={cn(
                 "h-20 w-20 rounded-full border-4 border-black transition-all duration-200 relative hover:scale-110",
                 isRecording 
-                  ? "bg-red-600 hover:bg-red-600 animate-pulse" 
+                  ? "bg-red-600 hover:bg-red-600" 
                   : "bg-white hover:bg-primary hover:text-primary-foreground"
               )}
               style={{ boxShadow: '0 6px 0 black' }}
             >
-              <Mic className={cn("transition-colors duration-200", isRecording ? "text-white" : "text-current")} style={{ width: '32px', height: '32px' }} />
-              {isRecording && (
-                <div className="absolute -top-2 -right-2 h-4 w-4 bg-red-600 rounded-full animate-ping"></div>
+              {isRecording ? (
+                <Square className="text-white transition-colors duration-200" style={{ width: '32px', height: '32px' }} />
+              ) : (
+                <Mic className="transition-colors duration-200 text-current" style={{ width: '32px', height: '32px' }} />
               )}
             </Button>
             
             {isRecording && (
-              <p className="text-white text-sm mt-2 animate-pulse">
-                🎤 Recording... Speak now!
-              </p>
+              <WaveformVisualizer />
             )}
             
 
