@@ -110,6 +110,12 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
   const iconStripToTextCardGap = "mb-1"; // Gap between icon strip and text card
   const textCardToMicGap = "mb-1"; // Gap between text card and mic button section
 
+  // Overlay configuration variables
+  const overlayScale = 4; // Scale factor for overlay size (1 = normal, 1.5 = 150%, etc.)
+  const overlayBottomOffset = -20; // Bottom positioning offset in px units (Tailwind: 2 = 8px)
+  const overlayHorizontalOffset = -100; // Horizontal margin from edges in px units (positive = smaller, negative = larger)
+  const overlayHeight = 200; // Height in pixels
+
   const checkAccuracy = useCallback((transcript: string) => {
     const originalWords = storyText.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
     const spokenWords = transcript.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
@@ -314,9 +320,29 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
           style={{ 
             border: '4px solid hsl(var(--primary) / 0.9)',
             boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
-            backgroundColor: 'hsl(var(--primary) / 0.9)'
+            backgroundColor: 'hsl(var(--primary) / 0.9)',
+            overflow: 'hidden' // Clip overlay content that goes beyond container
           }}
-        ></div>
+        >
+          {/* Bottom overlay - positioned to blend with purple background */}
+          <div 
+            className={`absolute z-5`}
+            style={{
+              bottom: `${overlayBottomOffset * 4}px`,
+              left: '55%',
+              width: `calc(100% - ${overlayHorizontalOffset * 8}px)`, // Account for both sides
+              height: `${overlayHeight}px`,
+              transform: `translateX(-50%) scale(${overlayScale})`,
+              transformOrigin: 'bottom center',
+              backgroundImage: `url('/backgrounds/bg-overlay.png')`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'bottom center',
+              backgroundRepeat: 'no-repeat',
+              mixBlendMode: 'multiply',
+              borderRadius: '20px'
+            }}
+          />
+        </div>
         
         {/* Content Container - Comic Panel + Sidebar */}
         <div 
@@ -336,7 +362,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
             style={{ marginRight: sidebarCollapsed ? '0px' : '5px' }}
           >
             {/* Icon Strip */}
-            <div className={`flex justify-center ${iconStripToTextCardGap} mt-10`}>
+            <div className={`flex justify-center ${iconStripToTextCardGap} mt-10 relative z-10`}>
             <div 
               className="flex items-center gap-0 px-6 py-3 rounded-2xl max-w-2xl w-full"
               style={{
@@ -372,7 +398,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
           </div>
           
           {/* Story Text Area */}
-          <div className={`flex-1 flex items-center justify-center ${textCardToMicGap} relative`}>
+          <div className={`flex-1 flex items-center justify-center ${textCardToMicGap} relative z-10`}>
             <div 
               className="relative bg-white rounded-3xl p-8 max-w-2xl w-full"
               style={{
@@ -449,7 +475,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
           </div>
           
           {/* Reading Prompt and Mic Button */}
-          <div className="flex flex-col items-center gap-4 mb-5">
+          <div className="flex flex-col items-center gap-4 mb-5 relative z-10">
             <p className="text-white text-xl font-medium">
               Now, read the story back to me
             </p>
