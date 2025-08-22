@@ -321,7 +321,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
             <div 
               className="flex items-center gap-0 px-6 py-3 rounded-2xl max-w-2xl w-full"
               style={{
-                background: 'linear-gradient(to bottom, hsl(from hsl(var(--primary)) h s 15%) 0%, hsl(from hsl(var(--primary)) h s 35%) 100%)',
+                background: 'linear-gradient(to bottom, hsl(from hsl(var(--primary)) h s 15%) 0%, hsl(from hsl(var(--primary)) h s 25%) 100%)',
                 border: '3px solid white',
                 boxShadow: '0 4px 0 black'
               }}
@@ -331,7 +331,14 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                   key={index}
                   className="flex flex-col items-center gap-1 flex-1 relative"
                 >
-                  <div className="text-4xl">{item.icon}</div>
+                  <div 
+                    className="text-4xl cursor-pointer transition-transform duration-200 ease-out hover:scale-125 select-none"
+                    style={{
+                      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
+                    {item.icon}
+                  </div>
                   {index < storyIcons.length - 1 && (
                     <div 
                       className="absolute right-0 top-1/2 -translate-y-1/2 w-px h-8 bg-white"
@@ -360,7 +367,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                 variant="outline"
                 size="icon"
                 onClick={handleSpeakerClick}
-                className="absolute bottom-4 right-4 h-12 w-12 rounded-lg border-2 border-black bg-white hover:bg-gray-100 z-10"
+                className="absolute bottom-4 right-4 h-12 w-12 rounded-lg border-2 border-black bg-white hover:bg-primary hover:text-primary-foreground z-10 transition-all duration-200 hover:scale-110"
                 style={{ boxShadow: '0 4px 0 black' }}
               >
                 <Volume2 className="h-5 w-5" />
@@ -394,7 +401,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
               
               {/* Story text with ruled lines */}
               <div 
-                className="mt-8 text-lg font-medium text-gray-800 relative"
+                className="mt-4 text-lg font-medium text-gray-800 relative"
                 style={{
                   lineHeight: '2.5rem', // Increased line spacing
                   backgroundImage: 'repeating-linear-gradient(transparent, transparent 2.4rem, #e5e7eb 2.4rem, #e5e7eb 2.5rem)',
@@ -433,14 +440,14 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
               size="lg"
               onClick={handleMicClick}
               className={cn(
-                "h-20 w-20 rounded-full border-4 border-black transition-all duration-200 relative",
+                "h-20 w-20 rounded-full border-4 border-black transition-all duration-200 relative hover:scale-110",
                 isRecording 
                   ? "bg-red-600 hover:bg-red-600 animate-pulse" 
-                  : "bg-white hover:bg-green-600"
+                  : "bg-white hover:bg-primary hover:text-primary-foreground"
               )}
               style={{ boxShadow: '0 6px 0 black' }}
             >
-              <Mic className="text-black" style={{ width: '32px', height: '32px' }} />
+              <Mic className={cn("transition-colors duration-200", isRecording ? "text-white" : "text-current")} style={{ width: '32px', height: '32px' }} />
               {isRecording && (
                 <div className="absolute -top-2 -right-2 h-4 w-4 bg-red-600 rounded-full animate-ping"></div>
               )}
