@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Mic, Volume2 } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
-import MessengerChat from "@/components/comic/MessengerChat";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
 import { X } from "lucide-react";
@@ -575,19 +574,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
         </div>
       </div>
       
-      {/* Krafty Avatar - Shows when sidebar is collapsed */}
-      {sidebarCollapsed && (
-        <MessengerChat 
-          key="messenger-chat-collapsed"
-          messages={chatMessages} 
-          onGenerate={onGenerate}
-          onGenerateImage={onGenerateImage}
-          onExpandChat={() => {
-            playClickSound();
-            setSidebarCollapsed(false);
-          }}
-        />
-      )}
+
     </main>
   );
 };

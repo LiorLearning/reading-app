@@ -209,7 +209,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     
     return (
       <div 
-        className="fixed bottom-6 right-8 z-50 animate-roll-out-from-avatar"
+        className="fixed bottom-6 right-8 z-[60] animate-roll-out-from-avatar"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >

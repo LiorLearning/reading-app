@@ -328,6 +328,13 @@ const Index = () => {
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   
+  // Auto-collapse sidebar when switching to Screen 2
+  React.useEffect(() => {
+    if (currentScreen === 2) {
+      setSidebarCollapsed(true);
+    }
+  }, [currentScreen]);
+  
   React.useEffect(() => {
     const updateScreenSize = () => {
       if (window.innerWidth <= 640) {
