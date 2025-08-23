@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { cn, loadUserAdventure } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Volume2, Check, X, Loader2, VolumeX } from "lucide-react";
+import { Volume2, Check, X, Loader2 } from "lucide-react";
 import { playClickSound, playMessageSound } from "@/lib/sounds";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
@@ -326,21 +326,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
   }, [currentQuestionIndex, currentTopic, setChatMessages]);
 
-  const handleSpeakerClick = useCallback(() => {
-    playClickSound();
-    
-    // Toggle speech - stop if currently speaking, otherwise start
-    if (ttsService.getIsSpeaking()) {
-      ttsService.stop();
-      setIsSpeaking(false);
-    } else {
-      // Read the question aloud (use contextual question if available)
-      setIsSpeaking(true);
-      ttsService.speakQuestion(displayQuestionText).finally(() => {
-        setIsSpeaking(false);
-      });
-    }
-  }, [displayQuestionText]);
+
 
   // Generate contextual question when component mounts or question changes
   useEffect(() => {
@@ -445,7 +431,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     const correctAnswerText = currentQuestion.options[currentQuestion.correctAnswer];
     
     setIsSpeaking(true);
-    ttsService.speakAnswer(`The correct answer is: ${correctAnswerText}`).finally(() => {
+    ttsService.speakAnswer(correctAnswerText).finally(() => {
       setIsSpeaking(false);
     });
   }, [currentQuestion]);
@@ -516,20 +502,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   borderRadius: '24px'
                 }}
               >
-                {/* Speaker button */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleSpeakerClick}
-                  className={cn(
-                    "absolute top-4 right-4 h-12 w-12 rounded-lg border-2 border-black bg-white hover:bg-primary hover:text-primary-foreground z-10 transition-all duration-200 hover:scale-110",
-                    isSpeaking && "bg-primary text-primary-foreground animate-pulse"
-                  )}
-                  style={{ boxShadow: '0 4px 0 black' }}
-                  title={isSpeaking ? "Stop speaking" : "Read question aloud"}
-                >
-                  {isSpeaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                </Button>
+
 
                 {/* Notebook spiral binding */}
                 <div className="absolute top-0 left-0 right-0 h-6 flex justify-evenly items-center px-4">
@@ -618,22 +591,20 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                         </div>
                       </div>
                       
-                      {/* Answer Speaker Button - only show when answered and correct */}
-                      {showFeedback && isCorrect && (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={handleSpeakAnswer}
-                          className={cn(
-                            "absolute -bottom-3 -right-3 h-10 w-10 rounded-full border-2 border-green-600 bg-green-100 hover:bg-green-200 z-10 transition-all duration-200 hover:scale-110",
-                            isSpeaking && "animate-pulse"
-                          )}
-                          style={{ boxShadow: '0 3px 0 #16a34a' }}
-                          title="Read the correct answer aloud"
-                        >
-                          <Volume2 className="h-4 w-4 text-green-600" />
-                        </Button>
-                      )}
+                      {/* Answer Speaker Button - always visible on left side */}
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleSpeakAnswer}
+                        className={cn(
+                          "absolute -bottom-3 -left-3 h-10 w-10 rounded-full border-2 border-blue-600 bg-blue-100 hover:bg-blue-200 z-10 transition-all duration-200 hover:scale-110",
+                          isSpeaking && "animate-pulse"
+                        )}
+                        style={{ boxShadow: '0 3px 0 #2563eb' }}
+                        title="Read the correct answer aloud"
+                      >
+                        <Volume2 className="h-4 w-4 text-blue-600" />
+                      </Button>
                     </div>
                   </div>
                   
