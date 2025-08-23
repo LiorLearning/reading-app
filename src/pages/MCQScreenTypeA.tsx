@@ -73,47 +73,257 @@ interface MCQScreenTypeAProps {
 // Sample MCQ data - this would normally come from an API or JSON file
 const sampleMCQData: MCQData = {
   "topics": {
-    "K-F.2": {
-      "topicInfo": {
-        "topicId": "K-F.2",
-        "topicName": "Choose_the_sentence_that_is_spaced_correctly",
-        "questionElements": "audio + text+image",
-        "answerElements": "text",
-        "templateType": "mcq"
+    'K-F.2': {
+      topicInfo: {
+        topicId: 'K-F.2',
+        topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+        questionElements: 'audio + text+image',
+        answerElements: 'text',
+        templateType: 'mcq'
       },
-      "questions": [
+      questions: [
         {
-          "id": 1,
-          "topicId": "K-F.2",
-          "topicName": "Choose_the_sentence_that_is_spaced_correctly",
-          "questionElements": "audio + text+image",
-          "answerElements": "text",
-          "templateType": "mcq",
-          "word": "sentence spacing",
-          "imageUrl": null,
-          "explanation": "Great job! That sentence is spaced correctly. Proper spacing between words makes reading easier.",
-          "questionText": "Which sentence is spaced correctly?",
-          "options": [
-            "Myname is John.",
-            "My nameis John.", 
-            "My name is John.",
-            "MynameisJohn."
-          ],
-          "correctAnswer": 2,
-          "template": "mcq",
-          "isSpacing": true,
-          "isSorting": false,
-          "isSpelling": false,
-          "aiHook": {
-            "targetWord": "sentence spacing",
-            "intent": "mcq",
-            "questionLine": "Which sentence is spaced correctly?",
-            "imagePrompt": "Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts"
+          id: 1,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Great job! That sentence is spaced correctly.",
+          questionText: "Which sentence is spaced correctly?",
+          options: ["Myname is John.", "My nameis John.", "My name is John.", "MynameisJohn."],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Which sentence is spaced correctly?",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
           }
         },
-      
-      ]
-    }
+        {
+          id: 2,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Well done! That sentence is correctly spaced.",
+          questionText: "Identify the correctly spaced sentence.",
+          options: ["The sun is hot.", "Thesunis hot.", "The sunishot.", "Thesu nis hot."],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Identify the correctly spaced sentence.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 3,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Correct! You found the right sentence spacing.",
+          questionText: "Select the sentence with the correct spacing.",
+          options: ["Thecat is furry.", "The cat is furry.", "Thecatis furry.", "The catis furry."],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Select the sentence with the correct spacing.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 4,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Nice work! That sentence has the correct spacing.",
+          questionText: "Find the correctly spaced sentence.",
+          options: ["Ilovemy dog.", "I lovemydog.", "Ilove mydog.", "I love my dog."],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Find the correctly spaced sentence.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 5,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "You're right! That sentence is spaced correctly.",
+          questionText: "Which of these sentences is spaced correctly?",
+          options: ["We go swimming.", "Wegoswimming.", "We goswimming.", "We go swimming."],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Which of these sentences is spaced correctly?",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 6,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Well done! That sentence is correctly spaced.",
+          questionText: "Choose the sentence that is spaced correctly.",
+          options: ["Heis a teacher.", "He isa teacher.", "He is a teacher.", "Heis ateacher."],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Choose the sentence that is spaced correctly.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 7,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Correct! You've chosen the right sentence.",
+          questionText: "Select the sentence with the proper spacing.",
+          options: ["Weplay soccer.", "We play soccer.", "Weplaysoccer.", "We play soccer."],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Select the sentence with the proper spacing.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 8,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Nice work! That sentence is spaced correctly.",
+          questionText: "Find the sentence with correct spacing.",
+          options: ["Thebird is flying.", "The birdis flying.", "The bird isflying.", "The bird is flying."],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Find the sentence with correct spacing.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 9,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "You're right! That sentence is spaced correctly.",
+          questionText: "Which sentence has the correct spacing?",
+          options: ["I like ice cream.", "Ilike ice cream.", "I likeice cream.", "Ilikeicecream."],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Which sentence has the correct spacing?",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        },
+        {
+          id: 10,
+          topicId: 'K-F.2',
+          topicName: 'Choose_the_sentence_that_is_spaced_correctly',
+          questionElements: 'audio + text+image',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'sentence spacing',
+          imageUrl: null,
+          explanation: "Well done! That's the correctly spaced sentence.",
+          questionText: "Pick the sentence that is spaced correctly.",
+          options: ["Sheloves cats.", "Shelovescats.", "She loves cats.", "She lovescats."],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: true,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'sentence spacing',
+            intent: 'mcq',
+            questionLine: "Pick the sentence that is spaced correctly.",
+            imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
+          }
+        }
+      ],
+    },
   }
 };
 
