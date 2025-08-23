@@ -7,264 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, ChatMessage, loadUserAdventure, saveUserAdventure } from "@/lib/utils";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
+import { aiService } from "@/lib/ai-service";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
 import cockpit4 from "@/assets/comic-cockpit-4.jpg";
-import QuestionScreenTypeA from "./QuestionScreenTypeA";
 
-// Old Screen2 component - to be removed
-const OldScreen2 = ({ 
-  getAspectRatio, 
-  sidebarCollapsed, 
-  setSidebarCollapsed, 
-  chatMessages, 
-  setChatMessages, 
-  onGenerate, 
-  onGenerateImage, 
-  newlyCreatedPanelId, 
-  zoomingPanelId, 
-  chatPanelWidthPercent, 
-  setChatPanelWidthPercent, 
-  isResizing, 
-  setIsResizing, 
-  messagesScrollRef, 
-  lastMessageCount,
-  handleResizeStart 
-}: any) => {
-  // Screen 2 specific data - different images and story
-  const screen2Images = useMemo(() => [spaceport2, alien3, cockpit4, rocket1], []);
-  
-  const screen2InitialPanels = useMemo(
-    () => [
-      { id: crypto.randomUUID(), image: spaceport2, text: "Welcome to the Space Port! A new adventure begins..." },
-    ],
-    []
-  );
-
-  const { panels, currentIndex, setCurrent, addPanel } = useComic(screen2InitialPanels);
-  const [screen2NewlyCreatedPanelId, setScreen2NewlyCreatedPanelId] = React.useState<string | null>(null);
-  const [screen2ZoomingPanelId, setScreen2ZoomingPanelId] = React.useState<string | null>(null);
-  
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const resizeRef = React.useRef<HTMLDivElement>(null);
-
-  // Screen 2 specific image generation
-  const onGenerateImageScreen2 = useCallback(() => {
-    playImageLoadingSound();
-    
-    const image = screen2Images[Math.floor(Math.random() * screen2Images.length)];
-    const newPanelId = crypto.randomUUID();
-    addPanel({ id: newPanelId, image, text: "The space adventure continues..." });
-    setScreen2NewlyCreatedPanelId(newPanelId);
-    
-    setTimeout(() => {
-      stopImageLoadingSound();
-      playImageCompleteSound();
-      setScreen2ZoomingPanelId(newPanelId);
-      setScreen2NewlyCreatedPanelId(null);
-      
-      setTimeout(() => {
-        setScreen2ZoomingPanelId(null);
-      }, 600);
-    }, 2000);
-  }, [addPanel, screen2Images]);
-
-  const current = panels[currentIndex] ?? screen2InitialPanels[0];
-
-  return (
-    <main 
-      className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
-      style={{
-        backgroundImage: `url('/backgrounds/space.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundBlendMode: 'multiply'
-      }}
-      role="main"
-    >
-      <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
-      <div 
-        className="relative responsive-max-width"
-        style={{ 
-          width: '95%',
-          maxWidth: '1520px',
-          aspectRatio: getAspectRatio,
-          maxHeight: 'calc(100vh - 100px)',
-          minHeight: '500px',
-          transition: 'all 0.3s ease-in-out'
-        }}
-      >
-        <div 
-          className="absolute inset-0 rounded-3xl z-0"
-          style={{ 
-            border: '4px solid hsl(var(--primary) / 0.9)',
-            boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
-            backgroundColor: 'hsl(var(--primary) / 0.9)'
-          }}
-        ></div>
-        
-        <div 
-          ref={containerRef}
-          className="flex relative z-10 h-full w-full"
-          style={{ 
-            paddingTop: '8px',
-            paddingBottom: '8px',
-            paddingLeft: '8px',
-            paddingRight: '8px'
-          }}
-        >
-        {/* Main Comic Panel - Left Side */}
-        <section 
-          aria-label="Main comic panel" 
-          className="flex flex-col min-h-0 relative flex-1 bg-white rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-in-out"
-          style={{ marginRight: sidebarCollapsed ? '0px' : '5px' }}
-        >
-          <div className="flex-1 min-h-0 relative">
-            <ComicPanel
-              image={current.image}
-              className="h-full w-full"
-              isNew={current.id === screen2NewlyCreatedPanelId}
-              shouldZoom={current.id === screen2ZoomingPanelId}
-              onPreviousPanel={() => {
-                if (currentIndex > 0) {
-                  setCurrent(currentIndex - 1);
-                }
-              }}
-              onNextPanel={() => {
-                if (currentIndex < panels.length - 1) {
-                  setCurrent(currentIndex + 1);
-                }
-              }}
-              hasPrevious={currentIndex > 0}
-              hasNext={currentIndex < panels.length - 1}
-            />
-          </div>
-        </section>
-
-        {/* Right Sidebar - Same as Screen 1 but with different image generation */}
-        <aside 
-          ref={resizeRef}
-          className={`flex flex-col min-h-0 z-10 relative rounded-3xl overflow-hidden border-2 border-black transition-all duration-300 ease-in-out ${isResizing ? 'chat-panel-resizing' : ''}`}
-          style={{ 
-            width: sidebarCollapsed ? '0%' : `${chatPanelWidthPercent}%`,
-            minWidth: sidebarCollapsed ? '0px' : '320px',
-            maxWidth: sidebarCollapsed ? '0px' : '450px',
-            opacity: sidebarCollapsed ? 0 : 1,
-            height: '100%',
-            backgroundImage: `url('/backgrounds/space.png')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            marginLeft: sidebarCollapsed ? '0px' : '5px',
-            pointerEvents: sidebarCollapsed ? 'none' : 'auto'
-          }}
-          >
-          <div 
-            className="absolute inset-0 backdrop-blur-sm bg-gradient-to-b from-primary/15 via-white/40 to-primary/10"
-            style={{ zIndex: 1 }}
-          ></div>
-          
-          <div className="relative z-10 flex flex-col h-full">
-            {!sidebarCollapsed && (
-              <div className="absolute top-3 right-3 z-20">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    playClickSound();
-                    setSidebarCollapsed(true);
-                  }}
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground btn-animate bg-white/20 backdrop-blur-sm rounded-full"
-                  aria-label="Close chat panel"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          
-            {!sidebarCollapsed && (
-              <>
-                <div className="flex-shrink-0 relative">
-                  <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
-                  <div className="relative z-10">
-                    <ChatAvatar />
-                  </div>
-                </div>
-              
-                <div className="flex-1 min-h-0 relative">
-                  <div 
-                    ref={messagesScrollRef}
-                    className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
-                  >
-                    {chatMessages.length === 0 ? (
-                      <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-                        <p>🚀 Welcome to Screen 2! Chat with Krafty!</p>
-                      </div>
-                    ) : (
-                      chatMessages.map((message, index) => (
-                        <div
-                          key={`${message.timestamp}-${index}`}
-                          className={cn(
-                            "flex animate-slide-up-smooth",
-                            message.type === 'user' ? "justify-end" : "justify-start"
-                          )}
-                          style={{ 
-                            animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
-                          }}
-                        >
-                          <div
-                            className={cn(
-                              "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
-                              message.type === 'user' 
-                                ? "bg-primary text-primary-foreground" 
-                                : "bg-card border-2"
-                            )}
-                            style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
-                          >
-                            <div className="font-medium text-xs mb-1 opacity-70">
-                              {message.type === 'user' ? 'You' : '🤖 Krafty'}
-                            </div>
-                            <div>{message.content}</div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                  <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImageScreen2} />
-                </div>
-              </>
-            )}
-          
-          {!sidebarCollapsed && (
-            <div
-              className="absolute top-0 left-0 w-1 h-full cursor-ew-resize bg-transparent hover:bg-foreground/20 transition-colors duration-200 group hidden sm:block"
-              onMouseDown={handleResizeStart}
-              title="Drag to resize chat panel"
-            >
-              <div className="absolute top-1/2 -translate-y-1/2 left-0 w-1 h-12 bg-transparent group-hover:bg-foreground/50 transition-colors duration-200" />
-            </div>
-          )}
-          </div>
-        </aside>
-        </div>
-      </div>
-    </main>
-  );
-};
-
-// Screen 2 Component - Question Screen Type A
-const Screen2 = (props: any) => {
-  return (
-    <QuestionScreenTypeA {...props} />
-  );
-};
+import MCQScreenTypeA from "./MCQScreenTypeA";
 
 const Index = () => {
   React.useEffect(() => {
@@ -307,30 +60,28 @@ const Index = () => {
 
   const { panels, currentIndex, setCurrent, addPanel, redo } = useComic(initialPanels);
   
-  interface ChatMessage {
-    type: 'user' | 'ai';
-    content: string;
-    timestamp: number;
-  }
-  
-  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>(() => {
+    // Load messages from local storage on component initialization
+    return loadUserAdventure();
+  });
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
+  const [isAIResponding, setIsAIResponding] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-  const [currentScreen, setCurrentScreen] = React.useState<1 | 2>(1);
+  const [currentScreen, setCurrentScreen] = React.useState<1 | 2 | 3>(1);
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   
-  // Auto-collapse sidebar when switching to Screen 2
+  // Auto-collapse sidebar when switching to Screen 3 (MCQ)
   React.useEffect(() => {
-    if (currentScreen === 2) {
+    if (currentScreen === 3) {
       setSidebarCollapsed(true);
     }
   }, [currentScreen]);
@@ -488,20 +239,14 @@ const Index = () => {
     };
   }, [isResizing, handleResizeMove, handleResizeEnd]);
 
-  const generateAIResponse = useCallback((userText: string): string => {
-    const responses = [
-      "Great idea! 🚀 That sounds exciting! What happens next?",
-      "Wow! 🌟 That's a fantastic twist! Keep the story going!",
-      "Amazing! ✨ I love where this story is heading!",
-      "Cool! 🎯 That's a great addition to your adventure!",
-      "Awesome! 🎭 Your story is getting more exciting!",
-      "Nice! 🌈 What a wonderful way to continue the tale!",
-      "Brilliant! 💫 I can't wait to see what happens next!",
-      "Super! 🎪 You're such a creative storyteller!",
-      "Perfect! 🎨 That adds great action to your comic!",
-      "Excellent! 🎊 Your adventure is becoming amazing!"
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
+  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[]): Promise<string> => {
+    try {
+      return await aiService.generateResponse(userText, messageHistory);
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      // Fallback response on error
+      return "That's interesting! 🤔 Tell me more about what happens next in your adventure!";
+    }
   }, []);
 
 
@@ -532,7 +277,7 @@ const Index = () => {
 
   // Handle text messages only (no image generation)
   const onGenerate = useCallback(
-    (text: string) => {
+    async (text: string) => {
       // Add user message
       const userMessage: ChatMessage = {
         type: 'user',
@@ -547,22 +292,43 @@ const Index = () => {
         return [...prev, userMessage];
       });
       
-      // Generate AI response with delay for natural feel
-      setTimeout(() => {
-        const aiResponse = generateAIResponse(text);
+      // Set loading state
+      setIsAIResponding(true);
+      
+      try {
+        // Generate AI response using the current message history
+        const currentMessages = [...chatMessages, userMessage];
+        const aiResponse = await generateAIResponse(text, currentMessages);
+        
         const aiMessage: ChatMessage = {
           type: 'ai',
           content: aiResponse,
           timestamp: Date.now()
         };
+        
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           return [...prev, aiMessage];
         });
-      }, 800);
+      } catch (error) {
+        console.error('Error generating AI response:', error);
+        // Show error message to user
+        const errorMessage: ChatMessage = {
+          type: 'ai',
+          content: "Sorry, I'm having trouble thinking right now! 😅 Try again in a moment!",
+          timestamp: Date.now()
+        };
+        
+        setChatMessages(prev => {
+          setLastMessageCount(prev.length + 1);
+          return [...prev, errorMessage];
+        });
+      } finally {
+        setIsAIResponding(false);
+      }
     },
-    [generateAIResponse]
+    [generateAIResponse, chatMessages]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -570,6 +336,11 @@ const Index = () => {
     if (messagesScrollRef.current) {
       messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight;
     }
+  }, [chatMessages]);
+
+  // Save messages to local storage whenever they change
+  React.useEffect(() => {
+    saveUserAdventure(chatMessages);
   }, [chatMessages]);
 
 
@@ -663,34 +434,71 @@ const Index = () => {
             )}
             
             <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
-              {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 'YOUR ADVENTURE'}
+              {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
+               currentScreen === 1 ? 'YOUR ADVENTURE' : 
+               'QUIZ TIME'}
             </h1>
             
             {devToolsVisible && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  playClickSound();
-                  setCurrentScreen(2);
-                }}
-                disabled={currentScreen === 2}
-                className="border-2 bg-white btn-animate"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-              >
-                Screen 2
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+              <>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(3);
+                  }}
+                  disabled={currentScreen === 3}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  MCQ Screen
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </>
             )}
           </div>
           
-          {/* View Whole Comic Button - Right - Positioned to align with purple container */}
+          {/* Right Buttons Group - Positioned to align with purple container */}
           <div 
-            className="absolute right-0 flex"
+            className="absolute right-0 flex items-center gap-2"
             style={{
               marginRight: `calc((100% - 92%) / 2)` // Align with right edge of purple container
             }}
           >
+            {/* Next Button - Show on Screen 1 */}
+            {currentScreen === 1 && (
+              <Button 
+                variant="default" 
+                onClick={() => {
+                  playClickSound();
+                  setCurrentScreen(3); // Go directly to MCQ screen
+                }}
+                className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate px-4"
+                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+              >
+                Answer Questions
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            )}
+            
+            {/* Back Button - Show on Screen 3 */}
+            {currentScreen === 3 && (
+              <Button 
+                variant="default" 
+                onClick={() => {
+                  playClickSound();
+                  setCurrentScreen(1); // Go back to adventure screen
+                }}
+                className="border-2 bg-blue-600 hover:bg-blue-700 text-white btn-animate px-4"
+                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Back to Adventure
+              </Button>
+            )}
+            
             <Dialog>
               <DialogTrigger asChild>
                                 <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
@@ -860,33 +668,62 @@ const Index = () => {
                               <p>💬 Start chatting with Krafty!</p>
                             </div>
                           ) : (
-                            chatMessages.map((message, index) => (
-                              <div
-                                key={`${message.timestamp}-${index}`}
-                                className={cn(
-                                  "flex animate-slide-up-smooth",
-                                  message.type === 'user' ? "justify-end" : "justify-start"
-                                )}
-                                style={{ 
-                                  animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
-                                }}
-                              >
+                            <>
+                              {chatMessages.map((message, index) => (
                                 <div
+                                  key={`${message.timestamp}-${index}`}
                                   className={cn(
-                                    "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
-                                    message.type === 'user' 
-                                      ? "bg-primary text-primary-foreground" 
-                                      : "bg-card border-2"
+                                    "flex animate-slide-up-smooth",
+                                    message.type === 'user' ? "justify-end" : "justify-start"
                                   )}
-                                  style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
+                                  style={{ 
+                                    animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
+                                  }}
                                 >
-                                  <div className="font-medium text-xs mb-1 opacity-70">
-                                    {message.type === 'user' ? 'You' : '🤖 Krafty'}
+                                  <div
+                                    className={cn(
+                                      "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                                      message.type === 'user' 
+                                        ? "bg-primary text-primary-foreground" 
+                                        : "bg-card border-2"
+                                    )}
+                                    style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
+                                  >
+                                    <div className="font-medium text-xs mb-1 opacity-70">
+                                      {message.type === 'user' ? 'You' : '🤖 Krafty'}
+                                    </div>
+                                    <div>{message.content}</div>
                                   </div>
-                                  <div>{message.content}</div>
                                 </div>
-                              </div>
-                            ))
+                              ))}
+                              
+                              {/* AI Typing Indicator */}
+                              {isAIResponding && (
+                                <div className="flex justify-start animate-slide-up-smooth">
+                                  <div className="max-w-[80%] rounded-lg px-3 py-2 text-sm bg-card border-2"
+                                       style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+                                    <div className="font-medium text-xs mb-1 opacity-70">
+                                      🤖 Krafty
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span>Krafty is thinking</span>
+                                      <div className="flex gap-1">
+                                        {[...Array(3)].map((_, i) => (
+                                          <div
+                                            key={i}
+                                            className="w-1 h-1 bg-primary rounded-full animate-pulse"
+                                            style={{
+                                              animationDelay: `${i * 0.2}s`,
+                                              animationDuration: '1s'
+                                            }}
+                                          />
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -914,7 +751,7 @@ const Index = () => {
             </div>
           </main>
         ) : (
-          <Screen2 
+          <MCQScreenTypeA
             getAspectRatio={getAspectRatio}
             sidebarCollapsed={sidebarCollapsed}
             setSidebarCollapsed={setSidebarCollapsed}
@@ -922,8 +759,6 @@ const Index = () => {
             setChatMessages={setChatMessages}
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
-            newlyCreatedPanelId={newlyCreatedPanelId}
-            zoomingPanelId={zoomingPanelId}
             chatPanelWidthPercent={chatPanelWidthPercent}
             setChatPanelWidthPercent={setChatPanelWidthPercent}
             isResizing={isResizing}
