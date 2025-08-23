@@ -111,35 +111,7 @@ const sampleMCQData: MCQData = {
             "imagePrompt": "Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts"
           }
         },
-        {
-          "id": 2,
-          "topicId": "K-F.2", 
-          "topicName": "Adventure_Reading_Comprehension",
-          "questionElements": "audio + text+image",
-          "answerElements": "text",
-          "templateType": "mcq",
-          "word": "adventure comprehension",
-          "imageUrl": null,
-          "explanation": "Excellent! Captain Asher found a map in the story. Maps help adventurers navigate new places.",
-          "questionText": "What did Captain Asher find in the moon jungle?",
-          "options": [
-            "A treasure chest",
-            "A magical map", 
-            "A friendly alien",
-            "A spaceship"
-          ],
-          "correctAnswer": 1,
-          "template": "mcq",
-          "isSpacing": false,
-          "isSorting": false,
-          "isSpelling": false,
-          "aiHook": {
-            "targetWord": "adventure comprehension",
-            "intent": "mcq",
-            "questionLine": "What did Captain Asher find in the moon jungle?",
-            "imagePrompt": "Adventure scene with Captain Asher discovering a map in a mystical moon jungle"
-          }
-        }
+      
       ]
     }
   }
@@ -197,17 +169,17 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
 
   const handleAnswerClick = useCallback(async (answerIndex: number) => {
-    if (hasAnswered || isGeneratingQuestion) return;
+    if ((hasAnswered && isCorrect) || isGeneratingQuestion || isInReflectionMode) return;
     
     playClickSound();
     setSelectedAnswer(answerIndex);
-    setHasAnswered(true);
     
     const correct = answerIndex === currentQuestion.correctAnswer;
     setIsCorrect(correct);
     
     if (correct) {
-      // Correct answer - show celebration immediately
+      // Correct answer - show celebration and disable further selections
+      setHasAnswered(true);
       setShowFeedback(true);
       const feedbackMessage = {
         type: 'ai' as const,
@@ -221,63 +193,49 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // Auto-speak the AI feedback message
       ttsService.speakAIMessage(feedbackMessage.content);
     } else {
-      // Wrong answer - enter reflection mode instead of showing correct answer
-      setIsInReflectionMode(true);
+      // Wrong answer - allow immediate retry but show hint
+      setHasAnswered(false); // Allow trying other options
       
-      try {
-        // Generate reflection prompt using AI
-        const reflectionPrompt = await aiService.generateReflectionPrompt(
-          currentQuestion.questionText,
-          currentQuestion.options,
-          answerIndex,
-          currentQuestion.correctAnswer
-        );
-        
-        const reflectionMessage = {
-          type: 'ai' as const,
-          content: reflectionPrompt,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages((prev: any) => [...prev, reflectionMessage]);
-        playMessageSound();
-        
-        // Auto-speak the reflection prompt
-        ttsService.speakAIMessage(reflectionMessage.content);
-      } catch (error) {
-        // Fallback reflection message if AI fails
-        const fallbackMessage = {
-          type: 'ai' as const,
-          content: `🤔 Hmm, that's not quite right! Can you think about why "${currentQuestion.options[answerIndex]}" might not be the best answer? What clues in the question might help you?`,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages((prev: any) => [...prev, fallbackMessage]);
-        playMessageSound();
-        
-        // Auto-speak the fallback reflection message
-        ttsService.speakAIMessage(fallbackMessage.content);
-      }
+      const hintMessage = {
+        type: 'ai' as const,
+        content: `❌ That's not correct. Try another option! 💡`,
+        timestamp: Date.now()
+      };
+      
+      setChatMessages((prev: any) => [...prev, hintMessage]);
+      playMessageSound();
+      
+      // Auto-speak the hint message
+      ttsService.speakAIMessage(hintMessage.content);
+      
+      // Clear the wrong answer visual feedback after a brief moment
+      setTimeout(() => {
+        setSelectedAnswer(null);
+      }, 1500);
     }
     
     // Auto-expand chat to show feedback
     setSidebarCollapsed(false);
-  }, [hasAnswered, isGeneratingQuestion, currentQuestion, setChatMessages, setSidebarCollapsed]);
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, setChatMessages, setSidebarCollapsed]);
 
   // Handle student reflection response
   const handleReflectionResponse = useCallback((studentReflection: string) => {
     if (!isInReflectionMode) return;
     
-    // Student has provided their reflection, now reveal the correct answer
+    // Student has provided their reflection, now let them try again
     setHasReflected(true);
     setIsInReflectionMode(false);
-    setShowFeedback(true);
     
-    // Generate response acknowledging their thinking and revealing the correct answer
-    const correctAnswer = currentQuestion.options[currentQuestion.correctAnswer];
+    // Reset the question state to allow another attempt
+    setSelectedAnswer(null);
+    setHasAnswered(false);
+    setShowFeedback(false);
+    setIsCorrect(false);
+    
+    // Generate response encouraging them to try again
     const encouragementMessage = {
       type: 'ai' as const,
-      content: `Thank you for thinking about it! 🤗 The correct answer is: "${correctAnswer}". ${currentQuestion.explanation} You're doing great by thinking through the question!`,
+      content: `Great thinking! 💭 Now that you've reflected on it, give the question another try. You can do this! 🌟`,
       timestamp: Date.now()
     };
     
@@ -614,29 +572,27 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       <button
                         key={index}
                         onClick={() => handleAnswerClick(index)}
-                        disabled={hasAnswered || isGeneratingQuestion}
+                        disabled={(hasAnswered && isCorrect) || isGeneratingQuestion || isInReflectionMode}
                         className={cn(
                           "w-full p-4 text-left rounded-xl border-3 border-black transition-all duration-200 hover:scale-[1.02] font-medium text-lg",
-                          hasAnswered && index === currentQuestion.correctAnswer && "bg-green-200 border-green-600",
-                          hasAnswered && index === selectedAnswer && index !== currentQuestion.correctAnswer && "bg-red-200 border-red-600",
-                          !hasAnswered && !isGeneratingQuestion && "bg-white hover:bg-primary/10 cursor-pointer",
-                          (hasAnswered || isGeneratingQuestion) && "cursor-not-allowed",
+                          hasAnswered && isCorrect && index === currentQuestion.correctAnswer && "bg-green-200 border-green-600",
+                          index === selectedAnswer && !isCorrect && "bg-red-100 border-red-400 animate-pulse",
+                          (!hasAnswered || !isCorrect) && !isGeneratingQuestion && "bg-white hover:bg-primary/10 cursor-pointer",
+                          ((hasAnswered && isCorrect) || isGeneratingQuestion) && "cursor-not-allowed",
                           isGeneratingQuestion && "opacity-50"
                         )}
                         style={{ 
-                          boxShadow: hasAnswered 
-                            ? (index === currentQuestion.correctAnswer ? '0 4px 0 #16a34a' : 
-                               index === selectedAnswer ? '0 4px 0 #dc2626' : '0 4px 0 black')
-                            : '0 4px 0 black'
+                          boxShadow: hasAnswered && isCorrect && index === currentQuestion.correctAnswer 
+                            ? '0 4px 0 #16a34a' 
+                            : index === selectedAnswer && !isCorrect
+                              ? '0 3px 0 #f87171' 
+                              : '0 4px 0 black'
                         }}
                       >
                         <div className="flex items-center justify-between">
                           <span>{option}</span>
-                          {hasAnswered && index === currentQuestion.correctAnswer && (
+                          {hasAnswered && isCorrect && index === currentQuestion.correctAnswer && (
                             <Check className="h-6 w-6 text-green-600" />
-                          )}
-                          {hasAnswered && index === selectedAnswer && index !== currentQuestion.correctAnswer && (
-                            <X className="h-6 w-6 text-red-600" />
                           )}
                         </div>
                       </button>
