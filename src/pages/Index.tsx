@@ -19,6 +19,7 @@ import alien3 from "@/assets/comic-alienland-3.jpg";
 import cockpit4 from "@/assets/comic-cockpit-4.jpg";
 
 import MCQScreenTypeA from "./MCQScreenTypeA";
+import TopicSelection from "./TopicSelection";
 
 const Index = () => {
   React.useEffect(() => {
@@ -74,7 +75,8 @@ const Index = () => {
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-  const [currentScreen, setCurrentScreen] = React.useState<1 | 2 | 3>(1);
+  const [currentScreen, setCurrentScreen] = React.useState<0 | 1 | 2 | 3>(0);
+  const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
   // Responsive aspect ratio management
@@ -432,6 +434,12 @@ const Index = () => {
     saveUserAdventure(chatMessages);
   }, [chatMessages]);
 
+  // Handle topic selection
+  const handleTopicSelect = React.useCallback((topicId: string) => {
+    setSelectedTopicId(topicId);
+    setCurrentScreen(1); // Go to adventure screen
+  }, []);
+
 
 
   const current = panels[currentIndex] ?? initialPanels[0];
@@ -506,24 +514,40 @@ const Index = () => {
           <div className="flex-1 flex justify-center items-center gap-4">
             {/* Screen Navigation Buttons - Only visible when dev tools are active */}
             {devToolsVisible && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  playClickSound();
-                  setCurrentScreen(1);
-                }}
-                disabled={currentScreen === 1}
-                className="border-2 bg-white btn-animate"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Screen 1
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(0);
+                  }}
+                  disabled={currentScreen === 0}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Screen 0
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(1);
+                  }}
+                  disabled={currentScreen === 1}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Screen 1
+                </Button>
+              </>
             )}
             
             <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
               {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
+               currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
                currentScreen === 1 ? 'YOUR ADVENTURE' : 
                'QUIZ TIME'}
             </h1>
@@ -557,7 +581,7 @@ const Index = () => {
             }}
           >
             {/* Next Button - Show on Screen 1 */}
-            {currentScreen === 1 && (
+            {currentScreen === 1 && selectedTopicId && (
               <Button 
                 variant="default" 
                 onClick={() => {
@@ -572,20 +596,34 @@ const Index = () => {
               </Button>
             )}
             
-            {/* Back Button - Show on Screen 3 */}
+            {/* Navigation buttons - Show on Screen 3 */}
             {currentScreen === 3 && (
-              <Button 
-                variant="default" 
-                onClick={() => {
-                  playClickSound();
-                  setCurrentScreen(1); // Go back to adventure screen
-                }}
-                className="border-2 bg-blue-600 hover:bg-blue-700 text-white btn-animate px-4"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Back to Adventure
-              </Button>
+              <>
+                <Button 
+                  variant="default" 
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(0); // Go back to topic selection
+                  }}
+                  className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate px-4"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Choose Topic
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(1); // Go back to adventure screen
+                  }}
+                  className="border-2 bg-blue-600 hover:bg-blue-700 text-white btn-animate px-4"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Back to Adventure
+                </Button>
+              </>
             )}
             
             <Dialog>
@@ -614,7 +652,9 @@ const Index = () => {
 
 
         {/* Conditional Screen Rendering */}
-        {currentScreen === 1 ? (
+        {currentScreen === 0 ? (
+          <TopicSelection onTopicSelect={handleTopicSelect} />
+        ) : currentScreen === 1 ? (
           <main 
             className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
             style={{
@@ -855,6 +895,7 @@ const Index = () => {
             messagesScrollRef={messagesScrollRef}
             lastMessageCount={lastMessageCount}
             handleResizeStart={handleResizeStart}
+            selectedTopicId={selectedTopicId}
           />
         )}
 

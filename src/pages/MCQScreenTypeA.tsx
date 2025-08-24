@@ -68,10 +68,11 @@ interface MCQScreenTypeAProps {
   messagesScrollRef: React.RefObject<HTMLDivElement>;
   lastMessageCount: number;
   handleResizeStart: (e: React.MouseEvent) => void;
+  selectedTopicId?: string;
 }
 
 // Sample MCQ data - this would normally come from an API or JSON file
-const sampleMCQData: MCQData = {
+export const sampleMCQData: MCQData = {
   "topics": {
     'K-F.2': {
       topicInfo: {
@@ -324,6 +325,1012 @@ const sampleMCQData: MCQData = {
         }
       ],
     },
+  
+    '1-B.1': {
+      topicInfo: {
+        topicId: '1-B.1',
+        topicName: 'How_many_syllables_does_the_word_have',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'mcq'
+      },
+      questions: [
+        {
+          id: 1,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'elephant',
+          imageUrl: null,
+          explanation: "Great job! 'Elephant' has three syllables: el-e-phant.",
+          questionText: "Listen to the word 'elephant.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'elephant',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'elephant.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 2,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'banana',
+          imageUrl: null,
+          explanation: "Well done! 'Banana' has three syllables: ba-na-na.",
+          questionText: "Listen to the word 'banana.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'banana',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'banana.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 3,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'computer',
+          imageUrl: null,
+          explanation: "Nice work! 'Computer' has three syllables: com-pu-ter.",
+          questionText: "Listen to the word 'computer.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'computer',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'computer.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 4,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'umbrella',
+          imageUrl: null,
+          explanation: "Excellent! 'Umbrella' has three syllables: um-brel-la.",
+          questionText: "Listen to the word 'umbrella.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'umbrella',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'umbrella.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 5,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'giraffe',
+          imageUrl: null,
+          explanation: "Good job! 'Giraffe' has two syllables: gi-raffe.",
+          questionText: "Listen to the word 'giraffe.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'giraffe',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'giraffe.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 6,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'cucumber',
+          imageUrl: null,
+          explanation: "Great! 'Cucumber' has three syllables: cu-cum-ber.",
+          questionText: "Listen to the word 'cucumber.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'cucumber',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'cucumber.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 7,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'chocolate',
+          imageUrl: null,
+          explanation: "Correct! 'Chocolate' usually has three syllables: cho-co-late.",
+          questionText: "Listen to the word 'chocolate.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'chocolate',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'chocolate.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 8,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'dinosaur',
+          imageUrl: null,
+          explanation: "Awesome! 'Dinosaur' has three syllables: di-no-saur.",
+          questionText: "Listen to the word 'dinosaur.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'dinosaur',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'dinosaur.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 9,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'avocado',
+          imageUrl: null,
+          explanation: "Fantastic! 'Avocado' has four syllables: a-vo-ca-do.",
+          questionText: "Listen to the word 'avocado.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'avocado',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'avocado.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        },
+        {
+          id: 10,
+          topicId: '1-B.1',
+          topicName: 'How_many_syllables_does_the_word_have',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'butterfly',
+          imageUrl: null,
+          explanation: "You're right! 'Butterfly' has three syllables: but-ter-fly.",
+          questionText: "Listen to the word 'butterfly.' How many syllables does it have?",
+          options: ["2", "3", "4", "5"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'butterfly',
+            intent: 'mcq',
+            questionLine: "Listen to the word 'butterfly.' How many syllables does it have?",
+            imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
+          }
+        }
+      ],
+    },
+    '1-S.3': {
+      topicInfo: {
+        topicId: '1-S.3',
+        topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'mcq'
+      },
+      questions: [
+        {
+          id: 1,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Great job! 'Tie' matches the picture.",
+          questionText: "Which word matches the picture?",
+          options: ["tie", "tick", "tin", "tide"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 2,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Well done! 'Dime' is the correct choice.",
+          questionText: "Which word matches the picture?",
+          options: ["dim", "dime", "dine", "dip"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 3,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "That's right! 'Fill' is the word that fits.",
+          questionText: "Which word matches the picture?",
+          options: ["fill", "file", "fin", "five"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 4,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Correct! 'Pine' matches the picture.",
+          questionText: "Which word matches the picture?",
+          options: ["pin", "pile", "pill", "pine"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 5,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Nice work! 'Mile' is the matching word.",
+          questionText: "Which word matches the picture?",
+          options: ["mill", "milk", "mile", "mint"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 6,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "You got it! 'Sit' is the correct choice.",
+          questionText: "Which word matches the picture?",
+          options: ["sit", "site", "sight", "sip"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 7,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Excellent! 'Ripe' is the matching word.",
+          questionText: "Which word matches the picture?",
+          options: ["rip", "rid", "ride", "ripe"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 8,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Correct! 'Five' matches the picture.",
+          questionText: "Which word matches the picture?",
+          options: ["fin", "five", "fit", "fig"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 9,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Well done! 'File' is the correct choice.",
+          questionText: "Which word matches the picture?",
+          options: ["fill", "file", "flit", "fist"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 10,
+          topicId: '1-S.3',
+          topicName: 'Choose_the_short_i_or_long_i_word_that_matches_the_picture',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Nice! 'Line' is the word that matches.",
+          questionText: "Which word matches the picture?",
+          options: ["lip", "lit", "line", "lid"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
+          }
+        }
+      ],
+    },
+    '1-S.4': {
+      topicInfo: {
+        topicId: '1-S.4',
+        topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'mcq'
+      },
+      questions: [
+        {
+          id: 1,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'short o sounds',
+          imageUrl: null,
+          explanation: "Great job! The picture shows a pot.",
+          questionText: "Which word matches the picture?",
+          options: ["pot", "pote", "pat", "pate"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'short o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 2,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'long o sounds',
+          imageUrl: null,
+          explanation: "Well done! The picture shows a cone.",
+          questionText: "Which word matches the picture?",
+          options: ["con", "cone", "can", "cane"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'long o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 3,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'short o sounds',
+          imageUrl: null,
+          explanation: "Nice work! The picture shows a log.",
+          questionText: "Which word matches the picture?",
+          options: ["lug", "leg", "lag", "log"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'short o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 4,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'long o sounds',
+          imageUrl: null,
+          explanation: "Excellent! The picture shows a rope.",
+          questionText: "Which word matches the picture?",
+          options: ["rop", "rap", "rope", "reap"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'long o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 5,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'long o sounds',
+          imageUrl: null,
+          explanation: "Good job! The picture shows a bone.",
+          questionText: "Which word matches the picture?",
+          options: ["bone", "bon", "bin", "bane"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'long o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 6,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'short o sounds',
+          imageUrl: null,
+          explanation: "You're right! The picture shows a sock.",
+          questionText: "Which word matches the picture?",
+          options: ["sack", "sock", "suck", "seek"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'short o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 7,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'long o sounds',
+          imageUrl: null,
+          explanation: "Correct! The picture shows a rose.",
+          questionText: "Which word matches the picture?",
+          options: ["rise", "rice", "race", "rose"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'long o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 8,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'short o sounds',
+          imageUrl: null,
+          explanation: "Well done! The picture shows a frog.",
+          questionText: "Which word matches the picture?",
+          options: ["frug", "flag", "frog", "frag"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'short o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 9,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'long o sounds',
+          imageUrl: null,
+          explanation: "Nice choice! The picture shows a coat.",
+          questionText: "Which word matches the picture?",
+          options: ["cot", "coat", "cat", "cut"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'long o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 10,
+          topicId: '1-S.4',
+          topicName: 'Choose_the_short_o_or_long_o_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'short o sounds',
+          imageUrl: null,
+          explanation: "Good choice! The picture shows a dog.",
+          questionText: "Which word matches the picture?",
+          options: ["dog", "dag", "dig", "dug"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'short o sounds',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
+          }
+        }
+      ],
+    },
+    '1-S.5': {
+      topicInfo: {
+        topicId: '1-S.5',
+        topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'mcq'
+      },
+      questions: [
+        {
+          id: 1,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Great job! The picture matches the word with the correct vowel sound.",
+          questionText: "Which word matches the picture?",
+          options: ["glue", "glum", "gloom", "glow"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 2,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Well done! You chose the correct word for the image.",
+          questionText: "Which word matches the picture?",
+          options: ["tub", "tube", "tab", "tubing"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 3,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "That's right! The word matches the picture perfectly.",
+          questionText: "Which word matches the picture?",
+          options: ["bug", "bag", "bugle", "bog"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 4,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Excellent! You picked the right word for the image.",
+          questionText: "Which word matches the picture?",
+          options: ["bun", "bunk", "bank", "bent"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 5,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Nice work! You selected the correct word.",
+          questionText: "Which word matches the picture?",
+          options: ["sun", "son", "sin", "sang"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 6,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Correct! The word matches the picture.",
+          questionText: "Which word matches the picture?",
+          options: ["dune", "done", "din", "dune"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 7,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Awesome! You matched the word correctly.",
+          questionText: "Which word matches the picture?",
+          options: ["cub", "cab", "cube", "curb"],
+          correctAnswer: 2,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 8,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "Good choice! The word matches the image.",
+          questionText: "Which word matches the picture?",
+          options: ["crum", "crumb", "cramp", "cream"],
+          correctAnswer: 1,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 9,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "You got it! The word fits the picture.",
+          questionText: "Which word matches the picture?",
+          options: ["jump", "jamp", "jimp", "jamb"],
+          correctAnswer: 0,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        },
+        {
+          id: 10,
+          topicId: '1-S.5',
+          topicName: 'Choose_the_short_u_or_long_u_word_that_matches_the_picture',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'mcq',
+          word: 'vowel sorting',
+          imageUrl: null,
+          explanation: "That's right! You chose the correct word.",
+          questionText: "Which word matches the picture?",
+          options: ["mug", "meg", "mog", "mule"],
+          correctAnswer: 3,
+          template: 'mcq',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: false,
+          aiHook: {
+            targetWord: 'vowel sorting',
+            intent: 'mcq',
+            questionLine: "Which word matches the picture?",
+            imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
+          }
+        }
+      ],
+      
+    },
   }
 };
 
@@ -341,7 +1348,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   setIsResizing,
   messagesScrollRef,
   lastMessageCount,
-  handleResizeStart
+  handleResizeStart,
+  selectedTopicId = 'K-F.2'
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const resizeRef = React.useRef<HTMLDivElement>(null);
@@ -370,7 +1378,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const [hasAutoSpokenQuestion, setHasAutoSpokenQuestion] = useState(false);
 
   // Get current topic and questions
-  const currentTopic = sampleMCQData.topics["K-F.2"];
+  const currentTopic = sampleMCQData.topics[selectedTopicId];
   const currentQuestion = currentTopic.questions[currentQuestionIndex];
   
   // Get the contextual question text or fall back to original
