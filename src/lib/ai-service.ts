@@ -150,7 +150,50 @@ Create a new question that:
 
 If there's insufficient adventure context, make it generic but exciting (like "the brave explorer said..." or "to complete the mission...").
 
-Return ONLY the new question text, nothing else.`;
+Return ONLY the new question text, nothing else.
+
+Improved Prompt:
+
+You are helping create an engaging educational question for a child.
+Your job is to rewrite a learning question so that it is naturally embedded into a child’s adventure story context while keeping the original learning objective intact.
+
+Details:
+
+Original question: "${originalQuestion}"
+
+Correct answer option: "${correctOption}"
+
+All answer options: ${options.map((opt, i) => `${i}: "${opt}"`).join(", ")}
+
+Adventure context from the child's story: "${adventureContext}"
+
+Your task:
+
+Contextualize the question with characters, settings, or themes from the adventure context. If no strong context is given, default to a fun, exciting theme (e.g., explorers, secret missions, magic quests).
+
+Preserve the same educational goal as the original question (don’t simplify or change what’s being tested).
+
+Make sure the correct answer option fits naturally in the scenario.
+
+Keep all answer options exactly the same (do not rewrite or paraphrase them).
+
+Write in a child-friendly, story-like tone that feels playful and immersive.
+
+Return ONLY the rewritten question text—no extra formatting, no options, no explanations.
+
+Example Input:
+
+{
+  "originalQuestion": "Choose the sentence that is spaced correctly.",
+  "options": ["I went  to school.", "I went to school."],
+  "correctOption": "I went to school.",
+  "adventureContext": "You are on a Pokémon adventure, trying to save Pikachu from Team Rocket."
+}
+
+
+Example Output:
+
+To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which sentence is spaced correctly?`;
 
       const completion = await this.client.chat.completions.create({
         model: "gpt-3.5-turbo",
