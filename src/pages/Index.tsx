@@ -12,6 +12,7 @@ import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, p
 
 import { useComic } from "@/hooks/use-comic";
 import { aiService } from "@/lib/ai-service";
+import { ttsService } from "@/lib/tts-service";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -251,33 +252,81 @@ const Index = () => {
 
 
 
-  // Generate new image panel only (no text message)
-  const onGenerateImage = useCallback(() => {
+  // Generate new image panel based on context
+  const onGenerateImage = useCallback(async (prompt?: string) => {
     // Play loading sound when generation starts
     playImageLoadingSound();
     
-    const image = images[Math.floor(Math.random() * images.length)];
-    const newPanelId = crypto.randomUUID();
-    addPanel({ id: newPanelId, image, text: "New adventure continues..." });
-    setNewlyCreatedPanelId(newPanelId);
-    
-    // Play completion sound and trigger zoom animation after 2 seconds
-    setTimeout(() => {
-      stopImageLoadingSound();
-      playImageCompleteSound();
-      setZoomingPanelId(newPanelId); // Trigger zoom animation
-      setNewlyCreatedPanelId(null);
+    try {
+      // Use the prompt or generate from recent context
+      const imagePrompt = prompt || 
+        chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
+        "space adventure with rocket";
       
-      // Clear zoom animation after it completes (0.6s duration)
+      // Generate contextual image using AI service
+      const generatedImageUrl = await aiService.generateContextualImage(
+        imagePrompt,
+        chatMessages,
+        "space adventure scene"
+      );
+      
+      // Use generated image if available, otherwise fallback to random image
+      const image = generatedImageUrl || images[Math.floor(Math.random() * images.length)];
+      const newPanelId = crypto.randomUUID();
+      
+      addPanel({ 
+        id: newPanelId, 
+        image, 
+        text: prompt ? `Generated: ${prompt}` : "New adventure continues..."
+      });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      // Play completion sound and trigger zoom animation after 2 seconds
       setTimeout(() => {
-        setZoomingPanelId(null);
-      }, 600);
-    }, 2000);
-  }, [addPanel, images]);
+        stopImageLoadingSound();
+        playImageCompleteSound();
+        setZoomingPanelId(newPanelId); // Trigger zoom animation
+        setNewlyCreatedPanelId(null);
+        
+        // Clear zoom animation after it completes (0.6s duration)
+        setTimeout(() => {
+          setZoomingPanelId(null);
+        }, 600);
+      }, 2000);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      // Fallback to random image on error
+      const image = images[Math.floor(Math.random() * images.length)];
+      const newPanelId = crypto.randomUUID();
+      addPanel({ id: newPanelId, image, text: "New adventure continues..." });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      setTimeout(() => {
+        stopImageLoadingSound();
+        playImageCompleteSound();
+        setZoomingPanelId(newPanelId);
+        setNewlyCreatedPanelId(null);
+        
+        setTimeout(() => {
+          setZoomingPanelId(null);
+        }, 600);
+      }, 2000);
+    }
+  }, [addPanel, images, chatMessages]);
 
-  // Handle text messages only (no image generation)
+  // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
+      // Check if user is asking for image generation
+      const imageKeywords = [
+        'image', 'picture', 'pic', 'draw', 'paint', 'sketch', 'show', 'illustrate', 
+        'generate', 'create image', 'make picture', 'visual', 'artwork', 'art',
+        'render', 'design', 'visualization', 'make image', 'photo', 'drawing'
+      ];
+      const isImageRequest = imageKeywords.some(keyword => 
+        text.toLowerCase().includes(keyword)
+      );
+      
       // Add user message
       const userMessage: ChatMessage = {
         type: 'user',
@@ -292,7 +341,42 @@ const Index = () => {
         return [...prev, userMessage];
       });
       
-      // Set loading state
+      // If user is asking for an image, generate one
+      if (isImageRequest) {
+        // Extract the subject from the user's request for better image generation
+        const imageSubject = text.replace(/\b(image|picture|pic|draw|paint|sketch|show|illustrate|generate|create image|make picture|visual|artwork|art|render|design|visualization|make image|photo|drawing)\b/gi, '').replace(/\b(of|for|with|about)\b/gi, '').trim();
+        await onGenerateImage(imageSubject || text);
+        
+        // Generate encouraging AI response for image generation
+        const imageResponses = [
+          `🎨 Amazing idea! I'm creating an image of ${imageSubject || 'that'} for your adventure! This is going to look fantastic! ✨`,
+          `✨ Great request! I'm drawing ${imageSubject || 'that'} right now! It's going to be perfect for your story! 🚀`,
+          `🌟 Wonderful! I'm making an image of ${imageSubject || 'that'} for you! This will make your adventure even more exciting! 🎯`,
+          `🎭 Excellent idea! Creating an image of ${imageSubject || 'that'} now! Your adventure is going to look amazing! 💫`,
+          `🚀 Perfect! I'm generating an image of ${imageSubject || 'that'} for your story! This is going to be so cool! 🌈`
+        ];
+        
+        const imageAIResponse = imageResponses[Math.floor(Math.random() * imageResponses.length)];
+        
+        const aiMessage: ChatMessage = {
+          type: 'ai',
+          content: imageAIResponse,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages(prev => {
+          setLastMessageCount(prev.length + 1);
+          playMessageSound();
+          // Auto-speak the AI message
+          ttsService.speakAIMessage(aiMessage.content);
+          return [...prev, aiMessage];
+        });
+        
+        // Don't generate additional AI response for image requests
+        return;
+      }
+      
+      // Set loading state for regular text responses
       setIsAIResponding(true);
       
       try {
@@ -309,6 +393,8 @@ const Index = () => {
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
+          // Auto-speak the AI message
+          ttsService.speakAIMessage(aiMessage.content);
           return [...prev, aiMessage];
         });
       } catch (error) {
@@ -322,6 +408,9 @@ const Index = () => {
         
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
+          playMessageSound();
+          // Auto-speak the error message
+          ttsService.speakAIMessage(errorMessage.content);
           return [...prev, errorMessage];
         });
       } finally {

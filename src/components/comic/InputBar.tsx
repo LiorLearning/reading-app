@@ -5,6 +5,7 @@ import { Mic, Send, Image as ImageIcon, Square } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
+import OpenAI from 'openai';
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
@@ -16,6 +17,22 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const recognitionRef = useRef<any | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [useWhisper, setUseWhisper] = useState(false);
+  
+  // Initialize OpenAI client for Whisper
+  const openaiClient = React.useMemo(() => {
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (apiKey) {
+      setUseWhisper(true);
+      return new OpenAI({
+        apiKey: apiKey,
+        dangerouslyAllowBrowser: true
+      });
+    }
+    return null;
+  }, []);
 
   // Waveform Visualizer Component
   const WaveformVisualizer = () => {
@@ -36,20 +53,72 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     );
   };
 
-  const startVoice = useCallback(() => {
-    playClickSound();
-    if (isMicActive) {
-      // Stop recording manually - user clicked cancel
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-        recognitionRef.current = null;
-      }
-      setIsMicActive(false);
-      setIsSubmitting(false);
-      return;
+  // Whisper API transcription
+  const transcribeWithWhisper = useCallback(async (audioBlob: Blob) => {
+    if (!openaiClient) {
+      throw new Error('OpenAI client not initialized');
     }
 
-    // Start recording
+    try {
+      // Create a File object from the blob
+      const audioFile = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
+      
+      const transcription = await openaiClient.audio.transcriptions.create({
+        file: audioFile,
+        model: 'whisper-1',
+        language: 'en',
+      });
+
+      return transcription.text;
+    } catch (error) {
+      console.error('Whisper transcription error:', error);
+      throw error;
+    }
+  }, [openaiClient]);
+
+  // Start recording with MediaRecorder for Whisper
+  const startWhisperRecording = useCallback(() => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        audioChunksRef.current = [];
+        
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          
+          try {
+            const transcription = await transcribeWithWhisper(audioBlob);
+            setText(transcription);
+          } catch (error) {
+            toast.error("Failed to transcribe audio. Using browser speech recognition as fallback.");
+            // Fallback to browser speech recognition
+            startBrowserSpeechRecognition();
+          }
+
+          // Stop all tracks
+          stream.getTracks().forEach(track => track.stop());
+          setIsMicActive(false);
+        };
+
+        mediaRecorder.start();
+        setIsMicActive(true);
+      })
+      .catch(error => {
+        console.error('Error accessing microphone:', error);
+        toast.error("Microphone access denied. Please allow microphone access.");
+      });
+  }, [transcribeWithWhisper]);
+
+  // Browser speech recognition fallback
+  const startBrowserSpeechRecognition = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition not supported in this browser.");
@@ -101,6 +170,30 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     recognitionRef.current = rec;
   }, [isMicActive, isSubmitting]);
 
+  const startVoice = useCallback(() => {
+    playClickSound();
+    if (isMicActive) {
+      // Stop recording manually - user clicked cancel
+      if (useWhisper && mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+        mediaRecorderRef.current = null;
+      } else if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+      setIsMicActive(false);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Use Whisper if available, otherwise fallback to browser speech recognition
+    if (useWhisper && openaiClient) {
+      startWhisperRecording();
+    } else {
+      startBrowserSpeechRecognition();
+    }
+  }, [isMicActive, isSubmitting, useWhisper, openaiClient, startWhisperRecording, startBrowserSpeechRecognition]);
+
   const submit = useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault();
@@ -110,7 +203,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       
       // If recording is active, stop it first
       if (isMicActive) {
-        if (recognitionRef.current) {
+        if (useWhisper && mediaRecorderRef.current) {
+          mediaRecorderRef.current.stop();
+          mediaRecorderRef.current = null;
+        } else if (recognitionRef.current) {
           recognitionRef.current.stop();
           recognitionRef.current = null;
         }
@@ -121,7 +217,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       setText("");
       setIsSubmitting(false);
     },
-    [onGenerate, text, isMicActive]
+    [onGenerate, text, isMicActive, useWhisper]
   );
 
   return (

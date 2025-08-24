@@ -189,7 +189,7 @@ const sampleMCQData: MCQData = {
           imageUrl: null,
           explanation: "You're right! That sentence is spaced correctly.",
           questionText: "Which of these sentences is spaced correctly?",
-          options: ["We go swimming.", "Wegoswimming.", "We goswimming.", "We go swimming."],
+          options: ["We go swimming.", "Wegoswimming.", "We goswimming.", "Wego swimming."],
           correctAnswer: 0,
           template: 'mcq',
           isSpacing: true,
@@ -509,6 +509,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       try {
         // Load user adventure context
         const userAdventure = loadUserAdventure();
+        console.log('Loading user adventure context for question generation:', {
+          messageCount: userAdventure.length,
+          recentMessages: userAdventure.slice(-5).map(msg => ({ type: msg.type, content: msg.content.substring(0, 100) + (msg.content.length > 100 ? '...' : '') }))
+        });
         
         const contextualQuestionText = await aiService.generateContextualQuestion(
           currentQuestion.questionText,
@@ -519,10 +523,16 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
         // Only update if we got a different question (AI successfully generated one)
         if (contextualQuestionText !== currentQuestion.questionText) {
+          console.log('✅ Successfully generated contextualized question:', {
+            original: currentQuestion.questionText,
+            contextualized: contextualQuestionText
+          });
           setContextualQuestions(prev => ({
             ...prev,
             [currentQuestionIndex]: contextualQuestionText
           }));
+        } else {
+          console.log('ℹ️ Using original question - AI did not generate a different contextualized version');
         }
       } catch (error) {
         console.error('Error generating contextual question:', error);
@@ -548,6 +558,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       try {
         // Load user adventure context
         const userAdventure = loadUserAdventure();
+        console.log('Loading user adventure context for image generation:', {
+          messageCount: userAdventure.length,
+          lastMessage: userAdventure.length > 0 ? userAdventure[userAdventure.length - 1].content : 'No messages'
+        });
         
         const imageUrl = await aiService.generateContextualImage(
           currentQuestion.word,

@@ -1,4 +1,4 @@
-import { ElevenLabsAPI } from '@elevenlabs/elevenlabs-js';
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 
 interface TTSOptions {
   voice?: string;
@@ -8,7 +8,7 @@ interface TTSOptions {
 }
 
 class TextToSpeechService {
-  private client: ElevenLabsAPI | null = null;
+  private client: ElevenLabsClient | null = null;
   private isInitialized = false;
   private currentAudio: HTMLAudioElement | null = null;
   private isSpeaking = false;
@@ -22,51 +22,14 @@ class TextToSpeechService {
     const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
     
     if (apiKey) {
-      this.client = new ElevenLabsAPI({
+      this.client = new ElevenLabsClient({
         apiKey: apiKey,
       });
       this.isInitialized = true;
     } else {
-      console.warn('VITE_ELEVENLABS_API_KEY not found. Using browser speech synthesis as fallback.');
+      console.warn('VITE_ELEVENLABS_API_KEY not found. TTS service will not be available.');
       this.isInitialized = false;
     }
-  }
-
-  // Fallback to browser speech synthesis
-  private speakWithBrowserAPI(text: string, options?: { rate?: number; pitch?: number }): void {
-    // Stop any current speech
-    this.stop();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = options?.rate || 0.9;
-    utterance.pitch = options?.pitch || 1.1;
-    utterance.volume = 1.0;
-
-    // Find a suitable voice (prefer female voices for children's content)
-    const voices = speechSynthesis.getVoices();
-    const preferredVoice = voices.find(voice => 
-      voice.lang.startsWith('en') && 
-      (voice.name.toLowerCase().includes('female') || 
-       voice.name.toLowerCase().includes('samantha') ||
-       voice.name.toLowerCase().includes('karen') ||
-       voice.name.toLowerCase().includes('susan'))
-    ) || voices.find(voice => voice.lang.startsWith('en'));
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
-
-    this.isSpeaking = true;
-    
-    utterance.onend = () => {
-      this.isSpeaking = false;
-    };
-
-    utterance.onerror = () => {
-      this.isSpeaking = false;
-    };
-
-    speechSynthesis.speak(utterance);
   }
 
   // Speak text using ElevenLabs API
@@ -74,9 +37,9 @@ class TextToSpeechService {
     // Clean the text for better speech
     const cleanText = this.cleanTextForSpeech(text);
     
-    // If not initialized or no API key, use browser fallback
+    // If not initialized or no API key, skip TTS
     if (!this.isInitialized || !this.client) {
-      this.speakWithBrowserAPI(cleanText);
+      console.warn('ElevenLabs TTS not configured. Cannot speak text.');
       return;
     }
 
@@ -85,23 +48,20 @@ class TextToSpeechService {
       this.stop();
 
       // Default voice settings for children's content
-      const voiceSettings = {
-        voice: options?.voice || 'EXAVITQu4vr4xnSDxMaL', // Bella - good for educational content
-        model: options?.model || 'eleven_monolingual_v1',
-        stability: options?.stability || 0.5,
-        similarity_boost: options?.similarity_boost || 0.75,
-      };
+      const voiceId = options?.voice || 'EXAVITQu4vr4xnSDxMaL'; // Bella - good for educational content
 
-      // Generate audio using ElevenLabs API
-      const audioStream = await this.client.textToSpeech.convert({
-        voice_id: voiceSettings.voice,
-        text: cleanText,
-        model_id: voiceSettings.model,
-        voice_settings: {
-          stability: voiceSettings.stability,
-          similarity_boost: voiceSettings.similarity_boost,
-        },
-      });
+      // Generate audio using ElevenLabs API (corrected method call)
+      const audioStream = await this.client.textToSpeech.convert(
+        voiceId,  // First parameter: voice ID as string
+        {         // Second parameter: options object
+          text: cleanText,
+          modelId: options?.model || 'eleven_monolingual_v1',
+          voiceSettings: {
+            stability: options?.stability || 0.5,
+            similarityBoost: options?.similarity_boost || 0.75,
+          },
+        }
+      );
 
       // Convert the stream to audio blob
       const chunks: Uint8Array[] = [];
@@ -128,16 +88,13 @@ class TextToSpeechService {
       this.currentAudio.onerror = () => {
         this.isSpeaking = false;
         URL.revokeObjectURL(audioUrl);
-        console.error('Error playing TTS audio');
-        // Fallback to browser speech synthesis on error
-        this.speakWithBrowserAPI(cleanText);
+        console.error('Error playing ElevenLabs TTS audio');
       };
 
       await this.currentAudio.play();
     } catch (error) {
       console.error('ElevenLabs TTS error:', error);
-      // Fallback to browser speech synthesis on error
-      this.speakWithBrowserAPI(cleanText);
+      this.isSpeaking = false;
     }
   }
 
@@ -164,11 +121,6 @@ class TextToSpeechService {
       this.currentAudio = null;
     }
     
-    // Also stop browser speech synthesis
-    if (speechSynthesis.speaking) {
-      speechSynthesis.cancel();
-    }
-    
     this.isSpeaking = false;
   }
 
@@ -189,7 +141,7 @@ class TextToSpeechService {
     } else {
       return { 
         configured: false, 
-        message: 'Using browser TTS. Add ElevenLabs API key for premium voice quality.' 
+        message: 'ElevenLabs API key required for TTS functionality.' 
       };
     }
   }

@@ -61,7 +61,7 @@ Key personality traits:
 - Age-appropriate language for children
 - Always asks follow-up questions to keep the story going
 
-The child is creating a comic story about space adventures. Respond to their story ideas with excitement and help them think of what could happen next.`
+The app has image generation capabilities, so you can suggest visual elements and encourage kids to ask for images when it would enhance their story. The child is creating a comic story about space adventures. Respond to their story ideas with excitement and help them think of what could happen next.`
     };
 
     // Include recent message history for context (last 6 messages max)
@@ -111,6 +111,81 @@ The child is creating a comic story about space adventures. Respond to their sto
     }
   }
 
+  // Extract and filter relevant adventure context
+  private extractAdventureContext(userAdventure: ChatMessage[]): string {
+    if (!userAdventure || userAdventure.length === 0) {
+      return "";
+    }
+
+    // Get recent messages (last 8 messages for better context)
+    const recentMessages = userAdventure.slice(-8);
+    
+    // Extract key story elements - characters, locations, objects, actions
+    const storyElements = recentMessages
+      .map(msg => msg.content)
+      .join(" ")
+      .toLowerCase();
+
+    // Look for story elements like characters, settings, objects
+    const characters = this.extractStoryElements(storyElements, [
+      'captain', 'explorer', 'astronaut', 'hero', 'friend', 'krafty', 'robot', 'alien', 
+      'pikachu', 'pokemon', 'character', 'wizard', 'princess', 'prince', 'knight'
+    ]);
+    
+    const settings = this.extractStoryElements(storyElements, [
+      'space', 'planet', 'rocket', 'spaceship', 'adventure', 'mission', 'quest', 
+      'journey', 'castle', 'forest', 'ocean', 'mountain', 'island', 'city', 'school'
+    ]);
+    
+    const objects = this.extractStoryElements(storyElements, [
+      'treasure', 'map', 'key', 'sword', 'shield', 'book', 'magic', 'crystal'
+    ]);
+
+    // Build contextual summary
+    let context = "";
+    if (characters.length > 0) {
+      context += `Characters: ${characters.join(", ")}. `;
+    }
+    if (settings.length > 0) {
+      context += `Setting: ${settings.join(", ")}. `;
+    }
+    if (objects.length > 0) {
+      context += `Objects: ${objects.join(", ")}. `;
+    }
+
+    console.log('Extracted adventure context:', {
+      characters,
+      settings,
+      objects,
+      fullContext: context
+    });
+
+    return context.trim();
+  }
+
+  // Helper method to extract story elements
+  private extractStoryElements(text: string, keywords: string[]): string[] {
+    const found = [];
+    for (const keyword of keywords) {
+      if (text.includes(keyword)) {
+        found.push(keyword);
+      }
+    }
+    return [...new Set(found)]; // Remove duplicates
+  }
+
+  // Get default adventure context when no user adventure exists
+  private getDefaultAdventureContext(): string {
+    const defaultContexts = [
+      "space adventure with brave explorer",
+      "magical quest with young hero",
+      "treasure hunt with adventurous captain",
+      "mysterious mission with clever detective",
+      "enchanted forest with friendly guide"
+    ];
+    return defaultContexts[Math.floor(Math.random() * defaultContexts.length)];
+  }
+
   // Generate contextual question based on adventure context
   async generateContextualQuestion(
     originalQuestion: string,
@@ -120,80 +195,47 @@ The child is creating a comic story about space adventures. Respond to their sto
   ): Promise<string> {
     // If not initialized or no API key, return original question
     if (!this.isInitialized || !this.client) {
+      console.log('AI service not initialized, returning original question');
       return originalQuestion;
     }
 
     try {
-      // Extract adventure context from chat messages
-      const adventureContext = userAdventure
-        .slice(-10) // Get last 10 messages for context
-        .map(msg => msg.content)
-        .join(" ");
+      // Extract structured adventure context
+      const adventureContext = this.extractAdventureContext(userAdventure);
+      console.log('Adventure context for question generation:', adventureContext);
 
       // Get the correct answer option
       const correctOption = options[correctAnswer];
 
-      const contextualPrompt = `You are helping create an educational question that incorporates a child's adventure story context while maintaining the original learning objective.
+      const contextualPrompt = `You are creating an engaging educational question for a child by incorporating their adventure story context.
 
-Original question: "${originalQuestion}"
-Correct answer option: "${correctOption}"
-All answer options: ${options.map((opt, i) => `${i}: "${opt}"`).join(", ")}
+TASK: Rewrite the learning question to fit naturally into the child's adventure story while keeping the same educational objective.
 
-Adventure context from the child's story: "${adventureContext}"
+ORIGINAL QUESTION: "${originalQuestion}"
+CORRECT ANSWER: "${correctOption}"
+ALL OPTIONS: ${options.map((opt, i) => `${i + 1}. "${opt}"`).join(", ")}
 
-Create a new question that:
-1. Incorporates characters, settings, or themes from the adventure context
-2. Maintains the exact same educational objective as the original question
-3. Uses the correct answer option naturally in the context
-4. Is engaging and age-appropriate for children
-5. Does NOT change the answer options - they must remain exactly the same
+ADVENTURE CONTEXT: "${adventureContext || this.getDefaultAdventureContext()}"
 
-If there's insufficient adventure context, make it generic but exciting (like "the brave explorer said..." or "to complete the mission...").
+REQUIREMENTS:
+1. Use characters, settings, or themes from the adventure context
+2. Keep the exact same educational objective (spacing, grammar, etc.)
+3. Make it exciting and age-appropriate for children
+4. Do NOT change any answer options
+5. If context is limited, use fun themes like "brave explorer", "space mission", "magic quest"
 
-Return ONLY the new question text, nothing else.
+EXAMPLES:
+- Original: "Choose the sentence with correct spacing"
+- Context: "space adventure with captain"  
+- Result: "Captain, to navigate the spaceship safely, which sentence has correct spacing?"
 
-Improved Prompt:
+- Original: "Find the correctly spaced sentence"
+- Context: "treasure hunt with pirates"
+- Result: "To find the treasure, which sentence is spaced correctly?"
 
-You are helping create an engaging educational question for a child.
-Your job is to rewrite a learning question so that it is naturally embedded into a child’s adventure story context while keeping the original learning objective intact.
+Return ONLY the new question text, nothing else.`;
 
-Details:
-
-Original question: "${originalQuestion}"
-
-Correct answer option: "${correctOption}"
-
-All answer options: ${options.map((opt, i) => `${i}: "${opt}"`).join(", ")}
-
-Adventure context from the child's story: "${adventureContext}"
-
-Your task:
-
-Contextualize the question with characters, settings, or themes from the adventure context. If no strong context is given, default to a fun, exciting theme (e.g., explorers, secret missions, magic quests).
-
-Preserve the same educational goal as the original question (don’t simplify or change what’s being tested).
-
-Make sure the correct answer option fits naturally in the scenario.
-
-Keep all answer options exactly the same (do not rewrite or paraphrase them).
-
-Write in a child-friendly, story-like tone that feels playful and immersive.
-
-Return ONLY the rewritten question text—no extra formatting, no options, no explanations.
-
-Example Input:
-
-{
-  "originalQuestion": "Choose the sentence that is spaced correctly.",
-  "options": ["I went  to school.", "I went to school."],
-  "correctOption": "I went to school.",
-  "adventureContext": "You are on a Pokémon adventure, trying to save Pikachu from Team Rocket."
-}
-
-
-Example Output:
-
-To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which sentence is spaced correctly?`;
+      console.log('Sending contextualized question prompt to AI:', contextualPrompt);
 
       const completion = await this.client.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -206,17 +248,20 @@ To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which s
         max_tokens: 150,
         temperature: 0.7,
       });
-      console.log(contextualPrompt);
 
       const response = completion.choices[0]?.message?.content;
       
-      if (response) {
-        return response.trim();
+      if (response && response.trim()) {
+        const contextualQuestion = response.trim();
+        console.log('Generated contextualized question:', contextualQuestion);
+        return contextualQuestion;
       } else {
-        throw new Error('No response content received');
+        console.log('No valid response received from AI, returning original question');
+        return originalQuestion;
       }
     } catch (error) {
       console.error('OpenAI API error generating contextual question:', error);
+      console.log('Falling back to original question due to error');
       // Return original question on error
       return originalQuestion;
     }
@@ -299,17 +344,13 @@ To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which s
     }
 
     try {
-      // Extract and sanitize adventure context from chat messages
-      const rawAdventureContext = userAdventure
-        .slice(-6) // Reduced from 8 to 6 for better safety
-        .map(msg => msg.content)
-        .join(" ");
+      // Extract structured adventure context using the same method as questions
+      const structuredContext = this.extractAdventureContext(userAdventure);
+      console.log('Structured adventure context for image:', structuredContext);
 
-      console.log('Raw adventure context:', rawAdventureContext);
+      const safeAdventureContext = this.sanitizeContentForImage(structuredContext);
 
-      const safeAdventureContext = this.sanitizeContentForImage(rawAdventureContext);
-
-      console.log('Safe adventure context:', safeAdventureContext);
+      console.log('Safe adventure context for image:', safeAdventureContext);
       console.log('Safe adventure context length:', safeAdventureContext.length);
 
       // Generate multiple prompt options from most specific to most generic
