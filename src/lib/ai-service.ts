@@ -206,6 +206,7 @@ To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which s
         max_tokens: 150,
         temperature: 0.7,
       });
+      console.log(contextualPrompt);
 
       const response = completion.choices[0]?.message?.content;
       
@@ -225,26 +226,37 @@ To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which s
   private sanitizeContentForImage(content: string): string {
     if (!content) return "";
 
-    // Remove potentially problematic content and keep only safe, educational terms
+    // Remove potentially problematic content and keep safe, educational terms
     const safeSentences = content
       .split(/[.!?]+/)
       .map(sentence => sentence.trim())
-      .filter(sentence => sentence.length > 3 && sentence.length < 50)
+      .filter(sentence => sentence.length > 3 && sentence.length < 80) // Increased length limit
       .filter(sentence => {
         const lowerSentence = sentence.toLowerCase();
-        // Keep only educational, adventure, and child-friendly content
+        
+        // First exclude obviously problematic content
+        if (/(violence|weapon|fight|scary|dark|evil|bad|hurt|danger|kill|death|blood|war)/i.test(lowerSentence)) {
+          return false;
+        }
+        
+        // Keep sentences with educational, adventure, and child-friendly content
         return (
-          // Include educational terms
-          /\b(learn|read|story|book|adventure|explore|discover|find|map|treasure|space|planet|rocket|journey|quest|mission)\b/.test(lowerSentence) ||
-          // Include safe character/setting references
-          /\b(captain|explorer|astronaut|character|hero|friend|journey|castle|forest|ocean|mountain|island)\b/.test(lowerSentence)
-        ) &&
-        // Exclude anything potentially problematic
-        !/(violence|weapon|fight|scary|dark|evil|bad|hurt|danger|problem)/i.test(lowerSentence);
+          // Educational terms
+          /\b(learn|read|story|book|adventure|explore|discover|find|map|treasure|space|planet|rocket|journey|quest|mission|study|school|teacher|student)\b/.test(lowerSentence) ||
+          // Character/setting references
+          /\b(captain|explorer|astronaut|character|hero|friend|journey|castle|forest|ocean|mountain|island|city|town|home|family|animal|pet)\b/.test(lowerSentence) ||
+          // Fun activities and objects
+          /\b(play|game|fun|exciting|amazing|wonderful|beautiful|colorful|magical|happy|smile|laugh|sing|dance|build|create|draw|paint)\b/.test(lowerSentence) ||
+          // Common story elements that are safe
+          /\b(prince|princess|king|queen|wizard|magic|fairy|dragon|unicorn|robot|spaceship|car|house|tree|flower|sun|moon|star)\b/.test(lowerSentence) ||
+          // Basic descriptive words
+          /\b(big|small|tall|short|fast|slow|new|old|good|great|nice|cool|awesome|super|special)\b/.test(lowerSentence)
+        );
       })
-      .slice(0, 3) // Keep only first 3 relevant sentences
+      .slice(0, 4) // Keep up to 4 relevant sentences
       .join(". ");
 
+    console.log('Sanitized sentences:', safeSentences);
     return safeSentences;
   }
 
@@ -257,7 +269,7 @@ To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which s
     const prompts: string[] = [];
 
     // Option 1: With sanitized context (if available)
-    if (safeContext && safeContext.length > 10) {
+    if (safeContext && safeContext.length > 5) {
       prompts.push(`${baseStyle} "${answerWord}" in a fun learning adventure with ${safeContext}. ${styleEnding}`);
     }
 
@@ -293,10 +305,17 @@ To rescue Pikachu from Team Rocket’s cage, you must solve this puzzle: which s
         .map(msg => msg.content)
         .join(" ");
 
+      console.log('Raw adventure context:', rawAdventureContext);
+
       const safeAdventureContext = this.sanitizeContentForImage(rawAdventureContext);
+
+      console.log('Safe adventure context:', safeAdventureContext);
+      console.log('Safe adventure context length:', safeAdventureContext.length);
 
       // Generate multiple prompt options from most specific to most generic
       const promptOptions = this.generateSafePrompt(answerWord, safeAdventureContext, imagePrompt);
+
+      console.log('Generated prompt options:', promptOptions);
 
       // Try each prompt option until one succeeds
       for (let i = 0; i < promptOptions.length; i++) {
