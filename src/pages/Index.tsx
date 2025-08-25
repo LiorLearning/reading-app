@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn, ChatMessage, loadUserAdventure, saveUserAdventure } from "@/lib/utils";
+import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic } from "@/lib/utils";
+import { sampleMCQData } from "./MCQScreenTypeA";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
@@ -20,6 +21,39 @@ import cockpit4 from "@/assets/comic-cockpit-4.jpg";
 
 import MCQScreenTypeA from "./MCQScreenTypeA";
 import TopicSelection from "./TopicSelection";
+import UserOnboarding from "./UserOnboarding";
+import HomePage from "./HomePage";
+
+// User data interface
+interface UserData {
+  username: string;
+  grade: string;
+  gradeDisplayName: string;
+  isFirstTime: boolean;
+}
+
+// User data localStorage utilities
+const USER_DATA_KEY = 'readingapp_user_data';
+
+const saveUserData = (userData: UserData): void => {
+  try {
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+  } catch (error) {
+    console.warn('Failed to save user data to localStorage:', error);
+  }
+};
+
+const loadUserData = (): UserData | null => {
+  try {
+    const stored = localStorage.getItem(USER_DATA_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.warn('Failed to load user data from localStorage:', error);
+  }
+  return null;
+};
 
 const Index = () => {
   React.useEffect(() => {
@@ -73,9 +107,14 @@ const Index = () => {
   const [isAIResponding, setIsAIResponding] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
   
+  // User data state
+  const [userData, setUserData] = React.useState<UserData | null>(() => loadUserData());
+  const [showOnboarding, setShowOnboarding] = React.useState(!userData);
+
+  
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-  const [currentScreen, setCurrentScreen] = React.useState<0 | 1 | 2 | 3>(0);
+  const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(() => userData ? -1 : 0);
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
@@ -434,10 +473,58 @@ const Index = () => {
     saveUserAdventure(chatMessages);
   }, [chatMessages]);
 
+  // Auto-assign topic based on level and navigate
+  const autoAssignTopicAndNavigate = React.useCallback((level: 'start' | 'middle') => {
+    const topicId = level === 'start' ? 'K-F.2' : '1-Q.4';
+    setSelectedTopicId(topicId);
+    setCurrentScreen(3); // Go directly to MCQ screen
+  }, []);
+
   // Handle topic selection
   const handleTopicSelect = React.useCallback((topicId: string) => {
     setSelectedTopicId(topicId);
     setCurrentScreen(1); // Go to adventure screen
+  }, []);
+
+  // Handle onboarding completion
+  const handleOnboardingComplete = React.useCallback((newUserData: { username: string; grade: string; gradeDisplayName: string }) => {
+    const userData: UserData = {
+      ...newUserData,
+      isFirstTime: false
+    };
+    setUserData(userData);
+    saveUserData(userData);
+    setShowOnboarding(false);
+    playClickSound();
+  }, []);
+
+  // Handle homepage navigation
+  const handleHomeNavigation = React.useCallback((path: 'start' | 'middle' | 'topics') => {
+    playClickSound();
+    if (path === 'topics') {
+      setCurrentScreen(0); // Go to topic selection
+    } else {
+      // For start/middle, automatically assign topic and go to questions
+      autoAssignTopicAndNavigate(path);
+    }
+  }, [autoAssignTopicAndNavigate]);
+
+  // Handle start adventure from progress tracking
+  const handleStartAdventure = React.useCallback((topicId: string) => {
+    playClickSound();
+    setSelectedTopicId(topicId);
+    setCurrentScreen(3); // Go directly to MCQ screen
+  }, []);
+
+  // Handle settings (reset user data)
+  const handleSettings = React.useCallback(() => {
+    if (confirm('Are you sure you want to reset your profile? This will clear your name and grade.')) {
+      localStorage.removeItem(USER_DATA_KEY);
+      setUserData(null);
+      setShowOnboarding(true);
+      setCurrentScreen(0);
+      playClickSound();
+    }
   }, []);
 
 
@@ -520,14 +607,26 @@ const Index = () => {
                   size="sm"
                   onClick={() => {
                     playClickSound();
+                    setCurrentScreen(-1);
+                  }}
+                  disabled={currentScreen === -1}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Home
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
                     setCurrentScreen(0);
                   }}
                   disabled={currentScreen === 0}
                   className="border-2 bg-white btn-animate"
                   style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Screen 0
+                  Topics
                 </Button>
                 <Button
                   variant="outline"
@@ -540,17 +639,27 @@ const Index = () => {
                   className="border-2 bg-white btn-animate"
                   style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
                 >
-                  Screen 1
+                  Adventure
                 </Button>
               </>
             )}
             
-            <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
-              {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
-               currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
-               currentScreen === 1 ? 'YOUR ADVENTURE' : 
-               'QUIZ TIME'}
-            </h1>
+            <div className="text-center">
+              <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
+                {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
+                 userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
+                 currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
+                 currentScreen === 1 ? 'YOUR ADVENTURE' : 
+                 'QUIZ TIME'}
+              </h1>
+              {userData && !devToolsVisible && (
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <span className="text-sm lg:text-base font-semibold text-primary/80">
+                    🎓 {userData.gradeDisplayName}
+                  </span>
+                </div>
+              )}
+            </div>
             
             {devToolsVisible && (
               <>
@@ -580,6 +689,21 @@ const Index = () => {
               marginRight: `calc((100% - 92%) / 2)` // Align with right edge of purple container
             }}
           >
+            {/* Home Button - Show on all screens except home (-1) when user is logged in */}
+            {userData && currentScreen !== -1 && (
+              <Button 
+                variant="default" 
+                onClick={() => {
+                  playClickSound();
+                  setCurrentScreen(-1); // Go back to home
+                }}
+                className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
+                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+              >
+                🏠 Home
+              </Button>
+            )}
+            
             {/* Next Button - Show on Screen 1 */}
             {currentScreen === 1 && selectedTopicId && (
               <Button 
@@ -652,7 +776,11 @@ const Index = () => {
 
 
         {/* Conditional Screen Rendering */}
-        {currentScreen === 0 ? (
+        {showOnboarding ? (
+          <UserOnboarding onComplete={handleOnboardingComplete} />
+        ) : currentScreen === -1 ? (
+          <HomePage userData={userData!} onNavigate={handleHomeNavigation} onStartAdventure={handleStartAdventure} onSettings={handleSettings} />
+        ) : currentScreen === 0 ? (
           <TopicSelection onTopicSelect={handleTopicSelect} />
         ) : currentScreen === 1 ? (
           <main 
@@ -896,6 +1024,30 @@ const Index = () => {
             lastMessageCount={lastMessageCount}
             handleResizeStart={handleResizeStart}
             selectedTopicId={selectedTopicId}
+            onBackToTopics={() => {
+              playClickSound();
+              setCurrentScreen(0); // Go back to topic selection
+            }}
+            onRetryTopic={() => {
+              playClickSound();
+              // MCQScreenTypeA will handle the reset internally
+            }}
+            onNextTopic={(nextTopicId) => {
+              playClickSound();
+              
+              // If a specific next topic is provided, use it
+              // Otherwise, determine the next topic from progress tracking
+              const topicToNavigateTo = nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics));
+              
+              if (topicToNavigateTo) {
+                // Navigate to the next topic
+                setSelectedTopicId(topicToNavigateTo);
+                // Stay on MCQ screen (currentScreen = 3)
+              } else {
+                // No more topics, go back to topic selection
+                setCurrentScreen(0);
+              }
+            }}
           />
         )}
 

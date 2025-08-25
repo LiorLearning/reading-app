@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { cn, loadUserAdventure } from "@/lib/utils";
+import { cn, loadUserAdventure, markTopicCompleted, setCurrentTopic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Volume2, Check, X, Loader2, Mic } from "lucide-react";
 import { playClickSound, playMessageSound } from "@/lib/sounds";
@@ -7,6 +7,9 @@ import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
 import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
+import TopicComplete from "./TopicComplete";
+import PracticeNeeded from "./PracticeNeeded";
+import confetti from 'canvas-confetti';
 
 // TypeScript interfaces for MCQ data structure
 interface AIHook {
@@ -35,6 +38,7 @@ interface MCQQuestion {
   isSpelling: boolean;
   aiHook: AIHook;
   passage?: string; // Optional for reading comprehension
+  audio: string; // Audio text for speaker button
 }
 
 interface DragDropQuestion {
@@ -57,6 +61,7 @@ interface DragDropQuestion {
   isSpelling: boolean;
   aiHook: AIHook;
   passage?: string; // Optional for reading comprehension
+  audio: string; // Audio text for speaker button
 }
 
 interface FillBlankQuestion {
@@ -77,6 +82,7 @@ interface FillBlankQuestion {
   isSpelling: boolean;
   aiHook: AIHook;
   passage?: string; // Optional for reading comprehension
+  audio: string; // Audio text for speaker button
 }
 
 interface TopicInfo {
@@ -161,6 +167,9 @@ interface MCQScreenTypeAProps {
   lastMessageCount: number;
   handleResizeStart: (e: React.MouseEvent) => void;
   selectedTopicId?: string;
+  onBackToTopics?: () => void;
+  onRetryTopic?: () => void;
+  onNextTopic?: (nextTopicId?: string) => void;
 }
 
 // Sample MCQ data - this would normally come from an API or JSON file
@@ -197,7 +206,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence is spaced correctly?",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "My name is John."
         },
         {
           id: 2,
@@ -221,7 +231,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Identify the correctly spaced sentence.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "The sun is hot."
         },
         {
           id: 3,
@@ -245,7 +256,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Select the sentence with the correct spacing.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "The cat is furry."
         },
         {
           id: 4,
@@ -269,7 +281,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Find the correctly spaced sentence.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "I love my dog."
         },
         {
           id: 5,
@@ -293,7 +306,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which of these sentences is spaced correctly?",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "We go swimming."
         },
         {
           id: 6,
@@ -317,7 +331,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Choose the sentence that is spaced correctly.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "He is a teacher."
         },
         {
           id: 7,
@@ -341,7 +356,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Select the sentence with the proper spacing.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "We play soccer."
         },
         {
           id: 8,
@@ -365,7 +381,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Find the sentence with correct spacing.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "The bird is flying."
         },
         {
           id: 9,
@@ -389,7 +406,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence has the correct spacing?",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "I like ice cream."
         },
         {
           id: 10,
@@ -413,7 +431,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Pick the sentence that is spaced correctly.",
             imagePrompt: 'Educational scene showing choose_the_sentence_that_is_spaced_correctly concepts'
-          }
+          },
+          audio: "She loves cats"
         }
       ],
     },
@@ -449,7 +468,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'elephant.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "elephant"
         },
         {
           id: 2,
@@ -473,7 +493,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'banana.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "banana"
         },
         {
           id: 3,
@@ -497,7 +518,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'computer.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "computer"
         },
         {
           id: 4,
@@ -521,7 +543,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'umbrella.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "umbrella"
         },
         {
           id: 5,
@@ -545,7 +568,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'giraffe.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "giraffe"
         },
         {
           id: 6,
@@ -569,7 +593,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'cucumber.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "cucumber"
         },
         {
           id: 7,
@@ -593,7 +618,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'chocolate.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "chocolate"
         },
         {
           id: 8,
@@ -617,7 +643,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'dinosaur.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "dinosaur"
         },
         {
           id: 9,
@@ -641,7 +668,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'avocado.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "avocado"
         },
         {
           id: 10,
@@ -665,7 +693,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'butterfly.' How many syllables does it have?",
             imagePrompt: 'Educational scene showing how_many_syllables_does_the_word_have concepts'
-          }
+          },
+          audio: "butterfly"
         }
       ],
     },
@@ -700,7 +729,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "tie"
         },
         {
           id: 2,
@@ -724,7 +754,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "dime"
         },
         {
           id: 3,
@@ -748,7 +779,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "fill"
         },
         {
           id: 4,
@@ -772,7 +804,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "pine"
         },
         {
           id: 5,
@@ -796,7 +829,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "mile"
         },
         {
           id: 6,
@@ -820,7 +854,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "sit"
         },
         {
           id: 7,
@@ -844,7 +879,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "ripe"
         },
         {
           id: 8,
@@ -868,7 +904,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "five"
         },
         {
           id: 9,
@@ -892,7 +929,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "file"
         },
         {
           id: 10,
@@ -916,7 +954,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_i_or_long_i_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "line"
         }
       ],
     },
@@ -951,7 +990,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "pot"
         },
         {
           id: 2,
@@ -975,7 +1015,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "cone"
         },
         {
           id: 3,
@@ -999,7 +1040,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "log"
         },
         {
           id: 4,
@@ -1023,7 +1065,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "rope"
         },
         {
           id: 5,
@@ -1047,7 +1090,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "bone"
         },
         {
           id: 6,
@@ -1071,7 +1115,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "sock"
         },
         {
           id: 7,
@@ -1095,7 +1140,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "rose"
         },
         {
           id: 8,
@@ -1119,7 +1165,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "frog"
         },
         {
           id: 9,
@@ -1143,7 +1190,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "coat"
         },
         {
           id: 10,
@@ -1167,7 +1215,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_o_or_long_o_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "dog"
         }
       ],
     },
@@ -1202,7 +1251,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "glue"
         },
         {
           id: 2,
@@ -1226,7 +1276,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "tube"
         },
         {
           id: 3,
@@ -1250,7 +1301,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "bugle"
         },
         {
           id: 4,
@@ -1274,7 +1326,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "bunk"
         },
         {
           id: 5,
@@ -1298,7 +1351,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "sun"
         },
         {
           id: 6,
@@ -1322,7 +1376,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "dune"
         },
         {
           id: 7,
@@ -1346,7 +1401,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "cube"
         },
         {
           id: 8,
@@ -1370,7 +1426,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "crumb"
         },
         {
           id: 9,
@@ -1394,7 +1451,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "jump"
         },
         {
           id: 10,
@@ -1418,7 +1476,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
             imagePrompt: 'Educational scene showing choose_the_short_u_or_long_u_word_that_matches_the_picture concepts'
-          }
+          },
+          audio: "mule"
         }
       ],
       
@@ -1455,7 +1514,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'fin' and 'fine' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "fin, fine"
         },
         {
           id: 2,
@@ -1480,7 +1540,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'fell' and 'feel' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "fell, feel"
         },
         {
           id: 3,
@@ -1505,7 +1566,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'back' and 'bake' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "back, bake"
         },
         {
           id: 4,
@@ -1530,7 +1592,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'hot' and 'hope' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "hot, hope"
         },
         {
           id: 5,
@@ -1555,7 +1618,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'cub' and 'cube' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "cub,cube"
         },
         {
           id: 6,
@@ -1580,7 +1644,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'bit' and 'bite' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "bit, bite"
         },
         {
           id: 7,
@@ -1605,7 +1670,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'pet' and 'peat' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "pet, peat"
         },
         {
           id: 8,
@@ -1630,7 +1696,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'cot' and 'coat' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "cot, coat"
         },
         {
           id: 9,
@@ -1655,7 +1722,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'tub' and 'tube' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "tub, tube"
         },
         {
           id: 10,
@@ -1680,7 +1748,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'cat' and 'cake' by their vowel sounds.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_and_short_vowel_words concepts'
-          }
+          },
+          audio: "cat, cake"
         }
       ],
     },
@@ -1715,7 +1784,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "ship"
         },
         {
           id: 2,
@@ -1739,7 +1809,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "thumb"
         },
         {
           id: 3,
@@ -1763,7 +1834,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "chip"
         },
         {
           id: 4,
@@ -1787,7 +1859,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "sheep"
         },
         {
           id: 5,
@@ -1811,7 +1884,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "whale"
         },
         {
           id: 6,
@@ -1835,7 +1909,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "phone"
         },
         {
           id: 7,
@@ -1859,7 +1934,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "whisper"
         },
         {
           id: 8,
@@ -1883,7 +1959,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "chair"
         },
         {
           id: 9,
@@ -1907,7 +1984,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "shell"
         },
         {
           id: 10,
@@ -1931,7 +2009,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
             imagePrompt: 'Educational scene showing choose_the_correct_digraph concepts'
-          }
+          },
+          audio: "this"
         }
       ],
     },
@@ -1966,7 +2045,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'cat'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "cat"
         },
         {
           id: 2,
@@ -1990,7 +2070,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'bed'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "bed"
         },
         {
           id: 3,
@@ -2014,7 +2095,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'fish'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "fish"
         },
         {
           id: 4,
@@ -2038,7 +2120,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'dog'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "dog"
         },
         {
           id: 5,
@@ -2062,7 +2145,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'cup'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "cup"
         },
         {
           id: 6,
@@ -2086,7 +2170,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'bat'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "bat"
         },
         {
           id: 7,
@@ -2110,7 +2195,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'pen'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "pen"
         },
         {
           id: 8,
@@ -2134,7 +2220,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'sit'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "sit"
         },
         {
           id: 9,
@@ -2158,7 +2245,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'log'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "log"
         },
         {
           id: 10,
@@ -2182,7 +2270,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word 'mud'. Which vowel sound does it have?",
             imagePrompt: 'Educational scene showing identify_the_short_vowel_sound_in_a_word concepts'
-          }
+          },
+          audio: "mud"
         }
       ],
     },
@@ -2217,7 +2306,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'bat'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "bat"
         },
         {
           id: 2,
@@ -2241,7 +2331,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'cat'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "cat"
         },
         {
           id: 3,
@@ -2265,7 +2356,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'dog'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "dog"
         },
         {
           id: 4,
@@ -2289,7 +2381,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'fish'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "fish"
         },
         {
           id: 5,
@@ -2313,7 +2406,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'hat'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "hat"
         },
         {
           id: 6,
@@ -2337,7 +2431,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'log'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "log"
         },
         {
           id: 7,
@@ -2361,7 +2456,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'net'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "net"
         },
         {
           id: 8,
@@ -2385,7 +2481,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'pen'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "pen"
         },
         {
           id: 9,
@@ -2409,7 +2506,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'rat'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "rat"
         },
         {
           id: 10,
@@ -2433,7 +2531,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'sun'?",
             imagePrompt: 'Educational scene showing identify_each_sound_in_a_word concepts'
-          }
+          },
+          audio: "sun"
         }
       ],
     },
@@ -2468,7 +2567,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ank",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "thank"
         },
         {
           id: 2,
@@ -2492,7 +2592,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _at",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "what"
         },
         {
           id: 3,
@@ -2516,7 +2617,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ip",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "chip"
         },
         {
           id: 4,
@@ -2540,7 +2642,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ick",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "thick"
         },
         {
           id: 5,
@@ -2564,7 +2667,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _eese",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "cheese"
         },
         {
           id: 6,
@@ -2576,7 +2680,7 @@ export const sampleMCQData: MCQData = {
           word: 'blend',
           imageUrl: null,
           explanation: "Good choice! You completed the word correctly.",
-          questionText: "Listen to the word. Then, fill in the missing digraph: _ow",
+          questionText: "Listen to the word. Then, fill in the missing digraph: _row",
           options: ["sh", "th", "ch", "wh"],
           correctAnswer: 1,
           template: 'mcq',
@@ -2586,9 +2690,10 @@ export const sampleMCQData: MCQData = {
           aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
-            questionLine: "Listen to the word. Then, fill in the missing digraph: _ow",
+            questionLine: "Listen to the word. Then, fill in the missing digraph: _row",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "throw"
         },
         {
           id: 7,
@@ -2612,7 +2717,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ip",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "whip"
         },
         {
           id: 8,
@@ -2625,7 +2731,7 @@ export const sampleMCQData: MCQData = {
           imageUrl: null,
           explanation: "Great job! You picked the right digraph.",
           questionText: "Listen to the word. Then, fill in the missing digraph: _ark",
-          options: ["sh", "ch", "th", "wh"],
+          options: ["th", "ch", "sh", "wh"],
           correctAnswer: 2,
           template: 'mcq',
           isSpacing: false,
@@ -2636,7 +2742,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ark",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "shark"
         },
         {
           id: 9,
@@ -2660,7 +2767,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ain",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "chain"
         },
         {
           id: 10,
@@ -2684,7 +2792,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _eel",
             imagePrompt: 'Educational scene showing complete_the_word_with_the_right_digraph concepts'
-          }
+          },
+          audio: "wheel"
         }
       ],
     },
@@ -2718,8 +2827,9 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ack",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "whack"
+        },
       {
         id: 2,
         topicId: '1-H.1',
@@ -2741,8 +2851,9 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ab",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "grab"
+        },
       {
         id: 3,
         topicId: '1-H.1',
@@ -2764,7 +2875,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ep",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "step"
       },
       {
         id: 4,
@@ -2787,7 +2899,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ock",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "block"
       },
       {
         id: 5,
@@ -2810,7 +2923,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ab",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "crab"
       },
       {
         id: 6,
@@ -2833,7 +2947,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ap",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "trap"
       },
       {
         id: 7,
@@ -2856,7 +2971,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ade",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "spade"
       },
       {
         id: 8,
@@ -2879,7 +2995,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ock",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "clock"
       },
       {
         id: 9,
@@ -2902,7 +3019,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _op",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "drop"
       },
       {
         id: 10,
@@ -2925,7 +3043,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ip",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
-        }
+        },
+        audio: "slip"
       }
     ],
     
@@ -2961,8 +3080,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "blush"
+        },
       {
         id: 2,
         topicId: '1-H.2',
@@ -2985,8 +3105,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "clap"
+        },
       {
         id: 3,
         topicId: '1-H.2',
@@ -3009,8 +3130,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "frog"
+        },
       {
         id: 4,
         topicId: '1-H.2',
@@ -3033,8 +3155,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "stump"
+        },
       {
         id: 5,
         topicId: '1-H.2',
@@ -3057,8 +3180,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "crab"
+        },
       {
         id: 6,
         topicId: '1-H.2',
@@ -3081,8 +3205,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "slide"
+        },
       {
         id: 7,
         topicId: '1-H.2',
@@ -3105,8 +3230,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "glove"
+        },
       {
         id: 8,
         topicId: '1-H.2',
@@ -3129,8 +3255,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "snail"
+        },
       {
         id: 9,
         topicId: '1-H.2',
@@ -3153,8 +3280,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "brush"
+        },
       {
         id: 10,
         topicId: '1-H.2',
@@ -3177,7 +3305,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_start_with_a_consonant_blend concepts'
-        }
+        },
+        audio: "slide"
       }
     ],
     
@@ -3212,8 +3341,9 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: po__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "pond"
+        },
       {
         id: 2,
         topicId: '1-H.4',
@@ -3235,7 +3365,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: hu__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "hump"
       },
       {
         id: 3,
@@ -3258,7 +3389,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: pi__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "pink"
       },
       {
         id: 4,
@@ -3281,7 +3413,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: ta__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "task"
       },
       {
         id: 5,
@@ -3304,7 +3437,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: li__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "lift"
       },
       {
         id: 6,
@@ -3327,7 +3461,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: ne__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "nest"
       },
       {
         id: 7,
@@ -3350,7 +3485,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: ha__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "hand"
       },
       {
         id: 8,
@@ -3373,7 +3509,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: te__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "tent"
       },
       {
         id: 9,
@@ -3396,7 +3533,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: fo__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+        },
+        audio: "fork"
       },
       {
         id: 10,
@@ -3419,7 +3557,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: co__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
-        }
+            },
+        audio: "cold"
       }
     ],
     
@@ -3455,8 +3594,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word ends with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Cast"
+        },
       {
         id: 2,
         topicId: '1-H.5',
@@ -3479,8 +3619,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Select the word that ends with a consonant blend.",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Lamp"
+        },
       {
         id: 3,
         topicId: '1-H.5',
@@ -3503,8 +3644,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which of these words ends with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Bend"
+        },
       {
         id: 4,
         topicId: '1-H.5',
@@ -3527,8 +3669,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Identify the word that ends with a consonant blend.",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Milk"
+        },
       {
         id: 5,
         topicId: '1-H.5',
@@ -3551,8 +3694,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Choose the word that ends with a consonant blend.",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Desk"
+        },
       {
         id: 6,
         topicId: '1-H.5',
@@ -3575,8 +3719,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word ends with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Bark"
+        },
       {
         id: 7,
         topicId: '1-H.5',
@@ -3599,8 +3744,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Select the word that ends with a consonant blend.",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Task"
+        },
       {
         id: 8,
         topicId: '1-H.5',
@@ -3623,8 +3769,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which of these words ends with a consonant blend?",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Gift"
+        },
       {
         id: 9,
         topicId: '1-H.5',
@@ -3647,8 +3794,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Identify the word that ends with a consonant blend.",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
-      },
+        },
+          audio: "Help"
+        },
       {
         id: 10,
         topicId: '1-H.5',
@@ -3671,7 +3819,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Choose the word that ends with a consonant blend.",
           imagePrompt: 'Educational scene showing does_the_word_end_with_a_consonant_blend concepts'
-        }
+              },
+        audio: "mask"
       }
     ],
     
@@ -3707,8 +3856,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Mask"
+        },
       {
         id: 2,
         topicId: '1-I.1',
@@ -3731,8 +3881,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "bat"
+        },
       {
         id: 3,
         topicId: '1-I.1',
@@ -3755,8 +3906,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "mat"
+        },
       {
         id: 4,
         topicId: '1-I.1',
@@ -3779,8 +3931,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "rat"
+        },
       {
         id: 5,
         topicId: '1-I.1',
@@ -3803,8 +3956,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "hat"
+        },
       {
         id: 6,
         topicId: '1-I.1',
@@ -3827,8 +3981,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "pan"
+        },
       {
         id: 7,
         topicId: '1-I.1',
@@ -3851,8 +4006,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "can"
+        },
       {
         id: 8,
         topicId: '1-I.1',
@@ -3875,8 +4031,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "bag"
+        },
       {
         id: 9,
         topicId: '1-I.1',
@@ -3899,8 +4056,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "jam"
+        },
       {
         id: 10,
         topicId: '1-I.1',
@@ -3923,7 +4081,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_word_that_matches_the_picture concepts'
-        }
+                    },
+        audio: "lap"
       }
     ],
     
@@ -3959,8 +4118,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "lap"
+        },
       {
         id: 2,
         topicId: '1-I.2',
@@ -3983,8 +4143,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "fan"
+        },
       {
         id: 3,
         topicId: '1-I.2',
@@ -4007,8 +4168,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "ham"
+        },
       {
         id: 4,
         topicId: '1-I.2',
@@ -4031,8 +4193,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "can"
+        },
       {
         id: 5,
         topicId: '1-I.2',
@@ -4055,8 +4218,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "dam"
+        },
       {
         id: 6,
         topicId: '1-I.2',
@@ -4079,8 +4243,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "pan"
+        },
       {
         id: 7,
         topicId: '1-I.2',
@@ -4103,8 +4268,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "jug"
+        },
       {
         id: 8,
         topicId: '1-I.2',
@@ -4127,8 +4293,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "man"
+        },
       {
         id: 9,
         topicId: '1-I.2',
@@ -4151,8 +4318,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
-      },
+        },
+          audio: "van"
+        },
       {
         id: 10,
         topicId: '1-I.2',
@@ -4175,7 +4343,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing read_words_with_am_and_an concepts'
-        }
+                                },
+        audio: "ram"
       }
     ],
     
@@ -4210,8 +4379,9 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: _at (Hint: A flying mammal)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
-      },
+        },
+          audio: "ram"
+        },
       {
         id: 2,
         topicId: '1-I.3',
@@ -4233,7 +4403,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: _at (Hint: A common pet)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "cat"
       },
       {
         id: 3,
@@ -4256,7 +4427,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: _at (Hint: Worn on the head)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "hat"
       },
       {
         id: 4,
@@ -4279,7 +4451,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: _ad (Hint: Feeling unhappy)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "sad"
       },
       {
         id: 5,
@@ -4302,7 +4475,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: _ad (Hint: Feeling angry)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "mad"
       },
       {
         id: 6,
@@ -4325,7 +4499,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: b_g (Hint: Used to carry things)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "bag"
       },
       {
         id: 7,
@@ -4348,7 +4523,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: j_m (Hint: A fruit spread)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "jam"
       },
       {
         id: 8,
@@ -4371,7 +4547,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: m_p (Hint: Used for directions)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "map"
       },
       {
         id: 9,
@@ -4394,7 +4571,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: m_n (Hint: An adult male)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+        },
+        audio: "man"
       },
       {
         id: 10,
@@ -4417,7 +4595,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: c_n (Hint: A container for drinks)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
-        }
+            },
+        audio: "can"
       }
     ],
     
@@ -4453,8 +4632,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat naps on the mat."
+        },
       {
         id: 2,
         topicId: '1-I.4',
@@ -4477,8 +4657,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat sits on the mat."
+        },
       {
         id: 3,
         topicId: '1-I.4',
@@ -4501,8 +4682,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The man wears a black hat."
+        },
       {
         id: 4,
         topicId: '1-I.4',
@@ -4525,8 +4707,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat sits on the mat."
+        },
       {
         id: 5,
         topicId: '1-I.4',
@@ -4549,8 +4732,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The man has a black cap."
+        },
       {
         id: 6,
         topicId: '1-I.4',
@@ -4573,8 +4757,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat naps on the mat."
+        },
       {
         id: 7,
         topicId: '1-I.4',
@@ -4597,8 +4782,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat naps on the chair."
+        },
       {
         id: 8,
         topicId: '1-I.4',
@@ -4621,8 +4807,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The man wears a black hat."
+        },
       {
         id: 9,
         topicId: '1-I.4',
@@ -4645,8 +4832,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat naps on the mat."
+        },
       {
         id: 10,
         topicId: '1-I.4',
@@ -4669,7 +4857,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_a_sentence_that_matches_the_picture concepts'
-        }
+        },
+        audio: "The cat naps on the mat."
       }
     ],
     
@@ -4705,8 +4894,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "pet"
+        },
       {
         id: 2,
         topicId: '1-J.2',
@@ -4729,8 +4919,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _eg",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "leg"
+        },
       {
         id: 3,
         topicId: '1-J.2',
@@ -4753,8 +4944,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _eb",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "web"
+        },
       {
         id: 4,
         topicId: '1-J.2',
@@ -4777,8 +4969,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "red"
+        },
       {
         id: 5,
         topicId: '1-J.2',
@@ -4801,8 +4994,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "bed"
+        },
       {
         id: 6,
         topicId: '1-J.2',
@@ -4825,8 +5019,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "net"
+        },
       {
         id: 7,
         topicId: '1-J.2',
@@ -4849,8 +5044,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "fed"
+        },
       {
         id: 8,
         topicId: '1-J.2',
@@ -4873,8 +5069,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "jet"
+        },
       {
         id: 9,
         topicId: '1-J.2',
@@ -4897,8 +5094,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _en",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
-      },
+        },
+          audio: "pen"
+        },
       {
         id: 10,
         topicId: '1-J.2',
@@ -4921,7 +5119,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
           imagePrompt: 'Educational scene showing complete_the_short_e_word concepts'
-        }
+                },
+        audio: "let"
       }
     ],
     
@@ -4957,8 +5156,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "l"
+        },
       {
         id: 2,
         topicId: '1-J.3',
@@ -4981,8 +5181,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The hen is red."
+        },
       {
         id: 3,
         topicId: '1-J.3',
@@ -5005,8 +5206,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "A pet is in a net."
+        },
       {
         id: 4,
         topicId: '1-J.3',
@@ -5029,8 +5231,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The vet has a pet."
+        },
       {
         id: 5,
         topicId: '1-J.3',
@@ -5053,8 +5256,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The jet is big."
+        },
       {
         id: 6,
         topicId: '1-J.3',
@@ -5077,8 +5281,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "A vet can rest."
+        },
       {
         id: 7,
         topicId: '1-J.3',
@@ -5101,8 +5306,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "A jet is wet."
+        },
       {
         id: 8,
         topicId: '1-J.3',
@@ -5125,8 +5331,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "A hen is in the shed."
+        },
       {
         id: 9,
         topicId: '1-J.3',
@@ -5149,8 +5356,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The jet is fast."
+        },
       {
         id: 10,
         topicId: '1-J.3',
@@ -5173,7 +5381,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_e_sentence_that_matches_the_picture concepts'
-        }
+          },
+        audio: "The hen is on a jet."
       }
     ],
     
@@ -5209,8 +5418,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "pin"
+        },
       {
         id: 2,
         topicId: '1-K.1',
@@ -5233,8 +5443,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "kid"
+        },
       {
         id: 3,
         topicId: '1-K.1',
@@ -5257,8 +5468,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "lid"
+        },
       {
         id: 4,
         topicId: '1-K.1',
@@ -5281,8 +5493,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "pig"
+        },
       {
         id: 5,
         topicId: '1-K.1',
@@ -5305,8 +5518,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "bin"
+        },
       {
         id: 6,
         topicId: '1-K.1',
@@ -5329,8 +5543,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "fin"
+        },
       {
         id: 7,
         topicId: '1-K.1',
@@ -5353,8 +5568,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "lip"
+        },
       {
         id: 8,
         topicId: '1-K.1',
@@ -5377,8 +5593,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "crib"
+        },
       {
         id: 9,
         topicId: '1-K.1',
@@ -5401,8 +5618,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "wig"
+        },
       {
         id: 10,
         topicId: '1-K.1',
@@ -5425,7 +5643,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_i_word_that_matches_the_picture concepts'
-        }
+          },
+        audio: "fig"
       }
     ],
     
@@ -5461,8 +5680,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "hop"
+        },
       {
         id: 2,
         topicId: '1-L.1',
@@ -5485,8 +5705,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "top"
+        },
       {
         id: 3,
         topicId: '1-L.1',
@@ -5509,8 +5730,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "box"
+        },
       {
         id: 4,
         topicId: '1-L.1',
@@ -5533,8 +5755,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "fox"
+        },
       {
         id: 5,
         topicId: '1-L.1',
@@ -5557,8 +5780,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "mop"
+        },
       {
         id: 6,
         topicId: '1-L.1',
@@ -5581,8 +5805,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "dot"
+        },
       {
         id: 7,
         topicId: '1-L.1',
@@ -5605,8 +5830,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cot"
+        },
       {
         id: 8,
         topicId: '1-L.1',
@@ -5629,8 +5855,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "pot"
+        },
       {
         id: 9,
         topicId: '1-L.1',
@@ -5653,8 +5880,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "log"
+        },
       {
         id: 10,
         topicId: '1-L.1',
@@ -5677,7 +5905,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_word_that_matches_the_picture concepts'
-        }
+        },
+        audio: "rod"
       }
     ],
     
@@ -5713,8 +5942,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "We chop the log."
+        },
       {
         id: 2,
         topicId: '1-L.3',
@@ -5737,8 +5967,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Don jogs with a mop."
+        },
       {
         id: 3,
         topicId: '1-L.3',
@@ -5761,8 +5992,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Jon and Bob mop."
+        },
       {
         id: 4,
         topicId: '1-L.3',
@@ -5785,8 +6017,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat on a log."
+        },
       {
         id: 5,
         topicId: '1-L.3',
@@ -5809,8 +6042,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The frog on a log."
+        },
       {
         id: 6,
         topicId: '1-L.3',
@@ -5833,8 +6067,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "A dog on a log."
+        },
       {
         id: 7,
         topicId: '1-L.3',
@@ -5857,8 +6092,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Bob chops a log."
+        },
       {
         id: 8,
         topicId: '1-L.3',
@@ -5881,8 +6117,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "A fox on a log."
+        },
       {
         id: 9,
         topicId: '1-L.3',
@@ -5905,8 +6142,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The frog hops on a log."
+        },
       {
         id: 10,
         topicId: '1-L.3',
@@ -5929,7 +6167,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_o_sentence_that_matches_the_picture concepts'
-        }
+        },
+        audio: "Tom mops the floor."
       }
     ],
     
@@ -5965,8 +6204,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "mug"
+        },
       {
         id: 2,
         topicId: '1-M.2',
@@ -5989,8 +6229,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "jug"
+        },
       {
         id: 3,
         topicId: '1-M.2',
@@ -6013,8 +6254,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "hug"
+        },
       {
         id: 4,
         topicId: '1-M.2',
@@ -6037,8 +6279,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "bug"
+        },
       {
         id: 5,
         topicId: '1-M.2',
@@ -6061,8 +6304,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "rug"
+        },
       {
         id: 6,
         topicId: '1-M.2',
@@ -6085,8 +6329,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "tub"
+        },
       {
         id: 7,
         topicId: '1-M.2',
@@ -6109,8 +6354,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "cub"
+        },
       {
         id: 8,
         topicId: '1-M.2',
@@ -6133,8 +6379,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "sub"
+        },
       {
         id: 9,
         topicId: '1-M.2',
@@ -6157,8 +6404,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _un",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
-      },
+        },
+          audio: "sun"
+        },
       {
         id: 10,
         topicId: '1-M.2',
@@ -6181,7 +6429,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _un",
           imagePrompt: 'Educational scene showing complete_the_short_u_word concepts'
-        }
+        },
+        audio: "fun"
       }
     ],
     
@@ -6217,8 +6466,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The pup jumps in the tub."
+        },
       {
         id: 2,
         topicId: '1-M.3',
@@ -6241,8 +6491,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The bug is in the mud."
+        },
       {
         id: 3,
         topicId: '1-M.3',
@@ -6265,8 +6516,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The pup naps in the sun."
+        },
       {
         id: 4,
         topicId: '1-M.3',
@@ -6289,8 +6541,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The pup digs in the mud."
+        },
       {
         id: 5,
         topicId: '1-M.3',
@@ -6313,8 +6566,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The duck swims in the pond."
+        },
       {
         id: 6,
         topicId: '1-M.3',
@@ -6337,8 +6591,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The pup runs in the yard."
+        },
       {
         id: 7,
         topicId: '1-M.3',
@@ -6361,8 +6616,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The bug crawls on the rug."
+        },
       {
         id: 8,
         topicId: '1-M.3',
@@ -6385,8 +6641,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The sun shines on the hill."
+        },
       {
         id: 9,
         topicId: '1-M.3',
@@ -6409,8 +6666,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The pup plays in the tub."
+        },
       {
         id: 10,
         topicId: '1-M.3',
@@ -6433,7 +6691,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_short_u_sentence_that_matches_the_picture concepts'
-        }
+        },
+        audio: "The pup chases the bug."
       }
     ],
     
@@ -6469,8 +6728,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: h_t",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "hat"
+        },
       {
         id: 2,
         topicId: '1-N.2',
@@ -6493,8 +6753,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: r_g",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "rug"
+        },
       {
         id: 3,
         topicId: '1-N.2',
@@ -6517,8 +6778,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: g_s",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "gas"
+        },
       {
         id: 4,
         topicId: '1-N.2',
@@ -6541,8 +6803,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: p_n",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "pen"
+        },
       {
         id: 5,
         topicId: '1-N.2',
@@ -6565,8 +6828,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: l_p",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "lip"
+        },
       {
         id: 6,
         topicId: '1-N.2',
@@ -6589,8 +6853,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: p_t",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "pot"
+        },
       {
         id: 7,
         topicId: '1-N.2',
@@ -6613,8 +6878,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: c_p",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "cup"
+        },
       {
         id: 8,
         topicId: '1-N.2',
@@ -6637,8 +6903,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: b_d",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "bed"
+        },
       {
         id: 9,
         topicId: '1-N.2',
@@ -6661,8 +6928,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: p_t",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
-      },
+        },
+          audio: "pit"
+        },
       {
         id: 10,
         topicId: '1-N.2',
@@ -6685,7 +6953,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: l_g",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_short_vowel concepts'
-        }
+        },
+        audio: "log"
       }
     ],
     
@@ -6721,8 +6990,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cake"
+        },
       {
         id: 2,
         topicId: '1-P.1',
@@ -6745,8 +7015,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "bake"
+        },
       {
         id: 3,
         topicId: '1-P.1',
@@ -6769,8 +7040,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "kite"
+        },
       {
         id: 4,
         topicId: '1-P.1',
@@ -6793,8 +7065,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "plane"
+        },
       {
         id: 5,
         topicId: '1-P.1',
@@ -6817,8 +7090,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cone"
+        },
       {
         id: 6,
         topicId: '1-P.1',
@@ -6841,8 +7115,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cube"
+        },
       {
         id: 7,
         topicId: '1-P.1',
@@ -6865,8 +7140,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "tube"
+        },
       {
         id: 8,
         topicId: '1-P.1',
@@ -6889,8 +7165,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "dune"
+        },
       {
         id: 9,
         topicId: '1-P.1',
@@ -6913,8 +7190,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "mile"
+        },
       {
         id: 10,
         topicId: '1-P.1',
@@ -6937,7 +7215,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_word_that_matches_the_picture concepts'
-        }
+        },
+        audio: "wave"
       }
     ],
     
@@ -6973,8 +7252,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Kate gets a good grade."
+        },
       {
         id: 2,
         topicId: '1-P.4',
@@ -6997,8 +7277,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Gabe broke the vase."
+        },
       {
         id: 3,
         topicId: '1-P.4',
@@ -7021,8 +7302,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Kate and Mike win a prize."
+        },
       {
         id: 4,
         topicId: '1-P.4',
@@ -7045,8 +7327,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "Jake plays a game."
+        },
       {
         id: 5,
         topicId: '1-P.4',
@@ -7069,8 +7352,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cake is on the table."
+        },
       {
         id: 6,
         topicId: '1-P.4',
@@ -7093,8 +7377,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The boy rides a bike."
+        },
       {
         id: 7,
         topicId: '1-P.4',
@@ -7117,8 +7402,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The girl bakes a cake."
+        },
       {
         id: 8,
         topicId: '1-P.4',
@@ -7141,8 +7427,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The kite flies high."
+        },
       {
         id: 9,
         topicId: '1-P.4',
@@ -7165,8 +7452,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The puppy takes a nap."
+        },
       {
         id: 10,
         topicId: '1-P.4',
@@ -7189,7 +7477,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_silent_e_sentence_that_matches_the_picture concepts'
-        }
+        },
+        audio: "The cake is on the plate."
       }
     ],
     
@@ -7225,8 +7514,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The boat sails on the sea."
+        },
       {
         id: 2,
         topicId: '1-Q.4',
@@ -7249,8 +7539,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The boy reads on the beach."
+        },
       {
         id: 3,
         topicId: '1-Q.4',
@@ -7273,8 +7564,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cat naps on the couch."
+        },
       {
         id: 4,
         topicId: '1-Q.4',
@@ -7297,8 +7589,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The dog barks at the mailman."
+        },
       {
         id: 5,
         topicId: '1-Q.4',
@@ -7321,8 +7614,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The plane flies through the clouds."
+        },
       {
         id: 6,
         topicId: '1-Q.4',
@@ -7345,8 +7639,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The frog jumps over the log."
+        },
       {
         id: 7,
         topicId: '1-Q.4',
@@ -7369,8 +7664,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The sheep grazes in the field."
+        },
       {
         id: 8,
         topicId: '1-Q.4',
@@ -7393,8 +7689,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The bird sings in the tree."
+        },
       {
         id: 9,
         topicId: '1-Q.4',
@@ -7417,8 +7714,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "The cow grazes in the meadow."
+        },
       {
         id: 10,
         topicId: '1-Q.4',
@@ -7441,7 +7739,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_vowel_team_sentence_that_matches_the_picture concepts'
-        }
+        },
+        audio: "The fish swims in the pond."
       }
     ],
     
@@ -7477,8 +7776,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "fur"
+        },
       {
         id: 2,
         topicId: '1-T.1',
@@ -7501,8 +7801,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "hard"
+        },
       {
         id: 3,
         topicId: '1-T.1',
@@ -7525,8 +7826,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cart"
+        },
       {
         id: 4,
         topicId: '1-T.1',
@@ -7549,8 +7851,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "bird"
+        },
       {
         id: 5,
         topicId: '1-T.1',
@@ -7573,8 +7876,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "star"
+        },
       {
         id: 6,
         topicId: '1-T.1',
@@ -7597,8 +7901,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "corn"
+        },
       {
         id: 7,
         topicId: '1-T.1',
@@ -7621,8 +7926,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "fork"
+        },
       {
         id: 8,
         topicId: '1-T.1',
@@ -7645,8 +7951,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "barn"
+        },
       {
         id: 9,
         topicId: '1-T.1',
@@ -7669,8 +7976,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "horn"
+        },
       {
         id: 10,
         topicId: '1-T.1',
@@ -7693,7 +8001,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_r_controlled_word_that_matches_the_picture concepts'
-        }
+        },
+        audio: "curl"
       }
     ],
     
@@ -7728,8 +8037,9 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: f__m",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
-      },
+        },
+          audio: "farm"
+        },
       {
         id: 2,
         topicId: '1-T.2',
@@ -7751,7 +8061,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: b__k",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "bark"
       },
       {
         id: 3,
@@ -7774,7 +8085,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: cl__k",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "clerk"
       },
       {
         id: 4,
@@ -7797,7 +8109,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: b__d",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "bird"
       },
       {
         id: 5,
@@ -7820,7 +8133,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: c__n",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "corn"
       },
       {
         id: 6,
@@ -7843,7 +8157,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: b__n",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "burn"
       },
       {
         id: 7,
@@ -7866,7 +8181,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: st__",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "star"
       },
       {
         id: 8,
@@ -7889,7 +8205,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: sh__t",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "shirt"
       },
       {
         id: 9,
@@ -7912,7 +8229,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: t__n",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+        },
+        audio: "turn"
       },
       {
         id: 10,
@@ -7935,7 +8253,8 @@ export const sampleMCQData: MCQData = {
           intent: 'fill_blank',
           questionLine: "Complete the word: h__n",
           imagePrompt: 'Educational scene showing complete_the_word_with_the_right_r_controlled_vowel concepts'
-        }
+          },
+        audio: "horn"
       }
     ],
     
@@ -7971,8 +8290,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "clown"
+        },
       {
         id: 2,
         topicId: '1-U.1',
@@ -7995,8 +8315,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "noise"
+        },
       {
         id: 3,
         topicId: '1-U.1',
@@ -8019,8 +8340,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "house"
+        },
       {
         id: 4,
         topicId: '1-U.1',
@@ -8043,8 +8365,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cloud"
+        },
       {
         id: 5,
         topicId: '1-U.1',
@@ -8067,8 +8390,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "cow"
+        },
       {
         id: 6,
         topicId: '1-U.1',
@@ -8091,8 +8415,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "sound"
+        },
       {
         id: 7,
         topicId: '1-U.1',
@@ -8115,8 +8440,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "toy"
+        },
       {
         id: 8,
         topicId: '1-U.1',
@@ -8139,8 +8465,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "owl"
+        },
       {
         id: 9,
         topicId: '1-U.1',
@@ -8163,8 +8490,9 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
-      },
+        },
+          audio: "coin"
+        },
       {
         id: 10,
         topicId: '1-U.1',
@@ -8187,7 +8515,8 @@ export const sampleMCQData: MCQData = {
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
           imagePrompt: 'Educational scene showing choose_the_diphthong_word_that_matches_the_picture concepts'
-        }
+        },
+        audio: "soil"
       }
     ],
   },
@@ -8223,7 +8552,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Sam have?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "soil"
         },
         {
           id: 2,
@@ -8248,7 +8578,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What kind of stamps does Cam like?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "Bat stamps"
         },
         {
           id: 3,
@@ -8273,7 +8604,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where is Sam standing?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "On a path"
         },
         {
           id: 4,
@@ -8298,7 +8630,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is on some of the stamps?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "Bats"
         },
         {
           id: 5,
@@ -8323,7 +8656,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is Sam standing on?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "Path"
         },
         {
           id: 6,
@@ -8348,7 +8682,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Who likes the bat stamps?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "Cam"
         },
         {
           id: 7,
@@ -8373,7 +8708,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Who stands by the plants?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "Sam"
         },
         {
           id: 8,
@@ -8398,7 +8734,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Gramps have a stack of?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "A stack"
         },
         {
           id: 9,
@@ -8423,7 +8760,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What helps Sam?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "A map"
         },
         {
           id: 10,
@@ -8448,7 +8786,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Cam say thanks for?",
             imagePrompt: 'Educational scene showing read_short_a_stories concepts'
-          }
+          },
+          audio: "soil"
         }
       ],
       
@@ -8485,7 +8824,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Len see in the den?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "Bat stamps"
         },
         {
           id: 2,
@@ -8510,7 +8850,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where does Ben put the pens?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "On the desk"
         },
         {
           id: 3,
@@ -8535,7 +8876,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Jen sweep?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "The steps"
         },
         {
           id: 4,
@@ -8560,7 +8902,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where is the den located?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "Next to the tent"
         },
         {
           id: 5,
@@ -8585,7 +8928,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where does Ben put his jet?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "On the shelf"
         },
         {
           id: 6,
@@ -8610,7 +8954,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Who helps Miss Dell?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "Jen"
         },
         {
           id: 7,
@@ -8635,7 +8980,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Ken and Len decide to do?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "Move the tent"
         },
         {
           id: 8,
@@ -8660,7 +9006,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Ben go to get from under the bed?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "His jet"
         },
         {
           id: 9,
@@ -8685,7 +9032,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where does Jen put the ten things?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "In the box"
         },
         {
           id: 10,
@@ -8710,7 +9058,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What animals does Len see in the den?",
             imagePrompt: 'Educational scene showing read_short_e_stories concepts'
-          }
+          },
+          audio: "Cubs"
         }
       ],
       
@@ -8747,7 +9096,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Sid give Jill?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "Cubs"
         },
         {
           id: 2,
@@ -8772,7 +9122,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Lin add to the dip?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "milk"
         },
         {
           id: 3,
@@ -8797,7 +9148,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does mom get for her gift?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "a pink ring"
         },
         {
           id: 4,
@@ -8822,7 +9174,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How big is the hat for Sid?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "too big"
         },
         {
           id: 5,
@@ -8847,7 +9200,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What ingredient does Lin use in the dip?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "dill"
         },
         {
           id: 6,
@@ -8872,7 +9226,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Kim and Tim decide to buy?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "a pink ring"
         },
         {
           id: 7,
@@ -8897,7 +9252,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Sid give Jill after getting the hat?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "a grin"
         },
         {
           id: 8,
@@ -8922,7 +9278,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Lin feel about the dip with the chips?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "good"
         },
         {
           id: 9,
@@ -8947,7 +9304,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What final gift do they choose for mom?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "a ring"
         },
         {
           id: 10,
@@ -8972,7 +9330,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Jill decide to do for Sid?",
             imagePrompt: 'Educational scene showing read_short_i_stories concepts'
-          }
+          },
+          audio: "fix the hat"
         }
       ],
       
@@ -9009,7 +9368,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Ron and Tod do together?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "fix the hat"
         },
         {
           id: 2,
@@ -9034,7 +9394,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is on Lon's new blocks?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "dots"
         },
         {
           id: 3,
@@ -9059,7 +9420,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Jon spot?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "a log"
         },
         {
           id: 4,
@@ -9084,7 +9446,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Tom do at his job?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Tom stocks the shelves."
         },
         {
           id: 5,
@@ -9109,7 +9472,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Bob do with his top?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Bob spins his top."
         },
         {
           id: 6,
@@ -9134,7 +9498,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Molly do with the pot?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Molly plants a seed."
         },
         {
           id: 7,
@@ -9159,7 +9524,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Don do with the blocks?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Don builds towers."
         },
         {
           id: 8,
@@ -9184,7 +9550,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Rob's frog do?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Rob's frog hops from log to log."
         },
         {
           id: 9,
@@ -9209,7 +9576,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Spot do at the park?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Spot chases the ducks."
         },
         {
           id: 10,
@@ -9234,7 +9602,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Dot do in the garden?",
             imagePrompt: 'Educational scene showing read_short_o_stories concepts'
-          }
+          },
+          audio: "Dot jumps over the pots."
         }
       ],
       
@@ -9271,7 +9640,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Russ do before settling in bed?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "Dot jumps over the pots."
         },
         {
           id: 2,
@@ -9296,7 +9666,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How can Russ help Gus?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "He can help Gus hum."
         },
         {
           id: 3,
@@ -9321,7 +9692,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where does the skunk drag her stuff?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "under a stump"
         },
         {
           id: 4,
@@ -9346,7 +9718,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How is Russ at the end of the story?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "Russ is snug in bed."
         },
         {
           id: 5,
@@ -9371,7 +9744,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "When does Russ hum?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "Russ hums when the sun is up."
         },
         {
           id: 6,
@@ -9396,7 +9770,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does the skunk find?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "The skunk finds a plum."
         },
         {
           id: 7,
@@ -9421,7 +9796,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Russ receive before settling down?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "Russ gets a hug."
         },
         {
           id: 8,
@@ -9446,7 +9822,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Gus feel about humming?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "Gus is glum and cannot hum."
         },
         {
           id: 9,
@@ -9471,7 +9848,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is the skunk doing?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "The skunk is on a hunt."
         },
         {
           id: 10,
@@ -9496,7 +9874,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does she do to help Russ sleep?",
             imagePrompt: 'Educational scene showing read_short_u_stories concepts'
-          }
+          },
+          audio: "She hums and gives Russ a hug."
         }
       ],
       
@@ -9533,7 +9912,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Why can't Pete and Kate pick the grapes at first?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "She hums and gives Russ a hug."
         },
         {
           id: 2,
@@ -9558,7 +9938,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where are Gabe's skates?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "They are at home."
         },
         {
           id: 3,
@@ -9583,7 +9964,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Jane and Luke do first in the race?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "They go down the slide."
         },
         {
           id: 4,
@@ -9608,7 +9990,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Pete and Kate do before they pick grapes?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "Ride past the vines"
         },
         {
           id: 5,
@@ -9633,7 +10016,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Pig and Gabe decide to do after getting the skates?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "Go to the lake"
         },
         {
           id: 6,
@@ -9658,7 +10042,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Jane and Luke do at the end of the race?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "Cross the finish line"
         },
         {
           id: 7,
@@ -9683,7 +10068,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What color do the grapes turn when they are ripe?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "Green"
         },
         {
           id: 8,
@@ -9708,7 +10094,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Pig prefer to do instead of racing?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "He likes skating side by side."
         },
         {
           id: 9,
@@ -9733,7 +10120,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Who wins the race?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "Both Jane and Luke"
         },
         {
           id: 10,
@@ -9758,7 +10146,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Pete and Kate do after picking the grapes?",
             imagePrompt: 'Educational scene showing read_silent_e_stories concepts'
-          }
+          },
+          audio: "They eat the grapes."
         }
       ],
       
@@ -9795,7 +10184,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Snail think of the tea?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "They eat the grapes."
         },
         {
           id: 2,
@@ -9820,7 +10210,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Flea give Snail to eat?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "A bite of pie"
         },
         {
           id: 3,
@@ -9845,7 +10236,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Snail ask for after the meal?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "More treats"
         },
         {
           id: 4,
@@ -9870,7 +10262,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Flea feel about the meal?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "He agrees it's a feast."
         },
         {
           id: 5,
@@ -9895,7 +10288,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Snail and Flea have for their meal?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "Tea, a pea, and cheese"
         },
         {
           id: 6,
@@ -9920,7 +10314,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is Lee excited to eat at the picnic?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "The pie"
         },
         {
           id: 7,
@@ -9945,7 +10340,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Which animals come to the picnic?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "Geese and a toad"
         },
         {
           id: 8,
@@ -9970,7 +10366,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Lee shout at the animals?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "This feast is not for you!"
         },
         {
           id: 9,
@@ -9995,7 +10392,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What happens after Lee shouts at the animals?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "The animals speed away."
         },
         {
           id: 10,
@@ -10020,7 +10418,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Why do Finn and Lee cheer at the end?",
             imagePrompt: 'Educational scene showing read_vowel_team_stories concepts'
-          }
+          },
+          audio: "It is time to eat."
         }
       ],
       
@@ -10057,7 +10456,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "play, tray, bake, cake"
         },
         {
           id: 2,
@@ -10082,7 +10482,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "train, sail, fade, gate"
         },
         {
           id: 3,
@@ -10107,7 +10508,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "stay, ray, late, date"
         },
         {
           id: 4,
@@ -10132,7 +10534,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "pain, grain, cane, pane"
         },
         {
           id: 5,
@@ -10157,7 +10560,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "clay, pray, flame, blame"
         },
         {
           id: 6,
@@ -10182,7 +10586,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "chain, mail, tame, frame"
         },
         {
           id: 7,
@@ -10207,7 +10612,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "way, bay, brave, crave"
         },
         {
           id: 8,
@@ -10232,7 +10638,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "snail, pail, fame, shame"
         },
         {
           id: 9,
@@ -10257,7 +10664,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+            audio: "day, gray, stale, scale"
         },
         {
           id: 10,
@@ -10282,7 +10690,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_a_words concepts'
-          }
+          },
+          audio: "trail, fail, cape, shape"
         }
       ],
       
@@ -10319,7 +10728,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "seal, feed, beast, green"
         },
         {
           id: 2,
@@ -10344,7 +10754,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "real, tree, bean, seat"
         },
         {
           id: 3,
@@ -10369,7 +10780,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "each, seen, bead, peel"
         },
         {
           id: 4,
@@ -10394,7 +10806,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "leaf, feel, steak, cheese"
         },
         {
           id: 5,
@@ -10419,7 +10832,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "greed, free, speak, peace"
         },
         {
           id: 6,
@@ -10444,7 +10858,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "leap, team, cheer, sheep"
         },
         {
           id: 7,
@@ -10469,7 +10884,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "steep, sleep, speak, plead"
         },
         {
           id: 8,
@@ -10494,7 +10910,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "heal, dream, creep, sweep"
         },
         {
           id: 9,
@@ -10519,7 +10936,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+            audio: "deem, sheep, peach, treat"
         },
         {
           id: 10,
@@ -10544,7 +10962,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_e_words concepts'
-          }
+          },
+          audio: "bleak, meat, sweep, creek"
         }
       ],
       
@@ -10581,7 +11000,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "smile, tie, shine, fly"
         },
         {
           id: 2,
@@ -10606,7 +11026,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "kite, pie, drive, cry"
         },
         {
           id: 3,
@@ -10631,7 +11052,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "line, die, ride, sigh"
         },
         {
           id: 4,
@@ -10656,7 +11078,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "like, lie, bike, try"
         },
         {
           id: 5,
@@ -10681,7 +11104,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "white, tie, drive, high"
         },
         {
           id: 6,
@@ -10706,7 +11130,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "site, pie, hike, lie"
         },
         {
           id: 7,
@@ -10731,7 +11156,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "dime, fry, ride, bye"
         },
         {
           id: 8,
@@ -10756,7 +11182,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "spine, tie, slide, my"
         },
         {
           id: 9,
@@ -10781,7 +11208,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "shine, lie, white, high"
         },
         {
           id: 10,
@@ -10806,7 +11234,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_i_words concepts'
-          }
+          },
+          audio: "like, tie, bike, bye"
         }
       ],
       
@@ -10843,7 +11272,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "bow, coat, flow, goal"
         },
         {
           id: 2,
@@ -10868,7 +11298,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "glow, row, smoke"
         },
         {
           id: 3,
@@ -10893,7 +11324,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "own, soap, float"
         },
         {
           id: 4,
@@ -10918,7 +11350,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "crow, road, snow"
         },
         {
           id: 5,
@@ -10943,7 +11376,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "blow, loaf, grow"
         },
         {
           id: 6,
@@ -10968,7 +11402,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "show, joke, bow"
         },
         {
           id: 7,
@@ -10993,7 +11428,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "grow, low, soap"
         },
         {
           id: 8,
@@ -11018,7 +11454,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "crow, slow, load"
         },
         {
           id: 9,
@@ -11043,7 +11480,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "row, stone, flow"
         },
         {
           id: 10,
@@ -11068,7 +11506,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_o_words concepts'
-          }
+          },
+          audio: "show, slow, boat"
         }
       ],
       
@@ -11105,7 +11544,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "mule, cue, prune, glue"
         },
         {
           id: 2,
@@ -11130,7 +11570,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "tune, blue, flute, rescue"
         },
         {
           id: 3,
@@ -11155,7 +11596,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "use, glue, brute, issue"
         },
         {
           id: 4,
@@ -11180,7 +11622,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "rude, glue, clue, tune"
         },
         {
           id: 5,
@@ -11205,7 +11648,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "blue, cute, brute, rescue"
         },
         {
           id: 6,
@@ -11230,7 +11674,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "cube, cue, flute, issue"
         },
         {
           id: 7,
@@ -11255,7 +11700,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "rescue, tune, glue, mute"
         },
         {
           id: 8,
@@ -11280,7 +11726,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "use, clue, mute, blue"
         },
         {
           id: 9,
@@ -11305,7 +11752,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "flute, glue, huge, clue"
         },
         {
           id: 10,
@@ -11330,7 +11778,8 @@ export const sampleMCQData: MCQData = {
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
             imagePrompt: 'Educational scene showing use_spelling_patterns_to_sort_long_u_words concepts'
-          }
+          },
+          audio: "glue, huge, rude, cue"
         }
       ],
       
@@ -11366,7 +11815,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "Emma eats lunch."
         },
         {
           id: 2,
@@ -11390,7 +11840,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "They play soccer."
         },
         {
           id: 3,
@@ -11414,7 +11865,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "She reads a book."
         },
         {
           id: 4,
@@ -11438,7 +11890,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "We are happy."
         },
         {
           id: 5,
@@ -11462,7 +11915,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "The dog barks loudly."
         },
         {
           id: 6,
@@ -11486,7 +11940,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "I like ice cream."
         },
         {
           id: 7,
@@ -11510,7 +11965,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "You drive the car."
         },
         {
           id: 8,
@@ -11534,7 +11990,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "The flowers bloom."
         },
         {
           id: 9,
@@ -11558,7 +12015,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+          },
+          audio: "The sun shines brightly."
         },
         {
           id: 10,
@@ -11582,7 +12040,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_present concepts'
-          }
+            },
+          audio: "She sings beautifully."
         }
       ],
       
@@ -11618,7 +12077,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "We wished him a good trip."
         },
         {
           id: 2,
@@ -11642,7 +12102,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "They fixed their boat."
         },
         {
           id: 3,
@@ -11666,7 +12127,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "Grandpa loved all kinds of trains."
         },
         {
           id: 4,
@@ -11690,7 +12152,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "She painted a picture yesterday."
         },
         {
           id: 5,
@@ -11714,7 +12177,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "He cooked dinner last night."
         },
         {
           id: 6,
@@ -11738,7 +12202,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "We danced at the party."
         },
         {
           id: 7,
@@ -11762,7 +12227,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "They ran to the store."
         },
         {
           id: 8,
@@ -11786,7 +12252,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "She wrote a letter."
         },
         {
           id: 9,
@@ -11810,7 +12277,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "They visited their grandparents."
         },
         {
           id: 10,
@@ -11834,7 +12302,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
             imagePrompt: 'Educational scene showing select_the_sentence_that_tells_about_the_past concepts'
-          }
+          },
+          audio: "He played the guitar."
         }
       ],
       
@@ -11870,7 +12339,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "again"
         },
         {
           id: 2,
@@ -11894,7 +12364,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "each"
         },
         {
           id: 3,
@@ -11918,7 +12389,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "from"
         },
         {
           id: 4,
@@ -11942,7 +12414,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "may"
         },
         {
           id: 5,
@@ -11966,7 +12439,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "stop"
         },
         {
           id: 6,
@@ -11990,7 +12464,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "than"
         },
         {
           id: 7,
@@ -12014,7 +12489,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "when"
         },
         {
           id: 8,
@@ -12038,7 +12514,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "again"
         },
         {
           id: 9,
@@ -12062,7 +12539,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "each"
         },
         {
           id: 10,
@@ -12086,7 +12564,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_1 concepts'
-          }
+          },
+          audio: "from"
         }
       ],
       
@@ -12122,7 +12601,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the word. Which one do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "has"
         },
         {
           id: 2,
@@ -12146,7 +12626,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the sound. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "gave"
         },
         {
           id: 3,
@@ -12170,7 +12651,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Play the audio. Which word is it?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "them"
         },
         {
           id: 4,
@@ -12194,7 +12676,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the button sound. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "after"
         },
         {
           id: 5,
@@ -12218,7 +12701,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Play the audio. What word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "best"
         },
         {
           id: 6,
@@ -12242,7 +12726,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click to hear the word. Which one is it?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "once"
         },
         {
           id: 7,
@@ -12266,7 +12751,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the audio clip. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "were"
         },
         {
           id: 8,
@@ -12290,7 +12776,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click to play the sound. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "has"
         },
         {
           id: 9,
@@ -12314,7 +12801,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Listen to the button sound. Which one do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "gave"
         },
         {
           id: 10,
@@ -12338,7 +12826,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Play the sound. Which word is it?",
             imagePrompt: 'Educational scene showing read_sight_words_set_2 concepts'
-          }
+          },
+          audio: "them"
         }
       ],
       
@@ -12374,7 +12863,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "as"
         },
         {
           id: 2,
@@ -12398,7 +12888,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "by"
         },
         {
           id: 3,
@@ -12422,7 +12913,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "four"
         },
         {
           id: 4,
@@ -12446,7 +12938,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "her"
         },
         {
           id: 5,
@@ -12470,7 +12963,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "more"
         },
         {
           id: 6,
@@ -12494,7 +12988,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "some"
         },
         {
           id: 7,
@@ -12518,7 +13013,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "think"
         },
         {
           id: 8,
@@ -12542,7 +13038,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "way"
         },
         {
           id: 9,
@@ -12566,7 +13063,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "her"
         },
         {
           id: 10,
@@ -12590,7 +13088,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_3 concepts'
-          }
+          },
+          audio: "as"
         }
       ],
       
@@ -12626,7 +13125,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "from"
         },
         {
           id: 2,
@@ -12650,7 +13150,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "after"
         },
         {
           id: 3,
@@ -12674,7 +13175,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "them"
         },
         {
           id: 4,
@@ -12698,7 +13200,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "once"
         },
         {
           id: 5,
@@ -12722,7 +13225,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "way"
         },
         {
           id: 6,
@@ -12746,7 +13250,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "best"
         },
         {
           id: 7,
@@ -12770,7 +13275,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "gave"
         },
         {
           id: 8,
@@ -12794,7 +13300,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "more"
         },
         {
           id: 9,
@@ -12818,7 +13325,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "think"
         },
         {
           id: 10,
@@ -12842,7 +13350,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_2_3 concepts'
-          }
+          },
+          audio: "as"
         }
       ],
       
@@ -12878,7 +13387,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "every"
         },
         {
           id: 2,
@@ -12902,7 +13412,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "could"
         },
         {
           id: 3,
@@ -12926,7 +13437,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "how"
         },
         {
           id: 4,
@@ -12950,7 +13462,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "over"
         },
         {
           id: 5,
@@ -12974,7 +13487,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "put"
         },
         {
           id: 6,
@@ -12998,7 +13512,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "where"
         },
         {
           id: 7,
@@ -13022,7 +13537,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "who"
         },
         {
           id: 8,
@@ -13046,7 +13562,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "every"
         },
         {
           id: 9,
@@ -13070,7 +13587,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "cloud"
         },
         {
           id: 10,
@@ -13094,7 +13612,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_4 concepts'
-          }
+          },
+          audio: "over"
         }
       ],
       
@@ -13130,7 +13649,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "ask"
         },
         {
           id: 2,
@@ -13154,7 +13674,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "five"
         },
         {
           id: 3,
@@ -13178,7 +13699,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "just"
         },
         {
           id: 4,
@@ -13202,7 +13724,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "long"
         },
         {
           id: 5,
@@ -13226,7 +13749,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "read"
         },
         {
           id: 6,
@@ -13250,7 +13774,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "then"
         },
         {
           id: 7,
@@ -13274,7 +13799,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "want"
         },
         {
           id: 8,
@@ -13298,7 +13824,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "ask"
         },
         {
           id: 9,
@@ -13322,7 +13849,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "five"
         },
         {
           id: 10,
@@ -13346,7 +13874,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_5 concepts'
-          }
+          },
+          audio: "long"
         }
       ],
       
@@ -13382,7 +13911,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "any"
         },
         {
           id: 2,
@@ -13406,7 +13936,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "give"
         },
         {
           id: 3,
@@ -13430,7 +13961,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "his"
         },
         {
           id: 4,
@@ -13454,7 +13986,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "new"
         },
         {
           id: 5,
@@ -13478,7 +14011,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "open"
         },
         {
           id: 6,
@@ -13502,7 +14036,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "sleep"
         },
         {
           id: 7,
@@ -13526,7 +14061,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "wish"
         },
         {
           id: 8,
@@ -13550,7 +14086,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "give"
         },
         {
           id: 9,
@@ -13574,7 +14111,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "his"
         },
         {
           id: 10,
@@ -13598,7 +14136,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
             imagePrompt: 'Educational scene showing read_sight_words_set_6 concepts'
-          }
+          },
+          audio: "new"
         }
       ],
       
@@ -13634,7 +14173,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word means 'in addition'?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "also"
         },
         {
           id: 2,
@@ -13658,7 +14198,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word describes what birds do in the sky?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "fly"
         },
         {
           id: 3,
@@ -13682,7 +14223,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word means to be aware of something?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "know"
         },
         {
           id: 4,
@@ -13706,7 +14248,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word means to reside or exist?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "live"
         },
         {
           id: 5,
@@ -13730,7 +14273,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word refers to something that has existed for a long time?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "old"
         },
         {
           id: 6,
@@ -13754,7 +14298,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word means in a short time?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "soon"
         },
         {
           id: 7,
@@ -13778,7 +14323,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word is used to ask for a reason?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "why"
         },
         {
           id: 8,
@@ -13802,7 +14348,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word means in addition to?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "also"
         },
         {
           id: 9,
@@ -13826,7 +14373,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word describes what insects and birds do?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "fly"
         },
         {
           id: 10,
@@ -13850,7 +14398,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word means to exist or reside?",
             imagePrompt: 'Educational scene showing read_sight_words_set_7 concepts'
-          }
+          },
+          audio: "live"
         }
       ],
       
@@ -13886,7 +14435,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence is correctly spaced?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "The cat runs fast."
         },
         {
           id: 2,
@@ -13910,7 +14460,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Choose the correct word to complete: 'I like to ___ my smoothie with fruits.'",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "I like to blend my smoothie with fruits."
         },
         {
           id: 3,
@@ -13934,7 +14485,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word has a long 'a' sound?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "cake"
         },
         {
           id: 4,
@@ -13958,7 +14510,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word has a short 'a' sound?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "map"
         },
         {
           id: 5,
@@ -13982,7 +14535,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'We went over ___ to play.'?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "We went over there to play?"
         },
         {
           id: 6,
@@ -13995,7 +14549,7 @@ export const sampleMCQData: MCQData = {
           imageUrl: null,
           explanation: "Good choice! 'Who' is the correct sight word.",
           questionText: "Which word is a question word?",
-          options: ["where", "who", "what", "when"],
+          options: ["the", "who", "they", "them"],
           correctAnswer: 1,
           template: 'mcq',
           isSpacing: false,
@@ -14006,7 +14560,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word is a question word?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "who"
         },
         {
           id: 7,
@@ -14030,7 +14585,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Select the sight word from the options below.",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "read"
         },
         {
           id: 8,
@@ -14054,7 +14610,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'Can you ___ the door?'",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "Can you open the door?"
         },
         {
           id: 9,
@@ -14078,7 +14635,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word fits: 'I ___ in a big city.'?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "I live in a big city."
         },
         {
           id: 10,
@@ -14102,7 +14660,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'I like apples and ___ oranges.'?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_4_5_6_7 concepts'
-          }
+          },
+          audio: "I like apples and oranges."
         }
       ],
       
@@ -14138,7 +14697,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence is correctly spaced?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "The cat runs fast."
         },
         {
           id: 2,
@@ -14162,7 +14722,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'I can ___ the colors together'?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "I can blend the colors together?"
         },
         {
           id: 3,
@@ -14186,7 +14747,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word has a short 'a' sound?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "apple"
         },
         {
           id: 4,
@@ -14210,7 +14772,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Select the word with a short 'a' sound.",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "cat"
         },
         {
           id: 5,
@@ -14234,7 +14797,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Choose the word that completes the sentence: 'Mix and ___ the ingredients well.'",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "Mix and blend the ingredients well."
         },
         {
           id: 6,
@@ -14258,7 +14822,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which sentence has correct spacing?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "I like to read."
         },
         {
           id: 7,
@@ -14282,7 +14847,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word includes a short 'a' sound?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "bat"
         },
         {
           id: 8,
@@ -14306,7 +14872,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Find the word that fits: 'We need to ___ the paints.'",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "We need to blend the paints."
         },
         {
           id: 9,
@@ -14330,7 +14897,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Which word contains a short 'a' sound?",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "hat"
         },
         {
           id: 10,
@@ -14354,7 +14922,8 @@ export const sampleMCQData: MCQData = {
             intent: 'mcq',
             questionLine: "Choose the correctly spaced sentence.",
             imagePrompt: 'Educational scene showing read_sight_words_review_sets_1_7 concepts'
-          }
+          },
+          audio: "She likes cats."
         }
       ],
       
@@ -14391,7 +14960,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Why does Mouse always find Lion?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "She likes cats."
         },
         {
           id: 2,
@@ -14416,7 +14986,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Nate know he can skate on the lake?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "The ice is hard and safe."
         },
         {
           id: 3,
@@ -14441,7 +15012,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is Andy looking for?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "his red ball"
         },
         {
           id: 4,
@@ -14466,7 +15038,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is the main idea of 'Play Time'?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "They are playing hide and seek."
         },
         {
           id: 5,
@@ -14491,7 +15064,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What happens after Nate's mother checks the ice?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "Nate skates on the ice."
         },
         {
           id: 6,
@@ -14516,7 +15090,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Who are the main characters in 'Play Time'?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "Mouse and Lion"
         },
         {
           id: 7,
@@ -14541,7 +15116,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where does 'Ice Skating Day' take place?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "By a lake"
         },
         {
           id: 8,
@@ -14566,7 +15142,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What problem is Andy facing in 'The Lost Ball'?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "He lost his red ball."
         },
         {
           id: 9,
@@ -14591,7 +15168,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Barb help solve the problem in 'The Lost Ball'?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "By flying with Andy"
         },
         {
           id: 10,
@@ -14616,7 +15194,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What might happen next after Mouse finds Lion?",
             imagePrompt: 'Educational scene showing read_animal_fantasy concepts'
-          }
+          },
+          audio: "They play another game."
         }
       ],
       
@@ -14653,7 +15232,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What kind of book did Leo read today?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "They play another game."
         },
         {
           id: 2,
@@ -14678,7 +15258,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Why doesn't Nora want to go to Ben's house?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "Nora and Ben want to do different things."
         },
         {
           id: 3,
@@ -14703,7 +15284,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Chen think about the sleepover?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "He does not know if he will like it."
         },
         {
           id: 4,
@@ -14728,7 +15310,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Cara ask Leo?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "She asks what the answer to the joke is."
         },
         {
           id: 5,
@@ -14753,7 +15336,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Mom suggest to Nora?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "To work it out with Ben."
         },
         {
           id: 6,
@@ -14778,7 +15362,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Leo decide to do at the table?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "Share a joke from his book."
         },
         {
           id: 7,
@@ -14803,7 +15388,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Mom help Nora with her problem?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "By suggesting they work it out."
         },
         {
           id: 8,
@@ -14828,7 +15414,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How does Mom reassure Chen about his sleepover?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "By promising to read his favorite book later."
         },
         {
           id: 9,
@@ -14853,7 +15440,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where does the story with Leo take place?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "At the dinner table."
         },
         {
           id: 10,
@@ -14878,7 +15466,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Nora prefer to do instead of playing Cupcake Store?",
             imagePrompt: 'Educational scene showing read_realistic_fiction concepts'
-          }
+          },
+          audio: "Draw and paint."
         }
       ],
       
@@ -14915,7 +15504,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does the woman use to make the rats go away?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "Draw and paint."
         },
         {
           id: 2,
@@ -14940,7 +15530,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What has Fox done before?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "Fox has played tricks on Lion."
         },
         {
           id: 3,
@@ -14965,7 +15556,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does Hans need?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "more money"
         },
         {
           id: 4,
@@ -14990,7 +15582,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Why were the people mad?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "The rats ate people's food."
         },
         {
           id: 5,
@@ -15015,7 +15608,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What does the woman use to help the town?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "A magical flute"
         },
         {
           id: 6,
@@ -15040,7 +15634,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What did Hans make in his store?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "Shoes"
         },
         {
           id: 7,
@@ -15065,7 +15660,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What had Fox done to Lion before?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "Tricked Lion"
         },
         {
           id: 8,
@@ -15090,7 +15686,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How did Hans need to think to solve his problem?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "Fast"
         },
         {
           id: 9,
@@ -15115,7 +15712,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Who needed help to get rid of the rats?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "The king"
         },
         {
           id: 10,
@@ -15140,7 +15738,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What was Fox doing when she saw Lion?",
             imagePrompt: 'Educational scene showing read_myths_legends_and_fables concepts'
-          }
+          },
+          audio: "On a walk"
         }
       ],
       
@@ -15177,7 +15776,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What are rays?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "On a walk"
         },
         {
           id: 2,
@@ -15202,7 +15802,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Arctic foxes use their tails to ________.",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "keep warm"
         },
         {
           id: 3,
@@ -15227,7 +15828,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How are most rays shaped?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Like big, flat kites"
         },
         {
           id: 4,
@@ -15252,7 +15854,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where do Arctic foxes live?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Very cold places"
         },
         {
           id: 5,
@@ -15277,7 +15880,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do the fins of rays look like?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Wings"
         },
         {
           id: 6,
@@ -15302,7 +15906,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What kind of tails do Arctic foxes have?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Big, bushy tails"
         },
         {
           id: 7,
@@ -15327,7 +15932,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How do rays appear in the water?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Like birds flying"
         },
         {
           id: 8,
@@ -15352,7 +15958,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What do Arctic foxes do with their tails when they sleep?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Put them around their bodies"
         },
         {
           id: 9,
@@ -15377,7 +15984,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What helps rays swim?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Their fins"
         },
         {
           id: 10,
@@ -15402,7 +16010,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What keeps Arctic foxes warm?",
             imagePrompt: 'Educational scene showing read_about_animals concepts'
-          }
+          },
+          audio: "Their fur coats"
         }
       ],
       
@@ -15439,7 +16048,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "How many players can a volleyball team have on their side?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "Their fur coats"
         },
         {
           id: 2,
@@ -15464,7 +16074,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What equipment is needed to play tennis?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "a racket and a ball"
         },
         {
           id: 3,
@@ -15489,7 +16100,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is used to play soccer?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "ball and feet"
         },
         {
           id: 4,
@@ -15514,7 +16126,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where is basketball played?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "on a court"
         },
         {
           id: 5,
@@ -15539,7 +16152,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where do people usually swim?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "in a pool"
         },
         {
           id: 6,
@@ -15564,7 +16178,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "Where are running races held?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "on a track"
         },
         {
           id: 7,
@@ -15589,7 +16204,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is used to play ice hockey?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "a puck"
         },
         {
           id: 8,
@@ -15614,7 +16230,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What equipment is needed to play baseball?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "a bat and a ball"
         },
         {
           id: 9,
@@ -15639,7 +16256,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What skills are important in gymnastics?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "balance and strength"
         },
         {
           id: 10,
@@ -15664,7 +16282,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is used to play golf?",
             imagePrompt: 'Educational scene showing read_about_sports_and_hobbies concepts'
-          }
+          },
+          audio: "clubs and a ball"
         }
       ],
       
@@ -15701,7 +16320,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is Big Ben known for?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "clubs and a ball"
         },
         {
           id: 2,
@@ -15726,7 +16346,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is a popular mode of transportation in Lisbon?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "Streetcars"
         },
         {
           id: 3,
@@ -15751,7 +16372,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What type of structure is the Eiffel Tower?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A tower"
         },
         {
           id: 4,
@@ -15776,7 +16398,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is the Statue of Liberty?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A statue"
         },
         {
           id: 5,
@@ -15801,7 +16424,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is the Great Wall of China?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A wall"
         },
         {
           id: 6,
@@ -15826,7 +16450,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is the Sydney Opera House known for?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A theater"
         },
         {
           id: 7,
@@ -15851,7 +16476,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What are the Pyramids of Giza?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A pyramid"
         },
         {
           id: 8,
@@ -15876,7 +16502,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What was the Colosseum used for?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "An amphitheater"
         },
         {
           id: 9,
@@ -15901,7 +16528,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is the Taj Mahal?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A mausoleum"
         },
         {
           id: 10,
@@ -15926,7 +16554,8 @@ export const sampleMCQData: MCQData = {
             intent: 'reading_comprehension',
             questionLine: "What is Machu Picchu?",
             imagePrompt: 'Educational scene showing read_about_famous_places concepts'
-          }
+          },
+          audio: "A city"
         }
       ],
       
@@ -15949,7 +16578,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   messagesScrollRef,
   lastMessageCount,
   handleResizeStart,
-  selectedTopicId = '1-H.1'
+  selectedTopicId = '1-H.1',
+  onBackToTopics,
+  onRetryTopic,
+  onNextTopic
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const resizeRef = React.useRef<HTMLDivElement>(null);
@@ -15960,6 +16592,14 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [hasAnswered, setHasAnswered] = useState(false);
+  
+  // Score tracking state
+  const [score, setScore] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [showCompletionPage, setShowCompletionPage] = useState<'none' | 'success' | 'practice'>('none');
+  
+  // Track first attempts for each question
+  const [firstAttempts, setFirstAttempts] = useState<Record<number, boolean>>({});
   
   // Fill blank state
   const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
@@ -15994,6 +16634,49 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   // Get current topic and questions
   const currentTopic = sampleMCQData.topics[selectedTopicId];
   const currentQuestion = currentTopic.questions[currentQuestionIndex];
+  
+  // Set current topic in progress tracking when component mounts or topic changes
+  useEffect(() => {
+    setCurrentTopic(selectedTopicId);
+  }, [selectedTopicId]);
+  
+  // Get all topic IDs in order
+  const topicIds = Object.keys(sampleMCQData.topics);
+  
+  // Get next topic ID
+  const getNextTopicId = useCallback(() => {
+    const currentIndex = topicIds.indexOf(selectedTopicId);
+    if (currentIndex >= 0 && currentIndex < topicIds.length - 1) {
+      return topicIds[currentIndex + 1];
+    }
+    return null; // No next topic (reached the end)
+  }, [selectedTopicId, topicIds]);
+
+  // Confetti celebration function
+  const celebrateWithConfetti = useCallback(() => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    
+    // Add more confetti bursts
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { x: 0.25, y: 0.7 }
+      });
+    }, 250);
+    
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { x: 0.75, y: 0.7 }
+      });
+    }, 400);
+  }, []);
 
   // Check if it's a reading comprehension question
   const isReadingComprehension = currentQuestion.templateType === 'reading_comprehension';
@@ -16018,12 +16701,30 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setSelectedAnswer(answerIndex);
     
     const correct = answerIndex === currentQuestion.correctAnswer;
+    const isFirstAttempt = !firstAttempts[currentQuestionIndex];
+    
+    // Mark this question as attempted
+    if (isFirstAttempt) {
+      setFirstAttempts(prev => ({
+        ...prev,
+        [currentQuestionIndex]: true
+      }));
+    }
+    
     setIsCorrect(correct);
     
     if (correct) {
       // Correct answer - show celebration and disable further selections
       setHasAnswered(true);
       setShowFeedback(true);
+      
+      // Only increment score if it's the first attempt
+      if (isFirstAttempt) {
+        setScore(prev => prev + 1);
+      }
+      
+      // Celebrate with confetti!
+      celebrateWithConfetti();
       const feedbackMessage = {
         type: 'ai' as const,
         content: `🎉 ${currentQuestion.explanation}`,
@@ -16072,12 +16773,29 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     const userAnswer = fillBlankAnswer.trim().toLowerCase();
     const correctAnswer = currentFillBlankQuestion.correctAnswer.toLowerCase();
     const isAnswerCorrect = userAnswer === correctAnswer;
+    const isFirstAttempt = !firstAttempts[currentQuestionIndex];
+    
+    // Mark this question as attempted
+    if (isFirstAttempt) {
+      setFirstAttempts(prev => ({
+        ...prev,
+        [currentQuestionIndex]: true
+      }));
+    }
     
     setIsCorrect(isAnswerCorrect);
     
     if (isAnswerCorrect) {
       // Correct answer
       setShowFeedback(true);
+      
+      // Only increment score if it's the first attempt
+      if (isFirstAttempt) {
+        setScore(prev => prev + 1);
+      }
+      
+      // Celebrate with confetti!
+      celebrateWithConfetti();
       const feedbackMessage = {
         type: 'ai' as const,
         content: `🎉 ${currentFillBlankQuestion.explanation}`,
@@ -16168,23 +16886,19 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setHasReflected(false);
       setFillBlankAnswer('');
       setHasAutoSpokenQuestion(false); // Reset auto-speech state for new question
-      // Reset drag-and-drop state
-      setSortedWords({});
-      setAvailableWords([]);
-      setDraggedWord(null);
-      setIsDragOverBin(null);
+      // Don't reset drag-and-drop state here - let useEffect handle initialization
     } else {
-      // All questions completed
-      const completionMessage = {
-        type: 'ai' as const,
-        content: `🌟 Congratulations! You've completed all the questions in this adventure. Great job learning about ${currentTopic.topicInfo.topicName.replace(/_/g, ' ')}!`,
-        timestamp: Date.now()
-      };
-      setChatMessages((prev: any) => [...prev, completionMessage]);
-      playMessageSound();
+      // All questions completed - check score and show appropriate completion page
+      setQuizCompleted(true);
       
-      // Auto-speak the completion message
-      ttsService.speakAIMessage(completionMessage.content);
+      // Save progress - topic is completed regardless of score
+      markTopicCompleted(selectedTopicId, score);
+      
+      if (score >= 7) {
+        setShowCompletionPage('success');
+      } else {
+        setShowCompletionPage('practice');
+      }
     }
   }, [currentQuestionIndex, currentTopic, setChatMessages]);
 
@@ -16212,15 +16926,15 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         if (isReadingComprehension) {
           // For reading comprehension, generate contextual reading passage
-          contextualText = await aiService.generateContextualReadingPassage(
-            currentQuestion.passage || '',
-            currentQuestion.word,
-            userAdventure
-          );
+                      contextualText = await aiService.generateContextualReadingPassage(
+              currentQuestion.passage || '',
+              `${currentTopic.topicInfo.topicName} - ${currentQuestion.word}`,
+              userAdventure
+            );
         } else if (isDragDropType(currentQuestion)) {
           // For drag-and-drop questions, pass different parameters
           contextualText = await aiService.generateContextualQuestion(
-            currentQuestion.questionText,
+            `Topic: ${currentTopic.topicInfo.topicName} - ${currentQuestion.questionText}`,
             currentQuestion.sortingWords, // Use sorting words instead of options
             0, // Dummy value since drag-drop doesn't have a single correct answer index
             userAdventure
@@ -16228,7 +16942,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         } else {
           // For MCQ questions
           contextualText = await aiService.generateContextualQuestion(
-            currentQuestion.questionText,
+            `Topic: ${currentTopic.topicInfo.topicName} - ${currentQuestion.questionText}`,
             (currentQuestion as MCQQuestion).options,
             (currentQuestion as MCQQuestion).correctAnswer,
             userAdventure
@@ -16259,7 +16973,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     };
 
     generateContextualQuestion();
-  }, [currentQuestionIndex, currentQuestion.questionText, currentQuestion]);
+  }, [currentQuestionIndex, currentQuestion.questionText, currentQuestion, currentTopic.topicInfo.topicName]);
 
   // Generate contextual image when component mounts or question changes
   useEffect(() => {
@@ -16279,11 +16993,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
           lastMessage: userAdventure.length > 0 ? userAdventure[userAdventure.length - 1].content : 'No messages'
         });
         
-        const imageUrl = await aiService.generateContextualImage(
-          currentQuestion.word,
-          userAdventure,
-          currentQuestion.aiHook.imagePrompt
-        );
+                  const imageUrl = await aiService.generateContextualImage(
+            `${currentTopic.topicInfo.topicName} - ${currentQuestion.word}`,
+            userAdventure,
+            `${currentTopic.topicInfo.topicName}: ${currentQuestion.aiHook.imagePrompt}`
+          );
 
         // Only update if we got a valid image URL
         if (imageUrl) {
@@ -16301,21 +17015,48 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     };
 
     generateContextualImage();
-  }, [currentQuestionIndex, currentQuestion.word, currentQuestion.aiHook.imagePrompt]);
+  }, [currentQuestionIndex, currentQuestion.word, currentQuestion.aiHook.imagePrompt, currentTopic.topicInfo.topicName]);
 
   // Initialize drag-and-drop state when question changes
   useEffect(() => {
-    if (isDragDropQuestion && isDragDropType(currentQuestion)) {
-      // Initialize available words and empty bins
-      setAvailableWords([...currentQuestion.sortingWords]);
-      const emptyBins: Record<string, string[]> = {};
-      currentQuestion.sortingBins.forEach(bin => {
-        emptyBins[bin] = [];
-      });
-      setSortedWords(emptyBins);
-      setDraggedWord(null);
-      setIsDragOverBin(null);
-    }
+    console.log('🔍 Drag-drop initialization check:', {
+      isDragDropQuestion,
+      template: currentQuestion.template,
+      hasTypeGuard: isDragDropType(currentQuestion),
+      questionIndex: currentQuestionIndex
+    });
+    
+    // Small delay to ensure state resets have completed
+    const timeoutId = setTimeout(() => {
+      if (isDragDropQuestion && isDragDropType(currentQuestion)) {
+        const dragDropQuestion = currentQuestion as DragDropQuestion;
+        console.log('✅ Initializing drag-drop with:', {
+          sortingWords: dragDropQuestion.sortingWords,
+          sortingBins: dragDropQuestion.sortingBins
+        });
+        
+        // Initialize available words and empty bins
+        setAvailableWords([...dragDropQuestion.sortingWords]);
+        const emptyBins: Record<string, string[]> = {};
+        dragDropQuestion.sortingBins.forEach(bin => {
+          emptyBins[bin] = [];
+        });
+        setSortedWords(emptyBins);
+        setDraggedWord(null);
+        setIsDragOverBin(null);
+        
+        console.log('🎯 Set availableWords to:', dragDropQuestion.sortingWords);
+      } else {
+        console.log('❌ Drag-drop conditions not met, clearing state');
+        // Clear drag-drop state for non-drag-drop questions
+        setSortedWords({});
+        setAvailableWords([]);
+        setDraggedWord(null);
+        setIsDragOverBin(null);
+      }
+    }, 10); // Small delay
+    
+    return () => clearTimeout(timeoutId);
   }, [currentQuestionIndex, isDragDropQuestion, currentQuestion]);
 
   // Auto-speak question when it loads (after contextual generation is complete)
@@ -16335,31 +17076,21 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
   }, [hasAutoSpokenQuestion, isGeneratingQuestion, displayQuestionText]);
 
-  // Handle speaking the correct answer
+  // Handle speaking the audio text
   const handleSpeakAnswer = useCallback(() => {
     playClickSound();
     
-    // Stop any current speech and speak the correct answer
+    // Stop any current speech and speak the audio text
     ttsService.stop();
     
-    let correctAnswerText = '';
-    
-    if (isDragDropQuestion && isDragDropType(currentQuestion)) {
-      // For drag-and-drop, speak the correct sorting
-      const sortingInfo = Object.entries(currentQuestion.correctAnswer)
-        .map(([bin, words]) => `${bin}: ${words.join(', ')}`)
-        .join('. ');
-      correctAnswerText = `The correct sorting is: ${sortingInfo}`;
-    } else {
-      // For MCQ, speak the correct option
-      correctAnswerText = (currentQuestion as MCQQuestion).options[(currentQuestion as MCQQuestion).correctAnswer];
-    }
+    // Use the audio field from the current question
+    const audioText = currentQuestion.audio;
     
     setIsSpeaking(true);
-    ttsService.speakAnswer(correctAnswerText).finally(() => {
+    ttsService.speakAnswer(audioText).finally(() => {
       setIsSpeaking(false);
     });
-  }, [currentQuestion, isDragDropQuestion]);
+  }, [currentQuestion]);
 
   // Handle speaking the reading passage for reading comprehension
   const handleSpeakPassage = useCallback(() => {
@@ -16590,11 +17321,28 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       }
     }
 
+    const isFirstAttempt = !firstAttempts[currentQuestionIndex];
+    
+    // Mark this question as attempted
+    if (isFirstAttempt) {
+      setFirstAttempts(prev => ({
+        ...prev,
+        [currentQuestionIndex]: true
+      }));
+    }
+
     setIsCorrect(isCorrect);
     setHasAnswered(true);
     setShowFeedback(true);
 
     if (isCorrect) {
+      // Only increment score if it's the first attempt
+      if (isFirstAttempt) {
+        setScore(prev => prev + 1);
+      }
+      
+      // Celebrate with confetti!
+      celebrateWithConfetti();
       const feedbackMessage = {
         type: 'ai' as const,
         content: `🎉 ${currentQuestion.explanation}`,
@@ -16620,6 +17368,96 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
     setSidebarCollapsed(false);
   }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages]);
+
+  // Reset quiz state
+  const resetQuiz = useCallback(() => {
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setIsCorrect(false);
+    setHasAnswered(false);
+    setScore(0);
+    setQuizCompleted(false);
+    setShowCompletionPage('none');
+    setFirstAttempts({});
+    setFillBlankAnswer('');
+    setIsInReflectionMode(false);
+    setHasReflected(false);
+    setSortedWords({});
+    setAvailableWords([]);
+    setDraggedWord(null);
+    setIsDragOverBin(null);
+  }, []);
+
+  // Reset quiz state when topic changes
+  useEffect(() => {
+    resetQuiz();
+    // Clear contextual questions and images for new topic
+    setContextualQuestions({});
+    setGeneratedImages({});
+    setIsGeneratingQuestion(false);
+    setIsGeneratingImage(false);
+  }, [selectedTopicId, resetQuiz]);
+
+  // Show completion pages
+  if (showCompletionPage === 'success') {
+    return (
+      <TopicComplete
+        score={score}
+        totalQuestions={currentTopic.questions.length}
+        topicName={currentTopic.topicInfo.topicName}
+        onNextTopic={() => {
+          const nextTopicId = getNextTopicId();
+          if (nextTopicId && onNextTopic) {
+            // Reset quiz state before moving to next topic
+            resetQuiz();
+            // Pass the next topic ID to the parent component
+            onNextTopic(nextTopicId);
+          } else {
+            // No more topics, go back to topic selection
+            resetQuiz();
+            if (onBackToTopics) {
+              onBackToTopics();
+            }
+          }
+        }}
+        onRetryTopic={() => {
+          resetQuiz();
+          if (onRetryTopic) {
+            onRetryTopic();
+          }
+        }}
+        onBackToTopics={() => {
+          resetQuiz();
+          if (onBackToTopics) {
+            onBackToTopics();
+          }
+        }}
+      />
+    );
+  }
+
+  if (showCompletionPage === 'practice') {
+    return (
+      <PracticeNeeded
+        score={score}
+        totalQuestions={currentTopic.questions.length}
+        topicName={currentTopic.topicInfo.topicName}
+        onRetryTopic={() => {
+          resetQuiz();
+          if (onRetryTopic) {
+            onRetryTopic();
+          }
+        }}
+        onBackToTopics={() => {
+          resetQuiz();
+          if (onBackToTopics) {
+            onBackToTopics();
+          }
+        }}
+      />
+    );
+  }
 
   return (
     <main 
@@ -16789,7 +17627,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                           isSpeaking && "animate-pulse"
                         )}
                         style={{ boxShadow: '0 3px 0 #2563eb' }}
-                        title="Read the correct answer aloud"
+                        title="Read the question description aloud"
                       >
                         <Volume2 className="h-4 w-4 text-blue-600" />
                       </Button>

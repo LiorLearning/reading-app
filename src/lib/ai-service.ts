@@ -207,9 +207,16 @@ The app has image generation capabilities, so you can suggest visual elements an
       // Get the correct answer option
       const correctOption = options[correctAnswer];
 
+      // Extract any specific words that should be preserved (words that appear in options)
+      const wordsToPreserve = options.flatMap(option => 
+        option.split(/\s+/).filter(word => word.length > 3 && /^[a-zA-Z]+$/.test(word))
+      );
+      
+      console.log('Educational words to preserve in question:', wordsToPreserve);
+
       const contextualPrompt = `You are creating an engaging educational question for a child by incorporating their adventure story context.
 
-TASK: Rewrite the learning question to fit naturally into the child's adventure story while keeping the same educational objective.
+TASK: Rewrite the learning question to fit naturally into the child's adventure story while preserving ALL educational words.
 
 ORIGINAL QUESTION: "${originalQuestion}"
 CORRECT ANSWER: "${correctOption}"
@@ -217,21 +224,29 @@ ALL OPTIONS: ${options.map((opt, i) => `${i + 1}. "${opt}"`).join(", ")}
 
 ADVENTURE CONTEXT: "${adventureContext || this.getDefaultAdventureContext()}"
 
-REQUIREMENTS:
-1. Use characters, settings, or themes from the adventure context
-2. Keep the exact same educational objective (spacing, grammar, etc.)
-3. Make it exciting and age-appropriate for children
-4. Do NOT change any answer options
-5. If context is limited, use fun themes like "brave explorer", "space mission", "magic quest"
+CRITICAL REQUIREMENTS:
+1. PRESERVE ALL WORDS that appear in the answer options - these are the educational words being taught
+2. Do NOT change any answer options
+3. Do NOT replace educational words with adventure-related words (e.g., don't change "elephant" to "rocketship")
+4. ONLY change the question scenario/context to fit the adventure
+5. Use characters, settings, or themes from the adventure context for the scenario
+6. Keep the exact same educational objective (spacing, grammar, phonics, etc.)
+7. Make it exciting and age-appropriate for children
+
+WORDS TO PRESERVE: ${wordsToPreserve.join(', ')}
 
 EXAMPLES:
 - Original: "Choose the sentence with correct spacing"
 - Context: "space adventure with captain"  
 - Result: "Captain, to navigate the spaceship safely, which sentence has correct spacing?"
 
-- Original: "Find the correctly spaced sentence"
-- Context: "treasure hunt with pirates"
-- Result: "To find the treasure, which sentence is spaced correctly?"
+- Original: "Which word has the long vowel sound?"
+- Context: "treasure hunt adventure"
+- Result: "In your treasure hunt, which word has the long vowel sound?"
+
+- Original: "Find the sentence with the word 'elephant'"
+- Context: "space mission with astronauts"
+- Result: "Astronaut, during your space mission, find the sentence with the word 'elephant'"
 
 Return ONLY the new question text, nothing else.`;
 
@@ -284,33 +299,39 @@ Return ONLY the new question text, nothing else.`;
       const adventureContext = this.extractAdventureContext(userAdventure);
       console.log('Adventure context for reading passage generation:', adventureContext);
 
+      // Extract important educational words from the original passage
+      const educationalWords = originalPassage.split(/\s+/)
+        .filter(word => word.length > 3 && /^[a-zA-Z]+$/.test(word.replace(/[.,!?]/g, '')))
+        .map(word => word.replace(/[.,!?]/g, ''));
+        
+      console.log('Educational words to preserve in reading passage:', educationalWords);
+
       const contextualPrompt = `You are creating an engaging reading passage for a child by incorporating their adventure story context.
 
-TASK: Create a new reading passage that incorporates the child's adventure story while teaching the same educational concept.
+TASK: Create a new reading passage that incorporates the child's adventure story while preserving ALL educational words and concepts.
 
 ORIGINAL PASSAGE: "${originalPassage}"
 EDUCATIONAL TOPIC: "${topic}"
 
 ADVENTURE CONTEXT: "${adventureContext || this.getDefaultAdventureContext()}"
 
-REQUIREMENTS:
-1. Use characters, settings, or themes from the adventure context
-2. Keep the same educational objective and reading level
-3. Make it exciting and age-appropriate for children (ages 5-8)
-4. Keep the passage length similar to the original (50-80 words)
-5. Include the target vocabulary/sounds being taught
-6. If context is limited, use fun themes like "brave explorer", "space mission", "magic quest", "treasure hunt"
+CRITICAL REQUIREMENTS:
+1. PRESERVE ALL educational words from the original passage - these are being taught
+2. Do NOT replace educational words with adventure-related words
+3. Use characters, settings, or themes from the adventure context for the story scenario
+4. Keep the same educational objective and reading level
+5. Make it exciting and age-appropriate for children (ages 5-8)
+6. Keep the passage length similar to the original (50-80 words)
+7. Include the target vocabulary/sounds being taught in their original form
 
-EXAMPLES:
-- Original: "Sam stands on a path. He stands by the plants. Sam has a map of the vast land."
-- Context: "space adventure with rocket ship"
-- Result: "Captain Sam stands on the path to his rocket. He stands by the plants on the strange planet. Sam has a map of the vast galaxy. The map helps Sam navigate. 'Let's blast off to that star,' says Sam."
+EDUCATIONAL WORDS TO PRESERVE: ${educationalWords.join(', ')}
 
-- Original: "Gramps has a stack of stamps. Some stamps have flags."
-- Context: "treasure hunt with pirates"
-- Result: "Captain Gramps has a stack of treasure maps. Some maps have flags marking dangerous lands. Some maps are tan and have bats drawn on them. The brave pirate crew likes the bat maps. Gramps lets the crew have the bat maps. The crew says, 'Thanks Captain Gramps!'"
+EXAMPLE:
+- Original: "The elephant is big. The ant is small."
+- Adventure context: "space mission"
+- Result: "On the space mission, the astronaut saw an elephant floating by the spaceship. The elephant is big. Next to it was a tiny ant in a space suit. The ant is small."
 
-Return ONLY the new reading passage text, nothing else.`;
+Return ONLY the new reading passage, nothing else.`;
 
       console.log('Sending contextualized reading passage prompt to AI:', contextualPrompt);
 
