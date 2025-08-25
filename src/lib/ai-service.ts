@@ -267,6 +267,89 @@ Return ONLY the new question text, nothing else.`;
     }
   }
 
+  // Generate contextual reading passage based on user's adventure and topic
+  async generateContextualReadingPassage(
+    originalPassage: string,
+    topic: string,
+    userAdventure: ChatMessage[]
+  ): Promise<string> {
+    // If not initialized or no API key, return original passage
+    if (!this.isInitialized || !this.client) {
+      console.log('AI service not initialized, returning original passage');
+      return originalPassage;
+    }
+
+    try {
+      // Extract structured adventure context
+      const adventureContext = this.extractAdventureContext(userAdventure);
+      console.log('Adventure context for reading passage generation:', adventureContext);
+
+      const contextualPrompt = `You are creating an engaging reading passage for a child by incorporating their adventure story context.
+
+TASK: Create a new reading passage that incorporates the child's adventure story while teaching the same educational concept.
+
+ORIGINAL PASSAGE: "${originalPassage}"
+EDUCATIONAL TOPIC: "${topic}"
+
+ADVENTURE CONTEXT: "${adventureContext || this.getDefaultAdventureContext()}"
+
+REQUIREMENTS:
+1. Use characters, settings, or themes from the adventure context
+2. Keep the same educational objective and reading level
+3. Make it exciting and age-appropriate for children (ages 5-8)
+4. Keep the passage length similar to the original (50-80 words)
+5. Include the target vocabulary/sounds being taught
+6. If context is limited, use fun themes like "brave explorer", "space mission", "magic quest", "treasure hunt"
+
+EXAMPLES:
+- Original: "Sam stands on a path. He stands by the plants. Sam has a map of the vast land."
+- Context: "space adventure with rocket ship"
+- Result: "Captain Sam stands on the path to his rocket. He stands by the plants on the strange planet. Sam has a map of the vast galaxy. The map helps Sam navigate. 'Let's blast off to that star,' says Sam."
+
+- Original: "Gramps has a stack of stamps. Some stamps have flags."
+- Context: "treasure hunt with pirates"
+- Result: "Captain Gramps has a stack of treasure maps. Some maps have flags marking dangerous lands. Some maps are tan and have bats drawn on them. The brave pirate crew likes the bat maps. Gramps lets the crew have the bat maps. The crew says, 'Thanks Captain Gramps!'"
+
+Return ONLY the new reading passage text, nothing else.`;
+
+      console.log('Sending contextualized reading passage prompt to AI:', contextualPrompt);
+
+      const completion = await this.client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are a creative educational content creator specializing in children's reading materials. You excel at weaving adventure themes into educational content while maintaining learning objectives."
+          },
+          {
+            role: "user",
+            content: contextualPrompt
+          }
+        ],
+        max_tokens: 200,
+        temperature: 0.8,
+      });
+
+      const generatedPassage = completion.choices[0]?.message?.content?.trim();
+      
+      if (generatedPassage && generatedPassage !== originalPassage) {
+        console.log('✅ Successfully generated contextualized reading passage:', {
+          original: originalPassage,
+          contextualized: generatedPassage,
+          context: adventureContext
+        });
+        return generatedPassage;
+      } else {
+        console.log('⚠️ AI returned same or empty passage, using original');
+        return originalPassage;
+      }
+
+    } catch (error) {
+      console.error('Error generating contextualized reading passage:', error);
+      return originalPassage;
+    }
+  }
+
   // Sanitize content for safe DALL-E prompts
   private sanitizeContentForImage(content: string): string {
     if (!content) return "";
