@@ -16635,6 +16635,21 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const currentTopic = sampleMCQData.topics[selectedTopicId];
   const currentQuestion = currentTopic.questions[currentQuestionIndex];
   
+  // Helper function to extract grade level from topicId
+  const getGradeLevel = (topicId: string): string => {
+    const gradeMatch = topicId.match(/^([KG0-9]+)/);
+    if (!gradeMatch) return "Elementary";
+    
+    const grade = gradeMatch[1];
+    if (grade === 'K' || grade === 'G') return "Kindergarten";
+    if (grade === '1') return "Grade 1";
+    if (grade === '2') return "Grade 2";
+    if (grade === '3') return "Grade 3";
+    if (grade === '4') return "Grade 4";
+    if (grade === '5') return "Grade 5";
+    return `Grade ${grade}`;
+  };
+  
   // Set current topic in progress tracking when component mounts or topic changes
   useEffect(() => {
     setCurrentTopic(selectedTopicId);
@@ -16737,20 +16752,46 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // Auto-speak the AI feedback message
       ttsService.speakAIMessage(feedbackMessage.content);
     } else {
-      // Wrong answer - allow immediate retry but show hint
+      // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying other options
       
-      const hintMessage = {
-        type: 'ai' as const,
-        content: `❌ That's not correct. Try another option! 💡`,
-        timestamp: Date.now()
-      };
-      
-      setChatMessages((prev: any) => [...prev, hintMessage]);
-      playMessageSound();
-      
-      // Auto-speak the hint message
-      ttsService.speakAIMessage(hintMessage.content);
+      try {
+        // Generate AI reflection response using the question context
+        const reflectionResponse = await aiService.generateReflectionPrompt(
+          displayQuestionText, // Use the contextual question text
+          (currentQuestion as MCQQuestion).options,
+          answerIndex,
+          Number(currentQuestion.correctAnswer),
+          currentQuestion.topicName,
+          getGradeLevel(currentQuestion.topicId),
+          'mcq'
+        );
+        
+        const hintMessage = {
+          type: 'ai' as const,
+          content: reflectionResponse,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages((prev: any) => [...prev, hintMessage]);
+        playMessageSound();
+        
+        // Auto-speak the hint message
+        ttsService.speakAIMessage(hintMessage.content);
+      } catch (error) {
+        console.error('Error generating reflection prompt:', error);
+        
+        // Fallback to a simple message if AI fails
+        const fallbackMessage = {
+          type: 'ai' as const,
+          content: `🤔 Great effort on this ${currentQuestion.topicName.replace(/_/g, ' ').toLowerCase()} question! Can you tell me what made you choose "${(currentQuestion as MCQQuestion).options[answerIndex]}"? Let's look at the question again together.`,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages((prev: any) => [...prev, fallbackMessage]);
+        playMessageSound();
+        ttsService.speakAIMessage(fallbackMessage.content);
+      }
       
       // Clear the wrong answer visual feedback after a brief moment
       setTimeout(() => {
@@ -16760,7 +16801,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     // Auto-expand chat to show feedback
     setSidebarCollapsed(false);
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, setChatMessages, setSidebarCollapsed]);
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages, setSidebarCollapsed]);
 
   // Handle fill blank answer submission
   const handleFillBlankSubmit = useCallback(async () => {
@@ -16808,20 +16849,46 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // Auto-speak the AI feedback message
       ttsService.speakAIMessage(feedbackMessage.content);
     } else {
-      // Wrong answer - allow immediate retry but show hint
+      // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying again
       
-      const hintMessage = {
-        type: 'ai' as const,
-        content: `❌ That's not quite right. Think about the initial consonant blend that makes sense with "_ack". Try another word! 💡`,
-        timestamp: Date.now()
-      };
-      
-      setChatMessages((prev: any) => [...prev, hintMessage]);
-      playMessageSound();
-      
-      // Auto-speak the hint message
-      ttsService.speakAIMessage(hintMessage.content);
+      try {
+        // Generate AI reflection response for fill-in-the-blank
+        const reflectionResponse = await aiService.generateReflectionPrompt(
+          displayQuestionText, // Use the contextual question text
+          null, // No options for fill-in-the-blank
+          fillBlankAnswer.trim(), // Student's answer
+          currentFillBlankQuestion.correctAnswer, // Correct answer
+          currentQuestion.topicName,
+          getGradeLevel(currentQuestion.topicId),
+          'fill_blank'
+        );
+        
+        const hintMessage = {
+          type: 'ai' as const,
+          content: reflectionResponse,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages((prev: any) => [...prev, hintMessage]);
+        playMessageSound();
+        
+        // Auto-speak the hint message
+        ttsService.speakAIMessage(hintMessage.content);
+      } catch (error) {
+        console.error('Error generating reflection prompt for fill-blank:', error);
+        
+        // Fallback to a simple message if AI fails
+        const fallbackMessage = {
+          type: 'ai' as const,
+          content: `🌟 Nice try with your ${currentQuestion.topicName.replace(/_/g, ' ').toLowerCase()} work! Can you think about what sounds you hear when you say "${fillBlankAnswer.trim()}"? What other word might fit better here?`,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages((prev: any) => [...prev, fallbackMessage]);
+        playMessageSound();
+        ttsService.speakAIMessage(fallbackMessage.content);
+      }
       
       // Clear the wrong answer after a brief moment
       setTimeout(() => {
@@ -17194,7 +17261,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     recognition.stop();
   }, [recognition, isRecording]);
 
-  const evaluateReadingComprehension = useCallback((transcript: string) => {
+  const evaluateReadingComprehension = useCallback(async (transcript: string) => {
     // Use the contextual passage if available, otherwise use the original
     const passageText = contextualQuestions[currentQuestionIndex] || currentQuestion.passage || '';
     const similarity = calculateReadingSimilarity(transcript, passageText);
@@ -17208,7 +17275,25 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     } else if (similarity >= 0.5) {
       feedbackMessage = `👍 Good job! You read ${Math.round(similarity * 100)}% correctly. Try reading the passage again to improve!`;
     } else {
-      feedbackMessage = `📖 Keep practicing! You read ${Math.round(similarity * 100)}% correctly. Let me read it for you first, then you can try again.`;
+      // Generate AI reflection for poor reading performance
+      try {
+        const reflectionResponse = await aiService.generateReflectionPrompt(
+          passageText, // Use the passage text
+          null, // No options for reading comprehension
+          Math.round(similarity * 100).toString(), // Student's accuracy percentage
+          '70+', // Target accuracy
+          currentQuestion.topicName,
+          getGradeLevel(currentQuestion.topicId),
+          'reading_comprehension'
+        );
+        
+        feedbackMessage = reflectionResponse;
+      } catch (error) {
+        console.error('Error generating reflection prompt for reading comprehension:', error);
+        
+        // Fallback to enhanced message if AI fails
+        feedbackMessage = `🌟 Great effort reading! Can you tell me which words felt the trickiest? What strategies might help you read even better?`;
+      }
       
       // Read the passage aloud for the user
       setTimeout(() => {
@@ -17290,7 +17375,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setAvailableWords(prev => [...prev, word]);
   }, []);
 
-  const handleCheckDragDropAnswer = useCallback(() => {
+  const handleCheckDragDropAnswer = useCallback(async () => {
     if (!isDragDropType(currentQuestion)) return;
 
     // Check if all words are sorted
@@ -17352,14 +17437,41 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       playMessageSound();
       ttsService.speakAIMessage(feedbackMessage.content);
     } else {
-      const hintMessage = {
-        type: 'ai' as const,
-        content: `❌ Not quite right. You can click words in the bins to move them back, then drag them to different bins! Think about the vowel sounds. 💡`,
-        timestamp: Date.now()
-      };
-      setChatMessages((prev: any) => [...prev, hintMessage]);
-      playMessageSound();
-      ttsService.speakAIMessage(hintMessage.content);
+      try {
+        // Generate AI reflection response for drag-and-drop
+        const reflectionResponse = await aiService.generateReflectionPrompt(
+          displayQuestionText, // Use the contextual question text
+          null, // No options for drag-and-drop
+          'current sorting has errors', // Student's answer description
+          'correct sorting needed', // Correct answer description
+          currentQuestion.topicName,
+          getGradeLevel(currentQuestion.topicId),
+          'drag_drop'
+        );
+        
+        const hintMessage = {
+          type: 'ai' as const,
+          content: reflectionResponse,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages((prev: any) => [...prev, hintMessage]);
+        playMessageSound();
+        ttsService.speakAIMessage(hintMessage.content);
+      } catch (error) {
+        console.error('Error generating reflection prompt for drag-drop:', error);
+        
+        // Fallback to a simple message if AI fails
+        const fallbackMessage = {
+          type: 'ai' as const,
+          content: `🤔 Interesting sorting work on ${currentQuestion.topicName.replace(/_/g, ' ').toLowerCase()}! Can you tell me what rule you're using to sort these words? What sounds do you hear in each word?`,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages((prev: any) => [...prev, fallbackMessage]);
+        playMessageSound();
+        ttsService.speakAIMessage(fallbackMessage.content);
+      }
       
       // Allow retry
       setHasAnswered(false);

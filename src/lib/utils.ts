@@ -16,11 +16,13 @@ export interface ChatMessage {
 }
 
 /**
- * Save chat messages to local storage
+ * Save the last 20 chat messages to local storage
  */
 export const saveUserAdventure = (messages: ChatMessage[]): void => {
   try {
-    const serialized = JSON.stringify(messages);
+    // Keep only the last 20 messages to manage storage size
+    const recentMessages = messages.slice(-20);
+    const serialized = JSON.stringify(recentMessages);
     localStorage.setItem(USER_ADVENTURE_KEY, serialized);
   } catch (error) {
     console.warn('Failed to save user adventure to local storage:', error);
