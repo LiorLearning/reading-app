@@ -16,6 +16,7 @@ import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
 import cockpit4 from "@/assets/comic-cockpit-4.jpg";
 import QuestionScreenTypeA from "./QuestionScreenTypeA";
+import QuestionScreenTypeB from "./QuestionScreenTypeB";
 
 // Old Screen2 component - to be removed
 const OldScreen2 = ({ 
@@ -266,6 +267,13 @@ const Screen2 = (props: any) => {
   );
 };
 
+// Screen 3 Component - Question Screen Type B (Word Guessing Game)
+const Screen3 = (props: any) => {
+  return (
+    <QuestionScreenTypeB {...props} />
+  );
+};
+
 const Index = () => {
   React.useEffect(() => {
     document.title = "AI Reading Learning App — Your Adventure";
@@ -314,7 +322,7 @@ const Index = () => {
   }
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true); // Default collapsed for Screen 3
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
@@ -322,7 +330,7 @@ const Index = () => {
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-  const [currentScreen, setCurrentScreen] = React.useState<1 | 2>(1);
+  const [currentScreen, setCurrentScreen] = React.useState<1 | 2 | 3>(3);
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
   // Responsive aspect ratio management
@@ -667,20 +675,36 @@ const Index = () => {
             </h1>
             
             {devToolsVisible && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  playClickSound();
-                  setCurrentScreen(2);
-                }}
-                disabled={currentScreen === 2}
-                className="border-2 bg-white btn-animate"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-              >
-                Screen 2
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(2);
+                  }}
+                  disabled={currentScreen === 2}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Screen 2
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(3);
+                  }}
+                  disabled={currentScreen === 3}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Screen 3
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </>
             )}
           </div>
           
@@ -913,7 +937,7 @@ const Index = () => {
               </div>
             </div>
           </main>
-        ) : (
+        ) : currentScreen === 2 ? (
           <Screen2 
             getAspectRatio={getAspectRatio}
             sidebarCollapsed={sidebarCollapsed}
@@ -932,6 +956,23 @@ const Index = () => {
             lastMessageCount={lastMessageCount}
             handleResizeStart={handleResizeStart}
           />
+        ) : (
+          <Screen3 
+            getAspectRatio={getAspectRatio}
+            sidebarCollapsed={sidebarCollapsed}
+            setSidebarCollapsed={setSidebarCollapsed}
+            chatMessages={chatMessages}
+            setChatMessages={setChatMessages}
+            onGenerate={onGenerate}
+            onGenerateImage={onGenerateImage}
+            chatPanelWidthPercent={chatPanelWidthPercent}
+            setChatPanelWidthPercent={setChatPanelWidthPercent}
+            isResizing={isResizing}
+            setIsResizing={setIsResizing}
+            messagesScrollRef={messagesScrollRef}
+            lastMessageCount={lastMessageCount}
+            handleResizeStart={handleResizeStart}
+          />
         )}
 
         {/* Messenger Chat when sidebar is collapsed */}
@@ -940,6 +981,7 @@ const Index = () => {
             messages={chatMessages} 
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
+            sidebarCollapsed={sidebarCollapsed}
             onExpandChat={() => {
               playClickSound();
               setSidebarCollapsed(false);

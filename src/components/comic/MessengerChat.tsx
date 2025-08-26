@@ -17,9 +17,10 @@ interface MessengerChatProps {
   onGenerate: (text: string) => void;
   onGenerateImage: () => void;
   onExpandChat: () => void; // Function to expand chat to full panel
+  sidebarCollapsed: boolean; // Add sidebar state to control auto-expansion
 }
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat }) => {
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat, sidebarCollapsed }) => {
   const [isHidden, setIsHidden] = useState(true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [text, setText] = useState("");
@@ -55,6 +56,43 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
       hideTimeoutRef.current = null;
     }, 1000);
   };
+
+  // Auto-expand on new AI messages when sidebar is collapsed
+  React.useEffect(() => {
+    // Only auto-expand if sidebar is collapsed and there are messages
+    if (sidebarCollapsed && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      
+      // If latest message is from AI (Krafty), auto-show the chat and messages
+      if (lastMessage.type === 'ai') {
+        // Clear any pending hide timeout first
+        if (hideTimeoutRef.current) {
+          clearTimeout(hideTimeoutRef.current);
+          hideTimeoutRef.current = null;
+        }
+        
+        // First, ensure the chat is not hidden (this will hide the floating button)
+        setIsHidden(false);
+        setHasBeenClicked(true);
+        
+        // Then after a brief delay, show the messages to avoid overlap
+        setTimeout(() => {
+          setIsAnimatingOut(false);
+          setShowMessages(true);
+          
+          // Auto-hide messages after 5 seconds (but keep chat visible)
+          hideTimeoutRef.current = setTimeout(() => {
+            setIsAnimatingOut(true);
+            setTimeout(() => {
+              setShowMessages(false);
+              setIsAnimatingOut(false);
+            }, 600); // Match animation duration
+            hideTimeoutRef.current = null;
+          }, 5000);
+        }, 100); // Small delay to ensure floating button disappears first
+      }
+    }
+  }, [messages, sidebarCollapsed]);
 
   // Cleanup timeout on unmount
   React.useEffect(() => {
@@ -349,6 +387,19 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               </Button>
             </form>
           </div>
+          
+          {/* Krafty Avatar - Hidden when messages are showing */}
+          {!showMessages && !isAnimatingOut && (
+            <div className="absolute -right-4 -bottom-4 z-20">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 border-2 border-black shadow-[0_4px_0_black] flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/avatars/krafty.png" 
+                  alt="Krafty" 
+                  className="w-full h-full object-cover scale-110"
+                />
+              </div>
+            </div>
+          )}
         </div>
         </div>
       </div>
