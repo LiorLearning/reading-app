@@ -17061,7 +17061,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         });
         
                   const imageUrl = await aiService.generateContextualImage(
-            `${currentTopic.topicInfo.topicName} - ${currentQuestion.word}`,
+            currentQuestion.audio, // Use the audio field text
             userAdventure,
             `${currentTopic.topicInfo.topicName}: ${currentQuestion.aiHook.imagePrompt}`
           );
@@ -17082,7 +17082,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     };
 
     generateContextualImage();
-  }, [currentQuestionIndex, currentQuestion.word, currentQuestion.aiHook.imagePrompt, currentTopic.topicInfo.topicName]);
+  }, [currentQuestionIndex, currentQuestion.audio, currentQuestion.aiHook.imagePrompt, currentTopic.topicInfo.topicName]);
 
   // Initialize drag-and-drop state when question changes
   useEffect(() => {

@@ -207,37 +207,49 @@ The app has image generation capabilities, so you can suggest visual elements an
     }
   }
 
-  // Extract and filter relevant adventure context
+  // Extract and filter relevant adventure context with weighted recent messages
   private extractAdventureContext(userAdventure: ChatMessage[]): string {
     if (!userAdventure || userAdventure.length === 0) {
       return "";
     }
 
-    // Get recent messages (last 8 messages for better context)
-    const recentMessages = userAdventure.slice(-8);
+    // Get recent messages (last 10 messages) and apply decreasing weights
+    const recentMessages = userAdventure.slice(-10);
     
-    // Extract key story elements - characters, locations, objects, actions
-    const storyElements = recentMessages
-      .map(msg => msg.content)
-      .join(" ")
-      .toLowerCase();
+    // Create weighted context - most recent messages have higher importance
+    let weightedContext = "";
+    recentMessages.reverse().forEach((msg, index) => {
+      // Weight: 1.0 for most recent, then 0.9, 0.8, 0.7, etc.
+      const weight = Math.max(0.1, 1.0 - (index * 0.1));
+      const repetitions = Math.ceil(weight * 3); // Repeat important messages more
+      
+      for (let i = 0; i < repetitions; i++) {
+        weightedContext += msg.content + " ";
+      }
+    });
+    
+    // Extract key story elements from weighted context
+    const storyElements = weightedContext.toLowerCase();
 
     // Look for story elements like characters, settings, objects
     const characters = this.extractStoryElements(storyElements, [
       'captain', 'explorer', 'astronaut', 'hero', 'friend', 'krafty', 'robot', 'alien', 
-      'pikachu', 'pokemon', 'character', 'wizard', 'princess', 'prince', 'knight'
+      'pikachu', 'pokemon', 'character', 'wizard', 'princess', 'prince', 'knight',
+      'pirate', 'dragon', 'fairy', 'unicorn', 'mage', 'warrior', 'scientist'
     ]);
     
     const settings = this.extractStoryElements(storyElements, [
       'space', 'planet', 'rocket', 'spaceship', 'adventure', 'mission', 'quest', 
-      'journey', 'castle', 'forest', 'ocean', 'mountain', 'island', 'city', 'school'
+      'journey', 'castle', 'forest', 'ocean', 'mountain', 'island', 'city', 'school',
+      'cave', 'temple', 'kingdom', 'galaxy', 'laboratory', 'treasure hunt', 'expedition'
     ]);
     
     const objects = this.extractStoryElements(storyElements, [
-      'treasure', 'map', 'key', 'sword', 'shield', 'book', 'magic', 'crystal'
+      'treasure', 'map', 'key', 'sword', 'shield', 'book', 'magic', 'crystal',
+      'potion', 'gem', 'artifact', 'spell', 'portal', 'compass', 'telescope'
     ]);
 
-    // Build contextual summary
+    // Build contextual summary with emphasis on most recent elements
     let context = "";
     if (characters.length > 0) {
       context += `Characters: ${characters.join(", ")}. `;
@@ -249,10 +261,17 @@ The app has image generation capabilities, so you can suggest visual elements an
       context += `Objects: ${objects.join(", ")}. `;
     }
 
-    console.log('Extracted adventure context:', {
+    // Add the most recent user message directly for highest priority
+    const lastUserMessage = userAdventure.filter(msg => msg.type === 'user').slice(-1)[0];
+    if (lastUserMessage) {
+      context = `Recent focus: ${lastUserMessage.content}. ` + context;
+    }
+
+    console.log('Extracted weighted adventure context:', {
       characters,
       settings,
       objects,
+      lastUserMessage: lastUserMessage?.content,
       fullContext: context
     });
 
@@ -310,39 +329,40 @@ The app has image generation capabilities, so you can suggest visual elements an
       
       console.log('Educational words to preserve in question:', wordsToPreserve);
 
-      const contextualPrompt = `You are creating an engaging educational question for a child by incorporating their adventure story context.
+      const contextualPrompt = `You are creating an engaging educational question for a child by incorporating their most recent adventure story context with highest priority.
 
-TASK: Rewrite the learning question to fit naturally into the child's adventure story while preserving ALL educational words.
+TASK: Rewrite the learning question to fit naturally into the child's adventure story while preserving ALL educational words. Give HIGHEST PRIORITY to the most recent user message.
 
 ORIGINAL QUESTION: "${originalQuestion}"
 CORRECT ANSWER: "${correctOption}"
 ALL OPTIONS: ${options.map((opt, i) => `${i + 1}. "${opt}"`).join(", ")}
 
-ADVENTURE CONTEXT: "${adventureContext || this.getDefaultAdventureContext()}"
+ADVENTURE CONTEXT (PRIORITIZED BY RECENCY): "${adventureContext || this.getDefaultAdventureContext()}"
 
 CRITICAL REQUIREMENTS:
 1. PRESERVE ALL WORDS that appear in the answer options - these are the educational words being taught
 2. Do NOT change any answer options
 3. Do NOT replace educational words with adventure-related words (e.g., don't change "elephant" to "rocketship")
 4. ONLY change the question scenario/context to fit the adventure
-5. Use characters, settings, or themes from the adventure context for the scenario
+5. Use characters, settings, or themes from the adventure context, ESPECIALLY the most recent elements
 6. Keep the exact same educational objective (spacing, grammar, phonics, etc.)
 7. Make it exciting and age-appropriate for children
+8. PRIORITIZE the most recent adventure elements mentioned by the user
 
 WORDS TO PRESERVE: ${wordsToPreserve.join(', ')}
 
 EXAMPLES:
 - Original: "Choose the sentence with correct spacing"
-- Context: "space adventure with captain"  
-- Result: "Captain, to navigate the spaceship safely, which sentence has correct spacing?"
+- Recent Context: "I found a magic dragon in the crystal cave"  
+- Result: "The magic dragon in the crystal cave needs your help! Which sentence has correct spacing?"
 
 - Original: "Which word has the long vowel sound?"
-- Context: "treasure hunt adventure"
-- Result: "In your treasure hunt, which word has the long vowel sound?"
+- Recent Context: "My spaceship landed on planet Zorb"
+- Result: "On planet Zorb, your spaceship's computer needs to know: which word has the long vowel sound?"
 
 - Original: "Find the sentence with the word 'elephant'"
-- Context: "space mission with astronauts"
-- Result: "Astronaut, during your space mission, find the sentence with the word 'elephant'"
+- Recent Context: "The pirate treasure is hidden in the jungle"
+- Result: "While searching for pirate treasure in the jungle, find the sentence with the word 'elephant'"
 
 Return ONLY the new question text, nothing else.`;
 
@@ -467,74 +487,160 @@ Return ONLY the new reading passage, nothing else.`;
     }
   }
 
-  // Sanitize content for safe DALL-E prompts
+  // Process content for adventure-themed DALL-E prompts
   private sanitizeContentForImage(content: string): string {
     if (!content) return "";
 
-    // Remove potentially problematic content and keep safe, educational terms
-    const safeSentences = content
+    // Keep adventure and educational content, remove only truly harmful content
+    const adventureSentences = content
       .split(/[.!?]+/)
       .map(sentence => sentence.trim())
-      .filter(sentence => sentence.length > 3 && sentence.length < 80) // Increased length limit
+      .filter(sentence => sentence.length > 3 && sentence.length < 100) // Increased length limit for more context
       .filter(sentence => {
         const lowerSentence = sentence.toLowerCase();
         
-        // First exclude obviously problematic content
-        if (/(violence|weapon|fight|scary|dark|evil|bad|hurt|danger|kill|death|blood|war)/i.test(lowerSentence)) {
+        // Only exclude genuinely harmful content
+        if (/(violence|weapon|fight|hurt|danger|kill|death|blood|war|scary|horror|nightmare)\i/.test(lowerSentence)) {
           return false;
         }
         
-        // Keep sentences with educational, adventure, and child-friendly content
+        // Keep ALL adventure, educational, and fun content
         return (
-          // Educational terms
-          /\b(learn|read|story|book|adventure|explore|discover|find|map|treasure|space|planet|rocket|journey|quest|mission|study|school|teacher|student)\b/.test(lowerSentence) ||
-          // Character/setting references
-          /\b(captain|explorer|astronaut|character|hero|friend|journey|castle|forest|ocean|mountain|island|city|town|home|family|animal|pet)\b/.test(lowerSentence) ||
+          // Adventure and exploration terms
+          /\b(adventure|explore|discover|find|map|treasure|space|planet|rocket|journey|quest|mission|expedition|voyage)\b/.test(lowerSentence) ||
+          // Characters and magical elements
+          /\b(captain|explorer|astronaut|character|hero|friend|wizard|magic|fairy|dragon|unicorn|robot|alien|pirate|knight)\b/.test(lowerSentence) ||
+          // Settings and places
+          /\b(castle|forest|ocean|mountain|island|city|town|cave|temple|spaceship|planet|galaxy|kingdom)\b/.test(lowerSentence) ||
           // Fun activities and objects
-          /\b(play|game|fun|exciting|amazing|wonderful|beautiful|colorful|magical|happy|smile|laugh|sing|dance|build|create|draw|paint)\b/.test(lowerSentence) ||
-          // Common story elements that are safe
-          /\b(prince|princess|king|queen|wizard|magic|fairy|dragon|unicorn|robot|spaceship|car|house|tree|flower|sun|moon|star)\b/.test(lowerSentence) ||
-          // Basic descriptive words
-          /\b(big|small|tall|short|fast|slow|new|old|good|great|nice|cool|awesome|super|special)\b/.test(lowerSentence)
+          /\b(play|game|fun|exciting|amazing|wonderful|beautiful|colorful|magical|happy|smile|laugh|sing|dance|build|create|draw|paint|fly|swim|run|jump)\b/.test(lowerSentence) ||
+          // Educational content
+          /\b(learn|read|story|book|study|school|teacher|student|lesson|word|letter|sound|practice)\b/.test(lowerSentence) ||
+          // Animals and creatures
+          /\b(animal|pet|cat|dog|bird|fish|elephant|lion|tiger|bear|rabbit|fox|wolf|dolphin|whale)\b/.test(lowerSentence) ||
+          // Basic descriptive and positive words
+          /\b(big|small|tall|short|fast|slow|new|old|good|great|nice|cool|awesome|super|special|brave|clever|kind|funny)\b/.test(lowerSentence)
         );
       })
-      .slice(0, 4) // Keep up to 4 relevant sentences
+      .slice(0, 6) // Keep up to 6 relevant sentences for richer context
       .join(". ");
 
-    console.log('Sanitized sentences:', safeSentences);
-    return safeSentences;
+    console.log('Adventure-processed sentences:', adventureSentences);
+    return adventureSentences;
   }
 
-  // Generate safe educational prompts
-  private generateSafePrompt(answerWord: string, safeContext: string, baseImagePrompt: string): string[] {
-    const baseStyle = "Create a colorful, educational illustration for children featuring";
-    const styleEnding = "Bright cartoon style, friendly, educational, safe for children.";
+  // Generate adventure-focused educational prompts showing what the text represents
+  private generateSafePrompt(audioText: string, adventureContext: string, baseImagePrompt: string): string[] {
+    const baseStyle = "Create a vibrant, adventure-themed illustration for children";
+    // Parse what the audio text represents - extract key visual elements
+    const visualElements = this.extractVisualElements(audioText);
+    const styleEnding = "Colorful realistic adventure style, exciting, fun, child-friendly with amazing characters and magical elements. NO TEXT OR WORDS should appear in the image.";
     
     // Multiple prompt options, from most contextual to most generic
     const prompts: string[] = [];
 
-    // Option 1: With sanitized context (if available)
-    if (safeContext && safeContext.length > 5) {
-      prompts.push(`${baseStyle} "${answerWord}" in a fun learning adventure with ${safeContext}. ${styleEnding}`);
+    // Option 1: With adventure context (if available)
+    if (adventureContext && adventureContext.length > 5) {
+      prompts.push(`${baseStyle} showing ${visualElements} in an epic learning adventure with ${adventureContext}. Include adventure characters, magical elements, and exciting scenery around the main subject. ${styleEnding}`);
     }
 
-    // Option 2: With base image prompt
+    // Option 2: With base image prompt and adventure theme
     if (baseImagePrompt) {
-      prompts.push(`${baseStyle} "${answerWord}" in an educational ${baseImagePrompt}. ${styleEnding}`);
+      prompts.push(`${baseStyle} featuring ${visualElements} in an exciting adventure scene with ${baseImagePrompt}. Add adventure characters, treasure, magical creatures, and fun elements surrounding the main subject. ${styleEnding}`);
     }
 
-    // Option 3: Generic educational prompt
-    prompts.push(`${baseStyle} the concept of "${answerWord}" in a fun, educational way. Show children learning about ${answerWord}. ${styleEnding}`);
+    // Option 3: Adventure-themed educational prompt
+    prompts.push(`${baseStyle} showing ${visualElements} with adventure characters like brave explorers, friendly dragons, magical creatures, and treasure in the background. ${styleEnding}`);
 
-    // Option 4: Super simple fallback
-    prompts.push(`Educational cartoon illustration showing "${answerWord}" for children. Colorful, friendly, safe.`);
+    // Option 4: Simple adventure fallback
+    prompts.push(`Fun adventure cartoon featuring ${visualElements} with cute characters, treasure, and magical elements for children. ${styleEnding}`);
 
     return prompts;
   }
 
+  // Extract visual elements from audio text (what to show, not the text itself)
+  private extractVisualElements(audioText: string): string {
+    const text = audioText.toLowerCase();
+    
+    // Common educational subjects and their visual representations
+    const visualMappings = [
+      // Animals
+      { keywords: ['elephant', 'elephants'], visual: 'a majestic elephant' },
+      { keywords: ['cat', 'cats'], visual: 'a cute cat' },
+      { keywords: ['dog', 'dogs'], visual: 'a friendly dog' },
+      { keywords: ['bird', 'birds'], visual: 'colorful birds flying' },
+      { keywords: ['fish'], visual: 'tropical fish swimming' },
+      { keywords: ['lion'], visual: 'a brave lion' },
+      { keywords: ['tiger'], visual: 'a majestic tiger' },
+      { keywords: ['bear'], visual: 'a cuddly bear' },
+      { keywords: ['rabbit'], visual: 'a hopping rabbit' },
+      
+      // Objects and things
+      { keywords: ['sun'], visual: 'a bright, shining sun' },
+      { keywords: ['moon'], visual: 'a glowing moon and stars' },
+      { keywords: ['tree', 'trees'], visual: 'beautiful trees' },
+      { keywords: ['flower', 'flowers'], visual: 'colorful blooming flowers' },
+      { keywords: ['house', 'home'], visual: 'a cozy house' },
+      { keywords: ['car'], visual: 'a cool car' },
+      { keywords: ['ship', 'boat'], visual: 'a sailing ship on the ocean' },
+      { keywords: ['rocket'], visual: 'a rocket ship blasting off' },
+      { keywords: ['castle'], visual: 'a magical castle' },
+      { keywords: ['treasure'], visual: 'glittering treasure chests' },
+      
+      // Activities and actions
+      { keywords: ['running', 'run'], visual: 'characters running energetically' },
+      { keywords: ['jumping', 'jump'], visual: 'characters jumping joyfully' },
+      { keywords: ['swimming', 'swim'], visual: 'characters swimming in clear water' },
+      { keywords: ['flying', 'fly'], visual: 'characters soaring through the sky' },
+      { keywords: ['playing', 'play'], visual: 'characters playing happily' },
+      
+      // Weather and nature
+      { keywords: ['hot'], visual: 'a sunny, warm scene with bright sunshine' },
+      { keywords: ['cold'], visual: 'a snowy, winter scene' },
+      { keywords: ['rain', 'raining'], visual: 'gentle rain and rainbows' },
+      { keywords: ['wind'], visual: 'trees swaying in the breeze' },
+      
+      // Colors
+      { keywords: ['red'], visual: 'beautiful red objects like apples and roses' },
+      { keywords: ['blue'], visual: 'stunning blue sky and ocean' },
+      { keywords: ['green'], visual: 'lush green forests and grass' },
+      { keywords: ['yellow'], visual: 'bright yellow sunflowers and sunshine' },
+    ];
+    
+    // Find matching visual elements
+    let foundVisuals = [];
+    for (const mapping of visualMappings) {
+      for (const keyword of mapping.keywords) {
+        if (text.includes(keyword)) {
+          foundVisuals.push(mapping.visual);
+          break;
+        }
+      }
+    }
+    
+    // If specific visuals found, use them
+    if (foundVisuals.length > 0) {
+      return foundVisuals.join(' and ');
+    }
+    
+    // If no specific mapping, try to extract nouns and adjectives for general visual
+    const words = audioText.split(/\s+/);
+    const importantWords = words.filter(word => 
+      word.length > 2 && 
+      !/^(the|a|an|is|are|was|were|has|have|had|do|does|did|will|would|should|could|my|your|his|her|its|our|their)$/i.test(word)
+    );
+    
+    if (importantWords.length > 0) {
+      return `a scene depicting ${importantWords.join(' ')}`;
+    }
+    
+    // Final fallback
+    return 'a magical learning adventure scene';
+  }
+
   // Generate contextual image using DALL-E with enhanced safety
   async generateContextualImage(
-    answerWord: string,
+    audioText: string,
     userAdventure: ChatMessage[],
     imagePrompt: string = ""
   ): Promise<string | null> {
@@ -554,7 +660,7 @@ Return ONLY the new reading passage, nothing else.`;
       console.log('Safe adventure context length:', safeAdventureContext.length);
 
       // Generate multiple prompt options from most specific to most generic
-      const promptOptions = this.generateSafePrompt(answerWord, safeAdventureContext, imagePrompt);
+      const promptOptions = this.generateSafePrompt(audioText, safeAdventureContext, imagePrompt);
 
       console.log('Generated prompt options:', promptOptions);
 
