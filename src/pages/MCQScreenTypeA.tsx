@@ -1297,11 +1297,14 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
             {/* Dynamic Image Section - Outside Notepad */}
             {!isReadingComprehension && (
-              <div className="mt-4 mb-6 relative flex justify-center">
+              <div className={cn("mt-4 relative flex justify-center", isDragDropQuestion ? "mb-4" : "mb-6")}>
                 {/* Centered Image Container */}
                 <div className="relative">
                   <div 
-                    className="w-[40rem] h-[32rem] border-2 border-gray-300 rounded-xl overflow-hidden"
+                    className={cn(
+                      "border-2 border-gray-300 rounded-xl overflow-hidden",
+                      isDragDropQuestion ? "w-[28rem] h-[20rem]" : "w-[40rem] h-[32rem]"
+                    )}
                     style={{
                       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
                     }}
@@ -1369,10 +1372,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
             {/* Answer Options - MCQ, Drag Drop, or Fill Blank - Outside Notepad */}
             {isDragDropQuestion && isDragDropType(currentQuestion) ? (
               /* Drag and Drop Interface */
-              <div className="space-y-4 mb-4">
+              <div className="space-y-3 mb-4">
                 {/* Available Words to Sort */}
-                <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-4">
-                        <h3 className="text-lg font-bold text-blue-800 mb-3 text-center">Words to Sort</h3>
+                <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-3">
+                        <h3 className="text-lg font-bold text-blue-800 mb-2 text-center">Words to Sort</h3>
                         <div className="flex flex-wrap justify-center gap-3 min-h-[60px] items-center">
                           {availableWords.map((word) => (
                             <div
@@ -1392,7 +1395,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       </div>
 
                       {/* Sorting Bins */}
-                      <div className="grid grid-cols-2 gap-6">
+                      <div className="grid grid-cols-2 gap-4">
                         {currentQuestion.sortingBins.map((binName) => (
                           <div
                             key={binName}
@@ -1400,14 +1403,14 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, binName)}
                             className={cn(
-                              "border-2 border-dashed rounded-xl p-4 min-h-[120px] transition-all duration-200",
+                              "border-2 border-dashed rounded-xl p-3 min-h-[100px] transition-all duration-200",
                               isDragOverBin === binName
                                 ? "border-green-500 bg-green-50 scale-105"
                                 : "border-gray-400 bg-gray-50 hover:bg-gray-100"
                             )}
                           >
-                            <h3 className="text-lg font-bold text-center mb-3 text-gray-700">{binName}</h3>
-                            <div className="space-y-2 min-h-[60px]">
+                            <h3 className="text-lg font-bold text-center mb-2 text-gray-700">{binName}</h3>
+                            <div className="space-y-2 min-h-[50px]">
                               {sortedWords[binName]?.map((word) => (
                                 <div
                                   key={word}
@@ -1420,7 +1423,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                                 </div>
                               )) || null}
                               {(!sortedWords[binName] || sortedWords[binName].length === 0) && (
-                                <div className="text-center text-gray-400 italic py-4">
+                                <div className="text-center text-gray-400 italic py-3">
                                   Drop words here
                                 </div>
                               )}
@@ -1664,7 +1667,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       isGeneratingQuestion && "opacity-50"
                     )}
                     style={{ 
-                      padding: '5px 40px 5px 40px', // 1px top, 2px left/right, 4px bottom for check icon space
+                      padding: '5px 20px 5px 20px', // Reduce horizontal padding
                       boxShadow: hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer 
                         ? '0 4px 0 #16a34a' 
                         : index === selectedAnswer && !isCorrect
@@ -1672,7 +1675,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                           : '0 4px 0 black'
                     }}
                   >
-                    <span className="text-center leading-tight break-words hyphens-auto whitespace-pre-wrap w-full flex items-center justify-center">
+                    <span className="text-center leading-tight whitespace-nowrap w-full flex items-center justify-center">
                       {option}
                     </span>
                     {hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && (
