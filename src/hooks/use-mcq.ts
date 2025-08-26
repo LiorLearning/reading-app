@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import mcqData from '@/data/mcq-questions.json';
+import mcqData from '@/data/mcq-questions';
 
 interface MCQQuestion {
   id: number;

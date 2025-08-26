@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { playClickSound } from "@/lib/sounds";
 import { Sparkles, Plus, Settings, Rocket } from "lucide-react";
 import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress } from "@/lib/utils";
-import { sampleMCQData } from "./MCQScreenTypeA";
+import { sampleMCQData } from "../data/mcq-questions";
 
 interface UserData {
   username: string;

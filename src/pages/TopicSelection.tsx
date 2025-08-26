@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { playClickSound } from "@/lib/sounds";
 import { ChevronRight, BookOpen, Sparkles } from "lucide-react";
 
-// Import the MCQ data to extract topics
-import { sampleMCQData } from "./MCQScreenTypeA";
+// Import the MCQ data from the correct location
+import { sampleMCQData } from "../data/mcq-questions";
 
 // Interface for extracted topic info
 interface TopicOption {

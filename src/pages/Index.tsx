@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic } from "@/lib/utils";
-import { sampleMCQData } from "./MCQScreenTypeA";
+import { sampleMCQData } from "../data/mcq-questions";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
