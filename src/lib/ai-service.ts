@@ -487,124 +487,121 @@ Return ONLY the new reading passage, nothing else.`;
     }
   }
 
-  // Process content for adventure-themed DALL-E prompts
-  private sanitizeContentForImage(content: string): string {
-    if (!content) return "";
 
-    // Keep adventure and educational content, remove only truly harmful content
-    const adventureSentences = content
-      .split(/[.!?]+/)
-      .map(sentence => sentence.trim())
-      .filter(sentence => sentence.length > 3 && sentence.length < 100) // Increased length limit for more context
-      .filter(sentence => {
-        const lowerSentence = sentence.toLowerCase();
-        
-        // Only exclude genuinely harmful content
-        if (/(violence|weapon|fight|hurt|danger|kill|death|blood|war|scary|horror|nightmare)\i/.test(lowerSentence)) {
-          return false;
-        }
-        
-        // Keep ALL adventure, educational, and fun content
-        return (
-          // Adventure and exploration terms
-          /\b(adventure|explore|discover|find|map|treasure|space|planet|rocket|journey|quest|mission|expedition|voyage)\b/.test(lowerSentence) ||
-          // Characters and magical elements
-          /\b(captain|explorer|astronaut|character|hero|friend|wizard|magic|fairy|dragon|unicorn|robot|alien|pirate|knight)\b/.test(lowerSentence) ||
-          // Settings and places
-          /\b(castle|forest|ocean|mountain|island|city|town|cave|temple|spaceship|planet|galaxy|kingdom)\b/.test(lowerSentence) ||
-          // Fun activities and objects
-          /\b(play|game|fun|exciting|amazing|wonderful|beautiful|colorful|magical|happy|smile|laugh|sing|dance|build|create|draw|paint|fly|swim|run|jump)\b/.test(lowerSentence) ||
-          // Educational content
-          /\b(learn|read|story|book|study|school|teacher|student|lesson|word|letter|sound|practice)\b/.test(lowerSentence) ||
-          // Animals and creatures
-          /\b(animal|pet|cat|dog|bird|fish|elephant|lion|tiger|bear|rabbit|fox|wolf|dolphin|whale)\b/.test(lowerSentence) ||
-          // Basic descriptive and positive words
-          /\b(big|small|tall|short|fast|slow|new|old|good|great|nice|cool|awesome|super|special|brave|clever|kind|funny)\b/.test(lowerSentence)
-        );
-      })
-      .slice(0, 6) // Keep up to 6 relevant sentences for richer context
-      .join(". ");
 
-    console.log('Adventure-processed sentences:', adventureSentences);
-    return adventureSentences;
-  }
-
-  // Generate adventure-focused educational prompts showing what the text represents
-  private generateSafePrompt(audioText: string, adventureContext: string, baseImagePrompt: string): string[] {
-    const baseStyle = "Create a vibrant, adventure-themed illustration for children";
-    // Parse what the audio text represents - extract key visual elements
-    const visualElements = this.extractVisualElements(audioText);
-    const styleEnding = "Colorful realistic adventure style, exciting, fun, child-friendly with amazing characters and magical elements. NO TEXT OR WORDS should appear in the image.";
-    
-    // Multiple prompt options, from most contextual to most generic
+  // Generate simple realistic prompts using raw audio content
+  private generateRealisticFunPrompt(audioText: string, baseImagePrompt: string): string[] {
+    // Simple, clean prompt options using audio text as-is
     const prompts: string[] = [];
 
-    // Option 1: With adventure context (if available)
-    if (adventureContext && adventureContext.length > 5) {
-      prompts.push(`${baseStyle} showing ${visualElements} in an epic learning adventure with ${adventureContext}. Include adventure characters, magical elements, and exciting scenery around the main subject. ${styleEnding}`);
-    }
+    // Option 1: Direct audio content with realistic and fun
+    prompts.push(`${audioText}, make it realistic and fun`);
 
-    // Option 2: With base image prompt and adventure theme
-    if (baseImagePrompt) {
-      prompts.push(`${baseStyle} featuring ${visualElements} in an exciting adventure scene with ${baseImagePrompt}. Add adventure characters, treasure, magical creatures, and fun elements surrounding the main subject. ${styleEnding}`);
-    }
+    // Option 2: Alternative phrasing
+    prompts.push(`Create a realistic and fun image of: ${audioText}`);
 
-    // Option 3: Adventure-themed educational prompt
-    prompts.push(`${baseStyle} showing ${visualElements} with adventure characters like brave explorers, friendly dragons, magical creatures, and treasure in the background. ${styleEnding}`);
+    // Option 3: Simple fallback
+    prompts.push(`${audioText} in realistic style`);
 
-    // Option 4: Simple adventure fallback
-    prompts.push(`Fun adventure cartoon featuring ${visualElements} with cute characters, treasure, and magical elements for children. ${styleEnding}`);
+    // Option 4: Basic fallback
+    prompts.push(`${audioText}`);
 
     return prompts;
   }
 
-  // Extract visual elements from audio text (what to show, not the text itself)
+  // Extract visual elements from audio text for realistic imagery
   private extractVisualElements(audioText: string): string {
     const text = audioText.toLowerCase();
     
-    // Common educational subjects and their visual representations
+    // Enhanced visual mappings for realistic imagery
     const visualMappings = [
-      // Animals
-      { keywords: ['elephant', 'elephants'], visual: 'a majestic elephant' },
-      { keywords: ['cat', 'cats'], visual: 'a cute cat' },
-      { keywords: ['dog', 'dogs'], visual: 'a friendly dog' },
-      { keywords: ['bird', 'birds'], visual: 'colorful birds flying' },
-      { keywords: ['fish'], visual: 'tropical fish swimming' },
-      { keywords: ['lion'], visual: 'a brave lion' },
-      { keywords: ['tiger'], visual: 'a majestic tiger' },
-      { keywords: ['bear'], visual: 'a cuddly bear' },
-      { keywords: ['rabbit'], visual: 'a hopping rabbit' },
+      // Animals - more detailed and realistic
+      { keywords: ['elephant', 'elephants'], visual: 'a realistic majestic elephant in its natural habitat' },
+      { keywords: ['cat', 'cats', 'kitten', 'kittens'], visual: 'a cute realistic cat with detailed fur' },
+      { keywords: ['dog', 'dogs', 'puppy', 'puppies'], visual: 'a friendly realistic dog with expressive eyes' },
+      { keywords: ['bird', 'birds'], visual: 'beautiful realistic birds with colorful feathers' },
+      { keywords: ['fish'], visual: 'realistic tropical fish in clear water' },
+      { keywords: ['lion', 'lions'], visual: 'a powerful realistic lion with magnificent mane' },
+      { keywords: ['tiger', 'tigers'], visual: 'a stunning realistic tiger with distinctive stripes' },
+      { keywords: ['bear', 'bears'], visual: 'a realistic bear in a natural forest setting' },
+      { keywords: ['rabbit', 'rabbits', 'bunny'], visual: 'a realistic rabbit with soft fur and long ears' },
+      { keywords: ['horse', 'horses'], visual: 'a beautiful realistic horse running in a field' },
+      { keywords: ['cow', 'cows'], visual: 'a realistic cow in a green pasture' },
+      { keywords: ['sheep'], visual: 'fluffy realistic sheep in a meadow' },
+      { keywords: ['pig', 'pigs'], visual: 'a realistic pig in a farm setting' },
+      { keywords: ['chicken', 'chickens'], visual: 'realistic chickens in a farmyard' },
+      { keywords: ['butterfly', 'butterflies'], visual: 'realistic colorful butterflies on flowers' },
+      { keywords: ['bee', 'bees'], visual: 'realistic bees collecting nectar from flowers' },
       
-      // Objects and things
-      { keywords: ['sun'], visual: 'a bright, shining sun' },
-      { keywords: ['moon'], visual: 'a glowing moon and stars' },
-      { keywords: ['tree', 'trees'], visual: 'beautiful trees' },
-      { keywords: ['flower', 'flowers'], visual: 'colorful blooming flowers' },
-      { keywords: ['house', 'home'], visual: 'a cozy house' },
-      { keywords: ['car'], visual: 'a cool car' },
-      { keywords: ['ship', 'boat'], visual: 'a sailing ship on the ocean' },
-      { keywords: ['rocket'], visual: 'a rocket ship blasting off' },
-      { keywords: ['castle'], visual: 'a magical castle' },
-      { keywords: ['treasure'], visual: 'glittering treasure chests' },
+      // Nature and objects - more realistic
+      { keywords: ['sun'], visual: 'a bright realistic sun with rays of light' },
+      { keywords: ['moon'], visual: 'a detailed realistic moon with craters and soft glow' },
+      { keywords: ['star', 'stars'], visual: 'twinkling realistic stars in the night sky' },
+      { keywords: ['tree', 'trees'], visual: 'realistic trees with detailed bark and leaves' },
+      { keywords: ['flower', 'flowers'], visual: 'realistic blooming flowers with vivid petals' },
+      { keywords: ['grass'], visual: 'lush realistic green grass swaying gently' },
+      { keywords: ['mountain', 'mountains'], visual: 'majestic realistic mountains with snow-capped peaks' },
+      { keywords: ['ocean', 'sea'], visual: 'a realistic ocean with gentle waves and blue water' },
+      { keywords: ['lake', 'pond'], visual: 'a peaceful realistic lake reflecting the sky' },
+      { keywords: ['river'], visual: 'a flowing realistic river through natural landscape' },
+      { keywords: ['forest'], visual: 'a dense realistic forest with tall trees and sunlight filtering through' },
+      { keywords: ['garden'], visual: 'a beautiful realistic garden with colorful flowers and plants' },
       
-      // Activities and actions
-      { keywords: ['running', 'run'], visual: 'characters running energetically' },
-      { keywords: ['jumping', 'jump'], visual: 'characters jumping joyfully' },
-      { keywords: ['swimming', 'swim'], visual: 'characters swimming in clear water' },
-      { keywords: ['flying', 'fly'], visual: 'characters soaring through the sky' },
-      { keywords: ['playing', 'play'], visual: 'characters playing happily' },
+      // Man-made objects - realistic versions
+      { keywords: ['house', 'home'], visual: 'a realistic cozy house with detailed architecture' },
+      { keywords: ['car', 'cars'], visual: 'a realistic modern car with shiny paint' },
+      { keywords: ['truck', 'trucks'], visual: 'a realistic truck with detailed features' },
+      { keywords: ['bus'], visual: 'a realistic colorful school bus' },
+      { keywords: ['train'], visual: 'a realistic train moving along railroad tracks' },
+      { keywords: ['airplane', 'plane'], visual: 'a realistic airplane flying through clouds' },
+      { keywords: ['ship', 'boat'], visual: 'a realistic sailing ship on calm ocean waters' },
+      { keywords: ['bicycle', 'bike'], visual: 'a realistic bicycle parked in a scenic location' },
+      { keywords: ['school'], visual: 'a realistic school building with children playing outside' },
+      { keywords: ['playground'], visual: 'a realistic colorful playground with swings and slides' },
+      { keywords: ['park'], visual: 'a realistic park with trees, benches, and walking paths' },
       
-      // Weather and nature
-      { keywords: ['hot'], visual: 'a sunny, warm scene with bright sunshine' },
-      { keywords: ['cold'], visual: 'a snowy, winter scene' },
-      { keywords: ['rain', 'raining'], visual: 'gentle rain and rainbows' },
-      { keywords: ['wind'], visual: 'trees swaying in the breeze' },
+      // Food and everyday items
+      { keywords: ['apple', 'apples'], visual: 'realistic red apples with natural shine' },
+      { keywords: ['banana', 'bananas'], visual: 'realistic yellow bananas with detailed texture' },
+      { keywords: ['orange', 'oranges'], visual: 'realistic oranges with textured peel' },
+      { keywords: ['cake'], visual: 'a realistic decorated cake with frosting' },
+      { keywords: ['cookie', 'cookies'], visual: 'realistic chocolate chip cookies' },
+      { keywords: ['bread'], visual: 'realistic fresh bread with golden crust' },
+      { keywords: ['milk'], visual: 'a realistic glass of fresh white milk' },
+      { keywords: ['water'], visual: 'crystal clear realistic water' },
       
-      // Colors
-      { keywords: ['red'], visual: 'beautiful red objects like apples and roses' },
-      { keywords: ['blue'], visual: 'stunning blue sky and ocean' },
-      { keywords: ['green'], visual: 'lush green forests and grass' },
-      { keywords: ['yellow'], visual: 'bright yellow sunflowers and sunshine' },
+      // Activities and actions - realistic scenes
+      { keywords: ['running', 'run'], visual: 'realistic children running joyfully in a park' },
+      { keywords: ['jumping', 'jump'], visual: 'realistic children jumping with expressions of joy' },
+      { keywords: ['swimming', 'swim'], visual: 'realistic scene of swimming in clear blue water' },
+      { keywords: ['flying', 'fly'], visual: 'realistic scene of birds or objects soaring through clear sky' },
+      { keywords: ['playing', 'play'], visual: 'realistic children playing together happily' },
+      { keywords: ['reading', 'read'], visual: 'realistic scene of children reading books' },
+      { keywords: ['writing', 'write'], visual: 'realistic scene of writing with pencils and paper' },
+      { keywords: ['drawing', 'draw'], visual: 'realistic scene of children drawing with crayons' },
+      { keywords: ['singing', 'sing'], visual: 'realistic children singing with happy expressions' },
+      { keywords: ['dancing', 'dance'], visual: 'realistic children dancing with joyful movements' },
+      
+      // Weather and seasons - realistic
+      { keywords: ['hot', 'summer'], visual: 'a realistic sunny summer day with bright sunshine and blue sky' },
+      { keywords: ['cold', 'winter'], visual: 'a realistic winter scene with snow, icicles, and bare trees' },
+      { keywords: ['rain', 'raining'], visual: 'realistic gentle rain with water droplets and puddles' },
+      { keywords: ['snow', 'snowing'], visual: 'realistic snow falling peacefully on a winter landscape' },
+      { keywords: ['wind', 'windy'], visual: 'realistic scene with trees and grass bending in the wind' },
+      { keywords: ['spring'], visual: 'a realistic spring scene with blooming flowers and green leaves' },
+      { keywords: ['autumn', 'fall'], visual: 'a realistic autumn scene with colorful falling leaves' },
+      
+      // Colors with realistic contexts
+      { keywords: ['red'], visual: 'realistic red objects like ripe strawberries, roses, or fire trucks' },
+      { keywords: ['blue'], visual: 'realistic blue elements like clear sky, ocean waves, or blueberries' },
+      { keywords: ['green'], visual: 'realistic green elements like fresh grass, leaves, or vegetables' },
+      { keywords: ['yellow'], visual: 'realistic yellow elements like bright sunflowers, lemons, or sunshine' },
+      { keywords: ['purple'], visual: 'realistic purple elements like grapes, lavender, or violets' },
+      { keywords: ['orange'], visual: 'realistic orange elements like pumpkins, oranges, or sunset colors' },
+      { keywords: ['pink'], visual: 'realistic pink elements like cherry blossoms, flamingos, or roses' },
+      { keywords: ['brown'], visual: 'realistic brown elements like tree bark, chocolate, or earth' },
+      { keywords: ['black'], visual: 'realistic black elements like night sky, ravens, or shadows' },
+      { keywords: ['white'], visual: 'realistic white elements like snow, clouds, or doves' },
     ];
     
     // Find matching visual elements
@@ -620,25 +617,27 @@ Return ONLY the new reading passage, nothing else.`;
     
     // If specific visuals found, use them
     if (foundVisuals.length > 0) {
-      return foundVisuals.join(' and ');
+      return foundVisuals.slice(0, 3).join(' and '); // Limit to 3 main elements for clarity
     }
     
-    // If no specific mapping, try to extract nouns and adjectives for general visual
+    // If no specific mapping, try to extract meaningful words for realistic scene
     const words = audioText.split(/\s+/);
-    const importantWords = words.filter(word => 
+    const meaningfulWords = words.filter(word => 
       word.length > 2 && 
-      !/^(the|a|an|is|are|was|were|has|have|had|do|does|did|will|would|should|could|my|your|his|her|its|our|their)$/i.test(word)
+      !/^(the|a|an|is|are|was|were|has|have|had|do|does|did|will|would|should|could|my|your|his|her|its|our|their|this|that|these|those|and|or|but|for|with|from|about|into|onto|upon|over|under|above|below|between|among|through|during|before|after|since|until)$/i.test(word)
     );
     
-    if (importantWords.length > 0) {
-      return `a scene depicting ${importantWords.join(' ')}`;
+    if (meaningfulWords.length > 0) {
+      // Take the most relevant words and create a realistic scene
+      const relevantWords = meaningfulWords.slice(0, 5).join(' ');
+      return `a realistic and detailed scene depicting ${relevantWords}`;
     }
     
-    // Final fallback
-    return 'a magical learning adventure scene';
+    // Final fallback - more realistic and educational
+    return 'a realistic, colorful educational scene perfect for children\'s learning';
   }
 
-  // Generate contextual image using DALL-E with enhanced safety
+  // Generate realistic fun image using DALL-E based only on audio content
   async generateContextualImage(
     audioText: string,
     userAdventure: ChatMessage[],
@@ -650,19 +649,12 @@ Return ONLY the new reading passage, nothing else.`;
     }
 
     try {
-      // Extract structured adventure context using the same method as questions
-      const structuredContext = this.extractAdventureContext(userAdventure);
-      console.log('Structured adventure context for image:', structuredContext);
+      console.log('Generating image based on audio content:', audioText);
 
-      const safeAdventureContext = this.sanitizeContentForImage(structuredContext);
+      // Generate multiple prompt options based only on audio content
+      const promptOptions = this.generateRealisticFunPrompt(audioText, imagePrompt);
 
-      console.log('Safe adventure context for image:', safeAdventureContext);
-      console.log('Safe adventure context length:', safeAdventureContext.length);
-
-      // Generate multiple prompt options from most specific to most generic
-      const promptOptions = this.generateSafePrompt(audioText, safeAdventureContext, imagePrompt);
-
-      console.log('Generated prompt options:', promptOptions);
+      console.log('Generated realistic fun prompt options:', promptOptions);
 
       // Try each prompt option until one succeeds
       for (let i = 0; i < promptOptions.length; i++) {

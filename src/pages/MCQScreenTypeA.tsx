@@ -17042,9 +17042,95 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     generateContextualQuestion();
   }, [currentQuestionIndex, currentQuestion.questionText, currentQuestion, currentTopic.topicInfo.topicName]);
 
-  // Generate contextual image when component mounts or question changes
+  // Silent bulk generation function to create multiple images in background
+  const bulkGenerateImages = useCallback(async (startIndex: number = 0, maxImages: number = 10) => {
+    const questionsToGenerate = Math.min(maxImages, currentTopic.questions.length - startIndex);
+    
+    if (questionsToGenerate <= 0) return;
+    
+    console.log(`🎨 Starting silent bulk generation of ${questionsToGenerate} images from index ${startIndex}`);
+    
+    const userAdventure = loadUserAdventure();
+    
+    // Generate first image immediately (priority for current question)
+    if (!generatedImages[startIndex]) {
+      try {
+        const firstQuestion = currentTopic.questions[startIndex];
+        console.log(`🖼️ Generating priority image for question ${startIndex + 1}`);
+        
+        const firstImageUrl = await aiService.generateContextualImage(
+          firstQuestion.audio,
+          userAdventure,
+          `${currentTopic.topicInfo.topicName}: ${firstQuestion.aiHook.imagePrompt}`
+        );
+        
+        if (firstImageUrl) {
+          setGeneratedImages(prev => ({
+            ...prev,
+            [startIndex]: firstImageUrl
+          }));
+          console.log(`✅ Priority image generated for question ${startIndex + 1}`);
+        }
+      } catch (error) {
+        console.error(`❌ Failed to generate priority image for question ${startIndex + 1}:`, error);
+      }
+    }
+    
+    // Continue generating remaining images in background (silently)
+    setTimeout(async () => {
+      console.log(`🔄 Starting background generation of ${questionsToGenerate - 1} remaining images`);
+      
+      for (let i = 1; i < questionsToGenerate; i++) {
+        const questionIndex = startIndex + i;
+        
+        // Skip if image already exists
+        if (generatedImages[questionIndex]) {
+          continue;
+        }
+        
+        try {
+          const question = currentTopic.questions[questionIndex];
+          console.log(`🖼️ Background generating image ${i + 1}/${questionsToGenerate} for question ${questionIndex + 1}`);
+          
+          const imageUrl = await aiService.generateContextualImage(
+            question.audio,
+            userAdventure,
+            `${currentTopic.topicInfo.topicName}: ${question.aiHook.imagePrompt}`
+          );
+          
+          if (imageUrl) {
+            setGeneratedImages(prev => ({
+              ...prev,
+              [questionIndex]: imageUrl
+            }));
+            console.log(`✅ Background generated image ${i + 1}/${questionsToGenerate} for question ${questionIndex + 1}`);
+          }
+        } catch (error) {
+          console.error(`❌ Failed to background generate image ${i + 1}/${questionsToGenerate} for question ${questionIndex + 1}:`, error);
+        }
+        
+        // Small delay between requests to avoid overwhelming the API
+        if (i < questionsToGenerate - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      console.log(`🎉 Completed silent bulk generation of ${questionsToGenerate} images`);
+    }, 500); // Start background generation after 500ms
+    
+  }, [currentTopic.questions, currentTopic.topicInfo.topicName, generatedImages]);
+
+  // Trigger bulk image generation when component mounts
   useEffect(() => {
-    const generateContextualImage = async () => {
+    // Only run bulk generation once when component mounts
+    if (currentQuestionIndex === 0 && Object.keys(generatedImages).length === 0) {
+      bulkGenerateImages(0, 10);
+    }
+  }, [bulkGenerateImages, generatedImages]);
+
+  // Generate current image if not already generated (fallback for images not in bulk)
+  useEffect(() => {
+    const generateCurrentImage = async () => {
       // Skip if we already have an image for this index
       if (generatedImages[currentQuestionIndex]) {
         return;
@@ -17055,22 +17141,22 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       try {
         // Load user adventure context
         const userAdventure = loadUserAdventure();
-        console.log('Loading user adventure context for image generation:', {
+        console.log('Loading user adventure context for current image generation:', {
           messageCount: userAdventure.length,
           lastMessage: userAdventure.length > 0 ? userAdventure[userAdventure.length - 1].content : 'No messages'
         });
         
-                  const imageUrl = await aiService.generateContextualImage(
-            currentQuestion.audio, // Use the audio field text
-            userAdventure,
-            `${currentTopic.topicInfo.topicName}: ${currentQuestion.aiHook.imagePrompt}`
-          );
+        const currentImageUrl = await aiService.generateContextualImage(
+          currentQuestion.audio, // Use the audio field text
+          userAdventure,
+          `${currentTopic.topicInfo.topicName}: ${currentQuestion.aiHook.imagePrompt}`
+        );
 
         // Only update if we got a valid image URL
-        if (imageUrl) {
+        if (currentImageUrl) {
           setGeneratedImages(prev => ({
             ...prev,
-            [currentQuestionIndex]: imageUrl
+            [currentQuestionIndex]: currentImageUrl
           }));
         }
       } catch (error) {
@@ -17081,8 +17167,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       }
     };
 
-    generateContextualImage();
-  }, [currentQuestionIndex, currentQuestion.audio, currentQuestion.aiHook.imagePrompt, currentTopic.topicInfo.topicName]);
+    generateCurrentImage();
+  }, [currentQuestionIndex, currentQuestion.audio, currentQuestion.aiHook.imagePrompt, currentTopic.topicInfo.topicName, generatedImages]);
 
   // Initialize drag-and-drop state when question changes
   useEffect(() => {
@@ -17663,9 +17749,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                 
                 {/* Question content */}
                 <div className="mt-4">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
                     Question {currentQuestionIndex + 1} of {currentTopic.questions.length}
                   </h2>
+                  
+
                   
                   {!isReadingComprehension && (
                     <div className="text-xl font-medium text-gray-800 mb-8 text-center leading-relaxed">
