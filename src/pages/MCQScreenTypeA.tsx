@@ -1240,7 +1240,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
             {/* Question Card */}
 <div className="flex items-start justify-center mb-10 relative z-40">
               <div 
-                className="relative bg-white rounded-3xl p-4 max-w-3xl w-full"
+                className={cn(
+                  "relative bg-white rounded-3xl p-4 w-full",
+                  isReadingComprehension ? "max-w-5xl" : "max-w-3xl"
+                )}
                 style={{
                   border: '4px solid black',
                   boxShadow: '0 8px 0 black',
@@ -1288,6 +1291,22 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                         </div>
                       ) : (
                         <p>{displayQuestionText}</p>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Reading Comprehension Passage - Inside Notebook */}
+                  {isReadingComprehension && (
+                    <div className="text-lg text-gray-800 mb-4 leading-relaxed p-4 border border-gray-200 rounded-lg bg-gray-50">
+                      {isGeneratingQuestion ? (
+                        <div className="flex items-center justify-center gap-2 py-4">
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          <span>Creating your adventure reading passage...</span>
+                        </div>
+                      ) : (
+                        <p className="leading-loose">
+                          {contextualQuestions[currentQuestionIndex] || currentQuestion.passage}
+                        </p>
                       )}
                     </div>
                   )}
@@ -1524,131 +1543,121 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
             ) : isReadingComprehension ? (
               /* Reading Comprehension Interface */
               <div className="space-y-4 mb-4">
-                {/* AI-Generated Reading Passage */}
-                <div className="bg-purple-50 border-2 border-purple-300 rounded-xl p-6">
-                        <div className="bg-white border border-purple-200 rounded-lg p-6 leading-relaxed">
-                          {isGeneratingQuestion ? (
-                            <div className="flex items-center justify-center gap-2 py-4">
-                              <Loader2 className="h-5 w-5 animate-spin" />
-                              <span>Creating your adventure reading passage...</span>
-                            </div>
-                          ) : (
-                            <p className="text-lg text-gray-800 leading-loose">
-                              {contextualQuestions[currentQuestionIndex] || currentQuestion.passage}
-                            </p>
-                          )}
+                {/* Image Section with Speaker Button */}
+                <div className="mt-4 relative flex justify-center mb-6">
+                  {/* Centered Image Container */}
+                  <div className="relative">
+                    <div 
+                      className="w-[28rem] h-[20rem] border-2 border-gray-300 rounded-xl overflow-hidden"
+                      style={{
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
+                      }}
+                    >
+                      {isGeneratingImage ? (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+                          <div className="text-center text-gray-600">
+                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
+                            <p className="text-sm font-medium">Creating your adventure image...</p>
+                          </div>
                         </div>
-                      </div>
-
-                      {/* Image Section */}
-                      <div className="flex justify-center">
-                        <div className="relative">
-                          <div 
-                            className="w-64 h-48 border-2 border-gray-300 rounded-xl overflow-hidden"
-                            style={{
-                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                            }}
-                          >
-                            {isGeneratingImage ? (
-                              <div className="w-full h-full bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-                                <div className="text-center text-gray-600">
-                                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" />
-                                  <p className="text-sm font-medium">Creating your adventure image...</p>
-                                </div>
-                              </div>
-                            ) : generatedImages[currentQuestionIndex] ? (
-                              <img 
-                                src={generatedImages[currentQuestionIndex]} 
-                                alt={`Illustration for ${currentQuestion.word}`}
-                                className="w-full h-full object-cover object-center"
-                                style={{
-                                  filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
-                                }}
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  const placeholder = target.nextElementSibling as HTMLElement;
-                                  if (placeholder) placeholder.style.display = 'flex';
-                                }}
-                              />
-                            ) : null}
-                            
-                            <div 
-                              className={cn(
-                                "w-full h-full bg-gray-100 flex items-center justify-center",
-                                !isGeneratingImage && !generatedImages[currentQuestionIndex] ? 'flex' : 'hidden'
-                              )}
-                            >
-                              <div className="text-center text-gray-400">
-                                <div className="text-4xl mb-2">🎨</div>
-                                <p className="text-sm font-medium">Adventure image</p>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Passage Speaker Button - always visible on left side */}
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleSpeakPassage}
-                            className={cn(
-                              "absolute -bottom-3 -left-3 h-12 w-12 rounded-full border-2 border-blue-600 bg-primary/15 hover:bg-primary/25 z-10 transition-all duration-200 hover:scale-110",
-                              isSpeaking && "animate-pulse"
-                            )}
-                            style={{ boxShadow: '0 3px 0 #2563eb' }}
-                            title="Read the passage aloud"
-                          >
-                            <Volume2 className="h-6 w-6 text-white" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Microphone Controls */}
-                      <div className="flex justify-center">
-                        <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 w-full max-w-md">
-                          <h3 className="text-lg font-bold text-blue-800 mb-4 text-center">Read the passage aloud!</h3>
-                          
-                          {/* Microphone Button */}
-                          <div className="flex justify-center mb-4">
-                            <Button
-                              onClick={isRecording ? stopRecording : startRecording}
-                              disabled={hasAnswered && isCorrect}
-                              className={cn(
-                                "rounded-full w-20 h-20 border-4 transition-all duration-200",
-                                isRecording 
-                                  ? "bg-red-500 hover:bg-red-600 border-red-600 animate-pulse" 
-                                  : "bg-blue-500 hover:bg-blue-600 border-blue-600 hover:scale-110"
-                              )}
-                              style={{
-                                boxShadow: isRecording ? '0 6px 0 #dc2626' : '0 6px 0 #2563eb'
-                              }}
-                            >
-                              <Mic className={cn("h-8 w-8 text-white", isRecording && "animate-pulse")} />
-                            </Button>
-                          </div>
-                          
-                          {/* Recording Status */}
-                          <div className="text-center">
-                            {isRecording ? (
-                              <p className="text-red-600 font-medium animate-pulse">
-                                🎤 Recording... Speak clearly!
-                              </p>
-                            ) : recordedText ? (
-                              <div className="space-y-2">
-                                <p className="text-green-600 font-medium">✓ Recording complete!</p>
-                                <div className="bg-gray-100 border border-gray-300 rounded-lg p-3">
-                                  <p className="text-sm text-gray-700 italic">"{recordedText}"</p>
-                                </div>
-                              </div>
-                            ) : (
-                              <p className="text-blue-600 font-medium">
-                                Click the microphone to start reading
-                              </p>
-                            )}
-                          </div>
+                      ) : generatedImages[currentQuestionIndex] ? (
+                        <img 
+                          src={generatedImages[currentQuestionIndex]} 
+                          alt={`Illustration for ${currentQuestion.word}`}
+                          className="w-full h-full object-cover object-center"
+                          style={{
+                            filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                          }}
+                          onError={(e) => {
+                            // If image fails to load, show placeholder
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const placeholder = target.nextElementSibling as HTMLElement;
+                            if (placeholder) placeholder.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      
+                      {/* Fallback placeholder (hidden by default, shown on image error or no image) */}
+                      <div 
+                        className={cn(
+                          "w-full h-full bg-gray-100 flex items-center justify-center",
+                          !isGeneratingImage && !generatedImages[currentQuestionIndex] ? 'flex' : 'hidden'
+                        )}
+                      >
+                        <div className="text-center text-gray-400">
+                          <div className="text-4xl mb-4">🎨</div>
+                          <p className="text-sm font-medium">Adventure image</p>
                         </div>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Speaker Button - Positioned closer to the left of the centered image */}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleSpeakPassage}
+                    className={cn(
+                      "absolute left-20 top-1/2 transform -translate-y-1/2 h-24 w-24 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110",
+                      isSpeaking && "animate-pulse"
+                    )}
+                    style={{ 
+                      borderColor: 'hsl(var(--primary))', 
+                      boxShadow: '0 8px 0 rgba(0, 0, 0, 0.3)' 
+                    }}
+                    title="Read the passage aloud"
+                  >
+                    <Volume2 className="h-8 w-8 text-white" style={{ minHeight: '2.5rem', minWidth: '2.5rem' }} />
+                  </Button>
+                </div>
+
+                {/* Microphone Controls */}
+                <div className="flex justify-center">
+                  <div className="w-full max-w-md">
+                    <h3 className="text-xl font-bold text-white mb-4 text-center">Read the passage aloud!</h3>
+                    
+                    {/* Microphone Button */}
+                    <div className="flex justify-center mb-4">
+                      <Button
+                        onClick={isRecording ? stopRecording : startRecording}
+                        disabled={hasAnswered && isCorrect}
+                        className={cn(
+                          "rounded-full w-20 h-20 border-4 transition-all duration-200",
+                          isRecording 
+                            ? "bg-red-500 hover:bg-red-600 border-red-600 animate-pulse" 
+                            : "bg-blue-500 hover:bg-blue-600 border-blue-600 hover:scale-110"
+                        )}
+                        style={{
+                          boxShadow: isRecording ? '0 6px 0 #dc2626' : '0 6px 0 #2563eb'
+                        }}
+                      >
+                        <Mic className={cn("text-white", isRecording && "animate-pulse")} style={{ height: '2rem', width: '2rem' }} />
+                      </Button>
+                    </div>
+                    
+                    {/* Recording Status */}
+                    <div className="text-center">
+                      {isRecording ? (
+                        <p className="text-red-600 font-medium animate-pulse">
+                          🎤 Recording... Speak clearly!
+                        </p>
+                      ) : recordedText ? (
+                        <div className="space-y-2">
+                          <p className="text-green-600 font-medium">✓ Recording complete!</p>
+                          <div className="bg-gray-100 border border-gray-300 rounded-lg p-3">
+                            <p className="text-sm text-gray-700 italic">"{recordedText}"</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium text-white">
+                          Click the microphone to start reading
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
               /* MCQ Interface - All 4 Options Side by Side with Individual Text-Based Sizing */
               <div className="flex flex-wrap justify-center items-start gap-8 mb-2 mt-8">
