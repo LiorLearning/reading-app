@@ -1202,7 +1202,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
           width: '95%',
           maxWidth: '1520px',
           aspectRatio: getAspectRatio,
-          maxHeight: 'calc(100vh - 100px)',
+          maxHeight: 'calc(100vh - 50px)',  // Instead of 100px
           minHeight: '500px',
           transition: 'all 0.3s ease-in-out'
         }}
@@ -1223,8 +1223,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
           ref={containerRef}
           className="flex relative z-10 h-full w-full"
           style={{ 
-            paddingTop: '8px',
-            paddingBottom: '8px',
+            paddingTop: '20px',     // Instead of 40px
+            paddingBottom: '4px',   // Instead of 8px  
             paddingLeft: '8px',
             paddingRight: '8px'
           }}
@@ -1238,9 +1238,9 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
             
             {/* Question Card */}
-            <div className="flex-1 flex items-center justify-center mb-2 relative z-10">
+<div className="flex items-start justify-center mb-10 relative z-40">
               <div 
-                className="relative bg-white rounded-3xl p-8 max-w-3xl w-full"
+                className="relative bg-white rounded-3xl p-4 max-w-3xl w-full"
                 style={{
                   border: '4px solid black',
                   boxShadow: '0 8px 0 black',
@@ -1272,15 +1272,15 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                 </div>
                 
                 {/* Question content */}
-                <div className="mt-4">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                <div className="mt-2">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">
                     Question {currentQuestionIndex + 1} of {currentTopic.questions.length}
                   </h2>
                   
 
                   
                   {!isReadingComprehension && (
-                    <div className="text-xl font-medium text-gray-800 mb-6 text-center leading-relaxed">
+                    <div className="text-xl font-medium text-gray-800 mb-4 text-center leading-relaxed">
                       {isGeneratingQuestion ? (
                         <div className="flex items-center justify-center gap-2">
                           <Loader2 className="h-5 w-5 animate-spin" />
@@ -1297,28 +1297,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
             {/* Dynamic Image Section - Outside Notepad */}
             {!isReadingComprehension && (
-              <div className="mb-6 flex justify-center items-center gap-6">
-                {/* Speaker Button - Left of Image */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleSpeakAnswer}
-                  className={cn(
-                    "h-16 w-16 rounded-full border-3 bg-primary/80 hover:bg-primary text-primary-foreground transition-all duration-200 hover:scale-110",
-                    isSpeaking && "animate-pulse"
-                  )}
-                  style={{ 
-                    borderColor: 'hsl(var(--primary))', 
-                    boxShadow: '0 4px 0 hsl(var(--primary))' 
-                  }}
-                  title="Read the question description aloud"
-                >
-                  <Volume2 className="h-8 w-8" />
-                </Button>
-
+              <div className="mt-4 mb-6 relative flex justify-center">
+                {/* Centered Image Container */}
                 <div className="relative">
                   <div 
-                    className="w-96 h-80 border-2 border-gray-300 rounded-xl overflow-hidden"
+                    className="w-[40rem] h-[32rem] border-2 border-gray-300 rounded-xl overflow-hidden"
                     style={{
                       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
                     }}
@@ -1334,7 +1317,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       <img 
                         src={generatedImages[currentQuestionIndex]} 
                         alt={`Illustration for ${currentQuestion.word}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-center"
                         style={{
                           filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
                         }}
@@ -1356,19 +1339,37 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       )}
                     >
                       <div className="text-center text-gray-400">
-                        <div className="text-4xl mb-2">🎨</div>
+                        <div className="text-4xl mb-4">🎨</div>
                         <p className="text-sm font-medium">Adventure image</p>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Speaker Button - Positioned closer to the left of the centered image */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleSpeakAnswer}
+                  className={cn(
+                    "absolute left-32 top-1/2 transform -translate-y-1/2 h-28 w-28 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110",
+                    isSpeaking && "animate-pulse"
+                  )}
+                  style={{ 
+                    borderColor: 'hsl(var(--primary))', 
+                    boxShadow: '0 8px 0 rgba(0, 0, 0, 0.3)' 
+                  }}
+                  title="Read the question description aloud"
+                >
+                  <Volume2 className="h-10 w-10 text-white" style={{ minHeight: '3rem', minWidth: '3rem' }} />
+                </Button>
               </div>
             )}
 
             {/* Answer Options - MCQ, Drag Drop, or Fill Blank - Outside Notepad */}
             {isDragDropQuestion && isDragDropType(currentQuestion) ? (
               /* Drag and Drop Interface */
-              <div className="space-y-6 mb-6">
+              <div className="space-y-4 mb-4">
                 {/* Available Words to Sort */}
                 <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-4">
                         <h3 className="text-lg font-bold text-blue-800 mb-3 text-center">Words to Sort</h3>
@@ -1442,15 +1443,15 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                     </div>
             ) : currentQuestion.templateType === 'fill_blank' ? (
               /* Fill Blank Interface */
-              <div className="space-y-6 mb-6">
-                <div className="flex flex-col items-center gap-6">
+              <div className="space-y-3 mb-4">
+                <div className="flex flex-col items-center gap-3">
                   {/* TYPE THE WORD YOU HEAR heading */}
-                  <h3 className="text-2xl font-bold text-white mb-4 text-center">
+                  <h3 className="text-2xl font-bold text-white mb-2 text-center">
                     TYPE THE WORD YOU HEAR!
                   </h3>
                   
                   {/* Individual letter blanks */}
-                  <div className="flex justify-center gap-2 mb-6">
+                  <div className="flex justify-center gap-2 mb-3">
                     {Array.from({ length: (currentQuestion as FillBlankQuestion).correctAnswer.length }).map((_, index) => (
                       <input
                         key={index}
@@ -1500,10 +1501,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       "border-2 text-white btn-animate px-8 py-3 text-lg font-bold transition-all duration-200",
                       hasAnswered && isCorrect 
                         ? "bg-green-600 hover:bg-green-700 border-green-700"
-                        : "bg-purple-600 hover:bg-purple-700 border-purple-700"
+                        : "bg-primary/70 hover:bg-primary/80 border-primary"
                     )}
                     style={{
-                      boxShadow: hasAnswered && isCorrect ? '0 4px 0 #10b981' : '0 4px 0 #7c3aed'
+                      boxShadow: hasAnswered && isCorrect ? '0 4px 0 #10b981' : '0 4px 0 black'
                     }}
                   >
                     {hasAnswered && isCorrect ? (
@@ -1519,7 +1520,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
               </div>
             ) : isReadingComprehension ? (
               /* Reading Comprehension Interface */
-              <div className="space-y-6 mb-6">
+              <div className="space-y-4 mb-4">
                 {/* AI-Generated Reading Passage */}
                 <div className="bg-purple-50 border-2 border-purple-300 rounded-xl p-6">
                         <div className="bg-white border border-purple-200 rounded-lg p-6 leading-relaxed">
@@ -1556,7 +1557,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                               <img 
                                 src={generatedImages[currentQuestionIndex]} 
                                 alt={`Illustration for ${currentQuestion.word}`}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover object-center"
                                 style={{
                                   filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
                                 }}
@@ -1588,13 +1589,13 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                             size="icon"
                             onClick={handleSpeakPassage}
                             className={cn(
-                              "absolute -bottom-3 -left-3 h-10 w-10 rounded-full border-2 border-blue-600 bg-blue-100 hover:bg-blue-200 z-10 transition-all duration-200 hover:scale-110",
+                              "absolute -bottom-3 -left-3 h-12 w-12 rounded-full border-2 border-blue-600 bg-primary/15 hover:bg-primary/25 z-10 transition-all duration-200 hover:scale-110",
                               isSpeaking && "animate-pulse"
                             )}
                             style={{ boxShadow: '0 3px 0 #2563eb' }}
                             title="Read the passage aloud"
                           >
-                            <Volume2 className="h-4 w-4 text-blue-600" />
+                            <Volume2 className="h-6 w-6 text-white" />
                           </Button>
                         </div>
                       </div>
@@ -1646,43 +1647,45 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       </div>
                     </div>
             ) : (
-              /* MCQ Interface */
-              <div className="space-y-4 mb-6">
+              /* MCQ Interface - All 4 Options Side by Side with Individual Text-Based Sizing */
+              <div className="flex flex-wrap justify-center items-start gap-8 mb-2 mt-8">
                 {(currentQuestion as MCQQuestion).options.map((option, index) => (
                   <button
-                          key={index}
-                          onClick={() => handleAnswerClick(index)}
-                          disabled={(hasAnswered && isCorrect) || isGeneratingQuestion || isInReflectionMode}
-                          className={cn(
-                            "w-full p-4 text-left rounded-xl border-3 border-black transition-all duration-200 hover:scale-[1.02] font-medium text-lg",
-                            hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && "bg-green-200 border-green-600",
-                            index === selectedAnswer && !isCorrect && "bg-red-100 border-red-400 animate-pulse",
-                            (!hasAnswered || !isCorrect) && !isGeneratingQuestion && "bg-white hover:bg-primary/10 cursor-pointer",
-                            ((hasAnswered && isCorrect) || isGeneratingQuestion) && "cursor-not-allowed",
-                            isGeneratingQuestion && "opacity-50"
-                          )}
-                          style={{ 
-                            boxShadow: hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer 
-                              ? '0 4px 0 #16a34a' 
-                              : index === selectedAnswer && !isCorrect
-                                ? '0 3px 0 #f87171' 
-                                : '0 4px 0 black'
-                          }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span>{option}</span>
-                            {hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && (
-                              <Check className="h-6 w-6 text-green-600" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
+                    key={index}
+                    onClick={() => handleAnswerClick(index)}
+                    disabled={(hasAnswered && isCorrect) || isGeneratingQuestion || isInReflectionMode}
+                    className={cn(
+                      "text-center rounded-xl border-3 border-black transition-all duration-200 hover:scale-[1.02] font-medium text-2xl inline-flex flex-col items-center justify-center gap-2",
+                      hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && "bg-green-200 border-green-600",
+                      index === selectedAnswer && !isCorrect && "bg-red-100 border-red-400 animate-pulse",
+                      (!hasAnswered || !isCorrect) && !isGeneratingQuestion && "bg-white hover:bg-primary/10 cursor-pointer",
+                      hasAnswered && isCorrect && index !== (currentQuestion as MCQQuestion).correctAnswer && "bg-white border-black",
+                      ((hasAnswered && isCorrect) || isGeneratingQuestion) && "cursor-not-allowed",
+                      isGeneratingQuestion && "opacity-50"
+                    )}
+                    style={{ 
+                      padding: '5px 40px 5px 40px', // 1px top, 2px left/right, 4px bottom for check icon space
+                      boxShadow: hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer 
+                        ? '0 4px 0 #16a34a' 
+                        : index === selectedAnswer && !isCorrect
+                          ? '0 3px 0 #f87171' 
+                          : '0 4px 0 black'
+                    }}
+                  >
+                    <span className="text-center leading-tight break-words hyphens-auto whitespace-pre-wrap w-full flex items-center justify-center">
+                      {option}
+                    </span>
+                    {hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && (
+                      <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
               </div>
             )}
             
             {/* Next Question Button - Outside Notepad */}
             {showFeedback && !isInReflectionMode && (
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center mt-4">
                 <Button
                   variant="default"
                   size="lg"
@@ -1697,7 +1700,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
             
             {/* Reflection mode indicator - Outside Notepad */}
             {isInReflectionMode && (
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center mt-4">
                 <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl px-6 py-3 text-center">
                   <p className="text-lg font-medium text-yellow-800">
                     💭 Think about it and share your thoughts in the chat!
