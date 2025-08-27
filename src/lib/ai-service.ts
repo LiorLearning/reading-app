@@ -702,6 +702,189 @@ Return ONLY the new reading passage, nothing else.`;
     }
   }
 
+  // Generate adventure-focused images using user_adventure context
+  async generateAdventureImage(
+    prompt: string,
+    userAdventure: ChatMessage[],
+    fallbackPrompt: string = "space adventure scene"
+  ): Promise<string | null> {
+    // If not initialized or no API key, return null (will show placeholder)
+    if (!this.isInitialized || !this.client) {
+      return null;
+    }
+
+    try {
+      console.log('🌟 Generating adventure image with user adventure context');
+
+      // Extract adventure context with high priority on recent messages
+      const adventureContext = this.extractAdventureContext(userAdventure);
+      console.log('Adventure context for image:', adventureContext);
+
+      // Generate adventure-focused prompts
+      const adventurePrompts = this.generateAdventurePrompts(prompt, adventureContext, fallbackPrompt);
+
+      console.log('Generated adventure prompt options:', adventurePrompts);
+
+      // Try each prompt option until one succeeds
+      for (let i = 0; i < adventurePrompts.length; i++) {
+        try {
+          const finalPrompt = adventurePrompts[i].length > 400 
+            ? adventurePrompts[i].substring(0, 390) + "..." 
+            : adventurePrompts[i];
+          
+          console.log(`🎨 Trying adventure DALL-E prompt ${i + 1}:`, finalPrompt);
+
+          const response = await this.client.images.generate({
+            model: "dall-e-3",
+            prompt: finalPrompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "standard",
+            style: "vivid"
+          });
+
+          const imageUrl = response.data[0]?.url;
+          
+          if (imageUrl) {
+            console.log(`✅ Adventure DALL-E prompt ${i + 1} succeeded`);
+            return imageUrl;
+          }
+        } catch (promptError: any) {
+          console.log(`❌ Adventure DALL-E prompt ${i + 1} failed:`, promptError.message);
+          
+          if (!promptError.message?.includes('safety system') || i === adventurePrompts.length - 1) {
+            throw promptError;
+          }
+          
+          continue;
+        }
+      }
+
+      throw new Error('All adventure prompt options failed');
+    } catch (error) {
+      console.error('DALL-E API error for adventure image:', error);
+      return null;
+    }
+  }
+
+  // Generate education-focused images WITHOUT user_adventure context
+  async generateEducationalQuestionImage(
+    audioText: string,
+    imagePrompt: string = "",
+    topicName: string = ""
+  ): Promise<string | null> {
+    // If not initialized or no API key, return null (will show placeholder)
+    if (!this.isInitialized || !this.client) {
+      return null;
+    }
+
+    try {
+      console.log('📚 Generating educational question image (no adventure context):', audioText);
+
+      // Generate educational-focused prompts without adventure context
+      const educationalPrompts = this.generateEducationalPrompts(audioText, imagePrompt, topicName);
+
+      console.log('Generated educational prompt options:', educationalPrompts);
+
+      // Try each prompt option until one succeeds
+      for (let i = 0; i < educationalPrompts.length; i++) {
+        try {
+          const finalPrompt = educationalPrompts[i].length > 400 
+            ? educationalPrompts[i].substring(0, 390) + "..." 
+            : educationalPrompts[i];
+          
+          console.log(`📖 Trying educational DALL-E prompt ${i + 1}:`, finalPrompt);
+
+          const response = await this.client.images.generate({
+            model: "dall-e-3",
+            prompt: finalPrompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "standard",
+            style: "vivid"
+          });
+
+          const imageUrl = response.data[0]?.url;
+          
+          if (imageUrl) {
+            console.log(`✅ Educational DALL-E prompt ${i + 1} succeeded`);
+            return imageUrl;
+          }
+        } catch (promptError: any) {
+          console.log(`❌ Educational DALL-E prompt ${i + 1} failed:`, promptError.message);
+          
+          if (!promptError.message?.includes('safety system') || i === educationalPrompts.length - 1) {
+            throw promptError;
+          }
+          
+          continue;
+        }
+      }
+
+      throw new Error('All educational prompt options failed');
+    } catch (error) {
+      console.error('DALL-E API error for educational image:', error);
+      return null;
+    }
+  }
+
+  // Helper: Generate adventure-focused prompts using user_adventure context
+  private generateAdventurePrompts(prompt: string, adventureContext: string, fallbackPrompt: string): string[] {
+    const prompts: string[] = [];
+
+    if (adventureContext && adventureContext.trim()) {
+      // Option 1: Full adventure context integration
+      prompts.push(
+        `Create a vivid adventure scene: ${prompt}. Adventure context: ${adventureContext}. Make it exciting and story-driven for children.`
+      );
+
+      // Option 2: Simplified adventure context
+      prompts.push(
+        `${prompt} in the context of: ${adventureContext}. Make it adventurous and fun for kids.`
+      );
+
+      // Option 3: Adventure context as setting
+      prompts.push(
+        `Adventure scene: ${prompt}. Setting and characters from: ${adventureContext}. Child-friendly and exciting.`
+      );
+    }
+
+    // Option 4: Fallback with basic adventure feel
+    prompts.push(`${prompt}, ${fallbackPrompt}, make it adventurous and exciting for children`);
+
+    // Option 5: Simple fallback
+    prompts.push(`${prompt}, make it fun and adventurous`);
+
+    return prompts;
+  }
+
+  // Helper: Generate education-focused prompts WITHOUT adventure context
+  private generateEducationalPrompts(audioText: string, imagePrompt: string, topicName: string): string[] {
+    const prompts: string[] = [];
+
+    // Extract educational visual elements (reuse existing method)
+    const visualElements = this.extractVisualElements(audioText);
+
+    // Option 1: Focus on educational content with visual elements
+    prompts.push(
+      `Educational illustration for children: ${visualElements}. Topic: ${topicName}. Make it clear, colorful, and perfect for learning ${audioText}`
+    );
+
+    // Option 2: Direct educational content
+    prompts.push(
+      `Create a clear educational image showing: ${audioText}. For ${topicName} learning. Child-friendly and realistic.`
+    );
+
+    // Option 3: Simple educational focus
+    prompts.push(`${audioText} for educational purposes, realistic and child-friendly`);
+
+    // Option 4: Use existing realistic prompts (fallback to original method)
+    const realisticPrompts = this.generateRealisticFunPrompt(audioText, imagePrompt);
+    prompts.push(...realisticPrompts);
+
+    return prompts;
+  }
+
   // Generate reflection prompt for wrong answers
   async generateReflectionPrompt(
     questionText: string,

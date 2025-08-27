@@ -304,8 +304,8 @@ const Index = () => {
         chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
         "space adventure with rocket";
       
-      // Generate contextual image using AI service
-      const generatedImageUrl = await aiService.generateContextualImage(
+      // Generate adventure image using AI service with user_adventure context
+      const generatedImageUrl = await aiService.generateAdventureImage(
         imagePrompt,
         chatMessages,
         "space adventure scene"
