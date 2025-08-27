@@ -899,15 +899,16 @@ Return ONLY the new reading passage, nothing else.`;
     if (!this.isInitialized || !this.client) {
       if (questionType === 'mcq' && options && Array.isArray(options)) {
         const selectedOption = options[selectedAnswer as number];
-        return `🤔 Great effort on this ${topicName.replace(/_/g, ' ').toLowerCase()} question! Can you tell me what made you choose "${selectedOption}"? Let's look at the question again together.`;
+        const correctOption = options[correctAnswer as number];
+        return `🤔 Great effort on this ${topicName.replace(/_/g, ' ').toLowerCase()} question! You chose "${selectedOption}", but the correct answer is "${correctOption}". Let me explain why that's the right choice!`;
       } else if (questionType === 'fill_blank') {
-        return `🌟 Nice try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Can you think about what sounds you hear when you say that word? What other word might fit better here?`;
+        return `🌟 Nice try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! The correct answer is "${correctAnswer}". Let me help you understand why this word fits perfectly here!`;
       } else if (questionType === 'drag_drop') {
-        return `🤔 Interesting sorting work on ${topicName.replace(/_/g, ' ').toLowerCase()}! Can you tell me what rule you're using to sort these words? What sounds do you hear in each word?`;
+        return `🤔 Good effort with your ${topicName.replace(/_/g, ' ').toLowerCase()} sorting! Let me show you the correct pattern and explain why it works this way.`;
       } else if (questionType === 'reading_comprehension') {
-        return `🌟 Great effort reading! Can you tell me which words felt the trickiest? What strategies might help you read even better?`;
+        return `🌟 Great effort reading! The correct answer is "${correctAnswer}". Let me explain why this is the best choice based on what we read.`;
       } else {
-        return `🤔 Great try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Can you tell me what you were thinking? Let's look at this together.`;
+        return `🤔 Great try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Let me explain the correct answer and help you understand why it's right.`;
       }
     }
 
@@ -917,167 +918,126 @@ Return ONLY the new reading passage, nothing else.`;
       if (questionType === 'mcq' && options && Array.isArray(options)) {
         // Multiple choice question
         const selectedOption = options[selectedAnswer as number];
+        const correctOption = options[correctAnswer as number];
         
-        reflectionPrompt = `You are Krafty, a warm and curious AI tutor using Socratic questioning to guide a ${gradeLevel} student learning English. The child chose a wrong answer, and your goal is to use strategic questions to help them discover the correct reasoning themselves.
+        reflectionPrompt = `You are Krafty, a warm and encouraging AI tutor helping a ${gradeLevel} student learning English. The child chose a wrong answer, and you need to directly teach them the correct answer and explain why it's right in a way that's perfect for their grade level.
 
-        LEARNING CONTEXT:
-        - Grade Level: ${gradeLevel}
-        - Topic: ${topicName.replace(/_/g, ' ')}
-        - Question: "${questionText}"
-        - Options: ${options.map((opt, i) => `${i}: "${opt}"`).join(", ")}
-        - Student chose: "${selectedOption}" (option ${selectedAnswer})
-        - Correct answer is option ${correctAnswer}, but DO NOT reveal this.
+      LEARNING CONTEXT:
+      - Grade Level: ${gradeLevel}
+      - Topic: ${topicName.replace(/_/g, ' ')}
+      - Question: "${questionText}"
+      - All Options: ${options.map((opt, i) => `${i}: "${opt}"`).join(", ")}
+      - Student chose: "${selectedOption}" (option ${selectedAnswer})
+      - Correct answer: "${correctOption}" (option ${correctAnswer})
 
-        SOCRATIC TEACHING APPROACH:
-        Use targeted questions to guide discovery rather than giving information. Follow this hierarchy:
-        
-        1. REFLECTION QUESTIONS: Get them to explain their thinking
-           Examples: "What made you choose that option?" "Can you tell me your thought process?"
-        
-        2. OBSERVATION QUESTIONS: Direct attention to specific details
-           Examples: "What do you notice about the word/sentence?" "Can you look more closely at...?"
-        
-        3. ANALYSIS QUESTIONS: Help them break down the problem
-           Examples: "What's the difference between these options?" "How are these words similar/different?"
-        
-        4. CONNECTION QUESTIONS: Link to prior knowledge
-           Examples: "Does this remind you of any patterns you know?" "What rule might apply here?"
+      DIRECT TEACHING APPROACH:
+      1. Start with warm encouragement about their effort
+      2. Clearly state what the correct answer is
+      3. Explain WHY the correct answer is right using simple, age-appropriate reasoning
+      4. If helpful, briefly explain why their choice wasn't the best option (be gentle)
+      5. Connect the explanation to the specific topic "${topicName.replace(/_/g, ' ')}"
+      6. Use vocabulary appropriate for ${gradeLevel} level
 
-        RESPONSE REQUIREMENTS:
-        - Start with warm encouragement
-        - Ask 1-2 strategic Socratic questions appropriate for ${gradeLevel} level
-        - Use age-appropriate vocabulary for the grade level
-        - Include topic-specific guidance for "${topicName.replace(/_/g, ' ')}"
-        - Add 1-2 encouraging emojis
-        - Keep to 2 sentences maximum
-        - DO NOT reveal the correct answer
-        
-        Example: "🤔 Great effort! Can you tell me what you were thinking when you picked '${selectedOption}'? Let's look at the question again - what clues can you find that might help you?"
-        
-        Return ONLY your Socratic response, nothing extra.`;
+      RESPONSE REQUIREMENTS:
+      - Start with encouraging emoji and acknowledgment of effort
+      - Clearly state: "The correct answer is [correct option]"
+      - Explain the reasoning in 1-2 simple sentences appropriate for ${gradeLevel}
+      - Keep it positive and educational, not discouraging
+      - Use topic-specific teaching points for "${topicName.replace(/_/g, ' ')}"
+      - Maximum 3 sentences total
+      - End with encouragement
+      
+      Example: "🌟 Great effort! The correct answer is '${correctOption}' because [simple explanation for ${gradeLevel} level]. This helps us understand [topic concept]!"
+      
+      Return ONLY your teaching response, nothing extra.`;
       } else if (questionType === 'fill_blank') {
         // Fill-in-the-blank question
-        reflectionPrompt = `You are Krafty, a warm and curious AI tutor using Socratic questioning to guide a ${gradeLevel} student learning English. The child gave a wrong answer to a fill-in-the-blank question, and your goal is to use strategic questions to help them discover the correct answer themselves.
+        reflectionPrompt = `You are Krafty, a warm and encouraging AI tutor helping a ${gradeLevel} student learning English. The child gave a wrong answer to a fill-in-the-blank question, and you need to directly teach them the correct answer and explain why it fits perfectly.
 
-        LEARNING CONTEXT:
-        - Grade Level: ${gradeLevel}
-        - Topic: ${topicName.replace(/_/g, ' ')}
-        - Question: "${questionText}"
-        - Student wrote: "${selectedAnswer}"
-        - Correct answer is "${correctAnswer}", but DO NOT reveal this.
+      LEARNING CONTEXT:
+      - Grade Level: ${gradeLevel}
+      - Topic: ${topicName.replace(/_/g, ' ')}
+      - Question: "${questionText}"
+      - Student wrote: "${selectedAnswer}"
+      - Correct answer: "${correctAnswer}"
 
-        SOCRATIC TEACHING APPROACH FOR FILL-IN-THE-BLANK:
-        Use targeted questions to guide discovery. Choose appropriate strategy:
-        
-        1. SOUND ANALYSIS: "What sounds do you hear at the beginning/middle/end?"
-        2. PATTERN RECOGNITION: "What word patterns or letter combinations do you know?"
-        3. MEANING CONTEXT: "What would make sense in this sentence?"
-        4. COMPARISON: "How is your answer different from what the sentence needs?"
-        5. REFLECTION: "What were you thinking when you wrote that word?"
+      DIRECT TEACHING APPROACH FOR FILL-IN-THE-BLANK:
+      1. Acknowledge their attempt warmly
+      2. State the correct word clearly
+      3. Explain why this word fits using age-appropriate reasoning:
+         - Sound patterns (phonics)
+         - Meaning in context
+         - Grammar rules (simple for grade level)
+         - Letter patterns or spelling rules
+      4. Connect to the learning topic "${topicName.replace(/_/g, ' ')}"
 
-        RESPONSE REQUIREMENTS:
-        - Start with warm encouragement about their attempt
-        - Ask 1-2 strategic Socratic questions appropriate for ${gradeLevel} level
-        - Focus on the specific learning goal in "${topicName.replace(/_/g, ' ')}"
-        - Use age-appropriate vocabulary and concepts
-        - Guide them toward the correct thinking process
-        - Add 1-2 encouraging emojis
-        - Keep to 2 sentences maximum
-        - DO NOT reveal the correct answer
-        
-        Example: "🌟 Nice try! Can you tell me what sounds you hear when you say your word slowly? Let's think about what sound would fit best at the beginning of this word."
-        
-        Return ONLY your Socratic response, nothing extra.`;
+      RESPONSE REQUIREMENTS:
+      - Start with encouraging acknowledgment
+      - Clearly state: "The correct word is '${correctAnswer}'"
+      - Explain why it fits in 1-2 simple sentences for ${gradeLevel}
+      - Use vocabulary and concepts appropriate for their grade
+      - Maximum 3 sentences total
+      - Stay positive and educational
+      
+      Example: "🌟 Nice try! The correct word is '${correctAnswer}' because [simple explanation]. This helps us practice [topic skill]!"
+      
+      Return ONLY your teaching response, nothing extra.`;
       } else if (questionType === 'drag_drop') {
-        // Drag-and-drop sorting question
-        reflectionPrompt = `You are Krafty, a warm and curious AI tutor using Socratic questioning to guide a ${gradeLevel} student learning English. The child made incorrect sorting choices in a drag-and-drop activity, and your goal is to use strategic questions to help them discover the correct sorting logic themselves.
+        // Drag-and-drop sorting question  
+        reflectionPrompt = `You are Krafty, a warm and encouraging AI tutor helping a ${gradeLevel} student learning English. The child made incorrect sorting choices in a drag-and-drop activity, and you need to directly teach them the correct sorting pattern and explain the logic.
 
-        LEARNING CONTEXT:
-        - Grade Level: ${gradeLevel}
-        - Topic: ${topicName.replace(/_/g, ' ')}
-        - Question: "${questionText}"
-        - Student's current sorting has errors
-        - There is a correct sorting pattern, but DO NOT reveal this.
+      LEARNING CONTEXT:
+      - Grade Level: ${gradeLevel}
+      - Topic: ${topicName.replace(/_/g, ' ')}
+      - Question: "${questionText}"
+      - Student made sorting errors
+      - There is a correct sorting pattern based on the topic
 
-        SOCRATIC TEACHING APPROACH FOR DRAG-AND-DROP SORTING:
-        Use targeted questions to guide discovery of sorting criteria:
-        
-        1. CRITERIA REFLECTION: "What rule are you using to sort these words?"
-        2. SOUND ANALYSIS: "What sounds do you hear in each word?"
-        3. PATTERN COMPARISON: "How are these words similar or different?"
-        4. CATEGORY THINKING: "What makes a word belong in this group?"
-        5. STRATEGY QUESTIONING: "Can you explain your thinking process?"
+      DIRECT TEACHING APPROACH FOR DRAG-AND-DROP:
+      1. Acknowledge their sorting effort
+      2. Explain the correct sorting rule/pattern
+      3. Give specific examples of why items belong in certain groups
+      4. Use simple language appropriate for ${gradeLevel}
+      5. Connect to the "${topicName.replace(/_/g, ' ')}" learning goal
 
-        RESPONSE REQUIREMENTS:
-        - Start with warm encouragement about their sorting attempt
-        - Ask 1-2 strategic Socratic questions appropriate for ${gradeLevel} level
-        - Focus on the specific sorting criteria for "${topicName.replace(/_/g, ' ')}"
-        - Use age-appropriate vocabulary and concepts
-        - Guide them to reconsider their sorting choices
-        - Add 1-2 encouraging emojis
-        - Keep to 2 sentences maximum
-        - DO NOT reveal the correct answers or sorting
-        
-        Example: "🤔 Interesting sorting! Can you tell me what sounds you hear in each word and how that helps you decide where they go? What do you notice about the vowel sounds in the words you put together?"
-        
-        Return ONLY your Socratic response, nothing extra.`;
+      RESPONSE REQUIREMENTS:
+      - Start with encouraging acknowledgment of their effort
+      - Explain the sorting rule in simple terms for ${gradeLevel}
+      - Give 1-2 specific examples of correct grouping
+      - Maximum 3 sentences total
+      - Keep it clear and educational
+      
+      Example: "🤔 Good effort sorting! The correct way to group these is [rule explanation]. For example, [specific example] because [simple reason]!"
+      
+      Return ONLY your teaching response, nothing extra.`;
       } else if (questionType === 'reading_comprehension') {
         // Reading comprehension question
-        reflectionPrompt = `You are Krafty, a warm and curious AI tutor using Socratic questioning to guide a ${gradeLevel} student learning English. The child had difficulty with reading comprehension, and your goal is to use strategic questions to help them improve their reading and understanding.
+        reflectionPrompt = `You are Krafty, a warm and encouraging AI tutor helping a ${gradeLevel} student with reading comprehension. The child chose a wrong answer, and you need to directly teach them the correct answer and explain how to find it in the text.
 
-        LEARNING CONTEXT:
-        - Grade Level: ${gradeLevel}
-        - Topic: ${topicName.replace(/_/g, ' ')}
-        - Reading Task: "${questionText}"
-        - Student's reading accuracy: ${selectedAnswer}%
-        - Target accuracy should be higher, but focus on improvement, not perfection.
+      LEARNING CONTEXT:
+      - Grade Level: ${gradeLevel}
+      - Topic: ${topicName.replace(/_/g, ' ')}
+      - Question: "${questionText}"
+      - Student chose: "${selectedAnswer}"
+      - Correct answer: "${correctAnswer}"
 
-        SOCRATIC TEACHING APPROACH FOR READING COMPREHENSION:
-        Use targeted questions to guide reading improvement:
-        
-        1. READING STRATEGY: "What strategies help you read more clearly?"
-        2. SOUND AWARENESS: "Can you tell me which words felt tricky to say?"
-        3. COMPREHENSION CHECK: "What did you understand from the passage?"
-        4. PACING REFLECTION: "How did the speed of your reading feel?"
-        5. CONFIDENCE BUILDING: "Which parts did you read really well?"
+      DIRECT TEACHING APPROACH FOR READING COMPREHENSION:
+      1. Acknowledge their reading effort
+      2. State the correct answer clearly
+      3. Explain how to find this answer in the text using simple strategies
+      4. Use reading comprehension vocabulary appropriate for ${gradeLevel}
+      5. Connect to the "${topicName.replace(/_/g, ' ')}" skill
 
-        RESPONSE REQUIREMENTS:
-        - Start with warm encouragement about their reading attempt
-        - Ask 1-2 strategic Socratic questions appropriate for ${gradeLevel} level
-        - Focus on the specific reading skills in "${topicName.replace(/_/g, ' ')}"
-        - Use age-appropriate vocabulary and concepts
-        - Guide them toward better reading strategies
-        - Add 1-2 encouraging emojis
-        - Keep to 2 sentences maximum
-        - DO NOT criticize, only guide improvement
-        
-        Example: "🌟 Great effort reading! Can you tell me which words felt the trickiest, and what strategies might help you with those words? Let's think about how we can make your reading even smoother!"
-        
-        Return ONLY your Socratic response, nothing extra.`;
-      } else {
-        // Fallback for any other question types (treat as generic)
-        const selectedOption = options ? options[selectedAnswer as number] : selectedAnswer;
-        
-        reflectionPrompt = `You are Krafty, a warm and curious AI tutor using Socratic questioning to guide a ${gradeLevel} student learning English. The child gave a wrong answer, and your goal is to use strategic questions to help them discover the correct reasoning themselves.
-
-        LEARNING CONTEXT:
-        - Grade Level: ${gradeLevel}
-        - Topic: ${topicName.replace(/_/g, ' ')}
-        - Question: "${questionText}"
-        - Student's answer: "${selectedOption}"
-        - There is a better answer, but DO NOT reveal this.
-
-        RESPONSE REQUIREMENTS:
-        - Start with warm encouragement
-        - Ask 1-2 strategic Socratic questions appropriate for ${gradeLevel} level
-        - Focus on the specific learning goal in "${topicName.replace(/_/g, ' ')}"
-        - Add 1-2 encouraging emojis
-        - Keep to 2 sentences maximum
-        - DO NOT reveal the correct answer
-        
-        Example: "🤔 Great try! Can you tell me what you were thinking? Let's look at this together - what clues can you find?"
-        
-        Return ONLY your Socratic response, nothing extra.`;
+      RESPONSE REQUIREMENTS:
+      - Start with encouraging acknowledgment
+      - Clearly state the correct answer
+      - Explain the reading strategy in simple terms for ${gradeLevel}
+      - Maximum 3 sentences total
+      - Focus on teaching the skill
+      
+      Example: "🌟 Great reading effort! The correct answer is '${correctAnswer}' because [explanation of how to find it in text]. This helps us practice [reading skill]!"
+      
+      Return ONLY your teaching response, nothing extra.`;
       }
 
       const completion = await this.client.chat.completions.create({
@@ -1104,15 +1064,16 @@ Return ONLY the new reading passage, nothing else.`;
       // Return fallback on error
       if (questionType === 'mcq' && options && Array.isArray(options)) {
         const selectedOption = options[selectedAnswer as number];
-        return `🤔 Great effort on this ${topicName.replace(/_/g, ' ').toLowerCase()} question! Can you tell me what made you choose "${selectedOption}"? Let's look at the question again together.`;
+        const correctOption = options[correctAnswer as number];
+        return `🤔 Great effort on this ${topicName.replace(/_/g, ' ').toLowerCase()} question! You chose "${selectedOption}", but the correct answer is "${correctOption}". Let me explain why that's the right choice!`;
       } else if (questionType === 'fill_blank') {
-        return `🌟 Nice try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Can you think about what sounds you hear when you say that word? What other word might fit better here?`;
+        return `🌟 Nice try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! The correct answer is "${correctAnswer}". Let me help you understand why this word fits perfectly here!`;
       } else if (questionType === 'drag_drop') {
-        return `🤔 Interesting sorting work on ${topicName.replace(/_/g, ' ').toLowerCase()}! Can you tell me what rule you're using to sort these words? What sounds do you hear in each word?`;
+        return `🤔 Good effort with your ${topicName.replace(/_/g, ' ').toLowerCase()} sorting! Let me show you the correct pattern and explain why it works this way.`;
       } else if (questionType === 'reading_comprehension') {
-        return `🌟 Great effort reading! Can you tell me which words felt the trickiest? What strategies might help you read even better?`;
+        return `🌟 Great effort reading! The correct answer is "${correctAnswer}". Let me explain why this is the best choice based on what we read.`;
       } else {
-        return `🤔 Great try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Can you tell me what you were thinking? Let's look at this together.`;
+        return `🤔 Great try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Let me explain the correct answer and help you understand why it's right.`;
       }
     }
   }

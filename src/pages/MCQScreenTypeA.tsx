@@ -1281,6 +1281,34 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   ))}
                 </div>
                 
+                {/* Speaker button - positioned at bottom right inside notepad */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    playClickSound();
+                    // Stop any current speech and speak the question
+                    ttsService.stop();
+                    
+                    const questionTextToSpeak = isReadingComprehension
+                      ? (contextualQuestions[currentQuestionIndex] || currentQuestion.passage || '')
+                      : displayQuestionText;
+                    
+                    setIsSpeaking(true);
+                    ttsService.speakQuestion(questionTextToSpeak).finally(() => {
+                      setIsSpeaking(false);
+                    });
+                  }}
+                  className={cn(
+                    "absolute bottom-4 right-4 h-12 w-12 rounded-lg border-2 border-black bg-white hover:bg-primary hover:text-primary-foreground z-10 transition-all duration-200 hover:scale-110",
+                    isSpeaking && "animate-pulse"
+                  )}
+                  style={{ boxShadow: '0 4px 0 black' }}
+                  title="Read the question aloud"
+                >
+                  <Volume2 className="h-5 w-5" />
+                </Button>
+
                 {/* Question content */}
                 <div className="mt-2">
                   <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">
@@ -1807,7 +1835,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                           >
                             <div
                               className={cn(
-                                "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                                "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200 relative",
                                 message.type === 'user' 
                                   ? "bg-primary text-primary-foreground" 
                                   : "bg-card border-2"
@@ -1817,7 +1845,22 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                               <div className="font-medium text-xs mb-1 opacity-70">
                                 {message.type === 'user' ? 'You' : '🤖 Krafty'}
                               </div>
-                              <div>{message.content}</div>
+                              <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
+                              {/* Speaker button for AI messages only */}
+                              {message.type === 'ai' && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={async () => {
+                                    playClickSound();
+                                    await ttsService.speakAIMessage(message.content);
+                                  }}
+                                  className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+                                  aria-label="Play message"
+                                >
+                                  <Volume2 className="h-3 w-3" />
+                                </Button>
+                              )}
                             </div>
                           </div>
                         ))

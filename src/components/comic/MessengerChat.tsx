@@ -2,9 +2,10 @@ import React, { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mic, Send, X, Square, Image as ImageIcon, ArrowUpRight } from "lucide-react";
+import { Mic, Send, X, Square, Image as ImageIcon, ArrowUpRight, Volume2 } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
+import { ttsService } from "@/lib/tts-service";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -281,13 +282,28 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                   
                   <div
                     className={cn(
-                      "max-w-56 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-[0_4px_0_black]",
+                      "max-w-56 rounded-lg px-4 py-3 text-sm max-h-24 overflow-y-auto shadow-[0_4px_0_black] relative",
                       message.type === 'user' 
                         ? "bg-primary text-primary-foreground border-2 border-black backdrop-blur-sm" 
                         : "bg-white/95 text-black border-2 border-black backdrop-blur-sm"
                     )}
                   >
-                    <div className="break-words font-medium">{message.content}</div>
+                    <div className="break-words font-medium pr-6">{message.content}</div>
+                    {/* Speaker button for AI messages only */}
+                    {message.type === 'ai' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          playClickSound();
+                          await ttsService.speakAIMessage(message.content);
+                        }}
+                        className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+                        aria-label="Play message"
+                      >
+                        <Volume2 className="h-3 w-3" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}

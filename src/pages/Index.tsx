@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2 } from "lucide-react";
 import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound } from "@/lib/sounds";
@@ -1378,7 +1378,7 @@ const Index = () => {
                                 >
                                   <div
                                     className={cn(
-                                      "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                                      "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200 relative",
                                       message.type === 'user' 
                                         ? "bg-primary text-primary-foreground" 
                                         : "bg-card border-2"
@@ -1388,7 +1388,22 @@ const Index = () => {
                                     <div className="font-medium text-xs mb-1 opacity-70">
                                       {message.type === 'user' ? 'You' : '🤖 Krafty'}
                                     </div>
-                                    <div>{message.content}</div>
+                                    <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
+                                    {/* Speaker button for AI messages only */}
+                                    {message.type === 'ai' && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={async () => {
+                                          playClickSound();
+                                          await ttsService.speakAIMessage(message.content);
+                                        }}
+                                        className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+                                        aria-label="Play message"
+                                      >
+                                        <Volume2 className="h-3 w-3" />
+                                      </Button>
+                                    )}
                                   </div>
                                 </div>
                               ))}

@@ -18,7 +18,7 @@ class TextToSpeechService {
   }
 
   private initialize() {
-    // Check if ElevenLabs API key is available
+    // Check if Jessica's TTS API key is available
     const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
     
     if (apiKey) {
@@ -27,19 +27,19 @@ class TextToSpeechService {
       });
       this.isInitialized = true;
     } else {
-      console.warn('VITE_ELEVENLABS_API_KEY not found. TTS service will not be available.');
+      console.warn('Jessica\'s TTS API key not found. TTS service will not be available.');
       this.isInitialized = false;
     }
   }
 
-  // Speak text using ElevenLabs API
+  // Speak text using Jessica's tone
   async speak(text: string, options?: TTSOptions): Promise<void> {
     // Clean the text for better speech
     const cleanText = this.cleanTextForSpeech(text);
     
     // If not initialized or no API key, skip TTS
     if (!this.isInitialized || !this.client) {
-      console.warn('ElevenLabs TTS not configured. Cannot speak text.');
+      console.warn('Jessica\'s TTS not configured. Cannot speak text.');
       return;
     }
 
@@ -47,10 +47,10 @@ class TextToSpeechService {
       // Stop any current audio
       this.stop();
 
-      // Default voice settings for children's content
-      const voiceId = options?.voice || 'cgSgspJ2msm6clMCkdW9'; // Jessica
+      // Jessica's voice settings for children's content
+      const voiceId = options?.voice || 'cgSgspJ2msm6clMCkdW9'; // Jessica's tone
 
-      // Generate audio using ElevenLabs API (corrected method call)
+      // Generate audio using Jessica's tone
       const audioStream = await this.client.textToSpeech.convert(
         voiceId,  // First parameter: voice ID as string
         {         // Second parameter: options object
@@ -88,12 +88,12 @@ class TextToSpeechService {
       this.currentAudio.onerror = () => {
         this.isSpeaking = false;
         URL.revokeObjectURL(audioUrl);
-        console.error('Error playing ElevenLabs TTS audio');
+        console.error('Error playing Jessica\'s TTS audio');
       };
 
       await this.currentAudio.play();
     } catch (error) {
-      console.error('ElevenLabs TTS error:', error);
+      console.error('Jessica\'s TTS error:', error);
       this.isSpeaking = false;
     }
   }
@@ -137,16 +137,16 @@ class TextToSpeechService {
   // Get configuration status
   getStatus(): { configured: boolean; message: string } {
     if (this.isInitialized) {
-      return { configured: true, message: 'ElevenLabs TTS is ready!' };
+      return { configured: true, message: 'Jessica\'s TTS is ready!' };
     } else {
       return { 
         configured: false, 
-        message: 'ElevenLabs API key required for TTS functionality.' 
+        message: 'Jessica\'s TTS API key required for TTS functionality.' 
       };
     }
   }
 
-  // Speak question automatically with appropriate voice settings for educational content
+  // Speak question automatically with Jessica's tone for educational content
   async speakQuestion(questionText: string): Promise<void> {
     await this.speak(questionText, {
       stability: 0.6,
@@ -154,7 +154,7 @@ class TextToSpeechService {
     });
   }
 
-  // Speak AI messages with friendly, encouraging tone
+  // Speak AI messages with Jessica's friendly, encouraging tone
   async speakAIMessage(message: string): Promise<void> {
     await this.speak(message, {
       stability: 0.7,
@@ -162,7 +162,7 @@ class TextToSpeechService {
     });
   }
 
-  // Speak answer text (for the speaker button beside image)
+  // Speak answer text with Jessica's tone (for the speaker button beside image)
   async speakAnswer(answerText: string): Promise<void> {
     await this.speak(answerText, {
       stability: 0.5,

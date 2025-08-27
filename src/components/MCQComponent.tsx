@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X, ChevronRight } from 'lucide-react';
+import { Check, X, ChevronRight, Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { playClickSound, playMessageSound } from '@/lib/sounds';
 

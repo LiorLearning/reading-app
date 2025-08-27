@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown, MessageCircle } from "lucide-react";
+import { ChevronUp, ChevronDown, MessageCircle, Volume2 } from "lucide-react";
+import { ttsService } from "@/lib/tts-service";
+import { playClickSound } from "@/lib/sounds";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -71,7 +73,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
                 >
                   <div
                     className={cn(
-                      "max-w-[80%] rounded-lg px-3 py-2 text-sm shadow-sm",
+                      "max-w-[80%] rounded-lg px-3 py-2 text-sm shadow-sm relative",
                       message.type === 'user' 
                         ? "bg-primary text-primary-foreground ml-4" 
                         : "bg-card border border-foreground/20 mr-4"
@@ -80,7 +82,22 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
                     <div className="font-medium text-xs mb-1 opacity-70">
                       {message.type === 'user' ? 'You' : '🤖 AI Helper'}
                     </div>
-                    <div>{message.content}</div>
+                    <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
+                    {/* Speaker button for AI messages only */}
+                    {message.type === 'ai' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          playClickSound();
+                          await ttsService.speakAIMessage(message.content);
+                        }}
+                        className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+                        aria-label="Play message"
+                      >
+                        <Volume2 className="h-3 w-3" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
