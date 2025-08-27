@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { playClickSound } from "@/lib/sounds";
-import { Sparkles, Plus, Rocket, ChevronDown, GraduationCap } from "lucide-react";
-import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress, loadAdventureSummaries, AdventureSummary, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from "@/lib/utils";
+import { Sparkles, Plus, Rocket } from "lucide-react";
+import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress, loadAdventureSummaries, AdventureSummary } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 
 interface UserData {
   username: string;
   grade: string;
   gradeDisplayName: string;
+  level: string;
+  levelDisplayName: string;
   isFirstTime: boolean;
 }
 
@@ -18,7 +19,7 @@ interface HomePageProps {
   onNavigate: (path: 'start' | 'middle' | 'topics') => void;
   onStartAdventure: (topicId: string, mode: 'new' | 'continue') => void;
   onContinueSpecificAdventure?: (adventureId: string) => void;
-
+  selectedTopicFromPreference?: string | null;
 }
 
 // Sample adventure data template
@@ -52,42 +53,26 @@ const topPicks = [
   }
 ];
 
-const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure }) => {
+const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure, selectedTopicFromPreference }) => {
   // Progress tracking state
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [nextTopicId, setNextTopicId] = useState<string | null>(null);
   const [savedAdventures, setSavedAdventures] = useState<AdventureSummary[]>([]);
-  const [selectedPreference, setSelectedPreference] = useState<'start' | 'middle' | null>(null);
-  const [selectedTopicFromPreference, setSelectedTopicFromPreference] = useState<string | null>(null);
   
   // Load user progress and saved adventures on component mount
   useEffect(() => {
     const progress = loadUserProgress();
     setUserProgress(progress);
     
-    // Load topic preference
-    const preference = loadTopicPreference();
-    setSelectedPreference(preference?.level || null);
-    
     // Get all available topic IDs from MCQ data
     const allTopicIds = Object.keys(sampleMCQData.topics);
-    let nextTopic = getNextTopic(allTopicIds);
-    
-    // If there's a preference, get the specific topic for that preference
-    if (preference?.level) {
-      const preferredTopic = getNextTopicByPreference(allTopicIds, preference.level);
-      if (preferredTopic) {
-        nextTopic = preferredTopic;
-        setSelectedTopicFromPreference(preferredTopic);
-      }
-    }
-    
+    const nextTopic = getNextTopic(allTopicIds);
     setNextTopicId(nextTopic);
     
     // Load saved adventures
     const adventures = loadAdventureSummaries();
     setSavedAdventures(adventures);
-  }, []);
+  }, [userData]);
 
   // Function to refresh saved adventures (call this from parent when new adventure is saved)
   const refreshSavedAdventures = () => {
@@ -142,42 +127,12 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
   const handleStartAdventure = (mode: 'new' | 'continue') => {
     playClickSound();
     
-    // Check if user has selected a level preference first
-    if (mode === 'new' && !selectedPreference) {
-      alert('Please select a level (Start or Middle) from the Grade Selection dropdown first!');
-      return;
-    }
-    
-    let topicToUse = nextTopicId;
-    
-    // If user has selected a topic from preference, use that specific topic
-    if (mode === 'new' && selectedTopicFromPreference) {
-      topicToUse = selectedTopicFromPreference;
-    }
+    // Prioritize selected topic from preference, fallback to default next topic
+    const topicToUse = selectedTopicFromPreference || nextTopicId;
     
     if (topicToUse) {
       onStartAdventure(topicToUse, mode);
     }
-  };
-
-  const handlePreferenceSelection = (level: 'start' | 'middle') => {
-    playClickSound();
-    
-    // Get all available topic IDs from MCQ data in order
-    const allTopicIds = Object.keys(sampleMCQData.topics);
-    
-    // Save preference and get the specific topic immediately
-    const specificTopic = saveTopicPreference(level, allTopicIds);
-    
-    setSelectedPreference(level);
-    setSelectedTopicFromPreference(specificTopic);
-    
-    // Update next topic immediately
-    if (specificTopic) {
-      setNextTopicId(specificTopic);
-    }
-    
-    console.log(`Selected ${level} level. Next topic: ${specificTopic}`);
   };
 
 
@@ -209,39 +164,33 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
               </h2>
             </div>
             
-            <div className="flex justify-center">
-              <div className="flex justify-center w-full max-w-2xl">
-                {/* Start New Adventure Button */}
-                <div 
-                  onClick={() => handleStartAdventure('new')}
-                  className="group cursor-pointer w-full"
-                >
-                  <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white text-center hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
-                       style={{ minHeight: '180px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div className="mb-4">
-                      <Plus className="h-12 w-12 mx-auto mb-3" />
-                      <Sparkles className="h-6 w-6 mx-auto" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2">
-                      START NEW ADVENTURE
-                    </h3>
-                    <p className="text-purple-100 text-sm mb-1">
-                      Begin a fresh new adventure
-                    </p>
-                    {selectedTopicFromPreference ? (
-                      <p className="text-purple-200 text-xs">
-                        Ready to start with topic: {selectedTopicFromPreference} ✨
-                      </p>
-                    ) : selectedPreference ? (
-                      <p className="text-purple-200 text-xs">
-                        {selectedPreference === 'start' ? 'Beginning' : 'Intermediate'} level selected
-                      </p>
-                    ) : (
-                      <p className="text-purple-200 text-xs">
-                        Select a level in Grade Selection first!
-                      </p>
-                    )}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Start New Adventure Button - spans full width on mobile, single column on larger screens */}
+              <div 
+                onClick={() => handleStartAdventure('new')}
+                className="group cursor-pointer md:col-span-2"
+              >
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white text-center hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+                     style={{ minHeight: '180px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div className="mb-4">
+                    <Plus className="h-12 w-12 mx-auto mb-3" />
+                    <Sparkles className="h-6 w-6 mx-auto" />
                   </div>
+                  <h3 className="text-2xl font-bold mb-2">
+                    START NEW ADVENTURE
+                  </h3>
+                  <p className="text-purple-100 text-sm mb-1">
+                    Begin a fresh new adventure
+                  </p>
+                  {selectedTopicFromPreference ? (
+                    <p className="text-purple-200 text-xs">
+                      Ready to start with topic: {selectedTopicFromPreference} ✨
+                    </p>
+                  ) : (
+                    <p className="text-purple-200 text-xs">
+                      Ready to start your next topic!
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -423,83 +372,6 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
         </section>
 
 
-      </div>
-      
-      {/* Grade Selection Dropdown - Floating on Right Side */}
-      <div className="fixed top-24 right-6 z-50">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="default"
-              className={`border-2 ${selectedPreference ? 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'} text-white rounded-xl px-4 py-3 font-semibold btn-animate flex items-center gap-2 shadow-lg transition-all duration-300`}
-              style={{ boxShadow: selectedPreference ? '0 4px 0 #15803d' : '0 4px 0 #1d4ed8' }}
-              onClick={() => playClickSound()}
-            >
-              <GraduationCap className="h-5 w-5" />
-              {selectedTopicFromPreference ? `Next: ${selectedTopicFromPreference}` : selectedPreference ? `${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` : 'Grade Selection'}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            className="w-56 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
-            align="end"
-          >
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg">
-                <span className="text-lg">🎓</span>
-                <span className="font-semibold">Grade 1</span>
-                {selectedTopicFromPreference && (
-                  <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    {selectedTopicFromPreference} ready
-                  </span>
-                )}
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent 
-                className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
-              >
-                <DropdownMenuItem 
-                  className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedPreference === 'start' ? 'bg-green-100' : ''}`}
-                  onClick={() => handlePreferenceSelection('start')}
-                >
-                  <span className="text-lg">🌱</span>
-                  <div>
-                    <div className="font-semibold">Start</div>
-                    <div className="text-sm text-gray-500">Beginning level</div>
-                  </div>
-                  {selectedPreference === 'start' && (
-                    <span className="ml-auto text-green-600">✓</span>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedPreference === 'middle' ? 'bg-blue-100' : ''}`}
-                  onClick={() => handlePreferenceSelection('middle')}
-                >
-                  <span className="text-lg">🚀</span>
-                  <div>
-                    <div className="font-semibold">Middle</div>
-                    <div className="text-sm text-gray-500">Intermediate level</div>
-                  </div>
-                  {selectedPreference === 'middle' && (
-                    <span className="ml-auto text-blue-600">✓</span>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-purple-50 cursor-pointer rounded-lg"
-                  onClick={() => {
-                    playClickSound();
-                    onNavigate('topics');
-                  }}
-                >
-                  <span className="text-lg">📚</span>
-                  <div>
-                    <div className="font-semibold">Choose Topic</div>
-                    <div className="text-sm text-gray-500">Pick your adventure</div>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </main>
   );

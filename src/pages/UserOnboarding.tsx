@@ -8,10 +8,16 @@ import { ChevronRight, User, GraduationCap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface UserOnboardingProps {
-  onComplete: (userData: { username: string; grade: string; gradeDisplayName: string }) => void;
+  onComplete: (userData: { username: string; grade: string; gradeDisplayName: string; level: string; levelDisplayName: string }) => void;
 }
 
 interface GradeOption {
+  value: string;
+  label: string;
+  displayName: string;
+}
+
+interface LevelOption {
   value: string;
   label: string;
   displayName: string;
@@ -21,9 +27,15 @@ const grades: GradeOption[] = [
   { value: "grade1", label: "1st Grade", displayName: "1st Grade" },
 ];
 
+const levels: LevelOption[] = [
+  { value: "start", label: "Start Level", displayName: "Start Level" },
+  { value: "mid", label: "Mid Level", displayName: "Mid Level" },
+];
+
 const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   const [username, setUsername] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState("");
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
 
   const handleUsernameSubmit = () => {
@@ -38,14 +50,22 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     setSelectedGrade(gradeValue);
   };
 
+  const handleLevelSelect = (levelValue: string) => {
+    playClickSound();
+    setSelectedLevel(levelValue);
+  };
+
   const handleComplete = () => {
-    if (username.trim() && selectedGrade) {
+    if (username.trim() && selectedGrade && selectedLevel) {
       playClickSound();
       const selectedGradeObj = grades.find(g => g.value === selectedGrade);
+      const selectedLevelObj = levels.find(l => l.value === selectedLevel);
       onComplete({
         username: username.trim(),
         grade: selectedGrade,
-        gradeDisplayName: selectedGradeObj?.displayName || selectedGrade
+        gradeDisplayName: selectedGradeObj?.displayName || selectedGrade,
+        level: selectedLevel,
+        levelDisplayName: selectedLevelObj?.displayName || selectedLevel
       });
     }
   };
@@ -54,7 +74,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     if (e.key === 'Enter') {
       if (step === 1) {
         handleUsernameSubmit();
-      } else if (step === 2 && selectedGrade) {
+      } else if (step === 2 && selectedGrade && selectedLevel) {
         handleComplete();
       }
     }
@@ -218,12 +238,41 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                     </Select>
                   </div>
 
-                  {/* Preview */}
+                  {/* Level Selection - Only show when grade is selected */}
                   {selectedGrade && (
+                    <div>
+                      <label htmlFor="level" className="block text-lg font-semibold text-gray-700 mb-3">
+                        Select Your Level:
+                      </label>
+                      <Select onValueChange={handleLevelSelect} value={selectedLevel}>
+                        <SelectTrigger 
+                          id="level"
+                          className="h-14 text-lg border-3 border-black rounded-xl bg-white hover:bg-gray-50 focus:bg-gray-50"
+                          style={{ boxShadow: '0 4px 0 black' }}
+                        >
+                          <SelectValue placeholder="Choose your level..." />
+                        </SelectTrigger>
+                        <SelectContent className="border-2 border-black rounded-xl bg-white">
+                          {levels.map((level) => (
+                            <SelectItem 
+                              key={level.value} 
+                              value={level.value}
+                              className="text-lg py-3 hover:bg-primary/10 cursor-pointer"
+                            >
+                              {level.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Preview */}
+                  {selectedGrade && selectedLevel && (
                     <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
                       <p className="text-blue-800 font-medium text-center flex items-center justify-center gap-2">
                         <Sparkles className="h-4 w-4" />
-                        Hello {username}! Ready for {grades.find(g => g.value === selectedGrade)?.label} adventures?
+                        Hello {username}! Ready for {grades.find(g => g.value === selectedGrade)?.label} {levels.find(l => l.value === selectedLevel)?.label} adventures?
                         <Sparkles className="h-4 w-4" />
                       </p>
                     </div>
@@ -241,16 +290,16 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                     
                     <Button
                       onClick={handleComplete}
-                      disabled={!selectedGrade}
+                      disabled={!selectedGrade || !selectedLevel}
                       className={cn(
                         "flex-1 h-12 text-lg font-bold rounded-xl border-3 btn-animate flex items-center justify-center gap-2",
-                        selectedGrade 
+                        (selectedGrade && selectedLevel)
                           ? "bg-green-600 hover:bg-green-700 text-white" 
                           : "bg-gray-400 text-gray-600 cursor-not-allowed"
                       )}
                       style={{ 
-                        borderColor: selectedGrade ? '#16a34a' : '#9ca3af',
-                        boxShadow: selectedGrade ? '0 6px 0 #16a34a' : '0 4px 0 #6b7280'
+                        borderColor: (selectedGrade && selectedLevel) ? '#16a34a' : '#9ca3af',
+                        boxShadow: (selectedGrade && selectedLevel) ? '0 6px 0 #16a34a' : '0 4px 0 #6b7280'
                       }}
                     >
                       <Sparkles className="h-4 w-4" />

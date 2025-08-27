@@ -48,7 +48,7 @@ class TextToSpeechService {
       this.stop();
 
       // Default voice settings for children's content
-      const voiceId = options?.voice || 'EXAVITQu4vr4xnSDxMaL'; // Bella - good for educational content
+      const voiceId = options?.voice || 'cgSgspJ2msm6clMCkdW9'; // Jessica
 
       // Generate audio using ElevenLabs API (corrected method call)
       const audioStream = await this.client.textToSpeech.convert(

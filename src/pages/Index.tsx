@@ -5,9 +5,10 @@ import MessengerChat from "@/components/comic/MessengerChat";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary } from "@/lib/utils";
+import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown } from "lucide-react";
+import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -35,6 +36,8 @@ interface UserData {
   username: string;
   grade: string;
   gradeDisplayName: string;
+  level: string;
+  levelDisplayName: string;
   isFirstTime: boolean;
 }
 
@@ -133,6 +136,10 @@ const Index = () => {
   // Current adventure tracking
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(null);
   const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
+  
+  // Grade selection state (for HomePage only)
+  const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
+  const [selectedTopicFromPreference, setSelectedTopicFromPreference] = React.useState<string | null>(null);
   
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
@@ -329,6 +336,50 @@ const Index = () => {
   useEffect(() => {
     changeTheme(selectedTheme);
   }, [selectedTheme, changeTheme]);
+  
+  // Grade selection logic (for HomePage only)
+  useEffect(() => {
+    if (userData && currentScreen === -1) { // Only on HomePage
+      // Load user progress to check for current topic
+      const userProgress = loadUserProgress();
+      
+      // Use saved preference first, then fallback to userData level
+      let preferenceLevel: 'start' | 'middle' | null = null;
+      
+      // First check localStorage for user's manual selection
+      const preference = loadTopicPreference();
+      console.log('Loaded preference from localStorage:', preference);
+      
+      if (preference?.level) {
+        preferenceLevel = preference.level;
+        console.log('Using saved preference:', preferenceLevel);
+      } else if (userData?.level) {
+        // Fallback to userData level only if no saved preference
+        preferenceLevel = userData.level === 'mid' ? 'middle' : userData.level as 'start' | 'middle';
+        console.log('Using userData.level:', userData.level, 'converted to:', preferenceLevel);
+      }
+      
+      console.log('Setting selectedPreference to:', preferenceLevel);
+      setSelectedPreference(preferenceLevel);
+      
+      // First, check if there's a current topic saved from previous selection
+      if (userProgress?.currentTopicId) {
+        console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
+        setSelectedTopicFromPreference(userProgress.currentTopicId);
+      } else if (preferenceLevel) {
+        // If no saved current topic, generate one based on preference level
+        console.log('Generating new topic for preference level:', preferenceLevel);
+        const allTopicIds = Object.keys(sampleMCQData.topics);
+        const preferredTopic = getNextTopicByPreference(allTopicIds, preferenceLevel);
+        if (preferredTopic) {
+          console.log('Generated preferred topic:', preferredTopic);
+          setSelectedTopicFromPreference(preferredTopic);
+        }
+      } else {
+        console.log('No preference level or current topic found');
+      }
+    }
+  }, [userData, currentScreen]);
   
   // Chat panel resize functionality - now proportional
   const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(20); // 20% of container width (smaller default)
@@ -611,7 +662,7 @@ const Index = () => {
   }, []);
 
   // Handle onboarding completion
-  const handleOnboardingComplete = React.useCallback((newUserData: { username: string; grade: string; gradeDisplayName: string }) => {
+  const handleOnboardingComplete = React.useCallback((newUserData: { username: string; grade: string; gradeDisplayName: string; level: string; levelDisplayName: string }) => {
     const userData: UserData = {
       ...newUserData,
       isFirstTime: false
@@ -777,6 +828,24 @@ const Index = () => {
     setCurrentScreen(1); // Go to adventure screen first to show AI response
   }, [currentAdventureId]);
 
+  // Handle preference selection (for HomePage only)
+  const handlePreferenceSelection = React.useCallback((level: 'start' | 'middle') => {
+    playClickSound();
+    
+    // Get all available topic IDs from MCQ data in order
+    const allTopicIds = Object.keys(sampleMCQData.topics);
+    
+    // Save preference and get the specific topic immediately
+    const specificTopic = saveTopicPreference(level, allTopicIds);
+    
+    console.log(`Preference selection - Level: ${level}, Topic: ${specificTopic}`);
+    
+    setSelectedPreference(level);
+    setSelectedTopicFromPreference(specificTopic);
+    
+    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}`);
+  }, []);
+
   // Handle session closing and save current adventure
   const handleCloseSession = React.useCallback(async () => {
     if (chatMessages.length >= 3 && currentAdventureId) {
@@ -869,6 +938,93 @@ const Index = () => {
               >
                 🏠 Home
               </Button>
+            )}
+            
+            {/* Grade Selection Button - Only show on HomePage */}
+            {userData && currentScreen === -1 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="default"
+                    className={`border-2 ${selectedPreference ? 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'} text-white rounded-xl px-4 py-3 font-semibold btn-animate flex items-center gap-2 shadow-lg transition-all duration-300`}
+                    style={{ boxShadow: selectedPreference ? '0 4px 0 #15803d' : '0 4px 0 #1d4ed8' }}
+                    onClick={() => playClickSound()}
+                  >
+                    <GraduationCap className="h-5 w-5" />
+                    {(() => {
+                      const buttonText = selectedTopicFromPreference 
+                        ? `Next: ${selectedTopicFromPreference}` 
+                        : selectedPreference 
+                          ? `${userData?.gradeDisplayName || 'Grade'} ${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` 
+                          : 'Grade Selection';
+                      console.log('Button render - selectedTopicFromPreference:', selectedTopicFromPreference, 'selectedPreference:', selectedPreference, 'buttonText:', buttonText);
+                      return buttonText;
+                    })()}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  className="w-56 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                  align="start"
+                >
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg">
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">Grade 1</span>
+                      {selectedTopicFromPreference && (
+                        <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                          {selectedTopicFromPreference} ready
+                        </span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedPreference === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {(() => {
+                          console.log('Start item render - selectedPreference:', selectedPreference, 'is selected:', selectedPreference === 'start');
+                          return selectedPreference === 'start' ? <span className="ml-auto text-green-600">✓</span> : null;
+                        })()}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedPreference === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {(() => {
+                          console.log('Middle item render - selectedPreference:', selectedPreference, 'is selected:', selectedPreference === 'middle');
+                          return selectedPreference === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null;
+                        })()}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="flex items-center gap-2 px-4 py-3 hover:bg-purple-50 cursor-pointer rounded-lg"
+                        onClick={() => {
+                          playClickSound();
+                          setCurrentScreen(0); // Navigate to topics screen
+                        }}
+                      >
+                        <span className="text-lg">📚</span>
+                        <div>
+                          <div className="font-semibold">Choose Topic</div>
+                          <div className="text-sm text-gray-500">Pick your adventure</div>
+                        </div>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
           
@@ -1056,12 +1212,12 @@ const Index = () => {
         {showOnboarding ? (
           <UserOnboarding onComplete={handleOnboardingComplete} />
         ) : currentScreen === -1 ? (
-          <HomePage 
+                    <HomePage 
             userData={userData!} 
             onNavigate={handleHomeNavigation} 
             onStartAdventure={handleStartAdventure} 
             onContinueSpecificAdventure={handleContinueSpecificAdventure}
- 
+            selectedTopicFromPreference={selectedTopicFromPreference}
           />
         ) : currentScreen === 0 ? (
           <TopicSelection onTopicSelect={handleTopicSelect} />
