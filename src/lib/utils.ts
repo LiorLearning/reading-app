@@ -71,6 +71,13 @@ export const clearUserAdventure = (): void => {
   }
 };
 
+// Comic panel type for saved adventures
+export interface ComicPanel {
+  id: string;
+  image: string;
+  text: string;
+}
+
 // Adventure storage types and utilities
 export interface SavedAdventure {
   id: string;
@@ -81,6 +88,7 @@ export interface SavedAdventure {
   lastPlayedAt: number;
   comicPanelImage?: string;
   topicId?: string;
+  comicPanels?: ComicPanel[]; // Store the comic panels
 }
 
 export interface AdventureSummary {
@@ -557,4 +565,137 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
   
   // All topics completed, return first topic for replay
   return allTopicIds[0] || null;
+};
+
+// Local storage key for cached adventure images
+const CACHED_ADVENTURE_IMAGES_KEY = 'readingapp_cached_adventure_images';
+
+// Interface for cached adventure images
+export interface CachedAdventureImage {
+  id: string;
+  url: string;
+  prompt: string;
+  adventureContext: string;
+  timestamp: number;
+  adventureId?: string;
+}
+
+/**
+ * Save a generated adventure image to local cache
+ */
+export const cacheAdventureImage = (
+  url: string, 
+  prompt: string, 
+  adventureContext: string = '',
+  adventureId?: string
+): void => {
+  try {
+    // Don't cache if URL is null, empty, or a local asset
+    if (!url || url.startsWith('/') || url.startsWith('data:')) {
+      return;
+    }
+
+    const cached = loadCachedAdventureImages();
+    
+    // Create new cached image entry
+    const newImage: CachedAdventureImage = {
+      id: crypto.randomUUID(),
+      url,
+      prompt,
+      adventureContext,
+      timestamp: Date.now(),
+      adventureId
+    };
+
+    // Remove any existing image with the same URL to avoid duplicates
+    const filteredImages = cached.filter(img => img.url !== url);
+    
+    // Add new image and keep only the last 10 adventure images (sorted by timestamp)
+    const updatedImages = [...filteredImages, newImage]
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 10);
+
+    localStorage.setItem(CACHED_ADVENTURE_IMAGES_KEY, JSON.stringify(updatedImages));
+    
+    console.log(`🖼️ Cached adventure image: ${prompt.substring(0, 50)}...`);
+  } catch (error) {
+    console.warn('Failed to cache adventure image:', error);
+  }
+};
+
+/**
+ * Load all cached adventure images (most recent first)
+ */
+export const loadCachedAdventureImages = (): CachedAdventureImage[] => {
+  try {
+    const stored = localStorage.getItem(CACHED_ADVENTURE_IMAGES_KEY);
+    if (!stored) {
+      return [];
+    }
+    
+    const parsed = JSON.parse(stored);
+    
+    // Validate the structure
+    if (Array.isArray(parsed)) {
+      return parsed
+        .filter((img): img is CachedAdventureImage => 
+          typeof img === 'object' && 
+          img !== null &&
+          typeof img.id === 'string' &&
+          typeof img.url === 'string' &&
+          typeof img.prompt === 'string' &&
+          typeof img.adventureContext === 'string' &&
+          typeof img.timestamp === 'number'
+        )
+        .sort((a, b) => b.timestamp - a.timestamp); // Most recent first
+    }
+    
+    return [];
+  } catch (error) {
+    console.warn('Failed to load cached adventure images from local storage:', error);
+    return [];
+  }
+};
+
+/**
+ * Get cached adventure images for a specific adventure
+ */
+export const getCachedImagesForAdventure = (adventureId: string): CachedAdventureImage[] => {
+  const allCached = loadCachedAdventureImages();
+  return allCached.filter(img => img.adventureId === adventureId);
+};
+
+/**
+ * Get recent cached adventure images (last 5 by default)
+ */
+export const getRecentCachedAdventureImages = (limit: number = 5): CachedAdventureImage[] => {
+  const allCached = loadCachedAdventureImages();
+  return allCached.slice(0, limit);
+};
+
+/**
+ * Clear all cached adventure images
+ */
+export const clearCachedAdventureImages = (): void => {
+  try {
+    localStorage.removeItem(CACHED_ADVENTURE_IMAGES_KEY);
+    console.log('🗑️ Cleared all cached adventure images');
+  } catch (error) {
+    console.warn('Failed to clear cached adventure images:', error);
+  }
+};
+
+/**
+ * Get adventure image cache statistics
+ */
+export const getAdventureImageCacheStats = (): { totalImages: number, totalSize: string, oldestImage: number, newestImage: number } => {
+  const cached = loadCachedAdventureImages();
+  const totalSize = localStorage.getItem(CACHED_ADVENTURE_IMAGES_KEY)?.length || 0;
+  
+  return {
+    totalImages: cached.length,
+    totalSize: `${(totalSize / 1024).toFixed(2)} KB`,
+    oldestImage: cached.length > 0 ? Math.min(...cached.map(img => img.timestamp)) : 0,
+    newestImage: cached.length > 0 ? Math.max(...cached.map(img => img.timestamp)) : 0
+  };
 };

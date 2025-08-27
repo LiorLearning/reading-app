@@ -833,27 +833,27 @@ Return ONLY the new reading passage, nothing else.`;
     const prompts: string[] = [];
 
     if (adventureContext && adventureContext.trim()) {
-      // Option 1: Full adventure context integration
+      // Option 1: Full adventure context integration with realistic emphasis
       prompts.push(
-        `Create a vivid adventure scene: ${prompt}. Adventure context: ${adventureContext}. Make it exciting and story-driven for children.`
+        `Create a vivid, realistic adventure scene: ${prompt}. Adventure context: ${adventureContext}. Make it exciting, story-driven, and photorealistic for children.`
       );
 
-      // Option 2: Simplified adventure context
+      // Option 2: Simplified adventure context with realistic style
       prompts.push(
-        `${prompt} in the context of: ${adventureContext}. Make it adventurous and fun for kids.`
+        `${prompt} in the context of: ${adventureContext}. Make it realistic, adventurous and fun for kids.`
       );
 
-      // Option 3: Adventure context as setting
+      // Option 3: Adventure context as setting with realistic details
       prompts.push(
-        `Adventure scene: ${prompt}. Setting and characters from: ${adventureContext}. Child-friendly and exciting.`
+        `Realistic adventure scene: ${prompt}. Setting and characters from: ${adventureContext}. Child-friendly, exciting, and photorealistic.`
       );
     }
 
-    // Option 4: Fallback with basic adventure feel
-    prompts.push(`${prompt}, ${fallbackPrompt}, make it adventurous and exciting for children`);
+    // Option 4: Fallback with basic adventure feel and realistic style
+    prompts.push(`${prompt}, ${fallbackPrompt}, make it realistic, adventurous and exciting for children`);
 
-    // Option 5: Simple fallback
-    prompts.push(`${prompt}, make it fun and adventurous`);
+    // Option 5: Simple fallback with realistic emphasis
+    prompts.push(`${prompt}, make it realistic, fun and adventurous`);
 
     return prompts;
   }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { playClickSound } from "@/lib/sounds";
-import { Sparkles, Plus, Settings, Rocket, ChevronDown, GraduationCap } from "lucide-react";
+import { Sparkles, Plus, Rocket, ChevronDown, GraduationCap } from "lucide-react";
 import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress, loadAdventureSummaries, AdventureSummary, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 
@@ -18,7 +18,7 @@ interface HomePageProps {
   onNavigate: (path: 'start' | 'middle' | 'topics') => void;
   onStartAdventure: (topicId: string, mode: 'new' | 'continue') => void;
   onContinueSpecificAdventure?: (adventureId: string) => void;
-  onSettings: () => void;
+
 }
 
 // Sample adventure data template
@@ -37,7 +37,7 @@ const topPicks = [
     title: "Stella and the Tiny Frog",
     author: "by Irene, 2nd grade",
     pages: "12 pages",
-    image: "/lovable-uploads/d7e6abca-63c5-44c6-ad2b-3b7f0715a215.png",
+    image: "/stories/stella-tiny-frog.jpg",
     badge: "Best Friend!",
     badgeColor: "bg-orange-500"
   },
@@ -46,13 +46,13 @@ const topPicks = [
     title: "Captain Asher and the Time Stranglers",
     author: "by Asher Elliman, 3rd grade",
     pages: "16 pages", 
-    image: "/lovable-uploads/d7e6abca-63c5-44c6-ad2b-3b7f0715a215.png",
+    image: "/stories/captain-asher-time-stranglers.jpg",
     badge: "Top Pick!",
     badgeColor: "bg-yellow-500"
   }
 ];
 
-const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure, onSettings }) => {
+const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure }) => {
   // Progress tracking state
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [nextTopicId, setNextTopicId] = useState<string | null>(null);
@@ -180,10 +180,7 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
     console.log(`Selected ${level} level. Next topic: ${specificTopic}`);
   };
 
-  const handleSettingsClick = () => {
-    playClickSound();
-    onSettings();
-  };
+
 
   // Create user adventure with current user data
   const currentUserAdventure = {
@@ -382,13 +379,30 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                 className="group cursor-pointer"
               >
                 <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-gray-200">
-                  <div className="aspect-video bg-gradient-to-br from-purple-400 to-pink-500 relative">
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-white text-4xl font-bold">
-                        {adventure.id.includes('stella') ? '🐸' : '🌟'}
-                      </div>
-                    </div>
+                  <div className="aspect-video relative overflow-hidden">
+                    <img 
+                      src={adventure.image} 
+                      alt={adventure.title}
+                      className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                      onError={(e) => {
+                        // Fallback to gradient background with emoji if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `
+                            <div class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-500 relative">
+                              <div class="absolute inset-0 bg-black/20"></div>
+                              <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-white text-4xl font-bold">
+                                  ${adventure.id.includes('stella') ? '🐸' : '🌟'}
+                                </div>
+                              </div>
+                            </div>
+                          `;
+                        }
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-200"></div>
                   </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -408,18 +422,7 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
           </div>
         </section>
 
-        {/* Settings Button */}
-        <div className="flex justify-center pt-4">
-          <Button
-            variant="outline"
-            onClick={handleSettingsClick}
-            className="border-2 border-gray-400 bg-white hover:bg-gray-50 text-gray-700 rounded-xl px-6 py-3 font-semibold btn-animate flex items-center gap-2"
-            style={{ boxShadow: '0 4px 0 #9ca3af' }}
-          >
-            <Settings className="h-5 w-5" />
-            Account Settings
-          </Button>
-        </div>
+
       </div>
       
       {/* Grade Selection Dropdown - Floating on Right Side */}

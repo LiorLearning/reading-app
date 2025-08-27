@@ -115,40 +115,46 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           />
         )}
         
-        {/* Navigation Hover Zones - Only visible on edge hover */}
-        {/* Left Edge Hover Zone */}
+        {/* Navigation Buttons - Always visible and positioned around the image */}
+        {/* Left Navigation Button */}
         {hasPrevious && onPreviousPanel && (
-          <div className="absolute left-0 top-0 w-20 h-full z-20 flex items-center justify-start pl-4 group">
-            <ChevronLeft 
+          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30">
+            <button 
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 playClickSound();
                 onPreviousPanel();
               }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                       h-12 w-12 text-white drop-shadow-lg cursor-pointer
-                       hover:scale-110 hover:text-gray-200 transition-all duration-200"
+              className="bg-black/70 hover:bg-black/90 text-white rounded-full p-3 
+                         transition-all duration-200 hover:scale-110 shadow-lg
+                         border-2 border-white/20 hover:border-white/40
+                         backdrop-blur-sm"
               aria-label="Previous panel"
-            />
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
           </div>
         )}
         
-        {/* Right Edge Hover Zone */}
+        {/* Right Navigation Button */}
         {hasNext && onNextPanel && (
-          <div className="absolute right-0 top-0 w-20 h-full z-20 flex items-center justify-end pr-4 group">
-            <ChevronRight 
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 z-30">
+            <button 
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 playClickSound();
                 onNextPanel();
               }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                       h-12 w-12 text-white drop-shadow-lg cursor-pointer
-                       hover:scale-110 hover:text-gray-200 transition-all duration-200"
+              className="bg-black/70 hover:bg-black/90 text-white rounded-full p-3 
+                         transition-all duration-200 hover:scale-110 shadow-lg
+                         border-2 border-white/20 hover:border-white/40
+                         backdrop-blur-sm"
               aria-label="Next panel"
-            />
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
           </div>
         )}
       </div>

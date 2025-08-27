@@ -21,8 +21,14 @@ import cockpit4 from "@/assets/comic-cockpit-4.jpg";
 
 import MCQScreenTypeA from "./MCQScreenTypeA";
 import TopicSelection from "./TopicSelection";
-import UserOnboarding from "./UserOnboarding";
-import HomePage from "./HomePage";
+  import UserOnboarding from "./UserOnboarding";
+  import HomePage from "./HomePage";
+  import { 
+    cacheAdventureImage, 
+    loadCachedAdventureImages, 
+    getRecentCachedAdventureImages,
+    getCachedImagesForAdventure 
+  } from "@/lib/utils";
 
 // User data interface
 interface UserData {
@@ -392,16 +398,29 @@ const Index = () => {
     
     try {
       // Use the prompt or generate from recent context
-      const imagePrompt = prompt || 
-        chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
-        "space adventure with rocket";
-      
-      // Generate adventure image using AI service with user_adventure context
-      const generatedImageUrl = await aiService.generateAdventureImage(
-        imagePrompt,
-        chatMessages,
-        "space adventure scene"
-      );
+              const imagePrompt = prompt || 
+          chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
+          "space adventure with rocket";
+        
+        // Extract adventure context for caching
+        const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
+        
+        // Generate adventure image using AI service with user_adventure context
+        const generatedImageUrl = await aiService.generateAdventureImage(
+          imagePrompt,
+          chatMessages,
+          "space adventure scene"
+        );
+        
+        // Cache the generated adventure image if it was successfully created
+        if (generatedImageUrl) {
+          cacheAdventureImage(
+            generatedImageUrl,
+            imagePrompt,
+            adventureContext,
+            currentAdventureId || undefined
+          );
+        }
       
       // Use generated image if available, otherwise fallback to random image
       const image = generatedImageUrl || images[Math.floor(Math.random() * images.length)];
@@ -444,8 +463,8 @@ const Index = () => {
           setZoomingPanelId(null);
         }, 600);
       }, 2000);
-    }
-  }, [addPanel, images, chatMessages]);
+          }
+    }, [addPanel, images, chatMessages, currentAdventureId]);
 
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
@@ -627,7 +646,8 @@ const Index = () => {
         createdAt: Date.now(),
         lastPlayedAt: Date.now(),
         comicPanelImage: currentPanelImage,
-        topicId: selectedTopicId
+        topicId: selectedTopicId,
+        comicPanels: panels // Save the comic panels
       };
       
       saveAdventure(adventure);
@@ -681,8 +701,37 @@ const Index = () => {
     const targetAdventure = savedAdventures.find(adv => adv.id === adventureId);
     
     if (targetAdventure) {
-      // Reset comic panels to initial state when loading a different adventure
-      reset(initialPanels);
+      // Restore comic panels from saved adventure if available
+      if (targetAdventure.comicPanels && targetAdventure.comicPanels.length > 0) {
+        // Check if we have cached images and restore them if the URLs are no longer available
+        const cachedImages = getCachedImagesForAdventure(adventureId);
+        const restoredPanels = targetAdventure.comicPanels.map(panel => {
+          // Try to use original image first
+          let imageToUse = panel.image;
+          
+          // If image URL is not available or is a remote URL that might expire, try to find cached version
+          if (panel.image.startsWith('https://')) {
+            const cachedImage = cachedImages.find(cached => 
+              cached.prompt && panel.text.includes(cached.prompt.split(' ').slice(0, 3).join(' '))
+            );
+            if (cachedImage && cachedImage.url !== panel.image) {
+              imageToUse = cachedImage.url;
+              console.log(`🔄 Restored cached image for panel: ${panel.text.substring(0, 30)}...`);
+            }
+          }
+          
+          return {
+            ...panel,
+            image: imageToUse
+          };
+        });
+        
+        reset(restoredPanels);
+        console.log(`✅ Restored ${restoredPanels.length} comic panels for adventure: ${targetAdventure.name}`);
+      } else {
+        // No saved panels, start with initial panels
+        reset(initialPanels);
+      }
       
       // Load the adventure's messages and state
       setChatMessages(targetAdventure.messages);
@@ -728,16 +777,7 @@ const Index = () => {
     }
   }, [chatMessages.length, currentAdventureId, saveCurrentAdventure]);
 
-  // Handle settings (reset user data)
-  const handleSettings = React.useCallback(() => {
-    if (confirm('Are you sure you want to reset your profile? This will clear your name and grade.')) {
-      localStorage.removeItem(USER_DATA_KEY);
-      setUserData(null);
-      setShowOnboarding(true);
-      setCurrentScreen(0);
-      playClickSound();
-    }
-  }, []);
+
 
   // Handle page unload - save adventure before closing
   React.useEffect(() => {
@@ -764,7 +804,8 @@ const Index = () => {
             createdAt: Date.now(),
             lastPlayedAt: Date.now(),
             comicPanelImage: panels[currentIndex]?.image,
-            topicId: selectedTopicId
+            topicId: selectedTopicId,
+            comicPanels: panels // Save the comic panels in page unload handler too
           };
           
           saveAdventure(adventure);
@@ -1039,7 +1080,7 @@ const Index = () => {
             onNavigate={handleHomeNavigation} 
             onStartAdventure={handleStartAdventure} 
             onContinueSpecificAdventure={handleContinueSpecificAdventure}
-            onSettings={handleSettings} 
+ 
           />
         ) : currentScreen === 0 ? (
           <TopicSelection onTopicSelect={handleTopicSelect} />
