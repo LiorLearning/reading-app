@@ -7,18 +7,109 @@ interface TTSOptions {
   similarity_boost?: number;
 }
 
+export interface Voice {
+  id: string;
+  name: string;
+  description: string;
+  previewText: string;
+}
+
+// Available voices for selection
+export const AVAILABLE_VOICES: Voice[] = [
+  {
+    id: 'cgSgspJ2msm6clMCkdW9',
+    name: 'Jessica',
+    description: 'Warm and friendly tone, perfect for children',
+    previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
+  },
+  {
+    id: 'EXAVITQu4vr4xnSDxMaL',
+    name: 'Sarah',
+    description: 'Clear and articulate, great for educational content',
+    previewText: "Hello! I'm Sarah. I enjoy making learning fun and easy to understand. Ready to discover something new?"
+  },
+  {
+    id: 'ErXwobaYiN019PkySvjV',
+    name: 'Antoni',
+    description: 'Deep and engaging voice for storytelling',
+    previewText: "Greetings! I'm Antoni, and I love bringing stories to life. Let me take you on an amazing journey!"
+  },
+  {
+    id: 'VR6AewLTigWG4xSOukaG',
+    name: 'Arnold',
+    description: 'Strong and confident, perfect for adventure stories',
+    previewText: "Hey there, adventurer! I'm Arnold, ready to guide you through exciting quests and challenges!"
+  },
+  {
+    id: '21m00Tcm4TlvDq8ikWAM',
+    name: 'Rachel',
+    description: 'Sweet and gentle, ideal for younger learners',
+    previewText: "Hello sweetie! I'm Rachel, and I can't wait to share wonderful stories and help you learn new things!"
+  }
+];
+
+const SELECTED_VOICE_KEY = 'reading_app_selected_voice';
+
 class TextToSpeechService {
   private client: ElevenLabsClient | null = null;
   private isInitialized = false;
   private currentAudio: HTMLAudioElement | null = null;
   private isSpeaking = false;
+  private selectedVoice: Voice;
 
   constructor() {
+    // Load selected voice from localStorage or default to Jessica
+    this.selectedVoice = this.loadSelectedVoice();
     this.initialize();
   }
 
+  private loadSelectedVoice(): Voice {
+    try {
+      const stored = localStorage.getItem(SELECTED_VOICE_KEY);
+      if (stored) {
+        const voiceId = JSON.parse(stored);
+        const voice = AVAILABLE_VOICES.find(v => v.id === voiceId);
+        if (voice) return voice;
+      }
+    } catch (error) {
+      console.warn('Failed to load selected voice from localStorage:', error);
+    }
+    
+    // Default to Jessica
+    return AVAILABLE_VOICES[0];
+  }
+
+  private saveSelectedVoice(voice: Voice): void {
+    try {
+      localStorage.setItem(SELECTED_VOICE_KEY, JSON.stringify(voice.id));
+    } catch (error) {
+      console.warn('Failed to save selected voice to localStorage:', error);
+    }
+  }
+
+  // Get current selected voice
+  getSelectedVoice(): Voice {
+    return this.selectedVoice;
+  }
+
+  // Set selected voice
+  setSelectedVoice(voice: Voice): void {
+    this.selectedVoice = voice;
+    this.saveSelectedVoice(voice);
+  }
+
+  // Get all available voices
+  getAvailableVoices(): Voice[] {
+    return AVAILABLE_VOICES;
+  }
+
+  // Preview a voice by having it introduce itself
+  async previewVoice(voice: Voice): Promise<void> {
+    await this.speak(voice.previewText, { voice: voice.id });
+  }
+
   private initialize() {
-    // Check if Jessica's TTS API key is available
+    // Check if TTS API key is available
     const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
     
     if (apiKey) {
@@ -27,19 +118,19 @@ class TextToSpeechService {
       });
       this.isInitialized = true;
     } else {
-      console.warn('Jessica\'s TTS API key not found. TTS service will not be available.');
+      console.warn('TTS API key not found. TTS service will not be available.');
       this.isInitialized = false;
     }
   }
 
-  // Speak text using Jessica's tone
+  // Speak text using selected voice
   async speak(text: string, options?: TTSOptions): Promise<void> {
     // Clean the text for better speech
     const cleanText = this.cleanTextForSpeech(text);
     
     // If not initialized or no API key, skip TTS
     if (!this.isInitialized || !this.client) {
-      console.warn('Jessica\'s TTS not configured. Cannot speak text.');
+      console.warn('TTS not configured. Cannot speak text.');
       return;
     }
 
@@ -47,10 +138,10 @@ class TextToSpeechService {
       // Stop any current audio
       this.stop();
 
-      // Jessica's voice settings for children's content
-      const voiceId = options?.voice || 'cgSgspJ2msm6clMCkdW9'; // Jessica's tone
+      // Use selected voice or override from options
+      const voiceId = options?.voice || this.selectedVoice.id;
 
-      // Generate audio using Jessica's tone
+      // Generate audio using selected voice
       const audioStream = await this.client.textToSpeech.convert(
         voiceId,  // First parameter: voice ID as string
         {         // Second parameter: options object
@@ -88,12 +179,12 @@ class TextToSpeechService {
       this.currentAudio.onerror = () => {
         this.isSpeaking = false;
         URL.revokeObjectURL(audioUrl);
-        console.error('Error playing Jessica\'s TTS audio');
+        console.error('Error playing TTS audio');
       };
 
       await this.currentAudio.play();
     } catch (error) {
-      console.error('Jessica\'s TTS error:', error);
+      console.error('TTS error:', error);
       this.isSpeaking = false;
     }
   }
@@ -137,16 +228,16 @@ class TextToSpeechService {
   // Get configuration status
   getStatus(): { configured: boolean; message: string } {
     if (this.isInitialized) {
-      return { configured: true, message: 'Jessica\'s TTS is ready!' };
+      return { configured: true, message: `TTS is ready with ${this.selectedVoice.name}'s voice!` };
     } else {
       return { 
         configured: false, 
-        message: 'Jessica\'s TTS API key required for TTS functionality.' 
+        message: 'TTS API key required for TTS functionality.' 
       };
     }
   }
 
-  // Speak question automatically with Jessica's tone for educational content
+  // Speak question automatically with selected voice for educational content
   async speakQuestion(questionText: string): Promise<void> {
     await this.speak(questionText, {
       stability: 0.6,
@@ -154,7 +245,7 @@ class TextToSpeechService {
     });
   }
 
-  // Speak AI messages with Jessica's friendly, encouraging tone
+  // Speak AI messages with selected voice
   async speakAIMessage(message: string): Promise<void> {
     await this.speak(message, {
       stability: 0.7,
@@ -162,7 +253,7 @@ class TextToSpeechService {
     });
   }
 
-  // Speak answer text with Jessica's tone (for the speaker button beside image)
+  // Speak answer text with selected voice (for the speaker button beside image)
   async speakAnswer(answerText: string): Promise<void> {
     await this.speak(answerText, {
       stability: 0.5,

@@ -356,7 +356,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                 variant="outline"
                 size="icon"
                 onClick={() => {
-                  onGenerateImage();
+                  if (!text.trim()) {
+                    toast.error("Please write something first before generating an image.");
+                    return;
+                  }
+                  playClickSound();
+                  onGenerate(`create image: ${text.trim()}`);
+                  setText("");
                 }}
                 aria-label="Generate new image"
                 className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate"

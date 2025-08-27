@@ -96,7 +96,16 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           
           try {
             const transcription = await transcribeWithWhisper(audioBlob);
-            setText(transcription);
+            
+            // Auto-send the transcription if it's not empty
+            if (transcription && transcription.trim()) {
+              setIsSubmitting(true);
+              onGenerate(transcription.trim());
+              setText("");
+              setIsSubmitting(false);
+            } else {
+              setText(transcription);
+            }
           } catch (error) {
             toast.error("Failed to transcribe audio. Using browser speech recognition as fallback.");
             // Fallback to browser speech recognition
@@ -131,8 +140,11 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     rec.maxAlternatives = 1;
     rec.continuous = true;
     
+    let finalTranscriptText = '';
+    
     rec.onstart = () => {
       setIsMicActive(true);
+      finalTranscriptText = ''; // Reset when starting
     };
     
     rec.onresult = (event: any) => {
@@ -145,12 +157,13 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
           finalTranscript += transcript;
+          finalTranscriptText += transcript; // Store for auto-send
         } else {
           interimTranscript += transcript;
         }
       }
       
-      setText(finalTranscript + interimTranscript);
+      setText(finalTranscriptText + interimTranscript);
     };
     
     rec.onerror = () => {
@@ -162,13 +175,20 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     rec.onend = () => {
       if (isMicActive) {
         setIsMicActive(false);
-        setIsSubmitting(false);
+        
+        // Auto-send the final transcript if it's not empty
+        if (finalTranscriptText && finalTranscriptText.trim()) {
+          setIsSubmitting(true);
+          onGenerate(finalTranscriptText.trim());
+          setText("");
+          setIsSubmitting(false);
+        }
       }
     };
     
     rec.start();
     recognitionRef.current = rec;
-  }, [isMicActive, isSubmitting]);
+  }, [isMicActive, isSubmitting, onGenerate]);
 
   const startVoice = useCallback(() => {
     playClickSound();
@@ -252,7 +272,13 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           variant="outline"
           size="icon"
           onClick={() => {
-            onGenerateImage();
+            if (!text.trim()) {
+              toast.error("Please write something first before generating an image.");
+              return;
+            }
+            playClickSound();
+            onGenerate(`create image: ${text.trim()}`);
+            setText("");
           }}
           aria-label="Generate new image"
           className="h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm"

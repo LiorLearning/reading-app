@@ -15,6 +15,7 @@ import { playMessageSound, playClickSound } from "@/lib/sounds";
 import { useComic } from "@/hooks/use-comic";
 import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
+import VoiceSelector from "@/components/ui/voice-selector";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -496,30 +497,46 @@ const Index = () => {
         const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
         
         // Generate adventure image using AI service with user_adventure context
-        const generatedImageUrl = await aiService.generateAdventureImage(
+        const generatedImageResult = await aiService.generateAdventureImage(
           imagePrompt,
           chatMessages,
           "space adventure scene"
         );
         
+        let image: string;
+        let panelText: string;
+        
         // Cache the generated adventure image if it was successfully created
-        if (generatedImageUrl) {
+        if (generatedImageResult) {
           cacheAdventureImage(
-            generatedImageUrl,
+            generatedImageResult.imageUrl,
             imagePrompt,
             adventureContext,
             currentAdventureId || undefined
           );
+          
+          image = generatedImageResult.imageUrl;
+          
+          // Generate contextual response text based on actual generated content
+          const contextualResponse = await aiService.generateAdventureImageResponse(
+            imagePrompt,
+            generatedImageResult.usedPrompt,
+            chatMessages
+          );
+          
+          panelText = contextualResponse;
+        } else {
+          // Use fallback image and text
+          image = images[Math.floor(Math.random() * images.length)];
+          panelText = prompt ? `Generated: ${prompt}` : "New adventure continues...";
         }
       
-      // Use generated image if available, otherwise fallback to random image
-      const image = generatedImageUrl || images[Math.floor(Math.random() * images.length)];
       const newPanelId = crypto.randomUUID();
       
       addPanel({ 
         id: newPanelId, 
         image, 
-        text: prompt ? `Generated: ${prompt}` : "New adventure continues..."
+        text: panelText
       });
       setNewlyCreatedPanelId(newPanelId);
       
@@ -597,18 +614,33 @@ const Index = () => {
           return [...prev, generatingMessage];
         });
         
+        // Generate image and get contextual response
+        const generatedImageResult = await aiService.generateAdventureImage(
+          imageSubject || text,
+          chatMessages,
+          "space adventure scene"
+        );
+        
+        let imageAIResponse: string;
+        
+        if (generatedImageResult) {
+          // Generate contextual response based on actual generated content
+          imageAIResponse = await aiService.generateAdventureImageResponse(
+            imageSubject || text,
+            generatedImageResult.usedPrompt,
+            chatMessages
+          );
+        } else {
+          // Fallback response if image generation failed
+          const fallbackResponses = [
+            `🎨 I tried to create an image for your adventure, but let's keep the story going with our imagination! ✨`,
+            `🌟 Your adventure idea is amazing! Let's continue the story and maybe try creating an image again later! 🚀`,
+            `✨ Great concept for your adventure! I'll keep working on bringing your visions to life! 🎭`
+          ];
+          imageAIResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+        }
+        
         await onGenerateImage(imageSubject || text);
-        
-        // Generate encouraging AI response for image generation
-        const imageResponses = [
-          `🎨 Amazing idea! I'm creating an image of ${imageSubject || 'that'} for your adventure! This is going to look fantastic! ✨`,
-          `✨ Great request! I'm drawing ${imageSubject || 'that'} right now! It's going to be perfect for your story! 🚀`,
-          `🌟 Wonderful! I'm making an image of ${imageSubject || 'that'} for you! This will make your adventure even more exciting! 🎯`,
-          `🎭 Excellent idea! Creating an image of ${imageSubject || 'that'} now! Your adventure is going to look amazing! 💫`,
-          `🚀 Perfect! I'm generating an image of ${imageSubject || 'that'} for your story! This is going to be so cool! 🌈`
-        ];
-        
-        const imageAIResponse = imageResponses[Math.floor(Math.random() * imageResponses.length)];
         
         const aiMessage: ChatMessage = {
           type: 'ai',
@@ -1391,20 +1423,23 @@ const Index = () => {
           >
 
             
-            {/* Next Button - Show on Screen 1 */}
+            {/* Voice Selector and Answer Questions Button - Show on Screen 1 */}
             {currentScreen === 1 && selectedTopicId && (
-              <Button 
-                variant="default" 
-                onClick={() => {
-                  playClickSound();
-                  setCurrentScreen(3); // Go directly to MCQ screen
-                }}
-                className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate px-4"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-              >
-                Answer Questions
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+              <>
+                <VoiceSelector />
+                <Button 
+                  variant="default" 
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(3); // Go directly to MCQ screen
+                  }}
+                  className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate px-4"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Answer Questions
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </>
             )}
             
             {/* Theme Changer and How To buttons - Show on all screens */}
