@@ -83,6 +83,8 @@ interface MCQScreenTypeAProps {
   onBackToTopics?: () => void;
   onRetryTopic?: () => void;
   onNextTopic?: (nextTopicId?: string) => void;
+  onBack?: (currentQuestionIndex: number) => string | void; // New prop for back navigation
+  startingQuestionIndex?: number; // Add this new prop
 }
 
 // Remove the empty sampleMCQData object (lines 178-180)
@@ -105,13 +107,15 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   selectedTopicId = '1-H.1',
   onBackToTopics,
   onRetryTopic,
-  onNextTopic
+  onNextTopic,
+  onBack,
+  startingQuestionIndex
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const resizeRef = React.useRef<HTMLDivElement>(null);
   
-  // MCQ state
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // MCQ state - Initialize with starting index if provided
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(startingQuestionIndex || 0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -124,6 +128,28 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   
   // Track first attempts for each question
   const [firstAttempts, setFirstAttempts] = useState<Record<number, boolean>>({});
+  
+  // New variables for enhanced score tracking - fix for correct answer counting
+  const [questionScores, setQuestionScores] = useState<Record<number, boolean>>({}); // Track which questions were answered correctly
+  const [totalQuestionsAttempted, setTotalQuestionsAttempted] = useState<number>(0); // Track total questions attempted
+  
+  // Computed accurate score - counts all questions answered correctly
+  const computedAccurateScore = React.useMemo(() => {
+    const correctAnswers = Object.values(questionScores).filter(Boolean).length;
+    console.log('🔍 SCORE DEBUG: questionScores:', questionScores, 'correctAnswers:', correctAnswers, 'originalScore:', score);
+    return correctAnswers;
+  }, [questionScores, score]);
+  
+  // Track questions attempted when they are answered
+  React.useEffect(() => {
+    if (hasAnswered && currentQuestionIndex >= 0) {
+      setTotalQuestionsAttempted(prev => {
+        const newAttempted = Math.max(prev, currentQuestionIndex + 1);
+        console.log('📊 ATTEMPT TRACKING: Question', currentQuestionIndex + 1, 'attempted. Total attempted:', newAttempted);
+        return newAttempted;
+      });
+    }
+  }, [hasAnswered, currentQuestionIndex]);
   
   // Fill blank state
   const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
@@ -154,6 +180,23 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const [sortedWords, setSortedWords] = useState<Record<string, string[]>>({});
   const [availableWords, setAvailableWords] = useState<string[]>([]);
   const [isDragOverBin, setIsDragOverBin] = useState<string | null>(null);
+
+  // Reset to starting index when startingQuestionIndex changes
+  React.useEffect(() => {
+    if (startingQuestionIndex !== undefined) {
+      console.log(`🔍 DEBUG MCQ: Received startingQuestionIndex: ${startingQuestionIndex}, setting currentQuestionIndex from ${currentQuestionIndex} to ${startingQuestionIndex}`);
+      setCurrentQuestionIndex(startingQuestionIndex);
+      // Also reset all question-specific state when switching to a new question
+      setSelectedAnswer(null);
+      setShowFeedback(false);
+      setIsCorrect(false);
+      setHasAnswered(false);
+      setIsInReflectionMode(false);
+      setHasReflected(false);
+      setFillBlankAnswer('');
+      setHasAutoSpokenQuestion(false);
+    }
+  }, [startingQuestionIndex, currentQuestionIndex]);
 
   // Get current topic and questions
   const currentTopic = sampleMCQData.topics[selectedTopicId];
@@ -262,6 +305,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setScore(prev => prev + 1);
       }
       
+      // New score tracking - track this question as correctly answered
+      setQuestionScores(prev => ({
+        ...prev,
+        [currentQuestionIndex]: true
+      }));
+      
       // Celebrate with confetti!
       celebrateWithConfetti();
       const feedbackMessage = {
@@ -273,8 +322,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setChatMessages((prev: any) => [...prev, feedbackMessage]);
       playMessageSound();
       
-      // Auto-speak the AI feedback message
-      ttsService.speakAIMessage(feedbackMessage.content);
+      // Auto-speak the AI feedback message and wait for completion
+      await ttsService.speakAIMessage(feedbackMessage.content);
     } else {
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying other options
@@ -314,7 +363,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, fallbackMessage]);
         playMessageSound();
-        ttsService.speakAIMessage(fallbackMessage.content);
+        await ttsService.speakAIMessage(fallbackMessage.content);
       }
       
       // Clear the wrong answer visual feedback after a brief moment
@@ -359,6 +408,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setScore(prev => prev + 1);
       }
       
+      // New score tracking - track this question as correctly answered
+      setQuestionScores(prev => ({
+        ...prev,
+        [currentQuestionIndex]: true
+      }));
+      
       // Celebrate with confetti!
       celebrateWithConfetti();
       const feedbackMessage = {
@@ -370,8 +425,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setChatMessages((prev: any) => [...prev, feedbackMessage]);
       playMessageSound();
       
-      // Auto-speak the AI feedback message
-      ttsService.speakAIMessage(feedbackMessage.content);
+      // Auto-speak the AI feedback message and wait for completion
+      await ttsService.speakAIMessage(feedbackMessage.content);
     } else {
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying again
@@ -397,8 +452,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setChatMessages((prev: any) => [...prev, hintMessage]);
         playMessageSound();
         
-        // Auto-speak the hint message
-        ttsService.speakAIMessage(hintMessage.content);
+        // Auto-speak the hint message and wait for completion
+        await ttsService.speakAIMessage(hintMessage.content);
       } catch (error) {
         console.error('Error generating reflection prompt for fill-blank:', error);
         
@@ -411,7 +466,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, fallbackMessage]);
         playMessageSound();
-        ttsService.speakAIMessage(fallbackMessage.content);
+        await ttsService.speakAIMessage(fallbackMessage.content);
       }
       
       // Clear the wrong answer after a brief moment
@@ -425,7 +480,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages, setSidebarCollapsed]);
 
   // Handle student reflection response
-  const handleReflectionResponse = useCallback((studentReflection: string) => {
+  const handleReflectionResponse = useCallback(async (studentReflection: string) => {
     if (!isInReflectionMode) return;
     
     // Student has provided their reflection, now let them try again
@@ -449,8 +504,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setChatMessages((prev: any) => [...prev, encouragementMessage]);
     playMessageSound();
     
-    // Auto-speak the encouragement message
-    ttsService.speakAIMessage(encouragementMessage.content);
+    // Auto-speak the encouragement message and wait for completion
+    await ttsService.speakAIMessage(encouragementMessage.content);
   }, [isInReflectionMode, currentQuestion, setChatMessages]);
 
   // Wrapper for onGenerate to handle reflection mode
@@ -465,28 +520,63 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     onGenerate(text);
   }, [isInReflectionMode, handleReflectionResponse, onGenerate]);
 
+  // Handle back button - sequential navigation logic
+  const handleBackButton = useCallback(() => {
+    playClickSound();
+    
+    if (onBack) {
+      const result = onBack(currentQuestionIndex);
+      // If onBack returns 'previous_question', go to previous question
+      if (result === 'previous_question' && currentQuestionIndex > 0) {
+        setCurrentQuestionIndex(prev => prev - 1);
+        setSelectedAnswer(null);
+        setShowFeedback(false);
+        setIsCorrect(false);
+        setHasAnswered(false);
+        setIsInReflectionMode(false);
+        setHasReflected(false);
+        setFillBlankAnswer('');
+        setHasAutoSpokenQuestion(false); // Reset auto-speech state
+      }
+      // Otherwise, the parent component (Index.tsx) handles the navigation
+    }
+  }, [onBack, currentQuestionIndex]);
+
   const handleNextQuestion = useCallback(() => {
     playClickSound();
+    
+    console.log(`🔍 DEBUG MCQ: handleNextQuestion called. currentQuestionIndex: ${currentQuestionIndex}`);
+    
+    // Reset question state for next question
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setIsCorrect(false);
+    setHasAnswered(false);
+    setIsInReflectionMode(false);
+    setHasReflected(false);
+    setFillBlankAnswer('');
+    setHasAutoSpokenQuestion(false); // Reset auto-speech state for new question
+    // Don't reset drag-and-drop state here - let useEffect handle initialization
+    
     if (currentQuestionIndex < currentTopic.questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setSelectedAnswer(null);
-      setShowFeedback(false);
-      setIsCorrect(false);
-      setHasAnswered(false);
-      setIsInReflectionMode(false);
-      setHasReflected(false);
-      setFillBlankAnswer('');
-      setHasAutoSpokenQuestion(false); // Reset auto-speech state for new question
-      // Don't reset drag-and-drop state here - let useEffect handle initialization
+      console.log(`🔍 DEBUG MCQ: Not last question, calling onNextTopic()`);
+      // Let parent component handle the progression logic
+      if (onNextTopic) {
+        onNextTopic(); // Call without nextTopicId to let Index.tsx handle the flow logic
+      }
     } else {
+      console.log(`🔍 DEBUG MCQ: Last question completed, showing completion page`);
       // All questions completed - check score and show appropriate completion page
       setQuizCompleted(true);
       
       // Save progress - topic is marked as completed only with passing grade (7/10+)
       // This immediately updates readingapp_user_progress in localStorage
-      markTopicCompleted(selectedTopicId, score);
+      // Use computed accurate score for marking completion
+      const finalScore = computedAccurateScore;
+      console.log('🏁 COMPLETION: Using accurate score:', finalScore, 'vs original score:', score);
+      markTopicCompleted(selectedTopicId, finalScore);
       
-      if (score >= 7) {
+      if (finalScore >= 7) {
         setShowCompletionPage('success');
         // Trigger confetti for passing grade
         confetti({
@@ -498,7 +588,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setShowCompletionPage('practice');
       }
     }
-  }, [currentQuestionIndex, currentTopic, setChatMessages]);
+  }, [currentQuestionIndex, currentTopic, setChatMessages, onNextTopic]);
 
 
 
@@ -929,7 +1019,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     };
     setChatMessages((prev: any) => [...prev, aiMessage]);
     playMessageSound();
-    ttsService.speakAIMessage(feedbackMessage);
+    await ttsService.speakAIMessage(feedbackMessage);
   }, [currentQuestion]);
 
   // Calculate reading similarity (simple word matching)
@@ -1004,7 +1094,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       };
       setChatMessages((prev: any) => [...prev, hintMessage]);
       playMessageSound();
-      ttsService.speakAIMessage(hintMessage.content);
+      await ttsService.speakAIMessage(hintMessage.content);
       return;
     }
 
@@ -1043,6 +1133,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setScore(prev => prev + 1);
       }
       
+      // New score tracking - track this question as correctly answered
+      setQuestionScores(prev => ({
+        ...prev,
+        [currentQuestionIndex]: true
+      }));
+      
       // Celebrate with confetti!
       celebrateWithConfetti();
       const feedbackMessage = {
@@ -1052,7 +1148,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       };
       setChatMessages((prev: any) => [...prev, feedbackMessage]);
       playMessageSound();
-      ttsService.speakAIMessage(feedbackMessage.content);
+      await ttsService.speakAIMessage(feedbackMessage.content);
     } else {
       try {
         // Generate AI reflection response for drag-and-drop
@@ -1074,7 +1170,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, hintMessage]);
         playMessageSound();
-        ttsService.speakAIMessage(hintMessage.content);
+        await ttsService.speakAIMessage(hintMessage.content);
       } catch (error) {
         console.error('Error generating reflection prompt for drag-drop:', error);
         
@@ -1087,7 +1183,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, fallbackMessage]);
         playMessageSound();
-        ttsService.speakAIMessage(fallbackMessage.content);
+        await ttsService.speakAIMessage(fallbackMessage.content);
       }
       
       // Allow retry
@@ -1116,6 +1212,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setAvailableWords([]);
     setDraggedWord(null);
     setIsDragOverBin(null);
+    
+    // New reset logic for enhanced score tracking
+    setQuestionScores({});
+    setTotalQuestionsAttempted(0);
+    console.log('🔄 RESET: Cleared all question scores and attempt tracking');
   }, []);
 
   // Reset quiz state when topic changes
@@ -1132,7 +1233,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   if (showCompletionPage === 'success') {
     return (
       <TopicComplete
-        score={score}
+        score={computedAccurateScore}
         totalQuestions={currentTopic.questions.length}
         topicName={currentTopic.topicInfo.topicName}
         onNextTopic={() => {
@@ -1169,7 +1270,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   if (showCompletionPage === 'practice') {
     return (
       <PracticeNeeded
-        score={score}
+        score={computedAccurateScore}
         totalQuestions={currentTopic.questions.length}
         topicName={currentTopic.topicInfo.topicName}
         onRetryTopic={() => {
@@ -1314,6 +1415,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">
                     Question {currentQuestionIndex + 1} of {currentTopic.questions.length}
                   </h2>
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="text-xs text-gray-500 text-center">
+                      DEBUG: currentQuestionIndex={currentQuestionIndex}, startingQuestionIndex={startingQuestionIndex}
+                    </div>
+                  )}
                   
 
                   
@@ -1730,7 +1836,9 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
               </div>
             )}
             
-            {/* Next Question Button - Outside Notepad */}
+
+
+            {/* Next Question Button - Show after answering */}
             {showFeedback && !isInReflectionMode && (
               <div className="flex justify-center mt-4">
                 <Button
@@ -1888,6 +1996,19 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
             </div>
           </aside>
         </div>
+      </div>
+      
+      {/* Fixed Back Button - Bottom Left */}
+      <div className="fixed bottom-4 left-4 z-50">
+        <Button
+          variant="default"
+          size="lg"
+          onClick={handleBackButton}
+          className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-6 py-3 text-lg font-bold"
+          style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+        >
+          ← Back
+        </Button>
       </div>
     </main>
   );

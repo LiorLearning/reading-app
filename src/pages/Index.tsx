@@ -144,6 +144,25 @@ const Index = () => {
   const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(null);
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
+  // Automatic Flow Control System
+  const ADVENTURE_PROMPT_THRESHOLD = 3; // Configurable threshold for when user can access questions
+  const [adventurePromptCount, setAdventurePromptCount] = React.useState<number>(0); // Track adventure prompts
+  const [topicQuestionIndex, setTopicQuestionIndex] = React.useState<number>(0); // Current question in topic (0-9)
+  const [isInQuestionMode, setIsInQuestionMode] = React.useState<boolean>(false); // Track if currently in question mode
+  const [canAccessQuestions, setCanAccessQuestions] = React.useState<boolean>(false); // Track if user has met threshold
+  
+  // New variables for retry functionality - to fix the "try again" bug
+  const [retryQuestionIndex, setRetryQuestionIndex] = React.useState<number>(0); // Track question index for retry scenarios
+  const [isRetryMode, setIsRetryMode] = React.useState<boolean>(false); // Track if we're in a retry scenario
+  
+  // Computed value for the correct starting question index - fixes the try again bug
+  const computedStartingQuestionIndex = React.useMemo(() => {
+    if (isRetryMode) {
+      return retryQuestionIndex; // Use retry index when in retry mode (should be 0 for full retry)
+    }
+    return topicQuestionIndex; // Use normal topic question index for regular flow
+  }, [isRetryMode, retryQuestionIndex, topicQuestionIndex]);
+  
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   
@@ -258,7 +277,10 @@ const Index = () => {
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
-          ttsService.speakAIMessage(initialMessage);
+          // Auto-speak the initial AI message and wait for completion
+          ttsService.speakAIMessage(initialMessage).catch(error => 
+            console.error('TTS error for initial message:', error)
+          );
           return [...prev, aiMessage];
         });
       };
@@ -595,6 +617,79 @@ const Index = () => {
         playMessageSound();
         return [...prev, userMessage];
       });
+
+      // Track adventure prompt count and implement automatic flow
+      console.log(`🔍 DEBUG: Message sent - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}, isInQuestionMode: ${isInQuestionMode}`);
+      
+      if (currentScreen === 1 && !isImageRequest) {
+        const newAdventurePromptCount = adventurePromptCount + 1;
+        console.log(`🔍 DEBUG: Adventure prompt sent. Count: ${adventurePromptCount} -> ${newAdventurePromptCount}, Threshold: ${ADVENTURE_PROMPT_THRESHOLD}`);
+        setAdventurePromptCount(newAdventurePromptCount);
+        
+        // Check if user has met the threshold for accessing questions
+        if (newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD && !canAccessQuestions) {
+          console.log(`🔍 DEBUG: Threshold reached! Setting canAccessQuestions to true`);
+          setCanAccessQuestions(true);
+        }
+        
+        // Implement automatic flow: adventure->q1->q2->q3->adventure->q4->q5->q6->adventure->q7->q8->q9->q10
+        // Only trigger automatic transitions if user has met the prompt threshold
+        const hasMetThreshold = canAccessQuestions || newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD;
+        console.log(`🔍 DEBUG: Threshold check - canAccessQuestions: ${canAccessQuestions}, newCount >= threshold: ${newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD}, hasMetThreshold: ${hasMetThreshold}`);
+        
+        if (hasMetThreshold) {
+          // Determine when to transition to questions based on the flow pattern
+          let shouldTransitionToQuestions = false;
+          
+          if (topicQuestionIndex === 0) {
+            // Start with questions after initial adventure phase (Q1-Q3)
+            console.log(`🔍 DEBUG: Starting Q1-Q3 sequence`);
+            shouldTransitionToQuestions = true;
+          } else if (topicQuestionIndex === 3) {
+            // After Q1->Q2->Q3->adventure, now go to Q4->Q5->Q6
+            console.log(`🔍 DEBUG: Starting Q4-Q6 sequence`);
+            shouldTransitionToQuestions = true;
+          } else if (topicQuestionIndex === 6) {
+            // After Q4->Q5->Q6->adventure, now go to Q7->Q8->Q9
+            console.log(`🔍 DEBUG: Starting Q7-Q9 sequence`);
+            shouldTransitionToQuestions = true;
+          } else if (topicQuestionIndex === 9) {
+            // After Q7->Q8->Q9->adventure, now go to Q10
+            console.log(`🔍 DEBUG: Starting Q10 sequence`);
+            shouldTransitionToQuestions = true;
+          }
+          
+          if (shouldTransitionToQuestions) {
+            // Add a transition message from AI and wait for speech to complete
+            setTimeout(async () => {
+              const transitionMessage: ChatMessage = {
+                type: 'ai',
+                content: `🎯 Great adventure building! Now let's test your reading skills with some questions. Ready for the challenge? 📚✨`,
+                timestamp: Date.now()
+              };
+              
+              setChatMessages(prev => {
+                playMessageSound();
+                return [...prev, transitionMessage];
+              });
+              
+              // Wait for the AI speech to complete before transitioning
+              await ttsService.speakAIMessage(transitionMessage.content);
+              
+              // Add a small buffer after speech completes
+              setTimeout(() => {
+                setIsInQuestionMode(true);
+                setCurrentScreen(3); // Go to MCQ screen
+              }, 500);
+            }, 1000);
+            
+            // Don't process the text further, just handle the transition
+            return;
+          }
+        }
+      } else {
+        console.log(`🔍 DEBUG: Skipping adventure prompt tracking - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}`);
+      }
       
       // If user is asking for an image, generate one
       if (isImageRequest) {
@@ -677,8 +772,10 @@ const Index = () => {
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
-          // Auto-speak the AI message
-          ttsService.speakAIMessage(aiMessage.content);
+          // Auto-speak the AI message and wait for completion
+          ttsService.speakAIMessage(aiMessage.content).catch(error => 
+            console.error('TTS error for AI message:', error)
+          );
           return [...prev, aiMessage];
         });
       } catch (error) {
@@ -693,15 +790,17 @@ const Index = () => {
         setChatMessages(prev => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
-          // Auto-speak the error message
-          ttsService.speakAIMessage(errorMessage.content);
+          // Auto-speak the error message and wait for completion
+          ttsService.speakAIMessage(errorMessage.content).catch(error => 
+            console.error('TTS error for error message:', error)
+          );
           return [...prev, errorMessage];
         });
       } finally {
         setIsAIResponding(false);
       }
     },
-    [generateAIResponse, chatMessages]
+    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, canAccessQuestions, topicQuestionIndex, isInQuestionMode]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -965,6 +1064,48 @@ const Index = () => {
     
     console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, []);
+
+  // Handle sequential back navigation from MCQ screen
+  const handleBackFromMCQ = React.useCallback((currentQuestionIndex: number): string | void => {
+    playClickSound();
+    
+    // Determine if we should go to previous question or back to adventure based on the flow pattern
+    // Adventure → q1→q2→q3 → Adventure → q4→q5→q6 → Adventure → q7→q8→q9→q10
+    
+    const isFirstInSequence = 
+      currentQuestionIndex === 0 || // q1 (first question in first batch)
+      currentQuestionIndex === 3 || // q4 (first question in second batch)
+      currentQuestionIndex === 6 || // q7 (first question in third batch)
+      currentQuestionIndex === 9;   // q10 (first question in fourth batch)
+    
+    if (isFirstInSequence) {
+      // Go back to adventure mode
+      setIsInQuestionMode(false);
+      setCurrentScreen(1); // Return to adventure screen
+      
+      // Add transition message
+      setTimeout(async () => {
+        const backToAdventureMessage: ChatMessage = {
+          type: 'ai',
+          content: `🏠 Back to your adventure! Let's continue building your amazing story! What exciting direction should we explore now? ✨`,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages(prev => {
+          playMessageSound();
+          return [...prev, backToAdventureMessage];
+        });
+        
+        // Wait for the AI speech to complete
+        await ttsService.speakAIMessage(backToAdventureMessage.content);
+      }, 500);
+      
+      return; // Return void for adventure mode navigation
+    } else {
+      // Go to previous question - return action type so MCQScreenTypeA can handle it
+      return 'previous_question';
+    }
+  }, [setChatMessages, ttsService]);
 
   // Handle session closing and save current adventure
   const handleCloseSession = React.useCallback(async () => {
@@ -1423,23 +1564,9 @@ const Index = () => {
           >
 
             
-            {/* Voice Selector and Answer Questions Button - Show on Screen 1 */}
-            {currentScreen === 1 && selectedTopicId && (
-              <>
-                <VoiceSelector />
-                <Button 
-                  variant="default" 
-                  onClick={() => {
-                    playClickSound();
-                    setCurrentScreen(3); // Go directly to MCQ screen
-                  }}
-                  className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate px-4"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-                >
-                  Answer Questions
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </>
+            {/* Voice Selector - Show on Screen 1 */}
+            {(currentScreen === 1 || currentScreen === 3) && selectedTopicId && (
+              <VoiceSelector />
             )}
             
             {/* Theme Changer and How To buttons - Show on all screens */}
@@ -1782,16 +1909,92 @@ const Index = () => {
             lastMessageCount={lastMessageCount}
             handleResizeStart={handleResizeStart}
             selectedTopicId={selectedTopicId}
+            startingQuestionIndex={computedStartingQuestionIndex} // Pass the computed question index - fixes try again bug
+            key={`mcq-${selectedTopicId}-${topicQuestionIndex}`} // Force re-render when question index changes
             onBackToTopics={() => {
               playClickSound();
               setCurrentScreen(0); // Go back to topic selection
             }}
             onRetryTopic={() => {
               playClickSound();
-              // MCQScreenTypeA will handle the reset internally
+              // New retry logic - fix for try again going to q10 instead of q1
+              setIsRetryMode(true); // Enter retry mode
+              setRetryQuestionIndex(0); // Start from question 1 (index 0)
+              setTopicQuestionIndex(0); // Reset the main topic question index as well
+              setIsInQuestionMode(true); // Ensure we're in question mode
+              setAdventurePromptCount(0); // Reset adventure prompt count for clean retry
+              setCanAccessQuestions(true); // Allow questions immediately on retry
+              console.log('🔄 RETRY: Reset to question 1, retry mode enabled');
             }}
+            onBack={handleBackFromMCQ}
             onNextTopic={(nextTopicId) => {
               playClickSound();
+              
+              console.log(`🔍 DEBUG: Question completed. Current topicQuestionIndex: ${topicQuestionIndex}`);
+              
+              // Handle question progression in the automatic flow
+              if (isInQuestionMode) {
+                let newQuestionIndex;
+                // New logic to handle retry mode properly
+                if (isRetryMode) {
+                  newQuestionIndex = retryQuestionIndex + 1;
+                  setRetryQuestionIndex(newQuestionIndex);
+                  console.log(`🔍 DEBUG RETRY: Setting retryQuestionIndex to: ${newQuestionIndex}`);
+                  // Exit retry mode after first question progression to return to normal flow
+                  if (newQuestionIndex > 0) {
+                    setIsRetryMode(false);
+                    setTopicQuestionIndex(newQuestionIndex);
+                    console.log(`🔍 DEBUG RETRY: Exiting retry mode, setting topicQuestionIndex to: ${newQuestionIndex}`);
+                  }
+                } else {
+                  newQuestionIndex = topicQuestionIndex + 1;
+                  setTopicQuestionIndex(newQuestionIndex);
+                  console.log(`🔍 DEBUG: Setting topicQuestionIndex to: ${newQuestionIndex}`);
+                }
+                
+                // Check if we should return to adventure mode based on the flow pattern
+                // After completing Q3 (index 2), newQuestionIndex becomes 3
+                // After completing Q6 (index 5), newQuestionIndex becomes 6
+                // After completing Q9 (index 8), newQuestionIndex becomes 9
+                if (newQuestionIndex === 3 || newQuestionIndex === 6 || newQuestionIndex === 9) {
+                  console.log(`🔍 DEBUG: Adventure break after question ${newQuestionIndex}. Going to adventure mode.`);
+                  // After q3, q6, or q9, return to adventure mode
+                  setIsInQuestionMode(false);
+                  setCurrentScreen(1); // Return to adventure screen
+                  
+                  // Reset adventure threshold for next sequence - user needs to send prompts again
+                  setAdventurePromptCount(0);
+                  setCanAccessQuestions(false);
+                  console.log(`🔍 DEBUG: Reset adventure threshold for next sequence`);
+                  
+                  // Add transition message and wait for speech to complete
+                  setTimeout(async () => {
+                    const backToAdventureMessage: ChatMessage = {
+                      type: 'ai',
+                      content: `🚀 Excellent work on those questions! Now let's continue building your amazing adventure! What happens next in your story? ✨`,
+                      timestamp: Date.now()
+                    };
+                    
+                    setChatMessages(prev => {
+                      playMessageSound();
+                      return [...prev, backToAdventureMessage];
+                    });
+                    
+                    // Wait for the AI speech to complete
+                    await ttsService.speakAIMessage(backToAdventureMessage.content);
+                  }, 500);
+                  return;
+                } else if (newQuestionIndex === 10) {
+                  console.log(`🔍 DEBUG: All 10 questions completed!`);
+                  // Completed all 10 questions, proceed to next topic or end
+                  setTopicQuestionIndex(0); // Reset for next topic
+                  setIsInQuestionMode(false);
+                  setAdventurePromptCount(0); // Reset adventure prompt count
+                  setCanAccessQuestions(false); // Reset threshold flag
+                }
+                
+                console.log(`🔍 DEBUG: Continuing to next question. New index will be: ${newQuestionIndex}`);
+              }
               
               // If a specific next topic is provided, use it
               // Otherwise, determine the next topic from progress tracking
@@ -1822,23 +2025,68 @@ const Index = () => {
           />
         )}
 
-        {/* Bottom Left Back to Adventure Button - Show on Screen 3 */}
-        {currentScreen === 3 && (
+        {/* Fixed Back Button - Bottom Left for Adventure Screen */}
+        {(() => {
+          const shouldShowBackButton = currentScreen === 1 && topicQuestionIndex > 0 && isInQuestionMode === false;
+          console.log('🔍 Back button debug:', { 
+            currentScreen, 
+            topicQuestionIndex, 
+            isInQuestionMode, 
+            shouldShowBackButton,
+            adventurePromptCount,
+            canAccessQuestions 
+          });
+          return shouldShowBackButton;
+        })() && (
           <div className="fixed bottom-4 left-4 z-50">
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
+              size="lg"
               onClick={() => {
                 playClickSound();
-                setCurrentScreen(1); // Go back to adventure screen
+                
+                // Navigate back in the question sequence
+                const newQuestionIndex = topicQuestionIndex - 1;
+                console.log(`🔍 DEBUG Adventure: Going back from question ${topicQuestionIndex + 1} to ${newQuestionIndex + 1}`);
+                
+                setTopicQuestionIndex(newQuestionIndex);
+                
+                // Check if we should go back to MCQ mode or stay in adventure
+                // Go to MCQ if we're going back to a question that should be answered
+                if (newQuestionIndex >= 0) {
+                  // Switch to MCQ mode to show the previous question
+                  setCurrentScreen(3);
+                  setIsInQuestionMode(true);
+                  
+                  // Add transition message
+                  setTimeout(async () => {
+                    const backToQuestionMessage: ChatMessage = {
+                      type: 'ai',
+                      content: `🔙 Let's go back to question ${newQuestionIndex + 1}! Take your time to review or change your answer. ✨`,
+                      timestamp: Date.now()
+                    };
+                    
+                    setChatMessages(prev => {
+                      playMessageSound();
+                      return [...prev, backToQuestionMessage];
+                    });
+                    
+                    // Wait for the AI speech to complete
+                    await ttsService.speakAIMessage(backToQuestionMessage.content);
+                  }, 500);
+                }
               }}
-              className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
+              className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate px-6 py-3 text-lg font-bold"
               style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
             >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Back
+              ← Back to Q{topicQuestionIndex}
             </Button>
           </div>
         )}
+
+        {/* Bottom Left Back to Adventure Button - Show on Screen 3 */}
+        {/* Note: The back button functionality is now handled by the onBack prop in MCQScreenTypeA */}
+        {/* MCQScreenTypeA component will render its own back button with the sequential navigation logic */}
 
         {/* Dev Tools Indicator */}
         {devToolsVisible && (

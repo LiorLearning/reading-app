@@ -171,21 +171,37 @@ class TextToSpeechService {
       this.currentAudio = new Audio(audioUrl);
       this.isSpeaking = true;
 
-      this.currentAudio.onended = () => {
-        this.isSpeaking = false;
-        URL.revokeObjectURL(audioUrl);
-      };
+      // Return a Promise that resolves when audio finishes playing
+      return new Promise<void>((resolve, reject) => {
+        if (!this.currentAudio) {
+          reject(new Error('Audio not initialized'));
+          return;
+        }
 
-      this.currentAudio.onerror = () => {
-        this.isSpeaking = false;
-        URL.revokeObjectURL(audioUrl);
-        console.error('Error playing TTS audio');
-      };
+        this.currentAudio.onended = () => {
+          this.isSpeaking = false;
+          URL.revokeObjectURL(audioUrl);
+          resolve();
+        };
 
-      await this.currentAudio.play();
+        this.currentAudio.onerror = () => {
+          this.isSpeaking = false;
+          URL.revokeObjectURL(audioUrl);
+          console.error('Error playing TTS audio');
+          reject(new Error('Audio playback failed'));
+        };
+
+        // Start playing the audio
+        this.currentAudio.play().catch((error) => {
+          this.isSpeaking = false;
+          URL.revokeObjectURL(audioUrl);
+          reject(error);
+        });
+      });
     } catch (error) {
       console.error('TTS error:', error);
       this.isSpeaking = false;
+      throw error;
     }
   }
 
