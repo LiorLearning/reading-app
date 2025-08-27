@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
-import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
+import { playMessageSound, playClickSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
 import { aiService } from "@/lib/ai-service";
@@ -393,9 +393,6 @@ const Index = () => {
 
   // Generate new image panel based on context
   const onGenerateImage = useCallback(async (prompt?: string) => {
-    // Play loading sound when generation starts
-    playImageLoadingSound();
-    
     try {
       // Use the prompt or generate from recent context
               const imagePrompt = prompt || 
@@ -433,10 +430,8 @@ const Index = () => {
       });
       setNewlyCreatedPanelId(newPanelId);
       
-      // Play completion sound and trigger zoom animation after 2 seconds
+      // Trigger zoom animation after 2 seconds
       setTimeout(() => {
-        stopImageLoadingSound();
-        playImageCompleteSound();
         setZoomingPanelId(newPanelId); // Trigger zoom animation
         setNewlyCreatedPanelId(null);
         
@@ -454,8 +449,6 @@ const Index = () => {
       setNewlyCreatedPanelId(newPanelId);
       
       setTimeout(() => {
-        stopImageLoadingSound();
-        playImageCompleteSound();
         setZoomingPanelId(newPanelId);
         setNewlyCreatedPanelId(null);
         
@@ -497,6 +490,20 @@ const Index = () => {
       if (isImageRequest) {
         // Extract the subject from the user's request for better image generation
         const imageSubject = text.replace(/\b(image|picture|pic|draw|paint|sketch|show|illustrate|generate|create image|make picture|visual|artwork|art|render|design|visualization|make image|photo|drawing)\b/gi, '').replace(/\b(of|for|with|about)\b/gi, '').trim();
+        
+        // Add immediate "generating image" chat message
+        const generatingMessage: ChatMessage = {
+          type: 'ai',
+          content: `🎨 Generating image... ✨`,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages(prev => {
+          setLastMessageCount(prev.length + 1);
+          playMessageSound();
+          return [...prev, generatingMessage];
+        });
+        
         await onGenerateImage(imageSubject || text);
         
         // Generate encouraging AI response for image generation
@@ -837,56 +844,32 @@ const Index = () => {
             boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.1)'
           }}
         >
-          {/* Left Tools Group - Positioned to align with purple container */}
+          {/* Top Left Home Button - Show on all screens except home (-1) when user is logged in */}
           <div 
             className="absolute left-0 flex items-center gap-1 lg:gap-2"
             style={{
-              marginLeft: `calc((100% - 92%) / 2)` // Align with left edge of purple container
+              marginLeft: `calc((100% - 92%) / 2)`, // Align with left edge of purple container
+              top: '50%',
+              transform: 'translateY(-50%)' // Center vertically to match right buttons
             }}
           >
-            <Popover>
-              <PopoverTrigger asChild>
-                                  <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                  <Palette className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-2" align="start">
-                <div className="grid grid-cols-5 gap-2">
-                  {colorThemes.map((theme) => (
-                    <Button
-                      key={theme.name}
-                      variant="comic"
-                      size="sm"
-                      onClick={() => changeTheme(theme)}
-                      className={`h-8 w-8 btn-animate rounded-full ${
-                        selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
-                      }`}
-                      aria-label={`Change theme to ${theme.name}`}
-                      style={{
-                        backgroundColor: `hsl(${theme.primary})`
-                      }}
-                    >
-                    </Button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            
-            <Dialog>
-              <DialogTrigger asChild>
-                                  <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                  <HelpCircle className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>How to use</DialogTitle>
-                  <DialogDescription>
-                    Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+            {userData && currentScreen !== -1 && (
+              <Button 
+                variant="default" 
+                onClick={async () => {
+                  playClickSound();
+                  await handleCloseSession(); // Save current adventure before going home
+                  
+                  // Trigger a re-render by briefly updating screen state to refresh homepage data
+                  setCurrentScreen(0);
+                  setTimeout(() => setCurrentScreen(-1), 100);
+                }}
+                className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
+                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+              >
+                🏠 Home
+              </Button>
+            )}
           </div>
           
           {/* Center Title */}
@@ -981,24 +964,7 @@ const Index = () => {
               marginRight: `calc((100% - 92%) / 2)` // Align with right edge of purple container
             }}
           >
-            {/* Home Button - Show on all screens except home (-1) when user is logged in */}
-            {userData && currentScreen !== -1 && (
-              <Button 
-                variant="default" 
-                onClick={async () => {
-                  playClickSound();
-                  await handleCloseSession(); // Save current adventure before going home
-                  
-                  // Trigger a re-render by briefly updating screen state to refresh homepage data
-                  setCurrentScreen(0);
-                  setTimeout(() => setCurrentScreen(-1), 100);
-                }}
-                className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-              >
-                🏠 Home
-              </Button>
-            )}
+
             
             {/* Next Button - Show on Screen 1 */}
             {currentScreen === 1 && selectedTopicId && (
@@ -1016,35 +982,50 @@ const Index = () => {
               </Button>
             )}
             
-            {/* Navigation buttons - Show on Screen 3 */}
-            {currentScreen === 3 && (
-              <>
-                <Button 
-                  variant="default" 
-                  onClick={() => {
-                    playClickSound();
-                    setCurrentScreen(0); // Go back to topic selection
-                  }}
-                  className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate px-4"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Choose Topic
+            {/* Theme Changer and How To buttons - Show on all screens */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
+                  <Palette className="h-4 w-4" />
                 </Button>
-                <Button 
-                  variant="default" 
-                  onClick={() => {
-                    playClickSound();
-                    setCurrentScreen(1); // Go back to adventure screen
-                  }}
-                  className="border-2 bg-blue-600 hover:bg-blue-700 text-white btn-animate px-4"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Back to Adventure
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2" align="start">
+                <div className="grid grid-cols-5 gap-2">
+                  {colorThemes.map((theme) => (
+                    <Button
+                      key={theme.name}
+                      variant="comic"
+                      size="sm"
+                      onClick={() => changeTheme(theme)}
+                      className={`h-8 w-8 btn-animate rounded-full ${
+                        selectedTheme.name === theme.name ? 'ring-2 ring-foreground ring-offset-2' : ''
+                      }`}
+                      aria-label={`Change theme to ${theme.name}`}
+                      style={{
+                        backgroundColor: `hsl(${theme.primary})`
+                      }}
+                    >
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
+                  <HelpCircle className="h-4 w-4" />
                 </Button>
-              </>
-            )}
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>How to use</DialogTitle>
+                  <DialogDescription>
+                    Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
             
             <Dialog>
               <DialogTrigger asChild>
@@ -1364,6 +1345,24 @@ const Index = () => {
               setSidebarCollapsed(false);
             }}
           />
+        )}
+
+        {/* Bottom Left Back to Adventure Button - Show on Screen 3 */}
+        {currentScreen === 3 && (
+          <div className="fixed bottom-4 left-4 z-50">
+            <Button 
+              variant="default" 
+              onClick={() => {
+                playClickSound();
+                setCurrentScreen(1); // Go back to adventure screen
+              }}
+              className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
+              style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+          </div>
         )}
 
         {/* Dev Tools Indicator */}

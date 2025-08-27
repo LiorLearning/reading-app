@@ -290,6 +290,15 @@
   }
 }
 
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .animate-image-factory {
   animation: image-factory 1.2s ease-out;
 }
@@ -372,6 +381,10 @@
 
 .animate-comic-panel-zoom {
   animation: comic-panel-zoom 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
 }
 
 /* Button Animations */

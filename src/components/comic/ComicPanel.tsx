@@ -25,12 +25,6 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   hasPrevious = false,
   hasNext = false
 }) => {
-  // Generate random colors for boxes each time
-  const boxColors = React.useMemo(() => [
-    ['bg-red-500', 'bg-blue-500', 'bg-green-500'][Math.floor(Math.random() * 3)],
-    ['bg-purple-500', 'bg-pink-500', 'bg-indigo-500'][Math.floor(Math.random() * 3)],
-    ['bg-orange-500', 'bg-teal-500', 'bg-cyan-500'][Math.floor(Math.random() * 3)]
-  ], [isNew]);
   return (
     <div className={cn(
       "relative w-full h-full flex flex-col overflow-hidden",
@@ -39,70 +33,58 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
     )}>
       <div className="flex-1 min-h-0 relative">
         {isNew ? (
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-orange-300 to-orange-400 flex items-center justify-center">
-            {/* Centered Factory Loading Container */}
-            <div className="bg-blue-600 rounded-2xl p-8 border-4 border-black shadow-xl relative overflow-hidden max-w-sm w-full mx-4">
-              {/* Conveyor Belt Section with Moving Boxes */}
-              <div className="bg-gray-800 rounded-lg p-4 mb-4 relative overflow-hidden h-20">
-                {/* Conveyor Belt Base */}
-                <div className="absolute inset-x-2 bottom-2 h-6 bg-black rounded-full">
-                  <div className="absolute inset-0 bg-repeating-linear-gradient-45 opacity-30"></div>
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
+            {/* Simple Loading Container */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full mx-4">
+              {/* Animated Magic Sparkles */}
+              <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                <div className="absolute top-4 left-4 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                <div className="absolute top-8 right-8 w-2 h-2 bg-pink-400 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+                <div className="absolute bottom-6 left-8 w-2 h-2 bg-blue-400 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+                <div className="absolute bottom-4 right-4 w-3 h-3 bg-purple-400 rounded-full animate-ping" style={{animationDelay: '1.5s'}}></div>
+                <div className="absolute top-1/2 left-1/4 w-1 h-1 bg-green-400 rounded-full animate-ping" style={{animationDelay: '2s'}}></div>
+                <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-orange-400 rounded-full animate-ping" style={{animationDelay: '2.5s'}}></div>
+              </div>
+              
+              {/* Central Animation */}
+              <div className="relative flex flex-col items-center">
+                {/* Rotating Circle */}
+                <div className="w-20 h-20 mb-6 relative">
+                  <div className="absolute inset-0 border-4 border-transparent border-t-purple-500 border-r-pink-500 rounded-full animate-spin"></div>
+                  <div className="absolute inset-2 border-4 border-transparent border-b-blue-500 border-l-green-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
                 
-                {/* Moving Boxes on Conveyor */}
-                <div className="absolute inset-0">
-                  <div className={`absolute top-2 w-8 h-8 ${boxColors[0]} border-2 border-black rounded animate-factory-box-1`}></div>
-                  <div className={`absolute top-2 w-8 h-8 ${boxColors[1]} border-2 border-black rounded animate-factory-box-2`}></div>
-                  <div className={`absolute top-2 w-8 h-8 ${boxColors[2]} border-2 border-black rounded animate-factory-box-3`}></div>
+                {/* Loading Text */}
+                <div className="text-center">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                    ✨ Creating Magic ✨
+                  </div>
+                  <div className="text-gray-600 text-sm animate-pulse">
+                    Your adventure image is being crafted...
+                  </div>
                 </div>
                 
-                {/* Gears */}
-                <div className="absolute -top-2 -left-2 w-8 h-8 bg-gray-700 rounded-full border-2 border-black animate-factory-gear">
-                  <div className="absolute inset-1 bg-yellow-400 rounded-full"></div>
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-700 rounded-full border-2 border-black animate-factory-gear" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}>
-                  <div className="absolute inset-1 bg-yellow-400 rounded-full"></div>
-                </div>
-                
-                {/* Robotic Arm */}
-                <div className="absolute top-0 right-4 w-16 h-4 bg-yellow-500 rounded transform -rotate-12 border-2 border-black">
-                  <div className="absolute -right-2 -top-1 w-6 h-6 bg-gray-600 rounded-full border-2 border-black"></div>
+                {/* Animated Progress Dots */}
+                <div className="flex gap-2 mt-4">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce"></div>
+                  <div className="w-3 h-3 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                 </div>
               </div>
-              
-              {/* Factory Chimney with Smoke */}
-              <div className="absolute -top-4 right-8 w-6 h-12 bg-blue-800 border-2 border-black rounded-t-lg">
-                <div className="absolute -top-2 -left-1 w-2 h-2 bg-gray-300 rounded-full animate-factory-smoke"></div>
-                <div className="absolute -top-3 left-1 w-3 h-3 bg-gray-400 rounded-full animate-factory-smoke" style={{animationDelay: '0.5s'}}></div>
-                <div className="absolute -top-4 -right-1 w-2 h-2 bg-gray-300 rounded-full animate-factory-smoke" style={{animationDelay: '1s'}}></div>
-              </div>
-              
-              {/* Progress Bar with Stripes */}
-              <div className="bg-gray-800 rounded-full h-8 mb-4 overflow-hidden border-2 border-black">
-                <div className="h-full bg-striped-progress rounded-full animate-factory-progress"></div>
-              </div>
-              
-              {/* Loading Text */}
-              <div className="text-center">
-                <div className="text-white text-lg font-bold animate-factory-blink">
-                  Creating your masterpiece...
-                </div>
-              </div>
-              
-              {/* Decorative gears in corners */}
-              <div className="absolute bottom-2 left-2 w-4 h-4 bg-gray-600 rounded-full animate-factory-gear" style={{animationDuration: '3s'}}></div>
-              <div className="absolute bottom-2 right-2 w-3 h-3 bg-gray-600 rounded-full animate-factory-gear" style={{animationDuration: '2.5s', animationDirection: 'reverse'}}></div>
             </div>
             
-            {/* Image with improved animation - starts hidden */}
+            {/* Image with fade-in animation - starts hidden */}
             <img 
               src={image} 
               alt="Current comic scene" 
               className="absolute inset-0 w-full h-full object-cover opacity-0" 
               loading="lazy" 
               style={{ 
-                animation: 'image-factory-improved 1.5s ease-out forwards',
-                animationDelay: '12s'
+                animation: 'fadeIn 1s ease-out forwards',
+                animationDelay: '1.8s'
               }}
             />
           </div>
