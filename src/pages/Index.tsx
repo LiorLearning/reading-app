@@ -1985,12 +1985,43 @@ const Index = () => {
                   }, 500);
                   return;
                 } else if (newQuestionIndex === 10) {
-                  console.log(`🔍 DEBUG: All 10 questions completed!`);
-                  // Completed all 10 questions, proceed to next topic or end
-                  setTopicQuestionIndex(0); // Reset for next topic
-                  setIsInQuestionMode(false);
-                  setAdventurePromptCount(0); // Reset adventure prompt count
-                  setCanAccessQuestions(false); // Reset threshold flag
+                  console.log(`🔍 DEBUG: All 10 questions completed! Starting new adventure for next topic.`);
+                  
+                  // Topic completed - create completely new adventure (same as Create New Adventure button)
+                  // Determine the next topic
+                  const topicToNavigateTo = nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics));
+                  
+                  if (topicToNavigateTo) {
+                    // Start a completely new adventure
+                    setSelectedTopicId(topicToNavigateTo);
+                    setAdventureMode('new');
+                    
+                    // Reset everything for new adventure (same as handleStartAdventure with mode='new')
+                    setChatMessages([]);                    // Clear chat history
+                    setCurrentAdventureId(crypto.randomUUID()); // New adventure ID
+                    reset(initialPanels);                   // Reset comic panels to default
+                    
+                    // Reset question flow state
+                    setTopicQuestionIndex(0);
+                    setIsInQuestionMode(false);
+                    setAdventurePromptCount(0);
+                    setCanAccessQuestions(false);
+                    setIsRetryMode(false);
+                    setRetryQuestionIndex(0);
+                    
+                    // Reset initial response ref
+                    initialResponseSentRef.current = null;
+                    
+                    console.log('🚀 Started completely new adventure for next topic');
+                    
+                    // Go to adventure screen to start fresh
+                    setCurrentScreen(1);
+                    return; // Exit early - don't execute the topic navigation logic below
+                  } else {
+                    // No more topics, go back to topic selection
+                    setCurrentScreen(0);
+                    return; // Exit early
+                  }
                 }
                 
                 console.log(`🔍 DEBUG: Continuing to next question. New index will be: ${newQuestionIndex}`);
