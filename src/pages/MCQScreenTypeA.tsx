@@ -15,6 +15,47 @@ import { sampleMCQData, type MCQData, type MCQQuestion, type DragDropQuestion, t
 
 // Remove duplicate interface definitions (lines 16-105) since they're now imported
 
+// Add localStorage utility functions for persistent topic score tracking
+const TOPIC_SCORES_KEY = 'readingapp_topic_scores';
+
+const saveTopicScore = (topicId: string, questionIndex: number, isCorrect: boolean): void => {
+  try {
+    const stored = localStorage.getItem(TOPIC_SCORES_KEY);
+    const topicScores = stored ? JSON.parse(stored) : {};
+    
+    if (!topicScores[topicId]) {
+      topicScores[topicId] = {};
+    }
+    
+    topicScores[topicId][questionIndex] = isCorrect;
+    localStorage.setItem(TOPIC_SCORES_KEY, JSON.stringify(topicScores));
+  } catch (error) {
+    console.warn('Failed to save topic score:', error);
+  }
+};
+
+const loadTopicScores = (topicId: string): Record<number, boolean> => {
+  try {
+    const stored = localStorage.getItem(TOPIC_SCORES_KEY);
+    const topicScores = stored ? JSON.parse(stored) : {};
+    return topicScores[topicId] || {};
+  } catch (error) {
+    console.warn('Failed to load topic scores:', error);
+    return {};
+  }
+};
+
+const clearTopicScores = (topicId: string): void => {
+  try {
+    const stored = localStorage.getItem(TOPIC_SCORES_KEY);
+    const topicScores = stored ? JSON.parse(stored) : {};
+    delete topicScores[topicId];
+    localStorage.setItem(TOPIC_SCORES_KEY, JSON.stringify(topicScores));
+  } catch (error) {
+    console.warn('Failed to clear topic scores:', error);
+  }
+};
+
 // Speech Recognition interfaces - keep these as they're specific to this component
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -129,27 +170,28 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   // Track first attempts for each question
   const [firstAttempts, setFirstAttempts] = useState<Record<number, boolean>>({});
   
-  // New variables for enhanced score tracking - fix for correct answer counting
-  const [questionScores, setQuestionScores] = useState<Record<number, boolean>>({}); // Track which questions were answered correctly
-  const [totalQuestionsAttempted, setTotalQuestionsAttempted] = useState<number>(0); // Track total questions attempted
+  // Store the final accurate score for completion pages
+  const [finalAccurateScore, setFinalAccurateScore] = useState<number>(0);
   
-  // Computed accurate score - counts all questions answered correctly
+  // Enhanced score tracking - load scores from localStorage on component mount
+  const [questionScores, setQuestionScores] = useState<Record<number, boolean>>(() => {
+    return loadTopicScores(selectedTopicId);
+  });
+  
+  // Computed accurate score - counts all questions answered correctly for this topic
   const computedAccurateScore = React.useMemo(() => {
     const correctAnswers = Object.values(questionScores).filter(Boolean).length;
-    console.log('🔍 SCORE DEBUG: questionScores:', questionScores, 'correctAnswers:', correctAnswers, 'originalScore:', score);
+    console.log('🔍 SCORE DEBUG: questionScores:', questionScores, 'correctAnswers:', correctAnswers);
     return correctAnswers;
-  }, [questionScores, score]);
+  }, [questionScores]);
   
-  // Track questions attempted when they are answered
-  React.useEffect(() => {
-    if (hasAnswered && currentQuestionIndex >= 0) {
-      setTotalQuestionsAttempted(prev => {
-        const newAttempted = Math.max(prev, currentQuestionIndex + 1);
-        console.log('📊 ATTEMPT TRACKING: Question', currentQuestionIndex + 1, 'attempted. Total attempted:', newAttempted);
-        return newAttempted;
-      });
-    }
-  }, [hasAnswered, currentQuestionIndex]);
+  // Load topic scores when topic changes
+  useEffect(() => {
+    console.log('🔄 Loading scores for topic:', selectedTopicId);
+    const savedScores = loadTopicScores(selectedTopicId);
+    setQuestionScores(savedScores);
+    console.log('📊 Loaded topic scores:', savedScores);
+  }, [selectedTopicId]);
   
   // Fill blank state
   const [fillBlankAnswer, setFillBlankAnswer] = useState<string>('');
@@ -305,11 +347,16 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setScore(prev => prev + 1);
       }
       
-      // New score tracking - track this question as correctly answered
-      setQuestionScores(prev => ({
-        ...prev,
-        [currentQuestionIndex]: true
-      }));
+      // Enhanced score tracking - save to localStorage and update state
+      setQuestionScores(prev => {
+        const updated = {
+          ...prev,
+          [currentQuestionIndex]: true
+        };
+        // Save to localStorage immediately
+        saveTopicScore(selectedTopicId, currentQuestionIndex, true);
+        return updated;
+      });
       
       // Celebrate with confetti!
       celebrateWithConfetti();
@@ -408,11 +455,16 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setScore(prev => prev + 1);
       }
       
-      // New score tracking - track this question as correctly answered
-      setQuestionScores(prev => ({
-        ...prev,
-        [currentQuestionIndex]: true
-      }));
+      // Enhanced score tracking - save to localStorage and update state
+      setQuestionScores(prev => {
+        const updated = {
+          ...prev,
+          [currentQuestionIndex]: true
+        };
+        // Save to localStorage immediately
+        saveTopicScore(selectedTopicId, currentQuestionIndex, true);
+        return updated;
+      });
       
       // Celebrate with confetti!
       celebrateWithConfetti();
@@ -571,9 +623,14 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       
       // Save progress - topic is marked as completed only with passing grade (7/10+)
       // This immediately updates readingapp_user_progress in localStorage
-      // Use computed accurate score for marking completion
-      const finalScore = computedAccurateScore;
-      console.log('🏁 COMPLETION: Using accurate score:', finalScore, 'vs original score:', score);
+      // Reload scores from localStorage to ensure we have the most current data including the final question
+      const currentTopicScores = loadTopicScores(selectedTopicId);
+      const finalScore = Object.values(currentTopicScores).filter(Boolean).length;
+      console.log('🏁 COMPLETION: Reloaded scores from localStorage:', currentTopicScores);
+      console.log('🏁 COMPLETION: Using accurate final score:', finalScore, 'vs computedAccurateScore:', computedAccurateScore, 'vs original score:', score);
+      
+      // Store the final accurate score for completion pages
+      setFinalAccurateScore(finalScore);
       markTopicCompleted(selectedTopicId, finalScore);
       
       if (finalScore >= 7) {
@@ -1133,11 +1190,16 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setScore(prev => prev + 1);
       }
       
-      // New score tracking - track this question as correctly answered
-      setQuestionScores(prev => ({
-        ...prev,
-        [currentQuestionIndex]: true
-      }));
+      // Enhanced score tracking - save to localStorage and update state
+      setQuestionScores(prev => {
+        const updated = {
+          ...prev,
+          [currentQuestionIndex]: true
+        };
+        // Save to localStorage immediately
+        saveTopicScore(selectedTopicId, currentQuestionIndex, true);
+        return updated;
+      });
       
       // Celebrate with confetti!
       celebrateWithConfetti();
@@ -1194,8 +1256,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setSidebarCollapsed(false);
   }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages]);
 
-  // Reset quiz state
-  const resetQuiz = useCallback(() => {
+  // Reset quiz UI state only (preserves saved scores)
+  const resetQuizState = useCallback(() => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowFeedback(false);
@@ -1212,53 +1274,64 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setAvailableWords([]);
     setDraggedWord(null);
     setIsDragOverBin(null);
-    
-    // New reset logic for enhanced score tracking
-    setQuestionScores({});
-    setTotalQuestionsAttempted(0);
-    console.log('🔄 RESET: Cleared all question scores and attempt tracking');
+    setFinalAccurateScore(0);
+    console.log('🔄 RESET UI: Reset interface state while preserving saved scores');
   }, []);
 
-  // Reset quiz state when topic changes
+  // Full reset including clearing persistent scores (for explicit retry only)
+  const resetQuizAndClearScores = useCallback(() => {
+    resetQuizState();
+    // Clear persistent topic scores when explicitly retrying
+    clearTopicScores(selectedTopicId);
+    setQuestionScores({});
+    console.log('🔄 FULL RESET: Cleared all question scores and attempt tracking for topic:', selectedTopicId);
+  }, [selectedTopicId, resetQuizState]);
+
+  // Reset quiz UI state when topic changes (preserve scores)
   useEffect(() => {
-    resetQuiz();
+    resetQuizState();
+    // Load scores for the new topic
+    const savedScores = loadTopicScores(selectedTopicId);
+    setQuestionScores(savedScores);
+    console.log('📊 TOPIC CHANGE: Loaded scores for topic', selectedTopicId, ':', savedScores);
+    
     // Clear contextual questions and images for new topic
     setContextualQuestions({});
     setGeneratedImages({});
     setIsGeneratingQuestion(false);
     setIsGeneratingImage(false);
-  }, [selectedTopicId, resetQuiz]);
+  }, [selectedTopicId, resetQuizState]);
 
   // Show completion pages
   if (showCompletionPage === 'success') {
     return (
       <TopicComplete
-        score={computedAccurateScore}
+        score={finalAccurateScore}
         totalQuestions={currentTopic.questions.length}
         topicName={currentTopic.topicInfo.topicName}
         onNextTopic={() => {
           const nextTopicId = getNextTopicId();
           if (nextTopicId && onNextTopic) {
-            // Reset quiz state before moving to next topic
-            resetQuiz();
+            // Reset UI state before moving to next topic (preserve scores)
+            resetQuizState();
             // Pass the next topic ID to the parent component
             onNextTopic(nextTopicId);
           } else {
             // No more topics, go back to topic selection
-            resetQuiz();
+            resetQuizState();
             if (onBackToTopics) {
               onBackToTopics();
             }
           }
         }}
         onRetryTopic={() => {
-          resetQuiz();
+          resetQuizAndClearScores();
           if (onRetryTopic) {
             onRetryTopic();
           }
         }}
         onBackToTopics={() => {
-          resetQuiz();
+          resetQuizState();
           if (onBackToTopics) {
             onBackToTopics();
           }
@@ -1270,17 +1343,17 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   if (showCompletionPage === 'practice') {
     return (
       <PracticeNeeded
-        score={computedAccurateScore}
+        score={finalAccurateScore}
         totalQuestions={currentTopic.questions.length}
         topicName={currentTopic.topicInfo.topicName}
         onRetryTopic={() => {
-          resetQuiz();
+          resetQuizAndClearScores();
           if (onRetryTopic) {
             onRetryTopic();
           }
         }}
         onBackToTopics={() => {
-          resetQuiz();
+          resetQuizState();
           if (onBackToTopics) {
             onBackToTopics();
           }
@@ -1415,11 +1488,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">
                     Question {currentQuestionIndex + 1} of {currentTopic.questions.length}
                   </h2>
-                  {process.env.NODE_ENV === 'development' && (
-                    <div className="text-xs text-gray-500 text-center">
-                      DEBUG: currentQuestionIndex={currentQuestionIndex}, startingQuestionIndex={startingQuestionIndex}
-                    </div>
-                  )}
+                  {/* {process.env.NODE_ENV === 'development' && (
+                    // <div className="text-xs text-gray-500 text-center">
+                    //   DEBUG: currentQuestionIndex={currentQuestionIndex}, startingQuestionIndex={startingQuestionIndex}
+                    // </div>
+                  )} */}
                   
 
                   
