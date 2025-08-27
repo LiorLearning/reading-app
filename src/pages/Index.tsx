@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2 } from "lucide-react";
-import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from "@/lib/utils";
+import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -133,13 +133,15 @@ const Index = () => {
   // Track if initial AI response has been sent for current session
   const initialResponseSentRef = React.useRef<string | null>(null);
   
-  // Current adventure tracking
-  const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(null);
+  // Current adventure tracking - initialize from localStorage on refresh
+  const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
   const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
   
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
   const [selectedTopicFromPreference, setSelectedTopicFromPreference] = React.useState<string | null>(null);
+  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(null);
+  const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
@@ -150,6 +152,37 @@ const Index = () => {
       setSidebarCollapsed(true);
     }
   }, [currentScreen]);
+
+  // Save current adventure ID whenever it changes
+  React.useEffect(() => {
+    saveCurrentAdventureId(currentAdventureId);
+  }, [currentAdventureId]);
+
+  // Restore latest image for current adventure ONLY on app initialization/refresh (not during same session)
+  React.useEffect(() => {
+    // Only restore if we have both an adventure ID and chat messages from localStorage (indicating page refresh)
+    const storedMessages = loadUserAdventure();
+    const storedAdventureId = loadCurrentAdventureId();
+    
+    if (storedAdventureId && storedMessages.length > 0 && currentAdventureId === storedAdventureId) {
+      // Get cached images for the current adventure
+      const cachedImages = getCachedImagesForAdventure(storedAdventureId);
+      const latestCachedImage = cachedImages.length > 0 ? cachedImages[0] : null;
+      
+      if (latestCachedImage && panels.length > 0) {
+        // Update the first panel to show the latest generated image
+        const updatedPanels = [...panels];
+        updatedPanels[0] = {
+          ...updatedPanels[0],
+          image: latestCachedImage.url,
+          text: updatedPanels[0].text // Keep original text
+        };
+        
+        reset(updatedPanels);
+        console.log(`📸 Restored latest image for adventure on page refresh: ${storedAdventureId}`);
+      }
+    }
+  }, []); // Run only once on mount
 
   // Generate initial AI response when entering adventure screen
   React.useEffect(() => {
@@ -361,6 +394,15 @@ const Index = () => {
       
       console.log('Setting selectedPreference to:', preferenceLevel);
       setSelectedPreference(preferenceLevel);
+      
+      // Initialize the combined grade and level selection for proper highlighting
+      if (preferenceLevel && userData?.gradeDisplayName) {
+        setSelectedGradeAndLevel({ 
+          grade: userData.gradeDisplayName, 
+          level: preferenceLevel 
+        });
+        console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
+      }
       
       // First, check if there's a current topic saved from previous selection
       if (userProgress?.currentTopicId) {
@@ -759,10 +801,13 @@ const Index = () => {
     const targetAdventure = savedAdventures.find(adv => adv.id === adventureId);
     
     if (targetAdventure) {
+      // Get cached images for this adventure to find the latest generated image
+      const cachedImages = getCachedImagesForAdventure(adventureId);
+      const latestCachedImage = cachedImages.length > 0 ? cachedImages[0] : null; // First item is most recent (sorted by timestamp)
+      
       // Restore comic panels from saved adventure if available
       if (targetAdventure.comicPanels && targetAdventure.comicPanels.length > 0) {
         // Check if we have cached images and restore them if the URLs are no longer available
-        const cachedImages = getCachedImagesForAdventure(adventureId);
         const restoredPanels = targetAdventure.comicPanels.map(panel => {
           // Try to use original image first
           let imageToUse = panel.image;
@@ -784,11 +829,38 @@ const Index = () => {
           };
         });
         
+        // If we have a latest cached image and generated images, update the first panel to show it as default
+        if (latestCachedImage && restoredPanels.length > 0) {
+          restoredPanels[0] = {
+            ...restoredPanels[0],
+            image: latestCachedImage.url,
+            text: restoredPanels[0].text // Keep the original text
+          };
+          console.log(`📸 Set latest generated image as default for adventure: ${targetAdventure.name}`);
+        }
+        
         reset(restoredPanels);
         console.log(`✅ Restored ${restoredPanels.length} comic panels for adventure: ${targetAdventure.name}`);
       } else {
-        // No saved panels, start with initial panels
-        reset(initialPanels);
+        // No saved panels - create initial panel with latest generated image or default
+        let initialPanelImage = rocket1; // default
+        let initialPanelText = "The brave astronaut climbs into ROCKET!"; // default text
+        
+        if (latestCachedImage) {
+          initialPanelImage = latestCachedImage.url;
+          initialPanelText = "Your adventure continues...";
+          console.log(`📸 Using latest generated image as default for adventure without saved panels: ${targetAdventure.name}`);
+        }
+        
+        const defaultPanels = [
+          { 
+            id: crypto.randomUUID(), 
+            image: initialPanelImage, 
+            text: initialPanelText 
+          }
+        ];
+        
+        reset(defaultPanels);
       }
       
       // Load the adventure's messages and state
@@ -818,6 +890,9 @@ const Index = () => {
       setChatMessages([]);
       // Generate new adventure ID
       setCurrentAdventureId(crypto.randomUUID());
+      // Reset comic panels to default image for new adventures
+      reset(initialPanels);
+      console.log('🚀 Started new adventure with default rocket image');
     } else {
       // For continuing, keep existing adventure ID or create new one
       if (!currentAdventureId) {
@@ -826,11 +901,24 @@ const Index = () => {
     }
     
     setCurrentScreen(1); // Go to adventure screen first to show AI response
-  }, [currentAdventureId]);
+  }, [currentAdventureId, reset, initialPanels]);
+
+  // Handle grade selection (for HomePage dropdown display)
+  const handleGradeSelection = React.useCallback((gradeDisplayName: string) => {
+    playClickSound();
+    setSelectedGradeFromDropdown(gradeDisplayName);
+  }, []);
 
   // Handle preference selection (for HomePage only)
-  const handlePreferenceSelection = React.useCallback((level: 'start' | 'middle') => {
+  const handlePreferenceSelection = React.useCallback((level: 'start' | 'middle', gradeDisplayName?: string) => {
     playClickSound();
+    
+    // Update selected grade if provided
+    if (gradeDisplayName) {
+      setSelectedGradeFromDropdown(gradeDisplayName);
+      // Track the combined grade and level selection for highlighting
+      setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+    }
     
     // Get all available topic IDs from MCQ data in order
     const allTopicIds = Object.keys(sampleMCQData.topics);
@@ -838,12 +926,12 @@ const Index = () => {
     // Save preference and get the specific topic immediately
     const specificTopic = saveTopicPreference(level, allTopicIds);
     
-    console.log(`Preference selection - Level: ${level}, Topic: ${specificTopic}`);
+    console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
     setSelectedPreference(level);
     setSelectedTopicFromPreference(specificTopic);
     
-    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}`);
+    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, []);
 
   // Handle session closing and save current adventure
@@ -952,64 +1040,247 @@ const Index = () => {
                   >
                     <GraduationCap className="h-5 w-5" />
                     {(() => {
+                      const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName || 'Grade';
                       const buttonText = selectedTopicFromPreference 
                         ? `Next: ${selectedTopicFromPreference}` 
                         : selectedPreference 
-                          ? `${userData?.gradeDisplayName || 'Grade'} ${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` 
+                          ? `${currentGrade} ${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` 
                           : 'Grade Selection';
-                      console.log('Button render - selectedTopicFromPreference:', selectedTopicFromPreference, 'selectedPreference:', selectedPreference, 'buttonText:', buttonText);
+                      console.log('Button render - selectedGradeFromDropdown:', selectedGradeFromDropdown, 'selectedTopicFromPreference:', selectedTopicFromPreference, 'selectedPreference:', selectedPreference, 'buttonText:', buttonText);
                       return buttonText;
                     })()}
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
-                  className="w-56 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                  className="w-64 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                   align="start"
                 >
+                  {/* Kindergarten */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg">
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''}`}>
                       <span className="text-lg">🎓</span>
-                      <span className="font-semibold">Grade 1</span>
-                      {selectedTopicFromPreference && (
-                        <span className="ml-auto text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                          {selectedTopicFromPreference} ready
-                        </span>
+                      <span className="font-semibold">Kindergarten</span>
+                      {selectedGradeAndLevel?.grade === 'Kindergarten' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
                       )}
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent 
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedPreference === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', 'Kindergarten')}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
                           <div className="font-semibold">Start</div>
                           <div className="text-sm text-gray-500">Beginning level</div>
                         </div>
-                        {(() => {
-                          console.log('Start item render - selectedPreference:', selectedPreference, 'is selected:', selectedPreference === 'start');
-                          return selectedPreference === 'start' ? <span className="ml-auto text-green-600">✓</span> : null;
-                        })()}
+                        {selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedPreference === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', 'Kindergarten')}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
                           <div className="font-semibold">Middle</div>
                           <div className="text-sm text-gray-500">Intermediate level</div>
                         </div>
-                        {(() => {
-                          console.log('Middle item render - selectedPreference:', selectedPreference, 'is selected:', selectedPreference === 'middle');
-                          return selectedPreference === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null;
-                        })()}
+                        {selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* 1st Grade */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' ? 'bg-blue-100' : ''}`}>
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">1st Grade</span>
+                      {selectedGradeAndLevel?.grade === '1st Grade' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', '1st Grade')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className="flex items-center gap-2 px-4 py-3 hover:bg-purple-50 cursor-pointer rounded-lg"
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', '1st Grade')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* 2nd Grade */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' ? 'bg-blue-100' : ''}`}>
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">2nd Grade</span>
+                      {selectedGradeAndLevel?.grade === '2nd Grade' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', '2nd Grade')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', '2nd Grade')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* 3rd Grade */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' ? 'bg-blue-100' : ''}`}>
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">3rd Grade</span>
+                      {selectedGradeAndLevel?.grade === '3rd Grade' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', '3rd Grade')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', '3rd Grade')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* 4th Grade */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' ? 'bg-blue-100' : ''}`}>
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">4th Grade</span>
+                      {selectedGradeAndLevel?.grade === '4th Grade' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', '4th Grade')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', '4th Grade')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* 5th Grade */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' ? 'bg-blue-100' : ''}`}>
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">5th Grade</span>
+                      {selectedGradeAndLevel?.grade === '5th Grade' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', '5th Grade')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', '5th Grade')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* Choose Topic Option */}
+                      <DropdownMenuItem 
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-purple-50 cursor-pointer rounded-lg border-t"
                         onClick={() => {
                           playClickSound();
                           setCurrentScreen(0); // Navigate to topics screen
@@ -1021,8 +1292,6 @@ const Index = () => {
                           <div className="text-sm text-gray-500">Pick your adventure</div>
                         </div>
                       </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -1086,7 +1355,7 @@ const Index = () => {
               {userData && !devToolsVisible && (
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <span className="text-sm lg:text-base font-semibold text-primary/80">
-                    🎓 {userData.gradeDisplayName}
+                    🎓 {selectedGradeFromDropdown || userData.gradeDisplayName}
                   </span>
                 </div>
               )}

@@ -7,6 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 
 // Local storage key for user adventure messages
 const USER_ADVENTURE_KEY = "user_adventure";
+// Local storage key for current adventure ID
+const CURRENT_ADVENTURE_ID_KEY = "current_adventure_id";
 
 // Chat message type for local storage
 export interface ChatMessage {
@@ -68,6 +70,33 @@ export const clearUserAdventure = (): void => {
     localStorage.removeItem(USER_ADVENTURE_KEY);
   } catch (error) {
     console.warn('Failed to clear user adventure from local storage:', error);
+  }
+};
+
+/**
+ * Save current adventure ID to local storage
+ */
+export const saveCurrentAdventureId = (adventureId: string | null): void => {
+  try {
+    if (adventureId) {
+      localStorage.setItem(CURRENT_ADVENTURE_ID_KEY, adventureId);
+    } else {
+      localStorage.removeItem(CURRENT_ADVENTURE_ID_KEY);
+    }
+  } catch (error) {
+    console.warn('Failed to save current adventure ID to local storage:', error);
+  }
+};
+
+/**
+ * Load current adventure ID from local storage
+ */
+export const loadCurrentAdventureId = (): string | null => {
+  try {
+    return localStorage.getItem(CURRENT_ADVENTURE_ID_KEY);
+  } catch (error) {
+    console.warn('Failed to load current adventure ID from local storage:', error);
+    return null;
   }
 };
 
