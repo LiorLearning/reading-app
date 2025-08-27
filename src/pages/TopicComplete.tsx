@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { playClickSound } from "@/lib/sounds";
 import { Trophy, Star, ChevronRight, RotateCcw } from "lucide-react";
+import confetti from 'canvas-confetti';
 
 interface TopicCompleteProps {
   score: number;
@@ -150,7 +151,14 @@ const TopicComplete: React.FC<TopicCompleteProps> = ({
                   size="lg"
                   onClick={() => {
                     playClickSound();
-                    onNextTopic();
+                    // Trigger celebration effects when advancing to next topic
+                    confetti({
+                      particleCount: 150,
+                      spread: 90,
+                      origin: { y: 0.8 },
+                      colors: ['#16a34a', '#22c55e', '#4ade80']
+                    });
+                    setTimeout(() => onNextTopic(), 300);
                   }}
                   className="border-3 bg-green-600 hover:bg-green-700 text-white btn-animate px-8 py-4 text-xl font-bold rounded-xl flex items-center gap-3"
                   style={{ 

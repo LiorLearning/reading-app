@@ -71,6 +71,157 @@ export const clearUserAdventure = (): void => {
   }
 };
 
+// Adventure storage types and utilities
+export interface SavedAdventure {
+  id: string;
+  name: string;
+  summary: string;
+  messages: ChatMessage[];
+  createdAt: number;
+  lastPlayedAt: number;
+  comicPanelImage?: string;
+  topicId?: string;
+}
+
+export interface AdventureSummary {
+  id: string;
+  name: string;
+  summary: string;
+  lastPlayedAt: number;
+  comicPanelImage?: string;
+}
+
+const SAVED_ADVENTURES_KEY = 'readingapp_saved_adventures';
+const ADVENTURE_SUMMARIES_KEY = 'readingapp_adventure_summaries';
+
+/**
+ * Save an adventure with AI-generated name and summary
+ */
+export const saveAdventure = (adventure: SavedAdventure): void => {
+  try {
+    const stored = localStorage.getItem(SAVED_ADVENTURES_KEY);
+    const adventures: SavedAdventure[] = stored ? JSON.parse(stored) : [];
+    
+    // Remove existing adventure with same ID
+    const filteredAdventures = adventures.filter(a => a.id !== adventure.id);
+    
+    // Add the new/updated adventure
+    filteredAdventures.push(adventure);
+    
+    // Keep only last 10 adventures to manage storage
+    const recentAdventures = filteredAdventures.slice(-10);
+    
+    localStorage.setItem(SAVED_ADVENTURES_KEY, JSON.stringify(recentAdventures));
+  } catch (error) {
+    console.warn('Failed to save adventure to local storage:', error);
+  }
+};
+
+/**
+ * Load all saved adventures
+ */
+export const loadSavedAdventures = (): SavedAdventure[] => {
+  try {
+    const stored = localStorage.getItem(SAVED_ADVENTURES_KEY);
+    if (!stored) {
+      return [];
+    }
+    
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('Failed to load saved adventures from local storage:', error);
+    return [];
+  }
+};
+
+/**
+ * Save adventure summaries for quick loading
+ */
+export const saveAdventureSummaries = (summaries: AdventureSummary[]): void => {
+  try {
+    localStorage.setItem(ADVENTURE_SUMMARIES_KEY, JSON.stringify(summaries));
+  } catch (error) {
+    console.warn('Failed to save adventure summaries to local storage:', error);
+  }
+};
+
+/**
+ * Load adventure summaries
+ */
+export const loadAdventureSummaries = (): AdventureSummary[] => {
+  try {
+    const stored = localStorage.getItem(ADVENTURE_SUMMARIES_KEY);
+    if (!stored) {
+      return [];
+    }
+    
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('Failed to load adventure summaries from local storage:', error);
+    return [];
+  }
+};
+
+/**
+ * Generate adventure summary from messages using AI
+ */
+export const generateAdventureSummary = async (messages: ChatMessage[]): Promise<string> => {
+  if (messages.length === 0) return "An empty adventure waiting to be filled with excitement!";
+  
+  // Get user messages to understand the adventure content
+  const userMessages = messages
+    .filter(msg => msg.type === 'user')
+    .map(msg => msg.content)
+    .join(' ');
+  
+  if (!userMessages.trim()) return "A mysterious adventure yet to unfold...";
+  
+  // Create a simple extractive summary from user messages
+  const words = userMessages.split(' ').filter(word => word.length > 3);
+  const uniqueWords = [...new Set(words)];
+  const keyWords = uniqueWords.slice(0, 10).join(' ');
+  
+  return `An adventure involving ${keyWords}...`.substring(0, 100);
+};
+
+/**
+ * Generate adventure name from messages
+ */
+export const generateAdventureName = async (messages: ChatMessage[]): Promise<string> => {
+  if (messages.length === 0) return "Untitled Adventure";
+  
+  // Get first few user messages for naming
+  const firstMessages = messages
+    .filter(msg => msg.type === 'user')
+    .slice(0, 3)
+    .map(msg => msg.content)
+    .join(' ');
+  
+  if (!firstMessages.trim()) return "Mystery Adventure";
+  
+  // Extract key themes for naming
+  const themes = ['space', 'magic', 'dragon', 'superhero', 'ocean', 'forest', 'castle', 'robot', 'ninja', 'pirate'];
+  const foundTheme = themes.find(theme => 
+    firstMessages.toLowerCase().includes(theme)
+  );
+  
+  if (foundTheme) {
+    const adventureTypes = ['Quest', 'Journey', 'Adventure', 'Mission', 'Story'];
+    const randomType = adventureTypes[Math.floor(Math.random() * adventureTypes.length)];
+    return `${foundTheme.charAt(0).toUpperCase() + foundTheme.slice(1)} ${randomType}`;
+  }
+  
+  // Fallback names
+  const fallbackNames = [
+    'Epic Adventure', 'Magical Journey', 'Hero Quest', 'Amazing Story',
+    'Great Adventure', 'Fantastic Tale', 'Wonder Quest', 'Dream Journey'
+  ];
+  
+  return fallbackNames[Math.floor(Math.random() * fallbackNames.length)];
+};
+
 // Progress tracking interfaces and utilities
 export interface TopicProgress {
   topicId: string;
@@ -131,7 +282,7 @@ export const loadUserProgress = (): UserProgress | null => {
 };
 
 /**
- * Update progress when a topic is completed
+ * Update progress when a topic is attempted (and mark as completed only with passing grade)
  */
 export const markTopicCompleted = (topicId: string, score: number): void => {
   const currentProgress = loadUserProgress() || {
@@ -140,30 +291,51 @@ export const markTopicCompleted = (topicId: string, score: number): void => {
     lastPlayedAt: Date.now()
   };
 
+  const PASSING_GRADE = 7; // Minimum score to consider topic completed
+  const isPassingGrade = score >= PASSING_GRADE;
+
   // Check if topic was already completed
   const existingIndex = currentProgress.completedTopics.findIndex(t => t.topicId === topicId);
   
   if (existingIndex >= 0) {
-    // Update existing completion
+    const wasAlreadyCompleted = currentProgress.completedTopics[existingIndex].completed;
+    
+    // Update existing attempt
     currentProgress.completedTopics[existingIndex] = {
       topicId,
-      completed: true,
+      completed: isPassingGrade, // Only mark as completed if passing grade
       score,
       completedAt: Date.now()
     };
+    
+    // If this is first time passing (wasn't completed before but is now)
+    if (!wasAlreadyCompleted && isPassingGrade) {
+      currentProgress.totalTopicsCompleted++;
+    }
+    // If was completed before but now failing (shouldn't happen in normal flow but just in case)
+    else if (wasAlreadyCompleted && !isPassingGrade) {
+      currentProgress.totalTopicsCompleted = Math.max(0, currentProgress.totalTopicsCompleted - 1);
+    }
   } else {
-    // Add new completion
+    // Add new attempt
     currentProgress.completedTopics.push({
       topicId,
-      completed: true,
+      completed: isPassingGrade, // Only mark as completed if passing grade
       score,
       completedAt: Date.now()
     });
-    currentProgress.totalTopicsCompleted++;
+    
+    // Only increment total if it's a passing grade
+    if (isPassingGrade) {
+      currentProgress.totalTopicsCompleted++;
+    }
   }
 
   currentProgress.lastPlayedAt = Date.now();
   saveUserProgress(currentProgress);
+  
+  // Log progress update for debugging
+  console.log(`Topic ${topicId} attempted with score ${score}/10. ${isPassingGrade ? 'PASSED' : 'NEEDS PRACTICE'} - Total completed: ${currentProgress.totalTopicsCompleted}`);
 };
 
 /**
@@ -192,29 +364,33 @@ export const getNextTopic = (allTopicIds: string[]): string | null => {
     return allTopicIds[0] || null;
   }
 
-  // If user has a current topic and it's not completed, continue with it
+  // If user has a current topic and it's not completed with passing grade, continue with it
   if (progress.currentTopicId) {
-    const isCurrentTopicCompleted = progress.completedTopics.some(
-      t => t.topicId === progress.currentTopicId && t.completed
+    const currentTopicProgress = progress.completedTopics.find(
+      t => t.topicId === progress.currentTopicId
     );
     
-    if (!isCurrentTopicCompleted) {
+    // Continue with current topic if it's not completed with passing grade
+    if (!currentTopicProgress || !currentTopicProgress.completed) {
       return progress.currentTopicId;
     }
   }
 
-  // Find first uncompleted topic
+  // Find first uncompleted topic (not completed with passing grade)
   for (const topicId of allTopicIds) {
-    const isCompleted = progress.completedTopics.some(
-      t => t.topicId === topicId && t.completed
+    const topicProgress = progress.completedTopics.find(
+      t => t.topicId === topicId
     );
     
-    if (!isCompleted) {
+    // Topic is available if:
+    // 1. Never attempted (not in completedTopics)
+    // 2. Attempted but not completed with passing grade
+    if (!topicProgress || !topicProgress.completed) {
       return topicId;
     }
   }
 
-  // All topics completed, return first topic for replay
+  // All topics completed with passing grades, return first topic for replay
   return allTopicIds[0] || null;
 };
 
@@ -230,9 +406,155 @@ export const getNextTopicInSequence = (allTopicIds: string[], currentTopicId: st
 };
 
 /**
- * Check if user has made progress (completed at least one topic)
+ * Check if user has made progress (completed at least one topic with passing grade)
  */
 export const hasUserProgress = (): boolean => {
   const progress = loadUserProgress();
   return progress ? progress.totalTopicsCompleted > 0 : false;
+};
+
+/**
+ * Get topic progress including score and completion status
+ */
+export const getTopicProgress = (topicId: string): TopicProgress | null => {
+  const progress = loadUserProgress();
+  if (!progress) return null;
+  
+  return progress.completedTopics.find(t => t.topicId === topicId) || null;
+};
+
+/**
+ * Check if a topic is completed with passing grade
+ */
+export const isTopicCompleted = (topicId: string): boolean => {
+  const topicProgress = getTopicProgress(topicId);
+  return topicProgress ? topicProgress.completed : false;
+};
+
+/**
+ * Get user's score for a specific topic
+ */
+export const getTopicScore = (topicId: string): number | null => {
+  const topicProgress = getTopicProgress(topicId);
+  return topicProgress ? (topicProgress.score || null) : null;
+};
+
+// Topic preference storage for grade level selection
+const TOPIC_PREFERENCE_KEY = 'readingapp_topic_preference';
+
+export interface TopicPreference {
+  level: 'start' | 'middle';
+  lastSelected: number;
+}
+
+/**
+ * Save user's topic level preference and determine the specific topic
+ */
+export const saveTopicPreference = (level: 'start' | 'middle', allTopicIds: string[]): string | null => {
+  try {
+    const preference: TopicPreference = {
+      level,
+      lastSelected: Date.now()
+    };
+    localStorage.setItem(TOPIC_PREFERENCE_KEY, JSON.stringify(preference));
+    
+    // Immediately determine the specific topic and save it as current topic
+    const specificTopic = getNextTopicByPreference(allTopicIds, level);
+    if (specificTopic) {
+      setCurrentTopic(specificTopic);
+      return specificTopic;
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Failed to save topic preference to local storage:', error);
+    return null;
+  }
+};
+
+/**
+ * Load user's topic level preference
+ */
+export const loadTopicPreference = (): TopicPreference | null => {
+  try {
+    const stored = localStorage.getItem(TOPIC_PREFERENCE_KEY);
+    if (!stored) {
+      return null;
+    }
+    
+    const parsed = JSON.parse(stored);
+    
+    if (
+      typeof parsed === 'object' && 
+      parsed !== null &&
+      (parsed.level === 'start' || parsed.level === 'middle') &&
+      typeof parsed.lastSelected === 'number'
+    ) {
+      return parsed as TopicPreference;
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Failed to load topic preference from local storage:', error);
+    return null;
+  }
+};
+
+/**
+ * Get the next available topic based on user's preference level and completed topics
+ * Uses the actual ordering from mcq-questions.tsx data file
+ */
+export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle'): string | null => {
+  const progress = loadUserProgress();
+  
+  // Topics are already ordered in the data file, use that exact order
+  // Start level begins with K-F.2, middle level begins with 1-Q.4
+  let startIndex = 0;
+  
+  if (level === 'middle') {
+    // Find 1-Q.4 topic index to start from middle level
+    startIndex = allTopicIds.findIndex(id => id === '1-Q.4');
+    if (startIndex === -1) {
+      // Fallback if 1-Q.4 not found - find first 1- topic
+      startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+      if (startIndex === -1) startIndex = 0;
+    }
+  }
+  
+  if (!progress) {
+    // First time playing, return first topic from preferred starting point
+    return allTopicIds[startIndex] || null;
+  }
+  
+  // Find first uncompleted topic starting from the preferred level
+  for (let i = startIndex; i < allTopicIds.length; i++) {
+    const topicId = allTopicIds[i];
+    const topicProgress = progress.completedTopics.find(
+      t => t.topicId === topicId
+    );
+    
+    // Topic is available if:
+    // 1. Never attempted (not in completedTopics)
+    // 2. Attempted but not completed with passing grade
+    if (!topicProgress || !topicProgress.completed) {
+      return topicId;
+    }
+  }
+  
+  // All topics from preferred starting point completed, check from beginning
+  if (startIndex > 0) {
+    for (let i = 0; i < startIndex; i++) {
+      const topicId = allTopicIds[i];
+      const topicProgress = progress.completedTopics.find(
+        t => t.topicId === topicId
+      );
+      
+      if (!topicProgress || !topicProgress.completed) {
+        return topicId;
+      }
+    }
+  }
+  
+  // All topics completed, return first topic for replay
+  return allTopicIds[0] || null;
 };

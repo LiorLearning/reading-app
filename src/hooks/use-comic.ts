@@ -17,7 +17,8 @@ type Action =
   | { type: "SET_CURRENT"; index: number }
   | { type: "ADD_PANEL"; panel: ComicPanel }
   | { type: "UNDO" }
-  | { type: "REDO" };
+  | { type: "REDO" }
+  | { type: "RESET"; initialPanels: ComicPanel[] };
 
 function clonePanels(arr: ComicPanel[]) {
   return arr.map((p) => ({ ...p }));
@@ -51,6 +52,9 @@ function reducer(state: State, action: Action): State {
       const pastSnap = { panels: clonePanels(state.panels), currentIndex: state.currentIndex };
       return { panels: next.panels, currentIndex: next.currentIndex, past: [...state.past, pastSnap], future: rest };
     }
+    case "RESET": {
+      return { panels: action.initialPanels, currentIndex: 0, past: [], future: [] };
+    }
     default:
       return state;
   }
@@ -68,6 +72,7 @@ export function useComic(initialPanels: ComicPanel[]) {
   const addPanel = useCallback((panel: ComicPanel) => dispatch({ type: "ADD_PANEL", panel }), []);
   const undo = useCallback(() => dispatch({ type: "UNDO" }), []);
   const redo = useCallback(() => dispatch({ type: "REDO" }), []);
+  const reset = useCallback((newInitialPanels: ComicPanel[]) => dispatch({ type: "RESET", initialPanels: newInitialPanels }), []);
 
-  return { ...state, setCurrent, addPanel, undo, redo };
+  return { ...state, setCurrent, addPanel, undo, redo, reset };
 }

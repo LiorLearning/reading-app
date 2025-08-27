@@ -482,11 +482,18 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // All questions completed - check score and show appropriate completion page
       setQuizCompleted(true);
       
-      // Save progress - topic is completed regardless of score
+      // Save progress - topic is marked as completed only with passing grade (7/10+)
+      // This immediately updates readingapp_user_progress in localStorage
       markTopicCompleted(selectedTopicId, score);
       
       if (score >= 7) {
         setShowCompletionPage('success');
+        // Trigger confetti for passing grade
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
       } else {
         setShowCompletionPage('practice');
       }

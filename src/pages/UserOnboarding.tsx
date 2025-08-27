@@ -18,12 +18,7 @@ interface GradeOption {
 }
 
 const grades: GradeOption[] = [
-  { value: "kindergarten", label: "Kindergarten", displayName: "Kindergarten" },
   { value: "grade1", label: "1st Grade", displayName: "1st Grade" },
-  { value: "grade2", label: "2nd Grade", displayName: "2nd Grade" },
-  { value: "grade3", label: "3rd Grade", displayName: "3rd Grade" },
-  { value: "grade4", label: "4th Grade", displayName: "4th Grade" },
-  { value: "grade5", label: "5th Grade", displayName: "5th Grade" },
 ];
 
 const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {

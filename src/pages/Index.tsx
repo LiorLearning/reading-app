@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic } from "@/lib/utils";
+import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound, playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -94,7 +94,7 @@ const Index = () => {
     []
   );
 
-  const { panels, currentIndex, setCurrent, addPanel, redo } = useComic(initialPanels);
+  const { panels, currentIndex, setCurrent, addPanel, redo, reset } = useComic(initialPanels);
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>(() => {
     // Load messages from local storage on component initialization
@@ -118,6 +118,16 @@ const Index = () => {
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
+  // Adventure mode state to track whether it's a new or continuing adventure
+  const [adventureMode, setAdventureMode] = React.useState<'new' | 'continue'>('new');
+  
+  // Track if initial AI response has been sent for current session
+  const initialResponseSentRef = React.useRef<string | null>(null);
+  
+  // Current adventure tracking
+  const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(null);
+  const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
+  
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   
@@ -127,6 +137,88 @@ const Index = () => {
       setSidebarCollapsed(true);
     }
   }, [currentScreen]);
+
+  // Generate initial AI response when entering adventure screen
+  React.useEffect(() => {
+    if (currentScreen === 1 && selectedTopicId && adventureMode) {
+      // Create unique session key to prevent duplicate messages
+      const sessionKey = `${selectedTopicId}-${adventureMode}`;
+      
+      // Check if we've already sent an initial response for this session
+      if (initialResponseSentRef.current === sessionKey) {
+        return;
+      }
+      
+      // Generate initial AI message based on adventure mode
+      const generateInitialResponse = async () => {
+        let initialMessage: string;
+        
+        if (adventureMode === 'new') {
+          // Ask about what kind of adventure they want to make
+          const newAdventureMessages = [
+            "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀",
+            "✨ Hey there, explorer! Ready to embark on something incredible? Tell me, what type of adventure is calling to you today? 🎭",
+            "🎨 Greetings, creative adventurer! I'm Krafty, and I'm here to help you craft the most amazing story! What adventure theme excites you most today? 🌈",
+            "🚀 Adventure awaits, my friend! I'm Krafty, your sidekick in this epic journey! What kind of thrilling adventure shall we create together today? ⭐"
+          ];
+          initialMessage = newAdventureMessages[Math.floor(Math.random() * newAdventureMessages.length)];
+        } else {
+          // Reference last messages and suggest interesting progress
+          const currentMessages = chatMessages;
+          const recentMessages = currentMessages.slice(-3);
+          const hasRecentContext = recentMessages.length > 0;
+          
+          if (hasRecentContext) {
+            const contextMessages = [
+              `🎯 Welcome back, adventurer! I've been thinking about our last conversation... ${recentMessages[recentMessages.length - 1]?.content?.substring(0, 50)}... What happens next in your epic tale? 🌟`,
+              `🚀 Great to see you again! Based on where we left off, I have some exciting ideas brewing! What direction would you like to take our adventure now? ✨`,
+              `⭐ You're back! I've been eagerly waiting to continue our journey! From what we discussed last time, there are so many possibilities ahead! What's your next move? 🎭`,
+              `🌈 Welcome back, storyteller! Our adventure has such great momentum! I can't wait to see what amazing twist you'll add next! What happens now? 🎪`
+            ];
+            initialMessage = contextMessages[Math.floor(Math.random() * contextMessages.length)];
+          } else {
+            // Load adventure summaries for context
+            const summaries = loadAdventureSummaries();
+            if (summaries.length > 0) {
+              const recentSummary = summaries[summaries.length - 1];
+              const contextMessages = [
+                `🎯 Welcome back to "${recentSummary.name}"! I remember we were working on ${recentSummary.summary}. What exciting direction should we take next? 🌟`,
+                `🚀 Great to see you again! I've been thinking about "${recentSummary.name}" - ${recentSummary.summary}. What happens next in our story? ✨`,
+                `⭐ You're back for more adventure! Last time we created "${recentSummary.name}" involving ${recentSummary.summary}. Where do we go from here? 🎭`
+              ];
+              initialMessage = contextMessages[Math.floor(Math.random() * contextMessages.length)];
+            } else {
+              const continueMessages = [
+                "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟",
+                "🚀 Great to see you again! Ready to pick up where we left off and create something incredible? What's next in your story? ✨",
+                "⭐ You're back for more adventure! I love your enthusiasm! What exciting twist should we add to your tale today? 🎭"
+              ];
+              initialMessage = continueMessages[Math.floor(Math.random() * continueMessages.length)];
+            }
+          }
+        }
+
+        // Mark that we've sent the initial response for this session
+        initialResponseSentRef.current = sessionKey;
+
+        // Add the initial AI message
+        const aiMessage: ChatMessage = {
+          type: 'ai',
+          content: initialMessage,
+          timestamp: Date.now()
+        };
+
+        setChatMessages(prev => {
+          setLastMessageCount(prev.length + 1);
+          playMessageSound();
+          ttsService.speakAIMessage(initialMessage);
+          return [...prev, aiMessage];
+        });
+      };
+
+      generateInitialResponse();
+    }
+  }, [currentScreen, selectedTopicId, adventureMode]);
   
   React.useEffect(() => {
     const updateScreenSize = () => {
@@ -473,6 +565,12 @@ const Index = () => {
     saveUserAdventure(chatMessages);
   }, [chatMessages]);
 
+  // Load adventure summaries on component mount
+  React.useEffect(() => {
+    const summaries = loadAdventureSummaries();
+    setAdventureSummaries(summaries);
+  }, []);
+
   // Auto-assign topic based on level and navigate
   const autoAssignTopicAndNavigate = React.useCallback((level: 'start' | 'middle') => {
     const topicId = level === 'start' ? 'K-F.2' : '1-Q.4';
@@ -495,6 +593,7 @@ const Index = () => {
     setUserData(userData);
     saveUserData(userData);
     setShowOnboarding(false);
+    setCurrentScreen(-1); // Redirect to home page instead of topic selection
     playClickSound();
   }, []);
 
@@ -509,12 +608,125 @@ const Index = () => {
     }
   }, [autoAssignTopicAndNavigate]);
 
+  // Save current adventure when user creates significant content
+  const saveCurrentAdventure = React.useCallback(async () => {
+    if (!currentAdventureId || chatMessages.length < 3) return;
+    
+    try {
+      const adventureName = await generateAdventureName(chatMessages);
+      const adventureSummary = await generateAdventureSummary(chatMessages);
+      
+      // Get the current comic panel image if available
+      const currentPanelImage = panels[currentIndex]?.image;
+      
+      const adventure: SavedAdventure = {
+        id: currentAdventureId,
+        name: adventureName,
+        summary: adventureSummary,
+        messages: chatMessages,
+        createdAt: Date.now(),
+        lastPlayedAt: Date.now(),
+        comicPanelImage: currentPanelImage,
+        topicId: selectedTopicId
+      };
+      
+      saveAdventure(adventure);
+      
+      // Create a new comic panel for this adventure if we have enough content
+      if (chatMessages.length >= 5 && panels.length === 1) { // Only if we haven't added panels yet
+        const userMessages = chatMessages.filter(msg => msg.type === 'user');
+        if (userMessages.length >= 2) {
+          const adventureContext = userMessages.slice(0, 3).map(msg => msg.content).join(' ');
+          // Generate new panel based on adventure content
+          onGenerateImage(adventureContext);
+        }
+      }
+      
+      // Update adventure summaries
+      const summaries = loadAdventureSummaries();
+      const updatedSummaries = summaries.filter(s => s.id !== currentAdventureId);
+      updatedSummaries.push({
+        id: currentAdventureId,
+        name: adventureName,
+        summary: adventureSummary,
+        lastPlayedAt: Date.now(),
+        comicPanelImage: currentPanelImage
+      });
+      
+      saveAdventureSummaries(updatedSummaries.slice(-10)); // Keep last 10
+      setAdventureSummaries(updatedSummaries);
+    } catch (error) {
+      console.error('Failed to save adventure:', error);
+    }
+  }, [currentAdventureId, chatMessages, panels, currentIndex, selectedTopicId, onGenerateImage]);
+
+  // Auto-save adventure when significant content is created
+  React.useEffect(() => {
+    if (chatMessages.length >= 3 && currentAdventureId) {
+      // Debounce saving to avoid too frequent saves
+      const timeoutId = setTimeout(async () => {
+        await saveCurrentAdventure();
+      }, 3000); // Save 3 seconds after last message
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [chatMessages.length, currentAdventureId, saveCurrentAdventure]);
+
+  // Handle continuing a specific saved adventure
+  const handleContinueSpecificAdventure = React.useCallback((adventureId: string) => {
+    playClickSound();
+    
+    // Load the specific adventure
+    const savedAdventures = loadSavedAdventures();
+    const targetAdventure = savedAdventures.find(adv => adv.id === adventureId);
+    
+    if (targetAdventure) {
+      // Reset comic panels to initial state when loading a different adventure
+      reset(initialPanels);
+      
+      // Load the adventure's messages and state
+      setChatMessages(targetAdventure.messages);
+      setCurrentAdventureId(targetAdventure.id);
+      setSelectedTopicId(targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '');
+      setAdventureMode('continue');
+      // Reset the initial response ref when starting a new adventure
+      initialResponseSentRef.current = null;
+      setCurrentScreen(1); // Go to adventure screen
+    } else {
+      // Fallback if adventure not found
+      handleStartAdventure(getNextTopic(Object.keys(sampleMCQData.topics)) || '', 'continue');
+    }
+  }, [reset, initialPanels]);
+
   // Handle start adventure from progress tracking
-  const handleStartAdventure = React.useCallback((topicId: string) => {
+  const handleStartAdventure = React.useCallback((topicId: string, mode: 'new' | 'continue' = 'new') => {
     playClickSound();
     setSelectedTopicId(topicId);
-    setCurrentScreen(3); // Go directly to MCQ screen
-  }, []);
+    setAdventureMode(mode);
+    // Reset the initial response ref when starting a new adventure
+    initialResponseSentRef.current = null;
+    
+    if (mode === 'new') {
+      // Clear chat messages for new adventures to provide clean slate
+      setChatMessages([]);
+      // Generate new adventure ID
+      setCurrentAdventureId(crypto.randomUUID());
+    } else {
+      // For continuing, keep existing adventure ID or create new one
+      if (!currentAdventureId) {
+        setCurrentAdventureId(crypto.randomUUID());
+      }
+    }
+    
+    setCurrentScreen(1); // Go to adventure screen first to show AI response
+  }, [currentAdventureId]);
+
+  // Handle session closing and save current adventure
+  const handleCloseSession = React.useCallback(async () => {
+    if (chatMessages.length >= 3 && currentAdventureId) {
+      await saveCurrentAdventure();
+    }
+  }, [chatMessages.length, currentAdventureId, saveCurrentAdventure]);
 
   // Handle settings (reset user data)
   const handleSettings = React.useCallback(() => {
@@ -526,6 +738,45 @@ const Index = () => {
       playClickSound();
     }
   }, []);
+
+  // Handle page unload - save adventure before closing
+  React.useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (chatMessages.length >= 3 && currentAdventureId) {
+        // Save synchronously on page unload
+        try {
+          // Generate names and summaries synchronously for page unload
+          const userMessages = chatMessages.filter(msg => msg.type === 'user').map(msg => msg.content).join(' ');
+          const themes = ['space', 'magic', 'dragon', 'superhero', 'ocean', 'forest'];
+          const foundTheme = themes.find(theme => userMessages.toLowerCase().includes(theme));
+          const adventureName = foundTheme ? `${foundTheme.charAt(0).toUpperCase() + foundTheme.slice(1)} Adventure` : 'Epic Adventure';
+          
+          const words = userMessages.split(' ').filter(word => word.length > 3);
+          const uniqueWords = [...new Set(words)];
+          const keyWords = uniqueWords.slice(0, 8).join(' ');
+          const adventureSummary = keyWords ? `An adventure involving ${keyWords}...`.substring(0, 100) : 'Amazing adventure';
+          
+          const adventure: SavedAdventure = {
+            id: currentAdventureId,
+            name: adventureName,
+            summary: adventureSummary,
+            messages: chatMessages,
+            createdAt: Date.now(),
+            lastPlayedAt: Date.now(),
+            comicPanelImage: panels[currentIndex]?.image,
+            topicId: selectedTopicId
+          };
+          
+          saveAdventure(adventure);
+        } catch (error) {
+          console.warn('Failed to save adventure on unload:', error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [chatMessages, currentAdventureId, panels, currentIndex, selectedTopicId]);
 
 
 
@@ -693,9 +944,13 @@ const Index = () => {
             {userData && currentScreen !== -1 && (
               <Button 
                 variant="default" 
-                onClick={() => {
+                onClick={async () => {
                   playClickSound();
-                  setCurrentScreen(-1); // Go back to home
+                  await handleCloseSession(); // Save current adventure before going home
+                  
+                  // Trigger a re-render by briefly updating screen state to refresh homepage data
+                  setCurrentScreen(0);
+                  setTimeout(() => setCurrentScreen(-1), 100);
                 }}
                 className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
                 style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
@@ -779,7 +1034,13 @@ const Index = () => {
         {showOnboarding ? (
           <UserOnboarding onComplete={handleOnboardingComplete} />
         ) : currentScreen === -1 ? (
-          <HomePage userData={userData!} onNavigate={handleHomeNavigation} onStartAdventure={handleStartAdventure} onSettings={handleSettings} />
+          <HomePage 
+            userData={userData!} 
+            onNavigate={handleHomeNavigation} 
+            onStartAdventure={handleStartAdventure} 
+            onContinueSpecificAdventure={handleContinueSpecificAdventure}
+            onSettings={handleSettings} 
+          />
         ) : currentScreen === 0 ? (
           <TopicSelection onTopicSelect={handleTopicSelect} />
         ) : currentScreen === 1 ? (
