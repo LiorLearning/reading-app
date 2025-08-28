@@ -1,11 +1,12 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Mic, Send, Image as ImageIcon, Square } from "lucide-react";
+import { Mic, Send, Image as ImageIcon, Square, X } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import OpenAI from 'openai';
+import { ttsService } from "@/lib/tts-service";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
@@ -20,6 +21,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [useWhisper, setUseWhisper] = useState(false);
+  const isCancelledRef = useRef(false);
   
   // Initialize OpenAI client for Whisper
   const openaiClient = React.useMemo(() => {
@@ -94,6 +96,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         mediaRecorder.onstop = async () => {
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
           
+          // Check if recording was cancelled
+          if (isCancelledRef.current) {
+            // Stop all tracks and exit without processing
+            stream.getTracks().forEach(track => track.stop());
+            setIsMicActive(false);
+            return;
+          }
+          
           try {
             const transcription = await transcribeWithWhisper(audioBlob);
             
@@ -119,6 +129,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
 
         mediaRecorder.start();
         setIsMicActive(true);
+        isCancelledRef.current = false; // Reset cancelled flag
       })
       .catch(error => {
         console.error('Error accessing microphone:', error);
@@ -145,6 +156,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     rec.onstart = () => {
       setIsMicActive(true);
       finalTranscriptText = ''; // Reset when starting
+      isCancelledRef.current = false; // Reset cancelled flag
     };
     
     rec.onresult = (event: any) => {
@@ -176,8 +188,8 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       if (isMicActive) {
         setIsMicActive(false);
         
-        // Auto-send the final transcript if it's not empty
-        if (finalTranscriptText && finalTranscriptText.trim()) {
+        // Auto-send the final transcript if it's not empty AND not cancelled
+        if (finalTranscriptText && finalTranscriptText.trim() && !isCancelledRef.current) {
           setIsSubmitting(true);
           onGenerate(finalTranscriptText.trim());
           setText("");
@@ -192,6 +204,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
 
   const startVoice = useCallback(() => {
     playClickSound();
+    
+    // Stop any ongoing TTS when mic button is clicked
+    ttsService.stop();
+    
     if (isMicActive) {
       // Stop recording manually - user clicked cancel
       if (useWhisper && mediaRecorderRef.current) {
@@ -213,6 +229,51 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       startBrowserSpeechRecognition();
     }
   }, [isMicActive, isSubmitting, useWhisper, openaiClient, startWhisperRecording, startBrowserSpeechRecognition]);
+
+  // New function to handle sending the recorded audio
+  const handleSendRecording = useCallback(() => {
+    playClickSound();
+    
+    if (useWhisper && mediaRecorderRef.current) {
+      // Stop Whisper recording and process
+      mediaRecorderRef.current.stop();
+    } else if (recognitionRef.current) {
+      // Stop browser speech recognition and process
+      recognitionRef.current.stop();
+    }
+    
+    // The actual processing and sending will happen in the respective onStop handlers
+    // which already have the auto-send logic
+  }, [useWhisper]);
+
+  // New function to handle canceling the recording
+  const handleCancelRecording = useCallback(() => {
+    playClickSound();
+    
+    // Set cancelled flag to prevent auto-sending
+    isCancelledRef.current = true;
+    
+    if (useWhisper && mediaRecorderRef.current) {
+      // Stop Whisper recording without processing
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+      
+      // Stop all audio tracks
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop());
+        })
+        .catch(console.error);
+    } else if (recognitionRef.current) {
+      // Stop browser speech recognition without processing
+      recognitionRef.current.abort(); // Use abort instead of stop to cancel
+      recognitionRef.current = null;
+    }
+    
+    setIsMicActive(false);
+    setIsSubmitting(false);
+    setText(""); // Clear any partial text
+  }, [useWhisper]);
 
   const submit = useCallback(
     (e?: React.FormEvent) => {
@@ -243,19 +304,43 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   return (
     <section aria-label="Create next panel" className="bg-transparent">
       <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
-        <Button
-          type="button"
-          variant="comic"
-          size="icon"
-          onClick={startVoice}
-          aria-label={isMicActive ? "Cancel recording" : "Voice input"}
-          className={cn(
-            "flex-shrink-0 btn-animate",
-            isMicActive && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-          )}
-        >
-          {isMicActive ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-        </Button>
+        {isMicActive ? (
+          // Recording state: Show Send and Cancel buttons
+          <>
+            <Button
+              type="button"
+              variant="comic"
+              size="icon"
+              onClick={handleSendRecording}
+              aria-label="Send recording"
+              className="flex-shrink-0 btn-animate bg-green-500 hover:bg-green-600 text-white border-green-500"
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+            <Button
+              type="button"
+              variant="comic"
+              size="icon"
+              onClick={handleCancelRecording}
+              aria-label="Cancel recording"
+              className="flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </>
+        ) : (
+          // Normal state: Show Mic button
+          <Button
+            type="button"
+            variant="comic"
+            size="icon"
+            onClick={startVoice}
+            aria-label="Voice input"
+            className="flex-shrink-0 btn-animate"
+          >
+            <Mic className="h-5 w-5" />
+          </Button>
+        )}
         {isMicActive ? (
           <WaveformVisualizer />
         ) : (

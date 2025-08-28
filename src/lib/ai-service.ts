@@ -111,7 +111,7 @@ Student Profile: ${summary || 'Getting to know this adventurer...'}`
       const messages = this.buildChatContext(chatHistory, userText);
 
       const completion = await this.client.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "chatgpt-4o-latest",
         messages: messages,
         max_tokens: 100,
         temperature: 0.8,
@@ -357,7 +357,7 @@ Return ONLY the new question text, nothing else.`;
       console.log('Sending contextualized question prompt to AI:', contextualPrompt);
 
       const completion = await this.client.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "chatgpt-4o-latest",
         messages: [
           {
             role: "user",
@@ -907,7 +907,7 @@ Examples:
 Return ONLY your enthusiastic response, nothing else.`;
 
       const completion = await this.client.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "chatgpt-4o-latest",
         messages: [
           {
             role: "user",
@@ -1126,7 +1126,7 @@ Return ONLY your enthusiastic response, nothing else.`;
       }
 
       const completion = await this.client.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "chatgpt-4o-latest",
         messages: [
           {
             role: "user",

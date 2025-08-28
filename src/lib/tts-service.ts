@@ -146,7 +146,7 @@ class TextToSpeechService {
         voiceId,  // First parameter: voice ID as string
         {         // Second parameter: options object
           text: cleanText,
-          modelId: options?.model || 'eleven_monolingual_v1',
+          modelId: options?.model || 'eleven_turbo_v2_5',
           voiceSettings: {
             stability: options?.stability || 0.5,
             similarityBoost: options?.similarity_boost || 0.75,

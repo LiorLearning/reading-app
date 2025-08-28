@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const recognitionRef = useRef<any | null>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isCancelledRef = useRef(false);
 
   // No need for message count or scroll management in hover chatbox
 
@@ -87,6 +88,10 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
 
   const startVoice = () => {
     playClickSound();
+    
+    // Stop any ongoing TTS when mic button is clicked
+    ttsService.stop();
+    
     if (isMicActive) {
       // Stop recording manually - user clicked cancel
       if (recognitionRef.current) {
@@ -113,11 +118,12 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     
     rec.onstart = () => {
       setIsMicActive(true);
+      isCancelledRef.current = false; // Reset cancelled flag
     };
     
     rec.onresult = (event: any) => {
-      // Don't update text if we're in the process of submitting
-      if (isSubmitting) return;
+      // Don't update text if we're in the process of submitting or if cancelled
+      if (isSubmitting || isCancelledRef.current) return;
       
       let finalTranscript = '';
       let interimTranscript = '';
@@ -152,6 +158,36 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     rec.start();
     recognitionRef.current = rec;
   };
+
+  // New function to handle sending the recorded audio
+  const handleSendRecording = useCallback(() => {
+    playClickSound();
+    
+    if (recognitionRef.current) {
+      // Stop browser speech recognition and process
+      recognitionRef.current.stop();
+    }
+    
+    // The actual processing and sending will happen in the onresult handler
+  }, []);
+
+  // New function to handle canceling the recording
+  const handleCancelRecording = useCallback(() => {
+    playClickSound();
+    
+    // Set cancelled flag to prevent processing
+    isCancelledRef.current = true;
+    
+    if (recognitionRef.current) {
+      // Stop browser speech recognition without processing
+      recognitionRef.current.abort(); // Use abort instead of stop to cancel
+      recognitionRef.current = null;
+    }
+    
+    setIsMicActive(false);
+    setIsSubmitting(false);
+    setText(""); // Clear any partial text
+  }, []);
 
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -315,20 +351,43 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
           {/* Main input area with integrated controls */}
           <div className="p-2">
             <form onSubmit={submit} className="flex items-center gap-2">
-              {/* Mic/Cancel Button (Primary Input) */}
-              <Button
-                type="button"
-                variant="comic"
-                size="icon"
-                onClick={startVoice}
-                aria-label={isMicActive ? "Cancel recording" : "Voice input"}
-                className={cn(
-                  "h-9 w-9 flex-shrink-0 btn-animate",
-                  isMicActive && "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                )}
-              >
-                {isMicActive ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
+              {isMicActive ? (
+                // Recording state: Show Send and Cancel buttons
+                <>
+                  <Button
+                    type="button"
+                    variant="comic"
+                    size="icon"
+                    onClick={handleSendRecording}
+                    aria-label="Send recording"
+                    className="h-9 w-9 flex-shrink-0 btn-animate bg-green-500 hover:bg-green-600 text-white border-green-500"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="comic"
+                    size="icon"
+                    onClick={handleCancelRecording}
+                    aria-label="Cancel recording"
+                    className="h-9 w-9 flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : (
+                // Normal state: Show Mic button
+                <Button
+                  type="button"
+                  variant="comic"
+                  size="icon"
+                  onClick={startVoice}
+                  aria-label="Voice input"
+                  className="h-9 w-9 flex-shrink-0 btn-animate"
+                >
+                  <Mic className="h-4 w-4" />
+                </Button>
+              )}
               
               {/* Text Input or Waveform - Container with fixed flex */}
               <div className="flex-1">

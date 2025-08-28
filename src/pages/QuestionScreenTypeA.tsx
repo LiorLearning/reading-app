@@ -8,6 +8,7 @@ import InputBar from "@/components/comic/InputBar";
 import { X } from "lucide-react";
 import MCQComponent from "@/components/MCQComponent";
 import { useMCQ } from "@/hooks/use-mcq";
+import { ttsService } from "@/lib/tts-service";
 
 // TypeScript declarations for Speech Recognition API
 declare global {
@@ -218,6 +219,9 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
   const handleMicClick = useCallback(() => {
     playClickSound();
     
+    // Stop any ongoing TTS when mic button is clicked
+    ttsService.stop();
+    
     if (!recognition) {
       // Fallback for browsers without speech recognition
       const transcript = prompt("Speech recognition not available. Please type what you read:");
@@ -295,7 +299,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
 
   return (
     <main 
-      className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4 lg:px-6 bg-primary/60 relative" 
       style={{
         backgroundImage: `url('/backgrounds/random2.png')`,
         backgroundSize: 'cover',
@@ -309,12 +313,11 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
       
       {/* Wrapper for both background and content to scale together */}
       <div 
-        className="relative responsive-max-width"
+        className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
         style={{ 
           width: '95%',
           maxWidth: '1520px',
           aspectRatio: getAspectRatio,
-          maxHeight: 'calc(100vh - 100px)',
           minHeight: '500px',
           transition: 'all 0.3s ease-in-out'
         }}

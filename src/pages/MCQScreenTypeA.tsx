@@ -1006,6 +1006,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     if (!recognition || isRecording) return;
     
     playClickSound();
+    
+    // Stop any ongoing TTS when mic button is clicked
+    ttsService.stop();
+    
     setRecordedText('');
     recognition.start();
     
@@ -1022,6 +1026,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     if (!recognition || !isRecording) return;
     
     playClickSound();
+    
+    // Stop any ongoing TTS when mic button is clicked
+    ttsService.stop();
+    
     recognition.stop();
   }, [recognition, isRecording]);
 
@@ -1364,7 +1372,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
   return (
     <main 
-      className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4 lg:px-6 bg-primary/60 relative" 
       style={{
         backgroundImage: `url('/backgrounds/random3.png')`,
         backgroundSize: 'cover',
@@ -1378,12 +1386,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       
       {/* Main container */}
       <div 
-        className="relative responsive-max-width"
+        className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
         style={{ 
           width: '95%',
           maxWidth: '1520px',
           aspectRatio: getAspectRatio,
-          maxHeight: 'calc(100vh - 50px)',  // Instead of 100px
           minHeight: '500px',
           transition: 'all 0.3s ease-in-out'
         }}

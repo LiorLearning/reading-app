@@ -637,6 +637,8 @@ const Index = () => {
         const hasMetThreshold = canAccessQuestions || newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD;
         console.log(`🔍 DEBUG: Threshold check - canAccessQuestions: ${canAccessQuestions}, newCount >= threshold: ${newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD}, hasMetThreshold: ${hasMetThreshold}`);
         
+        // COMMENTED OUT: Adventure to Questions Auto-move
+        /*
         if (hasMetThreshold) {
           // Determine when to transition to questions based on the flow pattern
           let shouldTransitionToQuestions = false;
@@ -687,6 +689,7 @@ const Index = () => {
             return;
           }
         }
+        */
       } else {
         console.log(`🔍 DEBUG: Skipping adventure prompt tracking - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}`);
       }
@@ -1071,12 +1074,14 @@ const Index = () => {
     
     // Determine if we should go to previous question or back to adventure based on the flow pattern
     // Adventure → q1→q2→q3 → Adventure → q4→q5→q6 → Adventure → q7→q8→q9→q10
+    // Use topicQuestionIndex instead of currentQuestionIndex for the logic
+    // because topicQuestionIndex represents the actual position in the overall flow
     
     const isFirstInSequence = 
-      currentQuestionIndex === 0 || // q1 (first question in first batch)
-      currentQuestionIndex === 3 || // q4 (first question in second batch)
-      currentQuestionIndex === 6 || // q7 (first question in third batch)
-      currentQuestionIndex === 9;   // q10 (first question in fourth batch)
+      topicQuestionIndex === 0 || // q1 (first question in first batch)
+      topicQuestionIndex === 3 || // q4 (first question in second batch)
+      topicQuestionIndex === 6 || // q7 (first question in third batch)
+      topicQuestionIndex === 9;   // q10 (first question in fourth batch)
     
     if (isFirstInSequence) {
       // Go back to adventure mode
@@ -1102,10 +1107,14 @@ const Index = () => {
       
       return; // Return void for adventure mode navigation
     } else {
-      // Go to previous question - return action type so MCQScreenTypeA can handle it
+      // Go to previous question - update topicQuestionIndex and return action type
+      const newTopicQuestionIndex = topicQuestionIndex - 1;
+      console.log(`🔍 DEBUG MCQ Back: Going from topicQuestionIndex ${topicQuestionIndex} to ${newTopicQuestionIndex}`);
+      setTopicQuestionIndex(newTopicQuestionIndex);
+      
       return 'previous_question';
     }
-  }, [setChatMessages, ttsService]);
+  }, [setChatMessages, ttsService, topicQuestionIndex]);
 
   // Handle session closing and save current adventure
   const handleCloseSession = React.useCallback(async () => {
@@ -1654,7 +1663,7 @@ const Index = () => {
           <TopicSelection onTopicSelect={handleTopicSelect} />
         ) : currentScreen === 1 ? (
           <main 
-            className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
+            className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4 lg:px-6 bg-primary/60 relative" 
             style={{
               backgroundImage: `url('/backgrounds/random.png')`,
               backgroundSize: 'cover',
@@ -1667,12 +1676,11 @@ const Index = () => {
             <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
             {/* Wrapper for both background and content to scale together */}
             <div 
-              className="relative responsive-max-width"
+              className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
               style={{ 
                 width: '95%', // 5% reduction from full width
                 maxWidth: '1520px',
                 aspectRatio: getAspectRatio,
-                maxHeight: 'calc(100vh - 100px)',
                 minHeight: '500px',
                 transition: 'all 0.3s ease-in-out'
               }}
@@ -2056,61 +2064,100 @@ const Index = () => {
           />
         )}
 
-        {/* Fixed Back Button - Bottom Left for Adventure Screen */}
-        {(() => {
-          const shouldShowBackButton = currentScreen === 1 && topicQuestionIndex > 0 && isInQuestionMode === false;
-          console.log('🔍 Back button debug:', { 
-            currentScreen, 
-            topicQuestionIndex, 
-            isInQuestionMode, 
-            shouldShowBackButton,
-            adventurePromptCount,
-            canAccessQuestions 
-          });
-          return shouldShowBackButton;
-        })() && (
-          <div className="fixed bottom-4 left-4 z-50">
+        {/* Fixed Navigation Buttons - Bottom Left for Adventure Screen */}
+        {currentScreen === 1 && isInQuestionMode === false && (
+          <div className="fixed bottom-4 left-4 z-50 flex gap-3">
+            {/* Back Button - Only show if we have previous questions */}
+            {(() => {
+              const shouldShowBackButton = topicQuestionIndex > 0;
+              console.log('🔍 Back button debug:', { 
+                currentScreen, 
+                topicQuestionIndex, 
+                isInQuestionMode, 
+                shouldShowBackButton,
+                adventurePromptCount,
+                canAccessQuestions 
+              });
+              return shouldShowBackButton;
+            })() && (
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => {
+                  playClickSound();
+                  
+                  // Navigate back in the question sequence
+                  const newQuestionIndex = topicQuestionIndex - 1;
+                  console.log(`🔍 DEBUG Adventure: Going back from question ${topicQuestionIndex + 1} to ${newQuestionIndex + 1}`);
+                  
+                  setTopicQuestionIndex(newQuestionIndex);
+                  
+                  // Check if we should go back to MCQ mode or stay in adventure
+                  // Go to MCQ if we're going back to a question that should be answered
+                  if (newQuestionIndex >= 0) {
+                    // Switch to MCQ mode to show the previous question
+                    setCurrentScreen(3);
+                    setIsInQuestionMode(true);
+                    
+                    // Add transition message
+                    setTimeout(async () => {
+                      const backToQuestionMessage: ChatMessage = {
+                        type: 'ai',
+                        content: `🔙 Let's go back to question ${newQuestionIndex + 1}! Take your time to review or change your answer. ✨`,
+                        timestamp: Date.now()
+                      };
+                      
+                      setChatMessages(prev => {
+                        playMessageSound();
+                        return [...prev, backToQuestionMessage];
+                      });
+                      
+                      // Wait for the AI speech to complete
+                      await ttsService.speakAIMessage(backToQuestionMessage.content);
+                    }, 500);
+                  }
+                }}
+                className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate px-6 py-3 text-lg font-bold"
+                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+              >
+                ← Back to Q{topicQuestionIndex}
+              </Button>
+            )}
+            
+            {/* Answer Questions Button - Always show on adventure screen */}
             <Button
               variant="default"
               size="lg"
               onClick={() => {
                 playClickSound();
                 
-                // Navigate back in the question sequence
-                const newQuestionIndex = topicQuestionIndex - 1;
-                console.log(`🔍 DEBUG Adventure: Going back from question ${topicQuestionIndex + 1} to ${newQuestionIndex + 1}`);
+                console.log(`🔍 DEBUG Adventure: Going to next question ${topicQuestionIndex + 1}`);
                 
-                setTopicQuestionIndex(newQuestionIndex);
+                // Switch to MCQ mode to show the next question
+                setCurrentScreen(3);
+                setIsInQuestionMode(true);
                 
-                // Check if we should go back to MCQ mode or stay in adventure
-                // Go to MCQ if we're going back to a question that should be answered
-                if (newQuestionIndex >= 0) {
-                  // Switch to MCQ mode to show the previous question
-                  setCurrentScreen(3);
-                  setIsInQuestionMode(true);
+                // Add transition message
+                setTimeout(async () => {
+                  const toQuestionMessage: ChatMessage = {
+                    type: 'ai',
+                    content: `🎯 Time for question ${topicQuestionIndex + 1}! Let's test your reading skills. Ready for the challenge? 📚✨`,
+                    timestamp: Date.now()
+                  };
                   
-                  // Add transition message
-                  setTimeout(async () => {
-                    const backToQuestionMessage: ChatMessage = {
-                      type: 'ai',
-                      content: `🔙 Let's go back to question ${newQuestionIndex + 1}! Take your time to review or change your answer. ✨`,
-                      timestamp: Date.now()
-                    };
-                    
-                    setChatMessages(prev => {
-                      playMessageSound();
-                      return [...prev, backToQuestionMessage];
-                    });
-                    
-                    // Wait for the AI speech to complete
-                    await ttsService.speakAIMessage(backToQuestionMessage.content);
-                  }, 500);
-                }
+                  setChatMessages(prev => {
+                    playMessageSound();
+                    return [...prev, toQuestionMessage];
+                  });
+                  
+                  // Wait for the AI speech to complete
+                  await ttsService.speakAIMessage(toQuestionMessage.content);
+                }, 500);
               }}
-              className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate px-6 py-3 text-lg font-bold"
-              style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+              className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate px-6 py-3 text-lg font-bold"
+              style={{ borderColor: 'hsl(from hsl(142 76% 36%) h s 25%)', boxShadow: '0 4px 0 black' }}
             >
-              ← Back to Q{topicQuestionIndex}
+              Answer Questions →
             </Button>
           </div>
         )}
