@@ -377,8 +377,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setHasAnswered(true);
       setShowFeedback(true);
       
-      // Only increment score if it's the first attempt
-      if (isFirstAttempt) {
+      // Check if this question was already answered correctly to avoid double-counting
+      const wasAlreadyCorrect = questionScores[currentQuestionIndex];
+      
+      // Increment score for any correct answer (not just first attempts)
+      // but only if it wasn't already answered correctly
+      if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
       }
       
@@ -488,8 +492,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // Correct answer
       setShowFeedback(true);
       
-      // Only increment score if it's the first attempt
-      if (isFirstAttempt) {
+      // Check if this question was already answered correctly to avoid double-counting
+      const wasAlreadyCorrect = questionScores[currentQuestionIndex];
+      
+      // Increment score for any correct answer (not just first attempts)
+      // but only if it wasn't already answered correctly
+      if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
       }
       
@@ -1237,8 +1245,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setShowFeedback(true);
 
     if (isCorrect) {
-      // Only increment score if it's the first attempt
-      if (isFirstAttempt) {
+      // Check if this question was already answered correctly to avoid double-counting
+      const wasAlreadyCorrect = questionScores[currentQuestionIndex];
+      
+      // Increment score for any correct answer (not just first attempts)
+      // but only if it wasn't already answered correctly
+      if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
       }
       
@@ -1999,9 +2011,9 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                     <span className="text-center leading-tight whitespace-nowrap w-full flex items-center justify-center">
                       {option}
                     </span>
-                    {hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && (
+                    {/* {hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && (
                       <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    )}
+                    )} */}
                   </button>
                 ))}
               </div>
