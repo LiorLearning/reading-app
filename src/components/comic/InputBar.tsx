@@ -109,6 +109,8 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
             
             // Auto-send the transcription if it's not empty
             if (transcription && transcription.trim()) {
+              // Pause any currently playing TTS when user sends a message via voice
+              ttsService.stop();
               setIsSubmitting(true);
               onGenerate(transcription.trim());
               setText("");
@@ -190,6 +192,8 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         
         // Auto-send the final transcript if it's not empty AND not cancelled
         if (finalTranscriptText && finalTranscriptText.trim() && !isCancelledRef.current) {
+          // Pause any currently playing TTS when user sends a message via voice
+          ttsService.stop();
           setIsSubmitting(true);
           onGenerate(finalTranscriptText.trim());
           setText("");
@@ -280,6 +284,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       e?.preventDefault();
       if (!text.trim()) return;
       
+      // Pause any currently playing TTS when user sends a message
+      ttsService.stop();
+      
       setIsSubmitting(true);
       
       // If recording is active, stop it first
@@ -362,6 +369,8 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
               return;
             }
             playClickSound();
+            // Pause any currently playing TTS when user generates an image
+            ttsService.stop();
             onGenerate(`create image: ${text.trim()}`);
             setText("");
           }}

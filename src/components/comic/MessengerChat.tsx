@@ -230,6 +230,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     
     if (!text.trim()) return;
     
+    // Pause any currently playing TTS when user sends a message
+    ttsService.stop();
+    
     // Set submitting flag to prevent onresult from overwriting
     setIsSubmitting(true);
     
@@ -451,6 +454,8 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                     return;
                   }
                   playClickSound();
+                  // Pause any currently playing TTS when user generates an image
+                  ttsService.stop();
                   onGenerate(`create image: ${text.trim()}`);
                   setText("");
                 }}
