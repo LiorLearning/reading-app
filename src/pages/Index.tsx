@@ -1820,9 +1820,9 @@ const Index = () => {
                                       "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200 relative",
                                       message.type === 'user' 
                                         ? "bg-primary text-primary-foreground" 
-                                        : "bg-card border-2"
+                                        : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
                                     )}
-                                    style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
+                                    style={{}}
                                   >
                                     <div className="font-medium text-xs mb-1 opacity-70">
                                       {message.type === 'user' ? 'You' : '🤖 Krafty'}

@@ -11,12 +11,6 @@ import { useMCQ } from "@/hooks/use-mcq";
 import { ttsService } from "@/lib/tts-service";
 
 // TypeScript declarations for Speech Recognition API
-declare global {
-  interface Window {
-    webkitSpeechRecognition: any;
-    SpeechRecognition: any;
-  }
-}
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -138,7 +132,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
     const accuracyScore = Math.round((correctWords / originalWords.length) * 100);
     setAccuracy(accuracyScore);
     setHasRecorded(true);
-    setSidebarCollapsed(false);
+    // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
     
     // Add user's transcript as a user message
     const userMessage = {
@@ -161,17 +155,16 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
     
     // Add both messages to chat
     setChatMessages((prev: any) => [...prev, userMessage, feedbackMessage]);
-  }, [storyText, setSidebarCollapsed, setChatMessages]);
+  }, [storyText, setChatMessages]); // Removed setSidebarCollapsed from dependencies
 
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       const recognitionInstance = new SpeechRecognition();
       recognitionInstance.continuous = true;
       recognitionInstance.interimResults = true;
       recognitionInstance.lang = 'en-US';
-      recognitionInstance.maxAlternatives = 1;
       
       recognitionInstance.onresult = (event) => {
         let finalTranscript = '';
@@ -385,7 +378,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                       timestamp: Date.now()
                     };
                     setChatMessages((prev: any) => [...prev, feedbackMessage]);
-                    setSidebarCollapsed(false);
+                    // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
                   }}
                   onNextQuestion={() => {
                     if (mcq.hasNextQuestion) {
@@ -398,7 +391,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                         timestamp: Date.now()
                       };
                       setChatMessages((prev: any) => [...prev, completionMessage]);
-                      setSidebarCollapsed(false);
+                      // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
                     }
                   }}
                   showNextButton={mcq.hasNextQuestion}
@@ -505,9 +498,9 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                                 "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
                                 message.type === 'user' 
                                   ? "bg-primary text-primary-foreground" 
-                                  : "bg-card border-2"
+                                  : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
                               )}
-                              style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
+                              style={{}}
                             >
                               <div className="font-medium text-xs mb-1 opacity-70">
                                 {message.type === 'user' ? 'You' : '🤖 Krafty'}

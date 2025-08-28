@@ -420,8 +420,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
     
     // Auto-expand chat to show feedback
-    setSidebarCollapsed(false);
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages, setSidebarCollapsed]);
+    // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages]); // Removed setSidebarCollapsed from dependencies
 
   // Handle fill blank answer submission
   const handleFillBlankSubmit = useCallback(async () => {
@@ -528,8 +528,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
     
     // Auto-expand chat to show feedback
-    setSidebarCollapsed(false);
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages, setSidebarCollapsed]);
+    // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages]); // Removed setSidebarCollapsed from dependencies
 
   // Handle student reflection response
   const handleReflectionResponse = useCallback(async (studentReflection: string) => {
@@ -1261,7 +1261,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setShowFeedback(false);
     }
 
-    setSidebarCollapsed(false);
+    // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
   }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages]);
 
   // Reset quiz UI state only (preserves saved scores)
@@ -2026,9 +2026,9 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                                 "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200 relative",
                                 message.type === 'user' 
                                   ? "bg-primary text-primary-foreground" 
-                                  : "bg-card border-2"
+                                  : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
                               )}
-                              style={message.type === 'ai' ? { borderColor: 'hsla(var(--primary), 0.9)' } : {}}
+                              style={{}}
                             >
                               <div className="font-medium text-xs mb-1 opacity-70">
                                 {message.type === 'user' ? 'You' : '🤖 Krafty'}
