@@ -56,6 +56,10 @@ class TextToSpeechService {
   private currentAudio: HTMLAudioElement | null = null;
   private isSpeaking = false;
   private selectedVoice: Voice;
+  private currentRequest: AbortController | null = null;
+  private pendingRequests: Set<AbortController> = new Set();
+  private lastSpeakTime = 0;
+  private readonly DEBOUNCE_DELAY = 100; // 100ms debounce to prevent rapid-fire calls
 
   constructor() {
     // Load selected voice from localStorage or default to Jessica
@@ -105,7 +109,12 @@ class TextToSpeechService {
 
   // Preview a voice by having it introduce itself
   async previewVoice(voice: Voice): Promise<void> {
-    await this.speak(voice.previewText, { voice: voice.id });
+    try {
+      await this.speak(voice.previewText, { voice: voice.id });
+    } catch (error) {
+      console.error('Error previewing voice:', error);
+      // Don't re-throw to prevent UI errors during voice preview
+    }
   }
 
   private initialize() {
@@ -134,10 +143,24 @@ class TextToSpeechService {
       return;
     }
 
-    try {
-      // Stop any current audio
-      this.stop();
+    // Debounce rapid calls to prevent multiple simultaneous requests
+    const now = Date.now();
+    if (now - this.lastSpeakTime < this.DEBOUNCE_DELAY) {
+      console.log('TTS call debounced - too rapid');
+      return;
+    }
+    this.lastSpeakTime = now;
 
+    // Cancel all previous requests and audio
+    this.cancelAllRequests();
+    this.stopCurrentAudio();
+
+    // Create new abort controller for this request
+    const abortController = new AbortController();
+    this.currentRequest = abortController;
+    this.pendingRequests.add(abortController);
+
+    try {
       // Use selected voice or override from options
       const voiceId = options?.voice || this.selectedVoice.id;
 
@@ -154,14 +177,42 @@ class TextToSpeechService {
         }
       );
 
+      // Check if request was cancelled during API call
+      if (abortController.signal.aborted) {
+        console.log('TTS request was cancelled during API call');
+        return;
+      }
+
       // Convert the stream to audio blob
       const chunks: Uint8Array[] = [];
       const reader = audioStream.getReader();
       
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
+      try {
+        while (true) {
+          // Check for cancellation during stream reading
+          if (abortController.signal.aborted) {
+            console.log('TTS request was cancelled during stream reading');
+            await reader.cancel();
+            return;
+          }
+
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+      } catch (readerError) {
+        // Handle reader cancellation gracefully
+        if (abortController.signal.aborted) {
+          console.log('TTS stream reading was cancelled');
+          return;
+        }
+        throw readerError;
+      }
+
+      // Final check before playing
+      if (abortController.signal.aborted) {
+        console.log('TTS request was cancelled before audio creation');
+        return;
       }
 
       // Create audio blob and play
@@ -174,19 +225,52 @@ class TextToSpeechService {
       // Return a Promise that resolves when audio finishes playing
       return new Promise<void>((resolve, reject) => {
         if (!this.currentAudio) {
+          URL.revokeObjectURL(audioUrl);
           reject(new Error('Audio not initialized'));
           return;
         }
 
+        // Handle cancellation during playback
+        const handleAbort = () => {
+          if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio = null;
+          }
+          this.isSpeaking = false;
+          URL.revokeObjectURL(audioUrl);
+          this.pendingRequests.delete(abortController);
+          if (this.currentRequest === abortController) {
+            this.currentRequest = null;
+          }
+          resolve(); // Resolve rather than reject for cancellation
+        };
+
+        // Check if already aborted
+        if (abortController.signal.aborted) {
+          handleAbort();
+          return;
+        }
+
+        // Listen for abort signal
+        abortController.signal.addEventListener('abort', handleAbort);
+
         this.currentAudio.onended = () => {
           this.isSpeaking = false;
           URL.revokeObjectURL(audioUrl);
+          this.pendingRequests.delete(abortController);
+          if (this.currentRequest === abortController) {
+            this.currentRequest = null;
+          }
           resolve();
         };
 
         this.currentAudio.onerror = () => {
           this.isSpeaking = false;
           URL.revokeObjectURL(audioUrl);
+          this.pendingRequests.delete(abortController);
+          if (this.currentRequest === abortController) {
+            this.currentRequest = null;
+          }
           console.error('Error playing TTS audio');
           reject(new Error('Audio playback failed'));
         };
@@ -195,12 +279,27 @@ class TextToSpeechService {
         this.currentAudio.play().catch((error) => {
           this.isSpeaking = false;
           URL.revokeObjectURL(audioUrl);
+          this.pendingRequests.delete(abortController);
+          if (this.currentRequest === abortController) {
+            this.currentRequest = null;
+          }
           reject(error);
         });
       });
     } catch (error) {
       console.error('TTS error:', error);
       this.isSpeaking = false;
+      this.pendingRequests.delete(abortController);
+      if (this.currentRequest === abortController) {
+        this.currentRequest = null;
+      }
+      
+      // Don't throw error if it was just a cancellation
+      if (abortController.signal.aborted) {
+        console.log('TTS request was cancelled');
+        return;
+      }
+      
       throw error;
     }
   }
@@ -220,20 +319,50 @@ class TextToSpeechService {
       .trim();
   }
 
-  // Stop current speech
-  stop(): void {
+  // Helper method to cancel all pending requests
+  private cancelAllRequests(): void {
+    // Cancel current request
+    if (this.currentRequest) {
+      this.currentRequest.abort();
+      this.currentRequest = null;
+    }
+    
+    // Cancel all pending requests
+    for (const controller of this.pendingRequests) {
+      controller.abort();
+    }
+    this.pendingRequests.clear();
+  }
+
+  // Helper method to stop current audio without cancelling requests
+  private stopCurrentAudio(): void {
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;
       this.currentAudio = null;
     }
-    
     this.isSpeaking = false;
+  }
+
+  // Stop current speech and cancel all requests
+  stop(): void {
+    this.cancelAllRequests();
+    this.stopCurrentAudio();
   }
 
   // Check if currently speaking
   getIsSpeaking(): boolean {
     return this.isSpeaking;
+  }
+
+  // Check if there are pending requests (useful for debugging)
+  hasPendingRequests(): boolean {
+    return this.pendingRequests.size > 0;
+  }
+
+  // Get number of pending requests (useful for debugging)
+  getPendingRequestCount(): number {
+    return this.pendingRequests.size;
   }
 
   // Check if TTS service is properly configured
