@@ -1557,10 +1557,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       setIsSpeaking(false);
                     });
                   }}
-                  className={cn(
-                    "absolute bottom-4 right-4 h-12 w-12 rounded-lg border-2 border-black bg-white hover:bg-primary hover:text-primary-foreground z-10 transition-all duration-200 hover:scale-110",
-                    isSpeaking && "animate-pulse"
-                  )}
+                  className="absolute bottom-4 right-4 h-12 w-12 rounded-lg border-2 border-black bg-white hover:bg-primary hover:text-primary-foreground z-10 transition-all duration-200 hover:scale-110"
                   style={{ boxShadow: '0 4px 0 black' }}
                   title="Read the question aloud"
                 >
@@ -1686,10 +1683,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   variant="outline"
                   size="icon"
                   onClick={handleSpeakAnswer}
-                  className={cn(
-                    "absolute left-32 top-1/2 transform -translate-y-1/2 h-28 w-28 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110",
-                    isSpeaking && "animate-pulse"
-                  )}
+                  className="absolute left-32 top-1/2 transform -translate-y-1/2 h-28 w-28 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110"
                   style={{ 
                     borderColor: 'hsl(var(--primary))', 
                     boxShadow: '0 8px 0 rgba(0, 0, 0, 0.3)' 
@@ -1926,10 +1920,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                     variant="outline"
                     size="icon"
                     onClick={handleSpeakPassage}
-                    className={cn(
-                      "absolute left-20 top-1/2 transform -translate-y-1/2 h-24 w-24 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110",
-                      isSpeaking && "animate-pulse"
-                    )}
+                    className="absolute left-20 top-1/2 transform -translate-y-1/2 h-24 w-24 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110"
                     style={{ 
                       borderColor: 'hsl(var(--primary))', 
                       boxShadow: '0 8px 0 rgba(0, 0, 0, 0.3)' 
