@@ -668,6 +668,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       }
     } else {
       console.log(`🔍 DEBUG MCQ: Last question completed, showing completion page`);
+      
+      // Stop any ongoing TTS before showing completion page
+      ttsService.stop();
+      
       // All questions completed - check score and show appropriate completion page
       setQuizCompleted(true);
       

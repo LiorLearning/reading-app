@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { playClickSound } from "@/lib/sounds";
+import { ttsService } from "@/lib/tts-service";
 import { Trophy, Star, ChevronRight, RotateCcw } from "lucide-react";
 import confetti from 'canvas-confetti';
 
@@ -23,6 +24,11 @@ const TopicComplete: React.FC<TopicCompleteProps> = ({
 }) => {
   const percentage = Math.round((score / totalQuestions) * 100);
   const displayTopicName = topicName.replace(/_/g, ' ');
+
+  // Stop any ongoing TTS when completion page mounts
+  useEffect(() => {
+    ttsService.stop();
+  }, []);
 
   return (
     <main 
@@ -150,6 +156,7 @@ const TopicComplete: React.FC<TopicCompleteProps> = ({
                   size="lg"
                   onClick={() => {
                     playClickSound();
+                    ttsService.stop(); // Stop TTS before navigating
                     // Trigger celebration effects when advancing to next topic
                     confetti({
                       particleCount: 150,
@@ -175,6 +182,7 @@ const TopicComplete: React.FC<TopicCompleteProps> = ({
                   size="lg"
                   onClick={() => {
                     playClickSound();
+                    ttsService.stop(); // Stop TTS before navigating
                     onRetryTopic();
                   }}
                   className="border-3 border-primary bg-white hover:bg-primary/10 text-primary btn-animate px-8 py-4 text-xl font-bold rounded-xl flex items-center gap-3"
@@ -191,6 +199,7 @@ const TopicComplete: React.FC<TopicCompleteProps> = ({
                   size="lg"
                   onClick={() => {
                     playClickSound();
+                    ttsService.stop(); // Stop TTS before navigating
                     onBackToTopics();
                   }}
                   className="border-3 border-gray-400 bg-white hover:bg-gray-50 text-gray-600 btn-animate px-8 py-4 text-xl font-bold rounded-xl"

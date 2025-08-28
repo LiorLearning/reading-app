@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { playClickSound } from "@/lib/sounds";
+import { ttsService } from "@/lib/tts-service";
 import { BookOpen, RotateCcw, Target, ArrowLeft, Heart } from "lucide-react";
 
 interface PracticeNeededProps {
@@ -21,6 +22,11 @@ const PracticeNeeded: React.FC<PracticeNeededProps> = ({
   const percentage = Math.round((score / totalQuestions) * 100);
   const displayTopicName = topicName.replace(/_/g, ' ');
   const needed = 7 - score;
+
+  // Stop any ongoing TTS when practice page mounts
+  useEffect(() => {
+    ttsService.stop();
+  }, []);
 
   return (
     <main 
@@ -163,6 +169,7 @@ const PracticeNeeded: React.FC<PracticeNeededProps> = ({
                   size="lg"
                   onClick={() => {
                     playClickSound();
+                    ttsService.stop(); // Stop TTS before navigating
                     onRetryTopic();
                   }}
                   className="border-3 bg-orange-600 hover:bg-orange-700 text-white btn-animate px-8 py-4 text-xl font-bold rounded-xl flex items-center gap-3"
@@ -181,6 +188,7 @@ const PracticeNeeded: React.FC<PracticeNeededProps> = ({
                   size="lg"
                   onClick={() => {
                     playClickSound();
+                    ttsService.stop(); // Stop TTS before navigating
                     onBackToTopics();
                   }}
                   className="border-3 border-gray-400 bg-white hover:bg-gray-50 text-gray-600 btn-animate px-8 py-4 text-xl font-bold rounded-xl flex items-center gap-3"

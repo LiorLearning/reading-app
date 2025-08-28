@@ -210,6 +210,12 @@ const Index = () => {
     }
   }, [currentScreen]);
 
+  // Stop all ElevenLabs TTS when switching between screens
+  React.useEffect(() => {
+    // Stop any playing TTS audio to prevent overlap when switching screens
+    ttsService.stop();
+  }, [currentScreen]);
+
   // Save current adventure ID whenever it changes
   React.useEffect(() => {
     saveCurrentAdventureId(currentAdventureId);
