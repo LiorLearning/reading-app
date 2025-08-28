@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
-import { playMessageSound, playClickSound } from "@/lib/sounds";
+import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
 import { aiService } from "@/lib/ai-service";
@@ -150,6 +150,8 @@ const Index = () => {
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
   const [isAIResponding, setIsAIResponding] = React.useState(false);
+  const [isGeneratingAdventureImage, setIsGeneratingAdventureImage] = React.useState(false);
+  const [isExplicitImageRequest, setIsExplicitImageRequest] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
   
   // User data state
@@ -538,8 +540,12 @@ const Index = () => {
   // Generate new image panel based on context
   const onGenerateImage = useCallback(async (prompt?: string) => {
     try {
+      // Set loading state and start loading sound
+      setIsGeneratingAdventureImage(true);
+      playImageLoadingSound();
+      
       // Use the prompt or generate from recent context
-              const imagePrompt = prompt || 
+      const imagePrompt = prompt || 
           chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
           "space adventure with rocket";
         
@@ -590,6 +596,14 @@ const Index = () => {
       });
       setNewlyCreatedPanelId(newPanelId);
       
+      // Stop loading sound and play completion sound when image is ready
+      stopImageLoadingSound();
+      playImageCompleteSound();
+      // Stop loading animation only for automatic generation, not explicit requests
+      if (!isExplicitImageRequest) {
+        setIsGeneratingAdventureImage(false);
+      }
+      
       // Trigger zoom animation after 2 seconds
       setTimeout(() => {
         setZoomingPanelId(newPanelId); // Trigger zoom animation
@@ -602,6 +616,14 @@ const Index = () => {
       }, 2000);
     } catch (error) {
       console.error('Error generating image:', error);
+      
+      // Stop loading sound on error
+      stopImageLoadingSound();
+      // Stop loading animation only for automatic generation, not explicit requests
+      if (!isExplicitImageRequest) {
+        setIsGeneratingAdventureImage(false);
+      }
+      
       // Fallback to random image on error
       const image = images[Math.floor(Math.random() * images.length)];
       const newPanelId = crypto.randomUUID();
@@ -617,7 +639,7 @@ const Index = () => {
         }, 600);
       }, 2000);
           }
-    }, [addPanel, images, chatMessages, currentAdventureId]);
+    }, [addPanel, images, chatMessages, currentAdventureId, isExplicitImageRequest]);
 
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
@@ -725,67 +747,98 @@ const Index = () => {
       
       // If user is asking for an image, generate one
       if (isImageRequest) {
-        // Extract the subject from the user's request for better image generation
-        const imageSubject = text.replace(/\b(image|picture|pic|draw|paint|sketch|show|illustrate|generate|create image|make picture|visual|artwork|art|render|design|visualization|make image|photo|drawing)\b/gi, '').replace(/\b(of|for|with|about)\b/gi, '').trim();
-        
-        // Add immediate "generating image" chat message
-        const generatingMessage: ChatMessage = {
-          type: 'ai',
-          content: `🎨 Generating image... ✨`,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages(prev => {
-          setLastMessageCount(prev.length + 1);
-          playMessageSound();
-          return [...prev, generatingMessage];
-        });
-        
-        // Generate image and get contextual response
-        const generatedImageResult = await aiService.generateAdventureImage(
-          imageSubject || text,
-          chatMessages,
-          "space adventure scene"
-        );
-        
-        let imageAIResponse: string;
-        
-        if (generatedImageResult) {
-          // Generate contextual response based on actual generated content
-          imageAIResponse = await aiService.generateAdventureImageResponse(
+        try {
+          // Extract the subject from the user's request for better image generation
+          const imageSubject = text.replace(/\b(image|picture|pic|draw|paint|sketch|show|illustrate|generate|create image|make picture|visual|artwork|art|render|design|visualization|make image|photo|drawing)\b/gi, '').replace(/\b(of|for|with|about)\b/gi, '').trim();
+          
+          // Set loading state and start loading sound immediately
+          setIsGeneratingAdventureImage(true);
+          setIsExplicitImageRequest(true);
+          playImageLoadingSound();
+          
+          // Add immediate "generating image" chat message
+          const generatingMessage: ChatMessage = {
+            type: 'ai',
+            content: `🎨 Generating image... ✨`,
+            timestamp: Date.now()
+          };
+          
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length + 1);
+            playMessageSound();
+            return [...prev, generatingMessage];
+          });
+          
+          // Generate image and get contextual response
+          const generatedImageResult = await aiService.generateAdventureImage(
             imageSubject || text,
-            generatedImageResult.usedPrompt,
-            chatMessages
+            chatMessages,
+            "space adventure scene"
           );
-        } else {
-          // Fallback response if image generation failed
-          const fallbackResponses = [
-            `🎨 I tried to create an image for your adventure, but let's keep the story going with our imagination! ✨`,
-            `🌟 Your adventure idea is amazing! Let's continue the story and maybe try creating an image again later! 🚀`,
-            `✨ Great concept for your adventure! I'll keep working on bringing your visions to life! 🎭`
-          ];
-          imageAIResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+          
+          let imageAIResponse: string;
+          
+          if (generatedImageResult) {
+            // Generate contextual response based on actual generated content
+            imageAIResponse = await aiService.generateAdventureImageResponse(
+              imageSubject || text,
+              generatedImageResult.usedPrompt,
+              chatMessages
+            );
+          } else {
+            // Fallback response if image generation failed
+            const fallbackResponses = [
+              `🎨 I tried to create an image for your adventure, but let's keep the story going with our imagination! ✨`,
+              `🌟 Your adventure idea is amazing! Let's continue the story and maybe try creating an image again later! 🚀`,
+              `✨ Great concept for your adventure! I'll keep working on bringing your visions to life! 🎭`
+            ];
+            imageAIResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+          }
+          
+          await onGenerateImage(imageSubject || text);
+          
+          const aiMessage: ChatMessage = {
+            type: 'ai',
+            content: imageAIResponse,
+            timestamp: Date.now()
+          };
+          
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length + 1);
+            playMessageSound();
+            // Stop loading animation and reset explicit request flag
+            setIsGeneratingAdventureImage(false);
+            setIsExplicitImageRequest(false);
+            // Auto-speak the AI message
+            const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+            ttsService.speakAIMessage(aiMessage.content, messageId);
+            return [...prev, aiMessage];
+          });
+        
+          // Don't generate additional AI response for image requests
+          return;
+        } catch (error) {
+          console.error('Error in image request handling:', error);
+          // Stop loading animation and sound on error, reset explicit request flag
+          setIsGeneratingAdventureImage(false);
+          setIsExplicitImageRequest(false);
+          stopImageLoadingSound();
+          
+          // Add error message to chat
+          const errorMessage: ChatMessage = {
+            type: 'ai',
+            content: `🎨 Oops! I had trouble creating your image, but let's keep the adventure going! ✨`,
+            timestamp: Date.now()
+          };
+          
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length + 1);
+            playMessageSound();
+            return [...prev, errorMessage];
+          });
+          
+          return;
         }
-        
-        await onGenerateImage(imageSubject || text);
-        
-        const aiMessage: ChatMessage = {
-          type: 'ai',
-          content: imageAIResponse,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages(prev => {
-          setLastMessageCount(prev.length + 1);
-          playMessageSound();
-          // Auto-speak the AI message
-          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
-          ttsService.speakAIMessage(aiMessage.content, messageId);
-          return [...prev, aiMessage];
-        });
-        
-        // Don't generate additional AI response for image requests
-        return;
       }
       
       // Set loading state for regular text responses
@@ -1781,6 +1834,7 @@ const Index = () => {
                     image={current.image}
                     className="h-full w-full"
                     isNew={current.id === newlyCreatedPanelId}
+                    isGenerating={isGeneratingAdventureImage}
                     shouldZoom={current.id === zoomingPanelId}
                     onPreviousPanel={() => {
                       if (currentIndex > 0) {

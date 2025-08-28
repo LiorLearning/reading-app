@@ -8,6 +8,7 @@ interface ComicPanelProps {
   image: string;
   className?: string;
   isNew?: boolean;
+  isGenerating?: boolean;
   shouldZoom?: boolean;
   onPreviousPanel?: () => void;
   onNextPanel?: () => void;
@@ -19,12 +20,83 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   image, 
   className, 
   isNew,
+  isGenerating = false,
   shouldZoom = false,
   onPreviousPanel,
   onNextPanel,
   hasPrevious = false,
   hasNext = false
 }) => {
+  const [showImageAfterLoad, setShowImageAfterLoad] = React.useState(false);
+  const [previousLoadingState, setPreviousLoadingState] = React.useState(isGenerating);
+  const [currentImage, setCurrentImage] = React.useState(image);
+  const fadeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Track when loading completes to trigger image fade-in
+  React.useEffect(() => {
+    // Clear any existing timeout
+    if (fadeTimeoutRef.current) {
+      clearTimeout(fadeTimeoutRef.current);
+      fadeTimeoutRef.current = null;
+    }
+
+    // When isGenerating changes from true to false, wait a brief moment then show image
+    if (previousLoadingState && !isGenerating) {
+      // Update the current image when loading completes
+      setCurrentImage(image);
+      
+      fadeTimeoutRef.current = setTimeout(() => {
+        // Safety check: only show image if we're still not generating
+        // This prevents showing the image if loading started again during the timeout
+        if (!isGenerating) {
+          setShowImageAfterLoad(true);
+        }
+      }, 300); // Small delay to ensure smooth transition
+    }
+    
+    // When loading starts again, immediately hide the image
+    if (isGenerating && !previousLoadingState) {
+      setShowImageAfterLoad(false);
+    }
+    
+    setPreviousLoadingState(isGenerating);
+  }, [isGenerating, previousLoadingState, image]);
+
+  // Reset state when it's a new panel or image changes
+  React.useEffect(() => {
+    if (isNew) {
+      setShowImageAfterLoad(false);
+      setCurrentImage(image);
+    }
+  }, [isNew, image]);
+
+  // Handle image changes during non-loading states
+  React.useEffect(() => {
+    if (!isGenerating && !isNew && image !== currentImage) {
+      setCurrentImage(image);
+      setShowImageAfterLoad(true);
+    }
+  }, [image, currentImage, isGenerating, isNew]);
+
+  // Handle image changes during fade timeout - update the image immediately
+  React.useEffect(() => {
+    if (fadeTimeoutRef.current && image !== currentImage && !isGenerating) {
+      // Clear the existing timeout and update image immediately
+      clearTimeout(fadeTimeoutRef.current);
+      fadeTimeoutRef.current = null;
+      setCurrentImage(image);
+      setShowImageAfterLoad(true);
+    }
+  }, [image, currentImage, isGenerating]);
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (fadeTimeoutRef.current) {
+        clearTimeout(fadeTimeoutRef.current);
+      }
+    };
+  }, []);
   return (
     <div className={cn(
       "relative w-full h-full flex flex-col overflow-hidden",
@@ -32,10 +104,15 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
       className
     )}>
       <div className="flex-1 min-h-0 relative">
-        {isNew ? (
+        {(isNew || isGenerating) ? (
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
-            {/* Simple Loading Container */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full mx-4">
+            {/* Loading Animation Container */}
+            <div 
+              className={cn(
+                "bg-white/90 backdrop-blur-sm rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full mx-4 transition-opacity duration-500",
+                showImageAfterLoad && "opacity-0 pointer-events-none"
+              )}
+            >
               {/* Animated Magic Sparkles */}
               <div className="absolute inset-0 overflow-hidden rounded-3xl">
                 <div className="absolute top-4 left-4 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
@@ -76,14 +153,16 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
               </div>
             </div>
             
-            {/* Image with fade-in animation - starts hidden */}
-            <div className="absolute inset-0 w-full h-full opacity-0 overflow-hidden" style={{ 
-              animation: 'fadeIn 1s ease-out forwards',
-              animationDelay: '1.8s'
-            }}>
+            {/* Image with synchronized fade-in - only shows when loading is complete */}
+            <div 
+              className={cn(
+                "absolute inset-0 w-full h-full overflow-hidden transition-opacity duration-700 ease-out",
+                showImageAfterLoad ? "opacity-100" : "opacity-0 pointer-events-none"
+              )}
+            >
               {/* Blurred background image */}
               <img 
-                src={image} 
+                src={currentImage} 
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover object-center"
                 loading="lazy"
@@ -95,7 +174,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
               {/* Main image - original size, centered */}
               <div className="relative w-full h-full flex items-center justify-center z-10">
                 <img 
-                  src={image} 
+                  src={currentImage} 
                   alt="Current comic scene" 
                   className="max-w-full max-h-full"
                   loading="lazy"
@@ -110,7 +189,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           <div className="relative w-full h-full overflow-hidden">
             {/* Blurred background image */}
             <img 
-              src={image} 
+              src={currentImage} 
               alt=""
               className="absolute inset-0 w-full h-full object-cover object-center"
               loading="lazy"
@@ -122,7 +201,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             {/* Main image - original size, centered */}
             <div className="relative w-full h-full flex items-center justify-center z-10">
               <img 
-                src={image} 
+                src={currentImage} 
                 alt="Current comic scene" 
                 className="max-w-full max-h-full"
                 loading="lazy"
