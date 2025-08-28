@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { cn, formatAIMessage, loadUserAdventure, markTopicCompleted, setCurrentTopic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Volume2, Check, X, Loader2, Mic, Square } from "lucide-react";
+import { Volume2, Check, X, Loader2, Mic, Square, ChevronLeft } from "lucide-react";
 import { playClickSound, playMessageSound } from "@/lib/sounds";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
@@ -1431,6 +1431,20 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       {/* Glass blur overlay */}
       <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
       
+      {/* Left Arrow Navigation - Outside the main container */}
+      <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-30">
+        <Button
+          variant="default"
+          size="lg"
+          onClick={handleBackButton}
+          className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate h-16 w-16 p-0 rounded-full flex items-center justify-center"
+          style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+          aria-label="Back"
+        >
+          <ChevronLeft className="h-8 w-8" />
+        </Button>
+      </div>
+
       {/* Main container */}
       <div 
         className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
@@ -2150,18 +2164,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         </div>
       </div>
       
-      {/* Fixed Back Button - Bottom Left */}
-      <div className="fixed bottom-4 left-4 z-50">
-        <Button
-          variant="default"
-          size="lg"
-          onClick={handleBackButton}
-          className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-6 py-3 text-lg font-bold"
-          style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-        >
-          ← Back
-        </Button>
-      </div>
+
     </main>
   );
 };
