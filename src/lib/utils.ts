@@ -728,3 +728,44 @@ export const getAdventureImageCacheStats = (): { totalImages: number, totalSize:
     newestImage: cached.length > 0 ? Math.max(...cached.map(img => img.timestamp)) : 0
   };
 };
+
+/**
+ * Format AI messages by converting markdown-style formatting to HTML
+ * Returns HTML that can be safely rendered using dangerouslySetInnerHTML
+ */
+export const formatAIMessage = (content: string): string => {
+  // First, escape any HTML characters to prevent XSS
+  const escapeHtml = (text: string) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+  
+  // Escape HTML first
+  let formatted = escapeHtml(content);
+  
+  // Convert literal \n characters to <br> tags
+  formatted = formatted.replace(/\\n/g, '<br>');
+  
+  // Apply formatting in order of complexity (most specific first)
+  
+  // Convert ___text___ to <strong><em>text</em></strong> (bold italic)
+  formatted = formatted.replace(/___([^_]+?)___/g, '<strong><em>$1</em></strong>');
+  
+  // Convert __text__ to <strong>text</strong> (alternative bold syntax)
+  formatted = formatted.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
+  
+  // Convert **text** to <strong>text</strong> (bold)
+  formatted = formatted.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  
+  // Convert remaining _text_ to <em>text</em> (italic/emphasis)
+  formatted = formatted.replace(/_([^_]+?)_/g, '<em>$1</em>');
+  
+  // Convert remaining *text* to <em>text</em> (italic)
+  formatted = formatted.replace(/\*([^*]+?)\*/g, '<em>$1</em>');
+  
+  // Clean up any weird spacing patterns like "_ _" 
+  formatted = formatted.replace(/<\/em>\s+<em>/g, ' ');
+  
+  return formatted;
+};

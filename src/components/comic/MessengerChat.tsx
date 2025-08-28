@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 import { ttsService } from "@/lib/tts-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
+import { formatAIMessage } from "@/lib/utils";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -359,7 +360,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                         : "bg-white/95 text-black border-2 border-black backdrop-blur-sm"
                     )}
                   >
-                    <div className="break-words font-medium pr-6">{message.content}</div>
+                    <div className="break-words font-medium pr-6">
+                      {message.type === 'ai' ? (
+                        <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                      ) : (
+                        message.content
+                      )}
+                    </div>
                     {/* Speaker button for AI messages only */}
                     {message.type === 'ai' && (
                       <SpeakerButton message={message} index={index} />

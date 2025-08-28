@@ -5,6 +5,7 @@ import { ChevronUp, ChevronDown, MessageCircle, Volume2, Square } from "lucide-r
 import { ttsService } from "@/lib/tts-service";
 import { playClickSound } from "@/lib/sounds";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
+import { formatAIMessage } from "@/lib/utils";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -117,7 +118,13 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
                     <div className="font-medium text-xs mb-1 opacity-70">
                       {message.type === 'user' ? 'You' : '🤖 AI Helper'}
                     </div>
-                    <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
+                    <div className={message.type === 'ai' ? 'pr-6' : ''}>
+                      {message.type === 'ai' ? (
+                        <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                      ) : (
+                        message.content
+                      )}
+                    </div>
                     {/* Speaker button for AI messages only */}
                     {message.type === 'ai' && (
                       <SpeakerButton message={message} index={index} />

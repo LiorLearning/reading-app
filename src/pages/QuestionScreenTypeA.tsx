@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatAIMessage } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
@@ -509,7 +509,13 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                               <div className="font-medium text-xs mb-1 opacity-70">
                                 {message.type === 'user' ? 'You' : '🤖 Krafty'}
                               </div>
-                              <div>{message.content}</div>
+                              <div>
+                                {message.type === 'ai' ? (
+                                  <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                                ) : (
+                                  message.content
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))

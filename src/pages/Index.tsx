@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square } from "lucide-react";
-import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound } from "@/lib/sounds";
 
@@ -1868,7 +1868,13 @@ const Index = () => {
                                     <div className="font-medium text-xs mb-1 opacity-70">
                                       {message.type === 'user' ? 'You' : '🤖 Krafty'}
                                     </div>
-                                    <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
+                                    <div className={message.type === 'ai' ? 'pr-6' : ''}>
+                                      {message.type === 'ai' ? (
+                                        <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                                      ) : (
+                                        message.content
+                                      )}
+                                    </div>
                                     {/* Speaker button for AI messages only */}
                                     {message.type === 'ai' && (
                                       <SpeakerButton message={message} index={index} />

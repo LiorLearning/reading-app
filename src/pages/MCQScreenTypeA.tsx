@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { cn, loadUserAdventure, markTopicCompleted, setCurrentTopic } from "@/lib/utils";
+import { cn, formatAIMessage, loadUserAdventure, markTopicCompleted, setCurrentTopic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Volume2, Check, X, Loader2, Mic, Square } from "lucide-react";
 import { playClickSound, playMessageSound } from "@/lib/sounds";
@@ -2110,7 +2110,13 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                               <div className="font-medium text-xs mb-1 opacity-70">
                                 {message.type === 'user' ? 'You' : '🤖 Krafty'}
                               </div>
-                              <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
+                              <div className={message.type === 'ai' ? 'pr-6' : ''}>
+                                {message.type === 'ai' ? (
+                                  <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                                ) : (
+                                  message.content
+                                )}
+                              </div>
                               {/* Speaker button for AI messages only */}
                               {message.type === 'ai' && (
                                 <SpeakerButton message={message} index={index} />
