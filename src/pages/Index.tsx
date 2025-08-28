@@ -482,6 +482,15 @@ const Index = () => {
     }
   }, [userData, currentScreen]);
   
+  // Ensure chat panel is always open when adventure mode starts
+  useEffect(() => {
+    if (currentScreen === 1) {
+      // Always open chat panel when entering adventure mode
+      setSidebarCollapsed(false);
+      console.log('🗨️ Adventure mode started - opening chat panel by default');
+    }
+  }, [currentScreen]);
+  
   // Chat panel resize functionality - now proportional
   const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(20); // 20% of container width (smaller default)
   const [isResizing, setIsResizing] = React.useState(false);
