@@ -292,12 +292,14 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
 
   return (
     <main 
-      className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4 lg:px-6 bg-primary/60 relative" 
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 lg:px-6 bg-primary/60 relative" 
       style={{
         backgroundImage: `url('/backgrounds/random2.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundBlendMode: 'multiply'
+        backgroundBlendMode: 'multiply',
+        paddingTop: '1rem',
+        paddingBottom: '1rem'
       }}
       role="main"
     >
@@ -306,15 +308,20 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
       
       {/* Wrapper for both background and content to scale together */}
       <div 
-        className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
+        className="relative responsive-max-width mx-auto flex-1 flex items-center justify-center"
         style={{ 
           width: '95%',
           maxWidth: '1520px',
-          aspectRatio: getAspectRatio,
-          minHeight: '500px',
           transition: 'all 0.3s ease-in-out'
         }}
       >
+        <div
+          className="w-full relative"
+          style={{ 
+            aspectRatio: getAspectRatio,
+            minHeight: '500px'
+          }}
+        >
         {/* Background Container with Border and Fill */}
         <div 
           className="absolute inset-0 rounded-3xl z-0"
@@ -350,21 +357,18 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
           ref={containerRef}
           className="flex relative z-10 h-full w-full"
           style={{ 
-            paddingTop: '8px',
-            paddingBottom: '8px',
-            paddingLeft: '8px',
-            paddingRight: '8px'
+            padding: '8px'
           }}
         >
           {/* Main Content Panel - MCQ Only */}
           <section 
             aria-label="Main content panel" 
-            className="flex flex-col min-h-0 relative flex-1 transition-all duration-300 ease-in-out"
+            className="flex flex-col justify-center min-h-0 relative flex-1 transition-all duration-300 ease-in-out"
             style={{ marginRight: sidebarCollapsed ? '0px' : '5px' }}
           >
             {/* MCQ Mode */}
             {mcq.currentQuestion && (
-              <div className="flex-1 flex items-center justify-center relative z-10 py-8">
+              <div className="flex flex-col items-center justify-center relative z-10 space-y-6">
                 <MCQComponent 
                   question={mcq.currentQuestion}
                   onAnswerComplete={(questionId, isCorrect, selectedAnswer) => {
@@ -396,25 +400,25 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                   }}
                   showNextButton={mcq.hasNextQuestion}
                 />
+                
+                {/* MCQ Progress Indicator */}
+                <div className="flex justify-center relative z-10">
+                  <div 
+                    className="px-6 py-2 rounded-xl text-white font-medium text-sm"
+                    style={{
+                      background: 'linear-gradient(to bottom, hsl(var(--primary) / 0.8), hsl(var(--primary) / 0.9))',
+                      border: '2px solid white',
+                      boxShadow: '0 2px 0 black'
+                    }}
+                  >
+                    Question {mcq.currentQuestionIndex + 1} of {mcq.totalQuestions} 
+                    {mcq.answerHistory.length > 0 && (
+                      <span className="ml-2">• Score: {mcq.score}/{mcq.answerHistory.length}</span>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
-
-            {/* MCQ Progress Indicator */}
-            <div className="flex justify-center mt-4 relative z-10">
-              <div 
-                className="px-6 py-2 rounded-xl text-white font-medium text-sm"
-                style={{
-                  background: 'linear-gradient(to bottom, hsl(var(--primary) / 0.8), hsl(var(--primary) / 0.9))',
-                  border: '2px solid white',
-                  boxShadow: '0 2px 0 black'
-                }}
-              >
-                Question {mcq.currentQuestionIndex + 1} of {mcq.totalQuestions} 
-                {mcq.answerHistory.length > 0 && (
-                  <span className="ml-2">• Score: {mcq.score}/{mcq.answerHistory.length}</span>
-                )}
-              </div>
-            </div>
           </section>
 
           {/* Right Sidebar - Appears when not collapsed */}
@@ -532,6 +536,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
               )}
             </div>
           </aside>
+        </div>
         </div>
       </div>
       

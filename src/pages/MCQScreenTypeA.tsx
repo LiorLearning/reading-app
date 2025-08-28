@@ -1411,8 +1411,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
           ref={containerRef}
           className="flex relative z-10 h-full w-full"
           style={{ 
-            paddingTop: '20px',     // Instead of 40px
-            paddingBottom: '4px',   // Instead of 8px  
+            paddingTop: '12px',
+            paddingBottom: '12px',
             paddingLeft: '8px',
             paddingRight: '8px'
           }}
