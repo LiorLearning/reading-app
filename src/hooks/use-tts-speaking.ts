@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { ttsService } from '@/lib/tts-service';
 
 export const useTTSSpeaking = (messageId: string) => {
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  // Use lazy initializer to get initial state safely
+  const [isSpeaking, setIsSpeaking] = useState(() => 
+    ttsService.isMessageSpeaking(messageId)
+  );
 
   useEffect(() => {
-    // Check initial state
-    setIsSpeaking(ttsService.isMessageSpeaking(messageId));
-
     // Listen for speaking state changes
     const handleSpeakingStateChange = (currentSpeakingMessageId: string | null) => {
       setIsSpeaking(currentSpeakingMessageId === messageId);
