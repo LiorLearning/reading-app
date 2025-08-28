@@ -1808,7 +1808,13 @@ const Index = () => {
                   });
                   return shouldShowBackButton;
                 })() && (
-                  <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-30">
+                  <div 
+                    className="fixed left-4 top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:left-8"
+                    style={{
+                      // Ensure button stays within viewport on all screen sizes
+                      left: 'max(16px, min(32px, calc((100vw - 1280px) / 2 + 16px)))'
+                    }}
+                  >
                     <Button
                       variant="default"
                       size="lg"
@@ -1847,7 +1853,7 @@ const Index = () => {
                           }, 500);
                         }
                       }}
-                      className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate h-16 w-16 p-0 rounded-full flex items-center justify-center"
+                      className="border-2 bg-purple-600 hover:bg-purple-700 text-white btn-animate h-16 w-16 p-0 rounded-full flex items-center justify-center shadow-lg"
                       style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
                       aria-label={`Back to Question ${topicQuestionIndex}`}
                     >
@@ -1860,7 +1866,13 @@ const Index = () => {
 
             {/* Right Arrow Navigation - Outside the main container */}
             {currentScreen === 1 && isInQuestionMode === false && (
-              <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-30">
+              <div 
+                className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:right-8"
+                style={{
+                  // Ensure button stays within viewport on all screen sizes
+                  right: 'max(16px, min(32px, calc((100vw - 1280px) / 2 + 16px)))'
+                }}
+              >
                 <Button
                   variant="default"
                   size="lg"
@@ -1891,7 +1903,7 @@ const Index = () => {
                       await ttsService.speakAIMessage(toQuestionMessage.content, messageId);
                     }, 500);
                   }}
-                  className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate h-16 w-16 p-0 rounded-full flex items-center justify-center"
+                  className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate h-16 w-16 p-0 rounded-full flex items-center justify-center shadow-lg"
                   style={{ borderColor: 'hsl(from hsl(142 76% 36%) h s 25%)', boxShadow: '0 4px 0 black' }}
                   aria-label="Answer Questions"
                 >
