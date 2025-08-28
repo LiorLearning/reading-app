@@ -42,7 +42,7 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
       aria-label={isSpeaking ? "Stop message" : "Play message"}
     >
       {isSpeaking ? (
-        <Square className="h-3 w-3 fill-current" />
+        <Square className="h-3 w-3 fill-red-500" />
       ) : (
         <Volume2 className="h-3 w-3" />
       )}
