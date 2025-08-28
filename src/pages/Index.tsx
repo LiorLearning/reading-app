@@ -250,75 +250,67 @@ const Index = () => {
         return;
       }
       
-      // Generate initial AI message based on adventure mode
+      // Generate initial AI message using real-time AI generation
       const generateInitialResponse = async () => {
-        let initialMessage: string;
-        
-        if (adventureMode === 'new') {
-          // Ask about what kind of adventure they want to make
-          const newAdventureMessages = [
-            "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀",
-            "✨ Hey there, explorer! Ready to embark on something incredible? Tell me, what type of adventure is calling to you today? 🎭",
-            "🎨 Greetings, creative adventurer! I'm Krafty, and I'm here to help you craft the most amazing story! What adventure theme excites you most today? 🌈",
-            "🚀 Adventure awaits, my friend! I'm Krafty, your sidekick in this epic journey! What kind of thrilling adventure shall we create together today? ⭐"
-          ];
-          initialMessage = newAdventureMessages[Math.floor(Math.random() * newAdventureMessages.length)];
-        } else {
-          // Reference last messages and suggest interesting progress
-          const currentMessages = chatMessages;
-          const recentMessages = currentMessages.slice(-3);
-          const hasRecentContext = recentMessages.length > 0;
-          
-          if (hasRecentContext) {
-            const contextMessages = [
-              `🎯 Welcome back, adventurer! I've been thinking about our last conversation... ${recentMessages[recentMessages.length - 1]?.content?.substring(0, 50)}... What happens next in your epic tale? 🌟`,
-              `🚀 Great to see you again! Based on where we left off, I have some exciting ideas brewing! What direction would you like to take our adventure now? ✨`,
-              `⭐ You're back! I've been eagerly waiting to continue our journey! From what we discussed last time, there are so many possibilities ahead! What's your next move? 🎭`,
-              `🌈 Welcome back, storyteller! Our adventure has such great momentum! I can't wait to see what amazing twist you'll add next! What happens now? 🎪`
-            ];
-            initialMessage = contextMessages[Math.floor(Math.random() * contextMessages.length)];
-          } else {
-            // Load adventure summaries for context
-            const summaries = loadAdventureSummaries();
-            if (summaries.length > 0) {
-              const recentSummary = summaries[summaries.length - 1];
-              const contextMessages = [
-                `🎯 Welcome back to "${recentSummary.name}"! I remember we were working on ${recentSummary.summary}. What exciting direction should we take next? 🌟`,
-                `🚀 Great to see you again! I've been thinking about "${recentSummary.name}" - ${recentSummary.summary}. What happens next in our story? ✨`,
-                `⭐ You're back for more adventure! Last time we created "${recentSummary.name}" involving ${recentSummary.summary}. Where do we go from here? 🎭`
-              ];
-              initialMessage = contextMessages[Math.floor(Math.random() * contextMessages.length)];
-            } else {
-              const continueMessages = [
-                "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟",
-                "🚀 Great to see you again! Ready to pick up where we left off and create something incredible? What's next in your story? ✨",
-                "⭐ You're back for more adventure! I love your enthusiasm! What exciting twist should we add to your tale today? 🎭"
-              ];
-              initialMessage = continueMessages[Math.floor(Math.random() * continueMessages.length)];
-            }
-          }
-        }
-
-        // Mark that we've sent the initial response for this session
-        initialResponseSentRef.current = sessionKey;
-
-        // Add the initial AI message
-        const aiMessage: ChatMessage = {
-          type: 'ai',
-          content: initialMessage,
-          timestamp: Date.now()
-        };
-
-        setChatMessages(prev => {
-          setLastMessageCount(prev.length + 1);
-          playMessageSound();
-          // Auto-speak the initial AI message and wait for completion
-          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
-          ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
-            console.error('TTS error for initial message:', error)
+        try {
+          // Generate initial message using AI service with adventure prompt
+          const initialMessage = await aiService.generateInitialMessage(
+            adventureMode,
+            chatMessages,
+            undefined, // currentAdventure - can be added later if needed
+            undefined, // storyEventsContext - can be added later if needed
+            undefined  // summary - can be added later if needed
           );
-          return [...prev, aiMessage];
-        });
+
+          // Mark that we've sent the initial response for this session
+          initialResponseSentRef.current = sessionKey;
+
+          // Add the initial AI message
+          const aiMessage: ChatMessage = {
+            type: 'ai',
+            content: initialMessage,
+            timestamp: Date.now()
+          };
+
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length + 1);
+            playMessageSound();
+            // Auto-speak the initial AI message and wait for completion
+            const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+            ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
+              console.error('TTS error for initial message:', error)
+            );
+            return [...prev, aiMessage];
+          });
+        } catch (error) {
+          console.error('Error generating initial AI message:', error);
+          
+          // Fallback to a simple message if AI generation fails
+          const fallbackMessage = adventureMode === 'new' 
+            ? "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀"
+            : "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟";
+          
+          // Mark that we've sent the initial response for this session
+          initialResponseSentRef.current = sessionKey;
+
+          // Add the fallback AI message
+          const aiMessage: ChatMessage = {
+            type: 'ai',
+            content: fallbackMessage,
+            timestamp: Date.now()
+          };
+
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length + 1);
+            playMessageSound();
+            // Auto-speak the fallback message
+            const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+            ttsService.speakAIMessage(fallbackMessage, messageId).catch(error => 
+              console.error('TTS error for fallback message:', error)
+            );
+            return [...prev, aiMessage];
+          });
+        }
       };
 
       generateInitialResponse();

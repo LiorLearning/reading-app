@@ -133,6 +133,123 @@ Student Profile: ${summary || 'Getting to know this adventurer...'}`
     }
   }
 
+  // Generate initial AI message for starting conversations
+  async generateInitialMessage(
+    adventureMode: 'new' | 'continue',
+    chatHistory: ChatMessage[] = [],
+    currentAdventure?: any,
+    storyEventsContext?: string,
+    summary?: string
+  ): Promise<string> {
+    // If not initialized or no API key, use fallback
+    if (!this.isInitialized || !this.client) {
+      return this.getFallbackInitialMessage(adventureMode, chatHistory);
+    }
+
+    try {
+      // Build context for initial message generation
+      const adventureState = adventureMode === 'new' ? 'new' : 'continue';
+      
+      // Create system message using the main adventure prompt
+      const systemMessage = {
+        role: "system" as const,
+        content: `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
+
+Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using explicit newline characters (\\n) at natural pauses for clean formatting.
+
+Goal: Create fast-paced, mission-oriented adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
+
+Ongoing Adventure: Show excitement, prompt me for what happens next, and occasionally suggest 1–2 creative ideas to spark the next turn.
+
+New Adventure: Ask about my interests (space exploration, robotics, dragons, sci-fi adventures, time travel, etc.). Offer:
+- Interest-based adventure (protagonist + villain + clear goal)
+- Another interest-based adventure
+- "Create-your-own" adventure (I invent the setting, sidekick, and villain)
+
+Use rich plots, lovable characters, and suspenseful cliffhangers.
+
+Character Creation: When creating sidekicks/characters, let me choose names with suggestions, offer trait lists (funny, optimistic, resilient, etc.), and ask me to describe appearance for image creation.
+
+Remember: I'm your loyal companion and guide in this adventure - speak as "I" and refer to the student as "you". Always end with excitement and either a cliffhanger or a single engaging question. Keep responses thrilling and mysterious to match interests.
+
+The app has image generation capabilities, so you can suggest visual elements and encourage kids to ask for images when it would enhance their story.
+
+Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : 'ONGOING_ADVENTURE'}
+
+Current Adventure Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
+
+Student Profile: ${summary || 'Getting to know this adventurer...'}
+
+IMPORTANT: This is the very first message to start our adventure conversation. Generate an enthusiastic greeting that follows the adventure state guidelines above.`
+      };
+
+      // For initial message, we send just the system prompt and ask for a greeting
+      const userMessage = {
+        role: "user" as const,
+        content: adventureMode === 'new' 
+          ? "Hi! I'm ready to start a new adventure!" 
+          : "Hi! I'm ready to continue our adventure!"
+      };
+
+      const messages = [systemMessage, userMessage];
+
+      const completion = await this.client.chat.completions.create({
+        model: "chatgpt-4o-latest",
+        messages: messages,
+        max_tokens: 100,
+        temperature: 0.8,
+        presence_penalty: 0.3,
+        frequency_penalty: 0.3,
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      
+      if (response) {
+        return response.trim();
+      } else {
+        throw new Error('No response content received');
+      }
+    } catch (error) {
+      console.error('OpenAI API error for initial message:', error);
+      // Return fallback response on error
+      return this.getFallbackInitialMessage(adventureMode, chatHistory);
+    }
+  }
+
+  // Fallback responses for initial messages when API is not available
+  private getFallbackInitialMessage(adventureMode: 'new' | 'continue', chatHistory: ChatMessage[]): string {
+    if (adventureMode === 'new') {
+      const newAdventureMessages = [
+        "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀",
+        "✨ Hey there, explorer! Ready to embark on something incredible? Tell me, what type of adventure is calling to you today? 🎭",
+        "🎨 Greetings, creative adventurer! I'm Krafty, and I'm here to help you craft the most amazing story! What adventure theme excites you most today? 🌈",
+        "🚀 Adventure awaits, my friend! I'm Krafty, your sidekick in this epic journey! What kind of thrilling adventure shall we create together today? ⭐"
+      ];
+      return newAdventureMessages[Math.floor(Math.random() * newAdventureMessages.length)];
+    } else {
+      // Continue adventure fallbacks
+      const recentMessages = chatHistory.slice(-3);
+      const hasRecentContext = recentMessages.length > 0;
+      
+      if (hasRecentContext) {
+        const contextMessages = [
+          `🎯 Welcome back, adventurer! I've been thinking about our last conversation... ${recentMessages[recentMessages.length - 1]?.content?.substring(0, 50)}... What happens next in your epic tale? 🌟`,
+          `🚀 Great to see you again! Based on where we left off, I have some exciting ideas brewing! What direction would you like to take our adventure now? ✨`,
+          `⭐ You're back! I've been eagerly waiting to continue our journey! From what we discussed last time, there are so many possibilities ahead! What's your next move? 🎭`,
+          `🌈 Welcome back, storyteller! Our adventure has such great momentum! I can't wait to see what amazing twist you'll add next! What happens now? 🎪`
+        ];
+        return contextMessages[Math.floor(Math.random() * contextMessages.length)];
+      } else {
+        const continueMessages = [
+          "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟",
+          "🚀 Great to see you again! Ready to pick up where we left off and create something incredible? What's next in your story? ✨",
+          "⭐ You're back for more adventure! I love your enthusiasm! What exciting twist should we add to your tale today? 🎭"
+        ];
+        return continueMessages[Math.floor(Math.random() * continueMessages.length)];
+      }
+    }
+  }
+
   // Extract and filter relevant adventure context with weighted recent messages
   private extractAdventureContext(userAdventure: ChatMessage[]): string {
     if (!userAdventure || userAdventure.length === 0) {
