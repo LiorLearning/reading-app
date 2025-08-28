@@ -1604,21 +1604,36 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                         </div>
                       </div>
                     ) : generatedImages[currentQuestionIndex] ? (
-                      <img 
-                        src={generatedImages[currentQuestionIndex]} 
-                        alt={`Illustration for ${currentQuestion.word}`}
-                        className="w-full h-full object-cover object-center"
-                        style={{
-                          filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
-                        }}
-                        onError={(e) => {
-                          // If image fails to load, show placeholder
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const placeholder = target.nextElementSibling as HTMLElement;
-                          if (placeholder) placeholder.style.display = 'flex';
-                        }}
-                      />
+                      <div className="relative w-full h-full overflow-hidden">
+                        {/* Blurred background image */}
+                        <img 
+                          src={generatedImages[currentQuestionIndex]} 
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover object-center"
+                          style={{
+                            filter: 'blur(20px) brightness(0.7) contrast(1.1) saturate(1.1)',
+                            transform: 'scale(1.1)' // Slightly scale to avoid blur edges
+                          }}
+                        />
+                        {/* Main image - original size, centered */}
+                        <div className="relative w-full h-full flex items-center justify-center z-10">
+                          <img 
+                            src={generatedImages[currentQuestionIndex]} 
+                            alt={`Illustration for ${currentQuestion.word}`}
+                            className="max-w-full max-h-full"
+                            style={{
+                              filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                            }}
+                            onError={(e) => {
+                              // If image fails to load, show placeholder
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const placeholder = target.closest('.relative')?.closest('.relative')?.nextElementSibling as HTMLElement;
+                              if (placeholder) placeholder.style.display = 'flex';
+                            }}
+                          />
+                        </div>
+                      </div>
                     ) : null}
                     
                     {/* Fallback placeholder (hidden by default, shown on image error or no image) */}
@@ -1829,21 +1844,36 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                           </div>
                         </div>
                       ) : generatedImages[currentQuestionIndex] ? (
-                        <img 
-                          src={generatedImages[currentQuestionIndex]} 
-                          alt={`Illustration for ${currentQuestion.word}`}
-                          className="w-full h-full object-cover object-center"
-                          style={{
-                            filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
-                          }}
-                          onError={(e) => {
-                            // If image fails to load, show placeholder
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const placeholder = target.nextElementSibling as HTMLElement;
-                            if (placeholder) placeholder.style.display = 'flex';
-                          }}
-                        />
+                        <div className="relative w-full h-full overflow-hidden">
+                          {/* Blurred background image */}
+                          <img 
+                            src={generatedImages[currentQuestionIndex]} 
+                            alt=""
+                            className="absolute inset-0 w-full h-full object-cover object-center"
+                            style={{
+                              filter: 'blur(20px) brightness(0.7) contrast(1.1) saturate(1.1)',
+                              transform: 'scale(1.1)' // Slightly scale to avoid blur edges
+                            }}
+                          />
+                          {/* Main image - original size, centered */}
+                          <div className="relative w-full h-full flex items-center justify-center z-10">
+                            <img 
+                              src={generatedImages[currentQuestionIndex]} 
+                              alt={`Illustration for ${currentQuestion.word}`}
+                              className="max-w-full max-h-full"
+                              style={{
+                                filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                              }}
+                              onError={(e) => {
+                                // If image fails to load, show placeholder
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const placeholder = target.closest('.relative')?.closest('.relative')?.nextElementSibling as HTMLElement;
+                                if (placeholder) placeholder.style.display = 'flex';
+                              }}
+                            />
+                          </div>
+                        </div>
                       ) : null}
                       
                       {/* Fallback placeholder (hidden by default, shown on image error or no image) */}

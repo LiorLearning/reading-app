@@ -77,24 +77,61 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             </div>
             
             {/* Image with fade-in animation - starts hidden */}
-            <img 
-              src={image} 
-              alt="Current comic scene" 
-              className="absolute inset-0 w-full h-full object-cover opacity-0" 
-              loading="lazy" 
-              style={{ 
-                animation: 'fadeIn 1s ease-out forwards',
-                animationDelay: '1.8s'
-              }}
-            />
+            <div className="absolute inset-0 w-full h-full opacity-0 overflow-hidden" style={{ 
+              animation: 'fadeIn 1s ease-out forwards',
+              animationDelay: '1.8s'
+            }}>
+              {/* Blurred background image */}
+              <img 
+                src={image} 
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover object-center"
+                loading="lazy"
+                style={{
+                  filter: 'blur(20px) brightness(0.7) contrast(1.1) saturate(1.1)',
+                  transform: 'scale(1.1)' // Slightly scale to avoid blur edges
+                }}
+              />
+              {/* Main image - original size, centered */}
+              <div className="relative w-full h-full flex items-center justify-center z-10">
+                <img 
+                  src={image} 
+                  alt="Current comic scene" 
+                  className="max-w-full max-h-full"
+                  loading="lazy"
+                  style={{
+                    filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                  }}
+                />
+              </div>
+            </div>
           </div>
         ) : (
-          <img 
-            src={image} 
-            alt="Current comic scene" 
-            className="absolute inset-0 w-full h-full object-cover" 
-            loading="lazy" 
-          />
+          <div className="relative w-full h-full overflow-hidden">
+            {/* Blurred background image */}
+            <img 
+              src={image} 
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              loading="lazy"
+              style={{
+                filter: 'blur(20px) brightness(0.7) contrast(1.1) saturate(1.1)',
+                transform: 'scale(1.1)' // Slightly scale to avoid blur edges
+              }}
+            />
+            {/* Main image - original size, centered */}
+            <div className="relative w-full h-full flex items-center justify-center z-10">
+              <img 
+                src={image} 
+                alt="Current comic scene" 
+                className="max-w-full max-h-full"
+                loading="lazy"
+                style={{
+                  filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                }}
+              />
+            </div>
+          </div>
         )}
         
         {/* Navigation Buttons - Always visible and positioned around the image */}
