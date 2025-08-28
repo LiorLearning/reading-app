@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown, MessageCircle, Volume2 } from "lucide-react";
+import { ChevronUp, ChevronDown, MessageCircle, Volume2, Square } from "lucide-react";
 import { ttsService } from "@/lib/tts-service";
 import { playClickSound } from "@/lib/sounds";
+import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -14,6 +15,40 @@ interface ChatMessage {
 interface ChatHistoryProps {
   messages: ChatMessage[];
 }
+
+// Component for individual speaker button
+const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ message, index }) => {
+  const messageId = `chat-history-${message.timestamp}-${index}`;
+  const isSpeaking = useTTSSpeaking(messageId);
+
+  const handleClick = async () => {
+    playClickSound();
+    
+    if (isSpeaking) {
+      // Stop current speech
+      ttsService.stop();
+    } else {
+      // Start speaking this message
+      await ttsService.speakAIMessage(message.content, messageId);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+      aria-label={isSpeaking ? "Stop message" : "Play message"}
+    >
+      {isSpeaking ? (
+        <Square className="h-3 w-3 fill-current" />
+      ) : (
+        <Volume2 className="h-3 w-3" />
+      )}
+    </Button>
+  );
+};
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -85,18 +120,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ messages }) => {
                     <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
                     {/* Speaker button for AI messages only */}
                     {message.type === 'ai' && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          playClickSound();
-                          await ttsService.speakAIMessage(message.content);
-                        }}
-                        className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
-                        aria-label="Play message"
-                      >
-                        <Volume2 className="h-3 w-3" />
-                      </Button>
+                      <SpeakerButton message={message} index={index} />
                     )}
                   </div>
                 </div>

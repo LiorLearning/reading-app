@@ -1,12 +1,13 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { cn, loadUserAdventure, markTopicCompleted, setCurrentTopic } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Volume2, Check, X, Loader2, Mic } from "lucide-react";
+import { Volume2, Check, X, Loader2, Mic, Square } from "lucide-react";
 import { playClickSound, playMessageSound } from "@/lib/sounds";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
 import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
+import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import TopicComplete from "./TopicComplete";
 import PracticeNeeded from "./PracticeNeeded";
 import confetti from 'canvas-confetti';
@@ -129,6 +130,40 @@ interface MCQScreenTypeAProps {
 }
 
 // Remove the empty sampleMCQData object (lines 178-180)
+
+// Component for individual speaker button in chat messages
+const SpeakerButton: React.FC<{ message: any; index: number }> = ({ message, index }) => {
+  const messageId = `mcq-chat-${message.timestamp}-${index}`;
+  const isSpeaking = useTTSSpeaking(messageId);
+
+  const handleClick = async () => {
+    playClickSound();
+    
+    if (isSpeaking) {
+      // Stop current speech
+      ttsService.stop();
+    } else {
+      // Start speaking this message
+      await ttsService.speakAIMessage(message.content, messageId);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+      aria-label={isSpeaking ? "Stop message" : "Play message"}
+    >
+      {isSpeaking ? (
+        <Square className="h-3 w-3 fill-current" />
+      ) : (
+        <Volume2 className="h-3 w-3" />
+      )}
+    </Button>
+  );
+};
 
 const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   getAspectRatio,
@@ -370,7 +405,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       playMessageSound();
       
       // Auto-speak the AI feedback message and wait for completion
-      await ttsService.speakAIMessage(feedbackMessage.content);
+      const messageId = `mcq-chat-${feedbackMessage.timestamp}-${chatMessages.length}`;
+      await ttsService.speakAIMessage(feedbackMessage.content, messageId);
     } else {
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying other options
@@ -397,7 +433,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         playMessageSound();
         
         // Auto-speak the hint message
-        ttsService.speakAIMessage(hintMessage.content);
+        const hintMessageId = `mcq-chat-${hintMessage.timestamp}-${chatMessages.length}`;
+        ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       } catch (error) {
         console.error('Error generating reflection prompt:', error);
         
@@ -410,7 +447,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, fallbackMessage]);
         playMessageSound();
-        await ttsService.speakAIMessage(fallbackMessage.content);
+        const fallbackMessageId = `mcq-chat-${fallbackMessage.timestamp}-${chatMessages.length}`;
+        await ttsService.speakAIMessage(fallbackMessage.content, fallbackMessageId);
       }
       
       // Clear the wrong answer visual feedback after a brief moment
@@ -478,7 +516,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       playMessageSound();
       
       // Auto-speak the AI feedback message and wait for completion
-      await ttsService.speakAIMessage(feedbackMessage.content);
+      const messageId = `mcq-chat-${feedbackMessage.timestamp}-${chatMessages.length}`;
+      await ttsService.speakAIMessage(feedbackMessage.content, messageId);
     } else {
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying again
@@ -505,7 +544,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         playMessageSound();
         
         // Auto-speak the hint message and wait for completion
-        await ttsService.speakAIMessage(hintMessage.content);
+        const hintMessageId = `mcq-chat-${hintMessage.timestamp}-${chatMessages.length}`;
+        await ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       } catch (error) {
         console.error('Error generating reflection prompt for fill-blank:', error);
         
@@ -518,7 +558,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, fallbackMessage]);
         playMessageSound();
-        await ttsService.speakAIMessage(fallbackMessage.content);
+        const fallbackMessageId = `mcq-chat-${fallbackMessage.timestamp}-${chatMessages.length}`;
+        await ttsService.speakAIMessage(fallbackMessage.content, fallbackMessageId);
       }
       
       // Clear the wrong answer after a brief moment
@@ -557,7 +598,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     playMessageSound();
     
     // Auto-speak the encouragement message and wait for completion
-    await ttsService.speakAIMessage(encouragementMessage.content);
+    const messageId = `mcq-chat-${encouragementMessage.timestamp}-${chatMessages.length}`;
+    await ttsService.speakAIMessage(encouragementMessage.content, messageId);
   }, [isInReflectionMode, currentQuestion, setChatMessages]);
 
   // Wrapper for onGenerate to handle reflection mode
@@ -1084,7 +1126,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     };
     setChatMessages((prev: any) => [...prev, aiMessage]);
     playMessageSound();
-    await ttsService.speakAIMessage(feedbackMessage);
+    const messageId = `mcq-chat-${aiMessage.timestamp}-${chatMessages.length}`;
+    await ttsService.speakAIMessage(feedbackMessage, messageId);
   }, [currentQuestion]);
 
   // Calculate reading similarity (simple word matching)
@@ -1159,7 +1202,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       };
       setChatMessages((prev: any) => [...prev, hintMessage]);
       playMessageSound();
-      await ttsService.speakAIMessage(hintMessage.content);
+      const hintMessageId = `mcq-chat-${hintMessage.timestamp}-${chatMessages.length}`;
+      await ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       return;
     }
 
@@ -1218,7 +1262,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       };
       setChatMessages((prev: any) => [...prev, feedbackMessage]);
       playMessageSound();
-      await ttsService.speakAIMessage(feedbackMessage.content);
+      const feedbackMessageId = `mcq-chat-${feedbackMessage.timestamp}-${chatMessages.length}`;
+      await ttsService.speakAIMessage(feedbackMessage.content, feedbackMessageId);
     } else {
       try {
         // Generate AI reflection response for drag-and-drop
@@ -1240,7 +1285,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, hintMessage]);
         playMessageSound();
-        await ttsService.speakAIMessage(hintMessage.content);
+        const hintMessageId = `mcq-chat-${hintMessage.timestamp}-${chatMessages.length}`;
+        await ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       } catch (error) {
         console.error('Error generating reflection prompt for drag-drop:', error);
         
@@ -1253,7 +1299,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         setChatMessages((prev: any) => [...prev, fallbackMessage]);
         playMessageSound();
-        await ttsService.speakAIMessage(fallbackMessage.content);
+        const fallbackMessageId = `mcq-chat-${fallbackMessage.timestamp}-${chatMessages.length}`;
+        await ttsService.speakAIMessage(fallbackMessage.content, fallbackMessageId);
       }
       
       // Allow retry
@@ -2036,18 +2083,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                               <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
                               {/* Speaker button for AI messages only */}
                               {message.type === 'ai' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={async () => {
-                                    playClickSound();
-                                    await ttsService.speakAIMessage(message.content);
-                                  }}
-                                  className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
-                                  aria-label="Play message"
-                                >
-                                  <Volume2 className="h-3 w-3" />
-                                </Button>
+                                <SpeakerButton message={message} index={index} />
                               )}
                             </div>
                           </div>

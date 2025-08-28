@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2 } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square } from "lucide-react";
 import { cn, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound } from "@/lib/sounds";
@@ -16,6 +16,7 @@ import { useComic } from "@/hooks/use-comic";
 import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
 import VoiceSelector from "@/components/ui/voice-selector";
+import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -63,6 +64,40 @@ const loadUserData = (): UserData | null => {
     console.warn('Failed to load user data from localStorage:', error);
   }
   return null;
+};
+
+// Component for individual speaker button
+const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ message, index }) => {
+  const messageId = `index-chat-${message.timestamp}-${index}`;
+  const isSpeaking = useTTSSpeaking(messageId);
+
+  const handleClick = async () => {
+    playClickSound();
+    
+    if (isSpeaking) {
+      // Stop current speech
+      ttsService.stop();
+    } else {
+      // Start speaking this message
+      await ttsService.speakAIMessage(message.content, messageId);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+      aria-label={isSpeaking ? "Stop message" : "Play message"}
+    >
+      {isSpeaking ? (
+        <Square className="h-3 w-3 fill-current" />
+      ) : (
+        <Volume2 className="h-3 w-3" />
+      )}
+    </Button>
+  );
 };
 
 const Index = () => {
@@ -278,7 +313,8 @@ const Index = () => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           // Auto-speak the initial AI message and wait for completion
-          ttsService.speakAIMessage(initialMessage).catch(error => 
+          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+          ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
             console.error('TTS error for initial message:', error)
           );
           return [...prev, aiMessage];
@@ -676,7 +712,8 @@ const Index = () => {
               });
               
               // Wait for the AI speech to complete before transitioning
-              await ttsService.speakAIMessage(transitionMessage.content);
+              const messageId = `index-chat-${transitionMessage.timestamp}-${chatMessages.length}`;
+              await ttsService.speakAIMessage(transitionMessage.content, messageId);
               
               // Add a small buffer after speech completes
               setTimeout(() => {
@@ -750,7 +787,8 @@ const Index = () => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           // Auto-speak the AI message
-          ttsService.speakAIMessage(aiMessage.content);
+          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+          ttsService.speakAIMessage(aiMessage.content, messageId);
           return [...prev, aiMessage];
         });
         
@@ -776,7 +814,8 @@ const Index = () => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           // Auto-speak the AI message and wait for completion
-          ttsService.speakAIMessage(aiMessage.content).catch(error => 
+          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+          ttsService.speakAIMessage(aiMessage.content, messageId).catch(error => 
             console.error('TTS error for AI message:', error)
           );
           return [...prev, aiMessage];
@@ -794,7 +833,8 @@ const Index = () => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           // Auto-speak the error message and wait for completion
-          ttsService.speakAIMessage(errorMessage.content).catch(error => 
+          const messageId = `index-chat-${errorMessage.timestamp}-${prev.length}`;
+          ttsService.speakAIMessage(errorMessage.content, messageId).catch(error => 
             console.error('TTS error for error message:', error)
           );
           return [...prev, errorMessage];
@@ -1102,7 +1142,8 @@ const Index = () => {
         });
         
         // Wait for the AI speech to complete
-        await ttsService.speakAIMessage(backToAdventureMessage.content);
+        const messageId = `index-chat-${backToAdventureMessage.timestamp}-${chatMessages.length}`;
+        await ttsService.speakAIMessage(backToAdventureMessage.content, messageId);
       }, 500);
       
       return; // Return void for adventure mode navigation
@@ -1830,18 +1871,7 @@ const Index = () => {
                                     <div className={message.type === 'ai' ? 'pr-6' : ''}>{message.content}</div>
                                     {/* Speaker button for AI messages only */}
                                     {message.type === 'ai' && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={async () => {
-                                          playClickSound();
-                                          await ttsService.speakAIMessage(message.content);
-                                        }}
-                                        className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
-                                        aria-label="Play message"
-                                      >
-                                        <Volume2 className="h-3 w-3" />
-                                      </Button>
+                                      <SpeakerButton message={message} index={index} />
                                     )}
                                   </div>
                                 </div>
@@ -1989,7 +2019,8 @@ const Index = () => {
                     });
                     
                     // Wait for the AI speech to complete
-                    await ttsService.speakAIMessage(backToAdventureMessage.content);
+                    const messageId = `index-chat-${backToAdventureMessage.timestamp}-${chatMessages.length}`;
+                    await ttsService.speakAIMessage(backToAdventureMessage.content, messageId);
                   }, 500);
                   return;
                 } else if (newQuestionIndex === 10) {
@@ -2113,7 +2144,8 @@ const Index = () => {
                       });
                       
                       // Wait for the AI speech to complete
-                      await ttsService.speakAIMessage(backToQuestionMessage.content);
+                      const messageId = `index-chat-${backToQuestionMessage.timestamp}-${chatMessages.length}`;
+                      await ttsService.speakAIMessage(backToQuestionMessage.content, messageId);
                     }, 500);
                   }
                 }}
@@ -2151,7 +2183,8 @@ const Index = () => {
                   });
                   
                   // Wait for the AI speech to complete
-                  await ttsService.speakAIMessage(toQuestionMessage.content);
+                  const messageId = `index-chat-${toQuestionMessage.timestamp}-${chatMessages.length}`;
+                  await ttsService.speakAIMessage(toQuestionMessage.content, messageId);
                 }, 500);
               }}
               className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate px-6 py-3 text-lg font-bold"

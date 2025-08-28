@@ -5,6 +5,7 @@ interface TTSOptions {
   model?: string;
   stability?: number;
   similarity_boost?: number;
+  messageId?: string; // Add message ID for tracking
 }
 
 export interface Voice {
@@ -56,6 +57,8 @@ class TextToSpeechService {
   private currentAudio: HTMLAudioElement | null = null;
   private isSpeaking = false;
   private selectedVoice: Voice;
+  private currentSpeakingMessageId: string | null = null; // Track which message is speaking
+  private speakingStateListeners: Set<(messageId: string | null) => void> = new Set(); // Listeners for speaking state changes
 
   constructor() {
     // Load selected voice from localStorage or default to Jessica
@@ -123,6 +126,21 @@ class TextToSpeechService {
     }
   }
 
+  // Add listener for speaking state changes
+  addSpeakingStateListener(listener: (messageId: string | null) => void): void {
+    this.speakingStateListeners.add(listener);
+  }
+
+  // Remove listener for speaking state changes
+  removeSpeakingStateListener(listener: (messageId: string | null) => void): void {
+    this.speakingStateListeners.delete(listener);
+  }
+
+  // Notify all listeners of speaking state change
+  private notifySpeakingStateChange(messageId: string | null): void {
+    this.speakingStateListeners.forEach(listener => listener(messageId));
+  }
+
   // Speak text using selected voice
   async speak(text: string, options?: TTSOptions): Promise<void> {
     // Clean the text for better speech
@@ -137,6 +155,10 @@ class TextToSpeechService {
     try {
       // Stop any current audio
       this.stop();
+
+      // Set current speaking message ID
+      this.currentSpeakingMessageId = options?.messageId || null;
+      this.notifySpeakingStateChange(this.currentSpeakingMessageId);
 
       // Use selected voice or override from options
       const voiceId = options?.voice || this.selectedVoice.id;
@@ -180,12 +202,16 @@ class TextToSpeechService {
 
         this.currentAudio.onended = () => {
           this.isSpeaking = false;
+          this.currentSpeakingMessageId = null;
+          this.notifySpeakingStateChange(null);
           URL.revokeObjectURL(audioUrl);
           resolve();
         };
 
         this.currentAudio.onerror = () => {
           this.isSpeaking = false;
+          this.currentSpeakingMessageId = null;
+          this.notifySpeakingStateChange(null);
           URL.revokeObjectURL(audioUrl);
           console.error('Error playing TTS audio');
           reject(new Error('Audio playback failed'));
@@ -194,6 +220,8 @@ class TextToSpeechService {
         // Start playing the audio
         this.currentAudio.play().catch((error) => {
           this.isSpeaking = false;
+          this.currentSpeakingMessageId = null;
+          this.notifySpeakingStateChange(null);
           URL.revokeObjectURL(audioUrl);
           reject(error);
         });
@@ -201,6 +229,8 @@ class TextToSpeechService {
     } catch (error) {
       console.error('TTS error:', error);
       this.isSpeaking = false;
+      this.currentSpeakingMessageId = null;
+      this.notifySpeakingStateChange(null);
       throw error;
     }
   }
@@ -229,11 +259,28 @@ class TextToSpeechService {
     }
     
     this.isSpeaking = false;
+    const wasPlayingMessageId = this.currentSpeakingMessageId;
+    this.currentSpeakingMessageId = null;
+    
+    // Only notify if there was actually something playing
+    if (wasPlayingMessageId) {
+      this.notifySpeakingStateChange(null);
+    }
   }
 
   // Check if currently speaking
   getIsSpeaking(): boolean {
     return this.isSpeaking;
+  }
+
+  // Check if a specific message is currently speaking
+  isMessageSpeaking(messageId: string): boolean {
+    return this.currentSpeakingMessageId === messageId;
+  }
+
+  // Get the currently speaking message ID
+  getCurrentSpeakingMessageId(): string | null {
+    return this.currentSpeakingMessageId;
   }
 
   // Check if TTS service is properly configured
@@ -262,10 +309,11 @@ class TextToSpeechService {
   }
 
   // Speak AI messages with selected voice
-  async speakAIMessage(message: string): Promise<void> {
+  async speakAIMessage(message: string, messageId?: string): Promise<void> {
     await this.speak(message, {
       stability: 0.7,
       similarity_boost: 0.9,
+      messageId: messageId,
     });
   }
 

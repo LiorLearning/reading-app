@@ -6,6 +6,7 @@ import { Mic, Send, X, Square, Image as ImageIcon, ArrowUpRight, Volume2 } from 
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 import { ttsService } from "@/lib/tts-service";
+import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -19,6 +20,40 @@ interface MessengerChatProps {
   onGenerateImage: () => void;
   onExpandChat: () => void; // Function to expand chat to full panel
 }
+
+// Component for individual speaker button
+const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ message, index }) => {
+  const messageId = `messenger-chat-${message.timestamp}-${index}`;
+  const isSpeaking = useTTSSpeaking(messageId);
+
+  const handleClick = async () => {
+    playClickSound();
+    
+    if (isSpeaking) {
+      // Stop current speech
+      ttsService.stop();
+    } else {
+      // Start speaking this message
+      await ttsService.speakAIMessage(message.content, messageId);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+      className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
+      aria-label={isSpeaking ? "Stop message" : "Play message"}
+    >
+      {isSpeaking ? (
+        <Square className="h-3 w-3 fill-current" />
+      ) : (
+        <Volume2 className="h-3 w-3" />
+      )}
+    </Button>
+  );
+};
 
 const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat }) => {
   const [isHidden, setIsHidden] = useState(true);
@@ -327,18 +362,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                     <div className="break-words font-medium pr-6">{message.content}</div>
                     {/* Speaker button for AI messages only */}
                     {message.type === 'ai' && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          playClickSound();
-                          await ttsService.speakAIMessage(message.content);
-                        }}
-                        className="absolute bottom-1 right-1 h-5 w-5 p-0 hover:bg-black/10 rounded-full"
-                        aria-label="Play message"
-                      >
-                        <Volume2 className="h-3 w-3" />
-                      </Button>
+                      <SpeakerButton message={message} index={index} />
                     )}
                   </div>
                 </div>
