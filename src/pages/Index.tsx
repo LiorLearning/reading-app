@@ -918,15 +918,24 @@ const Index = () => {
       
       saveAdventure(adventure);
       
-      // Create a new comic panel for this adventure if we have enough content
-      if (chatMessages.length >= 5 && panels.length === 1) { // Only if we haven't added panels yet
-        const userMessages = chatMessages.filter(msg => msg.type === 'user');
-        if (userMessages.length >= 2) {
-          const adventureContext = userMessages.slice(0, 3).map(msg => msg.content).join(' ');
-          // Generate new panel based on adventure content
-          onGenerateImage(adventureContext);
-        }
-      }
+      // // Create a new comic panel for this adventure every 10 messages
+      // console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
+      
+      // if (chatMessages.length >= 10 && chatMessages.length % 10 === 0) { // Generate every 10 messages regularly
+      //   const userMessages = chatMessages.filter(msg => msg.type === 'user');
+      //   console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 2`);
+        
+      //   if (userMessages.length >= 2) {
+      //     const adventureContext = userMessages.slice(-6).map(msg => msg.content).join(' '); // Use recent user messages for context
+      //     console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
+      //     // Generate new panel based on adventure content
+      //     onGenerateImage(adventureContext);
+      //   } else {
+      //     console.log(`🖼️ AUTO IMAGE: Skipped - not enough user messages (${userMessages.length} < 2)`);
+      //   }
+      // } else {
+      //   console.log(`🖼️ AUTO IMAGE: Not triggered - need ${10 - (chatMessages.length % 10)} more messages to reach next multiple of 10`);
+      // }
       
       // Update adventure summaries
       const summaries = loadAdventureSummaries();
@@ -1201,6 +1210,28 @@ const Index = () => {
 
 
   const current = panels[currentIndex] ?? initialPanels[0];
+
+  // Auto-generate images every 10 messages (immediate trigger)
+  React.useEffect(() => {
+    if (chatMessages.length >= 10 && chatMessages.length % 10 === 0 && currentAdventureId) {
+      console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
+      
+      const userMessages = chatMessages.filter(msg => msg.type === 'user');
+      console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 2`);
+      
+      if (userMessages.length >= 2) {
+        const adventureContext = userMessages.slice(-6).map(msg => msg.content).join(' ');
+        console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
+        
+        // Small delay to ensure message rendering is complete
+        setTimeout(() => {
+          onGenerateImage(adventureContext);
+        }, 500);
+      } else {
+        console.log(`🖼️ AUTO IMAGE: Skipped - not enough user messages (${userMessages.length} < 2)`);
+      }
+    }
+  }, [chatMessages.length, currentAdventureId, onGenerateImage]);
 
   return (
     <div className="h-screen bg-pattern flex flex-col overflow-hidden">
