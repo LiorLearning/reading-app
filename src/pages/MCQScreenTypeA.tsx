@@ -2173,7 +2173,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   </div>
                 
                   {/* Messages */}
-                  <div className="flex-1 min-h-0 relative">
+                  <div className="relative" style={{ height: '600px' }}>
                     <div 
                       ref={messagesScrollRef}
                       className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
