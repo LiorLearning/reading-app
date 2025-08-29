@@ -321,22 +321,39 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
     return context.trim();
   }
 
-  // Extract the last 3 messages from both user and AI for direct context
+  // Extract the last 4-5 user messages with minimal AI context for question contextualization
   private getRecentMessagesContext(userAdventure: ChatMessage[]): string {
     if (!userAdventure || userAdventure.length === 0) {
       return "";
     }
 
-    // Get the last 6 messages (to try to get 3 from each type)
-    const recentMessages = userAdventure.slice(-6);
+    // Get the last 4-5 user messages specifically
+    const userMessages = userAdventure.filter(msg => msg.type === 'user').slice(-5);
     
-    // Format the messages for context
-    const formattedMessages = recentMessages.map(msg => {
-      const speaker = msg.type === 'user' ? 'Child' : 'AI';
-      return `${speaker}: "${msg.content}"`;
-    }).join('\n');
+    // Get the most recent AI response for minimal context continuity
+    const lastAIMessage = userAdventure.filter(msg => msg.type === 'ai').slice(-1)[0];
+    
+    // Format primarily user messages for context, with last AI message for continuity
+    let formattedContext = '';
+    
+    if (userMessages.length > 0) {
+      const userContext = userMessages.map((msg, index) => 
+        `Child (${userMessages.length - index} messages ago): "${msg.content}"`
+      ).join('\n');
+      formattedContext += userContext;
+    }
+    
+    // Add the last AI response at the end for minimal context
+    if (lastAIMessage) {
+      formattedContext += `\nAI's last response: "${lastAIMessage.content}"`;
+    }
 
-    return formattedMessages;
+    console.log('Contextualized with user-focused messages:', {
+      userMessageCount: userMessages.length,
+      hasAIContext: !!lastAIMessage
+    });
+
+    return formattedContext;
   }
 
   // Helper method to extract story elements
@@ -440,17 +457,17 @@ ORIGINAL QUESTION: "${originalQuestion}"
 CORRECT ANSWER: "${correctOption}"
 ALL OPTIONS: ${options.map((opt, i) => `${i + 1}. "${opt}"`).join(", ")}
 
-RECENT CONVERSATION CONTEXT:
+RECENT USER CONVERSATION CONTEXT (Focus on user's last 4-5 messages):
 ${this.getRecentMessagesContext(userAdventure)}
 
 ADVENTURE SETTING: ${adventureContext || this.getDefaultAdventureContext()}
 
 Strict rules:
-0) Event anchoring: Build directly on the most recent event; include at least one concrete detail from it. Do not change the location/scene or introduce unrelated new objects.
+0) Event anchoring: Build directly on the most recent events from the user's messages; include at least one concrete detail from them. Do NOT progress the adventure or introduce new plot developments - only reference existing elements.
 1) Audience/decodability: Kindergarten. Do not use difficult words since this is a reading exercise for kindergarten students.
 2) Length: Keep questions concise and age-appropriate.
 3) Include these target words: ${wordsToPreserve.join(', ')}
-4) Keep it lively and connected to the current adventure.
+4) Keep it lively and connected to the current adventure context WITHOUT advancing the story.
 5) Name usage: You may use character names from the adventure. Avoid other proper names.
 6) Clarity: Very simple sentences appropriate for kindergarten reading level.
 7) Output format: Return ONLY the new question text. No titles, labels, or extra text.
@@ -461,11 +478,12 @@ CRITICAL REQUIREMENTS:
 2. Do NOT change any answer options
 3. Do NOT replace educational words with adventure-related words (e.g., don't change "elephant" to "rocketship")
 4. ONLY change the question scenario/context to fit the adventure
-5. Use characters, settings, or themes from the adventure context, ESPECIALLY the most recent elements
+5. Use characters, settings, or themes from the adventure context, ESPECIALLY from the user's recent messages
 6. Keep the exact same educational objective (spacing, grammar, phonics, etc.)
 7. Make it exciting and age-appropriate for children
-8. PRIORITIZE the most recent adventure elements mentioned by the user
+8. PRIORITIZE the user's most recent adventure elements and actions
 9. NEVER include the answer text in the question - the question must not give away the correct answer
+10. DO NOT advance the adventure story - only contextualize the question within existing adventure elements
 
 WORDS TO PRESERVE: ${wordsToPreserve.join(', ')}
 
