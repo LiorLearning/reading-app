@@ -275,6 +275,13 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
   }, [startingQuestionIndex, currentQuestionIndex]);
 
+  // Auto-scroll to bottom when new messages arrive in MCQ chat
+  useEffect(() => {
+    if (messagesScrollRef.current && !sidebarCollapsed) {
+      messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages, sidebarCollapsed]);
+
   // Get current topic and questions
   const currentTopic = sampleMCQData.topics[selectedTopicId];
   const currentQuestion = currentTopic.questions[currentQuestionIndex];

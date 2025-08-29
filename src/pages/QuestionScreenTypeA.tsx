@@ -209,6 +209,13 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
     }
   }, [checkAccuracy]);
 
+  // Auto-scroll to bottom when new messages arrive in Question chat
+  useEffect(() => {
+    if (messagesScrollRef.current && !sidebarCollapsed) {
+      messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages, sidebarCollapsed]);
+
   const handleMicClick = useCallback(() => {
     playClickSound();
     
