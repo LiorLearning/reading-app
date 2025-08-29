@@ -172,7 +172,7 @@ const Index = () => {
   const imageGenerationController = React.useRef<AbortController | null>(null);
   
   // Firebase auth integration
-  const { user, userData, signOut } = useAuth();
+  const { user, userData,loading, signOut } = useAuth();
   
   // Show onboarding if user is authenticated but hasn't completed setup
   const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
@@ -180,7 +180,7 @@ const Index = () => {
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-  const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(() => userData ? -1 : 0);
+  const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(0);
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
@@ -379,6 +379,7 @@ const Index = () => {
   }, [currentScreen, selectedTopicId, adventureMode]);
   
   React.useEffect(() => {
+    
     const updateScreenSize = () => {
       if (window.innerWidth <= 640) {
         setScreenSize('mobile');
@@ -537,6 +538,7 @@ const Index = () => {
 
     // Update currentScreen when userData loads to prevent flashing TopicSelection before onboarding
   useEffect(() => {
+    if (loading) return;
     if (user && userData) {
       // If user needs onboarding, ensure we don't show TopicSelection briefly
       const needsOnboarding = userData.isFirstTime || !userData.grade;
@@ -552,7 +554,7 @@ const Index = () => {
       // User is not authenticated, should be on TopicSelection
       setCurrentScreen(0);
     }
-  }, [user, userData, currentScreen]);
+  }, [user, userData, currentScreen, loading]);
   
   
   // Ensure chat panel is always open when adventure mode starts
@@ -1911,7 +1913,14 @@ const Index = () => {
 
 
         {/* Conditional Screen Rendering */}
-        {showOnboarding ? (
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-lg text-gray-600">Loading...</p>
+            </div>
+          </div>
+        ) : showOnboarding ? (
           <UserOnboarding onComplete={handleOnboardingComplete} />
         ) : currentScreen === -1 ? (
                     <HomePage 
