@@ -729,6 +729,87 @@ export const getAdventureImageCacheStats = (): { totalImages: number, totalSize:
   };
 };
 
+// Question Progress persistence - add after cached adventure images section
+const QUESTION_PROGRESS_KEY = 'readingapp_question_progress';
+
+export interface QuestionProgress {
+  topicId: string;
+  questionIndex: number;
+  timestamp: number;
+}
+
+/**
+ * Save current question progress for a topic
+ */
+export const saveQuestionProgress = (topicId: string, questionIndex: number): void => {
+  try {
+    const progress: QuestionProgress = {
+      topicId,
+      questionIndex,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(QUESTION_PROGRESS_KEY, JSON.stringify(progress));
+    console.log(`💾 Saved question progress: Topic ${topicId}, Question ${questionIndex + 1}`);
+  } catch (error) {
+    console.warn('Failed to save question progress to localStorage:', error);
+  }
+};
+
+/**
+ * Load question progress for current session
+ */
+export const loadQuestionProgress = (): QuestionProgress | null => {
+  try {
+    const stored = localStorage.getItem(QUESTION_PROGRESS_KEY);
+    if (!stored) {
+      return null;
+    }
+    
+    const progress = JSON.parse(stored) as QuestionProgress;
+    
+    // Only return progress if it's less than 24 hours old to avoid stale progress
+    const oneDay = 24 * 60 * 60 * 1000;
+    if (Date.now() - progress.timestamp < oneDay) {
+      return progress;
+    }
+    
+    // Clear stale progress
+    clearQuestionProgress();
+    return null;
+  } catch (error) {
+    console.warn('Failed to load question progress from localStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear question progress (called when topic is completed or abandoned)
+ */
+export const clearQuestionProgress = (): void => {
+  try {
+    localStorage.removeItem(QUESTION_PROGRESS_KEY);
+    console.log('🗑️ Cleared question progress');
+  } catch (error) {
+    console.warn('Failed to clear question progress from localStorage:', error);
+  }
+};
+
+/**
+ * Get starting question index for a topic, considering saved progress
+ */
+export const getStartingQuestionIndex = (topicId: string): number => {
+  const progress = loadQuestionProgress();
+  
+  // If there's saved progress for the same topic, resume from there
+  if (progress && progress.topicId === topicId) {
+    console.log(`🔄 Resuming topic ${topicId} from question ${progress.questionIndex + 1}`);
+    return progress.questionIndex;
+  }
+  
+  // Otherwise start from the beginning
+  return 0;
+};
+
 /**
  * Format AI messages by converting markdown-style formatting to HTML
  * Returns HTML that can be safely rendered using dangerouslySetInnerHTML

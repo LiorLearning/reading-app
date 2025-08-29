@@ -127,6 +127,7 @@ interface MCQScreenTypeAProps {
   onNextTopic?: (nextTopicId?: string) => void;
   onBack?: (currentQuestionIndex: number) => string | void; // New prop for back navigation
   startingQuestionIndex?: number; // Add this new prop
+  onQuestionChange?: (currentQuestionIndex: number) => void; // New prop for progress tracking
 }
 
 // Remove the empty sampleMCQData object (lines 178-180)
@@ -185,7 +186,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   onRetryTopic,
   onNextTopic,
   onBack,
-  startingQuestionIndex
+  startingQuestionIndex,
+  onQuestionChange
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const resizeRef = React.useRef<HTMLDivElement>(null);
@@ -680,7 +682,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       const result = onBack(currentQuestionIndex);
       // If onBack returns 'previous_question', go to previous question
       if (result === 'previous_question' && currentQuestionIndex > 0) {
-        setCurrentQuestionIndex(prev => prev - 1);
+        const previousQuestionIndex = currentQuestionIndex - 1;
+        setCurrentQuestionIndex(previousQuestionIndex);
+        
+        // Save progress when going back to a previous question
+        onQuestionChange?.(previousQuestionIndex);
+        
         setSelectedAnswer(null);
         setShowFeedback(false);
         setIsCorrect(false);
@@ -716,6 +723,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     if (currentQuestionIndex < currentTopic.questions.length - 1) {
       console.log(`🔍 DEBUG MCQ: Not last question, calling onNextTopic()`);
+      
+      // Save progress for the next question before moving
+      const nextQuestionIndex = currentQuestionIndex + 1;
+      onQuestionChange?.(nextQuestionIndex);
+      
       // Let parent component handle the progression logic
       if (onNextTopic) {
         onNextTopic(); // Call without nextTopicId to let Index.tsx handle the flow logic
@@ -723,7 +735,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     } else {
       console.log(`🔍 DEBUG MCQ: Last question completed, showing completion page`);
       
-      // All questions completed - check score and show appropriate completion page
+      // Topic completed - let parent handle progress clearing
+      // All questions completed - check score and show appropriate completion page  
       setQuizCompleted(true);
       
       // Save progress - topic is marked as completed only with passing grade (7/10+)
@@ -750,7 +763,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setShowCompletionPage('practice');
       }
     }
-  }, [currentQuestionIndex, currentTopic, setChatMessages, onNextTopic]);
+  }, [currentQuestionIndex, currentTopic, setChatMessages, onNextTopic, onQuestionChange]);
 
 
 

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
 
@@ -223,7 +223,15 @@ const Index = () => {
   // Automatic Flow Control System
   const ADVENTURE_PROMPT_THRESHOLD = 3; // Configurable threshold for when user can access questions
   const [adventurePromptCount, setAdventurePromptCount] = React.useState<number>(0); // Track adventure prompts
-  const [topicQuestionIndex, setTopicQuestionIndex] = React.useState<number>(0); // Current question in topic (0-9)
+  const [topicQuestionIndex, setTopicQuestionIndex] = React.useState<number>(() => {
+    // Initialize with saved progress if available - this allows seamless resume after page refresh
+    const savedProgress = loadQuestionProgress();
+    if (savedProgress && selectedTopicId && savedProgress.topicId === selectedTopicId) {
+      console.log(`🔄 Initializing with saved progress: Topic ${savedProgress.topicId}, Question ${savedProgress.questionIndex + 1}`);
+      return savedProgress.questionIndex;
+    }
+    return 0;
+  }); // Current question in topic (0-9)
   const [isInQuestionMode, setIsInQuestionMode] = React.useState<boolean>(false); // Track if currently in question mode
   const [canAccessQuestions, setCanAccessQuestions] = React.useState<boolean>(false); // Track if user has met threshold
   
@@ -1015,14 +1023,32 @@ const Index = () => {
   const autoAssignTopicAndNavigate = React.useCallback((level: 'start' | 'middle') => {
     const topicId = level === 'start' ? 'K-F.2' : '1-Q.4';
     setSelectedTopicId(topicId);
+    // Load saved question progress for this topic
+    const startingIndex = getStartingQuestionIndex(topicId);
+    setTopicQuestionIndex(startingIndex);
     setCurrentScreen(3); // Go directly to MCQ screen
   }, []);
 
   // Handle topic selection
   const handleTopicSelect = React.useCallback((topicId: string) => {
     setSelectedTopicId(topicId);
+    // Load saved question progress for this topic
+    const startingIndex = getStartingQuestionIndex(topicId);
+    setTopicQuestionIndex(startingIndex);
     setCurrentScreen(1); // Go to adventure screen
   }, []);
+
+  // Load question progress when selectedTopicId changes (handles all topic change scenarios)
+  React.useEffect(() => {
+    if (selectedTopicId) {
+      const startingIndex = getStartingQuestionIndex(selectedTopicId);
+      // Only update if different from current to avoid unnecessary re-renders
+      if (startingIndex !== topicQuestionIndex) {
+        console.log(`🔄 Topic changed to ${selectedTopicId}, loading progress: Question ${startingIndex + 1}`);
+        setTopicQuestionIndex(startingIndex);
+      }
+    }
+  }, [selectedTopicId]); // Don't include topicQuestionIndex in deps to avoid loops
 
   // Handle onboarding completion
   const handleOnboardingComplete = React.useCallback((newUserData: { username: string; grade: string; gradeDisplayName: string; level: string; levelDisplayName: string }) => {
@@ -2274,9 +2300,18 @@ const Index = () => {
               setIsInQuestionMode(true); // Ensure we're in question mode
               setAdventurePromptCount(0); // Reset adventure prompt count for clean retry
               setCanAccessQuestions(true); // Allow questions immediately on retry
-              console.log('🔄 RETRY: Reset to question 1, retry mode enabled');
+              // Clear saved question progress for clean restart
+              clearQuestionProgress();
+              console.log('🔄 RETRY: Reset to question 1, retry mode enabled, progress cleared');
             }}
             onBack={handleBackFromMCQ}
+            onQuestionChange={(questionIndex: number) => {
+              // Save progress whenever question changes
+              if (selectedTopicId) {
+                saveQuestionProgress(selectedTopicId, questionIndex);
+                setTopicQuestionIndex(questionIndex);
+              }
+            }}
             onNextTopic={(nextTopicId) => {
               playClickSound();
               
