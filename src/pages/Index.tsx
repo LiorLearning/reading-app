@@ -172,15 +172,25 @@ const Index = () => {
   const imageGenerationController = React.useRef<AbortController | null>(null);
   
   // Firebase auth integration
-  const { user, userData,loading, signOut } = useAuth();
+  const { user, userData, signOut } = useAuth();
   
   // Show onboarding if user is authenticated but hasn't completed setup
   const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
 
   
+  // If user is authenticated but we're still loading userData, we should wait
+  const isLoadingUserData = user && !userData;
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-  const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(0);
+    const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(() => {
+    // If user exists but no userData yet, start at loading state (don't show topic selection)
+    if (user && !userData) return -1;
+    // If userData exists and user is already setup, go to home
+    if (userData && userData.grade && !userData.isFirstTime) return -1;
+    // If user needs onboarding, the onboarding component will handle it
+    // Start at home screen to avoid topic selection flash
+    return -1;
+  });
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
@@ -536,25 +546,25 @@ const Index = () => {
     }
   }, [userData, currentScreen]);
 
-    // Update currentScreen when userData loads to prevent flashing TopicSelection before onboarding
-  useEffect(() => {
-    if (loading) return;
-    if (user && userData) {
-      // If user needs onboarding, ensure we don't show TopicSelection briefly
-      const needsOnboarding = userData.isFirstTime || !userData.grade;
-      if (needsOnboarding && currentScreen === 0) {
-        // User needs onboarding but currentScreen is on TopicSelection
-        // Don't change currentScreen - let showOnboarding take precedence
-        return;
-      } else if (!needsOnboarding && (currentScreen === 0 || currentScreen === -1)) {
-        // User doesn't need onboarding, ensure we go to HomePage
-        setCurrentScreen(-1);
-      }
-    } else if (!user && currentScreen !== 0) {
-      // User is not authenticated, should be on TopicSelection
-      setCurrentScreen(0);
-    }
-  }, [user, userData, currentScreen, loading]);
+  //   // Update currentScreen when userData loads to prevent flashing TopicSelection before onboarding
+  // useEffect(() => {
+  //   if (loading) return;
+  //   if (user && userData) {
+  //     // If user needs onboarding, ensure we don't show TopicSelection briefly
+  //     const needsOnboarding = userData.isFirstTime || !userData.grade;
+  //     if (needsOnboarding && currentScreen === 0) {
+  //       // User needs onboarding but currentScreen is on TopicSelection
+  //       // Don't change currentScreen - let showOnboarding take precedence
+  //       return;
+  //     } else if (!needsOnboarding && (currentScreen === 0 || currentScreen === -1)) {
+  //       // User doesn't need onboarding, ensure we go to HomePage
+  //       setCurrentScreen(-1);
+  //     }
+  //   } else if (!user && currentScreen !== 0) {
+  //     // User is not authenticated, should be on TopicSelection
+  //     setCurrentScreen(0);
+  //   }
+  // }, [user, userData, currentScreen, loading]);
   
   
   // Ensure chat panel is always open when adventure mode starts
@@ -1913,11 +1923,11 @@ const Index = () => {
 
 
         {/* Conditional Screen Rendering */}
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+          {isLoadingUserData ? (
+          <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-lg text-gray-600">Loading...</p>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-lg text-gray-600">Loading your profile...</p>
             </div>
           </div>
         ) : showOnboarding ? (
