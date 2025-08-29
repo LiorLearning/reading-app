@@ -7,6 +7,9 @@ let imageLoadingAudio: HTMLAudioElement | null = null;
 let imageCompleteAudio: HTMLAudioElement | null = null;
 let messageAudio: HTMLAudioElement | null = null;
 
+// Add state tracking for image loading sound
+let isImageLoadingSoundPlaying = false;
+
 /**
  * Initialize all audio files immediately to prevent delays
  */
@@ -124,13 +127,33 @@ export const playImageLoadingSound = (): void => {
     if (imageLoadingAudio) {
       // Reset audio to beginning in case it was already playing
       imageLoadingAudio.currentTime = 0;
+      
+      // Set up event listeners to track playing state
+      imageLoadingAudio.onplay = () => {
+        isImageLoadingSoundPlaying = true;
+      };
+      
+      imageLoadingAudio.onended = () => {
+        isImageLoadingSoundPlaying = false;
+      };
+      
+      imageLoadingAudio.onpause = () => {
+        isImageLoadingSoundPlaying = false;
+      };
+      
+      imageLoadingAudio.onerror = () => {
+        isImageLoadingSoundPlaying = false;
+      };
+      
       imageLoadingAudio.play().catch((error) => {
         // Silently handle autoplay restrictions
+        isImageLoadingSoundPlaying = false;
         console.debug('Audio play blocked by browser:', error);
       });
     }
   } catch (error) {
     // Silently handle any audio errors
+    isImageLoadingSoundPlaying = false;
     console.debug('Error playing image loading sound:', error);
   }
 };
@@ -143,6 +166,7 @@ export const stopImageLoadingSound = (): void => {
     if (imageLoadingAudio) {
       imageLoadingAudio.pause();
       imageLoadingAudio.currentTime = 0;
+      isImageLoadingSoundPlaying = false;
     }
   } catch (error) {
     // Silently handle any audio errors
@@ -175,6 +199,13 @@ export const playImageCompleteSound = (): void => {
 export const setImageLoadingSoundVolume = (volume: number): void => {
   const audio = initImageLoadingSound();
   audio.volume = Math.max(0, Math.min(1, volume));
+};
+
+/**
+ * Check if image loading sound is currently playing
+ */
+export const isImageLoadingSoundCurrentlyPlaying = (): boolean => {
+  return isImageLoadingSoundPlaying;
 };
 
 /**

@@ -190,9 +190,8 @@ const Index = () => {
   const [isExplicitImageRequest, setIsExplicitImageRequest] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
   
-  // Track ongoing image generation to cancel when navigating away
+  // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
-  const [imageGenerationCancelled, setImageGenerationCancelled] = React.useState(false);
   
   // User data state
   const [userData, setUserData] = React.useState<UserData | null>(() => loadUserData());
@@ -257,12 +256,10 @@ const Index = () => {
     // Stop image loading sound when navigating away from screens where it might be playing
     stopImageLoadingSound();
     
-    // Cancel ongoing image generation when navigating to home page
+    // Clean up any ongoing image generation when navigating to home page
     if (currentScreen === -1 && imageGenerationController.current) {
-      console.log('🏠 Navigating to home page - cancelling ongoing image generation');
-      imageGenerationController.current.abort();
+      console.log('🏠 Navigating to home page - cleaning up image generation');
       imageGenerationController.current = null;
-      setImageGenerationCancelled(true);
       setIsGeneratingAdventureImage(false);
       setIsExplicitImageRequest(false);
     }
@@ -609,7 +606,6 @@ const Index = () => {
     try {
       // Set loading state and start loading sound
       setIsGeneratingAdventureImage(true);
-      setImageGenerationCancelled(false);
       
       // Create AbortController for this generation
       imageGenerationController.current = new AbortController();
@@ -668,12 +664,6 @@ const Index = () => {
       });
       setNewlyCreatedPanelId(newPanelId);
       
-      // Check if generation was cancelled before proceeding with completion actions
-      if (imageGenerationCancelled || !imageGenerationController.current) {
-        console.log('🚫 Image generation was cancelled - skipping completion actions');
-        return;
-      }
-      
       // Stop loading sound and play completion sound when image is ready
       stopImageLoadingSound();
       playImageCompleteSound();
@@ -696,12 +686,6 @@ const Index = () => {
         }, 600);
       }, 2000);
     } catch (error) {
-      // Check if this was due to cancellation
-      if (imageGenerationCancelled) {
-        console.log('🚫 Image generation was cancelled');
-        return;
-      }
-      
       console.error('Error generating image:', error);
       
       // Stop loading sound on error
@@ -844,7 +828,6 @@ const Index = () => {
           // Set loading state and start loading sound immediately
           setIsGeneratingAdventureImage(true);
           setIsExplicitImageRequest(true);
-          setImageGenerationCancelled(false);
           
           // Create AbortController for this generation
           imageGenerationController.current = new AbortController();
@@ -892,11 +875,7 @@ const Index = () => {
           
           await onGenerateImage(imageSubject || text);
           
-          // Check if generation was cancelled before proceeding
-          if (imageGenerationCancelled || !imageGenerationController.current) {
-            console.log('🚫 Image generation was cancelled - skipping AI response');
-            return;
-          }
+          // Proceed with AI response if generation completed successfully
           
           const aiMessage: ChatMessage = {
             type: 'ai',
@@ -922,12 +901,6 @@ const Index = () => {
           // Don't generate additional AI response for image requests
           return;
         } catch (error) {
-          // Check if this was due to cancellation
-          if (imageGenerationCancelled) {
-            console.log('🚫 Image generation was cancelled');
-            return;
-          }
-          
           console.error('Error in image request handling:', error);
           // Stop loading animation and sound on error, reset explicit request flag
           setIsGeneratingAdventureImage(false);

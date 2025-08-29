@@ -1,4 +1,5 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
+import { isImageLoadingSoundCurrentlyPlaying } from './sounds';
 
 interface TTSOptions {
   voice?: string;
@@ -149,6 +150,12 @@ class TextToSpeechService {
     // If not initialized or no API key, skip TTS
     if (!this.isInitialized || !this.client) {
       console.warn('TTS not configured. Cannot speak text.');
+      return;
+    }
+
+    // Check if image loading sound is playing - if so, don't speak
+    if (isImageLoadingSoundCurrentlyPlaying()) {
+      console.debug('Image loading sound is playing, skipping TTS');
       return;
     }
 

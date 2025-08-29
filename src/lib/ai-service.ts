@@ -754,12 +754,22 @@ Return ONLY the new reading passage, nothing else.`;
     }
 
     try {
-      console.log('Generating image based on audio content:', audioText);
+      console.log('Generating contextual image with conversation history:', audioText);
 
-      // Generate multiple prompt options based only on audio content
-      const promptOptions = this.generateRealisticFunPrompt(audioText, imagePrompt);
+      // Get last 10 messages for conversation context
+      const last10Messages = userAdventure.slice(-10);
+      
+      // Build conversation context string
+      const conversationContext = last10Messages
+        .map(msg => `${msg.type === 'user' ? 'Student' : 'AI'}: ${msg.content}`)
+        .join('\n');
 
-      console.log('Generated realistic fun prompt options:', promptOptions);
+      console.log('Using conversation context for image generation:', conversationContext);
+
+      // Generate contextually aware prompt options
+      const promptOptions = this.generateContextualPrompts(audioText, conversationContext, imagePrompt);
+
+      console.log('Generated contextual prompt options:', promptOptions);
 
       // Try each prompt option until one succeeds
       for (let i = 0; i < promptOptions.length; i++) {
@@ -769,7 +779,7 @@ Return ONLY the new reading passage, nothing else.`;
           // Ensure prompt is not too long
           const finalPrompt = prompt.length > 400 ? prompt.substring(0, 390) + "..." : prompt;
           
-          console.log(`Trying DALL-E prompt ${i + 1}:`, finalPrompt);
+          console.log(`Trying contextual DALL-E prompt ${i + 1}:`, finalPrompt);
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -783,11 +793,11 @@ Return ONLY the new reading passage, nothing else.`;
           const imageUrl = response.data[0]?.url;
           
           if (imageUrl) {
-            console.log(`DALL-E prompt ${i + 1} succeeded`);
+            console.log(`Contextual DALL-E prompt ${i + 1} succeeded`);
             return imageUrl;
           }
         } catch (promptError: any) {
-          console.log(`DALL-E prompt ${i + 1} failed:`, promptError.message);
+          console.log(`Contextual DALL-E prompt ${i + 1} failed:`, promptError.message);
           
           // If this isn't a safety error, or it's the last prompt, throw the error
           if (!promptError.message?.includes('safety system') || i === promptOptions.length - 1) {
@@ -799,12 +809,45 @@ Return ONLY the new reading passage, nothing else.`;
         }
       }
 
-      throw new Error('All prompt options failed');
+      throw new Error('All contextual prompt options failed');
     } catch (error) {
-      console.error('DALL-E API error:', error);
+      console.error('DALL-E API error for contextual image:', error);
       // Return null on error to show placeholder
       return null;
     }
+  }
+
+  // Generate contextual prompts that include both audio and conversation history
+  private generateContextualPrompts(audioText: string, conversationContext: string, baseImagePrompt: string): string[] {
+    const prompts: string[] = [];
+
+    // Extract visual elements from audio text
+    const visualElements = this.extractVisualElements(audioText);
+
+    // Option 1: Full context with audio and conversation
+    if (conversationContext.length > 0) {
+      prompts.push(
+        `Create a realistic and engaging educational image for children based on this question: "${audioText}". Consider this recent conversation context to make it relevant: ${conversationContext.slice(-200)}. Make it colorful, clear, and educational.`
+      );
+    }
+
+    // Option 2: Conversation-informed visual elements
+    if (conversationContext.length > 0) {
+      prompts.push(
+        `Educational illustration showing: ${visualElements}. Context from recent learning: ${conversationContext.slice(-150)}. Question focus: ${audioText}. Child-friendly and realistic style.`
+      );
+    }
+
+    // Option 3: Audio-focused with light conversation context
+    prompts.push(
+      `${audioText}. ${conversationContext.length > 0 ? `Learning context: ${conversationContext.slice(-100)}` : ''} Make it realistic, educational, and engaging for children.`
+    );
+
+    // Option 4: Fallback to original realistic prompts
+    const realisticPrompts = this.generateRealisticFunPrompt(audioText, baseImagePrompt);
+    prompts.push(...realisticPrompts);
+
+    return prompts;
   }
 
   // Generate adventure-focused images using user_adventure context
