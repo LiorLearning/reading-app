@@ -534,6 +534,26 @@ const Index = () => {
       }
     }
   }, [userData, currentScreen]);
+
+    // Update currentScreen when userData loads to prevent flashing TopicSelection before onboarding
+  useEffect(() => {
+    if (user && userData) {
+      // If user needs onboarding, ensure we don't show TopicSelection briefly
+      const needsOnboarding = userData.isFirstTime || !userData.grade;
+      if (needsOnboarding && currentScreen === 0) {
+        // User needs onboarding but currentScreen is on TopicSelection
+        // Don't change currentScreen - let showOnboarding take precedence
+        return;
+      } else if (!needsOnboarding && (currentScreen === 0 || currentScreen === -1)) {
+        // User doesn't need onboarding, ensure we go to HomePage
+        setCurrentScreen(-1);
+      }
+    } else if (!user && currentScreen !== 0) {
+      // User is not authenticated, should be on TopicSelection
+      setCurrentScreen(0);
+    }
+  }, [user, userData, currentScreen]);
+  
   
   // Ensure chat panel is always open when adventure mode starts
   useEffect(() => {
