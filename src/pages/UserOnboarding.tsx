@@ -40,7 +40,7 @@ const levels: LevelOption[] = [
 
 const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   const { updateUserData, userData, user } = useAuth();
-  const [username, setUsername] = useState(userData?.username || user?.displayName || "");
+  const [username, setUsername] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
