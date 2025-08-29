@@ -1315,6 +1315,74 @@ Return ONLY your enthusiastic response, nothing else.`;
     }
   }
 
+  // Generate concise one-liner summaries from panel text
+  async generateOneLiner(panelText: string): Promise<string> {
+    // If not initialized or no API key, use simple truncation fallback
+    if (!this.isInitialized || !this.client) {
+      const firstSentence = panelText.match(/^[^.!?]*[.!?]/);
+      if (firstSentence && firstSentence[0].length <= 60) {
+        return firstSentence[0].trim();
+      }
+      const truncated = panelText.substring(0, 50).trim();
+      return truncated + (panelText.length > 50 ? "..." : "");
+    }
+
+    try {
+      const prompt = `Convert this comic panel description into a concise, exciting one-liner (max 60 characters) that captures the main action or moment:
+
+"${panelText}"
+
+Requirements:
+- Keep it under 60 characters
+- Capture the most important action or moment  
+- Make it exciting and engaging for kids
+- Use simple, clear language
+- Return ONLY the one-liner, nothing else
+
+Examples:
+- "The brave astronaut climbs into the rocket ship and prepares for an epic journey to Mars!" → "Astronaut boards rocket for Mars!"
+- "Captain Alex discovers a mysterious glowing portal hidden behind ancient vines in the enchanted forest!" → "Captain finds glowing portal!"
+
+Return ONLY the one-liner text:`;
+
+      const completion = await this.client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 30,
+        temperature: 0.7,
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      
+      if (response && response.trim()) {
+        const oneLiner = response.trim().replace(/['"]/g, ''); // Remove any quotes
+        return oneLiner.length <= 60 ? oneLiner : oneLiner.substring(0, 57) + "...";
+      } else {
+        // Fallback to simple truncation
+        const firstSentence = panelText.match(/^[^.!?]*[.!?]/);
+        if (firstSentence && firstSentence[0].length <= 60) {
+          return firstSentence[0].trim();
+        }
+        const truncated = panelText.substring(0, 50).trim();
+        return truncated + (panelText.length > 50 ? "..." : "");
+      }
+    } catch (error) {
+      console.error('Error generating one-liner:', error);
+      // Fallback to simple truncation
+      const firstSentence = panelText.match(/^[^.!?]*[.!?]/);
+      if (firstSentence && firstSentence[0].length <= 60) {
+        return firstSentence[0].trim();
+      }
+      const truncated = panelText.substring(0, 50).trim();
+      return truncated + (panelText.length > 50 ? "..." : "");
+    }
+  }
+
   // Check if AI service is properly configured
   isConfigured(): boolean {
     return this.isInitialized;

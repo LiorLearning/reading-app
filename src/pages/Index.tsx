@@ -100,6 +100,42 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
   );
 };
 
+// Component for handling async one-liner loading in the comic panel modal
+const PanelOneLinerFigure: React.FC<{
+  panel: { id: string; image: string; text: string };
+  index: number;
+}> = ({ panel, index }) => {
+  const [oneLiner, setOneLiner] = React.useState<string>('Loading...');
+
+  React.useEffect(() => {
+    const generateOneLiner = async () => {
+      try {
+        const result = await aiService.generateOneLiner(panel.text);
+        setOneLiner(result);
+      } catch (error) {
+        console.error('Failed to generate one-liner:', error);
+        // Fallback to simple truncation
+        const firstSentence = panel.text.match(/^[^.!?]*[.!?]/);
+        if (firstSentence && firstSentence[0].length <= 60) {
+          setOneLiner(firstSentence[0].trim());
+        } else {
+          const truncated = panel.text.substring(0, 50).trim();
+          setOneLiner(truncated + (panel.text.length > 50 ? "..." : ""));
+        }
+      }
+    };
+
+    generateOneLiner();
+  }, [panel.text]);
+
+  return (
+    <figure className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+      <img src={panel.image} alt={`Panel ${index + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
+      <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
+    </figure>
+  );
+};
+
 const Index = () => {
   React.useEffect(() => {
     document.title = "AI Reading Learning App — Your Adventure";
@@ -1770,11 +1806,8 @@ const Index = () => {
                     {panels
                       .filter(p => p.text !== "The brave astronaut climbs into ROCKET!") // Exclude the default starting panel
                       .map((p, i) => (
-                                            <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
-                                                <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
-                        <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
-                      </figure>
-                    ))}
+                        <PanelOneLinerFigure key={p.id} panel={p} index={i} />
+                      ))}
                   </div>
                 </div>
               </DialogContent>

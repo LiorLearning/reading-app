@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Undo2, Redo2, HelpCircle, Palette } from "lucide-react";
 import { ComicPanel } from "@/hooks/use-comic";
 import { playClickSound } from "@/lib/sounds";
+import { aiService } from "@/lib/ai-service";
 
 interface ComicHeaderProps {
   onUndo: () => void;
@@ -14,6 +15,42 @@ interface ComicHeaderProps {
   colorThemes?: { name: string; primary: string; background: string; accent: string; hue: string }[];
   onChangeTheme?: (theme: { name: string; primary: string; background: string; accent: string; hue: string }) => void;
 }
+
+// Component for handling async one-liner loading in the comic panel modal
+const PanelOneLinerFigure: React.FC<{
+  panel: ComicPanel;
+  index: number;
+}> = ({ panel, index }) => {
+  const [oneLiner, setOneLiner] = React.useState<string>('Loading...');
+
+  React.useEffect(() => {
+    const generateOneLiner = async () => {
+      try {
+        const result = await aiService.generateOneLiner(panel.text);
+        setOneLiner(result);
+      } catch (error) {
+        console.error('Failed to generate one-liner:', error);
+        // Fallback to simple truncation
+        const firstSentence = panel.text.match(/^[^.!?]*[.!?]/);
+        if (firstSentence && firstSentence[0].length <= 60) {
+          setOneLiner(firstSentence[0].trim());
+        } else {
+          const truncated = panel.text.substring(0, 50).trim();
+          setOneLiner(truncated + (panel.text.length > 50 ? "..." : ""));
+        }
+      }
+    };
+
+    generateOneLiner();
+  }, [panel.text]);
+
+  return (
+    <figure className="rounded-lg border-2 border-foreground bg-card">
+      <img src={panel.image} alt={`Panel ${index + 1}`} className="h-auto w-full object-cover" />
+      <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
+    </figure>
+  );
+};
 
 const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels, selectedTheme, colorThemes, onChangeTheme }) => {
   return (
@@ -32,10 +69,7 @@ const ComicHeader: React.FC<ComicHeaderProps> = ({ onUndo, onRedo, panels, selec
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {panels.map((p, i) => (
-                <figure key={p.id} className="rounded-lg border-2 border-foreground bg-card">
-                  <img src={p.image} alt={`Panel ${i + 1}`} className="h-auto w-full object-cover" />
-                  <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
-                </figure>
+                <PanelOneLinerFigure key={p.id} panel={p} index={i} />
               ))}
             </div>
           </DialogContent>
