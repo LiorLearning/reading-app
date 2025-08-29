@@ -1524,33 +1524,24 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         </Button>
       </div>
 
-      {/* Main container */}
+      {/* Main container - Remove aspect ratio constraint, let content determine height */}
       <div 
         className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
         style={{ 
           width: '95%',
           maxWidth: '1520px',
-          aspectRatio: getAspectRatio,
           minHeight: '500px',
           transition: 'all 0.3s ease-in-out'
         }}
       >
-        {/* Background Container */}
+        {/* Content Container - Now the primary container */}
         <div 
-          className="absolute inset-0 rounded-3xl z-0"
+          ref={containerRef}
+          className="flex relative z-10 w-full rounded-3xl"
           style={{ 
             border: '4px solid hsl(var(--primary) / 0.9)',
             boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
             backgroundColor: 'hsl(var(--primary) / 0.9)',
-            overflow: 'hidden'
-          }}
-        />
-        
-        {/* Content Container */}
-        <div 
-          ref={containerRef}
-          className="flex relative z-10 h-full w-full"
-          style={{ 
             paddingTop: '12px',
             paddingBottom: '12px',
             paddingLeft: '8px',
@@ -1570,7 +1561,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
               <div 
                 className={cn(
                   "relative bg-white rounded-3xl p-4 w-full",
-                  isReadingComprehension ? "max-w-5xl" : "max-w-3xl"
+                  isReadingComprehension ? "max-w-8xl" : "max-w-6xl"
                 )}
                 style={{
                   border: '4px solid black',
@@ -1582,7 +1573,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
                 {/* Notebook spiral binding */}
                 <div className="absolute top-0 left-0 right-0 h-6 flex justify-evenly items-center px-4">
-                  {[...Array(20)].map((_, i) => (
+                  {[...Array(25)].map((_, i) => (
                     <div key={i} className="relative">
                       <div 
                         className="w-4 h-4 border-2 border-black rounded-full bg-gray-300"
@@ -1680,7 +1671,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   <div 
                     className={cn(
                       "border-2 border-gray-300 rounded-xl overflow-hidden",
-                      isDragDropQuestion ? "w-[28rem] h-[20rem]" : "w-[40rem] h-[32rem]"
+                      // Responsive image sizing - smaller on smaller screens
+                      isDragDropQuestion 
+                        ? "w-[20rem] h-[14rem] md:w-[24rem] md:h-[17rem] lg:w-[28rem] lg:h-[20rem]"
+                        : "w-[24rem] h-[18rem] md:w-[32rem] md:h-[24rem] lg:w-[40rem] lg:h-[32rem]"
                     )}
                     style={{
                       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
@@ -1741,19 +1735,19 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   </div>
                 </div>
 
-                {/* Speaker Button - Positioned closer to the left of the centered image */}
+                {/* Speaker Button - Responsive positioning relative to image */}
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={handleSpeakAnswer}
-                  className="absolute left-32 top-1/2 transform -translate-y-1/2 h-28 w-28 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110"
+                  className="absolute left-8 md:left-16 lg:left-32 top-1/2 transform -translate-y-1/2 h-20 w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110"
                   style={{ 
                     borderColor: 'hsl(var(--primary))', 
                     boxShadow: '0 8px 0 rgba(0, 0, 0, 0.3)' 
                   }}
                   title="Read the question description aloud"
                 >
-                  <Volume2 className="h-10 w-10 text-white" style={{ minHeight: '3rem', minWidth: '3rem' }} />
+                  <Volume2 className="h-6 w-6 md:h-8 md:w-8 lg:h-10 lg:w-10 text-white" style={{ minHeight: '1.5rem', minWidth: '1.5rem' }} />
                 </Button>
               </div>
             )}
@@ -1918,7 +1912,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   {/* Centered Image Container */}
                   <div className="relative">
                     <div 
-                      className="w-[28rem] h-[20rem] border-2 border-gray-300 rounded-xl overflow-hidden"
+                      className="w-[20rem] h-[14rem] md:w-[24rem] md:h-[17rem] lg:w-[28rem] lg:h-[20rem] border-2 border-gray-300 rounded-xl overflow-hidden"
                       style={{
                         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
                       }}
@@ -1978,19 +1972,19 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                     </div>
                   </div>
 
-                  {/* Speaker Button - Positioned closer to the left of the centered image */}
+                  {/* Speaker Button - Responsive positioning for reading comprehension */}
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={handleSpeakPassage}
-                    className="absolute left-20 top-1/2 transform -translate-y-1/2 h-24 w-24 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110"
+                    className="absolute left-6 md:left-12 lg:left-20 top-1/2 transform -translate-y-1/2 h-18 w-18 md:h-20 md:w-20 lg:h-24 lg:w-24 rounded-full border-2 bg-primary/5 hover:bg-primary/10 text-white transition-all duration-200 hover:scale-110"
                     style={{ 
                       borderColor: 'hsl(var(--primary))', 
                       boxShadow: '0 8px 0 rgba(0, 0, 0, 0.3)' 
                     }}
                     title="Read the passage aloud"
                   >
-                    <Volume2 className="h-8 w-8 text-white" style={{ minHeight: '2.5rem', minWidth: '2.5rem' }} />
+                    <Volume2 className="h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 text-white" style={{ minHeight: '1.5rem', minWidth: '1.5rem' }} />
                   </Button>
                 </div>
 
@@ -2041,15 +2035,19 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                 </div>
               </div>
             ) : (
-              /* MCQ Interface - All 4 Options Side by Side with Individual Text-Based Sizing */
-              <div className="flex flex-wrap justify-center items-start gap-8 mb-2 mt-8">
+              /* MCQ Interface - Clean Responsive Layout (Container grows with content) */
+              <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 lg:gap-8 mb-4 mt-4 px-4 md:px-6 lg:px-8">
                 {(currentQuestion as MCQQuestion).options.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => handleAnswerClick(index)}
                     disabled={(hasAnswered && isCorrect) || isGeneratingQuestion || isInReflectionMode}
                     className={cn(
-                      "text-center rounded-xl border-3 border-black transition-all duration-200 hover:scale-[1.02] font-medium text-2xl inline-flex flex-col items-center justify-center gap-2",
+                      "text-center rounded-xl border-3 border-black transition-all duration-200 hover:scale-[1.02] font-medium inline-flex flex-col items-center justify-center gap-2",
+                      // Clean responsive text sizing
+                      "text-lg md:text-xl lg:text-2xl",
+                      // Reasonable max width that allows good text visibility
+                      "max-w-[10rem] md:max-w-[12rem] lg:max-w-none",
                       hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && "bg-green-200 border-green-600",
                       index === selectedAnswer && !isCorrect && "bg-red-100 border-red-400 animate-pulse",
                       (!hasAnswered || !isCorrect) && !isGeneratingQuestion && "bg-white hover:bg-primary/10 cursor-pointer",
@@ -2058,7 +2056,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       isGeneratingQuestion && "opacity-50"
                     )}
                     style={{ 
-                      padding: '5px 20px 5px 20px', // Reduce horizontal padding
+                      padding: '5px 12px', // Comfortable padding
                       boxShadow: hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer 
                         ? '0 4px 0 #16a34a' 
                         : index === selectedAnswer && !isCorrect
@@ -2066,7 +2064,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                           : '0 4px 0 black'
                     }}
                   >
-                    <span className="text-center leading-tight whitespace-nowrap w-full flex items-center justify-center">
+                    <span className="text-center leading-tight break-words w-full flex items-center justify-center px-1 lg:px-2">
                       {option}
                     </span>
                     {/* {hasAnswered && isCorrect && index === (currentQuestion as MCQQuestion).correctAnswer && (
