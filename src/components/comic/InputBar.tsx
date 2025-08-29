@@ -238,6 +238,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const handleSendRecording = useCallback(() => {
     playClickSound();
     
+    // Immediately hide the waveform visualizer
+    setIsMicActive(false);
+    
     if (useWhisper && mediaRecorderRef.current) {
       // Stop Whisper recording and process
       mediaRecorderRef.current.stop();

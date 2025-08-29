@@ -190,6 +190,10 @@ const Index = () => {
   const [isExplicitImageRequest, setIsExplicitImageRequest] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
   
+  // Track ongoing image generation to cancel when navigating away
+  const imageGenerationController = React.useRef<AbortController | null>(null);
+  const [imageGenerationCancelled, setImageGenerationCancelled] = React.useState(false);
+  
   // User data state
   const [userData, setUserData] = React.useState<UserData | null>(() => loadUserData());
   const [showOnboarding, setShowOnboarding] = React.useState(!userData);
@@ -250,6 +254,18 @@ const Index = () => {
   React.useEffect(() => {
     // Stop any playing TTS audio to prevent overlap when switching screens
     ttsService.stop();
+    // Stop image loading sound when navigating away from screens where it might be playing
+    stopImageLoadingSound();
+    
+    // Cancel ongoing image generation when navigating to home page
+    if (currentScreen === -1 && imageGenerationController.current) {
+      console.log('🏠 Navigating to home page - cancelling ongoing image generation');
+      imageGenerationController.current.abort();
+      imageGenerationController.current = null;
+      setImageGenerationCancelled(true);
+      setIsGeneratingAdventureImage(false);
+      setIsExplicitImageRequest(false);
+    }
   }, [currentScreen]);
 
   // Save current adventure ID whenever it changes
@@ -593,6 +609,11 @@ const Index = () => {
     try {
       // Set loading state and start loading sound
       setIsGeneratingAdventureImage(true);
+      setImageGenerationCancelled(false);
+      
+      // Create AbortController for this generation
+      imageGenerationController.current = new AbortController();
+      
       playImageLoadingSound();
       
       // Use the prompt or generate from recent context
@@ -647,6 +668,12 @@ const Index = () => {
       });
       setNewlyCreatedPanelId(newPanelId);
       
+      // Check if generation was cancelled before proceeding with completion actions
+      if (imageGenerationCancelled || !imageGenerationController.current) {
+        console.log('🚫 Image generation was cancelled - skipping completion actions');
+        return;
+      }
+      
       // Stop loading sound and play completion sound when image is ready
       stopImageLoadingSound();
       playImageCompleteSound();
@@ -654,6 +681,9 @@ const Index = () => {
       if (!isExplicitImageRequest) {
         setIsGeneratingAdventureImage(false);
       }
+      
+      // Clear the controller since generation completed successfully
+      imageGenerationController.current = null;
       
       // Trigger zoom animation after 2 seconds
       setTimeout(() => {
@@ -666,6 +696,12 @@ const Index = () => {
         }, 600);
       }, 2000);
     } catch (error) {
+      // Check if this was due to cancellation
+      if (imageGenerationCancelled) {
+        console.log('🚫 Image generation was cancelled');
+        return;
+      }
+      
       console.error('Error generating image:', error);
       
       // Stop loading sound on error
@@ -674,6 +710,9 @@ const Index = () => {
       if (!isExplicitImageRequest) {
         setIsGeneratingAdventureImage(false);
       }
+      
+      // Clear the controller on error
+      imageGenerationController.current = null;
       
       // Fallback to random image on error
       const image = images[Math.floor(Math.random() * images.length)];
@@ -805,6 +844,11 @@ const Index = () => {
           // Set loading state and start loading sound immediately
           setIsGeneratingAdventureImage(true);
           setIsExplicitImageRequest(true);
+          setImageGenerationCancelled(false);
+          
+          // Create AbortController for this generation
+          imageGenerationController.current = new AbortController();
+          
           playImageLoadingSound();
           
           // Add immediate "generating image" chat message
@@ -848,6 +892,12 @@ const Index = () => {
           
           await onGenerateImage(imageSubject || text);
           
+          // Check if generation was cancelled before proceeding
+          if (imageGenerationCancelled || !imageGenerationController.current) {
+            console.log('🚫 Image generation was cancelled - skipping AI response');
+            return;
+          }
+          
           const aiMessage: ChatMessage = {
             type: 'ai',
             content: imageAIResponse,
@@ -865,15 +915,27 @@ const Index = () => {
             ttsService.speakAIMessage(aiMessage.content, messageId);
             return [...prev, aiMessage];
           });
+          
+          // Clear the controller since generation completed successfully
+          imageGenerationController.current = null;
         
           // Don't generate additional AI response for image requests
           return;
         } catch (error) {
+          // Check if this was due to cancellation
+          if (imageGenerationCancelled) {
+            console.log('🚫 Image generation was cancelled');
+            return;
+          }
+          
           console.error('Error in image request handling:', error);
           // Stop loading animation and sound on error, reset explicit request flag
           setIsGeneratingAdventureImage(false);
           setIsExplicitImageRequest(false);
           stopImageLoadingSound();
+          
+          // Clear the controller on error
+          imageGenerationController.current = null;
           
           // Add error message to chat
           const errorMessage: ChatMessage = {
