@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { playClickSound } from "@/lib/sounds";
 import { ChevronRight, User, GraduationCap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 interface UserOnboardingProps {
-  onComplete: (userData: { username: string; grade: string; gradeDisplayName: string; level: string; levelDisplayName: string }) => void;
+  onComplete: () => void;
 }
 
 interface GradeOption {
@@ -38,10 +39,12 @@ const levels: LevelOption[] = [
 ];
 
 const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
-  const [username, setUsername] = useState("");
+  const { updateUserData, userData, user } = useAuth();
+  const [username, setUsername] = useState(userData?.username || user?.displayName || "");
   const [selectedGrade, setSelectedGrade] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
+  const [loading, setLoading] = useState(false);
 
   const handleUsernameSubmit = () => {
     if (username.trim()) {
@@ -60,18 +63,30 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     setSelectedLevel(levelValue);
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (username.trim() && selectedGrade && selectedLevel) {
       playClickSound();
-      const selectedGradeObj = grades.find(g => g.value === selectedGrade);
-      const selectedLevelObj = levels.find(l => l.value === selectedLevel);
-      onComplete({
-        username: username.trim(),
-        grade: selectedGrade,
-        gradeDisplayName: selectedGradeObj?.displayName || selectedGrade,
-        level: selectedLevel,
-        levelDisplayName: selectedLevelObj?.displayName || selectedLevel
-      });
+      setLoading(true);
+      
+      try {
+        const selectedGradeObj = grades.find(g => g.value === selectedGrade);
+        const selectedLevelObj = levels.find(l => l.value === selectedLevel);
+        
+        await updateUserData({
+          username: username.trim(),
+          grade: selectedGrade,
+          gradeDisplayName: selectedGradeObj?.displayName || selectedGrade,
+          level: selectedLevel,
+          levelDisplayName: selectedLevelObj?.displayName || selectedLevel,
+          isFirstTime: false
+        });
+        
+        onComplete();
+      } catch (error) {
+        console.error('Error updating user data:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

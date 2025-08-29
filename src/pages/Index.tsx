@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex } from "@/lib/utils";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
@@ -17,6 +17,7 @@ import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
 import VoiceSelector from "@/components/ui/voice-selector";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
+import { useAuth } from "@/hooks/use-auth";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -33,8 +34,8 @@ import TopicSelection from "./TopicSelection";
     getCachedImagesForAdventure 
   } from "@/lib/utils";
 
-// User data interface
-interface UserData {
+// Legacy user data interface for backwards compatibility
+interface LegacyUserData {
   username: string;
   grade: string;
   gradeDisplayName: string;
@@ -42,29 +43,6 @@ interface UserData {
   levelDisplayName: string;
   isFirstTime: boolean;
 }
-
-// User data localStorage utilities
-const USER_DATA_KEY = 'readingapp_user_data';
-
-const saveUserData = (userData: UserData): void => {
-  try {
-    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-  } catch (error) {
-    console.warn('Failed to save user data to localStorage:', error);
-  }
-};
-
-const loadUserData = (): UserData | null => {
-  try {
-    const stored = localStorage.getItem(USER_DATA_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (error) {
-    console.warn('Failed to load user data from localStorage:', error);
-  }
-  return null;
-};
 
 // Component for individual speaker button
 const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ message, index }) => {
@@ -193,9 +171,11 @@ const Index = () => {
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
   
-  // User data state
-  const [userData, setUserData] = React.useState<UserData | null>(() => loadUserData());
-  const [showOnboarding, setShowOnboarding] = React.useState(!userData);
+  // Firebase auth integration
+  const { user, userData, signOut } = useAuth();
+  
+  // Show onboarding if user is authenticated but hasn't completed setup
+  const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
 
   
   // Dev tools state
@@ -1051,15 +1031,8 @@ const Index = () => {
   }, [selectedTopicId]); // Don't include topicQuestionIndex in deps to avoid loops
 
   // Handle onboarding completion
-  const handleOnboardingComplete = React.useCallback((newUserData: { username: string; grade: string; gradeDisplayName: string; level: string; levelDisplayName: string }) => {
-    const userData: UserData = {
-      ...newUserData,
-      isFirstTime: false
-    };
-    setUserData(userData);
-    saveUserData(userData);
-    setShowOnboarding(false);
-    setCurrentScreen(-1); // Redirect to home page instead of topic selection
+  const handleOnboardingComplete = React.useCallback(() => {
+    setCurrentScreen(-1); // Redirect to home page
     playClickSound();
   }, []);
 
@@ -1723,6 +1696,25 @@ const Index = () => {
                           <div className="text-sm text-gray-500">Pick your adventure</div>
                         </div>
                       </DropdownMenuItem>
+
+                  {/* Sign Out Option */}
+                  <DropdownMenuItem 
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg border-t"
+                    onClick={async () => {
+                      playClickSound();
+                      try {
+                        await signOut();
+                      } catch (error) {
+                        console.error('Error signing out:', error);
+                      }
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 text-red-600" />
+                    <div>
+                      <div className="font-semibold text-red-600">Sign Out</div>
+                      <div className="text-sm text-gray-500">Return to login</div>
+                    </div>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
