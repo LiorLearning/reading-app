@@ -1397,27 +1397,26 @@ const Index = () => {
 
   const current = panels[currentIndex] ?? initialPanels[0];
 
-  // Auto-generate images every 10 messages (immediate trigger)
+  // Auto-generate images every 5 user messages (immediate trigger)
   React.useEffect(() => {
-    if (chatMessages.length >= 10 && chatMessages.length % 10 === 0 && currentAdventureId) {
-      console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
+    const userMessages = chatMessages.filter(msg => msg.type === 'user');
+    
+    if (userMessages.length >= 5 && userMessages.length % 5 === 0 && currentAdventureId) {
+      console.log(`🖼️ AUTO IMAGE CHECK: User messages: ${userMessages.length}, Multiple of 5: ${userMessages.length % 5 === 0}, Meets threshold: ${userMessages.length >= 5}`);
       
-      const userMessages = chatMessages.filter(msg => msg.type === 'user');
-      console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 2`);
+      console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 5`);
       
-      if (userMessages.length >= 2) {
-        const adventureContext = userMessages.slice(-6).map(msg => msg.content).join(' ');
-        console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
-        
-        // Small delay to ensure message rendering is complete
-        setTimeout(() => {
-          onGenerateImage(adventureContext);
-        }, 500);
-      } else {
-        console.log(`🖼️ AUTO IMAGE: Skipped - not enough user messages (${userMessages.length} < 2)`);
-      }
+      const adventureContext = userMessages.slice(-6).map(msg => msg.content).join(' ');
+      console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
+      
+      // Small delay to ensure message rendering is complete
+      setTimeout(() => {
+        onGenerateImage(adventureContext);
+      }, 500);
+    } else if (userMessages.length > 0) {
+      console.log(`🖼️ AUTO IMAGE: Not triggered - need ${5 - (userMessages.length % 5)} more user messages to reach next multiple of 5 (current: ${userMessages.length})`);
     }
-  }, [chatMessages.length, currentAdventureId, onGenerateImage]);
+  }, [chatMessages.filter(msg => msg.type === 'user').length, currentAdventureId, onGenerateImage]);
 
   return (
     <div className="h-screen bg-pattern flex flex-col overflow-hidden">

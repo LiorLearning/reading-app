@@ -238,6 +238,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const [isInReflectionMode, setIsInReflectionMode] = useState(false);
   const [hasReflected, setHasReflected] = useState(false);
   
+  // Track hint requests for progressive hinting
+  const [hintCount, setHintCount] = useState<number>(0);
+  const [isInHelpMode, setIsInHelpMode] = useState<boolean>(false);
+  
   // AI-generated contextual questions state
   const [contextualQuestions, setContextualQuestions] = useState<Record<number, string>>({});
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
@@ -273,6 +277,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setHasAnswered(false);
       setIsInReflectionMode(false);
       setHasReflected(false);
+      setHintCount(0);
+      setIsInHelpMode(false);
       setFillBlankAnswer('');
       setHasAutoSpokenQuestion(false);
     }
@@ -397,6 +403,23 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   // Type guard to check if question is drag-drop type
   const isDragDropType = (question: any): question is DragDropQuestion => {
     return question.template === 'drag_and_drop_sorting';
+  };
+
+  // Type guard to check if question is fill-in-the-blank type
+  const isFillBlankType = (question: any): question is FillBlankQuestion => {
+    return question.template === 'fill_blank';
+  };
+
+  // Function to detect if user is asking for help
+  const detectHelpRequest = (text: string): boolean => {
+    const helpKeywords = [
+      'help', 'hint', 'clue', 'stuck', 'don\'t know', 'confused', 'hard', 'difficult',
+      'what should', 'how do', 'which one', 'not sure', 'can you help', 'give me',
+      'i need', 'show me', 'tell me', 'explain'
+    ];
+    
+    const lowercaseText = text.toLowerCase();
+    return helpKeywords.some(keyword => lowercaseText.includes(keyword));
   };
   
 
@@ -641,6 +664,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setHasAnswered(false);
     setShowFeedback(false);
     setIsCorrect(false);
+    setHintCount(0);
+    setIsInHelpMode(false);
     setFillBlankAnswer('');
     
     // Generate response encouraging them to try again
@@ -658,17 +683,128 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     await ttsService.speakAIMessage(encouragementMessage.content, messageId);
   }, [isInReflectionMode, currentQuestion, setChatMessages]);
 
-  // Wrapper for onGenerate to handle reflection mode
-  const handleGenerate = useCallback((text: string) => {
+  // Function to handle help requests with progressive hinting
+  const handleHelpRequest = useCallback(async (userMessage: string) => {
+    if (!currentQuestion) return;
+    
+    setIsInHelpMode(true);
+    const nextHintLevel = Math.min(hintCount + 1, 3);
+    setHintCount(nextHintLevel);
+    
+    try {
+      // Load user adventure context
+      const userAdventure = loadUserAdventure();
+      
+      // Generate appropriate hint based on question type
+      let hintResponse = '';
+      
+      if (isDragDropType(currentQuestion)) {
+        // For drag-drop questions
+        hintResponse = await aiService.generateHint(
+          currentQuestion.questionText,
+          currentQuestion.sortingWords,
+          0, // Drag-drop doesn't have a single correct answer index
+          currentQuestion.explanation,
+          nextHintLevel,
+          userAdventure
+        );
+      } else if (isFillBlankType(currentQuestion)) {
+        // For fill-in-the-blank questions
+        const fillBlankOptions = [currentQuestion.correctAnswer, "other possible answers"];
+        hintResponse = await aiService.generateHint(
+          currentQuestion.questionText,
+          fillBlankOptions,
+          0,
+          currentQuestion.explanation,
+          nextHintLevel,
+          userAdventure
+        );
+      } else {
+        // For MCQ questions
+        const mcqQuestion = currentQuestion as MCQQuestion;
+        hintResponse = await aiService.generateHint(
+          mcqQuestion.questionText,
+          mcqQuestion.options,
+          mcqQuestion.correctAnswer,
+          mcqQuestion.explanation,
+          nextHintLevel,
+          userAdventure
+        );
+      }
+      
+      // Add progression message for multiple hints
+      let finalMessage = hintResponse;
+      if (nextHintLevel === 2) {
+        finalMessage = `Here's a more specific hint: ${hintResponse}`;
+      } else if (nextHintLevel === 3) {
+        finalMessage = `Let me give you one more detailed hint: ${hintResponse}`;
+      }
+      
+      // Add the hint message to chat
+      const hintMessage = {
+        type: 'ai' as const,
+        content: finalMessage,
+        timestamp: Date.now()
+      };
+      
+      setChatMessages((prev: any) => [...prev, hintMessage]);
+      playMessageSound();
+      
+      // Auto-speak the hint
+      const messageId = `mcq-hint-${hintMessage.timestamp}`;
+      await ttsService.speakAIMessage(finalMessage, messageId);
+      
+      // Encourage user to try after hint
+      if (nextHintLevel < 3) {
+        setTimeout(async () => {
+          const encouragementMessage = {
+            type: 'ai' as const,
+            content: "Give it a try now! If you need another hint, just ask! 🌟",
+            timestamp: Date.now()
+          };
+          setChatMessages((prev: any) => [...prev, encouragementMessage]);
+          
+          const encouragementId = `mcq-encourage-${encouragementMessage.timestamp}`;
+          await ttsService.speakAIMessage(encouragementMessage.content, encouragementId);
+        }, 1500);
+      }
+      
+    } catch (error) {
+      console.error('Error generating hint:', error);
+      
+      // Fallback hint message
+      const fallbackHint = {
+        type: 'ai' as const,
+        content: "🤔 Take your time to look at each option carefully. Think about what you've learned, and trust your instincts! You can do this! 🌟",
+        timestamp: Date.now()
+      };
+      
+      setChatMessages((prev: any) => [...prev, fallbackHint]);
+      playMessageSound();
+    }
+  }, [currentQuestion, hintCount, setChatMessages, loadUserAdventure]);
+
+  // Wrapper for onGenerate to handle reflection mode and help requests
+  const handleGenerate = useCallback(async (text: string) => {
     if (isInReflectionMode) {
       // Student is responding to reflection prompt
       handleReflectionResponse(text);
       return;
     }
     
+    // Check if user is asking for help and hasn't answered yet
+    const isAskingForHelp = detectHelpRequest(text);
+    const hasntAnsweredYet = !hasAnswered && selectedAnswer === null;
+    
+    if (isAskingForHelp && hasntAnsweredYet) {
+      // User is asking for help before attempting the question
+      await handleHelpRequest(text);
+      return;
+    }
+    
     // Normal chat generation
     onGenerate(text);
-  }, [isInReflectionMode, handleReflectionResponse, onGenerate]);
+  }, [isInReflectionMode, handleReflectionResponse, onGenerate, hasAnswered, selectedAnswer, handleHelpRequest]);
 
   // Handle back button - sequential navigation logic
   const handleBackButton = useCallback(() => {
@@ -694,6 +830,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         setHasAnswered(false);
         setIsInReflectionMode(false);
         setHasReflected(false);
+        setHintCount(0);
+        setIsInHelpMode(false);
         setFillBlankAnswer('');
         setHasAutoSpokenQuestion(false); // Reset auto-speech state
       }
@@ -717,6 +855,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setHasAnswered(false);
     setIsInReflectionMode(false);
     setHasReflected(false);
+    setHintCount(0);
+    setIsInHelpMode(false);
     setFillBlankAnswer('');
     setHasAutoSpokenQuestion(false); // Reset auto-speech state for new question
     // Don't reset drag-and-drop state here - let useEffect handle initialization
@@ -1402,6 +1542,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setShowFeedback(false);
     setIsCorrect(false);
     setHasAnswered(false);
+    setHintCount(0);
+    setIsInHelpMode(false);
     setScore(0);
     setQuizCompleted(false);
     setShowCompletionPage('none');
@@ -1630,6 +1772,14 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                 >
                   <Volume2 className="h-5 w-5" />
                 </Button>
+
+                {/* Help Mode Indicator */}
+                {isInHelpMode && (
+                  <div className="absolute top-4 right-4 bg-blue-100 text-blue-800 px-3 py-2 rounded-xl text-sm flex items-center gap-2 z-20 border-2 border-blue-300 animate-pulse">
+                    <span className="text-lg">💡</span>
+                    <span className="font-medium">Help Mode ({hintCount}/3)</span>
+                  </div>
+                )}
 
                 {/* Question content */}
                 <div className="mt-2">

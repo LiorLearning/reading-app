@@ -1444,6 +1444,117 @@ Return ONLY the one-liner text:`;
     }
   }
 
+  // Generate educational hints for MCQ questions without giving away the answer
+  async generateHint(
+    question: string,
+    options: string[],
+    correctAnswer: number,
+    explanation: string,
+    hintLevel: number = 1, // 1 = general, 2 = specific, 3 = very specific
+    userAdventure: ChatMessage[] = []
+  ): Promise<string> {
+    // If not initialized or no API key, use fallback
+    if (!this.isInitialized || !this.client) {
+      return this.getFallbackHint(question, options, hintLevel);
+    }
+
+    try {
+      // Extract adventure context for engagement
+      const adventureContext = this.extractAdventureContext(userAdventure);
+      
+      // Get the correct answer for hint generation context
+      const correctOption = options[correctAnswer];
+
+      const hintPrompt = `You are an encouraging educational AI helping a child with a learning question. Your goal is to guide them toward the correct answer without giving it away directly.
+
+QUESTION: "${question}"
+OPTIONS: ${options.map((opt, i) => `${i + 1}. "${opt}"`).join(", ")}
+EXPLANATION: "${explanation}"
+ADVENTURE CONTEXT: ${adventureContext || this.getDefaultAdventureContext()}
+HINT LEVEL: ${hintLevel}/3 (1=general, 2=specific, 3=very specific)
+
+HINT GUIDELINES BY LEVEL:
+Level 1 (General): 
+- Give a broad strategy or approach
+- Focus on what to look for or think about
+- Encourage thinking process
+- Stay very general
+
+Level 2 (Specific):
+- Point to specific elements in the question
+- Give more focused direction
+- Still don't reveal the answer directly
+- Help narrow down choices
+
+Level 3 (Very Specific):
+- Give very targeted guidance
+- Help eliminate wrong options
+- Provide clear reasoning paths
+- Almost lead them to the answer
+
+RULES:
+1. NEVER state the correct answer directly
+2. Be encouraging and supportive in tone
+3. Use adventure context naturally when possible (mention characters, settings briefly)
+4. Keep hints age-appropriate for elementary students
+5. End with encouragement to try
+6. Use 1-2 sentences maximum
+7. Include relevant emoji for engagement
+
+Generate a hint at level ${hintLevel}:`;
+
+      const completion = await this.client.chat.completions.create({
+        model: "chatgpt-4o-latest",
+        messages: [
+          {
+            role: "user",
+            content: hintPrompt
+          }
+        ],
+        max_tokens: 80,
+        temperature: 0.7,
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      
+      if (response && response.trim()) {
+        return response.trim();
+      } else {
+        throw new Error('No hint response received');
+      }
+    } catch (error) {
+      console.error('OpenAI API error generating hint:', error);
+      return this.getFallbackHint(question, options, hintLevel);
+    }
+  }
+
+  // Fallback hints when API is not available
+  private getFallbackHint(question: string, options: string[], hintLevel: number): string {
+    const hintsByLevel = {
+      1: [
+        "🤔 Take your time and read each option carefully. What sounds right to you?",
+        "💡 Think about what you've learned before. Which option makes the most sense?",
+        "🌟 Look at each choice and ask yourself which one fits best!",
+        "🎯 Trust your instincts! Read through the options one more time."
+      ],
+      2: [
+        "🔍 Look closely at the differences between the options. What makes them unique?",
+        "📚 Think about the rules you know. Which option follows them correctly?",
+        "⭐ Compare the options carefully - one of them stands out as more correct!",
+        "🎨 Focus on the key words in the question. They'll guide you to the answer!"
+      ],
+      3: [
+        "🎯 Try eliminating the options that clearly don't fit first!",
+        "🔎 Look for the option that matches exactly what the question is asking for!",
+        "💫 Think step by step - which option solves the problem completely?",
+        "🌟 You're almost there! One option is clearly the best choice!"
+      ]
+    };
+
+    const levelHints = hintsByLevel[hintLevel as keyof typeof hintsByLevel] || hintsByLevel[1];
+    return levelHints[Math.floor(Math.random() * levelHints.length)];
+  }
+
   // Check if AI service is properly configured
   isConfigured(): boolean {
     return this.isInitialized;
