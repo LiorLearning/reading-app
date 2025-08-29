@@ -160,8 +160,11 @@ class TextToSpeechService {
     }
 
     try {
-      // Stop any current audio
+      // Stop any current audio and clean up resources
       this.stop();
+      
+      // Add a small delay to ensure previous audio is fully stopped
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       // Set current speaking message ID
       this.currentSpeakingMessageId = options?.messageId || null;
@@ -259,10 +262,21 @@ class TextToSpeechService {
 
   // Stop current speech
   stop(): void {
+    const wasPlaying = this.isSpeaking || this.currentAudio;
+    
     if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-      this.currentAudio = null;
+      try {
+        this.currentAudio.pause();
+        this.currentAudio.currentTime = 0;
+        
+        // Clean up event listeners to prevent memory leaks
+        this.currentAudio.onended = null;
+        this.currentAudio.onerror = null;
+        
+        this.currentAudio = null;
+      } catch (error) {
+        console.warn('Error stopping TTS audio:', error);
+      }
     }
     
     this.isSpeaking = false;
@@ -272,6 +286,10 @@ class TextToSpeechService {
     // Only notify if there was actually something playing
     if (wasPlayingMessageId) {
       this.notifySpeakingStateChange(null);
+    }
+    
+    if (wasPlaying) {
+      console.debug('🔧 TTS stopped successfully');
     }
   }
 

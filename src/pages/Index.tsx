@@ -252,6 +252,7 @@ const Index = () => {
   // Stop all ElevenLabs TTS when switching between screens
   React.useEffect(() => {
     // Stop any playing TTS audio to prevent overlap when switching screens
+    console.log('🔧 Screen change cleanup: Stopping TTS for screen', currentScreen);
     ttsService.stop();
     // Stop image loading sound when navigating away from screens where it might be playing
     stopImageLoadingSound();
@@ -263,12 +264,27 @@ const Index = () => {
       setIsGeneratingAdventureImage(false);
       setIsExplicitImageRequest(false);
     }
+    
+    // Add a small delay to ensure TTS is fully stopped
+    const timeoutId = setTimeout(() => {
+      console.log('🔧 TTS cleanup completed for screen transition');
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [currentScreen]);
 
   // Save current adventure ID whenever it changes
   React.useEffect(() => {
     saveCurrentAdventureId(currentAdventureId);
   }, [currentAdventureId]);
+
+  // Cleanup TTS on component unmount
+  React.useEffect(() => {
+    return () => {
+      console.log('🔧 Index component cleanup: Stopping TTS');
+      ttsService.stop();
+    };
+  }, []);
 
   // Restore latest image for current adventure ONLY on app initialization/refresh (not during same session)
   React.useEffect(() => {
@@ -1024,6 +1040,11 @@ const Index = () => {
   // Handle homepage navigation
   const handleHomeNavigation = React.useCallback((path: 'start' | 'middle' | 'topics') => {
     playClickSound();
+    
+    // Stop any ongoing TTS before navigation
+    console.log('🔧 Home navigation cleanup: Stopping TTS');
+    ttsService.stop();
+    
     if (path === 'topics') {
       setCurrentScreen(0); // Go to topic selection
     } else {

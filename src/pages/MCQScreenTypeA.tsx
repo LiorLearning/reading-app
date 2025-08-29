@@ -322,6 +322,28 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   useEffect(() => {
     setCurrentTopic(selectedTopicId);
   }, [selectedTopicId]);
+
+  // Cleanup TTS on component unmount
+  useEffect(() => {
+    return () => {
+      console.log('🔧 MCQScreenTypeA cleanup: Stopping TTS on unmount');
+      ttsService.stop();
+    };
+  }, []);
+
+  // Stop TTS when currentQuestionIndex changes
+  useEffect(() => {
+    console.log('🔧 Question change cleanup: Stopping TTS');
+    ttsService.stop();
+  }, [currentQuestionIndex]);
+
+  // Stop TTS when reflection mode changes
+  useEffect(() => {
+    if (isInReflectionMode) {
+      console.log('🔧 Reflection mode cleanup: Stopping TTS before reflection');
+      ttsService.stop();
+    }
+  }, [isInReflectionMode]);
   
   // Get all topic IDs in order
   const topicIds = Object.keys(sampleMCQData.topics);
@@ -650,6 +672,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const handleBackButton = useCallback(() => {
     playClickSound();
     
+    // Stop any ongoing TTS before navigation
+    console.log('🔧 Back button cleanup: Stopping TTS');
+    ttsService.stop();
+    
     if (onBack) {
       const result = onBack(currentQuestionIndex);
       // If onBack returns 'previous_question', go to previous question
@@ -670,6 +696,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
   const handleNextQuestion = useCallback(() => {
     playClickSound();
+    
+    // Stop any ongoing TTS before proceeding
+    console.log('🔧 Next question cleanup: Stopping TTS');
+    ttsService.stop();
     
     console.log(`🔍 DEBUG MCQ: handleNextQuestion called. currentQuestionIndex: ${currentQuestionIndex}`);
     
@@ -692,9 +722,6 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       }
     } else {
       console.log(`🔍 DEBUG MCQ: Last question completed, showing completion page`);
-      
-      // Stop any ongoing TTS before showing completion page
-      ttsService.stop();
       
       // All questions completed - check score and show appropriate completion page
       setQuizCompleted(true);
@@ -1353,6 +1380,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
   // Reset quiz UI state only (preserves saved scores)
   const resetQuizState = useCallback(() => {
+    // Stop any ongoing TTS when resetting
+    console.log('🔧 Quiz reset cleanup: Stopping TTS');
+    ttsService.stop();
+    
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setShowFeedback(false);
@@ -1375,6 +1406,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
   // Full reset including clearing persistent scores (for explicit retry only)
   const resetQuizAndClearScores = useCallback(() => {
+    // Stop TTS before clearing everything
+    console.log('🔧 Quiz reset and clear cleanup: Stopping TTS');
+    ttsService.stop();
+    
     resetQuizState();
     // Clear persistent topic scores when explicitly retrying
     clearTopicScores(selectedTopicId);
@@ -1384,6 +1419,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 
   // Reset quiz UI state when topic changes (preserve scores)
   useEffect(() => {
+    // Stop any ongoing TTS when switching topics
+    console.log('🔧 Topic change cleanup: Stopping TTS');
+    ttsService.stop();
+    
     resetQuizState();
     // Load scores for the new topic
     const savedScores = loadTopicScores(selectedTopicId);
