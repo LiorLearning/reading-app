@@ -1761,17 +1761,21 @@ const Index = () => {
                   View Whole Comic
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-3xl">
+              <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
                 <DialogHeader>
                   <DialogTitle>Your Adventure (All Panels)</DialogTitle>
                 </DialogHeader>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {panels.map((p, i) => (
-                                        <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
-                                            <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
-                      <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
-                    </figure>
-                  ))}
+                <div className="flex-1 overflow-auto pr-2">
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 pb-4">
+                    {panels
+                      .filter(p => p.text !== "The brave astronaut climbs into ROCKET!") // Exclude the default starting panel
+                      .map((p, i) => (
+                                            <figure key={p.id} className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+                                                <img src={p.image} alt={`Panel ${i + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
+                        <figcaption className="px-2 py-1 text-sm font-semibold">{i + 1}. {p.text}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>

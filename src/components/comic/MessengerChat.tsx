@@ -202,10 +202,20 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     if (recognitionRef.current) {
       // Stop browser speech recognition and process
       recognitionRef.current.stop();
+      recognitionRef.current = null;
     }
     
-    // The actual processing and sending will happen in the onresult handler
-  }, []);
+    // Immediately send the current transcribed text
+    setIsMicActive(false);
+    
+    if (text.trim()) {
+      // Pause any currently playing TTS when user sends a message
+      ttsService.stop();
+      
+      onGenerate(text.trim());
+      setText("");
+    }
+  }, [text, onGenerate]);
 
   // New function to handle canceling the recording
   const handleCancelRecording = useCallback(() => {
