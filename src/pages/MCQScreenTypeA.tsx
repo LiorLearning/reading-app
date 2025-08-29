@@ -189,6 +189,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const resizeRef = React.useRef<HTMLDivElement>(null);
+  const nextButtonRef = React.useRef<HTMLButtonElement>(null);
   
   // MCQ state - Initialize with starting index if provided
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(startingQuestionIndex || 0);
@@ -281,6 +282,22 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight;
     }
   }, [chatMessages, sidebarCollapsed]);
+
+  // Auto-scroll to Next button when feedback is shown
+  useEffect(() => {
+    if (showFeedback && nextButtonRef.current) {
+      // Small delay to ensure the button is rendered
+      const scrollTimeout = setTimeout(() => {
+        nextButtonRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 300); // 300ms delay to allow feedback animation to start
+
+      return () => clearTimeout(scrollTimeout);
+    }
+  }, [showFeedback]);
 
   // Get current topic and questions
   const currentTopic = sampleMCQData.topics[selectedTopicId];
@@ -2027,6 +2044,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
             {showFeedback && !isInReflectionMode && (
               <div className="flex justify-center mt-4">
                 <Button
+                  ref={nextButtonRef}
                   variant="default"
                   size="lg"
                   onClick={handleNextQuestion}
