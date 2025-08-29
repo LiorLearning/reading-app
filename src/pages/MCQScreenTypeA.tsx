@@ -13,6 +13,7 @@ import PracticeNeeded from "./PracticeNeeded";
 import confetti from 'canvas-confetti';
 // Updated import from the correct file
 import { sampleMCQData, type MCQData, type MCQQuestion, type DragDropQuestion, type FillBlankQuestion, type TopicInfo, type Topic, type AIHook } from '../data/mcq-questions';
+import { adventureSessionService } from '@/lib/adventure-session-service';
 
 // Remove duplicate interface definitions (lines 16-105) since they're now imported
 
@@ -128,6 +129,7 @@ interface MCQScreenTypeAProps {
   onBack?: (currentQuestionIndex: number) => string | void; // New prop for back navigation
   startingQuestionIndex?: number; // Add this new prop
   onQuestionChange?: (currentQuestionIndex: number) => void; // New prop for progress tracking
+  currentSessionId?: string | null; // Add session tracking prop
 }
 
 // Remove the empty sampleMCQData object (lines 178-180)
@@ -187,7 +189,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   onNextTopic,
   onBack,
   startingQuestionIndex,
-  onQuestionChange
+  onQuestionChange,
+  currentSessionId
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const resizeRef = React.useRef<HTMLDivElement>(null);
@@ -443,6 +446,18 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     setIsCorrect(correct);
     
+    // Optional: Track answer in Firebase session (track all answers, not just correct ones)
+    if (currentSessionId && currentQuestion) {
+      adventureSessionService.trackMCQAnswer(
+        currentSessionId,
+        currentQuestion.id,
+        answerIndex, // Use the actual answer index
+        correct,     // Use local variable, not async state
+        selectedTopicId,
+        currentQuestionIndex
+      );
+    }
+    
     if (correct) {
       // Correct answer - show celebration and disable further selections
       setHasAnswered(true);
@@ -467,6 +482,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         saveTopicScore(selectedTopicId, currentQuestionIndex, true);
         return updated;
       });
+      
       
       // Celebrate with confetti!
       celebrateWithConfetti();
@@ -559,6 +575,18 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     setIsCorrect(isAnswerCorrect);
     
+    // Optional: Track fill-blank answer in Firebase session (track all answers)
+    if (currentSessionId && currentQuestion) {
+      adventureSessionService.trackMCQAnswer(
+        currentSessionId,
+        currentQuestion.id,
+        -1, // No specific answer index for fill-blank questions
+        isAnswerCorrect, // Use local variable
+        selectedTopicId,
+        currentQuestionIndex
+      );
+    }
+    
     if (isAnswerCorrect) {
       // Correct answer
       setShowFeedback(true);
@@ -582,6 +610,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         saveTopicScore(selectedTopicId, currentQuestionIndex, true);
         return updated;
       });
+      
       
       // Celebrate with confetti!
       celebrateWithConfetti();
@@ -1452,6 +1481,18 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     setHasAnswered(true);
     setShowFeedback(true);
 
+    // Optional: Track drag-drop answer in Firebase session (track all answers)
+    if (currentSessionId && currentQuestion) {
+      adventureSessionService.trackMCQAnswer(
+        currentSessionId,
+        currentQuestion.id,
+        -1, // No specific answer index for drag-drop questions
+        isCorrect, // Use local variable for drag-drop
+        selectedTopicId,
+        currentQuestionIndex
+      );
+    }
+
     if (isCorrect) {
       // Check if this question was already answered correctly to avoid double-counting
       const wasAlreadyCorrect = questionScores[currentQuestionIndex];
@@ -1472,6 +1513,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         saveTopicScore(selectedTopicId, currentQuestionIndex, true);
         return updated;
       });
+      
       
       // Celebrate with confetti!
       celebrateWithConfetti();

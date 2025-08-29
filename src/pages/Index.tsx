@@ -18,6 +18,7 @@ import { ttsService } from "@/lib/tts-service";
 import VoiceSelector from "@/components/ui/voice-selector";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import { useAuth } from "@/hooks/use-auth";
+import { adventureSessionService } from "@/lib/adventure-session-service";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -174,12 +175,15 @@ const Index = () => {
   // Firebase auth integration
   const { user, userData, signOut } = useAuth();
   
+  // Optional session tracking for Firebase (won't break existing functionality)
+  const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
+  
   // Show onboarding if user is authenticated but hasn't completed setup
   const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
 
-  
   // If user is authenticated but we're still loading userData, we should wait
   const isLoadingUserData = user && !userData;
+  
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
     const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(() => {
@@ -778,6 +782,11 @@ const Index = () => {
         return [...prev, userMessage];
       });
 
+      // Optional: Save user message to Firebase session (non-blocking)
+      if (currentSessionId) {
+        adventureSessionService.addChatMessage(currentSessionId, userMessage);
+      }
+
       // Track adventure prompt count and implement automatic flow
       console.log(`🔍 DEBUG: Message sent - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}, isInQuestionMode: ${isInQuestionMode}`);
       
@@ -987,6 +996,11 @@ const Index = () => {
           );
           return [...prev, aiMessage];
         });
+
+        // Optional: Save AI message to Firebase session (non-blocking)
+        if (currentSessionId) {
+          adventureSessionService.addChatMessage(currentSessionId, aiMessage);
+        }
       } catch (error) {
         console.error('Error generating AI response:', error);
         // Show error message to user
@@ -1010,7 +1024,7 @@ const Index = () => {
         setIsAIResponding(false);
       }
     },
-    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, canAccessQuestions, topicQuestionIndex, isInQuestionMode]
+    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -1030,6 +1044,16 @@ const Index = () => {
     const summaries = loadAdventureSummaries();
     setAdventureSummaries(summaries);
   }, []);
+
+  // Optional: Sync adventure state changes to Firebase session (non-blocking)
+  React.useEffect(() => {
+    if (currentSessionId && user) {
+      adventureSessionService.updateAdventureState(currentSessionId, {
+        isInQuestionMode,
+        adventurePromptCount
+      });
+    }
+  }, [currentSessionId, isInQuestionMode, adventurePromptCount, user]);
 
   // Auto-assign topic based on level and navigate
   const autoAssignTopicAndNavigate = React.useCallback((level: 'start' | 'middle') => {
@@ -1159,7 +1183,7 @@ const Index = () => {
   }, [chatMessages.length, currentAdventureId, saveCurrentAdventure]);
 
   // Handle continuing a specific saved adventure
-  const handleContinueSpecificAdventure = React.useCallback((adventureId: string) => {
+  const handleContinueSpecificAdventure = React.useCallback(async (adventureId: string) => {
     playClickSound();
     
     // Load the specific adventure
@@ -1232,10 +1256,25 @@ const Index = () => {
       // Load the adventure's messages and state
       setChatMessages(targetAdventure.messages);
       setCurrentAdventureId(targetAdventure.id);
-      setSelectedTopicId(targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '');
+      const topicId = targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '';
+      setSelectedTopicId(topicId);
       setAdventureMode('continue');
       // Reset the initial response ref when starting a new adventure
       initialResponseSentRef.current = null;
+      
+      // Optional Firebase session creation for specific adventure (non-blocking)
+      if (user) {
+        const sessionId = await adventureSessionService.createAdventureSession(
+          user.uid,
+          'continue_specific',
+          targetAdventure.id,
+          topicId,
+          'continue',
+          targetAdventure.name
+        );
+        setCurrentSessionId(sessionId);
+      }
+      
       setCurrentScreen(1); // Go to adventure screen
     } else {
       // Fallback if adventure not found
@@ -1244,30 +1283,46 @@ const Index = () => {
   }, [reset, initialPanels]);
 
   // Handle start adventure from progress tracking
-  const handleStartAdventure = React.useCallback((topicId: string, mode: 'new' | 'continue' = 'new') => {
+  const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new') => {
     playClickSound();
     setSelectedTopicId(topicId);
     setAdventureMode(mode);
     // Reset the initial response ref when starting a new adventure
     initialResponseSentRef.current = null;
     
+    let adventureId: string;
+    
     if (mode === 'new') {
       // Clear chat messages for new adventures to provide clean slate
       setChatMessages([]);
       // Generate new adventure ID
-      setCurrentAdventureId(crypto.randomUUID());
+      adventureId = crypto.randomUUID();
+      setCurrentAdventureId(adventureId);
       // Reset comic panels to default image for new adventures
       reset(initialPanels);
       console.log('🚀 Started new adventure with default rocket image');
     } else {
       // For continuing, keep existing adventure ID or create new one
+      adventureId = currentAdventureId || crypto.randomUUID();
       if (!currentAdventureId) {
-        setCurrentAdventureId(crypto.randomUUID());
+        setCurrentAdventureId(adventureId);
       }
     }
     
+    // Optional Firebase session creation (non-blocking)
+    if (user) {
+      const sessionId = await adventureSessionService.createAdventureSession(
+        user.uid,
+        mode === 'new' ? 'new_adventure' : 'continue_adventure',
+        adventureId,
+        topicId,
+        mode
+      );
+      setCurrentSessionId(sessionId);
+    }
+    
     setCurrentScreen(1); // Go to adventure screen first to show AI response
-  }, [currentAdventureId, reset, initialPanels]);
+  }, [currentAdventureId, reset, initialPanels, user]);
 
   // Handle grade selection (for HomePage dropdown display)
   const handleGradeSelection = React.useCallback((gradeDisplayName: string) => {
@@ -2049,7 +2104,8 @@ const Index = () => {
                     setCurrentScreen(3);
                     setIsInQuestionMode(true);
                     
-                    // Add transition message
+                    // COMMENTED OUT: Add transition message
+                    /*
                     setTimeout(async () => {
                       const toQuestionMessage: ChatMessage = {
                         type: 'ai',
@@ -2066,6 +2122,7 @@ const Index = () => {
                       const messageId = `index-chat-${toQuestionMessage.timestamp}-${chatMessages.length}`;
                       await ttsService.speakAIMessage(toQuestionMessage.content, messageId);
                     }, 500);
+                    */
                   }}
                   className="border-2 bg-green-600 hover:bg-green-700 text-white btn-animate h-16 w-16 p-0 rounded-full flex items-center justify-center shadow-lg"
                   style={{ borderColor: 'hsl(from hsl(142 76% 36%) h s 25%)', boxShadow: '0 4px 0 black' }}
@@ -2456,6 +2513,7 @@ const Index = () => {
                 setCurrentScreen(0);
               }
             }}
+            currentSessionId={currentSessionId}
           />
         )}
 
