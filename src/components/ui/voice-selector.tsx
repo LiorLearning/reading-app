@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Volume2, Check } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Volume2, Check, Gauge } from 'lucide-react';
 import { ttsService, Voice, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { playClickSound } from '@/lib/sounds';
 
@@ -11,6 +12,7 @@ interface VoiceSelectorProps {
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
   const [selectedVoice, setSelectedVoice] = useState<Voice>(ttsService.getSelectedVoice());
+  const [selectedSpeed, setSelectedSpeed] = useState<number>(ttsService.getSelectedSpeed());
   const [isPreviewPlaying, setIsPreviewPlaying] = useState<string | null>(null);
 
   const handleVoiceSelect = async (voice: Voice) => {
@@ -45,6 +47,12 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
     } finally {
       setIsPreviewPlaying(null);
     }
+  };
+
+  const handleSpeedChange = (value: number[]) => {
+    const speed = value[0];
+    setSelectedSpeed(speed);
+    ttsService.setSelectedSpeed(speed);
   };
 
   return (
@@ -101,6 +109,30 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
               </div>
             ))}
           </div>
+          
+          {/* Voice Speed Control */}
+          <div className="pt-3 border-t border-gray-200">
+            <div className="flex items-center gap-2 mb-2">
+              <Gauge className="h-4 w-4 text-gray-600" />
+              <h4 className="font-medium text-sm">Voice Speed</h4>
+              <span className="text-xs text-gray-500 ml-auto">{selectedSpeed.toFixed(1)}x</span>
+            </div>
+            <Slider
+              value={[selectedSpeed]}
+              onValueChange={handleSpeedChange}
+              max={1.2}
+              min={0.7}
+              step={0.1}
+              className="w-full"
+              disabled={!ttsService.isConfigured()}
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>0.7x (Slow)</span>
+              <span>1.0x (Normal)</span>
+              <span>1.2x (Fast)</span>
+            </div>
+          </div>
+          
           {!ttsService.isConfigured() && (
             <p className="text-xs text-gray-500 mt-2">
               TTS API key required for voice functionality

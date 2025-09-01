@@ -6,6 +6,7 @@ interface TTSOptions {
   model?: string;
   stability?: number;
   similarity_boost?: number;
+  speed?: number; // Voice speed control (0.25-4.0, default 1.0)
   messageId?: string; // Add message ID for tracking
 }
 
@@ -49,7 +50,7 @@ export const AVAILABLE_VOICES: Voice[] = [
     previewText: "Hello sweetie! I'm Rachel, and I can't wait to share wonderful stories and help you learn new things!"
   },
   {
-    id: 'bRqAiMNSKOgF1mA3FsJH',
+    id: '7fbQ7yJuEo56rYjrYaEh',
     name: 'John Doe',
     description: 'Deep, mature voice perfect for audiobooks and storytelling',
     previewText: "Hello there! I'm John Doe, and I bring stories to life with my deep, resonant voice. Let's dive into an amazing adventure together!"
@@ -57,6 +58,7 @@ export const AVAILABLE_VOICES: Voice[] = [
 ];
 
 const SELECTED_VOICE_KEY = 'reading_app_selected_voice';
+const SELECTED_SPEED_KEY = 'reading_app_voice_speed';
 
 class TextToSpeechService {
   private client: ElevenLabsClient | null = null;
@@ -64,12 +66,15 @@ class TextToSpeechService {
   private currentAudio: HTMLAudioElement | null = null;
   private isSpeaking = false;
   private selectedVoice: Voice;
+  private selectedSpeed: number; // Voice speed (0.25-4.0, default 0.8)
   private currentSpeakingMessageId: string | null = null; // Track which message is speaking
   private speakingStateListeners: Set<(messageId: string | null) => void> = new Set(); // Listeners for speaking state changes
 
   constructor() {
     // Load selected voice from localStorage or default to Jessica
     this.selectedVoice = this.loadSelectedVoice();
+    // Load selected speed from localStorage or default to 0.8
+    this.selectedSpeed = this.loadSelectedSpeed();
     this.initialize();
   }
 
@@ -89,11 +94,37 @@ class TextToSpeechService {
     return AVAILABLE_VOICES[0];
   }
 
+  private loadSelectedSpeed(): number {
+    try {
+      const stored = localStorage.getItem(SELECTED_SPEED_KEY);
+      if (stored) {
+        const speed = parseFloat(stored);
+        // Validate speed is within acceptable range (0.7-1.2)
+        if (speed >= 0.7 && speed <= 1.2) {
+          return speed;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load selected speed from localStorage:', error);
+    }
+    
+    // Default to 0.8 as requested
+    return 0.8;
+  }
+
   private saveSelectedVoice(voice: Voice): void {
     try {
       localStorage.setItem(SELECTED_VOICE_KEY, JSON.stringify(voice.id));
     } catch (error) {
       console.warn('Failed to save selected voice to localStorage:', error);
+    }
+  }
+
+  private saveSelectedSpeed(speed: number): void {
+    try {
+      localStorage.setItem(SELECTED_SPEED_KEY, speed.toString());
+    } catch (error) {
+      console.warn('Failed to save selected speed to localStorage:', error);
     }
   }
 
@@ -111,6 +142,23 @@ class TextToSpeechService {
   // Get all available voices
   getAvailableVoices(): Voice[] {
     return AVAILABLE_VOICES;
+  }
+
+  // Get current selected speed
+  getSelectedSpeed(): number {
+    return this.selectedSpeed;
+  }
+
+  // Set selected speed (0.7-1.2)
+  setSelectedSpeed(speed: number): void {
+    // Validate speed is within acceptable range
+    if (speed < 0.7 || speed > 1.2) {
+      console.warn('Speed must be between 0.7 and 1.2, using default 0.8');
+      speed = 0.8;
+    }
+    
+    this.selectedSpeed = speed;
+    this.saveSelectedSpeed(speed);
   }
 
   // Preview a voice by having it introduce itself
@@ -188,6 +236,7 @@ class TextToSpeechService {
           voiceSettings: {
             stability: options?.stability || 0.5,
             similarityBoost: options?.similarity_boost || 0.75,
+            speed: options?.speed || this.selectedSpeed,
           },
         }
       );

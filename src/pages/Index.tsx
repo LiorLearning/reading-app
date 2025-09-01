@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex } from "@/lib/utils";
+import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
 
@@ -35,6 +36,10 @@ import TopicSelection from "./TopicSelection";
     getCachedImagesForAdventure 
   } from "@/lib/utils";
 import { cacheAdventureImageHybrid } from "@/lib/firebase-image-cache";
+
+import { testFirebaseStorage } from "@/lib/firebase-test";
+import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
+import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
 // Legacy user data interface for backwards compatibility
 interface LegacyUserData {
@@ -117,9 +122,31 @@ const PanelOneLinerFigure: React.FC<{
 };
 
 const Index = () => {
+  // Firebase auth integration - must be at the top
+  const { user, userData, signOut } = useAuth();
+
+  // Auto-migrate localStorage data to Firebase when user authenticates
+  React.useEffect(() => {
+    if (user?.uid) {
+      autoMigrateOnLogin(user.uid).catch(error => {
+        console.warn('Auto-migration failed:', error);
+      });
+    }
+  }, [user?.uid]);
+
   React.useEffect(() => {
     document.title = "AI Reading Learning App — Your Adventure";
-  }, []);
+    
+    // Add Firebase test and debug functions to window for debugging
+    if (typeof window !== 'undefined') {
+      (window as any).testFirebaseStorage = testFirebaseStorage;
+      (window as any).debugFirebaseAdventures = () => debugFirebaseAdventures(user?.uid || null);
+      (window as any).debugSaveTestAdventure = () => debugSaveTestAdventure(user?.uid || null);
+      (window as any).debugFirebaseConnection = debugFirebaseConnection;
+      (window as any).migrateToFirebase = () => forceMigrateUserData(user?.uid || 'anonymous');
+      (window as any).autoMigrateOnLogin = () => autoMigrateOnLogin(user?.uid || 'anonymous');
+    }
+  }, [user]);
 
   const jsonLd = useMemo(
     () => ({
@@ -172,9 +199,6 @@ const Index = () => {
   
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
-  
-  // Firebase auth integration
-  const { user, userData, signOut } = useAuth();
   
   // Optional session tracking for Firebase (won't break existing functionality)
   const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
@@ -582,7 +606,7 @@ const Index = () => {
   }, [currentScreen]);
   
   // Chat panel resize functionality - now proportional
-  const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(20); // 20% of container width (smaller default)
+  const [chatPanelWidthPercent, setChatPanelWidthPercent] = React.useState(30); // 30% of container width for 70:30 split
   const [isResizing, setIsResizing] = React.useState(false);
   const resizeRef = React.useRef<HTMLDivElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -761,15 +785,61 @@ const Index = () => {
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
-      // Check if user is asking for image generation
-      const imageKeywords = [
-        'image', 'picture', 'pic', 'draw', 'paint', 'sketch', 'show', 'illustrate', 
-        'generate', 'create image', 'make picture', 'visual', 'artwork', 'art',
-        'render', 'design', 'visualization', 'make image', 'photo', 'drawing'
-      ];
-      const isImageRequest = imageKeywords.some(keyword => 
-        text.toLowerCase().includes(keyword)
-      );
+      // Check if user is asking for image generation using intent-based detection
+      const detectImageIntent = (text: string): boolean => {
+        const lowerText = text.toLowerCase().trim();
+        
+        // Direct image request patterns
+        const directImagePatterns = [
+          /\b(create|generate|make|draw|paint|sketch|show me|give me)\s+(an?\s+)?(image|picture|pic|photo|drawing|artwork|visual|illustration)/,
+          /\b(can you|could you|please)\s+(create|generate|make|draw|show|give me)\s+(an?\s+)?(image|picture|pic)/,
+          /\bi want\s+(an?\s+)?(image|picture|pic|photo|drawing)/,
+          /\bshow me\s+(what|how)/,
+          /\billustrate\s+(this|that|it)/,
+          /\bvisualize\s+(this|that|it)/
+        ];
+        
+        // Check for direct patterns first
+        if (directImagePatterns.some(pattern => pattern.test(lowerText))) {
+          return true;
+        }
+        
+        // Standalone image-related words (only when they're the main intent)
+        const standaloneImageWords = ['image', 'picture', 'pic', 'photo', 'drawing', 'artwork', 'illustration'];
+        const isStandaloneImageRequest = standaloneImageWords.some(word => {
+          const wordRegex = new RegExp(`\\b${word}\\b`);
+          return wordRegex.test(lowerText) && lowerText.split(/\s+/).length <= 3; // Short requests only
+        });
+        
+        if (isStandaloneImageRequest) {
+          return true;
+        }
+        
+        // Context-aware checks - only trigger if it's clearly about visual creation
+        const hasImageContext = /\b(image|picture|pic|photo|visual|artwork|illustration)\b/.test(lowerText);
+        const hasCreationIntent = /\b(create|generate|make|draw|paint|sketch|design|render)\b/.test(lowerText);
+        
+        // Only combine creation + image words if they're close together (within 5 words)
+        if (hasImageContext && hasCreationIntent) {
+          const words = lowerText.split(/\s+/);
+          const imageWordIndex = words.findIndex(word => 
+            /^(image|picture|pic|photo|visual|artwork|illustration)s?$/.test(word)
+          );
+          const creationWordIndex = words.findIndex(word => 
+            /^(create|generate|make|draw|paint|sketch|design|render)/.test(word)
+          );
+          
+          if (imageWordIndex >= 0 && creationWordIndex >= 0) {
+            const distance = Math.abs(imageWordIndex - creationWordIndex);
+            return distance <= 5; // Words must be within 5 positions of each other
+          }
+        }
+        
+        return false;
+      };
+
+      // Use the new function instead of the keyword array
+      const isImageRequest = detectImageIntent(text);
       
       // Add user message
       const userMessage: ChatMessage = {
@@ -870,6 +940,14 @@ const Index = () => {
       // If user is asking for an image, generate one
       if (isImageRequest) {
         try {
+          // Pause automatic image generation for 30 seconds when user requests an image
+          console.log('🖼️ USER IMAGE REQUEST: Pausing automatic image generation for 30 seconds');
+          setIsAutoImageGenerationPaused(true);
+          setTimeout(() => {
+            setIsAutoImageGenerationPaused(false);
+            console.log('🖼️ USER IMAGE REQUEST: Resuming automatic image generation');
+          }, 30000); // Pause for 30 seconds
+          
           // Extract the subject from the user's request for better image generation
           const imageSubject = text.replace(/\b(image|picture|pic|draw|paint|sketch|show|illustrate|generate|create image|make picture|visual|artwork|art|render|design|visualization|make image|photo|drawing)\b/gi, '').replace(/\b(of|for|with|about)\b/gi, '').trim();
           
@@ -1134,7 +1212,12 @@ const Index = () => {
         comicPanels: panels // Save the comic panels
       };
       
-      saveAdventure(adventure);
+      // Save to Firebase (with localStorage fallback) if user is authenticated
+      if (user?.uid) {
+        await saveAdventureHybrid(user.uid, adventure);
+      } else {
+        saveAdventure(adventure);
+      }
       
       // // Create a new comic panel for this adventure every 10 messages
       // console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
@@ -1166,6 +1249,8 @@ const Index = () => {
         comicPanelImage: currentPanelImage
       });
       
+      // Note: Adventure summaries are automatically updated when the full adventure is saved to Firebase
+      // Only update localStorage summaries as a backup
       saveAdventureSummaries(updatedSummaries.slice(-10)); // Keep last 10
       setAdventureSummaries(updatedSummaries);
     } catch (error) {
@@ -1242,7 +1327,7 @@ const Index = () => {
         if (latestCachedImage) {
           initialPanelImage = latestCachedImage.url;
           initialPanelText = "Your adventure continues...";
-          console.log(`📸 Using latest generated image as default for adventure without saved panels: ${targetAdventure.name}`);
+
         }
         
         const defaultPanels = [
@@ -1445,7 +1530,13 @@ const Index = () => {
             comicPanels: panels // Save the comic panels in page unload handler too
           };
           
-          saveAdventure(adventure);
+          // Save to Firebase (with localStorage fallback) if user is authenticated
+          if (user?.uid) {
+            // Don't await in beforeunload handler - just trigger the save
+            saveAdventureHybrid(user.uid, adventure);
+          } else {
+            saveAdventure(adventure);
+          }
         } catch (error) {
           console.warn('Failed to save adventure on unload:', error);
         }
@@ -1460,26 +1551,214 @@ const Index = () => {
 
   const current = panels[currentIndex] ?? initialPanels[0];
 
-  // Auto-generate images every 5 user messages (immediate trigger)
+  // State to track when to pause automatic image generation
+  const [isAutoImageGenerationPaused, setIsAutoImageGenerationPaused] = useState(false);
+  const [lastAutoImageMessageCount, setLastAutoImageMessageCount] = useState(0);
+
+  // Silent automatic image generation function (no sound, no loading animation)
+  const onGenerateAutoImage = useCallback(async (prompt?: string) => {
+    try {
+      console.log(`🤖 AUTO IMAGE: Generating silently...`);
+      
+      // Use the prompt or generate from recent context
+      const imagePrompt = prompt || 
+          chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
+          "space adventure with rocket";
+        
+      // Extract adventure context for caching
+      const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
+      
+      // Generate adventure image using AI service with user_adventure context
+      const generatedImageResult = await aiService.generateAdventureImage(
+        imagePrompt,
+        chatMessages,
+        "space adventure scene"
+      );
+      
+      let image: string;
+      let panelText: string;
+      
+      // Cache the generated adventure image if it was successfully created
+      if (generatedImageResult) {
+        // Use Firebase caching if user is authenticated, fallback to localStorage
+        await cacheAdventureImageHybrid(
+          user?.uid || null,
+          generatedImageResult.imageUrl,
+          imagePrompt,
+          adventureContext,
+          currentAdventureId || undefined
+        );
+        
+        image = generatedImageResult.imageUrl;
+        
+        // Generate contextual response text based on actual generated content
+        const contextualResponse = await aiService.generateAdventureImageResponse(
+          imagePrompt,
+          generatedImageResult.usedPrompt,
+          chatMessages
+        );
+        
+        panelText = contextualResponse;
+      } else {
+        // Use fallback image and text
+        image = images[Math.floor(Math.random() * images.length)];
+        panelText = prompt ? `Generated: ${prompt}` : "New adventure continues...";
+      }
+    
+      const newPanelId = crypto.randomUUID();
+      
+      addPanel({ 
+        id: newPanelId, 
+        image, 
+        text: panelText
+      });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      // No sound or loading animation for automatic generation
+      console.log(`🤖 AUTO IMAGE: Silent generation completed`);
+      
+      // Trigger zoom animation after 2 seconds
+      setTimeout(() => {
+        setZoomingPanelId(newPanelId);
+        setNewlyCreatedPanelId(null);
+        
+        setTimeout(() => {
+          setZoomingPanelId(null);
+        }, 600);
+      }, 2000);
+    } catch (error) {
+      console.error('🤖 AUTO IMAGE ERROR:', error);
+      
+      // Fallback to random image on error (still silent)
+      const image = images[Math.floor(Math.random() * images.length)];
+      const newPanelId = crypto.randomUUID();
+      addPanel({ id: newPanelId, image, text: "New adventure continues..." });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      setTimeout(() => {
+        setZoomingPanelId(newPanelId);
+        setNewlyCreatedPanelId(null);
+        
+        setTimeout(() => {
+          setZoomingPanelId(null);
+        }, 600);
+      }, 2000);
+    }
+  }, [addPanel, images, chatMessages, currentAdventureId]);
+
+  // Function to detect scene changes based on context keywords
+  const detectSceneChange = useCallback((messages: ChatMessage[]) => {
+    if (messages.length < 2) return false;
+    
+    const sceneKeywords = [
+      // Movement/location changes
+      'go to', 'went to', 'arrive', 'reached', 'enter', 'entered', 'exit', 'left', 'move to', 'walk to', 'run to', 'fly to', 'travel', 'journey',
+      // New environments
+      'room', 'building', 'house', 'forest', 'mountain', 'ocean', 'space', 'planet', 'ship', 'cave', 'city', 'town', 'village', 'island',
+      // New characters/encounters
+      'meet', 'met', 'see', 'saw', 'found', 'discover', 'encounter', 'appear', 'appeared', 'approach', 'arrived',
+      // Action changes
+      'suddenly', 'then', 'next', 'after', 'meanwhile', 'later', 'now', 'finally'
+    ];
+    
+    const recent2Messages = messages.slice(-2).map(msg => msg.content.toLowerCase()).join(' ');
+    const recent3Messages = messages.slice(-3).map(msg => msg.content.toLowerCase()).join(' ');
+    
+    return sceneKeywords.some(keyword => 
+      recent2Messages.includes(keyword) || recent3Messages.includes(keyword)
+    );
+  }, []);
+
+  // Function to detect if a message contains descriptive visual content
+  const isDescriptiveMessage = useCallback((messageContent: string) => {
+    const descriptiveKeywords = [
+      // Visual descriptors
+      'looks like', 'appears', 'seems', 'bright', 'dark', 'colorful', 'shiny', 'glowing', 'sparkling',
+      'beautiful', 'amazing', 'incredible', 'stunning', 'magnificent', 'gigantic', 'tiny', 'huge', 'massive',
+      // Physical descriptions
+      'covered in', 'filled with', 'surrounded by', 'made of', 'built from', 'decorated with',
+      'tall', 'short', 'wide', 'narrow', 'thick', 'thin', 'round', 'square', 'triangular',
+      // Colors
+      'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'black', 'white', 'silver', 'gold',
+      // Textures/materials
+      'smooth', 'rough', 'soft', 'hard', 'metal', 'wood', 'stone', 'glass', 'crystal', 'fabric',
+      // Atmospheric
+      'misty', 'foggy', 'cloudy', 'sunny', 'stormy', 'peaceful', 'chaotic', 'mysterious', 'eerie'
+    ];
+    
+    const lowerContent = messageContent.toLowerCase();
+    return descriptiveKeywords.some(keyword => lowerContent.includes(keyword));
+  }, []);
+
+  // Auto-generate images based on: scene changes (2-3 messages) OR long/descriptive prompts (immediate)
   React.useEffect(() => {
     const userMessages = chatMessages.filter(msg => msg.type === 'user');
+    const currentMessageCount = userMessages.length;
     
-    if (userMessages.length >= 5 && userMessages.length % 5 === 0 && currentAdventureId) {
-      console.log(`🖼️ AUTO IMAGE CHECK: User messages: ${userMessages.length}, Multiple of 5: ${userMessages.length % 5 === 0}, Meets threshold: ${userMessages.length >= 5}`);
+    // Don't trigger if paused or if we don't have an adventure ID
+    if (isAutoImageGenerationPaused || !currentAdventureId || currentMessageCount === 0) {
+      return;
+    }
+    
+    // Get the latest user message to check if it's long/detailed
+    const latestUserMessage = userMessages[userMessages.length - 1];
+    const isLongMessage = latestUserMessage && (
+      latestUserMessage.content.length > 100 || // More than 100 characters
+      latestUserMessage.content.split(' ').length > 20 // More than 20 words
+    );
+    const isDescriptive = latestUserMessage && isDescriptiveMessage(latestUserMessage.content);
+    const isLongDetailedPrompt = isLongMessage || isDescriptive;
+    
+    // Check if enough messages have passed since last auto image (minimum 2, maximum 3)
+    const messagesSinceLastAuto = currentMessageCount - lastAutoImageMessageCount;
+    const hasMinMessages = messagesSinceLastAuto >= 2;
+    const shouldForceGenerate = messagesSinceLastAuto >= 3;
+    const hasSceneChange = detectSceneChange(userMessages);
+    
+    // Trigger conditions:
+    // 1. Regular: 2+ messages + scene change OR 3+ messages (force)
+    // 2. Long/descriptive prompt: Immediately if detailed (100+ chars OR 20+ words OR descriptive keywords), but only if at least 1 message since last auto
+    const shouldTriggerRegular = hasMinMessages && (hasSceneChange || shouldForceGenerate);
+    const shouldTriggerLongPrompt = isLongDetailedPrompt && messagesSinceLastAuto >= 1;
+    
+    if (shouldTriggerRegular || shouldTriggerLongPrompt) {
+      let reason = "";
+      if (shouldTriggerLongPrompt) {
+        const lengthInfo = `${latestUserMessage?.content.length} chars, ${latestUserMessage?.content.split(' ').length} words`;
+        if (isLongMessage && isDescriptive) {
+          reason = `long descriptive prompt (${lengthInfo})`;
+        } else if (isLongMessage) {
+          reason = `long prompt (${lengthInfo})`;
+        } else if (isDescriptive) {
+          reason = `descriptive content detected (${lengthInfo})`;
+        }
+      } else if (shouldForceGenerate) {
+        reason = "3+ messages";
+      } else {
+        reason = "scene change detected";
+      }
       
-      console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 5`);
+      console.log(`🖼️ AUTO IMAGE: Triggering due to ${reason}. Messages since last: ${messagesSinceLastAuto}`);
       
-      const adventureContext = userMessages.slice(-6).map(msg => msg.content).join(' ');
-      console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
+      const adventureContext = userMessages.slice(-4).map(msg => msg.content).join(' ');
+      console.log(`🖼️ AUTO IMAGE: Context: "${adventureContext}"`);
+      
+      // Update the last auto image message count
+      setLastAutoImageMessageCount(currentMessageCount);
       
       // Small delay to ensure message rendering is complete
       setTimeout(() => {
-        onGenerateImage(adventureContext);
+        onGenerateAutoImage(adventureContext);
       }, 500);
-    } else if (userMessages.length > 0) {
-      console.log(`🖼️ AUTO IMAGE: Not triggered - need ${5 - (userMessages.length % 5)} more user messages to reach next multiple of 5 (current: ${userMessages.length})`);
+    } else {
+      const nextTrigger = isLongDetailedPrompt 
+        ? "next message (detailed prompt ready)" 
+        : hasMinMessages 
+          ? "scene change detection" 
+          : `${2 - messagesSinceLastAuto} more messages`;
+      console.log(`🖼️ AUTO IMAGE: Not triggered - waiting for ${nextTrigger} (current gap: ${messagesSinceLastAuto})`);
     }
-  }, [chatMessages.filter(msg => msg.type === 'user').length, currentAdventureId, onGenerateImage]);
+  }, [chatMessages.filter(msg => msg.type === 'user').length, currentAdventureId, onGenerateAutoImage, isAutoImageGenerationPaused, lastAutoImageMessageCount, detectSceneChange, isDescriptiveMessage]);
 
   return (
     <div className="h-screen bg-pattern flex flex-col overflow-hidden">
@@ -2262,7 +2541,7 @@ const Index = () => {
                           className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
                         >
                           {chatMessages.length === 0 ? (
-                            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                            <div className="flex items-center justify-center h-full text-muted-foreground text-lg">
                               <p>💬 Start chatting with Krafty!</p>
                             </div>
                           ) : (
@@ -2280,14 +2559,14 @@ const Index = () => {
                                 >
                                   <div
                                     className={cn(
-                                      "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200 relative",
+                                      "max-w-[80%] rounded-lg px-3 py-2 text-xl transition-all duration-200 relative",
                                       message.type === 'user' 
                                         ? "bg-primary text-primary-foreground" 
                                         : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
                                     )}
                                     style={{}}
                                   >
-                                    <div className="font-medium text-xs mb-1 opacity-70">
+                                    <div className="font-medium text-lg mb-1 opacity-70">
                                       {message.type === 'user' ? 'You' : '🤖 Krafty'}
                                     </div>
                                     <div className={message.type === 'ai' ? 'pr-6' : ''}>
@@ -2308,9 +2587,9 @@ const Index = () => {
                               {/* AI Typing Indicator */}
                               {isAIResponding && (
                                 <div className="flex justify-start animate-slide-up-smooth">
-                                  <div className="max-w-[80%] rounded-lg px-3 py-2 text-sm bg-card border-2"
+                                  <div className="max-w-[80%] rounded-lg px-3 py-2 text-xl bg-card border-2"
                                        style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
-                                    <div className="font-medium text-xs mb-1 opacity-70">
+                                    <div className="font-medium text-lg mb-1 opacity-70">
                                       🤖 Krafty
                                     </div>
                                     <div className="flex items-center gap-1">

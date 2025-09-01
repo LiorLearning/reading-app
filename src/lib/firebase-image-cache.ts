@@ -10,7 +10,7 @@ export interface FirebaseCachedImage {
 }
 
 /**
- * Firebase-based adventure image caching (replaces localStorage version)
+ * Firebase-based adventure image caching (stores actual files with CORS bypass)
  */
 export const cacheAdventureImageFirebase = async (
   userId: string,
@@ -26,9 +26,10 @@ export const cacheAdventureImageFirebase = async (
     }
 
     if (!adventureId) {
-      console.warn('⚠️ No adventureId provided for Firebase image caching');
+      console.warn('No adventureId provided for Firebase image caching');
       return false;
     }
+
 
     const storedImage = await firebaseImageService.uploadGeneratedImage(
       userId,
@@ -39,14 +40,14 @@ export const cacheAdventureImageFirebase = async (
     );
 
     if (storedImage) {
-      console.log(`🖼️ Successfully cached adventure image to Firebase: ${prompt.substring(0, 50)}...`);
+
       return true;
     } else {
-      console.warn('⚠️ Failed to cache adventure image to Firebase');
+      console.warn('Failed to cache adventure image to Firebase');
       return false;
     }
   } catch (error) {
-    console.error('❌ Error caching adventure image to Firebase:', error);
+    console.error('Error caching adventure image to Firebase:', error);
     return false;
   }
 };
@@ -82,9 +83,9 @@ export const getCachedImagesForAdventureFirebase = async (
   adventureId: string
 ): Promise<FirebaseCachedImage[]> => {
   try {
-    const storedImages = await firebaseImageService.getAdventureImages(userId, adventureId);
+    const storedImages = await firebaseImageUrlService.getAdventureImageUrls(userId, adventureId);
     
-    return storedImages.map((img: StoredImage): FirebaseCachedImage => ({
+    return storedImages.map((img: StoredImageUrl): FirebaseCachedImage => ({
       id: img.id || crypto.randomUUID(),
       url: img.imageUrl,
       prompt: img.prompt,
@@ -106,9 +107,9 @@ export const getRecentCachedAdventureImagesFirebase = async (
   limit: number = 5
 ): Promise<FirebaseCachedImage[]> => {
   try {
-    const storedImages = await firebaseImageService.getRecentImages(userId, limit);
+    const storedImages = await firebaseImageUrlService.getRecentImageUrls(userId, limit);
     
-    return storedImages.map((img: StoredImage): FirebaseCachedImage => ({
+    return storedImages.map((img: StoredImageUrl): FirebaseCachedImage => ({
       id: img.id || crypto.randomUUID(),
       url: img.imageUrl,
       prompt: img.prompt,
@@ -129,10 +130,10 @@ export const clearCachedAdventureImagesFirebase = async (
   userId: string
 ): Promise<void> => {
   try {
-    await firebaseImageService.clearAllUserImages(userId);
-    console.log('🗑️ Cleared all cached adventure images from Firebase');
+    await firebaseImageUrlService.clearAllUserImageUrls(userId);
+
   } catch (error) {
-    console.error('❌ Failed to clear cached adventure images from Firebase:', error);
+    console.error('Failed to clear cached adventure image URLs from Firebase:', error);
   }
 };
 
@@ -143,29 +144,29 @@ export const getAdventureImageCacheStatsFirebase = async (
   userId: string
 ): Promise<{
   totalImages: number;
-  totalSize: string;
   oldestImage: number;
   newestImage: number;
   imagesByAdventure: { [adventureId: string]: number };
+  imagesBySource: { [source: string]: number };
 }> => {
   try {
-    const stats = await firebaseImageService.getStorageStats(userId);
+    const stats = await firebaseImageUrlService.getStorageStats(userId);
     
     return {
       totalImages: stats.totalImages,
-      totalSize: `${(stats.totalSize / (1024 * 1024)).toFixed(2)} MB`,
       oldestImage: stats.oldestImage?.getTime() || 0,
       newestImage: stats.newestImage?.getTime() || 0,
-      imagesByAdventure: stats.imagesByAdventure
+      imagesByAdventure: stats.imagesByAdventure,
+      imagesBySource: stats.imagesBySource
     };
   } catch (error) {
     console.error('❌ Failed to get adventure image cache stats from Firebase:', error);
     return {
       totalImages: 0,
-      totalSize: '0 MB',
       oldestImage: 0,
       newestImage: 0,
-      imagesByAdventure: {}
+      imagesByAdventure: {},
+      imagesBySource: {}
     };
   }
 };

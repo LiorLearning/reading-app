@@ -41,7 +41,7 @@ class FirebaseImageService {
   private readonly MAX_TOTAL_IMAGES = 50;
 
   /**
-   * Upload generated image to Firebase Storage and save metadata
+   * Upload generated image to Firebase Storage via Cloud Function
    */
   async uploadGeneratedImage(
     userId: string,
@@ -51,35 +51,89 @@ class FirebaseImageService {
     adventureContext: string = ''
   ): Promise<StoredImage | null> {
     try {
-      // Download the generated image from DALL-E URL
-      console.log('📥 Downloading generated image from DALL-E...');
-      const response = await fetch(imageUrl);
+
+      
+      // Call Firebase Cloud Function to download and store the image
+      const functionUrl = `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net/uploadImage`;
+      
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getAuthToken()}`
+        },
+        body: JSON.stringify({
+          userId,
+          adventureId,
+          imageUrl,
+          prompt,
+          adventureContext
+        })
+      });
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.statusText}`);
+        console.log('❌ Cloud function failed, falling back to metadata-only storage...');
+        // Fallback: Store metadata with original URL (will expire but at least tracks the image)
+        return await this.storeImageMetadata(userId, adventureId, imageUrl, prompt, adventureContext, 0);
       }
 
-      const imageBlob = await response.blob();
-      const fileSize = imageBlob.size;
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log(`✅ Image uploaded successfully via Cloud Function: ${result.filename}`);
+        
+        // Clean up old images after successful upload
+        await this.cleanupOldImages(userId, adventureId);
+        
+        return result.storedImage;
+      } else {
+        throw new Error(result.error || 'Cloud function returned failure');
+      }
 
-      // Create unique filename with timestamp
+    } catch (error) {
+      console.error('❌ Failed to upload via Cloud Function:', error);
+      console.log('📝 Storing metadata only (URL will expire)...');
+      
+      // Final fallback: Store just the metadata
+      return await this.storeImageMetadata(userId, adventureId, imageUrl, prompt, adventureContext, 0);
+    }
+  }
+
+  /**
+   * Get authentication token for Cloud Function
+   */
+  private async getAuthToken(): Promise<string> {
+    // Import auth here to avoid circular dependencies
+    const { auth } = await import('./firebase');
+    const user = auth.currentUser;
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    return await user.getIdToken();
+  }
+
+  /**
+   * Fallback: Store image metadata only (URL will expire)
+   */
+  private async storeImageMetadata(
+    userId: string,
+    adventureId: string,
+    imageUrl: string,
+    prompt: string,
+    adventureContext: string,
+    fileSize: number
+  ): Promise<StoredImage | null> {
+    try {
       const timestamp = Date.now();
-      const filename = `${adventureId}_${timestamp}.jpg`;
-      const storagePath = `${this.STORAGE_PATH}/${userId}/${adventureId}/${filename}`;
-
-      // Upload to Firebase Storage
-      console.log('☁️ Uploading to Firebase Storage...');
-      const storageRef = ref(storage, storagePath);
-      const uploadResult = await uploadBytes(storageRef, imageBlob);
-
-      // Get download URL
-      const firebaseImageUrl = await getDownloadURL(uploadResult.ref);
-
-      // Save metadata to Firestore
+      const filename = `${adventureId}_${timestamp}_metadata_only.jpg`;
+      
       const imageMetadata: Omit<StoredImage, 'id'> = {
         userId,
         adventureId,
-        imageUrl: firebaseImageUrl,
-        storagePath,
+        imageUrl, // Original DALL-E URL (will expire)
+        storagePath: `metadata-only/${filename}`,
         prompt,
         adventureContext,
         timestamp: serverTimestamp() as Timestamp,
@@ -91,17 +145,13 @@ class FirebaseImageService {
       const storedImage: StoredImage = {
         id: docRef.id,
         ...imageMetadata,
-        timestamp: Timestamp.now() // Use current time for local representation
+        timestamp: Timestamp.now()
       };
 
-      console.log(`✅ Image uploaded successfully: ${filename}`);
-
-      // Clean up old images after successful upload
-      await this.cleanupOldImages(userId, adventureId);
-
+      console.log(`📝 Stored image metadata: ${prompt.substring(0, 30)}... (URL will expire)`);
       return storedImage;
     } catch (error) {
-      console.error('❌ Failed to upload image to Firebase:', error);
+      console.error('❌ Failed to store image metadata:', error);
       return null;
     }
   }
@@ -153,15 +203,20 @@ class FirebaseImageService {
   }
 
   /**
-   * Clean up old images to maintain limits
+   * Clean up old images to maintain limits (temporarily disabled until indexes are ready)
    */
   private async cleanupOldImages(userId: string, adventureId: string): Promise<void> {
     try {
-      // Clean up images for this specific adventure (keep only 5 most recent)
-      await this.cleanupAdventureImages(userId, adventureId);
-
-      // Clean up total user images (keep only 50 most recent)
-      await this.cleanupUserImages(userId);
+      console.log('🧹 Cleanup temporarily disabled until Firestore indexes are created');
+      console.log('📝 Current storage: unlimited until indexes are ready');
+      
+      // TODO: Re-enable after creating Firestore indexes:
+      // 1. Go to Firebase Console → Firestore → Indexes
+      // 2. Create composite indexes for cleanup queries
+      // 3. Uncomment cleanup functions below
+      
+      // await this.cleanupAdventureImages(userId, adventureId);
+      // await this.cleanupUserImages(userId);
     } catch (error) {
       console.warn('⚠️ Failed to cleanup old images (continuing normally):', error);
     }
