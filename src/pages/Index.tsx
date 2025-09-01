@@ -34,6 +34,7 @@ import TopicSelection from "./TopicSelection";
     getRecentCachedAdventureImages,
     getCachedImagesForAdventure 
   } from "@/lib/utils";
+import { cacheAdventureImageHybrid } from "@/lib/firebase-image-cache";
 
 // Legacy user data interface for backwards compatibility
 interface LegacyUserData {
@@ -672,7 +673,9 @@ const Index = () => {
         
         // Cache the generated adventure image if it was successfully created
         if (generatedImageResult) {
-          cacheAdventureImage(
+          // Use Firebase caching if user is authenticated, fallback to localStorage
+          await cacheAdventureImageHybrid(
+            user?.uid || null,
             generatedImageResult.imageUrl,
             imagePrompt,
             adventureContext,

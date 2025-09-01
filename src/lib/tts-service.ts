@@ -47,6 +47,12 @@ export const AVAILABLE_VOICES: Voice[] = [
     name: 'Rachel',
     description: 'Sweet and gentle, ideal for younger learners',
     previewText: "Hello sweetie! I'm Rachel, and I can't wait to share wonderful stories and help you learn new things!"
+  },
+  {
+    id: 'bRqAiMNSKOgF1mA3FsJH',
+    name: 'John Doe',
+    description: 'Deep, mature voice perfect for audiobooks and storytelling',
+    previewText: "Hello there! I'm John Doe, and I bring stories to life with my deep, resonant voice. Let's dive into an amazing adventure together!"
   }
 ];
 
