@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
+import { ttsService } from '@/lib/tts-service';
+import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -60,7 +62,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [showHint, setShowHint] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [attempts, setAttempts] = useState(0);
 
   console.log('sentence', sentence);
@@ -113,18 +114,29 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return isWordComplete(answer, expectedLength) && !isWordCorrect(answer, correctAnswer);
   }, [isWordComplete, isWordCorrect]);
 
-  // Play word audio
-  const playWordAudio = useCallback(() => {
-    if ('speechSynthesis' in window) {
-      setIsPlayingAudio(true);
-      const utterance = new SpeechSynthesisUtterance(audioText);
-      utterance.rate = 0.7;
-      utterance.pitch = 1.2;
-      utterance.onend = () => setIsPlayingAudio(false);
-      utterance.onerror = () => setIsPlayingAudio(false);
-      window.speechSynthesis.speak(utterance);
+  // Generate unique messageId for TTS
+  const messageId = `spellbox-audio-${targetWord}-${Date.now()}`;
+  const isSpeaking = useTTSSpeaking(messageId);
+
+  // Play word audio using ElevenLabs TTS
+  const playWordAudio = useCallback(async () => {
+    console.log('🎵 SPELLBOX SPEAKER BUTTON: Click detected', {
+      audioText,
+      targetWord,
+      messageId,
+      isSpeaking
+    });
+    
+    playClickSound();
+    
+    if (isSpeaking) {
+      console.log('🎵 SPELLBOX SPEAKER BUTTON: Stopping current speech');
+      ttsService.stop();
+    } else {
+      console.log('🎵 SPELLBOX SPEAKER BUTTON: Starting speech with ElevenLabs TTS');
+      await ttsService.speakAIMessage(audioText, messageId);
     }
-  }, [audioText]);
+  }, [audioText, targetWord, messageId, isSpeaking]);
 
   // Handle answer change
   const handleAnswerChange = useCallback((newAnswer: string) => {
@@ -379,7 +391,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   );
                                 })}
                                 
-                                {/* Audio button with enhanced styling */}
+                                {/* Audio button with ElevenLabs TTS */}
                                 <button
                                   onClick={playWordAudio}
                                   style={{
@@ -387,8 +399,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     height: '40px',
                                     borderRadius: '8px',
                                     border: 'none',
-                                    background: isPlayingAudio 
-                                      ? 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)'
+                                    background: isSpeaking 
+                                      ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)'
                                       : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
                                     color: 'white',
                                     cursor: 'pointer',
@@ -396,24 +408,26 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     fontSize: '20px',
-                                    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+                                    boxShadow: isSpeaking 
+                                      ? '0 4px 12px rgba(220, 38, 38, 0.3)'
+                                      : '0 4px 12px rgba(99, 102, 241, 0.3)',
                                     transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                     opacity: 1,
                                     transform: 'scale(1)'
                                   }}
-                                  title="Listen to this word"
+                                  title={isSpeaking ? "Stop audio" : "Listen to this word"}
                                   onMouseEnter={(e) => {
-                                    if (!isPlayingAudio) {
+                                    if (!isSpeaking) {
                                       e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
                                     }
                                   }}
                                   onMouseLeave={(e) => {
-                                    if (!isPlayingAudio) {
+                                    if (!isSpeaking) {
                                       e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
                                     }
                                   }}
                                 >
-                                  {isPlayingAudio ? '🎵' : '🔊'}
+                                  {isSpeaking ? '⏹️' : '🔊'}
                                 </button>
                               </div>
                             );
