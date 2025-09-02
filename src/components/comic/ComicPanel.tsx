@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
+import SpellBox from "./SpellBox";
 
 interface ComicPanelProps {
   image: string;
@@ -14,6 +15,26 @@ interface ComicPanelProps {
   onNextPanel?: () => void;
   hasPrevious?: boolean;
   hasNext?: boolean;
+  // Spell box props
+  spellWord?: string;
+  spellSentence?: string;
+  onSpellComplete?: (isCorrect: boolean, userAnswer?: string) => void;
+  onSpellSkip?: () => void;
+  onSpellNext?: () => void;
+  showSpellBox?: boolean;
+  spellQuestion?: {
+    id: number;
+    word: string;
+    questionText: string;
+    correctAnswer: string;
+    audio: string;
+    explanation: string;
+  };
+  showProgress?: boolean;
+  totalQuestions?: number;
+  currentQuestionIndex?: number;
+  showHints?: boolean;
+  showExplanation?: boolean;
 }
 
 const ComicPanel: React.FC<ComicPanelProps> = ({ 
@@ -25,7 +46,19 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   onPreviousPanel,
   onNextPanel,
   hasPrevious = false,
-  hasNext = false
+  hasNext = false,
+  spellWord,
+  spellSentence,
+  onSpellComplete,
+  onSpellSkip,
+  onSpellNext,
+  showSpellBox,
+  spellQuestion,
+  showProgress = false,
+  totalQuestions = 1,
+  currentQuestionIndex = 0,
+  showHints = true,
+  showExplanation = true
 }) => {
   const [showImageAfterLoad, setShowImageAfterLoad] = React.useState(false);
   const [previousLoadingState, setPreviousLoadingState] = React.useState(isGenerating);
@@ -212,6 +245,21 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             </div>
           </div>
         )}
+        
+          <SpellBox
+            word={spellWord}
+            sentence={spellSentence}
+            question={spellQuestion}
+            onComplete={onSpellComplete}
+            onSkip={onSpellSkip}
+            onNext={onSpellNext}
+            isVisible={showSpellBox}
+            showProgress={showProgress}
+            totalQuestions={totalQuestions}
+            currentQuestionIndex={currentQuestionIndex}
+            showHints={showHints}
+            showExplanation={showExplanation}
+          />
         
         {/* Navigation Buttons - Always visible and positioned around the image */}
         {/* Left Navigation Button */}

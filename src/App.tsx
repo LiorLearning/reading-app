@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { CameraWidget } from "@/components/CameraWidget";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -16,6 +17,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <CameraWidget />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={

@@ -14,7 +14,7 @@ import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
 
 import { useComic } from "@/hooks/use-comic";
-import { aiService } from "@/lib/ai-service";
+import { AdventureResponse, aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
 import VoiceSelector from "@/components/ui/voice-selector";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
@@ -35,11 +35,15 @@ import TopicSelection from "./TopicSelection";
     getRecentCachedAdventureImages,
     getCachedImagesForAdventure 
   } from "@/lib/utils";
+
 import { cacheAdventureImageHybrid } from "@/lib/firebase-image-cache";
 
 import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
+
+import { getRandomSpellingQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
+
 
 // Legacy user data interface for backwards compatibility
 interface LegacyUserData {
@@ -268,6 +272,42 @@ const Index = () => {
   
   // Responsive aspect ratio management
   const [screenSize, setScreenSize] = React.useState<'mobile' | 'tablet' | 'desktop'>('desktop');
+  
+  // SpellBox state management
+  const [showSpellBox, setShowSpellBox] = React.useState<boolean>(false);
+  const [currentSpellQuestion, setCurrentSpellQuestion] = React.useState<SpellingQuestion | null>(null);
+  const [spellProgress, setSpellProgress] = React.useState<{totalQuestions: number, currentIndex: number}>({
+    totalQuestions: 10,
+    currentIndex: 0
+  });
+  
+  // Get the current spelling word from the latest AI message
+  const currentSpellingWord = chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_word;
+  const currentSpellingSentence = chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence;
+
+  // Auto-trigger SpellBox when there's a spelling word
+  React.useEffect(() => {
+    if (currentSpellingWord && currentScreen === 1) {
+      // Convert the spelling word to a SpellingQuestion format
+      const spellQuestion: SpellingQuestion = {
+        id: Date.now(),
+        topicId: selectedTopicId,
+        topicName: selectedTopicId,
+        templateType: 'spelling',
+        word: currentSpellingWord,
+        questionText: currentSpellingSentence,
+        correctAnswer: currentSpellingWord.toUpperCase(),
+        audio: currentSpellingWord,
+        explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`
+      };
+      
+      setCurrentSpellQuestion(spellQuestion);
+      setShowSpellBox(true);
+    } else {
+      setShowSpellBox(false);
+      setCurrentSpellQuestion(null);
+    }
+  }, [currentSpellingWord, currentScreen]);
   
   // Auto-collapse sidebar when switching to Screen 3 (MCQ)
   React.useEffect(() => {
@@ -654,13 +694,16 @@ const Index = () => {
     };
   }, [isResizing, handleResizeMove, handleResizeEnd]);
 
-  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[]): Promise<string> => {
+  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion): Promise<AdventureResponse> => {
     try {
-      return await aiService.generateResponse(userText, messageHistory);
+      return await aiService.generateResponse(userText, messageHistory, spellingQuestion);
     } catch (error) {
       console.error('Error generating AI response:', error);
       // Fallback response on error
-      return "That's interesting! 🤔 Tell me more about what happens next in your adventure!";
+      return {
+        spelling_sentence: "Let's continue our amazing adventure!",
+        adventure_story: "That's interesting! 🤔 Tell me more about what happens next in your adventure!"
+      };
     }
   }, []);
 
@@ -1059,12 +1102,47 @@ const Index = () => {
       try {
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
-        const aiResponse = await generateAIResponse(text, currentMessages);
+        const spellingQuestion = getRandomSpellingQuestion();
+        const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
+        
+        // First, add the spelling sentence message
+        if (aiResponse.spelling_sentence) {
+          const spellingSentenceMessage: ChatMessage = {
+            type: 'ai',
+            content: aiResponse.spelling_sentence,
+            timestamp: Date.now(),
+            spelling_word: spellingQuestion.audio,
+            spelling_sentence: aiResponse.spelling_sentence,
+            content_after_spelling: aiResponse.adventure_story // Store the adventure story for later
+          };
+          
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length + 1);
+            playMessageSound();
+            // Auto-speak the spelling sentence
+            const messageId = `index-chat-${spellingSentenceMessage.timestamp}-${prev.length}`;
+            ttsService.speakAIMessage(spellingSentenceMessage.content, messageId).catch(error => 
+              console.error('TTS error for spelling sentence:', error)
+            );
+            return [...prev, spellingSentenceMessage];
+          });
+
+          // The SpellBox will automatically appear due to the useEffect hook that watches for spelling_word
+          // After successful completion, handleSpellComplete will be called
+
+          // Save message to Firebase session if available
+          if (currentSessionId) {
+            adventureSessionService.addChatMessage(currentSessionId, spellingSentenceMessage);
+          }
+          return;
+        }
         
         const aiMessage: ChatMessage = {
           type: 'ai',
-          content: aiResponse,
-          timestamp: Date.now()
+          content: aiResponse.adventure_story,
+          timestamp: Date.now(),
+          spelling_sentence: aiResponse.spelling_sentence,
+          spelling_word: spellingQuestion.audio
         };
         
         setChatMessages(prev => {
@@ -1759,6 +1837,113 @@ const Index = () => {
       console.log(`🖼️ AUTO IMAGE: Not triggered - waiting for ${nextTrigger} (current gap: ${messagesSinceLastAuto})`);
     }
   }, [chatMessages.filter(msg => msg.type === 'user').length, currentAdventureId, onGenerateAutoImage, isAutoImageGenerationPaused, lastAutoImageMessageCount, detectSceneChange, isDescriptiveMessage]);
+
+  // SpellBox event handlers
+  const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string) => {
+    playClickSound();
+    
+    if (isCorrect) {
+      // Update progress
+      setSpellProgress(prev => ({
+        ...prev,
+        currentIndex: prev.currentIndex + 1
+      }));
+      
+      // Get the latest AI response that has the stored adventure story
+      const latestAIResponse = chatMessages
+        .filter(msg => msg.type === 'ai' && msg.content_after_spelling)
+        .slice(-1)[0];
+
+      if (latestAIResponse?.content_after_spelling) {
+        // Add adventure story
+        setChatMessages(prev => {
+          
+          // Create the adventure story message
+          const adventureStoryMessage: ChatMessage = {
+            type: 'ai',
+            content: latestAIResponse.content_after_spelling,
+            timestamp: Date.now() + 1 // Ensure it comes after success message
+          };
+          
+          playMessageSound();
+          
+          // Auto-speak both messages in sequence
+          const adventureMessageId = `index-chat-${adventureStoryMessage.timestamp}-${prev.length + 1}`;
+          
+          ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId)
+            .catch(error => console.error('TTS error:', error));
+          
+          // Save message to Firebase if available
+          if (currentSessionId) {
+            adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
+          }
+          
+          return [...prev, adventureStoryMessage];
+        });
+      }
+      
+      // Hide spell box after success
+      setShowSpellBox(false);
+      setCurrentSpellQuestion(null);
+    } else {
+      // Provide encouragement for incorrect answers
+      const encouragementMessage: ChatMessage = {
+        type: 'ai',
+        content: `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`,
+        timestamp: Date.now()
+      };
+      
+      setChatMessages(prev => {
+        playMessageSound();
+        // Auto-speak the encouragement
+        const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
+        ttsService.speakAIMessage(encouragementMessage.content, messageId)
+          .catch(error => console.error('TTS error for encouragement:', error));
+        return [...prev, encouragementMessage];
+      });
+    }
+  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService]);
+
+  const handleSpellSkip = useCallback(() => {
+    playClickSound();
+    
+    // Add skip message to chat
+    const skipMessage: ChatMessage = {
+      type: 'ai',
+      content: `No worries! We can practice spelling "${currentSpellQuestion?.word}" another time. Let's continue our adventure! ✨`,
+      timestamp: Date.now()
+    };
+    
+    setChatMessages(prev => {
+      playMessageSound();
+      return [...prev, skipMessage];
+    });
+    
+    // Hide spell box
+    setShowSpellBox(false);
+    setCurrentSpellQuestion(null);
+  }, [currentSpellQuestion, setChatMessages]);
+
+  const handleSpellNext = useCallback(() => {
+    playClickSound();
+    
+    // For automatic system, just hide the current spell box
+    // The next one will appear automatically when the AI generates a new spelling word
+    setShowSpellBox(false);
+    setCurrentSpellQuestion(null);
+    
+    // Add transition message
+    const nextMessage: ChatMessage = {
+      type: 'ai',
+      content: `Great job! Let's continue our adventure! ✨`,
+      timestamp: Date.now()
+    };
+    
+    setChatMessages(prev => {
+      playMessageSound();
+      return [...prev, nextMessage];
+    });
+  }, [setChatMessages]);
 
   return (
     <div className="h-screen bg-pattern flex flex-col overflow-hidden">
@@ -2472,6 +2657,19 @@ const Index = () => {
                     }}
                     hasPrevious={currentIndex > 0}
                     hasNext={currentIndex < panels.length - 1}
+                    spellWord={chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_word}
+                    spellSentence={chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence}
+                    // SpellBox props
+                    onSpellComplete={handleSpellComplete}
+                    onSpellSkip={handleSpellSkip}
+                    onSpellNext={handleSpellNext}
+                    showSpellBox={showSpellBox}
+                    spellQuestion={currentSpellQuestion}
+                    showProgress={true}
+                    totalQuestions={spellProgress.totalQuestions}
+                    currentQuestionIndex={spellProgress.currentIndex}
+                    showHints={true}
+                    showExplanation={true}
                   />
                 </div>
               </section>
@@ -2571,7 +2769,7 @@ const Index = () => {
                                     </div>
                                     <div className={message.type === 'ai' ? 'pr-6' : ''}>
                                       {message.type === 'ai' ? (
-                                        <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                                        <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content, message.spelling_word) }} />
                                       ) : (
                                         message.content
                                       )}
