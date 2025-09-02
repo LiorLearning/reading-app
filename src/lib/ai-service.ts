@@ -15,6 +15,7 @@ export interface AdventureResponse {
 class AIService {
   private client: OpenAI | null = null;
   private isInitialized = false;
+  private isGeneratingImage = false; // Track image generation to prevent simultaneous calls
 
   constructor() {
     this.initialize();
@@ -71,7 +72,7 @@ class AIService {
       role: "system" as const,
       content: `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
 
-Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using explicit newline characters (\\n) at natural pauses for clean formatting.
+Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using actual newline characters at natural pauses for clean formatting. Put numbered options (like "1. Option A 2. Option B") on separate lines.
 
 Goal: Create fast-paced, mission-oriented and spelling question aligned adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
 
@@ -201,7 +202,7 @@ Return ONLY the JSON object, no other text.`
         role: "system" as const,
         content: `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
 
-Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time in prompt changes.Ask one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using explicit newline characters (\\n) at natural pauses for clean formatting.
+Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time in prompt changes.Ask one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using actual newline characters at natural pauses for clean formatting. Put numbered options (like "1. Option A 2. Option B") on separate lines.
 
 Goal: Create fast-paced, mission-oriented adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
 
@@ -242,7 +243,7 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
         messages: messages,
-        max_tokens: 100,
+        max_tokens: 200,
         temperature: 0.8,
         presence_penalty: 0.3,
         frequency_penalty: 0.3,
@@ -914,7 +915,7 @@ Return ONLY the new reading passage, nothing else.`;
     return prompts;
   }
 
-  // Generate adventure-focused images using user_adventure context
+  // Generate adventure-focused images using user_adventure context with early-exit fallback
   async generateAdventureImage(
     prompt: string,
     userAdventure: ChatMessage[],
@@ -925,26 +926,77 @@ Return ONLY the new reading passage, nothing else.`;
       return null;
     }
 
+    // Prevent multiple simultaneous image generation calls
+    if (this.isGeneratingImage) {
+      console.log('🚫 Image generation already in progress, skipping duplicate call');
+      return null;
+    }
+
+    // Set generation flag to prevent simultaneous calls
+    this.isGeneratingImage = true;
+
     try {
-      console.log('🌟 Generating adventure image with user adventure context');
+      console.log('🌟 Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
 
       // Extract adventure context with high priority on recent messages
       const adventureContext = this.extractAdventureContext(userAdventure);
       console.log('Adventure context for image:', adventureContext);
 
-      // Generate adventure-focused prompts using weighted approach
-      const adventurePrompts = this.generateAdventurePrompts(prompt, userAdventure, fallbackPrompt);
+      // Generate one optimized prompt first, then fallback prompts if needed
+      const primaryPrompt = this.generatePrimaryAdventurePrompt(prompt, userAdventure, fallbackPrompt);
+      
+      console.log('🎯 Trying PRIMARY adventure prompt first:', primaryPrompt);
 
-      console.log('Generated adventure prompt options:', adventurePrompts);
+      // Try primary prompt first
+      try {
+        const finalPrompt = primaryPrompt.length > 400 
+          ? primaryPrompt.substring(0, 390) + "..." 
+          : primaryPrompt;
+        
+        console.log(`🎨 Generating with primary prompt`);
 
-      // Try each prompt option until one succeeds
-      for (let i = 0; i < adventurePrompts.length; i++) {
+        const response = await this.client.images.generate({
+          model: "dall-e-3",
+          prompt: finalPrompt,
+          n: 1,
+          size: "1024x1024",
+          quality: "standard",
+          style: "vivid"
+        });
+
+        const imageUrl = response.data[0]?.url;
+        
+        if (imageUrl) {
+          console.log(`✅ PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
+          this.isGeneratingImage = false; // Clear generation flag
+          return { imageUrl, usedPrompt: finalPrompt };
+        }
+      } catch (primaryError: any) {
+        console.log(`❌ Primary adventure prompt failed:`, primaryError.message);
+        
+        // Only proceed to fallback if it's a safety/policy issue
+        if (!primaryError.message?.includes('safety system')) {
+          this.isGeneratingImage = false; // Clear generation flag
+          throw primaryError;
+        }
+        
+        console.log('🔄 Primary prompt blocked by safety system - trying fallback prompts');
+      }
+
+      // Only if primary fails, generate fallback prompts
+      console.log('🔄 Generating fallback prompts (primary prompt failed)');
+      const fallbackPrompts = this.generateFallbackAdventurePrompts(prompt, userAdventure, fallbackPrompt);
+
+      console.log('Generated fallback prompt options:', fallbackPrompts);
+
+      // Try each fallback prompt option until one succeeds
+      for (let i = 0; i < fallbackPrompts.length; i++) {
         try {
-          const finalPrompt = adventurePrompts[i].length > 400 
-            ? adventurePrompts[i].substring(0, 390) + "..." 
-            : adventurePrompts[i];
+          const finalPrompt = fallbackPrompts[i].length > 400 
+            ? fallbackPrompts[i].substring(0, 390) + "..." 
+            : fallbackPrompts[i];
           
-          console.log(`🎨 Trying adventure DALL-E prompt ${i + 1}:`, finalPrompt);
+          console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}:`, finalPrompt);
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -958,13 +1010,15 @@ Return ONLY the new reading passage, nothing else.`;
           const imageUrl = response.data[0]?.url;
           
           if (imageUrl) {
-            console.log(`✅ Adventure DALL-E prompt ${i + 1} succeeded`);
+            console.log(`✅ Fallback DALL-E prompt ${i + 1} succeeded`);
+            this.isGeneratingImage = false; // Clear generation flag
             return { imageUrl, usedPrompt: finalPrompt };
           }
         } catch (promptError: any) {
-          console.log(`❌ Adventure DALL-E prompt ${i + 1} failed:`, promptError.message);
+          console.log(`❌ Fallback DALL-E prompt ${i + 1} failed:`, promptError.message);
           
-          if (!promptError.message?.includes('safety system') || i === adventurePrompts.length - 1) {
+          if (!promptError.message?.includes('safety system') || i === fallbackPrompts.length - 1) {
+            this.isGeneratingImage = false; // Clear generation flag
             throw promptError;
           }
           
@@ -975,7 +1029,11 @@ Return ONLY the new reading passage, nothing else.`;
       throw new Error('All adventure prompt options failed');
     } catch (error) {
       console.error('DALL-E API error for adventure image:', error);
+      this.isGeneratingImage = false; // Clear generation flag on error
       return null;
+    } finally {
+      // Ensure flag is always cleared (backup safety measure)
+      this.isGeneratingImage = false;
     }
   }
 
@@ -1040,10 +1098,10 @@ Return ONLY the new reading passage, nothing else.`;
     }
   }
 
-  // Helper: Generate adventure-focused prompts using mainimageprompt approach
-  private generateAdventurePrompts(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string): string[] {
-    console.log('=== ADVENTURE MODE WEIGHTED IMAGE GENERATION ===');
-    console.log('Function: AIService.generateAdventurePrompts');
+  // Helper: Generate the primary optimized adventure prompt (used first)
+  private generatePrimaryAdventurePrompt(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string): string {
+    console.log('=== PRIMARY ADVENTURE PROMPT GENERATION ===');
+    console.log('Function: AIService.generatePrimaryAdventurePrompt');
     console.log('Current input prompt:', prompt);
 
     // Get conversation history for weighted prompt generation (last 6 messages - OpenAI style)
@@ -1054,43 +1112,58 @@ Return ONLY the new reading passage, nothing else.`;
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
     console.log('Weighted content (80% user input, 10% latest AI response, 10% other context):', weightedContent);
 
-    const prompts: string[] = [];
-
-    // Option 1: Ultra-realistic adventure with vivid storytelling
-    const contextParts1 = [];
-    contextParts1.push(weightedContent);
-    contextParts1.push('Remove moderated parts from the image if present, and create it.');
-    contextParts1.push('Create a photorealistic, vivid, and captivating adventure scene with stunning details that brings the story to life for children.');
-    const mainimageprompt1 = contextParts1.join('. ');
-    prompts.push(mainimageprompt1);
-
-    // Option 2: Cinematic realistic adventure with exciting atmosphere
-    const contextParts2 = [];
-    contextParts2.push(weightedContent);
-    contextParts2.push('Remove moderated parts from the image if present, and create it.');
-    contextParts2.push('Make it a cinematic, photorealistic adventure scene with exciting atmosphere, rich textures, and amazing lighting that feels like a real movie scene for kids.');
-    const mainimageprompt2 = contextParts2.join('. ');
-    prompts.push(mainimageprompt2);
-
-    // Option 3: Hyper-realistic engaging adventure world
-    const contextParts3 = [];
-    contextParts3.push(weightedContent);
-    contextParts3.push('Remove moderated parts from the image if present, and create it.');
-    contextParts3.push('Create a hyper-realistic, immersive adventure world with incredible detail, vibrant colors, and fascinating elements that capture imagination and wonder for children.');
-    const mainimageprompt3 = contextParts3.join('. ');
-    prompts.push(mainimageprompt3);
+    // Create the primary optimized prompt - most likely to succeed
+    const contextParts = [];
+    contextParts.push(weightedContent);
+    contextParts.push('Remove moderated parts from the image if present, and create it.');
+    contextParts.push('Create a photorealistic, vivid, and captivating adventure scene with stunning details that brings the story to life for children.');
+    const primaryPrompt = contextParts.join('. ');
     
-    console.log('Final mainimageprompt Option 1 (Ultra-realistic):', mainimageprompt1);
-    console.log('Final mainimageprompt Option 2 (Cinematic):', mainimageprompt2);
-    console.log('Final mainimageprompt Option 3 (Hyper-realistic):', mainimageprompt3);
+    console.log('PRIMARY adventure prompt:', primaryPrompt);
     console.log('WEIGHTING: 80% User Input + 10% Latest AI Response + 10% Other Context');
     console.log('================================================');
 
-    // Optional: Add a realistic and interesting fallback if all weighted approaches fail
+    return primaryPrompt;
+  }
+
+  // Helper: Generate fallback adventure prompts (only used if primary fails)
+  private generateFallbackAdventurePrompts(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string): string[] {
+    console.log('=== FALLBACK ADVENTURE PROMPTS GENERATION ===');
+    console.log('Function: AIService.generateFallbackAdventurePrompts');
+    console.log('Current input prompt:', prompt);
+
+    // Get conversation history for weighted prompt generation
+    const conversationHistory = this.getLastConversationMessages(userAdventure);
+    const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
+
+    const prompts: string[] = [];
+
+    // Fallback Option 1: Cinematic realistic adventure with exciting atmosphere
+    const contextParts1 = [];
+    contextParts1.push(weightedContent);
+    contextParts1.push('Remove moderated parts from the image if present, and create it.');
+    contextParts1.push('Make it a cinematic, photorealistic adventure scene with exciting atmosphere, rich textures, and amazing lighting that feels like a real movie scene for kids.');
+    const fallbackPrompt1 = contextParts1.join('. ');
+    prompts.push(fallbackPrompt1);
+
+    // Fallback Option 2: Hyper-realistic engaging adventure world
+    const contextParts2 = [];
+    contextParts2.push(weightedContent);
+    contextParts2.push('Remove moderated parts from the image if present, and create it.');
+    contextParts2.push('Create a hyper-realistic, immersive adventure world with incredible detail, vibrant colors, and fascinating elements that capture imagination and wonder for children.');
+    const fallbackPrompt2 = contextParts2.join('. ');
+    prompts.push(fallbackPrompt2);
+    
+    console.log('Fallback prompt 1 (Cinematic):', fallbackPrompt1);
+    console.log('Fallback prompt 2 (Hyper-realistic):', fallbackPrompt2);
+
+    // Add simple fallback if all weighted approaches fail
     if (fallbackPrompt) {
       prompts.push(`${prompt}, ${fallbackPrompt}, create a photorealistic, captivating and visually stunning adventure scene with amazing details that will fascinate children`);
+      console.log('Final fallback prompt (Simple):', prompts[prompts.length - 1]);
     }
 
+    console.log('================================================');
     return prompts;
   }
 

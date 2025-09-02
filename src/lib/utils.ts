@@ -828,8 +828,27 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
   // Escape HTML first
   let formatted = escapeHtml(content);
   
-  // Convert literal \n characters to <br> tags
+  // Convert newlines to <br> tags (handle multiple formats)
+  // 1. Convert literal \n characters (escaped backslash + n)
   formatted = formatted.replace(/\\n/g, '<br>');
+  
+  // 2. Convert actual newline characters to <br> tags
+  formatted = formatted.replace(/\n/g, '<br>');
+  
+  // 3. Handle numbered lists by ensuring they're on separate lines with extra spacing
+  // Convert patterns like "1. text 2. text 3. text" to "1. text<br><br>2. text<br><br>3. text"
+  // Use a loop to catch all consecutive numbered items
+  let previousLength = 0;
+  while (formatted.length !== previousLength) {
+    previousLength = formatted.length;
+    formatted = formatted.replace(/(\d+\.\s+[^0-9]*?)(\s+)(\d+\.\s)/g, '$1<br><br>$3');
+  }
+  
+  // 4. Handle dash/bullet lists with extra spacing
+  formatted = formatted.replace(/(-\s+[^-]*?)(\s+)(-\s)/g, '$1<br><br>$3');
+  
+  // 5. Add spacing after "Choose one:" or similar prompts before numbered lists
+  formatted = formatted.replace(/(choose one:|pick one:|select:|options?:)(\s*<br>\s*)(\d+\.)/gi, '$1<br><br>$3');
   
   // Apply formatting in order of complexity (most specific first)
   
@@ -854,6 +873,9 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
   if (spellingWord) {
     formatted = formatted.replace(spellingWord, '');
   }
+  
+  // Clean up multiple consecutive <br> tags
+  formatted = formatted.replace(/(<br\s*\/?>){3,}/g, '<br><br>');
   
   return formatted;
 };

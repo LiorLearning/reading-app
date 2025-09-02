@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { playClickSound } from "@/lib/sounds";
 import { Sparkles, Plus, Rocket } from "lucide-react";
 import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress, loadAdventureSummaries, AdventureSummary } from "@/lib/utils";
+import { loadAdventureSummariesHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
+import { useAuth } from "@/hooks/use-auth";
 
 interface UserData {
   username: string;
@@ -54,6 +56,9 @@ const topPicks = [
 ];
 
 const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure, selectedTopicFromPreference }) => {
+  // Get Firebase authenticated user
+  const { user } = useAuth();
+  
   // Progress tracking state
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const [nextTopicId, setNextTopicId] = useState<string | null>(null);
@@ -68,25 +73,33 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
     const allTopicIds = Object.keys(sampleMCQData.topics);
     const nextTopic = getNextTopic(allTopicIds);
     setNextTopicId(nextTopic);
-    
-    // Load saved adventures
-    const adventures = loadAdventureSummaries();
-    setSavedAdventures(adventures);
   }, [userData]);
 
+  useEffect(() => {
+    if (user) {
+      refreshSavedAdventures();
+    } else {
+      // Load from localStorage as fallback when not authenticated
+      const adventures = loadAdventureSummaries();
+      setSavedAdventures(adventures);
+    }
+  }, [user]);
+
   // Function to refresh saved adventures (call this from parent when new adventure is saved)
-  const refreshSavedAdventures = () => {
-    const adventures = loadAdventureSummaries();
+  const refreshSavedAdventures = async () => {
+    const adventures = await loadAdventureSummariesHybrid(user?.uid || null);
     setSavedAdventures(adventures);
   };
 
   // Expose refresh function to parent component via ref or callback
   React.useEffect(() => {
     // Set up a polling mechanism to check for new adventures and progress updates
-    const interval = setInterval(() => {
-      const currentAdventures = loadAdventureSummaries();
-      if (currentAdventures.length !== savedAdventures.length) {
-        setSavedAdventures(currentAdventures);
+    const interval = setInterval(async () => {
+      if (user) {
+        const currentAdventures = await loadAdventureSummariesHybrid(user.uid);
+        if (currentAdventures.length !== savedAdventures.length) {
+          setSavedAdventures(currentAdventures);
+        }
       }
       
       // Also refresh user progress to get immediate updates
