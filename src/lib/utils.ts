@@ -15,6 +15,9 @@ export interface ChatMessage {
   type: 'user' | 'ai';
   content: string;
   timestamp: number;
+  spelling_sentence?: string;
+  spelling_word?: string;
+  content_after_spelling?: string;
 }
 
 /**
@@ -814,7 +817,7 @@ export const getStartingQuestionIndex = (topicId: string): number => {
  * Format AI messages by converting markdown-style formatting to HTML
  * Returns HTML that can be safely rendered using dangerouslySetInnerHTML
  */
-export const formatAIMessage = (content: string): string => {
+export const formatAIMessage = (content: string, spellingWord?: string): string => {
   // First, escape any HTML characters to prevent XSS
   const escapeHtml = (text: string) => {
     const div = document.createElement('div');
@@ -847,6 +850,10 @@ export const formatAIMessage = (content: string): string => {
   
   // Clean up any weird spacing patterns like "_ _" 
   formatted = formatted.replace(/<\/em>\s+<em>/g, ' ');
+
+  if (spellingWord) {
+    formatted = formatted.replace(spellingWord, '');
+  }
   
   return formatted;
 };

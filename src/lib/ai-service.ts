@@ -1,9 +1,15 @@
 import OpenAI from 'openai';
+import { SpellingQuestion } from './questionBankUtils';
 
 interface ChatMessage {
   type: 'user' | 'ai';
   content: string;
   timestamp: number;
+}
+
+export interface AdventureResponse {
+  spelling_sentence: string;
+  adventure_story: string;
 }
 
 class AIService {
@@ -31,7 +37,7 @@ class AIService {
   }
 
   // Fallback responses when API is not available
-  private getFallbackResponse(userText: string): string {
+  private getFallbackResponse(userText: string): AdventureResponse {
     const responses = [
       "Great idea! 🚀 That sounds exciting! What happens next?",
       "Wow! 🌟 That's a fantastic twist! Keep the story going!",
@@ -44,17 +50,22 @@ class AIService {
       "Perfect! 🎨 That adds great action to your comic!",
       "Excellent! 🎊 Your adventure is becoming amazing!"
     ];
-    return responses[Math.floor(Math.random() * responses.length)];
+    const fallbackText = responses[Math.floor(Math.random() * responses.length)];
+    return {
+      spelling_sentence: "Let's continue our amazing adventure!",
+      adventure_story: fallbackText
+    };
   }
 
   // Generate chat context from message history
   private buildChatContext(
     messages: ChatMessage[], 
     currentUserMessage: string,
+    spellingWord?: string,
     adventureState?: string,
     currentAdventure?: any,
     storyEventsContext?: string,
-    summary?: string
+    summary?: string,
   ): any[] {
     const systemMessage = {
       role: "system" as const,
@@ -62,7 +73,7 @@ class AIService {
 
 Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using explicit newline characters (\\n) at natural pauses for clean formatting.
 
-Goal: Create fast-paced, mission-oriented adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
+Goal: Create fast-paced, mission-oriented and spelling question aligned adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
 
 Ongoing Adventure: Show excitement, prompt me for what happens next, and occasionally suggest 1–2 creative ideas to spark the next turn.
 
@@ -83,7 +94,21 @@ Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : adventureState =
 
 Current Adventure Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
 
-Student Profile: ${summary || 'Getting to know this adventurer...'}`
+Student Profile: ${summary || 'Getting to know this adventurer...'}
+
+You are provided with spelling word which is ${spellingWord}. You are to always use the spelling word to create the first sentence of the adventure.
+
+CRITICAL: You MUST return your response as a valid JSON object with exactly these two keys:
+- "spelling_sentence": The first sentence of the adventure that uses the spelling word ${spellingWord}
+- "adventure_story": The remaining sentences of the adventure, this should be purely story based on provided context
+
+Example format:
+{
+  "spelling_sentence": "The brave astronaut discovered a mysterious planet.",
+  "adventure_story": "As the spaceship landed, strange lights began to glow from the surface. What could be waiting for us down there?"
+}
+
+Return ONLY the JSON object, no other text.`
     };
 
     // Include recent message history for context (last 6 messages max)
@@ -101,28 +126,49 @@ Student Profile: ${summary || 'Getting to know this adventurer...'}`
     return [systemMessage, ...recentMessages, currentMessage];
   }
 
-  async generateResponse(userText: string, chatHistory: ChatMessage[] = []): Promise<string> {
+  async generateResponse(userText: string, chatHistory: ChatMessage[] = [], spellingQuestion: SpellingQuestion): Promise<AdventureResponse> {
     // If not initialized or no API key, use fallback
     if (!this.isInitialized || !this.client) {
       return this.getFallbackResponse(userText);
     }
 
+    // need to pass this every 3 alternative chat messages
+    const stringSpellingWord = JSON.stringify(spellingQuestion.audio);
+
     try {
-      const messages = this.buildChatContext(chatHistory, userText);
+      const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord);
 
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
         messages: messages,
-        max_tokens: 100,
+        response_format: { type: "json_object" },
+        max_tokens: 500,
         temperature: 0.8,
         presence_penalty: 0.3,
         frequency_penalty: 0.3,
       });
 
       const response = completion.choices[0]?.message?.content;
+      console.log('Response:', response);
       
       if (response) {
-        return response.trim();
+        try {
+          // Parse and validate the JSON response
+          const parsedResponse: AdventureResponse = JSON.parse(response.trim());
+          
+          // Validate that both required keys exist
+          if (!parsedResponse.spelling_sentence || !parsedResponse.adventure_story) {
+            console.warn('Response missing required keys, using fallback');
+            return this.getFallbackResponse(userText);
+          }
+          
+          // Return the formatted response
+          return parsedResponse;
+        } catch (parseError) {
+          console.error('Failed to parse JSON response:', parseError);
+          console.log('Raw response:', response);
+          return this.getFallbackResponse(userText);
+        }
       } else {
         throw new Error('No response content received');
       }
