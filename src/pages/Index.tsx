@@ -45,6 +45,7 @@ import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnectio
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
 import { getRandomSpellingQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
+import FeedbackModal from "@/components/FeedbackModal";
 
 
 // Legacy user data interface for backwards compatibility
@@ -295,6 +296,42 @@ const Index = () => {
     totalQuestions: 10,
     currentIndex: 0
   });
+  
+  // Feedback modal state
+  const [showFeedbackModal, setShowFeedbackModal] = React.useState<boolean>(false);
+  
+  // Handle feedback submission
+  const handleFeedbackSubmit = async (feedbackData: {enjoymentAnswer: string}) => {
+    // Close modal immediately regardless of API success/failure
+    setShowFeedbackModal(false);
+    setCurrentScreen(-1);
+    
+    try {
+      console.log('Feedback submitted:', feedbackData);
+      
+      // Only save if user is authenticated (required by security rules)
+      if (!user?.uid) {
+        console.warn('Cannot save feedback: User not authenticated');
+        return;
+      }
+      
+      // Import feedback service dynamically to avoid circular dependencies
+      const { feedbackService } = await import('@/lib/feedback-service');
+      
+      // Save to Firestore - userId must match authenticated user for security rules
+      await feedbackService.saveFeedback(
+        currentAdventureId,
+        user.uid, // Use authenticated user's UID
+        feedbackData.enjoymentAnswer
+      );
+      
+      console.log('Feedback saved successfully to Firestore');
+      
+    } catch (error) {
+      console.error('Error saving feedback:', error);
+      // Don't re-throw - modal is already closed
+    }
+  };
   
   // Get the current spelling word from the latest AI message
   const currentSpellingWord = chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_word;
@@ -2767,6 +2804,23 @@ const Index = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            
+            {/* End Session Button - only show when adventure is active */}
+            {currentScreen === 1 && (
+              <Button 
+                variant="destructive" 
+                size="icon"
+                aria-label="End Session" 
+                className="border-2 bg-red-500 text-white btn-animate hover:bg-red-600 rounded-full w-12 h-12" 
+                style={{ borderColor: 'hsl(from hsl(0 84% 55%) h s 25%)', boxShadow: '0 4px 0 black' }} 
+                onClick={() => {
+                  playClickSound();
+                  setShowFeedbackModal(true);
+                }}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            )}
           </div>
         </header>
 
@@ -3375,6 +3429,13 @@ const Index = () => {
             🛠️ DEV MODE ACTIVE (A+S+D to toggle)
           </div>
         )}
+
+        {/* Feedback Modal */}
+        <FeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+          onSubmit={handleFeedbackSubmit}
+        />
       </div>
     </div>
   );
