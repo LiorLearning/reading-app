@@ -1,0 +1,422 @@
+import { ChatMessage } from './utils';
+import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from './sounds';
+
+export interface StreamChunk {
+  type: 'text' | 'image_start' | 'image' | 'error';
+  content: string;
+  metadata?: {
+    prompt?: string;
+    duration?: number;
+    attempts?: number;
+    provider?: string;
+    imageUrl?: string;
+  };
+}
+
+export interface ImagePrompt {
+  prompt: string;
+  start: number;
+  end: number;
+  type: 'tag' | 'description';
+}
+
+export class ResponseProcessor {
+  private static readonly IMAGE_PATTERN = /<generateImage>(.*?)<\/generateImage>/gs;
+  private static readonly IMAGE_DESC_PATTERN = /Image description:\s*(.+?)(?:\n|$)/gsi;
+  
+  /**
+   * Extract image generation prompts from AI response text
+   */
+  static extractImagePrompts(response: string): ImagePrompt[] {
+    const prompts: ImagePrompt[] = [];
+    
+    // Reset regex lastIndex to ensure clean matching
+    this.IMAGE_PATTERN.lastIndex = 0;
+    this.IMAGE_DESC_PATTERN.lastIndex = 0;
+    
+    // Primary: <generateImage> tags
+    let match;
+    while ((match = this.IMAGE_PATTERN.exec(response)) !== null) {
+      prompts.push({
+        prompt: match[1].trim(),
+        start: match.index,
+        end: match.index + match[0].length,
+        type: 'tag'
+      });
+    }
+    
+    // Secondary: "Image description:" format (fallback)
+    this.IMAGE_DESC_PATTERN.lastIndex = 0;
+    while ((match = this.IMAGE_DESC_PATTERN.exec(response)) !== null) {
+      prompts.push({
+        prompt: match[1].trim(),
+        start: match.index,
+        end: match.index + match[0].length,
+        type: 'description'
+      });
+    }
+    
+    // Sort by position in text
+    return prompts.sort((a, b) => a.start - b.start);
+  }
+  
+  /**
+   * Process AI response that may contain image generation instructions
+   * Returns async generator that yields text and image content as it becomes available
+   */
+  static async *processResponseWithImages(
+    response: string,
+    userId: string,
+    adventureContext: ChatMessage[],
+    imageGenerator: any, // MultiProviderImageGenerator will be defined next
+    originalUserMessage?: string // Add original user message to use for image generation
+  ): AsyncGenerator<StreamChunk, void, unknown> {
+    
+    const imagePrompts = this.extractImagePrompts(response);
+    
+    // If no explicit image prompts found, check for fallback content-based generation
+    if (!imagePrompts.length) {
+      if (this.shouldGenerateImageFromContent(response)) {
+        console.log('🔍 No explicit image tags found, but content suggests visual scene - generating fallback image');
+        
+        // Extract context from previous messages
+        const previousContext = adventureContext
+          .slice(-3)
+          .map(msg => msg.content)
+          .join(' ');
+        
+        // Use original user message for fallback generation if available
+        const rawFallbackPrompt = originalUserMessage || this.generateFallbackImagePrompt(response, previousContext);
+        
+        // Apply enhanced safety prompt to fallback as well
+        const enhancedFallbackPrompt = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawFallbackPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
+        
+        console.log(`🎨 Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
+        console.log(`📝 Raw fallback: ${rawFallbackPrompt}`);
+        console.log(`🛡️ Enhanced fallback: ${enhancedFallbackPrompt}`);
+        
+        // Yield text first
+        yield { 
+          type: 'text', 
+          content: response 
+        };
+        
+        // Then generate image
+        yield { 
+          type: 'image_start', 
+          content: 'GENERATING_IMAGE',
+          metadata: { prompt: enhancedFallbackPrompt }
+        };
+        
+        try {
+          const startTime = Date.now();
+          const result = await imageGenerator.generateWithFallback(enhancedFallbackPrompt, userId, {
+            adventureContext,
+            size: '1024x1024',
+            quality: 'hd'
+          });
+          
+          const duration = Date.now() - startTime;
+          
+          if (result.success && result.imageUrl) {
+            console.log(`✅ Fallback image generated successfully in ${duration}ms`);
+            
+            yield { 
+              type: 'image', 
+              content: result.imageUrl,
+              metadata: { 
+                prompt: enhancedFallbackPrompt, 
+                duration, 
+                attempts: result.attempts,
+                provider: result.provider,
+                imageUrl: result.imageUrl
+              }
+            };
+          } else {
+            console.error(`❌ Fallback image generation failed:`, result.error);
+            
+            yield { 
+              type: 'error', 
+              content: result.error || 'Failed to generate image',
+              metadata: { prompt: enhancedFallbackPrompt, duration }
+            };
+          }
+        } catch (error) {
+          console.error(`❌ Fallback image generation error:`, error);
+          
+          yield { 
+            type: 'error', 
+            content: error instanceof Error ? error.message : 'Image generation failed',
+            metadata: { prompt: enhancedFallbackPrompt }
+          };
+        }
+        
+        return; // Exit after handling fallback
+      } else {
+        // No image generation needed, just yield text
+        yield { 
+          type: 'text', 
+          content: response 
+        };
+        return;
+      }
+    }
+    
+    console.log(`🎨 Found ${imagePrompts.length} image generation request(s) in AI response`);
+    
+    let lastEnd = 0;
+    let hasGeneratedSuccessfulImage = false;
+    
+    // Process each image prompt in order, but stop after first success
+    for (const [index, { prompt, start, end }] of imagePrompts.entries()) {
+      // Stream any text before this image first
+      const textBefore = response.slice(lastEnd, start);
+      if (textBefore.trim()) {
+        yield { 
+          type: 'text', 
+          content: textBefore 
+        };
+      }
+      
+      // If we already generated a successful image, skip this image prompt but continue with text
+      if (hasGeneratedSuccessfulImage) {
+        console.log(`🛑 Skipping image ${index + 1} - already generated a successful image`);
+        // Skip the image tag content but continue with the loop to process remaining text
+        lastEnd = end;
+        continue;
+      }
+      
+      // Signal that image generation is starting
+      console.log('🎵 Starting image loading sound...');
+      playImageLoadingSound();
+      
+      yield { 
+        type: 'image_start', 
+        content: 'GENERATING_IMAGE',
+        metadata: { prompt }
+      };
+      
+      try {
+        // Use original user message for image generation instead of AI-generated description
+        const rawPrompt = originalUserMessage || prompt;
+        
+        // Apply enhanced safety prompt as PRIMARY attempt
+        const enhancedPrompt = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
+        
+        const startTime = Date.now();
+        console.log(`🎯 Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
+        console.log(`📝 Raw user input: ${rawPrompt}`);
+        console.log(`🛡️ Enhanced prompt: ${enhancedPrompt}`);
+        
+        const result = await imageGenerator.generateWithFallback(enhancedPrompt, userId, {
+          adventureContext,
+          size: '1024x1024',
+          quality: 'hd'
+        });
+        
+        const duration = Date.now() - startTime;
+        
+        if (result.success && result.imageUrl) {
+          console.log(`✅ Image ${index + 1} generated successfully in ${duration}ms`);
+          hasGeneratedSuccessfulImage = true; // Mark as successful, stop generating more
+          
+          // Stop loading sound and play completion sound
+          console.log('🎵 Stopping loading sound and playing completion sound...');
+          stopImageLoadingSound();
+          playImageCompleteSound();
+          
+          // Stream the completed image
+          yield { 
+            type: 'image', 
+            content: result.imageUrl,
+            metadata: { 
+              prompt, 
+              duration, 
+              attempts: result.attempts,
+              provider: result.provider,
+              imageUrl: result.imageUrl
+            }
+          };
+          
+          // Update adventure context with the generated image
+          adventureContext.push({
+            type: 'ai',
+            content: `![Generated Image](${result.imageUrl})`,
+            timestamp: Date.now()
+          });
+          
+        } else {
+          console.error(`❌ Image ${index + 1} generation failed:`, result.error);
+          
+          // Stop loading sound on error
+          console.log('🎵 Stopping loading sound due to error...');
+          stopImageLoadingSound();
+          
+          // Stream error and continue to next prompt (don't mark as successful)
+          yield { 
+            type: 'error', 
+            content: result.error || 'Failed to generate image',
+            metadata: { prompt, duration }
+          };
+        }
+        
+      } catch (error) {
+        console.error(`❌ Image ${index + 1} generation error:`, error);
+        
+        // Stop loading sound on error
+        console.log('🎵 Stopping loading sound due to generation error...');
+        stopImageLoadingSound();
+        
+        yield { 
+          type: 'error', 
+          content: error instanceof Error ? error.message : 'Image generation failed',
+          metadata: { prompt }
+        };
+      }
+      
+      lastEnd = end;
+    }
+    
+    // Stream any remaining text after the last image
+    const remainingText = response.slice(lastEnd);
+    if (remainingText.trim()) {
+      yield { 
+        type: 'text', 
+        content: remainingText 
+      };
+    }
+    
+    console.log('✅ Response processing completed');
+  }
+  
+  /**
+   * Convert processed chunks back to a single text string (for fallback scenarios)
+   */
+  static async chunksToText(chunks: StreamChunk[]): Promise<string> {
+    return chunks
+      .filter(chunk => chunk.type === 'text')
+      .map(chunk => chunk.content)
+      .join('');
+  }
+  
+  /**
+   * Check if response contains image generation requests
+   * @param response - The AI's response text
+   * @param userMessage - The user's message (optional, for fallback visual detection)
+   */
+  static containsImageRequests(response: string, userMessage?: string): boolean {
+    const explicitImageRequests = this.extractImagePrompts(response).length > 0;
+    
+    // If explicit <generateImage> tags found in AI response, return true
+    if (explicitImageRequests) {
+      console.log('✅ Found explicit image generation tags in AI response');
+      return true;
+    }
+    
+    // Fallback: Only check for EXPLICIT visual requests in user's message
+    // This is extremely selective and only triggers on clear "show me" type requests
+    if (userMessage) {
+      const hasExplicitRequest = this.shouldGenerateImageFromContent(userMessage);
+      if (hasExplicitRequest) {
+        console.log('✅ Found explicit visual request in user message:', userMessage);
+        return true;
+      } else {
+        console.log('🚫 No explicit visual request found in user message:', userMessage);
+        return false;
+      }
+    }
+    
+    console.log('🚫 No image generation signals detected');
+    return false;
+  }
+  
+  /**
+   * Fallback method to detect visual content that should have images
+   * This catches cases where AI forgets to add <generateImage> tags
+   * Now extremely selective - only triggers on explicit visual requests
+   */
+  static shouldGenerateImageFromContent(response: string): boolean {
+    const lowerResponse = response.toLowerCase();
+    
+    // Trigger on EXPLICIT visual request phrases
+    const explicitVisualRequests = [
+      // Direct creation commands
+      'create an image', 'make a picture', 'generate a drawing', 'build a picture',
+      'design an image', 'create a drawing', 'make an image', 'generate an image',
+      'create', 'make', 'generate', 'build', 'design', 'draw',
+      // Direct visual requests  
+      'show me', 'what does it look like', 'what does that look like', 'i want to see',
+      'let me see', 'can i see', 'picture of', 'drawing',
+      'how big is', 'what color is', 'what colour is', 'describe the appearance',
+      'what do they look like', 'what do you look like', 'appearance of'
+    ];
+    
+    // Check for explicit visual request phrases
+    const foundVisualRequests = explicitVisualRequests.filter(phrase => {
+      return lowerResponse.includes(phrase);
+    });
+    
+    const hasExplicitVisualRequest = foundVisualRequests.length > 0;
+    
+    console.log('🔍 Visual content detection (EXTREMELY SELECTIVE):', {
+      responseText: lowerResponse,
+      foundVisualRequests,
+      hasExplicitVisualRequest,
+      shouldGenerate: hasExplicitVisualRequest
+    });
+    
+    // Only generate image if there's an explicit visual request
+    return hasExplicitVisualRequest;
+  }
+  
+  /**
+   * Generate a fallback image prompt from response content
+   * Used when AI doesn't provide explicit <generateImage> tags
+   */
+  static generateFallbackImagePrompt(response: string, previousContext: string = ''): string {
+    const lowerResponse = response.toLowerCase();
+    
+    // Try to extract key visual elements
+    let prompt = '';
+    
+    // Check for specific elements and build prompt
+    if (lowerResponse.includes('robot') || lowerResponse.includes('mechanical')) {
+      prompt += 'steampunk robots with brass gears and steam, ';
+    }
+    
+    if (lowerResponse.includes('pyramid')) {
+      prompt += 'ancient Egyptian pyramids in desert landscape, ';
+    }
+    
+    if (lowerResponse.includes('ancient') && lowerResponse.includes('shimmer')) {
+      prompt += 'mysterious ancient ruins shimmering with magical energy, ';
+    }
+    
+    if (lowerResponse.includes('crash') || lowerResponse.includes('landed')) {
+      prompt += 'dramatic crash landing scene with debris and smoke, ';
+    }
+    
+    if (lowerResponse.includes('time') && lowerResponse.includes('vortex')) {
+      prompt += 'swirling time vortex with glowing energy and mystical effects, ';
+    }
+    
+    // Add context from previous conversation if available
+    if (previousContext) {
+      const contextLower = previousContext.toLowerCase();
+      if (contextLower.includes('space') || contextLower.includes('adventure')) {
+        prompt += 'science fiction adventure scene, ';
+      }
+    }
+    
+    // Default fallback
+    if (!prompt.trim()) {
+      prompt = 'epic adventure scene with dramatic lighting and fantasy elements, ';
+    }
+    
+    // Clean up and add style
+    prompt = prompt.replace(/,\s*$/, ''); // Remove trailing comma
+    prompt += ', digital art, vivid colors, child-friendly fantasy style';
+    
+    return prompt;
+  }
+}

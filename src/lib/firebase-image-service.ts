@@ -341,4 +341,5 @@ class FirebaseImageService {
   }
 }
 
+export { FirebaseImageService };
 export const firebaseImageService = new FirebaseImageService();

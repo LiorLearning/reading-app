@@ -488,9 +488,36 @@ export interface TopicPreference {
 }
 
 /**
+ * Map selected grade to content grade based on new requirements
+ */
+export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string => {
+  // Grade 4 and Grade 5 selections should reflect grade 3 content
+  if (gradeDisplayName === '4th Grade' || gradeDisplayName === '5th Grade') {
+    return '3';
+  }
+  // Grade 2 and Grade 3 selections should reflect their respective content
+  if (gradeDisplayName === '2nd Grade') {
+    return '2';
+  }
+  if (gradeDisplayName === '3rd Grade') {
+    return '3';
+  }
+  // Grade 1 should reflect grade 1 content
+  if (gradeDisplayName === '1st Grade') {
+    return '1';
+  }
+  // Kindergarten should reflect kindergarten content
+  if (gradeDisplayName === 'Kindergarten') {
+    return 'K';
+  }
+  // Default to grade 1 for any other cases
+  return '1';
+};
+
+/**
  * Save user's topic level preference and determine the specific topic
  */
-export const saveTopicPreference = (level: 'start' | 'middle', allTopicIds: string[]): string | null => {
+export const saveTopicPreference = (level: 'start' | 'middle', allTopicIds: string[], gradeDisplayName?: string): string | null => {
   try {
     const preference: TopicPreference = {
       level,
@@ -499,7 +526,7 @@ export const saveTopicPreference = (level: 'start' | 'middle', allTopicIds: stri
     localStorage.setItem(TOPIC_PREFERENCE_KEY, JSON.stringify(preference));
     
     // Immediately determine the specific topic and save it as current topic
-    const specificTopic = getNextTopicByPreference(allTopicIds, level);
+    const specificTopic = getNextTopicByPreference(allTopicIds, level, gradeDisplayName);
     if (specificTopic) {
       setCurrentTopic(specificTopic);
       return specificTopic;
@@ -541,32 +568,69 @@ export const loadTopicPreference = (): TopicPreference | null => {
 };
 
 /**
- * Get the next available topic based on user's preference level and completed topics
+ * Get the next available topic based on user's preference level, selected grade, and completed topics
  * Uses the actual ordering from mcq-questions.tsx data file
  */
-export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle'): string | null => {
+export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle', gradeDisplayName?: string): string | null => {
   const progress = loadUserProgress();
   
-  // Topics are already ordered in the data file, use that exact order
-  // Start level begins with K-F.2, middle level begins with 1-Q.4
+  // Map selected grade to content grade
+  const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';
+  console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
+  
+  // Find starting index based on content grade and level
   let startIndex = 0;
   
-  if (level === 'middle') {
-    // Find 1-Q.4 topic index to start from middle level
-    startIndex = allTopicIds.findIndex(id => id === '1-Q.4');
+  // Find the first topic that matches the content grade
+  if (contentGrade === 'K') {
+    // Start with Kindergarten topics (K- prefix)
+    startIndex = allTopicIds.findIndex(id => id.startsWith('K-'));
+    if (startIndex === -1) startIndex = 0;
+  } else if (contentGrade === '1') {
+    if (level === 'start') {
+      // Grade 1 start level - find first 1- topic or use K- if 1- not found
+      startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('K-'));
+        if (startIndex === -1) startIndex = 0;
+      }
+    } else {
+      // Grade 1 middle level - find 1-Q.4 or first 1- topic
+      startIndex = allTopicIds.findIndex(id => id === '1-Q.4');
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+        if (startIndex === -1) startIndex = 0;
+      }
+    }
+  } else if (contentGrade === '2') {
+    // Grade 2 content - find first 2- topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
     if (startIndex === -1) {
-      // Fallback if 1-Q.4 not found - find first 1- topic
+      // Fallback to grade 1 if grade 2 topics not found
       startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
       if (startIndex === -1) startIndex = 0;
+    }
+  } else if (contentGrade === '3') {
+    // Grade 3 content - find first 3- topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
+    if (startIndex === -1) {
+      // Fallback to grade 2 if grade 3 topics not found
+      startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+        if (startIndex === -1) startIndex = 0;
+      }
     }
   }
   
   if (!progress) {
     // First time playing, return first topic from preferred starting point
-    return allTopicIds[startIndex] || null;
+    const selectedTopic = allTopicIds[startIndex] || null;
+    console.log(`🚀 First time playing - Starting with topic: ${selectedTopic} at index ${startIndex}`);
+    return selectedTopic;
   }
   
-  // Find first uncompleted topic starting from the preferred level
+  // Find first uncompleted topic starting from the preferred level and grade
   for (let i = startIndex; i < allTopicIds.length; i++) {
     const topicId = allTopicIds[i];
     const topicProgress = progress.completedTopics.find(
@@ -577,6 +641,7 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // 1. Never attempted (not in completedTopics)
     // 2. Attempted but not completed with passing grade
     if (!topicProgress || !topicProgress.completed) {
+      console.log(`✅ Found available topic: ${topicId} at index ${i}`);
       return topicId;
     }
   }
@@ -818,15 +883,55 @@ export const getStartingQuestionIndex = (topicId: string): number => {
  * Returns HTML that can be safely rendered using dangerouslySetInnerHTML
  */
 export const formatAIMessage = (content: string, spellingWord?: string): string => {
-  // First, escape any HTML characters to prevent XSS
+  let formatted = content;
+  
+  // First, extract and convert all images (existing HTML and markdown) to final HTML
+  const allImages: string[] = [];
+  const placeholderMap = new Map<string, string>();
+  
+  // Extract existing HTML image tags
+  const imageTagRegex = /<img[^>]*>/gi;
+  formatted = formatted.replace(imageTagRegex, (match) => {
+    const placeholder = `XIMGPLACEHOLDERX${allImages.length}XENDX`;
+    allImages.push(match);
+    placeholderMap.set(placeholder, match);
+    return placeholder;
+  });
+  
+  // Convert markdown image syntax to HTML and extract
+  formatted = formatted.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, altText, url) => {
+    // Validate that the URL looks like a proper image URL
+    const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i;
+    const isValidImageUrl = url.startsWith('http') || url.startsWith('data:') || imageExtensions.test(url);
+    
+    if (isValidImageUrl) {
+      const placeholder = `XIMGPLACEHOLDERX${allImages.length}XENDX`;
+      // Create styled image HTML
+      const imageHTML = `<div class="adventure-image-container" style="margin: 8px 0; text-align: center;">
+        <img src="${url}" alt="${altText || 'Generated adventure image'}" 
+             class="adventure-image" 
+             style="max-width: 100%; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid #000;" 
+             loading="lazy" />
+      </div>`;
+      
+      allImages.push(imageHTML);
+      placeholderMap.set(placeholder, imageHTML);
+      return placeholder;
+    }
+    
+    // If not a valid image URL, remove it completely to avoid display issues
+    return '';
+  });
+  
+  // Function to escape HTML characters to prevent XSS
   const escapeHtml = (text: string) => {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   };
   
-  // Escape HTML first
-  let formatted = escapeHtml(content);
+  // Now escape HTML for everything except our image placeholders
+  formatted = escapeHtml(formatted);
   
   // Convert newlines to <br> tags (handle multiple formats)
   // 1. Convert literal \n characters (escaped backslash + n)
@@ -876,6 +981,17 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
   
   // Clean up multiple consecutive <br> tags
   formatted = formatted.replace(/(<br\s*\/?>){3,}/g, '<br><br>');
+  
+  // Restore all image HTML using the placeholder map
+  placeholderMap.forEach((imageHTML, placeholder) => {
+    formatted = formatted.replace(new RegExp(placeholder, 'g'), imageHTML);
+  });
+  
+  // Clean up any remaining broken placeholders that might have been missed
+  formatted = formatted.replace(/_MARKDOWNIMAGEPLACEHOLDER\d+/g, '');
+  formatted = formatted.replace(/__[A-Z_]*PLACEHOLDER[^_]*__/g, '');
+  formatted = formatted.replace(/_PRESERVEDIMAGE_\d+_/g, '');
+  formatted = formatted.replace(/XIMGPLACEHOLDERX\d+XENDX/g, '');
   
   return formatted;
 };

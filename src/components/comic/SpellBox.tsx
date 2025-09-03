@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService } from '@/lib/tts-service';
@@ -107,6 +107,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Get audio text with context from working sentence
   const audioText = (() => {
     if (!workingSentence) return targetWord;
+
     
     const words = workingSentence.split(' ');
     // More robust word matching - remove punctuation for comparison
@@ -151,8 +152,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return isWordComplete(answer, expectedLength) && !isWordCorrect(answer, correctAnswer);
   }, [isWordComplete, isWordCorrect]);
 
-  // Generate unique messageId for TTS
-  const messageId = `spellbox-audio-${targetWord}-${Date.now()}`;
+  // Generate stable messageId for TTS (only changes when targetWord changes)
+  const messageId = useMemo(() => 
+    `spellbox-audio-${targetWord}-${Date.now()}`, 
+    [targetWord]
+  );
   const isSpeaking = useTTSSpeaking(messageId);
 
   // Generate AI hint for incorrect spelling
@@ -274,7 +278,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setIsGeneratingHint(false);
   }, [targetWord]);
 
+
   // Don't render if we don't have the basic requirements, but be more lenient about sentence
+
   if (!isVisible || !targetWord) return null;
 
   return (
@@ -305,9 +311,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           )}
 
           {/* Question text */}
+
           {workingSentence && (
+
             <div className="mb-6 text-center px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border-2 border-indigo-100 shadow-inner">
-              <p className="text-lg text-gray-800" style={{ 
+              <div className="text-lg text-gray-800" style={{ 
                 fontFamily: 'Quicksand, sans-serif',
                 lineHeight: 1.8,
                 letterSpacing: '0.01em',
@@ -317,9 +325,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 justifyContent: 'center',
                 gap: '6px'
               }}>
+
                 {workingSentence.split(' ').map((word, idx) => (
                   <React.Fragment key={idx}>
                     {word.toLowerCase().replace(/[^\w]/g, '') === targetWord.toLowerCase().replace(/[^\w]/g, '') ? (
+
                       <div style={{ 
                         display: 'inline-flex',
                         gap: '6px',
@@ -540,10 +550,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         {word}
                       </span>
                     )}
+
                     {idx < workingSentence.split(' ').length - 1 && " "}
+
                   </React.Fragment>
                 ))}
-              </p>
+              </div>
             </div>
           )}
 

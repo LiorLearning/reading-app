@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { SpellingQuestion } from './questionBankUtils';
+import { UnifiedAIStreamingService, UnifiedAIResponse } from './unified-ai-streaming-service';
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -16,9 +17,11 @@ class AIService {
   private client: OpenAI | null = null;
   private isInitialized = false;
   private isGeneratingImage = false; // Track image generation to prevent simultaneous calls
+  private unifiedStreamingService: UnifiedAIStreamingService; // NEW: Unified AI + Image system
 
   constructor() {
     this.initialize();
+    this.unifiedStreamingService = new UnifiedAIStreamingService(); // Initialize unified system
   }
 
   private initialize() {
@@ -1223,18 +1226,14 @@ Return ONLY the new reading passage, nothing else.`;
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
     console.log('Weighted content (80% user input, 10% latest AI response, 10% other context):', weightedContent);
 
-    // Create the primary optimized prompt - most likely to succeed
-    const contextParts = [];
-    contextParts.push(weightedContent);
-    contextParts.push('Remove moderated parts from the image if present, and create it.');
-    contextParts.push('Create a photorealistic, vivid, and captivating adventure scene with stunning details that brings the story to life for children.');
-    const primaryPrompt = contextParts.join('. ');
+    // Create exciting, adventurous images that kids will love while maintaining safety
+    const enhancedPrompt = `Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
     
-    console.log('PRIMARY adventure prompt:', primaryPrompt);
+    console.log('PRIMARY adventure prompt:', enhancedPrompt);
     console.log('WEIGHTING: 80% User Input + 10% Latest AI Response + 10% Other Context');
     console.log('================================================');
 
-    return primaryPrompt;
+    return enhancedPrompt;
   }
 
   // Helper: Generate fallback adventure prompts (only used if primary fails)
@@ -1249,29 +1248,22 @@ Return ONLY the new reading passage, nothing else.`;
 
     const prompts: string[] = [];
 
-    // Fallback Option 1: Cinematic realistic adventure with exciting atmosphere
-    const contextParts1 = [];
-    contextParts1.push(weightedContent);
-    contextParts1.push('Remove moderated parts from the image if present, and create it.');
-    contextParts1.push('Make it a cinematic, photorealistic adventure scene with exciting atmosphere, rich textures, and amazing lighting that feels like a real movie scene for kids.');
-    const fallbackPrompt1 = contextParts1.join('. ');
-    prompts.push(fallbackPrompt1);
+    // Fallback Option 1: Epic and dynamic cinematic adventure
+    const sanitizedEnhancedPrompt1 = `Create an epic, high-quality image: ${weightedContent}. Style: dynamic and cinematic with vivid colors, dramatic lighting, and amazing magical details. Make it look awesome and thrilling - the kind of image kids would want as their wallpaper. Ensure no nudity, sexual content, or sexually inappropriate material whatsoever. Strictly avoid text on the images.`;
+    prompts.push(sanitizedEnhancedPrompt1);
 
-    // Fallback Option 2: Hyper-realistic engaging adventure world
-    const contextParts2 = [];
-    contextParts2.push(weightedContent);
-    contextParts2.push('Remove moderated parts from the image if present, and create it.');
-    contextParts2.push('Create a hyper-realistic, immersive adventure world with incredible detail, vibrant colors, and fascinating elements that capture imagination and wonder for children.');
-    const fallbackPrompt2 = contextParts2.join('. ');
-    prompts.push(fallbackPrompt2);
+    // Fallback Option 2: Thrilling adventure with safe content
+    const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cinematic and realistic with vibrant details, exciting atmosphere, and captivating elements. Make it visually stunning and engaging for children while keeping all content completely family-friendly. No inappropriate content or text on the images.`;
+    prompts.push(sanitizedEnhancedPrompt2);
     
-    console.log('Fallback prompt 1 (Cinematic):', fallbackPrompt1);
-    console.log('Fallback prompt 2 (Hyper-realistic):', fallbackPrompt2);
+    console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
+    console.log('Fallback prompt 2 (Thrilling Safe):', sanitizedEnhancedPrompt2);
 
-    // Add simple fallback if all weighted approaches fail
+    // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
-      prompts.push(`${prompt}, ${fallbackPrompt}, create a photorealistic, captivating and visually stunning adventure scene with amazing details that will fascinate children`);
-      console.log('Final fallback prompt (Simple):', prompts[prompts.length - 1]);
+      const simpleFallback = `Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content, no text on images.`;
+      prompts.push(simpleFallback);
+      console.log('Final fallback prompt (Simple Safe):', simpleFallback);
     }
 
     console.log('================================================');
@@ -1848,6 +1840,46 @@ Generate a hint at level ${hintLevel}:`;
   // Check if AI service is properly configured
   isConfigured(): boolean {
     return this.isInitialized;
+  }
+
+  // NEW: Unified AI response generation that may include images
+  // This is the new method that uses AI to decide when to generate images
+  async generateUnifiedResponse(
+    userText: string, 
+    chatHistory: ChatMessage[] = [], 
+    spellingQuestion: SpellingQuestion,
+    userId: string,
+    sessionId: string = crypto.randomUUID()
+  ): Promise<UnifiedAIResponse> {
+    console.log('🚀 Using NEW unified AI response generation system');
+    
+    return await this.unifiedStreamingService.generateUnifiedResponse(
+      userText,
+      chatHistory,
+      spellingQuestion,
+      userId,
+      sessionId
+    );
+  }
+  
+  // NEW: Register for streaming events from unified system
+  onUnifiedStreamEvent(sessionId: string, callback: (event: any) => void) {
+    this.unifiedStreamingService.onStreamEvent(sessionId, callback);
+  }
+  
+  // NEW: Remove stream listener
+  removeUnifiedStreamListener(sessionId: string) {
+    this.unifiedStreamingService.removeStreamListener(sessionId);
+  }
+  
+  // NEW: Abort ongoing unified stream
+  abortUnifiedStream(sessionId: string) {
+    this.unifiedStreamingService.abortStream(sessionId);
+  }
+  
+  // NEW: Check if unified system is ready
+  isUnifiedSystemReady(): boolean {
+    return this.unifiedStreamingService.isReady();
   }
 
   // Get configuration status for UI feedback
