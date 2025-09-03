@@ -1843,100 +1843,216 @@ const Index = () => {
 
   const current = panels[currentIndex] ?? initialPanels[0];
 
-  // DISABLED: State variables for old automatic image generation system
-  // const [isAutoImageGenerationPaused, setIsAutoImageGenerationPaused] = useState(false);
-  // const [lastAutoImageMessageCount, setLastAutoImageMessageCount] = useState(0);
+  // Auto image generation based on adventure summary + last 3 messages
+  const [isAutoImageGenerationActive, setIsAutoImageGenerationActive] = useState(true);
+  const [lastAutoImageMessageCount, setLastAutoImageMessageCount] = useState(0);
+  const AUTO_IMAGE_TRIGGER_INTERVAL = 4; // Generate image every 4 user messages
+  
+  console.log(`🔥 AUTO IMAGE SYSTEM STATUS:`, {
+    isAutoImageGenerationActive,
+    lastAutoImageMessageCount, 
+    AUTO_IMAGE_TRIGGER_INTERVAL,
+    currentUserMessageCount: chatMessages.filter(msg => msg.type === 'user').length,
+    currentAdventureId,
+    timestamp: Date.now()
+  });
 
-  // DISABLED: Silent automatic image generation function - replaced by unified AI streaming system
-  // const onGenerateAutoImage = useCallback(async (prompt?: string) => {
-  //   try {
-  //     console.log(`🤖 AUTO IMAGE: Generating silently...`);
-  //     
-  //     // Use the prompt or generate from recent context
-  //     const imagePrompt = prompt || 
-  //         chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
-  //         "space adventure with rocket";
-  //       
-  //     // Extract adventure context for caching
-  //     const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
-  //     
-  //     // Generate adventure image using AI service with user_adventure context
-  //     const generatedImageResult = await aiService.generateAdventureImage(
-  //       imagePrompt,
-  //       chatMessages,
-  //       "space adventure scene"
-  //     );
-  //     
-  //     let image: string;
-  //     let panelText: string;
-  //     
-  //     // Cache the generated adventure image if it was successfully created
-  //     if (generatedImageResult) {
-  //       // Use Firebase caching if user is authenticated, fallback to localStorage
-  //       await cacheAdventureImageHybrid(
-  //         user?.uid || null,
-  //         generatedImageResult.imageUrl,
-  //         imagePrompt,
-  //         adventureContext,
-  //         currentAdventureId || undefined
-  //       );
-  //       
-  //       image = generatedImageResult.imageUrl;
-  //       
-  //       // Generate contextual response text based on actual generated content
-  //       const contextualResponse = await aiService.generateAdventureImageResponse(
-  //         imagePrompt,
-  //         generatedImageResult.usedPrompt,
-  //         chatMessages
-  //       );
-  //       
-  //       panelText = contextualResponse;
-  //     } else {
-  //       // Use fallback image and text
-  //       image = images[Math.floor(Math.random() * images.length)];
-  //       panelText = prompt ? `Generated: ${prompt}` : "New adventure continues...";
-  //     }
-  //   
-  //     const newPanelId = crypto.randomUUID();
-  //     
-  //     addPanel({ 
-  //       id: newPanelId, 
-  //       image, 
-  //       text: panelText
-  //     });
-  //     setNewlyCreatedPanelId(newPanelId);
-  //     
-  //     // No sound or loading animation for automatic generation
-  //     console.log(`🤖 AUTO IMAGE: Silent generation completed`);
-  //     
-  //     // Trigger zoom animation after 2 seconds
-  //     setTimeout(() => {
-  //       setZoomingPanelId(newPanelId);
-  //       setNewlyCreatedPanelId(null);
-  //       
-  //       setTimeout(() => {
-  //         setZoomingPanelId(null);
-  //       }, 600);
-  //     }, 2000);
-  //   } catch (error) {
-  //     console.error('🤖 AUTO IMAGE ERROR:', error);
-  //     
-  //     // Fallback to random image on error (still silent)
-  //     const image = images[Math.floor(Math.random() * images.length)];
-  //     const newPanelId = crypto.randomUUID();
-  //     addPanel({ id: newPanelId, image, text: "New adventure continues..." });
-  //     setNewlyCreatedPanelId(newPanelId);
-  //     
-  //     setTimeout(() => {
-  //       setZoomingPanelId(newPanelId);
-  //       setNewlyCreatedPanelId(null);
-  //       
-  //       setTimeout(() => {
-  //         setZoomingPanelId(null);
-  //       }, 600);
-  //     }, 2000);
-  //   }
-  // }, [addPanel, images, chatMessages, currentAdventureId]);
+  // Reset auto image counter when adventure changes
+  React.useEffect(() => {
+    console.log(`🔄 ADVENTURE CHANGE DETECTED - Resetting auto image counter`);
+    console.log(`🔄 Previous lastAutoImageMessageCount:`, lastAutoImageMessageCount);
+    console.log(`🔄 New currentAdventureId:`, currentAdventureId);
+    setLastAutoImageMessageCount(0);
+  }, [currentAdventureId]); // Reset when adventure ID changes
+
+  // Additional reset when chat is cleared or screen changes (safety net)
+  React.useEffect(() => {
+    const userMessageCount = chatMessages.filter(msg => msg.type === 'user').length;
+    
+    // If we have very few messages but high counter, something went wrong - reset
+    if (userMessageCount < 3 && lastAutoImageMessageCount > 0) {
+      console.log(`🔄 SAFETY RESET - Chat cleared or new adventure started`);
+      console.log(`🔄 userMessageCount: ${userMessageCount}, lastAutoImageMessageCount: ${lastAutoImageMessageCount}`);
+      setLastAutoImageMessageCount(0);
+    }
+  }, [chatMessages.length, currentScreen]); // Reset when messages or screen change
+
+  // Auto image generation function using adventure summary + last 3 messages
+  const generateAutoImage = useCallback(async () => {
+    try {
+      console.log(`🎨 AUTO IMAGE: === STARTING GENERATION PROCESS ===`);
+      console.log(`🎨 AUTO IMAGE: Function called at:`, new Date().toISOString());
+      
+      // Get current adventure summary from session
+      let adventureSummary = '';
+      console.log(`🎨 AUTO IMAGE: Current session ID:`, currentSessionId);
+      
+      if (currentSessionId) {
+        try {
+          console.log(`🎨 AUTO IMAGE: Fetching session data...`);
+          const sessionData = await adventureSessionService.getAdventureSession(currentSessionId);
+          adventureSummary = sessionData?.chatSummary?.summary || '';
+          
+          console.log(`🎨 AUTO IMAGE: Session data retrieved:`, {
+            hasSessionData: !!sessionData,
+            hasSummary: !!sessionData?.chatSummary?.summary,
+            summaryLength: adventureSummary.length,
+            summaryPreview: adventureSummary.substring(0, 100) + '...'
+          });
+        } catch (error) {
+          console.warn('⚠️ AUTO IMAGE: Could not load adventure summary for auto image generation:', error);
+        }
+      } else {
+        console.log(`❌ AUTO IMAGE: No currentSessionId available`);
+      }
+      
+      // Get last 3 user messages for recent context
+      const userMessages = chatMessages.filter(msg => msg.type === 'user');
+      const lastThreeMessages = userMessages.slice(-3).map(msg => msg.content).join(' ');
+      
+      console.log(`🎨 AUTO IMAGE: Message analysis:`, {
+        totalChatMessages: chatMessages.length,
+        totalUserMessages: userMessages.length,
+        lastThreeUserMessages: userMessages.slice(-3).map(msg => msg.content),
+        combinedLastThree: lastThreeMessages
+      });
+      
+      // Create enhanced prompt combining both contexts
+      const combinedContext = adventureSummary 
+        ? `Adventure so far: ${adventureSummary}. Recent events: ${lastThreeMessages}`
+        : `Recent adventure events: ${lastThreeMessages}`;
+      
+      console.log(`🎨 AUTO IMAGE: Final combined context:`, {
+        length: combinedContext.length,
+        hasAdventureSummary: !!adventureSummary,
+        preview: combinedContext.substring(0, 200) + '...',
+        fullContext: combinedContext
+      });
+      
+      // Generate adventure image using AI service with combined context
+      console.log(`🎨 AUTO IMAGE: Calling aiService.generateAdventureImage()...`);
+      console.log(`🎨 AUTO IMAGE: Parameters:`, {
+        prompt: combinedContext,
+        chatMessagesLength: chatMessages.length,
+        fallbackPrompt: "adventure scene"
+      });
+      
+      const generatedImageResult = await aiService.generateAdventureImage(
+        combinedContext,
+        chatMessages,
+        "adventure scene"
+      );
+      
+      console.log(`🎨 AUTO IMAGE: Generation result:`, {
+        hasResult: !!generatedImageResult,
+        imageUrl: generatedImageResult?.imageUrl?.substring(0, 50) + '...',
+        usedPrompt: generatedImageResult?.usedPrompt?.substring(0, 100) + '...'
+      });
+      
+      if (!generatedImageResult) {
+        console.log('❌ AUTO IMAGE: Generation failed, skipping this cycle');
+        return;
+      }
+      
+      let image: string;
+      let panelText: string;
+      
+      // Use Firebase caching if user is authenticated
+      if (user?.uid) {
+        try {
+          await cacheAdventureImageHybrid(
+            user.uid,
+            generatedImageResult.imageUrl,
+            combinedContext,
+            combinedContext,
+            currentAdventureId || undefined
+          );
+        } catch (cacheError) {
+          console.warn('⚠️ Failed to cache auto-generated image:', cacheError);
+        }
+      }
+      
+      image = generatedImageResult.imageUrl;
+      
+      // Generate contextual response text based on actual generated content
+      try {
+        const contextualResponse = await aiService.generateAdventureImageResponse(
+          combinedContext,
+          generatedImageResult.usedPrompt,
+          chatMessages
+        );
+        panelText = contextualResponse;
+      } catch (responseError) {
+        console.warn('⚠️ Failed to generate contextual response, using fallback:', responseError);
+        panelText = "A new scene unfolds in your adventure...";
+      }
+      
+      const newPanelId = crypto.randomUUID();
+      
+      addPanel({ 
+        id: newPanelId, 
+        image, 
+        text: panelText
+      });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      // Silent generation - no sounds
+      console.log(`✅ AUTO IMAGE: Generated successfully based on summary + recent messages`);
+      console.log(`🎨 AUTO IMAGE: Created panel:`, {
+        panelId: newPanelId,
+        imageUrl: image.substring(0, 50) + '...',
+        text: panelText,
+        timestamp: Date.now()
+      });
+      
+      // Trigger zoom animation after 2 seconds
+      setTimeout(() => {
+        console.log(`🎨 AUTO IMAGE: Starting zoom animation for panel:`, newPanelId);
+        setZoomingPanelId(newPanelId);
+        setNewlyCreatedPanelId(null);
+        
+        setTimeout(() => {
+          console.log(`🎨 AUTO IMAGE: Ending zoom animation for panel:`, newPanelId);
+          setZoomingPanelId(null);
+        }, 600);
+      }, 2000);
+      
+    } catch (error) {
+      console.error('🎨 AUTO IMAGE ERROR:', error);
+      console.error('🎨 AUTO IMAGE ERROR DETAILS:', {
+        errorMessage: error.message,
+        errorStack: error.stack,
+        timestamp: Date.now()
+      });
+      
+      // Fallback to random image on error (still silent)
+      const fallbackImage = images[Math.floor(Math.random() * images.length)];
+      const newPanelId = crypto.randomUUID();
+      
+      console.log(`🎨 AUTO IMAGE: Using fallback image:`, {
+        fallbackImage,
+        newPanelId,
+        availableImagesCount: images.length
+      });
+      
+      addPanel({ 
+        id: newPanelId, 
+        image: fallbackImage, 
+        text: "Your adventure continues with new mysteries..."
+      });
+      setNewlyCreatedPanelId(newPanelId);
+      
+      setTimeout(() => {
+        console.log(`🎨 AUTO IMAGE: Starting fallback zoom animation for panel:`, newPanelId);
+        setZoomingPanelId(newPanelId);
+        setNewlyCreatedPanelId(null);
+        setTimeout(() => {
+          console.log(`🎨 AUTO IMAGE: Ending fallback zoom animation for panel:`, newPanelId);
+          setZoomingPanelId(null);
+        }, 600);
+      }, 2000);
+    }
+  }, [addPanel, images, chatMessages, currentSessionId, currentAdventureId, user?.uid]);
 
   // DISABLED: Helper functions for old automatic image generation system
   // const detectSceneChange = useCallback((messages: ChatMessage[]) => {
@@ -1981,76 +2097,74 @@ const Index = () => {
   //   return descriptiveKeywords.some(keyword => lowerContent.includes(keyword));
   // }, []);
 
-  // DISABLED: Old auto-generate images system - replaced by unified AI streaming system
-  // The unified AI streaming system now handles automatic image generation intelligently
-  // React.useEffect(() => {
-  //   const userMessages = chatMessages.filter(msg => msg.type === 'user');
-  //   const currentMessageCount = userMessages.length;
-  //   
-  //   // Don't trigger if paused or if we don't have an adventure ID
-  //   if (isAutoImageGenerationPaused || !currentAdventureId || currentMessageCount === 0) {
-  //     return;
-  //   }
-  //   
-  //   // Get the latest user message to check if it's long/detailed
-  //   const latestUserMessage = userMessages[userMessages.length - 1];
-  //   const isLongMessage = latestUserMessage && (
-  //     latestUserMessage.content.length > 100 || // More than 100 characters
-  //     latestUserMessage.content.split(' ').length > 20 // More than 20 words
-  //   );
-  //   const isDescriptive = latestUserMessage && isDescriptiveMessage(latestUserMessage.content);
-  //   const isLongDetailedPrompt = isLongMessage || isDescriptive;
-  //   
-  //   // Check if enough messages have passed since last auto image (minimum 2, maximum 3)
-  //   const messagesSinceLastAuto = currentMessageCount - lastAutoImageMessageCount;
-  //   const hasMinMessages = messagesSinceLastAuto >= 2;
-  //   const shouldForceGenerate = messagesSinceLastAuto >= 3;
-  //   const hasSceneChange = detectSceneChange(userMessages);
-  //   
-  //   // Trigger conditions:
-  //   // 1. Regular: 2+ messages + scene change OR 3+ messages (force)
-  //   // 2. Long/descriptive prompt: Immediately if detailed (100+ chars OR 20+ words OR descriptive keywords), but only if at least 1 message since last auto
-  //   const shouldTriggerRegular = hasMinMessages && (hasSceneChange || shouldForceGenerate);
-  //   const shouldTriggerLongPrompt = isLongDetailedPrompt && messagesSinceLastAuto >= 1;
-  //   
-  //   if (shouldTriggerRegular || shouldTriggerLongPrompt) {
-  //     let reason = "";
-  //     if (shouldTriggerLongPrompt) {
-  //       const lengthInfo = `${latestUserMessage?.content.length} chars, ${latestUserMessage?.content.split(' ').length} words`;
-  //       if (isLongMessage && isDescriptive) {
-  //         reason = `long descriptive prompt (${lengthInfo})`;
-  //       } else if (isLongMessage) {
-  //         reason = `long prompt (${lengthInfo})`;
-  //       } else if (isDescriptive) {
-  //         reason = `descriptive content detected (${lengthInfo})`;
-  //       }
-  //     } else if (shouldForceGenerate) {
-  //       reason = "3+ messages";
-  //     } else {
-  //       reason = "scene change detected";
-  //     }
-  //     
-  //     console.log(`🖼️ AUTO IMAGE: Triggering due to ${reason}. Messages since last: ${messagesSinceLastAuto}`);
-  //     
-  //     const adventureContext = userMessages.slice(-4).map(msg => msg.content).join(' ');
-  //     console.log(`🖼️ AUTO IMAGE: Context: "${adventureContext}"`);
-  //     
-  //     // Update the last auto image message count
-  //     setLastAutoImageMessageCount(currentMessageCount);
-  //     
-  //     // Small delay to ensure message rendering is complete
-  //     setTimeout(() => {
-  //       onGenerateAutoImage(adventureContext);
-  //     }, 500);
-  //   } else {
-  //     const nextTrigger = isLongDetailedPrompt 
-  //       ? "next message (detailed prompt ready)" 
-  //       : hasMinMessages 
-  //         ? "scene change detection" 
-  //         : `${2 - messagesSinceLastAuto} more messages`;
-  //     console.log(`🖼️ AUTO IMAGE: Not triggered - waiting for ${nextTrigger} (current gap: ${messagesSinceLastAuto})`);
-  //   }
-  // }, [chatMessages.filter(msg => msg.type === 'user').length, currentAdventureId, onGenerateAutoImage, isAutoImageGenerationPaused, lastAutoImageMessageCount, detectSceneChange, isDescriptiveMessage]);
+  // Auto image generation trigger - based on adventure summary + last 3 messages
+  React.useEffect(() => {
+    const userMessages = chatMessages.filter(msg => msg.type === 'user');
+    const currentMessageCount = userMessages.length;
+    
+    // COMPREHENSIVE DEBUG LOGGING
+    console.log(`🔍 AUTO IMAGE DEBUG:`, {
+      totalChatMessages: chatMessages.length,
+      userMessageCount: currentMessageCount,
+      userMessages: userMessages.map(msg => msg.content.substring(0, 30) + '...'),
+      isAutoImageGenerationActive,
+      currentAdventureId,
+      lastAutoImageMessageCount,
+      AUTO_IMAGE_TRIGGER_INTERVAL,
+      messagesSinceLastAuto: currentMessageCount - lastAutoImageMessageCount
+    });
+    
+    // Don't trigger if disabled, no adventure ID, no messages, or not enough messages
+    if (!isAutoImageGenerationActive) {
+      console.log(`❌ AUTO IMAGE BLOCKED: isAutoImageGenerationActive = false`);
+      return;
+    }
+    
+    if (!currentAdventureId) {
+      console.log(`❌ AUTO IMAGE BLOCKED: No currentAdventureId`);
+      return;
+    }
+    
+    if (currentMessageCount < 3) {
+      console.log(`❌ AUTO IMAGE BLOCKED: Not enough user messages (${currentMessageCount} < 3)`);
+      return;
+    }
+    
+    // Check if enough user messages have passed since last auto image
+    const messagesSinceLastAuto = currentMessageCount - lastAutoImageMessageCount;
+    const shouldGenerate = messagesSinceLastAuto >= AUTO_IMAGE_TRIGGER_INTERVAL;
+    
+    console.log(`🎨 AUTO IMAGE CALCULATION:`, {
+      currentMessageCount,
+      lastAutoImageMessageCount,
+      messagesSinceLastAuto,
+      AUTO_IMAGE_TRIGGER_INTERVAL,
+      shouldGenerate
+    });
+    
+    if (shouldGenerate) {
+      console.log(`✅ AUTO IMAGE: TRIGGERING! After ${messagesSinceLastAuto} user messages (threshold: ${AUTO_IMAGE_TRIGGER_INTERVAL})`);
+      console.log(`🎨 AUTO IMAGE: Setting lastAutoImageMessageCount from ${lastAutoImageMessageCount} to ${currentMessageCount}`);
+      
+      // Update the counter first to prevent duplicate triggers
+      setLastAutoImageMessageCount(currentMessageCount);
+      
+      // Small delay to ensure message rendering is complete
+      setTimeout(() => {
+        console.log(`🎨 AUTO IMAGE: Calling generateAutoImage() now...`);
+        generateAutoImage();
+      }, 1000);
+    } else {
+      const remaining = AUTO_IMAGE_TRIGGER_INTERVAL - messagesSinceLastAuto;
+      console.log(`⏳ AUTO IMAGE: Waiting for ${remaining} more user messages (${messagesSinceLastAuto}/${AUTO_IMAGE_TRIGGER_INTERVAL})`);
+    }
+  }, [
+    chatMessages.filter(msg => msg.type === 'user').length, 
+    currentAdventureId, 
+    isAutoImageGenerationActive, 
+    lastAutoImageMessageCount, 
+    generateAutoImage
+  ]);
 
   // SpellBox event handlers
   const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string) => {
