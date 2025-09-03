@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { ChatMessage } from './utils';
-import { ChatSummary } from './chat-summary-service';
+import { ChatSummary, chatSummaryService } from './chat-summary-service';
 
 export interface MCQAnswer {
   questionId: number;
@@ -68,10 +68,41 @@ class AdventureSessionService {
     adventureId: string,
     topicId: string,
     adventureMode: 'new' | 'continue',
-    title?: string
+    title?: string,
+    existingMessages?: ChatMessage[] // For loading old adventures with context
   ): Promise<string | null> {
     try {
       const sessionTitle = title || this.generateSessionTitle(sessionType, adventureMode, topicId);
+      
+      // Use existing messages if provided (for continuing adventures)
+      const initialMessages = existingMessages || [];
+      const initialMessageCount = initialMessages.length;
+      
+      // Generate initial summary from existing messages if we have them
+      let initialSummary: ChatSummary | undefined = undefined;
+      if (initialMessages.length > 0) {
+        try {
+          const summaryText = await chatSummaryService.generateChatSummary(
+            initialMessages, // Use all existing messages for initial summary
+            undefined, // No previous summary
+            { 
+              adventureMode, 
+              topicId, 
+              isInQuestionMode: false 
+            }
+          );
+          
+          initialSummary = chatSummaryService.createSummaryObject(
+            summaryText,
+            initialMessageCount,
+            initialMessages[initialMessages.length - 1]?.timestamp || Date.now()
+          );
+          
+          console.log(`🧠 Generated initial summary from ${initialMessageCount} existing messages:`, summaryText.substring(0, 100) + '...');
+        } catch (error) {
+          console.warn('⚠️ Failed to generate initial summary (continuing without):', error);
+        }
+      }
       
       const newSession: Omit<AdventureSession, 'id'> = {
         userId,
@@ -80,12 +111,13 @@ class AdventureSessionService {
         topicId,
         title: sessionTitle,
         
-        // Initialize chat data
-        chatMessages: [],
-        totalChatMessages: 0,
+        // Initialize chat data with existing messages
+        chatMessages: initialMessages,
+        totalChatMessages: initialMessageCount,
         
-        // Initialize chat summary
-        lastSummaryMessageCount: 0,
+        // Initialize chat summary with generated summary if available
+        chatSummary: initialSummary,
+        lastSummaryMessageCount: initialMessageCount, // Mark all existing messages as summarized
         
         // Initialize question data
         mcqAnswers: [],

@@ -1630,7 +1630,7 @@ const Index = () => {
       // Reset the initial response ref when starting a new adventure
       initialResponseSentRef.current = null;
       
-      // Optional Firebase session creation for specific adventure (non-blocking)
+      // Optional Firebase session creation for specific adventure with existing messages (non-blocking)
       if (user) {
         const sessionId = await adventureSessionService.createAdventureSession(
           user.uid,
@@ -1638,7 +1638,8 @@ const Index = () => {
           targetAdventure.id,
           topicId,
           'continue',
-          targetAdventure.name
+          targetAdventure.name,
+          targetAdventure.messages // Pass existing messages for AI context
         );
         setCurrentSessionId(sessionId);
       }
