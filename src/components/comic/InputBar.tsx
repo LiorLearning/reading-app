@@ -378,9 +378,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
             setText("");
           }}
           aria-label="Generate new image"
-          className="h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm"
+          className="h-10 w-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 backdrop-blur-sm transition-all duration-300 relative overflow-hidden group"
         >
-          <ImageIcon className="h-4 w-4" />
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <ImageIcon className="h-4 w-4 relative z-10 drop-shadow-sm" />
         </Button>
         <Button type="submit" variant="outline" size="icon" className="h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm">
           <Send className="h-4 w-4" />

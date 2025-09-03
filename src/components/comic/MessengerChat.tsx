@@ -470,9 +470,10 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                   setText("");
                 }}
                 aria-label="Generate new image"
-                className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate"
+                className="h-9 w-9 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 transition-all duration-300 relative overflow-hidden group"
               >
-                <ImageIcon className="h-4 w-4" />
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <ImageIcon className="h-4 w-4 relative z-10 drop-shadow-sm" />
               </Button>
             </form>
           </div>

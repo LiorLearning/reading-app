@@ -104,23 +104,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     hasQuestion: !!question 
   });
   
-  // Get audio text with context from working sentence
-  const audioText = (() => {
-    if (!workingSentence) return targetWord;
-
-    
-    const words = workingSentence.split(' ');
-    // More robust word matching - remove punctuation for comparison
-    const targetIndex = words.findIndex(w => 
-      w.toLowerCase().replace(/[^\w]/g, '') === targetWord.toLowerCase().replace(/[^\w]/g, '')
-    );
-    if (targetIndex === -1) return targetWord;
-    
-    // Get target word and up to 2 words after it
-    return words
-      .slice(targetIndex, targetIndex + 3)
-      .join(' ');
-  })();
+  // Get audio text - only the target word for SpellBox
+  const audioText = targetWord;
   
   const explanation = question?.explanation;
 
@@ -223,8 +208,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       console.log('🎵 SPELLBOX SPEAKER BUTTON: Stopping current speech');
       ttsService.stop();
     } else {
-      console.log('🎵 SPELLBOX SPEAKER BUTTON: Starting speech with ElevenLabs TTS');
-      await ttsService.speakAIMessage(audioText, messageId);
+      console.log('🎵 SPELLBOX SPEAKER BUTTON: Starting speech with ElevenLabs TTS at 0.7x speed');
+      await ttsService.speak(audioText, {
+        stability: 0.7,
+        similarity_boost: 0.9,
+        speed: 0.7,  // Set speed to 0.7x for SpellBox words
+        messageId: messageId
+      });
     }
   }, [audioText, targetWord, messageId, isSpeaking]);
 
