@@ -67,6 +67,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [attempts, setAttempts] = useState(0);
   const [aiHint, setAiHint] = useState<string>('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
+  
+  // First-time instruction state
+  const [showFirstTimeInstruction, setShowFirstTimeInstruction] = useState(false);
+  const [hasShownFirstTimeInstruction, setHasShownFirstTimeInstruction] = useState(false);
+  const [speakerButtonPosition, setSpeakerButtonPosition] = useState<{x: number, y: number} | null>(null);
 
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
@@ -137,12 +142,69 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return isWordComplete(answer, expectedLength) && !isWordCorrect(answer, correctAnswer);
   }, [isWordComplete, isWordCorrect]);
 
+  // Check for first-time instruction display
+  const shouldShowFirstTimeInstruction = currentQuestionIndex === 0 && !hasShownFirstTimeInstruction;
+
+  // Check localStorage for first-time instruction
+  useEffect(() => {
+    const hasSeenInstruction = localStorage.getItem('spellbox-first-time-instruction-seen');
+    if (hasSeenInstruction) {
+      setHasShownFirstTimeInstruction(true);
+    } else if (currentQuestionIndex === 0 && isVisible) {
+      // Show instruction for first question and first time
+      setShowFirstTimeInstruction(true);
+    }
+  }, [currentQuestionIndex, isVisible]);
+
   // Generate stable messageId for TTS (only changes when targetWord changes)
   const messageId = useMemo(() => 
     `spellbox-audio-${targetWord}-${Date.now()}`, 
     [targetWord]
   );
   const isSpeaking = useTTSSpeaking(messageId);
+
+  // TTS message ID for first-time instruction
+  const instructionMessageId = useMemo(() => 
+    'spellbox-first-time-instruction',
+    []
+  );
+  const isInstructionSpeaking = useTTSSpeaking(instructionMessageId);
+
+  // Calculate speaker button position dynamically
+  const calculateSpeakerButtonPosition = useCallback(() => {
+    const speakerButton = document.getElementById('spellbox-speaker-button');
+    const spellBoxContainer = document.querySelector('.spellbox-container');
+    
+    if (speakerButton && spellBoxContainer) {
+      const buttonRect = speakerButton.getBoundingClientRect();
+      const containerRect = spellBoxContainer.getBoundingClientRect();
+      
+      const relativeX = buttonRect.left - containerRect.left + (buttonRect.width / 2);
+      const relativeY = buttonRect.top - containerRect.top + (buttonRect.height / 2);
+      
+      setSpeakerButtonPosition({ x: relativeX, y: relativeY });
+      console.log('📍 Speaker button position calculated:', { 
+        x: relativeX, 
+        y: relativeY,
+        buttonRect: {
+          left: buttonRect.left,
+          top: buttonRect.top,
+          width: buttonRect.width,
+          height: buttonRect.height
+        },
+        containerRect: {
+          left: containerRect.left,
+          top: containerRect.top,
+          width: containerRect.width,
+          height: containerRect.height
+        }
+      });
+    } else {
+      console.warn('⚠️ Speaker button or container not found for positioning');
+      // Fallback to center-based positioning
+      setSpeakerButtonPosition({ x: 300, y: 200 }); // Default fallback
+    }
+  }, []);
 
   // Generate AI hint for incorrect spelling
   const generateAIHint = useCallback(async (incorrectAttempt: string) => {
@@ -192,6 +254,74 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       });
     }, 400);
   }, []);
+
+  // Handle first-time instruction completion
+  const handleFirstTimeInstructionComplete = useCallback(() => {
+    setShowFirstTimeInstruction(false);
+    setHasShownFirstTimeInstruction(true);
+    localStorage.setItem('spellbox-first-time-instruction-seen', 'true');
+    
+    // Stop instruction audio if playing
+    if (isInstructionSpeaking) {
+      ttsService.stop();
+    }
+  }, [isInstructionSpeaking]);
+
+  // Play instruction audio after waiting for any current TTS to complete
+  const playInstructionAudio = useCallback(async () => {
+    console.log('🎵 INSTRUCTION AUDIO: Checking if TTS is currently speaking...');
+    
+    // Check if TTS is currently speaking
+    if (ttsService.getIsSpeaking()) {
+      console.log('🎵 INSTRUCTION AUDIO: TTS is speaking, waiting for completion...');
+      const currentMessageId = ttsService.getCurrentSpeakingMessageId();
+      console.log('🎵 INSTRUCTION AUDIO: Current speaking message ID:', currentMessageId);
+      
+      // Create a promise that resolves when current TTS finishes (with timeout)
+      const waitForTTSComplete = new Promise<void>((resolve) => {
+        let attempts = 0;
+        const maxAttempts = 50; // 10 seconds maximum wait (50 * 200ms)
+        
+        const checkTTSStatus = () => {
+          attempts++;
+          
+          if (!ttsService.getIsSpeaking()) {
+            console.log('🎵 INSTRUCTION AUDIO: TTS completed, ready to play instruction');
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            console.warn('🎵 INSTRUCTION AUDIO: Timeout waiting for TTS completion, proceeding anyway');
+            resolve();
+          } else {
+            // Check again in 200ms
+            setTimeout(checkTTSStatus, 200);
+          }
+        };
+        checkTTSStatus();
+      });
+      
+      await waitForTTSComplete;
+    }
+    
+    // Final check to make sure no new TTS started while we were waiting
+    if (ttsService.getIsSpeaking()) {
+      console.log('🎵 INSTRUCTION AUDIO: New TTS started while waiting, skipping instruction audio');
+      return;
+    }
+    
+    console.log('🎵 INSTRUCTION AUDIO: Playing instruction audio');
+    const instructionText = "Fill in the blank with the correct spelling using the audio";
+    
+    try {
+      await ttsService.speak(instructionText, {
+        stability: 0.7,
+        similarity_boost: 0.9,
+        speed: 0.8,
+        messageId: instructionMessageId
+      });
+    } catch (error) {
+      console.error('🎵 INSTRUCTION AUDIO: Error playing instruction audio:', error);
+    }
+  }, [instructionMessageId]);
 
   // Play word audio using ElevenLabs TTS
   const playWordAudio = useCallback(async () => {
@@ -268,6 +398,48 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setIsGeneratingHint(false);
   }, [targetWord]);
 
+  // Play instruction audio when first-time instruction shows
+  useEffect(() => {
+    if (showFirstTimeInstruction) {
+      // Calculate speaker button position first
+      const positionTimer = setTimeout(() => {
+        calculateSpeakerButtonPosition();
+      }, 100);
+      
+      // Wait longer before trying to play audio to allow chat TTS to complete
+      const audioTimer = setTimeout(() => {
+        playInstructionAudio();
+      }, 1500); // Increased delay to allow chat audio to complete
+      
+      return () => {
+        clearTimeout(positionTimer);
+        clearTimeout(audioTimer);
+      };
+    }
+  }, [showFirstTimeInstruction, playInstructionAudio, calculateSpeakerButtonPosition]);
+
+  // Retry position calculation if not found initially
+  useEffect(() => {
+    if (showFirstTimeInstruction && !speakerButtonPosition) {
+      const retryTimer = setTimeout(() => {
+        calculateSpeakerButtonPosition();
+      }, 200);
+      return () => clearTimeout(retryTimer);
+    }
+  }, [showFirstTimeInstruction, speakerButtonPosition, calculateSpeakerButtonPosition]);
+
+  // Recalculate position on window resize
+  useEffect(() => {
+    if (showFirstTimeInstruction) {
+      const handleResize = () => {
+        calculateSpeakerButtonPosition();
+      };
+      
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, [showFirstTimeInstruction, calculateSpeakerButtonPosition]);
+
 
   // Don't render if we don't have the basic requirements, but be more lenient about sentence
 
@@ -278,7 +450,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
       className
     )}>
-      <div className="pointer-events-auto bg-white/95 backdrop-blur-sm rounded-3xl p-6 border-4 border-purple-200 shadow-2xl max-w-md w-full mx-4">
+      <div className="spellbox-container pointer-events-auto bg-white/95 backdrop-blur-sm rounded-3xl p-6 border-4 border-purple-200 shadow-2xl max-w-md w-full mx-4">
         <div style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 18, fontWeight: 500, lineHeight: 1.6 }}>
           {/* Progress indicator */}
           {showProgress && (
@@ -491,6 +663,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 {/* Audio button with ElevenLabs TTS */}
                                 <button
                                   onClick={playWordAudio}
+                                  id="spellbox-speaker-button"
                                   style={{
                                     width: '40px',
                                     height: '40px',
@@ -510,7 +683,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       : '0 4px 12px rgba(99, 102, 241, 0.3)',
                                     transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                                     opacity: 1,
-                                    transform: 'scale(1)'
+                                    transform: 'scale(1)',
+                                    position: 'relative'
                                   }}
                                   title={isSpeaking ? "Stop audio" : "Listen to this word"}
                                   onMouseEnter={(e) => {
@@ -701,6 +875,115 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             }
           `}</style>
         </div>
+
+        {/* First-time instruction overlay - pointing finger only */}
+        {showFirstTimeInstruction && (
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: speakerButtonPosition ? `
+                radial-gradient(
+                  circle at ${speakerButtonPosition.x}px ${speakerButtonPosition.y}px,
+                  transparent 30px,
+                  rgba(0, 0, 0, 0.2) 40px,
+                  rgba(0, 0, 0, 0.7) 80px
+                )
+              ` : 'rgba(0, 0, 0, 0.6)',
+              zIndex: 1000,
+              borderRadius: '24px',
+              pointerEvents: 'auto'
+            }}
+            onClick={handleFirstTimeInstructionComplete}
+          >
+            {/* Speaker button highlight circle */}
+            {speakerButtonPosition && (
+              <div style={{
+                position: 'absolute',
+                left: `${Math.max(0, speakerButtonPosition.x - 25)}px`,
+                top: `${Math.max(0, speakerButtonPosition.y - 25)}px`,
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                background: 'rgba(99, 102, 241, 0.3)',
+                animation: 'speakerHighlight 2s ease-in-out infinite',
+                zIndex: 999,
+                pointerEvents: 'none'
+              }} />
+            )}
+
+            {/* Pointing finger positioned relative to speaker button */}
+            <div 
+              className="pointing-finger"
+              style={{
+                position: 'absolute',
+                fontSize: 'clamp(40px, 8vw, 52px)', // Responsive font size
+                animation: 'pointToSpeaker 1.5s ease-in-out infinite',
+                filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4))',
+                zIndex: 1001,
+                // Position relative to dynamic speaker button location (pointing towards it)
+                left: speakerButtonPosition ? `${Math.max(10, speakerButtonPosition.x - 60)}px` : '50%',
+                top: speakerButtonPosition ? `${speakerButtonPosition.y - 15}px` : '50%',
+                transform: speakerButtonPosition ? 'none' : 'translate(70px, -10px)',
+                transformOrigin: 'center',
+                pointerEvents: 'none'
+              }}
+            >
+              👉
+            </div>
+
+            {/* Pointing animation styles */}
+            <style>{`
+              @keyframes pointToSpeaker {
+                0%, 100% {
+                  transform: rotate(0deg) scale(1);
+                  opacity: 0.9;
+                }
+                25% {
+                  transform: translate(8px, 4px) rotate(10deg) scale(1.1);
+                  opacity: 1;
+                }
+                50% {
+                  transform: translate(4px, -4px) rotate(-3deg) scale(1.05);
+                  opacity: 0.95;
+                }
+                75% {
+                  transform: translate(-4px, 2px) rotate(-8deg) scale(1.08);
+                  opacity: 1;
+                }
+              }
+
+              @keyframes speakerHighlight {
+                0%, 100% {
+                  transform: scale(1);
+                  opacity: 0.3;
+                  background: rgba(99, 102, 241, 0.3);
+                }
+                50% {
+                  transform: scale(1.2);
+                  opacity: 0.6;
+                  background: rgba(99, 102, 241, 0.5);
+                }
+              }
+
+              /* Responsive adjustments for smaller screens */
+              @media (max-width: 480px) {
+                .pointing-finger {
+                  font-size: 36px !important;
+                }
+              }
+
+              @media (max-width: 320px) {
+                .pointing-finger {
+                  font-size: 32px !important;
+                }
+              }
+            `}</style>
+          </div>
+        )}
       </div>
     </div>
   );
