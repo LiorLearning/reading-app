@@ -958,17 +958,38 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         
         if (isReadingComprehension) {
           // For reading comprehension, generate contextual reading passage
-                      contextualText = await aiService.generateContextualReadingPassage(
-              currentQuestion.passage || '',
-              `${currentTopic.topicInfo.topicName} - ${currentQuestion.word}`,
-              userAdventure
-            );
+          contextualText = await aiService.generateContextualReadingPassage(
+            currentQuestion.passage || '',
+            `${currentTopic.topicInfo.topicName} - ${currentQuestion.word}`,
+            userAdventure
+          );
         } else if (isDragDropType(currentQuestion)) {
           // For drag-and-drop questions, pass different parameters
           contextualText = await aiService.generateContextualQuestion(
             `Topic: ${currentTopic.topicInfo.topicName} - ${currentQuestion.questionText}`,
             currentQuestion.sortingWords, // Use sorting words instead of options
             0, // Dummy value since drag-drop doesn't have a single correct answer index
+            userAdventure
+          );
+        } else if (isFillBlankType(currentQuestion)) {
+          // For fill-in-the-blank questions - create appropriate options based on question type
+          let fillBlankOptions: string[] = [];
+          let correctIndex = 0;
+          
+          // Handle vowel sound questions
+          if (currentQuestion.questionText.toLowerCase().includes('short or long vowel')) {
+            fillBlankOptions = ["short", "long"];
+            correctIndex = fillBlankOptions.indexOf(currentQuestion.correctAnswer as string);
+          } else {
+            // For other fill blank questions, treat the correct answer as the only option
+            fillBlankOptions = [currentQuestion.correctAnswer as string];
+            correctIndex = 0;
+          }
+          
+          contextualText = await aiService.generateContextualQuestion(
+            `Topic: ${currentTopic.topicInfo.topicName} - ${currentQuestion.questionText}`,
+            fillBlankOptions,
+            correctIndex,
             userAdventure
           );
         } else {
