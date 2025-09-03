@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
+import confetti from 'canvas-confetti';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -64,18 +65,51 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [isComplete, setIsComplete] = useState(false);
   const [attempts, setAttempts] = useState(0);
 
-  console.log('sentence', sentence);
-
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
   const questionText = question?.questionText;
   
-  // Get audio text with context from sentence
-  const audioText = (() => {
-    if (!sentence) return targetWord;
+  // Ensure we have a valid sentence for spelling - create fallback if needed
+  const ensureSpellingSentence = useCallback((word: string, sentence?: string, questionText?: string): string => {
+    // If we have a question object, prioritize using questionText as the sentence
+    if (question && questionText) {
+      return questionText;
+    }
     
-    const words = sentence.split(' ');
-    const targetIndex = words.findIndex(w => w.toLowerCase() === targetWord.toLowerCase());
+    // If we have a sentence that contains the target word, use it
+    if (sentence && word && sentence.toLowerCase().includes(word.toLowerCase())) {
+      return sentence;
+    }
+    
+    // Fallback: create a simple sentence structure that works for spelling
+    if (word) {
+      return `Let's spell this word together: ${word}`;
+    }
+    
+    // Final fallback
+    return "Let's spell this word together!";
+  }, [question]);
+
+  // Get the working sentence - this ensures we always have something to work with
+  const workingSentence = ensureSpellingSentence(targetWord, sentence, questionText);
+  
+  console.log('SpellBox Debug:', { 
+    sentence, 
+    targetWord, 
+    questionText, 
+    workingSentence,
+    hasQuestion: !!question 
+  });
+  
+  // Get audio text with context from working sentence
+  const audioText = (() => {
+    if (!workingSentence) return targetWord;
+    
+    const words = workingSentence.split(' ');
+    // More robust word matching - remove punctuation for comparison
+    const targetIndex = words.findIndex(w => 
+      w.toLowerCase().replace(/[^\w]/g, '') === targetWord.toLowerCase().replace(/[^\w]/g, '')
+    );
     if (targetIndex === -1) return targetWord;
     
     // Get target word and up to 2 words after it
@@ -118,6 +152,39 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const messageId = `spellbox-audio-${targetWord}-${Date.now()}`;
   const isSpeaking = useTTSSpeaking(messageId);
 
+  // Confetti celebration function
+  const triggerConfetti = useCallback(() => {
+    // Create a burst of confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+    });
+    
+    // Add a second burst with different settings
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#FF6B6B', '#4ECDC4', '#45B7D1']
+      });
+    }, 250);
+    
+    // Add a third burst from the other side
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#FFD700', '#96CEB4', '#FFEAA7']
+      });
+    }, 400);
+  }, []);
+
   // Play word audio using ElevenLabs TTS
   const playWordAudio = useCallback(async () => {
     console.log('🎵 SPELLBOX SPEAKER BUTTON: Click detected', {
@@ -147,15 +214,20 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setIsCorrect(correct);
       setIsComplete(true);
       
-      if (correct && onComplete) {
-        // Enhanced callback includes user answer
-        onComplete(true, newAnswer);
+      if (correct) {
+        // Trigger confetti celebration for correct answer
+        triggerConfetti();
+        
+        if (onComplete) {
+          // Enhanced callback includes user answer
+          onComplete(true, newAnswer);
+        }
       }
     } else {
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isWordComplete, isWordCorrect]);
+  }, [targetWord, onComplete, isWordComplete, isWordCorrect, triggerConfetti]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
@@ -178,7 +250,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setAttempts(0);
   }, [targetWord]);
 
-  if (!isVisible || !targetWord || !sentence || !word) return null;
+  // Don't render if we don't have the basic requirements, but be more lenient about sentence
+  if (!isVisible || !targetWord) return null;
 
   return (
     <div className={cn(
@@ -208,7 +281,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           )}
 
           {/* Question text */}
-          {sentence && (
+          {workingSentence && (
             <div className="mb-6 text-center px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border-2 border-indigo-100 shadow-inner">
               <p className="text-lg text-gray-800" style={{ 
                 fontFamily: 'Quicksand, sans-serif',
@@ -220,9 +293,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 justifyContent: 'center',
                 gap: '6px'
               }}>
-                {sentence.split(' ').map((word, idx) => (
+                {workingSentence.split(' ').map((word, idx) => (
                   <React.Fragment key={idx}>
-                    {word.toLowerCase() === targetWord.toLowerCase() ? (
+                    {word.toLowerCase().replace(/[^\w]/g, '') === targetWord.toLowerCase().replace(/[^\w]/g, '') ? (
                       <div style={{ 
                         display: 'inline-flex',
                         gap: '6px',
@@ -443,7 +516,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         {word}
                       </span>
                     )}
-                    {idx < sentence.split(' ').length - 1 && " "}
+                    {idx < workingSentence.split(' ').length - 1 && " "}
                   </React.Fragment>
                 ))}
               </p>

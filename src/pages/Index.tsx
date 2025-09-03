@@ -207,6 +207,16 @@ const Index = () => {
   // Optional session tracking for Firebase (won't break existing functionality)
   const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
   
+  // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
+  const [messageCycleCount, setMessageCycleCount] = React.useState(0);
+  
+  // Initialize message cycle count based on existing messages
+  React.useEffect(() => {
+    // Count AI messages to determine current cycle position
+    const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
+    setMessageCycleCount(aiMessageCount % 6);
+  }, []); // Only run on mount
+  
   // Show onboarding if user is authenticated but hasn't completed setup
   const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
 
@@ -399,7 +409,8 @@ const Index = () => {
             chatMessages,
             undefined, // currentAdventure - can be added later if needed
             undefined, // storyEventsContext - can be added later if needed
-            undefined  // summary - can be added later if needed
+            undefined, // summary - can be added later if needed
+            userData   // user data from Firebase
           );
 
           // Mark that we've sent the initial response for this session
@@ -694,18 +705,18 @@ const Index = () => {
     };
   }, [isResizing, handleResizeMove, handleResizeEnd]);
 
-  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion): Promise<AdventureResponse> => {
+  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion | null): Promise<AdventureResponse> => {
     try {
-      return await aiService.generateResponse(userText, messageHistory, spellingQuestion);
+      return await aiService.generateResponse(userText, messageHistory, spellingQuestion, userData);
     } catch (error) {
       console.error('Error generating AI response:', error);
       // Fallback response on error
       return {
-        spelling_sentence: "Let's continue our amazing adventure!",
+        spelling_sentence: spellingQuestion ? "Let's continue our amazing adventure!" : null,
         adventure_story: "That's interesting! 🤔 Tell me more about what happens next in your adventure!"
       };
     }
-  }, []);
+  }, [userData]);
 
 
 
@@ -1102,11 +1113,20 @@ const Index = () => {
       try {
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
-        const spellingQuestion = getRandomSpellingQuestion();
+        
+        // Implement 3-3 pattern: 3 pure adventure messages, then 3 with spelling questions
+        const isSpellingPhase = messageCycleCount >= 3; // Messages 3, 4, 5 have spelling
+        const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion() : null;
+        
+        console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
+        
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
-        // First, add the spelling sentence message
-        if (aiResponse.spelling_sentence) {
+        // Update cycle count and reset after 6 messages (3 adventure + 3 spelling)
+        setMessageCycleCount(prev => (prev + 1) % 6);
+        
+        // First, add the spelling sentence message if we have one
+        if (aiResponse.spelling_sentence && spellingQuestion) {
           const spellingSentenceMessage: ChatMessage = {
             type: 'ai',
             content: aiResponse.spelling_sentence,
@@ -1137,12 +1157,13 @@ const Index = () => {
           return;
         }
         
+        // For pure adventure messages (no spelling), just add the adventure story
         const aiMessage: ChatMessage = {
           type: 'ai',
           content: aiResponse.adventure_story,
           timestamp: Date.now(),
-          spelling_sentence: aiResponse.spelling_sentence,
-          spelling_word: spellingQuestion.audio
+          spelling_sentence: null,
+          spelling_word: undefined
         };
         
         setChatMessages(prev => {
@@ -1183,7 +1204,7 @@ const Index = () => {
         setIsAIResponding(false);
       }
     },
-    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId]
+    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -1461,6 +1482,8 @@ const Index = () => {
     if (mode === 'new') {
       // Clear chat messages for new adventures to provide clean slate
       setChatMessages([]);
+      // Reset message cycle count for new adventure
+      setMessageCycleCount(0);
       // Generate new adventure ID
       adventureId = crypto.randomUUID();
       setCurrentAdventureId(adventureId);
@@ -2951,6 +2974,7 @@ const Index = () => {
                     
                     // Reset everything for new adventure (same as handleStartAdventure with mode='new')
                     setChatMessages([]);                    // Clear chat history
+                    setMessageCycleCount(0);                // Reset message cycle count
                     setCurrentAdventureId(crypto.randomUUID()); // New adventure ID
                     reset(initialPanels);                   // Reset comic panels to default
                     
