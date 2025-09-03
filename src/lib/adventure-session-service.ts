@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { ChatMessage } from './utils';
+import { ChatSummary } from './chat-summary-service';
 
 export interface MCQAnswer {
   questionId: number;
@@ -35,6 +36,10 @@ export interface AdventureSession {
   // Chat data
   chatMessages: ChatMessage[];
   totalChatMessages: number;
+  
+  // Chat summary for memory management
+  chatSummary?: ChatSummary;
+  lastSummaryMessageCount: number; // Track when last summary was generated
   
   // Question data
   mcqAnswers: MCQAnswer[];
@@ -78,6 +83,9 @@ class AdventureSessionService {
         // Initialize chat data
         chatMessages: [],
         totalChatMessages: 0,
+        
+        // Initialize chat summary
+        lastSummaryMessageCount: 0,
         
         // Initialize question data
         mcqAnswers: [],
@@ -162,6 +170,47 @@ class AdventureSessionService {
     }
   }
 
+  // Update chat summary (non-blocking)
+  async updateChatSummary(sessionId: string, summary: ChatSummary): Promise<void> {
+    if (!sessionId) return; // Graceful exit if no session
+
+    try {
+      const sessionRef = doc(db, this.COLLECTION_NAME, sessionId);
+      
+      await updateDoc(sessionRef, {
+        chatSummary: summary,
+        lastSummaryMessageCount: summary.messageCount,
+        updatedAt: serverTimestamp(),
+        lastActivityAt: serverTimestamp()
+      });
+
+      console.log(`🧠 Updated chat summary for session (${summary.messageCount} messages)`);
+    } catch (error) {
+      console.warn('⚠️ Failed to update chat summary (continuing normally):', error);
+      // Don't throw error - app continues working without Firebase sync
+    }
+  }
+
+  // Get current session data
+  async getAdventureSession(sessionId: string): Promise<AdventureSession | null> {
+    if (!sessionId) return null;
+
+    try {
+      const sessionRef = doc(db, this.COLLECTION_NAME, sessionId);
+      const sessionDoc = await getDoc(sessionRef);
+
+      if (sessionDoc.exists()) {
+        const sessionData = sessionDoc.data() as AdventureSession;
+        return { ...sessionData, id: sessionDoc.id };
+      }
+      
+      return null;
+    } catch (error) {
+      console.warn('⚠️ Failed to get adventure session:', error);
+      return null;
+    }
+  }
+
   // Update adventure state (non-blocking)
   async updateAdventureState(
     sessionId: string, 
@@ -236,23 +285,7 @@ class AdventureSessionService {
     }
   }
 
-  // Get specific adventure session
-  async getAdventureSession(sessionId: string): Promise<AdventureSession | null> {
-    try {
-      const sessionDoc = await getDoc(doc(db, this.COLLECTION_NAME, sessionId));
 
-      if (sessionDoc.exists()) {
-        return {
-          id: sessionId,
-          ...sessionDoc.data()
-        } as AdventureSession;
-      }
-      return null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch adventure session:', error);
-      return null;
-    }
-  }
 
   // Generate session title based on type and mode
   private generateSessionTitle(

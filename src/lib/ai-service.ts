@@ -89,6 +89,15 @@ class AIService {
       Adventure State Awareness
       Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : adventureState === 'character_creation' ? 'CHARACTER_CREATION' : 'ONGOING_ADVENTURE'}
       Current Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
+      
+      ${summary ? `Adventure Memory (Key Details from Previous Conversations):
+      ${summary}
+      
+      Use this memory to:
+      - Reference characters, locations, and events the child has created
+      - Build on previous decisions and story elements
+      - Maintain consistency with established world rules
+      - Recall the child's interests and creative patterns` : ''}
 
       NEW_ADVENTURE
       Step 1: Discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
@@ -139,7 +148,6 @@ class AIService {
       - Tone: Playful, encouraging, humorous, kid-friendly. React with excitement. Use character dialogue often when fitting.
       - Use the student's name naturally throughout the conversation to make it personal and engaging.
 
-      Student Profile: ${summary || 'Getting to know this adventurer...'}
       Student Name: ${userData?.username || 'adventurer'}
 
       Current Adventure Details:
@@ -736,7 +744,7 @@ Return ONLY the new reading passage, nothing else.`;
       console.log('Sending contextualized reading passage prompt to AI:', contextualPrompt);
 
       const completion = await this.client.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "chatgpt-4o-latest",
         messages: [
           {
             role: "system",

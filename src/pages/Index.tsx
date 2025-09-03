@@ -21,6 +21,7 @@ import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import { useAuth } from "@/hooks/use-auth";
 import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-ai-streaming";
 import { adventureSessionService } from "@/lib/adventure-session-service";
+import { chatSummaryService } from "@/lib/chat-summary-service";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -742,7 +743,31 @@ const Index = () => {
   const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion): Promise<AdventureResponse> => {
 
     try {
-      return await aiService.generateResponse(userText, messageHistory, spellingQuestion, userData);
+      // Load current chat summary from session (if available)
+      let currentSummary: string | undefined = undefined;
+      if (currentSessionId) {
+        try {
+          const sessionData = await adventureSessionService.getAdventureSession(currentSessionId);
+          currentSummary = sessionData?.chatSummary?.summary;
+          
+          if (currentSummary) {
+            console.log('🧠 Using chat summary for AI context:', currentSummary.substring(0, 100) + '...');
+          }
+        } catch (summaryError) {
+          console.warn('⚠️ Could not load chat summary, continuing without it:', summaryError);
+        }
+      }
+
+      return await aiService.generateResponse(
+        userText, 
+        messageHistory, 
+        spellingQuestion, 
+        userData,
+        undefined, // adventureState
+        undefined, // currentAdventure  
+        undefined, // storyEventsContext
+        currentSummary // summary
+      );
     } catch (error) {
       console.error('Error generating AI response:', error);
       // Fallback response on error
@@ -751,7 +776,7 @@ const Index = () => {
         adventure_story: "That's interesting! 🤔 Tell me more about what happens next in your adventure!"
       };
     }
-  }, [userData]);
+  }, [userData, currentSessionId]);
 
 
 
@@ -1260,6 +1285,8 @@ const Index = () => {
         };
         
         setChatMessages(prev => {
+          const updatedMessages = [...prev, aiMessage];
+          
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           // Auto-speak the AI message and wait for completion
@@ -1267,13 +1294,17 @@ const Index = () => {
           ttsService.speakAIMessage(aiMessage.content, messageId).catch(error => 
             console.error('TTS error for AI message:', error)
           );
-          return [...prev, aiMessage];
+          
+          // Optional: Save AI message to Firebase session and check for summary generation (non-blocking)
+          if (currentSessionId) {
+            adventureSessionService.addChatMessage(currentSessionId, aiMessage);
+            
+            // Check if we should generate a chat summary (every 2 messages)
+            handleSummaryGeneration(currentSessionId, updatedMessages);
+          }
+          
+          return updatedMessages;
         });
-
-        // Optional: Save AI message to Firebase session (non-blocking)
-        if (currentSessionId) {
-          adventureSessionService.addChatMessage(currentSessionId, aiMessage);
-        }
       } catch (error) {
         console.error('Error generating AI response:', error);
         // Show error message to user
@@ -1380,6 +1411,63 @@ const Index = () => {
       autoAssignTopicAndNavigate(path);
     }
   }, [autoAssignTopicAndNavigate]);
+
+  // Handle chat summary generation (every 2 messages)
+  const handleSummaryGeneration = useCallback(async (sessionId: string, currentMessages: ChatMessage[]) => {
+    try {
+      // Get current session data to check summary state
+      const sessionData = await adventureSessionService.getAdventureSession(sessionId);
+      if (!sessionData) {
+        console.warn('No session data found for summary generation');
+        return;
+      }
+
+      // Check if we should generate a summary
+      const shouldGenerate = chatSummaryService.shouldGenerateSummary(
+        currentMessages.length,
+        sessionData.lastSummaryMessageCount
+      );
+
+      if (!shouldGenerate) {
+        return; // Not time for summary yet
+      }
+
+      console.log(`🧠 Generating chat summary (${currentMessages.length} messages total)`);
+
+      // Get recent messages for summarization (typically last 2-4 messages)
+      const messagesToSummarize = currentMessages.slice(-4); // Last 4 messages for context
+      
+      // Get previous summary if it exists
+      const previousSummary = sessionData.chatSummary?.summary;
+      
+      // Generate new summary
+      const newSummaryText = await chatSummaryService.generateChatSummary(
+        messagesToSummarize,
+        previousSummary,
+        { 
+          adventureMode: sessionData.adventureMode,
+          topicId: sessionData.topicId,
+          isInQuestionMode: sessionData.isInQuestionMode
+        }
+      );
+
+      // Create summary object with metadata
+      const summaryObject = chatSummaryService.createSummaryObject(
+        newSummaryText,
+        currentMessages.length,
+        currentMessages[currentMessages.length - 1]?.timestamp || Date.now()
+      );
+
+      // Save summary to Firebase (non-blocking)
+      adventureSessionService.updateChatSummary(sessionId, summaryObject);
+      
+      console.log('✅ Chat summary generated and saved');
+      
+    } catch (error) {
+      console.warn('⚠️ Failed to generate chat summary (continuing normally):', error);
+      // Don't throw - summary generation is non-critical
+    }
+  }, []);
 
   // Save current adventure when user creates significant content
   const saveCurrentAdventure = React.useCallback(async () => {
