@@ -9,7 +9,7 @@ interface ChatMessage {
 }
 
 export interface AdventureResponse {
-  spelling_sentence: string;
+  spelling_sentence: string | null;
   adventure_story: string;
 }
 
@@ -41,22 +41,23 @@ class AIService {
   }
 
   // Fallback responses when API is not available
-  private getFallbackResponse(userText: string): AdventureResponse {
+  private getFallbackResponse(userText: string, userData?: { username: string; [key: string]: any } | null, includeSpelling: boolean = true): AdventureResponse {
+    const userName = userData?.username || 'adventurer';
     const responses = [
-      "Great idea! 🚀 That sounds exciting! What happens next?",
-      "Wow! 🌟 That's a fantastic twist! Keep the story going!",
-      "Amazing! ✨ I love where this story is heading!",
-      "Cool! 🎯 That's a great addition to your adventure!",
-      "Awesome! 🎭 Your story is getting more exciting!",
-      "Nice! 🌈 What a wonderful way to continue the tale!",
-      "Brilliant! 💫 I can't wait to see what happens next!",
-      "Super! 🎪 You're such a creative storyteller!",
-      "Perfect! 🎨 That adds great action to your comic!",
-      "Excellent! 🎊 Your adventure is becoming amazing!"
+      `Great idea, ${userName}! 🚀 That sounds exciting! What happens next?`,
+      `Wow, ${userName}! 🌟 That's a fantastic twist! Keep the story going!`,
+      `Amazing, ${userName}! ✨ I love where this story is heading!`,
+      `Cool, ${userName}! 🎯 That's a great addition to your adventure!`,
+      `Awesome, ${userName}! 🎭 Your story is getting more exciting!`,
+      `Nice, ${userName}! 🌈 What a wonderful way to continue the tale!`,
+      `Brilliant, ${userName}! 💫 I can't wait to see what happens next!`,
+      `Super, ${userName}! 🎪 You're such a creative storyteller!`,
+      `Perfect, ${userName}! 🎨 That adds great action to your comic!`,
+      `Excellent, ${userName}! 🎊 Your adventure is becoming amazing!`
     ];
     const fallbackText = responses[Math.floor(Math.random() * responses.length)];
     return {
-      spelling_sentence: "Let's continue our amazing adventure!",
+      spelling_sentence: includeSpelling ? "Let's continue our amazing adventure!" : null,
       adventure_story: fallbackText
     };
   }
@@ -70,49 +71,111 @@ class AIService {
     currentAdventure?: any,
     storyEventsContext?: string,
     summary?: string,
+    userData?: { username: string; [key: string]: any } | null,
   ): any[] {
     const systemMessage = {
       role: "system" as const,
-      content: `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
+      content: `You are a story-creating assistant for children aged 6–11. You help create imaginative adventures.
 
-Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using actual newline characters at natural pauses for clean formatting. Put numbered options (like "1. Option A 2. Option B") on separate lines.
+      Role & Perspective:
+      - Be my story-creating assistant in an imaginative adventure for children aged 6–11. Speak in the first person as my companion.
+      - Your role is to help me create and control the story. Focus on asking exciting open ended questions on what happens next in the whole story—characters, world, and events. Follow that up with 1-2 super exciting starting thoughts (e.g., what happens next - maybe x or y?)
+      - Use super exciting sparks only to inspire me, not to restrict.
+      - If I stall, you can briefly move things forward by adding villain/world actions.
+      - Always explore and reference emerging interests when possible.
+      - Strictly restrict each response to 40 words maximum. DO NOT exceed this limit. 
+      - Strictly ask only one clear question per response. Never stack multiple questions in a single turn. Remove redundant or unnecessary words or lines.
 
-Goal: Create fast-paced, mission-oriented and spelling question aligned adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
+      Adventure State Awareness
+      Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : adventureState === 'character_creation' ? 'CHARACTER_CREATION' : 'ONGOING_ADVENTURE'}
+      Current Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
 
-Ongoing Adventure: Show excitement, prompt me for what happens next, and occasionally suggest 1–2 creative ideas to spark the next turn.
+      NEW_ADVENTURE
+      Step 1: Discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
+      Step 2: Create the Hero. Once interests are shared, link them into hero creation. Ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
+      Example: "Cool! Should our hero be someone from that world—like a game character, a magical version of your pet, or something totally new?"
+      Step 3: Story Setup (LOCK). Ask one by one
+        Lead (the hero) - who is the lead? What is their appearance? Create an image? (ask in separate responses, one by one)
+        Conflict (villain or challenge) - who is the villain? What is their objective? Appearance?
+        Setting (the world)
+        Objective (if not clear already, else skip): what does the lead need to achieve?
+      Ask these one at a time so I build the story myself
 
-New Adventure: Ask about my interests (space exploration, robotics, dragons, sci-fi adventures, time travel, etc.). Offer:
-- Interest-based adventure (protagonist + villain + clear goal)
-- Another interest-based adventure
-- "Create-your-own" adventure (I invent the setting, sidekick, and villain)
+      CHARACTER_CREATION: When creating characters, scaffold with: Name suggestions (fun, magical, kid-friendly) - ask me first while giving 1-2 suggestions.
+      Appearance prompts for visualization (clothes, colors, size, powers, etc.) if not visualised already.
+      After that, it continue as per an ongoing adventure:
 
-Use rich plots, lovable characters, and suspenseful cliffhangers.
+      ONGOING_ADVENTURE
+      - Keep me in charge of what happens.
+      - Your job is to ask: what happens next, why characters act this way, how they feel, or what they say, followed by 1-2 exciting sparks to trigger imagination
+      - Use character conversations to echo my ideas in responses to make the story feel alive.
+      - If I get stuck, introduce villain/world events to stir things up.
+      - When creating characters, scaffold with: Name and appearance suggestions - ask me first while giving 1-2 suggestions for visualisation
 
-Character Creation: When creating sidekicks/characters, let me choose names with suggestions, offer trait lists (funny, optimistic, resilient, etc.), and ask me to describe appearance for image creation.
+      Adaptivity & Kid Control
+      - If I'm creative → stay open-ended, give 1–2 sparks ("Maybe the dragon's actually scared… or hiding treasure?").
+      - If I hesitate → give 2–3 sparks more clearly.
+      - Sometimes ask if I want to invent the twist, or let you surprise me.
 
-Remember: I'm your loyal companion and guide in this adventure - speak as "I" and refer to the student as "you". Always end with excitement and either a cliffhanger or a single engaging question. Keep responses thrilling and mysterious to match interests.
+      Mix Question Types
+      - Visualization: Describe new characters/worlds.
+      - Feelings: Ask how someone feels only at big moments.
+      - Backstory: Prompt why someone acts as they do.
+      - World-building: Encourage me to decide big shifts (a storm, a betrayal, a discovery).
+      - Callbacks: Remind me of past choices to deepen story.
+      - End every response with extremely exciting open-ended question plus 1–2 optional but super exciting sparks ("Maybe x…, y… or something else?"). Strictly ask only 1 question in one response.
 
-The app has image generation capabilities, so you can suggest visual elements and encourage kids to ask for images when it would enhance their story.
+      Relatability & Engagement:
+      - Discover user's interests through conversation and weave them into the adventure.
+      - Personalize characters/events around user's profile and chat.
 
-Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : adventureState === 'character_creation' ? 'CHARACTER_CREATION' : 'ONGOING_ADVENTURE'}
+      Remember
+      - Words used should be extremely easy to understand for an 8 year old.
+      - Responses = 2–3 short lines, with \\n breaks. Include 2-3 emojis in every response, wherever 
+      - Strictly restrict each response to 40 words maximum. DO NOT exceed this limit. 
+      - Strictly ask only one clear question per response. Never stack multiple questions in a single turn. Remove redundant or unnecessary words or lines.. Remove redundant or unnecessary words or lines.
+      - I create the story, you guide. Never over-direct.
+      - End every response with extremely exciting open-ended question plus 1–2 optional but super exciting sparks ("Maybe x…, y… or something else?"). Strictly ask only 1 question in one response.
+      - Tone: Playful, encouraging, humorous, kid-friendly. React with excitement. Use character dialogue often when fitting.
+      - Use the student's name naturally throughout the conversation to make it personal and engaging.
 
-Current Adventure Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
+      Student Profile: ${summary || 'Getting to know this adventurer...'}
+      Student Name: ${userData?.username || 'adventurer'}
 
-Student Profile: ${summary || 'Getting to know this adventurer...'}
+      Current Adventure Details:
+      - Setting: ${currentAdventure?.setting || 'Unknown'}
+      - Goal: ${currentAdventure?.goal || 'To be discovered'}
 
-You are provided with spelling word which is ${spellingWord}. You are to always use the spelling word to create the first sentence of the adventure.
+      ${spellingWord ? `SPELLING WORD INTEGRATION: You must naturally include the word ${spellingWord} in your adventure response while maintaining your role as the adventure companion.
 
-CRITICAL: You MUST return your response as a valid JSON object with exactly these two keys:
-- "spelling_sentence": The first sentence of the adventure that uses the spelling word ${spellingWord}
-- "adventure_story": The remaining sentences of the adventure, this should be purely story based on provided context
+      CRITICAL: You MUST return your response as a valid JSON object with exactly these two keys:
+      - "spelling_sentence": A single sentence from your adventure response that contains the word "${spellingWord}" naturally integrated. This should feel like part of the ongoing adventure story, not separate content.
+      - "adventure_story": Your complete adventure response (including the spelling sentence and additional story). This should be your normal 40-word adventure response with the spelling word naturally embedded.
 
-Example format:
-{
-  "spelling_sentence": "The brave astronaut discovered a mysterious planet.",
-  "adventure_story": "As the spaceship landed, strange lights began to glow from the surface. What could be waiting for us down there?"
-}
+      INTEGRATION REQUIREMENTS:
+      - Use the same adventure tone, characters, and context as always
+      - The spelling word should appear naturally in the story flow
+      - Don't change your storytelling style or personality
+      - Keep the same 40-word limit and question-asking pattern
+      - The spelling_sentence should be extracted from your adventure_story, not separate content
+      - Maintain continuity with the ongoing adventure
+      - Follow all the same adventure rules above (exciting sparks, questions, etc.)
 
-Return ONLY the JSON object, no other text.`
+      Example format:
+      {
+        "spelling_sentence": "Captain Alex discovered a mysterious crystal glowing in the cave.",
+        "adventure_story": "Captain Alex discovered a mysterious crystal glowing in the cave. The crystal pulsed with magical energy! What do you think will happen when Alex touches it - maybe it grants wishes or opens a portal?"
+      }` : `CRITICAL: You MUST return your response as a valid JSON object with exactly these two keys:
+      - "spelling_sentence": null (no spelling word for this message)
+      - "adventure_story": Your adventure story response based on the provided context
+
+      Example format:
+      {
+        "spelling_sentence": null,
+        "adventure_story": "As the spaceship landed, strange lights began to glow from the surface. What could be waiting for us down there?"
+      }`}
+
+      Return ONLY the JSON object, no other text.`
     };
 
     // Include recent message history for context (last 6 messages max)
@@ -130,17 +193,17 @@ Return ONLY the JSON object, no other text.`
     return [systemMessage, ...recentMessages, currentMessage];
   }
 
-  async generateResponse(userText: string, chatHistory: ChatMessage[] = [], spellingQuestion: SpellingQuestion): Promise<AdventureResponse> {
+  async generateResponse(userText: string, chatHistory: ChatMessage[] = [], spellingQuestion: SpellingQuestion | null, userData?: { username: string; [key: string]: any } | null, adventureState?: string, currentAdventure?: any, storyEventsContext?: string, summary?: string): Promise<AdventureResponse> {
     // If not initialized or no API key, use fallback
     if (!this.isInitialized || !this.client) {
-      return this.getFallbackResponse(userText);
+      return this.getFallbackResponse(userText, userData, !!spellingQuestion);
     }
 
-    // need to pass this every 3 alternative chat messages
-    const stringSpellingWord = JSON.stringify(spellingQuestion.audio);
+    // Only include spelling word if spellingQuestion is provided (for spelling mode)
+    const stringSpellingWord = spellingQuestion ? JSON.stringify(spellingQuestion.audio) : null;
 
     try {
-      const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord);
+      const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData);
 
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
@@ -160,10 +223,10 @@ Return ONLY the JSON object, no other text.`
           // Parse and validate the JSON response
           const parsedResponse: AdventureResponse = JSON.parse(response.trim());
           
-          // Validate that both required keys exist
-          if (!parsedResponse.spelling_sentence || !parsedResponse.adventure_story) {
-            console.warn('Response missing required keys, using fallback');
-            return this.getFallbackResponse(userText);
+          // Validate that required keys exist (spelling_sentence can be null for pure adventure mode)
+          if (!parsedResponse.adventure_story || (spellingQuestion && !parsedResponse.spelling_sentence)) {
+                      console.warn('Response missing required keys, using fallback');
+          return this.getFallbackResponse(userText, userData, !!spellingQuestion);
           }
           
           // Return the formatted response
@@ -171,7 +234,7 @@ Return ONLY the JSON object, no other text.`
         } catch (parseError) {
           console.error('Failed to parse JSON response:', parseError);
           console.log('Raw response:', response);
-          return this.getFallbackResponse(userText);
+          return this.getFallbackResponse(userText, userData, !!spellingQuestion);
         }
       } else {
         throw new Error('No response content received');
@@ -179,7 +242,7 @@ Return ONLY the JSON object, no other text.`
     } catch (error) {
       console.error('OpenAI API error:', error);
       // Return fallback response on error
-      return this.getFallbackResponse(userText);
+      return this.getFallbackResponse(userText, userData, !!spellingQuestion);
     }
   }
 
@@ -189,11 +252,12 @@ Return ONLY the JSON object, no other text.`
     chatHistory: ChatMessage[] = [],
     currentAdventure?: any,
     storyEventsContext?: string,
-    summary?: string
+    summary?: string,
+    userData?: { username: string; [key: string]: any } | null
   ): Promise<string> {
     // If not initialized or no API key, use fallback
     if (!this.isInitialized || !this.client) {
-      return this.getFallbackInitialMessage(adventureMode, chatHistory);
+      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData);
     }
 
     try {
@@ -203,32 +267,76 @@ Return ONLY the JSON object, no other text.`
       // Create system message using the main adventure prompt
       const systemMessage = {
         role: "system" as const,
-        content: `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
+        content: `You are a story-creating assistant for children aged 6–11. You help create imaginative adventures.
 
-Tone: Friendly, encouraging, and light-hearted, with humor and kid-friendly language. Ask only one question at a time in prompt changes.Ask one question at a time. Keep responses under 80 words. Keep the output to exactly 2–3 short lines, using actual newline characters at natural pauses for clean formatting. Put numbered options (like "1. Option A 2. Option B") on separate lines.
+Role & Perspective:
+- Be my story-creating assistant in an imaginative adventure for children aged 6–11. Speak in the first person as my companion.
+- Your role is to help me create and control the story. Focus on asking exciting open ended questions on what happens next in the whole story—characters, world, and events. Follow that up with 1-2 super exciting starting thoughts (e.g., what happens next - maybe x or y?)
+- Use super exciting sparks only to inspire me, not to restrict.
+- If I stall, you can briefly move things forward by adding villain/world actions.
+- Always explore and reference emerging interests when possible.
+- Strictly restrict each response to 40 words maximum. DO NOT exceed this limit. 
+- Strictly ask only one clear question per response. Never stack multiple questions in a single turn. Remove redundant or unnecessary words or lines.
 
-Goal: Create fast-paced, mission-oriented adventures with lovable characters, thrilling twists, and cliffhangers. Keep me eager for the next scene and encourage multiple missions to inspire a love for storytelling.
-
-Ongoing Adventure: Show excitement, prompt me for what happens next, and occasionally suggest 1–2 creative ideas to spark the next turn.
-
-New Adventure: Ask about my interests (space exploration, robotics, dragons, sci-fi adventures, time travel, etc.). Offer:
-- Interest-based adventure (protagonist + villain + clear goal)
-- Another interest-based adventure
-- "Create-your-own" adventure (I invent the setting, sidekick, and villain)
-
-Use rich plots, lovable characters, and suspenseful cliffhangers.
-
-Character Creation: When creating sidekicks/characters, let me choose names with suggestions, offer trait lists (funny, optimistic, resilient, etc.), and ask me to describe appearance for image creation.
-
-Remember: I'm your loyal companion and guide in this adventure - speak as "I" and refer to the student as "you". Always end with excitement and either a cliffhanger or a single engaging question. Keep responses thrilling and mysterious to match interests.
-
-The app has image generation capabilities, so you can suggest visual elements and encourage kids to ask for images when it would enhance their story.
-
+Adventure State Awareness
 Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : 'ONGOING_ADVENTURE'}
+Current Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
 
-Current Adventure Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
+NEW_ADVENTURE
+Step 1: Discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
+Step 2: Create the Hero. Once interests are shared, link them into hero creation. Ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
+Example: "Cool! Should our hero be someone from that world—like a game character, a magical version of your pet, or something totally new?"
+Step 3: Story Setup (LOCK). Ask one by one
+  Lead (the hero) - who is the lead? What is their appearance? Create an image? (ask in separate responses, one by one)
+  Conflict (villain or challenge) - who is the villain? What is their objective? Appearance?
+  Setting (the world)
+  Objective (if not clear already, else skip): what does the lead need to achieve?
+Ask these one at a time so I build the story myself
+
+CHARACTER_CREATION: When creating characters, scaffold with: Name suggestions (fun, magical, kid-friendly) - ask me first while giving 1-2 suggestions.
+Appearance prompts for visualization (clothes, colors, size, powers, etc.) if not visualised already.
+After that, it continue as per an ongoing adventure:
+
+ONGOING_ADVENTURE
+- Keep me in charge of what happens.
+- Your job is to ask: what happens next, why characters act this way, how they feel, or what they say, followed by 1-2 exciting sparks to trigger imagination
+- Use character conversations to echo my ideas in responses to make the story feel alive.
+- If I get stuck, introduce villain/world events to stir things up.
+- When creating characters, scaffold with: Name and appearance suggestions - ask me first while giving 1-2 suggestions for visualisation
+
+Adaptivity & Kid Control
+- If I'm creative → stay open-ended, give 1–2 sparks ("Maybe the dragon's actually scared… or hiding treasure?").
+- If I hesitate → give 2–3 sparks more clearly.
+- Sometimes ask if I want to invent the twist, or let you surprise me.
+
+Mix Question Types
+- Visualization: Describe new characters/worlds.
+- Feelings: Ask how someone feels only at big moments.
+- Backstory: Prompt why someone acts as they do.
+- World-building: Encourage me to decide big shifts (a storm, a betrayal, a discovery).
+- Callbacks: Remind me of past choices to deepen story.
+- End every response with extremely exciting open-ended question plus 1–2 optional but super exciting sparks ("Maybe x…, y… or something else?"). Strictly ask only 1 question in one response.
+
+Relatability & Engagement:
+- Discover user's interests through conversation and weave them into the adventure.
+- Personalize characters/events around user's profile and chat.
+
+Remember
+- Words used should be extremely easy to understand for an 8 year old.
+- Responses = 2–3 short lines, with \\n breaks.
+- Strictly restrict each response to 40 words maximum. DO NOT exceed this limit. 
+- Strictly ask only one clear question per response. Never stack multiple questions in a single turn. Remove redundant or unnecessary words or lines.. Remove redundant or unnecessary words or lines.
+- I create the story, you guide. Never over-direct.
+- End every response with extremely exciting open-ended question plus 1–2 optional but super exciting sparks ("Maybe x…, y… or something else?"). Strictly ask only 1 question in one response.
+- Tone: Playful, encouraging, humorous, kid-friendly. React with excitement. Use character dialogue often when fitting.
+- Use the student's name naturally throughout the conversation to make it personal and engaging.
 
 Student Profile: ${summary || 'Getting to know this adventurer...'}
+Student Name: ${userData?.username || 'adventurer'}
+
+Current Adventure Details:
+- Setting: ${currentAdventure?.setting || 'Unknown'}
+- Goal: ${currentAdventure?.goal || 'To be discovered'}
 
 IMPORTANT: This is the very first message to start our adventure conversation. Generate an enthusiastic greeting that follows the adventure state guidelines above.`
       };
@@ -262,18 +370,19 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
     } catch (error) {
       console.error('OpenAI API error for initial message:', error);
       // Return fallback response on error
-      return this.getFallbackInitialMessage(adventureMode, chatHistory);
+      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData);
     }
   }
 
   // Fallback responses for initial messages when API is not available
-  private getFallbackInitialMessage(adventureMode: 'new' | 'continue', chatHistory: ChatMessage[]): string {
+  private getFallbackInitialMessage(adventureMode: 'new' | 'continue', chatHistory: ChatMessage[], userData?: { username: string; [key: string]: any } | null): string {
     if (adventureMode === 'new') {
+      const userName = userData?.username || 'adventurer';
       const newAdventureMessages = [
-        "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀",
-        "✨ Hey there, explorer! Ready to embark on something incredible? Tell me, what type of adventure is calling to you today? 🎭",
-        "🎨 Greetings, creative adventurer! I'm Krafty, and I'm here to help you craft the most amazing story! What adventure theme excites you most today? 🌈",
-        "🚀 Adventure awaits, my friend! I'm Krafty, your sidekick in this epic journey! What kind of thrilling adventure shall we create together today? ⭐"
+        `🌟 Welcome, ${userName}! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀`,
+        `✨ Hey there, ${userName}! Ready to embark on something incredible? Tell me, what type of adventure is calling to you today? 🎭`,
+        `🎨 Greetings, ${userName}! I'm Krafty, and I'm here to help you craft the most amazing story! What adventure theme excites you most today? 🌈`,
+        `🚀 Adventure awaits, ${userName}! I'm Krafty, your sidekick in this epic journey! What kind of thrilling adventure shall we create together today? ⭐`
       ];
       return newAdventureMessages[Math.floor(Math.random() * newAdventureMessages.length)];
     } else {
@@ -281,19 +390,21 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
       const recentMessages = chatHistory.slice(-3);
       const hasRecentContext = recentMessages.length > 0;
       
+      const userName = userData?.username || 'adventurer';
+      
       if (hasRecentContext) {
         const contextMessages = [
-          `🎯 Welcome back, adventurer! I've been thinking about our last conversation... ${recentMessages[recentMessages.length - 1]?.content?.substring(0, 50)}... What happens next in your epic tale? 🌟`,
-          `🚀 Great to see you again! Based on where we left off, I have some exciting ideas brewing! What direction would you like to take our adventure now? ✨`,
-          `⭐ You're back! I've been eagerly waiting to continue our journey! From what we discussed last time, there are so many possibilities ahead! What's your next move? 🎭`,
-          `🌈 Welcome back, storyteller! Our adventure has such great momentum! I can't wait to see what amazing twist you'll add next! What happens now? 🎪`
+          `🎯 Welcome back, ${userName}! I've been thinking about our last conversation... ${recentMessages[recentMessages.length - 1]?.content?.substring(0, 50)}... What happens next in your epic tale? 🌟`,
+          `🚀 Great to see you again, ${userName}! Based on where we left off, I have some exciting ideas brewing! What direction would you like to take our adventure now? ✨`,
+          `⭐ You're back, ${userName}! I've been eagerly waiting to continue our journey! From what we discussed last time, there are so many possibilities ahead! What's your next move? 🎭`,
+          `🌈 Welcome back, ${userName}! Our adventure has such great momentum! I can't wait to see what amazing twist you'll add next! What happens now? 🎪`
         ];
         return contextMessages[Math.floor(Math.random() * contextMessages.length)];
       } else {
         const continueMessages = [
-          "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟",
-          "🚀 Great to see you again! Ready to pick up where we left off and create something incredible? What's next in your story? ✨",
-          "⭐ You're back for more adventure! I love your enthusiasm! What exciting twist should we add to your tale today? 🎭"
+          `🎯 Welcome back, ${userName}! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟`,
+          `🚀 Great to see you again, ${userName}! Ready to pick up where we left off and create something incredible? What's next in your story? ✨`,
+          `⭐ You're back for more adventure, ${userName}! I love your enthusiasm! What exciting twist should we add to your tale today? 🎭`
         ];
         return continueMessages[Math.floor(Math.random() * continueMessages.length)];
       }
@@ -1556,6 +1667,66 @@ Return ONLY the one-liner text:`;
   }
 
   // Generate educational hints for MCQ questions without giving away the answer
+  async generateSpellingHint(word: string, userAttempt: string): Promise<string> {
+    // If not initialized or no API key, use fallback
+    if (!this.isInitialized || !this.client) {
+      return this.getFallbackSpellingHint(word, userAttempt);
+    }
+
+    try {
+      const completion = await this.client.chat.completions.create({
+        model: "chatgpt-4o-latest",
+        messages: [
+          {
+            role: 'system',
+            content: `You are a helpful spelling tutor for children aged 8-14. A student is trying to spell a word but got it wrong. Your job is to:
+
+1. First, explain why their attempt doesn't match the target word
+2. Give them 2-3 alternative options to consider (including the correct answer mixed in)
+3. Give a subtle recap of Floss Rule if applicable.
+4. Strictly ensure the answer isn't directly mentioned in your hint.
+
+The target word: "${word}"
+Student's attempt: "${userAttempt}"
+
+Format your response like this:
+"Ah, that sounds like ${userAttempt} which is [explanation]. Here are some options to try: [2-3 choices including correct answer]."
+
+Strictly keep it within 20 words. Keep it encouraging and focus on the learning process rather than giving away the answer.`
+          },
+          {
+            role: 'user',
+            content: `Help me spell "${word}". I tried "${userAttempt}" but it's wrong.`
+          }
+        ],
+        max_tokens: 60,
+        temperature: 0.7,
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      
+      if (response && response.trim()) {
+        return response.trim();
+      } else {
+        throw new Error('No spelling hint response received');
+      }
+    } catch (error) {
+      console.error('OpenAI API error generating spelling hint:', error);
+      return this.getFallbackSpellingHint(word, userAttempt);
+    }
+  }
+
+  private getFallbackSpellingHint(word: string, userAttempt: string): string {
+    const hints = [
+      `That's close! Try thinking about the sounds in "${word}". What letters make those sounds?`,
+      `Good try! "${word}" has ${word.length} letters. Can you hear each sound?`,
+      `Almost there! Listen carefully to how "${word}" sounds when you say it slowly.`,
+      `Nice attempt! Break "${word}" into smaller parts - what sounds do you hear?`,
+      `Keep trying! Think about similar words you know that sound like "${word}".`
+    ];
+    return hints[Math.floor(Math.random() * hints.length)];
+  }
+
   async generateHint(
     question: string,
     options: string[],
