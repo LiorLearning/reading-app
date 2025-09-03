@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
+import { aiService } from '@/lib/ai-service';
 import confetti from 'canvas-confetti';
 
 interface WordPart {
@@ -64,6 +65,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [isCorrect, setIsCorrect] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [aiHint, setAiHint] = useState<string>('');
+  const [isGeneratingHint, setIsGeneratingHint] = useState(false);
 
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
@@ -152,6 +155,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const messageId = `spellbox-audio-${targetWord}-${Date.now()}`;
   const isSpeaking = useTTSSpeaking(messageId);
 
+  // Generate AI hint for incorrect spelling
+  const generateAIHint = useCallback(async (incorrectAttempt: string) => {
+    if (!targetWord || !incorrectAttempt) return;
+    
+    setIsGeneratingHint(true);
+    try {
+      const hint = await aiService.generateSpellingHint(targetWord, incorrectAttempt);
+      setAiHint(hint);
+    } catch (error) {
+      console.error('Error generating AI hint:', error);
+      setAiHint(`That's close! Try thinking about the sounds in "${targetWord}". What letters make those sounds?`);
+    } finally {
+      setIsGeneratingHint(false);
+    }
+  }, [targetWord]);
+
   // Confetti celebration function
   const triggerConfetti = useCallback(() => {
     // Create a burst of confetti
@@ -222,12 +241,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           // Enhanced callback includes user answer
           onComplete(true, newAnswer);
         }
+      } else {
+        // Generate AI hint for incorrect answer
+        generateAIHint(newAnswer);
       }
     } else {
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isWordComplete, isWordCorrect, triggerConfetti]);
+  }, [targetWord, onComplete, isWordComplete, isWordCorrect, triggerConfetti, generateAIHint]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
@@ -248,6 +270,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setIsComplete(false);
     setShowHint(false);
     setAttempts(0);
+    setAiHint('');
+    setIsGeneratingHint(false);
   }, [targetWord]);
 
   // Don't render if we don't have the basic requirements, but be more lenient about sentence
@@ -523,33 +547,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
-          {/* Progress indicator ribbon */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px', 
-            marginBottom: '20px',
-            padding: '12px 16px',
-            background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-            borderRadius: '16px',
-            border: '2px solid rgba(99, 102, 241, 0.2)',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.1)',
-            animation: 'bounceIn 0.5s ease-out'
-          }}>
-            <span style={{ fontSize: '24px' }}>✨</span>
-            <span style={{ 
-              fontSize: '16px', 
-              fontWeight: 600, 
-              color: '#4F46E5',
-              fontFamily: 'Quicksand, sans-serif'
-            }}>
-              {correctlySpelledWords === totalBlanks ? 'Amazing job! You spelled it right! 🎉' : 
-               correctlySpelledWords === 0 ? `Let's spell this word together!` : 
-               `Keep going, you're doing great!`}
-            </span>
-          </div>
+          
 
-          {/* Hints for incorrect words */}
+          {/* AI-powered hints for incorrect words */}
           {isComplete && !isCorrect && showHints && (
             <div style={{
               background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
@@ -563,7 +563,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               animation: 'bounceIn 0.5s ease-out',
               boxShadow: '0 4px 12px rgba(251, 146, 60, 0.15)'
             }}>
-              <span style={{ fontSize: '24px' }}>🌟</span>
+              <span style={{ fontSize: '24px' }}>🤖</span>
               <div style={{ 
                 fontSize: '15px', 
                 fontWeight: 500, 
@@ -572,39 +572,34 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 flex: 1,
                 fontFamily: 'Quicksand, sans-serif'
               }}>
-                <strong>Friendly Hint:</strong> {showHint ? `This word has ${targetWord.length} magical letters!` : 'Click the star for a helpful hint!'}
+                {isGeneratingHint ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid #FB923C',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }}></div>
+                    <span>Thinking of a helpful hint...</span>
+                  </div>
+                ) : aiHint ? (
+                  <div>
+                    <strong>AI Tutor:</strong> {aiHint}
+                  </div>
+                ) : (
+                  <div>
+                    <strong>Friendly Hint:</strong> This word has {targetWord.length} magical letters!
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => setShowHint(!showHint)}
-                style={{
-                  background: 'linear-gradient(135deg, #FB923C 0%, #EA580C 100%)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  color: 'white',
-                  boxShadow: '0 4px 8px rgba(251, 146, 60, 0.3)',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.1) rotate(15deg)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
-                }}
-              >
-                ⭐
-              </button>
             </div>
           )}
 
           {/* Action buttons with enhanced styling */}
           <div className="flex justify-center items-center gap-4 mt-8">
+            {/* Skip button commented out - might use later
             <button
               onClick={onSkip}
               className="px-6 py-3 font-semibold text-gray-600 hover:text-gray-800 transition-colors rounded-xl hover:bg-gray-100"
@@ -612,6 +607,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             >
               Skip this one
             </button>
+            */}
             
             {isComplete && !isCorrect && showHints && (
               <button
@@ -620,6 +616,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   setIsCorrect(false);
                   setIsComplete(false);
                   setShowHint(false);
+                  setAiHint('');
                   setAttempts(prev => prev + 1);
                   playClickSound();
                 }}
@@ -685,6 +682,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               }
               100% {
                 transform: translateY(0px);
+              }
+            }
+
+            @keyframes spin {
+              0% {
+                transform: rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg);
               }
             }
 
