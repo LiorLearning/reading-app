@@ -228,8 +228,32 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
               )}
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {savedAdventures.slice().reverse().map((adventure) => { // Reverse to show newest first
+            <div className="overflow-x-auto">
+              <div className="flex gap-4 pb-2" style={{ minWidth: 'max-content' }}>
+                {/* Create New Story Card - positioned first on the left */}
+                <div className="flex-shrink-0" style={{ width: '280px' }}>
+                  <div 
+                    onClick={handleCreateNewStory}
+                    className="group cursor-pointer h-full"
+                  >
+                    <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-purple-400 h-full flex flex-col">
+                      <div className="aspect-video relative flex items-center justify-center">
+                        <div className="text-white text-6xl mb-2">✨</div>
+                      </div>
+                      <div className="p-4 flex-1 flex flex-col justify-center text-center">
+                        <h3 className="font-bold text-xl text-white mb-2">
+                          Create New Story
+                        </h3>
+                        <p className="text-purple-100 text-sm">
+                          Start your adventure
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Adventures */}
+                {savedAdventures.slice().reverse().map((adventure) => { // Reverse to show newest first
                 // Get adventure theme emoji based on name
                 const getAdventureEmoji = (name: string) => {
                   const lowerName = name.toLowerCase();
@@ -265,9 +289,10 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                   <div 
                     key={adventure.id}
                     onClick={() => handleContinueAdventure(adventure.id)}
-                    className="group cursor-pointer"
+                    className="group cursor-pointer flex-shrink-0"
+                    style={{ width: '280px' }}
                   >
-                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-gray-200">
+                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-gray-200 h-full">
                       {adventure.comicPanelImage ? (
                         <div className="aspect-video relative">
                           <img 
@@ -314,6 +339,7 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                   </div>
                 );
               })}
+              </div>
             </div>
             
             {savedAdventures.length === 0 && (
