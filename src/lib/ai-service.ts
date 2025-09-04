@@ -82,24 +82,27 @@ class AIService {
   ): any[] {
     // Generate phase-specific instructions
     const phaseInstructions = spellingWord ? 
-      `🎯 CRITICAL SPELLING CHALLENGE PHASE 🎯
+      `🎯 SPELLING CHALLENGE MODE 🎯
 
-MANDATORY: Include "${spellingWord}" in the FIRST or SECOND sentence ONLY.
+MANDATORY FIRST-SENTENCE RULE: Your FIRST or SECOND sentence MUST contain "${spellingWord}" naturally.
+
+WRITING PATTERN:
+Sentence 1: [Continue story naturally with "${spellingWord}" OR setup for sentence 2]
+Sentence 2: [If not in sentence 1, include "${spellingWord}" here naturally]
+Sentence 3: [Optional - continue adventure, ask question]
+
+EXCELLENT EXAMPLES:
+✅ "The magical ${spellingWord} glows brightly in the cave. What do you want to do with it?"
+✅ "You step forward carefully. A mysterious ${spellingWord} appears in your path, shimmering with power."
+✅ "The dragon roars! Suddenly, you spot a golden ${spellingWord} on the ground."
 
 REQUIREMENTS:
-- The word "${spellingWord}" MUST appear in sentence 1 OR sentence 2
-- Use the exact word (no variations, plurals, or similar words)
-- Write naturally continuing the adventure story
-- Keep response to 2-3 sentences maximum
-- Do NOT create puzzles or ask for spelling
+- "${spellingWord}" must appear in sentence 1 OR 2 (never later!)
+- Use exact spelling: "${spellingWord}" (no variations)
+- Keep it natural and story-appropriate
+- Maximum 3 sentences total
 
-✅ GOOD EXAMPLES:
-- "The magical ${spellingWord} glows before you! What do you do next?"
-- "You continue forward. A mysterious ${spellingWord} appears in your path."
-
-❌ AVOID: Putting "${spellingWord}" in the 3rd+ sentence
-
-TARGET WORD: "${spellingWord}" (must be in sentence 1 or 2)`
+TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       : `You are in CHAT PHASE. Respond naturally to continue the adventure story. Write 2-3 sentences continuing the adventure.`;
 
     // Get adventure-specific details from currentAdventure
@@ -195,11 +198,16 @@ Current Adventure Details:
 
 Current Phase: ${spellingWord ? 'SPELLING CHALLENGE' : 'CHAT PHASE'}
 
-${spellingWord ? `🎯 SPELLING WORD REQUIREMENT: 
-- The word "${spellingWord}" MUST appear in sentence 1 or sentence 2 of your response
-- Use the exact word "${spellingWord}" (no variations, synonyms, or plurals)
-- This is critical for the spelling system to work properly
-- NEVER put the spelling word in sentence 3 or later` : ''}
+${spellingWord ? `🚨 CRITICAL SPELLING REQUIREMENT 🚨
+
+SENTENCE PLACEMENT RULE: The word "${spellingWord}" MUST appear in your FIRST or SECOND sentence ONLY.
+
+❌ WRONG: Putting "${spellingWord}" in sentence 3, 4, or later
+✅ CORRECT: "${spellingWord}" appears in sentence 1 OR sentence 2
+
+This is mandatory for the educational system to function properly. The word "${spellingWord}" must be exactly as written (no variations, synonyms, or plurals).
+
+REMEMBER: First two sentences = ✅ | Later sentences = ❌` : ''}
 
 CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask students to guess words. Simply continue the story naturally and include the target word in your narrative. The spelling practice happens automatically through the system.`
     };
@@ -210,10 +218,14 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
       content: msg.content
     }));
 
-    // Add current user message
+    // Add current user message with spelling context if needed
+    const enhancedUserMessage = spellingWord ? 
+      `[SPELLING MODE: Include "${spellingWord}" in sentence 1 or 2] ${currentUserMessage}` : 
+      currentUserMessage;
+      
     const currentMessage = {
       role: "user" as const,
-      content: currentUserMessage
+      content: enhancedUserMessage
     };
 
     return [systemMessage, ...recentMessages, currentMessage];
@@ -248,9 +260,12 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
         model: "chatgpt-4o-latest",
         messages: messages,
         max_tokens: 500,
-        temperature: 0.8,
+        // Lower temperature for spelling challenges to ensure more consistent instruction following
+        temperature: spellingQuestion ? 0.6 : 0.8,
         presence_penalty: 0.3,
         frequency_penalty: 0.3,
+        // Add stop sequences to prevent overly long responses
+        stop: spellingQuestion ? ['\n\n\n', '###'] : undefined,
       });
 
       const response = completion.choices[0]?.message?.content;
@@ -265,54 +280,23 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
         if (spellingQuestion && spellingQuestion.audio) {
           const spellingWord = spellingQuestion.audio;
           
-          // PRE-PROCESSING: Ensure word is included AND appears in first two sentences
-          const allSentences = adventureText.split(/(?<=[.!?])\s+/).filter(s => s.trim());
-          const firstTwoSentences = allSentences.slice(0, 2).join(' ').trim();
-          const remainingSentences = allSentences.slice(2).join(' ').trim();
-          
-          // Handle edge case where response is very short
-          const textToCheck = allSentences.length < 2 ? adventureText : firstTwoSentences;
-          
-          const wordInText = adventureText.toLowerCase().includes(spellingWord.toLowerCase());
-          const wordInFirstTwo = textToCheck.toLowerCase().includes(spellingWord.toLowerCase());
-          
-          console.log(`🔍 PRE-PROCESSING Check:`);
-          console.log(`   - Total sentences: ${allSentences.length}`);
-          console.log(`   - Word "${spellingWord}" in full text: ${wordInText}`);
-          console.log(`   - Word "${spellingWord}" in first two sentences: ${wordInFirstTwo}`);
-          console.log(`   - Text being checked: "${textToCheck}"`);
-          console.log(`   - First two sentences: "${firstTwoSentences}"`);
-          
-          if (!wordInText || !wordInFirstTwo) {
-            console.log(`🔧 PRE-PROCESSING: Need to inject "${spellingWord}" into first two sentences...`);
+          // PRE-PROCESSING: Ensure word is included before extraction
+          if (!adventureText.toLowerCase().includes(spellingWord.toLowerCase())) {
+            console.log(`🔧 PRE-PROCESSING: AI didn't include "${spellingWord}", injecting it now...`);
             
-            // Create natural injection patterns that work well at the beginning
-            const firstSentencePatterns = [
-              `The ${spellingWord} glows with magical energy!`,
+            // Create natural injection patterns based on common story contexts
+            const naturalPatterns = [
+              `The ${spellingWord} appears before you!`,
               `You notice a ${spellingWord} nearby.`,
-              `A mysterious ${spellingWord} appears before you.`,
-              `The word "${spellingWord}" echoes in the air.`,
-              `You discover a special ${spellingWord} here.`
+              `A magical ${spellingWord} glows softly.`,
+              `The word "${spellingWord}" echoes around you.`,
+              `You discover a ${spellingWord} in the adventure.`
             ];
             
-            const selectedPattern = firstSentencePatterns[Math.floor(Math.random() * firstSentencePatterns.length)];
-            
-            if (!wordInText) {
-              // Word not in text at all - add to beginning
-              adventureText = `${selectedPattern} ${adventureText}`;
-              console.log(`🔧 Word not found - injected at beginning: "${selectedPattern}"`);
-            } else {
-              // Word exists but not in first two sentences - move it forward
-              // Remove the word from later sentences and add to beginning
-              const wordRegex = new RegExp(`\\b${spellingWord}\\b`, 'gi');
-              const cleanedLaterText = remainingSentences.replace(wordRegex, 'it');
-              adventureText = `${selectedPattern} ${firstTwoSentences} ${cleanedLaterText}`;
-              console.log(`🔧 Word found later - moved to beginning: "${selectedPattern}"`);
-            }
-            
-            console.log(`🔧 Final enhanced response: "${adventureText}"`);
-          } else {
-            console.log(`✅ Word "${spellingWord}" already in first two sentences - no changes needed`);
+            const selectedPattern = naturalPatterns[Math.floor(Math.random() * naturalPatterns.length)];
+            adventureText = `${selectedPattern} ${adventureText}`;
+            console.log(`🔧 Enhanced response with pattern: "${selectedPattern}"`);
+            console.log(`🔧 Full enhanced response: "${adventureText}"`);
           }
           
           console.log(`🔍 Extracting spelling sentence for word: "${spellingWord}" from: "${adventureText}"`);
