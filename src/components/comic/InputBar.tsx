@@ -22,6 +22,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const audioChunksRef = useRef<Blob[]>([]);
   const [useWhisper, setUseWhisper] = useState(false);
   const isCancelledRef = useRef(false);
+  const pendingActionRef = useRef<'send' | 'image' | null>(null);
   
   // Initialize OpenAI client for Whisper
   const openaiClient = React.useMemo(() => {
@@ -96,37 +97,57 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         mediaRecorder.onstop = async () => {
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
           
+          // Stop all tracks first
+          stream.getTracks().forEach(track => track.stop());
+          
           // Check if recording was cancelled
           if (isCancelledRef.current) {
-            // Stop all tracks and exit without processing
-            stream.getTracks().forEach(track => track.stop());
             setIsMicActive(false);
+            setText(""); // Clear any partial text
             return;
           }
           
           try {
             const transcription = await transcribeWithWhisper(audioBlob);
             
-            // Auto-send the transcription if it's not empty
             if (transcription && transcription.trim()) {
-              // Pause any currently playing TTS when user sends a message via voice
-              ttsService.stop();
-              setIsSubmitting(true);
-              onGenerate(transcription.trim());
-              setText("");
-              setIsSubmitting(false);
+              console.log('Whisper transcription completed:', transcription.trim());
+              
+              // Check if there's a pending action to execute
+              if (pendingActionRef.current === 'send') {
+                // Send transcription directly
+                pendingActionRef.current = null;
+                setIsMicActive(false);
+                ttsService.stop();
+                onGenerate(transcription.trim());
+                setText("");
+              } else if (pendingActionRef.current === 'image') {
+                // Send as create image request directly
+                pendingActionRef.current = null;
+                setIsMicActive(false);
+                ttsService.stop();
+                onGenerate(`create image: ${transcription.trim()}`);
+                setText("");
+              } else {
+                // Normal behavior: set text for user to choose action
+                setText(transcription.trim());
+                setIsMicActive(false);
+              }
             } else {
-              setText(transcription);
+              setIsMicActive(false);
             }
           } catch (error) {
+            console.error('Whisper transcription failed:', error);
             toast.error("Failed to transcribe audio. Using browser speech recognition as fallback.");
-            // Fallback to browser speech recognition
-            startBrowserSpeechRecognition();
+            
+            // Stop current recording state and fallback to browser recognition
+            setIsMicActive(false);
+            
+            // Small delay to ensure state is updated before starting fallback
+            setTimeout(() => {
+              startBrowserSpeechRecognition();
+            }, 100);
           }
-
-          // Stop all tracks
-          stream.getTracks().forEach(track => track.stop());
-          setIsMicActive(false);
         };
 
         mediaRecorder.start();
@@ -137,7 +158,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         console.error('Error accessing microphone:', error);
         toast.error("Microphone access denied. Please allow microphone access.");
       });
-  }, [transcribeWithWhisper]);
+  }, [transcribeWithWhisper, onGenerate]);
 
   // Browser speech recognition fallback
   const startBrowserSpeechRecognition = useCallback(() => {
@@ -187,18 +208,34 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     };
     
     rec.onend = () => {
-      if (isMicActive) {
-        setIsMicActive(false);
+      // Always stop the recording state first
+      setIsMicActive(false);
+      
+      // Handle final transcript - either execute pending action or set text
+      if (finalTranscriptText && finalTranscriptText.trim() && !isCancelledRef.current) {
+        console.log('Browser speech recognition completed:', finalTranscriptText.trim());
         
-        // Auto-send the final transcript if it's not empty AND not cancelled
-        if (finalTranscriptText && finalTranscriptText.trim() && !isCancelledRef.current) {
-          // Pause any currently playing TTS when user sends a message via voice
+        // Check if there's a pending action to execute
+        if (pendingActionRef.current === 'send') {
+          // Send transcription directly
+          pendingActionRef.current = null;
           ttsService.stop();
-          setIsSubmitting(true);
           onGenerate(finalTranscriptText.trim());
           setText("");
-          setIsSubmitting(false);
+        } else if (pendingActionRef.current === 'image') {
+          // Send as create image request directly
+          pendingActionRef.current = null;
+          ttsService.stop();
+          onGenerate(`create image: ${finalTranscriptText.trim()}`);
+          setText("");
+        } else {
+          // Normal behavior: set text for user to choose action
+          setText(finalTranscriptText.trim());
         }
+      } else if (isCancelledRef.current) {
+        console.log('Speech recognition cancelled');
+        pendingActionRef.current = null; // Clear any pending action
+        setText(""); // Clear any partial text if cancelled
       }
     };
     
@@ -213,19 +250,23 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     ttsService.stop();
     
     if (isMicActive) {
-      // Stop recording manually - user clicked cancel
+      // Stop recording manually - user clicked to stop (not cancel)
       if (useWhisper && mediaRecorderRef.current) {
+        // Let the recording finish naturally and process the transcription
         mediaRecorderRef.current.stop();
         mediaRecorderRef.current = null;
       } else if (recognitionRef.current) {
+        // Let browser recognition finish naturally and process the transcription  
         recognitionRef.current.stop();
         recognitionRef.current = null;
       }
-      setIsMicActive(false);
-      setIsSubmitting(false);
+      // Don't set isMicActive to false here - let the onend/onstop handlers do it
       return;
     }
 
+    // Clear any existing text before starting new recording
+    setText("");
+    
     // Use Whisper if available, otherwise fallback to browser speech recognition
     if (useWhisper && openaiClient) {
       startWhisperRecording();
@@ -234,31 +275,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     }
   }, [isMicActive, isSubmitting, useWhisper, openaiClient, startWhisperRecording, startBrowserSpeechRecognition]);
 
-  // New function to handle sending the recorded audio
-  const handleSendRecording = useCallback(() => {
-    playClickSound();
-    
-    // Immediately hide the waveform visualizer
-    setIsMicActive(false);
-    
-    if (useWhisper && mediaRecorderRef.current) {
-      // Stop Whisper recording and process
-      mediaRecorderRef.current.stop();
-    } else if (recognitionRef.current) {
-      // Stop browser speech recognition and process
-      recognitionRef.current.stop();
-    }
-    
-    // The actual processing and sending will happen in the respective onStop handlers
-    // which already have the auto-send logic
-  }, [useWhisper]);
 
-  // New function to handle canceling the recording
+  // Function to handle canceling the recording
   const handleCancelRecording = useCallback(() => {
     playClickSound();
     
     // Set cancelled flag to prevent auto-sending
     isCancelledRef.current = true;
+    pendingActionRef.current = null; // Clear any pending action
     
     if (useWhisper && mediaRecorderRef.current) {
       // Stop Whisper recording without processing
@@ -280,6 +304,42 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     setIsMicActive(false);
     setIsSubmitting(false);
     setText(""); // Clear any partial text
+  }, [useWhisper]);
+
+  // Function to handle send button during recording
+  const handleSendDuringRecording = useCallback(() => {
+    playClickSound();
+    console.log('Send button clicked during recording - stopping and sending...');
+    
+    // Set pending action to send
+    pendingActionRef.current = 'send';
+    
+    // Stop recording and let transcription handler do the sending
+    if (useWhisper && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    } else if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+  }, [useWhisper]);
+
+  // Function to handle create image button during recording
+  const handleImageDuringRecording = useCallback(() => {
+    playClickSound();
+    console.log('Create image button clicked during recording - stopping and sending as image...');
+    
+    // Set pending action to image
+    pendingActionRef.current = 'image';
+    
+    // Stop recording and let transcription handler do the sending
+    if (useWhisper && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    } else if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
   }, [useWhisper]);
 
   const submit = useCallback(
@@ -315,29 +375,17 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     <section aria-label="Create next panel" className="bg-transparent">
       <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
         {isMicActive ? (
-          // Recording state: Show Send and Cancel buttons
-          <>
-            <Button
-              type="button"
-              variant="comic"
-              size="icon"
-              onClick={handleSendRecording}
-              aria-label="Send recording"
-              className="flex-shrink-0 btn-animate bg-green-500 hover:bg-green-600 text-white border-green-500"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-            <Button
-              type="button"
-              variant="comic"
-              size="icon"
-              onClick={handleCancelRecording}
-              aria-label="Cancel recording"
-              className="flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </>
+          // Recording state: Show only Cancel button
+          <Button
+            type="button"
+            variant="comic"
+            size="icon"
+            onClick={handleCancelRecording}
+            aria-label="Cancel recording"
+            className="flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
+          >
+            <X className="h-5 w-5" />
+          </Button>
         ) : (
           // Normal state: Show Mic button
           <Button
@@ -366,24 +414,53 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           type="button"
           variant="outline"
           size="icon"
+          disabled={!text.trim() && !isMicActive}
           onClick={() => {
-            if (!text.trim()) {
-              toast.error("Please write something first before generating an image.");
-              return;
+            if (isMicActive) {
+              // During recording: stop and send as image
+              handleImageDuringRecording();
+            } else {
+              // Normal mode: check text and send as image
+              if (!text.trim()) {
+                toast.error("Please write something first before generating an image.");
+                return;
+              }
+              playClickSound();
+              ttsService.stop();
+              onGenerate(`create image: ${text.trim()}`);
+              setText("");
             }
-            playClickSound();
-            // Pause any currently playing TTS when user generates an image
-            ttsService.stop();
-            onGenerate(`create image: ${text.trim()}`);
-            setText("");
           }}
-          aria-label="Generate new image"
-          className="h-10 w-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 backdrop-blur-sm transition-all duration-300 relative overflow-hidden group"
+          aria-label={isMicActive ? "Stop recording and generate image" : "Generate new image"}
+          className={cn(
+            "h-10 w-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 backdrop-blur-sm transition-all duration-300 relative overflow-hidden group",
+            (!text.trim() && !isMicActive) && "opacity-50 cursor-not-allowed hover:scale-100"
+          )}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <ImageIcon className="h-4 w-4 relative z-10 drop-shadow-sm" />
         </Button>
-        <Button type="submit" variant="outline" size="icon" className="h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm">
+        <Button 
+          type="button"
+          variant="outline" 
+          size="icon" 
+          disabled={!text.trim() && !isMicActive}
+          onClick={(e) => {
+            if (isMicActive) {
+              // During recording: stop and send directly
+              e.preventDefault();
+              handleSendDuringRecording();
+            } else {
+              // Normal mode: use regular submit logic
+              submit(e);
+            }
+          }}
+          aria-label={isMicActive ? "Stop recording and send" : "Send message"}
+          className={cn(
+            "h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm",
+            (!text.trim() && !isMicActive) && "opacity-50 cursor-not-allowed"
+          )}
+        >
           <Send className="h-4 w-4" />
         </Button>
       </form>
