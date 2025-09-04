@@ -2397,7 +2397,7 @@ const Index = () => {
   }, [setChatMessages]);
 
   return (
-    <div className="h-screen bg-pattern flex flex-col overflow-hidden">
+    <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -3068,14 +3068,11 @@ const Index = () => {
               </div>
             )}
             
-            {/* Wrapper for both background and content to scale together */}
+            {/* Full-height content container */}
             <div 
-              className="relative responsive-max-width mx-auto my-4 flex-shrink-0"
+              className="relative flex-1 min-h-0 w-full"
               style={{ 
-                width: '95%', // 5% reduction from full width
-                maxWidth: '1520px',
-                aspectRatio: getAspectRatio,
-                minHeight: '500px',
+                padding: '8px',
                 transition: 'all 0.3s ease-in-out'
               }}
             >
@@ -3094,12 +3091,9 @@ const Index = () => {
                 ref={containerRef}
                 className="flex relative z-10 h-full w-full"
                 style={{ 
-                  paddingTop: '8px',
-                  paddingBottom: '8px',
-                  paddingLeft: '8px',
-                  paddingRight: '8px'
+                  padding: '8px'
                 }}
-            >
+              >
               {/* Main Comic Panel - Center */}
               <section 
                 aria-label="Main comic panel" 

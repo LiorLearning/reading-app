@@ -236,10 +236,11 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
               <img 
                 src={currentImage} 
                 alt="Current comic scene" 
-                className="max-w-full max-h-full"
+                className="max-w-full max-h-full transition-opacity duration-300"
                 loading="lazy"
                 style={{
-                  filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                  filter: 'brightness(1.05) contrast(1.1) saturate(1.1)',
+                  opacity: showSpellBox ? 0.25 : 1
                 }}
               />
             </div>

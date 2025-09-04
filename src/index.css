@@ -540,8 +540,41 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html, body {
+    height: 100%;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent page-level scrolling */
+  }
+
   body {
     @apply bg-background text-foreground font-kids;
+  }
+
+  #root {
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Safe area support for notched devices */
+  @supports (padding: max(0px)) {
+    html, body, #root {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+
+  /* Mobile keyboard handling */
+  @supports (height: 100dvh) {
+    .mobile-keyboard-aware {
+      height: 100dvh;
+      height: 100svh; /* Small viewport height - excludes keyboard */
+    }
   }
 }
 
@@ -684,6 +717,27 @@ All colors MUST be HSL.
     50% {
       transform: scale(1.1);
       box-shadow: 0 5px 0 black;
+    }
+  }
+
+  /* Full-screen responsive utilities */
+  .fullscreen-container {
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Mobile-first responsive layout */
+  @media (max-width: 768px) {
+    .mobile-stack {
+      flex-direction: column;
+    }
+    
+    .mobile-full-width {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
     }
   }
 

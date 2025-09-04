@@ -15,20 +15,22 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <CameraWidget />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={
-              <AuthGuard>
-                <Index />
-              </AuthGuard>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <div className="h-full w-full overflow-hidden">
+          <Toaster />
+          <Sonner />
+          <CameraWidget />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <AuthGuard>
+                  <Index />
+                </AuthGuard>
+              } />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
