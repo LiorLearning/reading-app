@@ -11,9 +11,10 @@ import { ttsService } from "@/lib/tts-service";
 interface InputBarProps {
   onGenerate: (text: string) => void;
   onGenerateImage: () => void;
+  onAddMessage: (message: { type: 'user' | 'ai'; content: string; timestamp: number }) => void;
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage, onAddMessage }) => {
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -311,6 +312,13 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     playClickSound();
     console.log('Send button clicked during recording - stopping and sending...');
     
+    // Immediately add "transcribing..." message for instant feedback
+    onAddMessage({
+      type: 'user',
+      content: 'Transcribing...',
+      timestamp: Date.now()
+    });
+    
     // Set pending action to send
     pendingActionRef.current = 'send';
     
@@ -322,12 +330,19 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
-  }, [useWhisper]);
+  }, [useWhisper, onAddMessage]);
 
   // Function to handle create image button during recording
   const handleImageDuringRecording = useCallback(() => {
     playClickSound();
     console.log('Create image button clicked during recording - stopping and sending as image...');
+    
+    // Immediately add "transcribing..." message for instant feedback
+    onAddMessage({
+      type: 'user',
+      content: 'Transcribing...',
+      timestamp: Date.now()
+    });
     
     // Set pending action to image
     pendingActionRef.current = 'image';
@@ -340,7 +355,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
-  }, [useWhisper]);
+  }, [useWhisper, onAddMessage]);
 
   const submit = useCallback(
     (e?: React.FormEvent) => {

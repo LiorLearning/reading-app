@@ -20,6 +20,7 @@ interface MessengerChatProps {
   onGenerate: (text: string) => void;
   onGenerateImage: () => void;
   onExpandChat: () => void; // Function to expand chat to full panel
+  onAddMessage: (message: { type: 'user' | 'ai'; content: string; timestamp: number }) => void;
 }
 
 // Component for individual speaker button
@@ -56,7 +57,7 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
   );
 };
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat }) => {
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat, onAddMessage }) => {
   const [isHidden, setIsHidden] = useState(true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [text, setText] = useState("");
@@ -199,6 +200,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   const handleSendRecording = useCallback(() => {
     playClickSound();
     
+    // Immediately add "transcribing..." message for instant feedback
+    onAddMessage({
+      type: 'user',
+      content: 'transcribing...',
+      timestamp: Date.now()
+    });
+    
     if (recognitionRef.current) {
       // Stop browser speech recognition and process
       recognitionRef.current.stop();
@@ -215,7 +223,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
       onGenerate(text.trim());
       setText("");
     }
-  }, [text, onGenerate]);
+  }, [text, onGenerate, onAddMessage]);
 
   // New function to handle canceling the recording
   const handleCancelRecording = useCallback(() => {

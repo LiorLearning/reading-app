@@ -938,9 +938,20 @@ const Index = () => {
           }
     }, [addPanel, images, chatMessages, currentAdventureId, isExplicitImageRequest]);
 
+  // Add message directly to chat (for immediate feedback during transcription)
+  const onAddMessage = useCallback((message: { type: 'user' | 'ai'; content: string; timestamp: number }) => {
+    setChatMessages(prev => [...prev, message]);
+  }, []);
+
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
+      
+      // Check if the last message is "transcribing..." and replace it with actual transcription
+      const lastMessage = chatMessages[chatMessages.length - 1];
+      const shouldReplaceTranscribingMessage = lastMessage && 
+        lastMessage.type === 'user' && 
+        lastMessage.content === 'transcribing...';
       
       // NEW: Try unified AI system first (if available and ready)
       console.log('🔧 Unified system check:', {
@@ -1044,7 +1055,7 @@ const Index = () => {
             
             // 🛠️ CRITICAL FIX: For image requests, only accept responses that actually contain images
             if (unifiedResponse.hasImages && unifiedResponse.imageUrls.length > 0) {
-              // Add user message
+              // Add or replace user message
               const userMessage: ChatMessage = {
                 type: 'user',
                 content: text,
@@ -1059,14 +1070,28 @@ const Index = () => {
               };
               
               setChatMessages(prev => {
-                setLastMessageCount(prev.length + 2);
-                playMessageSound();
-                
-                // Auto-speak the AI message
-                const messageId = `index-chat-${aiMessage.timestamp}-${prev.length + 1}`;
-                ttsService.speakAIMessage(aiMessage.content, messageId);
-                
-                return [...prev, userMessage, aiMessage];
+                if (shouldReplaceTranscribingMessage) {
+                  // Replace the last "transcribing..." message with actual content
+                  const newMessages = [...prev.slice(0, -1), userMessage, aiMessage];
+                  setLastMessageCount(newMessages.length);
+                  playMessageSound();
+                  
+                  // Auto-speak the AI message
+                  const messageId = `index-chat-${aiMessage.timestamp}-${newMessages.length - 1}`;
+                  ttsService.speakAIMessage(aiMessage.content, messageId);
+                  
+                  return newMessages;
+                } else {
+                  // Normal flow - add both messages
+                  setLastMessageCount(prev.length + 2);
+                  playMessageSound();
+                  
+                  // Auto-speak the AI message
+                  const messageId = `index-chat-${aiMessage.timestamp}-${prev.length + 1}`;
+                  ttsService.speakAIMessage(aiMessage.content, messageId);
+                  
+                  return [...prev, userMessage, aiMessage];
+                }
               });
               
               // Save updated adventure
@@ -1107,11 +1132,20 @@ const Index = () => {
         timestamp: Date.now()
       };
       
-      // Add user message immediately with sound
+      // Add user message immediately with sound (or replace transcribing message)
       setChatMessages(prev => {
-        setLastMessageCount(prev.length + 1);
-        playMessageSound();
-        return [...prev, userMessage];
+        if (shouldReplaceTranscribingMessage) {
+          // Replace the last "transcribing..." message with actual content
+          const newMessages = [...prev.slice(0, -1), userMessage];
+          setLastMessageCount(newMessages.length);
+          playMessageSound();
+          return newMessages;
+        } else {
+          // Normal flow - add user message
+          setLastMessageCount(prev.length + 1);
+          playMessageSound();
+          return [...prev, userMessage];
+        }
       });
 
       // Optional: Save user message to Firebase session (non-blocking)
@@ -3280,7 +3314,7 @@ const Index = () => {
           </div>
         )}
                         
-                        <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
+                        <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
                       </div>
                     </>
                   )}
@@ -3469,6 +3503,7 @@ const Index = () => {
             messages={chatMessages} 
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
+            onAddMessage={onAddMessage}
             onExpandChat={() => {
               playClickSound();
               setSidebarCollapsed(false);
