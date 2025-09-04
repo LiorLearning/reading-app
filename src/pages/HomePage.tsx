@@ -167,64 +167,65 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
       <div className="max-w-4xl mx-auto w-full space-y-8">
         
         {/* Your Adventures Section */}
-        {savedAdventures.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-2xl">🎯</span>
-              <h2 className="text-2xl font-bold text-gray-800">Your Adventures</h2>
+        <section>
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-2xl">🎯</span>
+            <h2 className="text-2xl font-bold text-gray-800">Your Adventures</h2>
+            {savedAdventures.length > 0 && (
               <span className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm font-medium">
                 {savedAdventures.length}
               </span>
-              {userProgress && userProgress.totalTopicsCompleted > 0 && (
-                <span className="bg-emerald-500 text-white px-2 py-1 rounded-full text-sm font-medium ml-2">
-                  {userProgress.totalTopicsCompleted} topics mastered ⭐
-                </span>
-              )}
-            </div>
-            
-            <div className="overflow-x-auto">
-              <div className="flex gap-4 pb-2" style={{ minWidth: 'max-content' }}>
-                {/* Create New Story Card - positioned first on the left */}
-                <div className="flex-shrink-0" style={{ width: '280px' }}>
-                  <div 
-                    onClick={handleCreateNewStory}
-                    className="group cursor-pointer h-full"
-                  >
-                    <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-purple-400 h-full flex flex-col">
-                      <div className="aspect-video relative flex items-center justify-center">
-                        <div className="text-white text-6xl mb-2">✨</div>
+            )}
+            {userProgress && userProgress.totalTopicsCompleted > 0 && (
+              <span className="bg-emerald-500 text-white px-2 py-1 rounded-full text-sm font-medium ml-2">
+                {userProgress.totalTopicsCompleted} topics mastered ⭐
+              </span>
+            )}
+          </div>
+          
+          <div className="overflow-x-auto">
+            <div className="flex gap-4 pb-2" style={{ minWidth: 'max-content' }}>
+              {/* Create New Story Card - always positioned first on the left */}
+              <div className="flex-shrink-0" style={{ width: '280px' }}>
+                <div 
+                  onClick={handleCreateNewStory}
+                  className="group cursor-pointer h-full"
+                >
+                  <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-purple-400 h-full flex flex-col">
+                    <div className="aspect-video relative flex items-center justify-center">
+                      <div className="text-white text-6xl mb-2">✨</div>
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col justify-center text-center">
+                      <div className="mb-3">
+                        <Plus className="h-8 w-8 mx-auto mb-2 text-white" />
+                        <Sparkles className="h-5 w-5 mx-auto text-white" />
                       </div>
-                      <div className="p-4 flex-1 flex flex-col justify-center text-center">
-                        <div className="mb-3">
-                          <Plus className="h-8 w-8 mx-auto mb-2 text-white" />
-                          <Sparkles className="h-5 w-5 mx-auto text-white" />
-                        </div>
-                        <h3 className="font-bold text-xl text-white mb-2">
-                          Start New Adventure
-                        </h3>
-                        <p className="text-purple-100 text-sm mb-1">
-                          Begin a fresh new adventure
+                      <h3 className="font-bold text-xl text-white mb-2">
+                        Start New Adventure
+                      </h3>
+                      <p className="text-purple-100 text-sm mb-1">
+                        Begin a fresh new adventure
+                      </p>
+                      {selectedTopicFromPreference ? (
+                        <p className="text-purple-200 text-xs">
+                          Ready with topic: {selectedTopicFromPreference} ✨
                         </p>
-                        {selectedTopicFromPreference ? (
-                          <p className="text-purple-200 text-xs">
-                            Ready with topic: {selectedTopicFromPreference} ✨
-                          </p>
-                        ) : nextTopicId ? (
-                          <p className="text-purple-200 text-xs">
-                            Ready for your next topic!
-                          </p>
-                        ) : (
-                          <p className="text-purple-200 text-xs">
-                            Choose your topic to begin
-                          </p>
-                        )}
-                      </div>
+                      ) : nextTopicId ? (
+                        <p className="text-purple-200 text-xs">
+                          Ready for your next topic!
+                        </p>
+                      ) : (
+                        <p className="text-purple-200 text-xs">
+                          Choose your topic to begin
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
-                
-                {/* Adventures */}
-                {savedAdventures.slice().reverse().map((adventure) => { // Reverse to show newest first
+              </div>
+              
+              {/* Show existing adventures if any */}
+              {savedAdventures.length > 0 && savedAdventures.slice().reverse().map((adventure) => { // Reverse to show newest first
                 // Get adventure theme emoji based on name
                 const getAdventureEmoji = (name: string) => {
                   const lowerName = name.toLowerCase();
@@ -310,18 +311,18 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                   </div>
                 );
               })}
-              </div>
             </div>
-            
-            {savedAdventures.length === 0 && (
-              <div className="text-center py-12">
-                <span className="text-6xl mb-4 block">📖</span>
-                <h3 className="text-xl font-bold text-gray-700 mb-2">No Adventures Yet</h3>
-                <p className="text-gray-500">Start your first adventure to see it here!</p>
-              </div>
-            )}
-          </section>
-        )}
+          </div>
+          
+          {/* Show encouraging message for new users */}
+          {savedAdventures.length === 0 && (
+            <div className="text-center py-8">
+              <span className="text-4xl mb-3 block">🌟</span>
+              <h3 className="text-lg font-bold text-gray-700 mb-2">Start Your First Adventure!</h3>
+              <p className="text-gray-500 text-sm">Click the purple card above to begin your reading journey.</p>
+            </div>
+          )}
+        </section>
 
         {/* Top Picks of the Week Section */}
         <section>
