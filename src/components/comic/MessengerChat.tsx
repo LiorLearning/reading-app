@@ -62,11 +62,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [showMessages, setShowMessages] = useState(false);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const recognitionRef = useRef<any | null>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isCancelledRef = useRef(false);
+  const optimisticMessageRef = useRef<string | null>(null);
 
   // No need for message count or scroll management in hover chatbox
 
@@ -181,6 +183,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
       toast.error("Microphone error – please try again.");
       setIsMicActive(false);
       setIsSubmitting(false); // Reset submitting flag on error
+      setIsTranscribing(false);
+      
+      // Handle optimistic message error
+      if (optimisticMessageRef.current) {
+        onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:Microphone error occurred`);
+        optimisticMessageRef.current = null;
+      }
     };
     
     rec.onend = () => {
@@ -188,6 +197,20 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
       if (isMicActive) {
         setIsMicActive(false);
         setIsSubmitting(false); // Reset submitting flag when recording ends
+      }
+      setIsTranscribing(false);
+      
+      // Handle optimistic message update if we have one pending
+      if (optimisticMessageRef.current && !isCancelledRef.current) {
+        const currentText = text.trim();
+        if (currentText) {
+          console.log('MessengerChat: Updating optimistic message with final transcript:', currentText);
+          onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:${currentText}`);
+        } else {
+          console.log('MessengerChat: No transcript available for optimistic message');
+          onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:Unable to transcribe audio`);
+        }
+        optimisticMessageRef.current = null;
       }
     };
     
@@ -199,21 +222,35 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   const handleSendRecording = useCallback(() => {
     playClickSound();
     
-    if (recognitionRef.current) {
-      // Stop browser speech recognition and process
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-    }
-    
-    // Immediately send the current transcribed text
-    setIsMicActive(false);
-    
+    // If we have transcribed text, send it immediately
     if (text.trim()) {
       // Pause any currently playing TTS when user sends a message
       ttsService.stop();
-      
       onGenerate(text.trim());
       setText("");
+      setIsMicActive(false);
+      return;
+    }
+    
+    // If no transcribed text yet, show optimistic UI
+    setIsTranscribing(true);
+    
+    // Generate unique ID for optimistic message
+    const optimisticId = `messenger_optimistic_${Date.now()}`;
+    optimisticMessageRef.current = optimisticId;
+    
+    // Send optimistic message immediately
+    console.log('MessengerChat: Sending optimistic message with ID:', optimisticId);
+    onGenerate(`__OPTIMISTIC__:${optimisticId}:🎤 Transcribing audio...`);
+    
+    // Clear text and stop recording - the onend handler will update the optimistic message
+    setText("");
+    setIsMicActive(false);
+    
+    if (recognitionRef.current) {
+      // Stop browser speech recognition and let onend handler process the result
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
     }
   }, [text, onGenerate]);
 
@@ -224,6 +261,13 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     // Set cancelled flag to prevent processing
     isCancelledRef.current = true;
     
+    // Clear optimistic message if it exists
+    if (optimisticMessageRef.current) {
+      console.log('MessengerChat: Cancelling optimistic message:', optimisticMessageRef.current);
+      onGenerate(`__CANCEL_OPTIMISTIC__:${optimisticMessageRef.current}`);
+      optimisticMessageRef.current = null;
+    }
+    
     if (recognitionRef.current) {
       // Stop browser speech recognition without processing
       recognitionRef.current.abort(); // Use abort instead of stop to cancel
@@ -232,8 +276,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
     
     setIsMicActive(false);
     setIsSubmitting(false);
+    setIsTranscribing(false);
     setText(""); // Clear any partial text
-  }, []);
+  }, [onGenerate]);
 
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -419,6 +464,18 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                     <X className="h-4 w-4" />
                   </Button>
                 </>
+              ) : isTranscribing ? (
+                // Transcribing state: Show Cancel button only
+                <Button
+                  type="button"
+                  variant="comic"
+                  size="icon"
+                  onClick={handleCancelRecording}
+                  aria-label="Cancel transcription"
+                  className="h-9 w-9 flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               ) : (
                 // Normal state: Show Mic button
                 <Button
@@ -437,6 +494,12 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               <div className="flex-1">
                 {isMicActive ? (
                   <WaveformVisualizer />
+                ) : isTranscribing ? (
+                  // Transcription loading state
+                  <div className="rounded-xl border border-blue-200 w-full bg-blue-50 text-sm h-9 flex items-center justify-center gap-2 px-3">
+                    <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-blue-600 font-medium">Transcribing...</span>
+                  </div>
                 ) : (
                   <Input
                     aria-label="What happens next?"
@@ -449,7 +512,16 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
               </div>
               
               {/* Send Button */}
-              <Button type="submit" variant="outline" size="icon" className="h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate">
+              <Button 
+                type="submit" 
+                variant="outline" 
+                size="icon" 
+                disabled={isTranscribing}
+                className={cn(
+                  "h-9 w-9 border border-foreground/30 bg-white hover:border-foreground/60 flex-shrink-0 btn-animate",
+                  isTranscribing && "opacity-75 cursor-wait"
+                )}
+              >
                 <Send className="h-4 w-4" />
               </Button>
               
@@ -458,7 +530,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                 type="button"
                 variant="outline"
                 size="icon"
+                disabled={isTranscribing}
                 onClick={() => {
+                  if (isTranscribing) return;
                   if (!text.trim()) {
                     toast.error("Please write something first before generating an image.");
                     return;
@@ -469,8 +543,11 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                   onGenerate(`create image: ${text.trim()}`);
                   setText("");
                 }}
-                aria-label="Generate new image"
-                className="h-9 w-9 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 transition-all duration-300 relative overflow-hidden group"
+                aria-label={isTranscribing ? "Transcribing..." : "Generate new image"}
+                className={cn(
+                  "h-9 w-9 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 transition-all duration-300 relative overflow-hidden group",
+                  isTranscribing && "opacity-75 cursor-wait hover:scale-100"
+                )}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <ImageIcon className="h-4 w-4 relative z-10 drop-shadow-sm" />

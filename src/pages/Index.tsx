@@ -942,6 +942,71 @@ const Index = () => {
   const onGenerate = useCallback(
     async (text: string) => {
       
+      // Handle optimistic UI commands first
+      if (text.startsWith('__OPTIMISTIC__:')) {
+        console.log('🔮 Handling optimistic message:', text);
+        const [, messageId, content] = text.split(':', 3);
+        const optimisticMessage: ChatMessage = {
+          type: 'user',
+          content: content,
+          timestamp: Date.now(),
+          optimisticId: messageId // Add ID for later updating
+        };
+        
+        setChatMessages(prev => {
+          setLastMessageCount(prev.length + 1);
+          playMessageSound();
+          return [...prev, optimisticMessage];
+        });
+        
+        // Save optimistic message to Firebase session (non-blocking)
+        if (currentSessionId) {
+          adventureSessionService.addChatMessage(currentSessionId, optimisticMessage);
+        }
+        return;
+      }
+      
+      if (text.startsWith('__UPDATE_OPTIMISTIC__:')) {
+        console.log('🔄 Updating optimistic message:', text);
+        const [, messageId, newContent] = text.split(':', 3);
+        
+        setChatMessages(prev => {
+          const updated = prev.map(msg => {
+            if (msg.optimisticId === messageId) {
+              return { ...msg, content: newContent, optimisticId: undefined };
+            }
+            return msg;
+          });
+          return updated;
+        });
+        
+        // Update in Firebase session as well (non-blocking)  
+        if (currentSessionId) {
+          // Find the updated message and save it
+          const updatedMessage = chatMessages.find(msg => msg.optimisticId === messageId);
+          if (updatedMessage) {
+            adventureSessionService.addChatMessage(currentSessionId, {
+              ...updatedMessage,
+              content: newContent,
+              optimisticId: undefined
+            });
+          }
+        }
+        return;
+      }
+      
+      if (text.startsWith('__CANCEL_OPTIMISTIC__:')) {
+        console.log('❌ Cancelling optimistic message:', text);
+        const [, messageId] = text.split(':', 2);
+        
+        setChatMessages(prev => {
+          const filtered = prev.filter(msg => msg.optimisticId !== messageId);
+          setLastMessageCount(filtered.length);
+          return filtered;
+        });
+        return;
+      }
+      
       // NEW: Try unified AI system first (if available and ready)
       console.log('🔧 Unified system check:', {
         isUnifiedSystemReady,

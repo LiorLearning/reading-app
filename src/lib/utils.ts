@@ -19,6 +19,7 @@ export interface ChatMessage {
   spelling_word?: string;
   content_after_spelling?: string;
   hiddenInChat?: boolean;
+  optimisticId?: string; // For handling optimistic UI updates during audio transcription
 }
 
 /**

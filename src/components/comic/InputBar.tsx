@@ -17,12 +17,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const recognitionRef = useRef<any | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [useWhisper, setUseWhisper] = useState(false);
   const isCancelledRef = useRef(false);
   const pendingActionRef = useRef<'send' | 'image' | null>(null);
+  const optimisticMessageRef = useRef<string | null>(null);
   
   // Initialize OpenAI client for Whisper
   const openaiClient = React.useMemo(() => {
@@ -103,7 +105,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           // Check if recording was cancelled
           if (isCancelledRef.current) {
             setIsMicActive(false);
+            setIsTranscribing(false);
             setText(""); // Clear any partial text
+            optimisticMessageRef.current = null;
             return;
           }
           
@@ -115,33 +119,64 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
               
               // Check if there's a pending action to execute
               if (pendingActionRef.current === 'send') {
-                // Send transcription directly
+                // Update the optimistic message with actual transcription
+                if (optimisticMessageRef.current) {
+                  // The message was already sent optimistically, now we need to update it
+                  // This will be handled by the parent component
+                  console.log('Updating optimistic message with transcription:', transcription.trim());
+                  onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:${transcription.trim()}`);
+                  optimisticMessageRef.current = null;
+                } else {
+                  // Fallback: send normally
+                  onGenerate(transcription.trim());
+                }
                 pendingActionRef.current = null;
                 setIsMicActive(false);
+                setIsTranscribing(false);
                 ttsService.stop();
-                onGenerate(transcription.trim());
                 setText("");
               } else if (pendingActionRef.current === 'image') {
-                // Send as create image request directly
+                // Update optimistic image request
+                if (optimisticMessageRef.current) {
+                  onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:create image: ${transcription.trim()}`);
+                  optimisticMessageRef.current = null;
+                } else {
+                  // Fallback: send normally
+                  onGenerate(`create image: ${transcription.trim()}`);
+                }
                 pendingActionRef.current = null;
                 setIsMicActive(false);
+                setIsTranscribing(false);
                 ttsService.stop();
-                onGenerate(`create image: ${transcription.trim()}`);
                 setText("");
               } else {
                 // Normal behavior: set text for user to choose action
                 setText(transcription.trim());
                 setIsMicActive(false);
+                setIsTranscribing(false);
               }
             } else {
               setIsMicActive(false);
+              setIsTranscribing(false);
+              // If no transcription and this was optimistic, we need to handle the failed case
+              if (optimisticMessageRef.current) {
+                onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:Unable to transcribe audio`);
+                optimisticMessageRef.current = null;
+              }
             }
           } catch (error) {
             console.error('Whisper transcription failed:', error);
             toast.error("Failed to transcribe audio. Using browser speech recognition as fallback.");
             
+            // Handle optimistic message failure
+            if (optimisticMessageRef.current) {
+              onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:Transcription failed`);
+              optimisticMessageRef.current = null;
+            }
+            
             // Stop current recording state and fallback to browser recognition
             setIsMicActive(false);
+            setIsTranscribing(false);
             
             // Small delay to ensure state is updated before starting fallback
             setTimeout(() => {
@@ -210,6 +245,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     rec.onend = () => {
       // Always stop the recording state first
       setIsMicActive(false);
+      setIsTranscribing(false);
       
       // Handle final transcript - either execute pending action or set text
       if (finalTranscriptText && finalTranscriptText.trim() && !isCancelledRef.current) {
@@ -217,16 +253,29 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         
         // Check if there's a pending action to execute
         if (pendingActionRef.current === 'send') {
-          // Send transcription directly
+          // Update optimistic message with actual transcription
+          if (optimisticMessageRef.current) {
+            console.log('Updating optimistic message with browser transcription:', finalTranscriptText.trim());
+            onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:${finalTranscriptText.trim()}`);
+            optimisticMessageRef.current = null;
+          } else {
+            // Fallback: send normally
+            onGenerate(finalTranscriptText.trim());
+          }
           pendingActionRef.current = null;
           ttsService.stop();
-          onGenerate(finalTranscriptText.trim());
           setText("");
         } else if (pendingActionRef.current === 'image') {
-          // Send as create image request directly
+          // Update optimistic image request
+          if (optimisticMessageRef.current) {
+            onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:create image: ${finalTranscriptText.trim()}`);
+            optimisticMessageRef.current = null;
+          } else {
+            // Fallback: send normally
+            onGenerate(`create image: ${finalTranscriptText.trim()}`);
+          }
           pendingActionRef.current = null;
           ttsService.stop();
-          onGenerate(`create image: ${finalTranscriptText.trim()}`);
           setText("");
         } else {
           // Normal behavior: set text for user to choose action
@@ -236,6 +285,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         console.log('Speech recognition cancelled');
         pendingActionRef.current = null; // Clear any pending action
         setText(""); // Clear any partial text if cancelled
+        optimisticMessageRef.current = null;
+      } else {
+        // No transcription available
+        if (optimisticMessageRef.current && pendingActionRef.current) {
+          onGenerate(`__UPDATE_OPTIMISTIC__:${optimisticMessageRef.current}:Unable to transcribe audio`);
+          optimisticMessageRef.current = null;
+          pendingActionRef.current = null;
+        }
       }
     };
     
@@ -284,6 +341,13 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     isCancelledRef.current = true;
     pendingActionRef.current = null; // Clear any pending action
     
+    // Clear optimistic message if it exists
+    if (optimisticMessageRef.current) {
+      console.log('Cancelling optimistic message:', optimisticMessageRef.current);
+      onGenerate(`__CANCEL_OPTIMISTIC__:${optimisticMessageRef.current}`);
+      optimisticMessageRef.current = null;
+    }
+    
     if (useWhisper && mediaRecorderRef.current) {
       // Stop Whisper recording without processing
       mediaRecorderRef.current.stop();
@@ -303,8 +367,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     
     setIsMicActive(false);
     setIsSubmitting(false);
+    setIsTranscribing(false);
     setText(""); // Clear any partial text
-  }, [useWhisper]);
+  }, [useWhisper, onGenerate]);
 
   // Function to handle send button during recording
   const handleSendDuringRecording = useCallback(() => {
@@ -314,7 +379,21 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     // Set pending action to send
     pendingActionRef.current = 'send';
     
-    // Stop recording and let transcription handler do the sending
+    // Show immediate transcription state
+    setIsTranscribing(true);
+    
+    // Generate unique ID for optimistic message
+    const optimisticId = `optimistic_${Date.now()}`;
+    optimisticMessageRef.current = optimisticId;
+    
+    // Send optimistic message immediately
+    console.log('Sending optimistic message with ID:', optimisticId);
+    onGenerate(`__OPTIMISTIC__:${optimisticId}:🎤 Transcribing audio...`);
+    
+    // Clear text input and stop recording
+    setText("");
+    
+    // Stop recording and let transcription handler do the updating
     if (useWhisper && mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current = null;
@@ -322,7 +401,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
-  }, [useWhisper]);
+  }, [useWhisper, onGenerate]);
 
   // Function to handle create image button during recording
   const handleImageDuringRecording = useCallback(() => {
@@ -332,7 +411,21 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
     // Set pending action to image
     pendingActionRef.current = 'image';
     
-    // Stop recording and let transcription handler do the sending
+    // Show immediate transcription state
+    setIsTranscribing(true);
+    
+    // Generate unique ID for optimistic message
+    const optimisticId = `optimistic_${Date.now()}`;
+    optimisticMessageRef.current = optimisticId;
+    
+    // Send optimistic image request immediately
+    console.log('Sending optimistic image message with ID:', optimisticId);
+    onGenerate(`__OPTIMISTIC__:${optimisticId}:🎨 Creating image from audio...`);
+    
+    // Clear text input and stop recording
+    setText("");
+    
+    // Stop recording and let transcription handler do the updating
     if (useWhisper && mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current = null;
@@ -340,7 +433,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
-  }, [useWhisper]);
+  }, [useWhisper, onGenerate]);
 
   const submit = useCallback(
     (e?: React.FormEvent) => {
@@ -374,14 +467,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
   return (
     <section aria-label="Create next panel" className="bg-transparent">
       <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
-        {isMicActive ? (
-          // Recording state: Show only Cancel button
+        {isMicActive || isTranscribing ? (
+          // Recording/Transcribing state: Show Cancel button
           <Button
             type="button"
             variant="comic"
             size="icon"
             onClick={handleCancelRecording}
-            aria-label="Cancel recording"
+            aria-label={isTranscribing ? "Cancel transcription" : "Cancel recording"}
             className="flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
           >
             <X className="h-5 w-5" />
@@ -401,6 +494,12 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
         )}
         {isMicActive ? (
           <WaveformVisualizer />
+        ) : isTranscribing ? (
+          // Transcription loading state
+          <div className="flex items-center justify-center gap-2 h-10 px-4 bg-blue-50/90 rounded-xl shadow-sm flex-1 backdrop-blur-sm border border-blue-200">
+            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-sm text-blue-600 font-medium">Transcribing...</span>
+          </div>
         ) : (
           <Input
             aria-label="What happens next?"
@@ -410,15 +509,18 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
             className="rounded-xl flex-1 bg-white/90 border-0 shadow-sm focus:shadow-md transition-shadow backdrop-blur-sm"
           />
         )}
-        <Button 
+                <Button 
           type="button"
-          variant="outline"
-          size="icon"
-          disabled={!text.trim() && !isMicActive}
+          variant="outline" 
+          size="icon" 
+          disabled={!text.trim() && !isMicActive && !isTranscribing}
           onClick={() => {
             if (isMicActive) {
               // During recording: stop and send as image
               handleImageDuringRecording();
+            } else if (isTranscribing) {
+              // During transcription: ignore clicks
+              return;
             } else {
               // Normal mode: check text and send as image
               if (!text.trim()) {
@@ -431,10 +533,11 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
               setText("");
             }
           }}
-          aria-label={isMicActive ? "Stop recording and generate image" : "Generate new image"}
+          aria-label={isMicActive ? "Stop recording and generate image" : isTranscribing ? "Transcribing..." : "Generate new image"}
           className={cn(
             "h-10 w-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 backdrop-blur-sm transition-all duration-300 relative overflow-hidden group",
-            (!text.trim() && !isMicActive) && "opacity-50 cursor-not-allowed hover:scale-100"
+            (!text.trim() && !isMicActive && !isTranscribing) && "opacity-50 cursor-not-allowed hover:scale-100",
+            isTranscribing && "opacity-75 cursor-wait hover:scale-100"
           )}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -444,21 +547,25 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage }) => {
           type="button"
           variant="outline" 
           size="icon" 
-          disabled={!text.trim() && !isMicActive}
+          disabled={!text.trim() && !isMicActive && !isTranscribing}
           onClick={(e) => {
             if (isMicActive) {
               // During recording: stop and send directly
               e.preventDefault();
               handleSendDuringRecording();
+            } else if (isTranscribing) {
+              // During transcription: ignore clicks
+              e.preventDefault();
             } else {
               // Normal mode: use regular submit logic
               submit(e);
             }
           }}
-          aria-label={isMicActive ? "Stop recording and send" : "Send message"}
+          aria-label={isMicActive ? "Stop recording and send" : isTranscribing ? "Transcribing..." : "Send message"}
           className={cn(
             "h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm",
-            (!text.trim() && !isMicActive) && "opacity-50 cursor-not-allowed"
+            (!text.trim() && !isMicActive && !isTranscribing) && "opacity-50 cursor-not-allowed",
+            isTranscribing && "opacity-75 cursor-wait"
           )}
         >
           <Send className="h-4 w-4" />
