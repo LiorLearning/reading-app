@@ -7,10 +7,27 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  signInWithCredential
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+
+// Google Identity Services types
+declare global {
+  interface Window {
+    google: {
+      accounts: {
+        id: {
+          initialize: (config: any) => void;
+          prompt: (callback?: (notification: any) => void) => void;
+          renderButton: (parent: HTMLElement, options: any) => void;
+          cancel: () => void;
+        };
+      };
+    };
+  }
+}
 
 // Enhanced user data interface that includes Firebase user info
 export interface UserData {
@@ -35,6 +52,8 @@ interface AuthContextType {
   signUpWithEmail: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserData: (data: Partial<UserData>) => Promise<void>;
+  initializeOneTapSignIn: () => void;
+  hasGoogleAccount: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasGoogleAccount, setHasGoogleAccount] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -65,6 +85,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
             setUserData(data);
+            
+            // Check if user signed in with Google
+            const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
+            setHasGoogleAccount(isGoogleUser);
             
             // Update last login
             await updateDoc(userDocRef, {
@@ -87,12 +111,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             
             await setDoc(userDocRef, newUserData);
             setUserData(newUserData);
+            
+            // Check if user signed in with Google
+            const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
+            setHasGoogleAccount(isGoogleUser);
           }
         } catch (error) {
           console.error('Error loading user data:', error);
         }
       } else {
         setUserData(null);
+        setHasGoogleAccount(false);
       }
       
       setLoading(false);
@@ -159,6 +188,52 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Handle One Tap Sign-in credential response
+  const handleOneTapSignIn = async (response: any) => {
+    try {
+      // Create Google Auth Provider credential from the One Tap response
+      const credential = GoogleAuthProvider.credential(response.credential);
+      
+      // Sign in with the credential
+      await signInWithCredential(auth, credential);
+    } catch (error) {
+      console.error('Error with One Tap sign-in:', error);
+      throw error;
+    }
+  };
+
+  // Initialize Google One Tap Sign-in
+  const initializeOneTapSignIn = () => {
+    if (!window.google || !import.meta.env.VITE_FIREBASE_API_KEY) {
+      console.warn('Google Identity Services not available or Firebase config missing');
+      return;
+    }
+
+    try {
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_FIREBASE_API_KEY;
+      
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleOneTapSignIn,
+        auto_select: hasGoogleAccount, // Auto-select if user has Google account
+        context: 'signin',
+        ux_mode: 'popup',
+        cancel_on_tap_outside: false
+      });
+
+      // Only show the prompt if user is not already signed in
+      if (!user) {
+        window.google.accounts.id.prompt((notification: any) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('One Tap prompt was not displayed or skipped');
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing One Tap Sign-in:', error);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     userData,
@@ -168,6 +243,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signUpWithEmail,
     signOut,
     updateUserData,
+    initializeOneTapSignIn,
+    hasGoogleAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
