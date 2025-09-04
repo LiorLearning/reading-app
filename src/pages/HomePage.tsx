@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { playClickSound } from "@/lib/sounds";
-import { Sparkles, Plus, Rocket } from "lucide-react";
+import { Sparkles, Plus } from "lucide-react";
 import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress, loadAdventureSummaries, AdventureSummary } from "@/lib/utils";
 import { loadAdventureSummariesHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
@@ -116,7 +116,18 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
   
   const handleCreateNewStory = () => {
     playClickSound();
-    onNavigate('topics');
+    // If we have a next topic available, start a new adventure directly
+    // Otherwise, navigate to topics for topic selection
+    if (nextTopicId || selectedTopicFromPreference) {
+      const topicToUse = selectedTopicFromPreference || nextTopicId;
+      if (topicToUse) {
+        onStartAdventure(topicToUse, 'new');
+      } else {
+        onNavigate('topics');
+      }
+    } else {
+      onNavigate('topics');
+    }
   };
 
   const handleContinueAdventure = (adventureId: string) => {
@@ -137,18 +148,6 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
     onNavigate('topics');
   };
 
-  const handleStartAdventure = (mode: 'new' | 'continue') => {
-    playClickSound();
-    
-    // Prioritize selected topic from preference, fallback to default next topic
-    const topicToUse = selectedTopicFromPreference || nextTopicId;
-    
-    if (topicToUse) {
-      onStartAdventure(topicToUse, mode);
-    }
-  };
-
-
 
   // Create user adventure with current user data
   const currentUserAdventure = {
@@ -167,51 +166,6 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
       {/* Main Content Container */}
       <div className="max-w-4xl mx-auto w-full space-y-8">
         
-        {/* Adventure Buttons Section - Only show if user has progress or can start a topic */}
-        {nextTopicId && (
-          <section>
-            <div className="flex items-center gap-2 mb-6">
-              <span className="text-2xl">🚀</span>
-              <h2 className="text-2xl font-bold text-gray-800">
-                Your Adventure Awaits
-              </h2>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Start New Adventure Button - spans full width on mobile, single column on larger screens */}
-              <div 
-                onClick={() => handleStartAdventure('new')}
-                className="group cursor-pointer md:col-span-2"
-              >
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white text-center hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
-                     style={{ minHeight: '180px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div className="mb-4">
-                    <Plus className="h-12 w-12 mx-auto mb-3" />
-                    <Sparkles className="h-6 w-6 mx-auto" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2">
-                    START NEW ADVENTURE
-                  </h3>
-                  <p className="text-purple-100 text-sm mb-1">
-                    Begin a fresh new adventure
-                  </p>
-                  {selectedTopicFromPreference ? (
-                    <p className="text-purple-200 text-xs">
-                      Ready to start with topic: {selectedTopicFromPreference} ✨
-                    </p>
-                  ) : (
-                    <p className="text-purple-200 text-xs">
-                      Ready to start your next topic!
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-        
-
-
         {/* Your Adventures Section */}
         {savedAdventures.length > 0 && (
           <section>
@@ -241,12 +195,29 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                         <div className="text-white text-6xl mb-2">✨</div>
                       </div>
                       <div className="p-4 flex-1 flex flex-col justify-center text-center">
+                        <div className="mb-3">
+                          <Plus className="h-8 w-8 mx-auto mb-2 text-white" />
+                          <Sparkles className="h-5 w-5 mx-auto text-white" />
+                        </div>
                         <h3 className="font-bold text-xl text-white mb-2">
-                          Create New Story
+                          Start New Adventure
                         </h3>
-                        <p className="text-purple-100 text-sm">
-                          Start your adventure
+                        <p className="text-purple-100 text-sm mb-1">
+                          Begin a fresh new adventure
                         </p>
+                        {selectedTopicFromPreference ? (
+                          <p className="text-purple-200 text-xs">
+                            Ready with topic: {selectedTopicFromPreference} ✨
+                          </p>
+                        ) : nextTopicId ? (
+                          <p className="text-purple-200 text-xs">
+                            Ready for your next topic!
+                          </p>
+                        ) : (
+                          <p className="text-purple-200 text-xs">
+                            Choose your topic to begin
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
