@@ -777,7 +777,7 @@ const Index = () => {
     setIsGeneratingAdventureImage(unifiedAIStreaming.isGeneratingImage);
   }, [unifiedAIStreaming.isGeneratingImage]);
 
-  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion): Promise<AdventureResponse> => {
+  const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion | null): Promise<AdventureResponse> => {
 
     try {
       // Load current chat summary from session (if available)
@@ -795,7 +795,9 @@ const Index = () => {
         }
       }
 
-      return await aiService.generateResponse(
+      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData });
+      
+      const result = await aiService.generateResponse(
         userText, 
         messageHistory, 
         spellingQuestion, 
@@ -805,6 +807,9 @@ const Index = () => {
         undefined, // storyEventsContext
         currentSummary // summary
       );
+      
+      console.log('✅ AI service returned:', result);
+      return result;
     } catch (error) {
       console.error('Error generating AI response:', error);
       // Fallback response on error
@@ -1282,13 +1287,21 @@ const Index = () => {
         
         // First, add the spelling sentence message if we have one
         if (aiResponse.spelling_sentence && spellingQuestion) {
+          console.log('📝 Creating spelling message:', {
+            spellingWord: spellingQuestion.audio,
+            spellingSentence: aiResponse.spelling_sentence,
+            adventureStory: aiResponse.adventure_story,
+            wordInSentence: aiResponse.spelling_sentence.toLowerCase().includes(spellingQuestion.audio.toLowerCase())
+          });
+          
           const spellingSentenceMessage: ChatMessage = {
             type: 'ai',
             content: aiResponse.spelling_sentence,
             timestamp: Date.now(),
             spelling_word: spellingQuestion.audio,
             spelling_sentence: aiResponse.spelling_sentence,
-            content_after_spelling: aiResponse.adventure_story // Store the adventure story for later
+            content_after_spelling: aiResponse.adventure_story, // Store the adventure story for later
+            hiddenInChat: true
           };
           
           setChatMessages(prev => {
@@ -3040,7 +3053,14 @@ const Index = () => {
                     hasPrevious={currentIndex > 0}
                     hasNext={currentIndex < panels.length - 1}
                     spellWord={chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_word}
-                    spellSentence={chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence}
+                    spellSentence={
+                      // Get the full adventure story passage instead of just the spelling sentence
+                      chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content_after_spelling ||
+                      // Fallback to the main content if content_after_spelling is not available
+                      chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content ||
+                      // Last resort: use the spelling sentence
+                      chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence
+                    }
                     // SpellBox props
                     onSpellComplete={handleSpellComplete}
                     onSpellSkip={handleSpellSkip}
@@ -3126,7 +3146,7 @@ const Index = () => {
                             </div>
                           ) : (
                             <>
-                              {chatMessages.map((message, index) => (
+                              {chatMessages.filter(m => !m.hiddenInChat).map((message, index) => (
                                 <div
                                   key={`${message.timestamp}-${index}`}
                                   className={cn(

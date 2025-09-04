@@ -28,14 +28,21 @@ class AIService {
     // Check if OpenAI API key is available
     const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     
+    console.log('🔑 AI Service initialization:', { 
+      hasApiKey: !!apiKey, 
+      apiKeyLength: apiKey?.length || 0,
+      apiKeyStart: apiKey?.substring(0, 7) || 'none'
+    });
+    
     if (apiKey) {
       this.client = new OpenAI({
         apiKey: apiKey,
         dangerouslyAllowBrowser: true // Required for client-side usage
       });
       this.isInitialized = true;
+      console.log('✅ AI Service initialized successfully');
     } else {
-      console.warn('VITE_OPENAI_API_KEY not found. AI responses will use fallback mode.');
+      console.warn('⚠️ VITE_OPENAI_API_KEY not found. AI responses will use fallback mode.');
       this.isInitialized = false;
     }
   }
@@ -75,51 +82,25 @@ class AIService {
   ): any[] {
     // Generate phase-specific instructions
     const phaseInstructions = spellingWord ? 
-      `CRITICAL SPELLING CHALLENGE PHASE: Your response MUST include the exact word "${spellingWord}" for spelling practice. 
+      `🎯 CRITICAL SPELLING CHALLENGE PHASE 🎯
+
+MANDATORY: Include "${spellingWord}" in the FIRST or SECOND sentence ONLY.
 
 REQUIREMENTS:
-- Include the word "${spellingWord}" exactly as written (no variations, plurals, or similar words) somewhere in your response.
-- Be careful on integrating it naturally in the response. It should NOT appear out of place at all. Use it naturally in the current adventure story context. 
-- Embed the word such that it appears most natural within the 2-3 sentences of your response. You can fit it anywhere in the response. Ideally have it in the second line.
-- Do NOT ask questions or create puzzles
-- The word will be automatically converted to a fill-in-the-blank for spelling practice
-- Strictly ensure that the word is not used elsewhere in the passage so that the student can't just copy and paste the answer.
-- Strictly keep it within 50 words, but also exciting.
+- The word "${spellingWord}" MUST appear in sentence 1 OR sentence 2
+- Use the exact word (no variations, plurals, or similar words)
+- Write naturally continuing the adventure story
+- Keep response to 2-3 sentences maximum
+- Do NOT create puzzles or ask for spelling
 
-Example: "We need to find the powerful ${spellingWord} hidden in the mysterious location..."
+✅ GOOD EXAMPLES:
+- "The magical ${spellingWord} glows before you! What do you do next?"
+- "You continue forward. A mysterious ${spellingWord} appears in your path."
 
-TARGET WORD TO INCLUDE: "${spellingWord}"
-REMEMBER: Use this exact word in your response!
+❌ AVOID: Putting "${spellingWord}" in the 3rd+ sentence
 
-CRITICAL: You MUST return your response as a valid JSON object with exactly these two keys:
-- "spelling_sentence": A single sentence from your adventure response that contains the word "${spellingWord}" naturally integrated. This should feel like part of the ongoing adventure story, not separate content.
-- "adventure_story": Your complete adventure response (including the spelling sentence and additional story). This should be your normal 50-word adventure response with the spelling word naturally embedded.
-
-INTEGRATION REQUIREMENTS:
-- Use the same adventure tone, characters, and context as always
-- The spelling word should appear naturally in the story flow
-- Don't change your storytelling style or personality
-- Keep the same 50-word limit and question-asking pattern
-- The spelling_sentence should be extracted from your adventure_story, not separate content
-- Maintain continuity with the ongoing adventure
-- Follow all the same adventure rules above (exciting sparks, questions, etc.)
-
-Example format:
-{
-  "spelling_sentence": "Captain Alex discovered a mysterious ${spellingWord} glowing in the cave.",
-  "adventure_story": "Captain Alex discovered a mysterious ${spellingWord} glowing in the cave. The ${spellingWord} pulsed with magical energy! What do you think will happen when Alex touches it - maybe it grants wishes or opens a portal?"
-}`
-      : `You are in CHAT PHASE. Respond naturally to continue the adventure story. Write 2-3 sentences continuing the adventure.
-
-CRITICAL: You MUST return your response as a valid JSON object with exactly these two keys:
-- "spelling_sentence": null (no spelling word for this message)
-- "adventure_story": Your adventure story response based on the provided context
-
-Example format:
-{
-  "spelling_sentence": null,
-  "adventure_story": "As the spaceship landed, strange lights began to glow from the surface. What could be waiting for us down there?"
-}`;
+TARGET WORD: "${spellingWord}" (must be in sentence 1 or 2)`
+      : `You are in CHAT PHASE. Respond naturally to continue the adventure story. Write 2-3 sentences continuing the adventure.`;
 
     // Get adventure-specific details from currentAdventure
     const adventureType = currentAdventure?.type || 'adventure';
@@ -156,9 +137,9 @@ Use this memory to:
 ${phaseInstructions}
 
 NEW_ADVENTURE
-Step 1: Discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
-Step 2: Create the Hero. Once interests are shared, link them into hero creation. Ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
-Example: "Cool! Should our hero be someone from that world—like a game character, a magical version of your pet, or something totally new?"
+Step 1: Welcome user with a "hi" and discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
+Step 2: First, give the user context that they will create their very own story. Only after that, ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
+Example: "Get ready, Virok—we’re about to create your very own epic story! You'll decide what happens, who our hero is, and what wild adventures we go on. So… who should our hero be? Maybe a legendary game character, a supercharged robot, or something totally new?"
 Step 3: Story Setup (LOCK). Ask one by one
   Lead (the hero) - who is the lead? What is their appearance? Create an image? (ask in separate responses, one by one)
   Conflict (villain or challenge) - who is the villain? What is their objective? Appearance?
@@ -214,7 +195,13 @@ Current Adventure Details:
 
 Current Phase: ${spellingWord ? 'SPELLING CHALLENGE' : 'CHAT PHASE'}
 
-Return ONLY the JSON object, no other text.`
+${spellingWord ? `🎯 SPELLING WORD REQUIREMENT: 
+- The word "${spellingWord}" MUST appear in sentence 1 or sentence 2 of your response
+- Use the exact word "${spellingWord}" (no variations, synonyms, or plurals)
+- This is critical for the spelling system to work properly
+- NEVER put the spelling word in sentence 3 or later` : ''}
+
+CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask students to guess words. Simply continue the story naturally and include the target word in your narrative. The spelling practice happens automatically through the system.`
     };
 
     // Include recent message history for context (last 6 messages max)
@@ -233,21 +220,33 @@ Return ONLY the JSON object, no other text.`
   }
 
   async generateResponse(userText: string, chatHistory: ChatMessage[] = [], spellingQuestion: SpellingQuestion | null, userData?: { username: string; [key: string]: any } | null, adventureState?: string, currentAdventure?: any, storyEventsContext?: string, summary?: string): Promise<AdventureResponse> {
+    console.log('🤖 AI Service generateResponse called:', { 
+      userText, 
+      hasSpellingQuestion: !!spellingQuestion, 
+      spellingWord: spellingQuestion?.audio,
+      isInitialized: this.isInitialized, 
+      hasClient: !!this.client 
+    });
+    
     // If not initialized or no API key, use fallback
     if (!this.isInitialized || !this.client) {
+      console.warn('⚠️ AI Service not initialized, using fallback');
       return this.getFallbackResponse(userText, userData, !!spellingQuestion);
     }
 
     // Only include spelling word if spellingQuestion is provided (for spelling mode)
-    const stringSpellingWord = spellingQuestion ? JSON.stringify(spellingQuestion.audio) : null;
+    const stringSpellingWord = spellingQuestion ? spellingQuestion.audio : null;
+
+    // Remove temporary test - now using real AI generation
 
     try {
+      console.log('🚀 Building chat context with spelling word:', stringSpellingWord);
       const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData);
-
+      
+      console.log('📤 Sending request to OpenAI with', messages.length, 'messages');
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
         messages: messages,
-        response_format: { type: "json_object" },
         max_tokens: 500,
         temperature: 0.8,
         presence_penalty: 0.3,
@@ -255,25 +254,160 @@ Return ONLY the JSON object, no other text.`
       });
 
       const response = completion.choices[0]?.message?.content;
-      console.log('Response:', response);
+      console.log('📥 OpenAI Response:', response);
+      console.log('📥 OpenAI Response Length:', response?.length);
+      console.log('📥 Expected Spelling Word:', spellingQuestion?.audio);
       
       if (response) {
-        try {
-          // Parse and validate the JSON response
-          const parsedResponse: AdventureResponse = JSON.parse(response.trim());
+        let adventureText = response.trim();
+        
+        // For spelling questions, ensure the word is included BEFORE extraction
+        if (spellingQuestion && spellingQuestion.audio) {
+          const spellingWord = spellingQuestion.audio;
           
-          // Validate that required keys exist (spelling_sentence can be null for pure adventure mode)
-          if (!parsedResponse.adventure_story || (spellingQuestion && !parsedResponse.spelling_sentence)) {
-                      console.warn('Response missing required keys, using fallback');
-          return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+          // PRE-PROCESSING: Ensure word is included AND appears in first two sentences
+          const allSentences = adventureText.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+          const firstTwoSentences = allSentences.slice(0, 2).join(' ').trim();
+          const remainingSentences = allSentences.slice(2).join(' ').trim();
+          
+          // Handle edge case where response is very short
+          const textToCheck = allSentences.length < 2 ? adventureText : firstTwoSentences;
+          
+          const wordInText = adventureText.toLowerCase().includes(spellingWord.toLowerCase());
+          const wordInFirstTwo = textToCheck.toLowerCase().includes(spellingWord.toLowerCase());
+          
+          console.log(`🔍 PRE-PROCESSING Check:`);
+          console.log(`   - Total sentences: ${allSentences.length}`);
+          console.log(`   - Word "${spellingWord}" in full text: ${wordInText}`);
+          console.log(`   - Word "${spellingWord}" in first two sentences: ${wordInFirstTwo}`);
+          console.log(`   - Text being checked: "${textToCheck}"`);
+          console.log(`   - First two sentences: "${firstTwoSentences}"`);
+          
+          if (!wordInText || !wordInFirstTwo) {
+            console.log(`🔧 PRE-PROCESSING: Need to inject "${spellingWord}" into first two sentences...`);
+            
+            // Create natural injection patterns that work well at the beginning
+            const firstSentencePatterns = [
+              `The ${spellingWord} glows with magical energy!`,
+              `You notice a ${spellingWord} nearby.`,
+              `A mysterious ${spellingWord} appears before you.`,
+              `The word "${spellingWord}" echoes in the air.`,
+              `You discover a special ${spellingWord} here.`
+            ];
+            
+            const selectedPattern = firstSentencePatterns[Math.floor(Math.random() * firstSentencePatterns.length)];
+            
+            if (!wordInText) {
+              // Word not in text at all - add to beginning
+              adventureText = `${selectedPattern} ${adventureText}`;
+              console.log(`🔧 Word not found - injected at beginning: "${selectedPattern}"`);
+            } else {
+              // Word exists but not in first two sentences - move it forward
+              // Remove the word from later sentences and add to beginning
+              const wordRegex = new RegExp(`\\b${spellingWord}\\b`, 'gi');
+              const cleanedLaterText = remainingSentences.replace(wordRegex, 'it');
+              adventureText = `${selectedPattern} ${firstTwoSentences} ${cleanedLaterText}`;
+              console.log(`🔧 Word found later - moved to beginning: "${selectedPattern}"`);
+            }
+            
+            console.log(`🔧 Final enhanced response: "${adventureText}"`);
+          } else {
+            console.log(`✅ Word "${spellingWord}" already in first two sentences - no changes needed`);
           }
           
-          // Return the formatted response
-          return parsedResponse;
-        } catch (parseError) {
-          console.error('Failed to parse JSON response:', parseError);
-          console.log('Raw response:', response);
-          return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+          console.log(`🔍 Extracting spelling sentence for word: "${spellingWord}" from: "${adventureText}"`);
+          console.log(`🔍 Raw AI Response for debugging: "${response}"`);
+          console.log(`🔍 Adventure Text (trimmed): "${adventureText}"`);
+          
+          // First, verify the word is actually in the response
+          const wordFoundInResponse = adventureText.toLowerCase().includes(spellingWord.toLowerCase());
+          console.log(`🎯 Target word "${spellingWord}" found in response: ${wordFoundInResponse}`);
+          
+          // More detailed debugging
+          console.log(`🔍 Searching for word: "${spellingWord.toLowerCase()}" in text: "${adventureText.toLowerCase()}"`);
+          const wordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
+          console.log(`🔍 Word index in text: ${wordIndex}`);
+          
+          if (!wordFoundInResponse) {
+            console.error(`❌ CRITICAL ERROR: Word "${spellingWord}" should have been included by pre-processing but wasn't found!`);
+            console.log(`📝 This should not happen - check pre-processing logic`);
+            console.log(`📝 AI Response: "${adventureText}"`);
+            console.log(`🔤 Expected word: "${spellingWord}"`);
+            
+            // Emergency fallback - this should rarely be reached now
+            return {
+              spelling_sentence: `The ${spellingWord} awaits your discovery!`,
+              adventure_story: `${adventureText} The ${spellingWord} awaits your discovery!`
+            };
+          }
+          
+          // Split into sentences more robustly, preserving punctuation
+          const sentences = adventureText.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+          
+          // Find the sentence containing the target word (case-insensitive, word boundary aware)
+          const spellingSentence = sentences.find(sentence => {
+            const normalizedSentence = sentence.toLowerCase().replace(/[^\w\s]/g, ' ');
+            const normalizedWord = spellingWord.toLowerCase();
+            
+            // Check for word boundaries to avoid partial matches
+            const wordRegex = new RegExp(`\\b${normalizedWord}\\b`, 'i');
+            return wordRegex.test(normalizedSentence);
+          });
+          
+          if (spellingSentence) {
+            // Clean up the sentence and ensure proper punctuation
+            let cleanSentence = spellingSentence.trim();
+            if (!cleanSentence.match(/[.!?]$/)) {
+              cleanSentence += '.';
+            }
+            
+            console.log(`✅ Extracted spelling sentence: "${cleanSentence}"`);
+            return {
+              spelling_sentence: cleanSentence,
+              adventure_story: adventureText
+            };
+          } else {
+            // Enhanced fallback: try to find the word anywhere and create a sentence around it
+            const wordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
+            if (wordIndex !== -1) {
+              // Find sentence boundaries around the word
+              const beforeWord = adventureText.substring(0, wordIndex);
+              const afterWord = adventureText.substring(wordIndex);
+              
+              const sentenceStart = Math.max(
+                beforeWord.lastIndexOf('.'),
+                beforeWord.lastIndexOf('!'),
+                beforeWord.lastIndexOf('?')
+              ) + 1;
+              
+              const sentenceEndMatch = afterWord.match(/[.!?]/);
+              const sentenceEnd = sentenceEndMatch ? 
+                wordIndex + afterWord.indexOf(sentenceEndMatch[0]) + 1 : 
+                adventureText.length;
+              
+              const extractedSentence = adventureText.substring(sentenceStart, sentenceEnd).trim();
+              const finalSentence = extractedSentence || adventureText;
+              
+              console.log(`✅ Fallback extracted sentence: "${finalSentence}"`);
+              return {
+                spelling_sentence: finalSentence,
+                adventure_story: adventureText
+              };
+            } else {
+              // Final fallback: use the full adventure text
+              console.warn(`⚠️ Could not find word "${spellingWord}" in response, using full text`);
+              return {
+                spelling_sentence: adventureText,
+                adventure_story: adventureText
+              };
+            }
+          }
+        } else {
+          // No spelling question - pure adventure mode
+          return {
+            spelling_sentence: null,
+            adventure_story: adventureText
+          };
         }
       } else {
         throw new Error('No response content received');
@@ -322,9 +456,9 @@ Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : 'ONGOING_ADVENTU
 Current Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
 
 NEW_ADVENTURE
-Step 1: Discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
-Step 2: Create the Hero. Once interests are shared, link them into hero creation. Ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
-Example: "Cool! Should our hero be someone from that world—like a game character, a magical version of your pet, or something totally new?"
+Step 1: Welcome user with a "hi" and discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
+Step 2: First, give the user context that they will create their very own story. Only after that, ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
+Example: "Get ready, Virok—we’re about to create your very own epic story! You'll decide what happens, who our hero is, and what wild adventures we go on. So… who should our hero be? Maybe a legendary game character, a supercharged robot, or something totally new?"
 Step 3: Story Setup (LOCK). Ask one by one
   Lead (the hero) - who is the lead? What is their appearance? Create an image? (ask in separate responses, one by one)
   Conflict (villain or challenge) - who is the villain? What is their objective? Appearance?

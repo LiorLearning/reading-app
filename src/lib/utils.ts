@@ -18,6 +18,7 @@ export interface ChatMessage {
   spelling_sentence?: string;
   spelling_word?: string;
   content_after_spelling?: string;
+  hiddenInChat?: boolean;
 }
 
 /**
@@ -975,9 +976,8 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
   // Clean up any weird spacing patterns like "_ _" 
   formatted = formatted.replace(/<\/em>\s+<em>/g, ' ');
 
-  if (spellingWord) {
-    formatted = formatted.replace(spellingWord, '');
-  }
+  // Note: Don't remove spelling word here - SpellBox needs it to create input boxes
+  // The SpellBox component will handle replacing the word with interactive blanks
   
   // Clean up multiple consecutive <br> tags
   formatted = formatted.replace(/(<br\s*\/?>){3,}/g, '<br><br>');

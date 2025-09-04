@@ -74,21 +74,66 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   
   // Ensure we have a valid sentence for spelling - create fallback if needed
   const ensureSpellingSentence = useCallback((word: string, sentence?: string, questionText?: string): string => {
-    // If we have a question object, prioritize using questionText as the sentence
-    if (question && questionText) {
+    const normalize = (s: string) => {
+      // First strip HTML tags, then normalize
+      const stripped = s.replace(/<[^>]*>/g, '');
+      return stripped.toLowerCase().replace(/[^\w\s]/g, '');
+    };
+    
+    const containsWord = (s?: string, checkStrict: boolean = true) => {
+      if (!s || !word) return false;
+      const normSentence = normalize(s);
+      const normWord = normalize(word);
+      
+      if (checkStrict) {
+        // word-boundary style check to avoid partial matches
+        const re = new RegExp(`\\b${normWord}\\b`);
+        return re.test(normSentence);
+      } else {
+        // More lenient check for longer passages
+        return normSentence.includes(normWord);
+      }
+    };
+
+    // Prefer questionText only if it truly contains the target word
+    if (question && questionText && containsWord(questionText)) {
       return questionText;
     }
-    
-    // If we have a sentence that contains the target word, use it
-    if (sentence && word && sentence.toLowerCase().includes(word.toLowerCase())) {
-      return sentence;
+
+    // For full passages (longer content), use more lenient matching
+    if (sentence && sentence.length > 100) {
+      console.log('🔍 SpellBox: Processing long passage for word:', word);
+      // First try strict matching
+      if (containsWord(sentence, true)) {
+        console.log('✅ SpellBox: Found word with strict matching in long passage');
+        return sentence;
+      }
+      // Then try lenient matching for longer passages
+      if (containsWord(sentence, false)) {
+        console.log('✅ SpellBox: Found word with lenient matching in long passage');
+        return sentence;
+      }
+      // Last attempt: extract sentence containing the word
+      const sentences = sentence.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
+      for (const sent of sentences) {
+        if (containsWord(sent, false)) {
+          console.log('✅ SpellBox: Found word in extracted sentence:', sent);
+          return sent;
+        }
+      }
+      console.log('❌ SpellBox: Could not find word in long passage');
+    } else {
+      // For shorter content, use strict matching
+      if (sentence && containsWord(sentence, true)) {
+        return sentence;
+      }
     }
-    
-    // Fallback: create a simple sentence structure that works for spelling
+
+    // Fallback: synthesize a simple sentence that definitely includes the word
     if (word) {
       return `Let's spell this word together: ${word}`;
     }
-    
+
     // Final fallback
     return "Let's spell this word together!";
   }, [question]);
@@ -96,13 +141,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Get the working sentence - this ensures we always have something to work with
   const workingSentence = ensureSpellingSentence(targetWord, sentence, questionText);
   
-  console.log('SpellBox Debug:', { 
+  console.log('🎯 SpellBox Debug:', { 
     sentence, 
+    sentenceLength: sentence?.length,
     targetWord, 
     questionText, 
     workingSentence,
+    workingSentenceLength: workingSentence?.length,
     hasQuestion: !!question 
   });
+  
+  // Debug: Check if target word is found in working sentence
+  const wordFoundInSentence = workingSentence && targetWord && 
+    workingSentence.toLowerCase().includes(targetWord.toLowerCase());
+  console.log(`🔍 SpellBox: Target word "${targetWord}" found in sentence: ${wordFoundInSentence}`);
+  
+  if (!wordFoundInSentence && targetWord && workingSentence) {
+    console.error(`❌ SpellBox CRITICAL: Target word "${targetWord}" NOT found in sentence: "${workingSentence}"`);
+  }
   
   // Get audio text with context from working sentence
   const audioText = (() => {
@@ -136,6 +192,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const parts = parseWord(targetWord);
   const totalBlanks = parts.filter(part => part.type === 'blank').length;
   const correctlySpelledWords = isCorrect ? totalBlanks : 0;
+  
+  console.log('🧩 SpellBox Parts Debug:', {
+    targetWord,
+    parts,
+    totalBlanks,
+    partsLength: parts.length
+  });
 
   // Check if word is complete
   const isWordComplete = useCallback((answer: string, expectedLength: number): boolean => {
@@ -326,9 +389,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 gap: '6px'
               }}>
 
-                {workingSentence.split(' ').map((word, idx) => (
+                {workingSentence.split(' ').map((word, idx) => {
+                  const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
+                  const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');
+                  const isTargetWord = normalizedWord === normalizedTarget;
+                  
+                  console.log(`🔤 Word comparison: "${word}" (normalized: "${normalizedWord}") vs target "${targetWord}" (normalized: "${normalizedTarget}") = ${isTargetWord}`);
+                  
+                  return (
                   <React.Fragment key={idx}>
-                    {word.toLowerCase().replace(/[^\w]/g, '') === targetWord.toLowerCase().replace(/[^\w]/g, '') ? (
+                    {isTargetWord ? (
 
                       <div style={{ 
                         display: 'inline-flex',
@@ -341,6 +411,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         margin: '0 4px'
                       }}>
                         {parts.map((part, partIndex) => {
+                          console.log('🎨 Rendering part:', { partIndex, part, type: part.type });
+                          
                           if (part.type === 'text') {
                             return (
                               <span key={partIndex} style={{ whiteSpace: 'pre-wrap' }}>
@@ -349,6 +421,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             );
                           } else {
                             const expectedLength = part.answer?.length || 5;
+                            console.log('📝 Creating input boxes:', { expectedLength, answer: part.answer });
                             return (
                               <div key={partIndex} className="flex items-center gap-2">
                                 {Array.from({ length: expectedLength }, (_, letterIndex) => {
@@ -554,7 +627,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     {idx < workingSentence.split(' ').length - 1 && " "}
 
                   </React.Fragment>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

@@ -30,6 +30,14 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
   Object.values(sampleMCQData.topics).forEach(topic => {
     topic.questions.forEach(question => {
       if (question.isSpelling === true) {
+        // Determine the actual spelling target word
+        let spellingTarget = question.audio || question.word;
+        
+        // If the audio field contains a phonetic concept (multiple words), use the word field instead
+        if (spellingTarget && spellingTarget.includes(' ') && spellingTarget.includes('sounds')) {
+          spellingTarget = question.word;
+        }
+        
         spellingQuestions.push({
           id: question.id,
           topicId: question.topicId,
@@ -37,7 +45,7 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
           word: question.word,
           questionText: question.questionText,
           correctAnswer: question.correctAnswer.toString(),
-          audio: question.audio,
+          audio: spellingTarget, // Use the determined spelling target
           explanation: question.explanation,
           templateType: question.templateType
         });
@@ -53,11 +61,21 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
  */
 export const getRandomSpellingQuestion = (): SpellingQuestion | null => {
   const spellingQuestions = getAllSpellingQuestions();
+  console.log('🎲 Available spelling questions:', spellingQuestions.length);
   
   if (spellingQuestions.length === 0) {
     return null;
   }
   
   const randomIndex = Math.floor(Math.random() * spellingQuestions.length);
-  return spellingQuestions[randomIndex];
+  const selectedQuestion = spellingQuestions[randomIndex];
+  
+  console.log('🎯 Selected spelling question:', {
+    id: selectedQuestion.id,
+    word: selectedQuestion.word,
+    audio: selectedQuestion.audio,
+    questionText: selectedQuestion.questionText
+  });
+  
+  return selectedQuestion;
 };
