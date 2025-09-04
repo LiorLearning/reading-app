@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { playClickSound } from "@/lib/sounds";
+import { playClickSound, playImageCompleteSound } from "@/lib/sounds";
 import SpellBox from "./SpellBox";
 
 interface ComicPanelProps {
@@ -63,9 +63,20 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   const [showImageAfterLoad, setShowImageAfterLoad] = React.useState(false);
   const [previousLoadingState, setPreviousLoadingState] = React.useState(isGenerating);
   const [currentImage, setCurrentImage] = React.useState(image);
+  const [isImageLoading, setIsImageLoading] = React.useState(false);
   const fadeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Track when loading completes to trigger image fade-in
+  // Preload image and wait for it to fully load before showing
+  const preloadImage = React.useCallback((imageUrl: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Image failed to load'));
+      img.src = imageUrl;
+    });
+  }, []);
+
+  // Track when loading completes to trigger image fade-in with proper image loading
   React.useEffect(() => {
     // Clear any existing timeout
     if (fadeTimeoutRef.current) {
@@ -73,54 +84,109 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
       fadeTimeoutRef.current = null;
     }
 
-    // When isGenerating changes from true to false, wait a brief moment then show image
+    // When isGenerating changes from true to false, preload the new image first
     if (previousLoadingState && !isGenerating) {
+      setIsImageLoading(true);
+      
       // Update the current image when loading completes
       setCurrentImage(image);
       
-      fadeTimeoutRef.current = setTimeout(() => {
-        // Safety check: only show image if we're still not generating
-        // This prevents showing the image if loading started again during the timeout
-        if (!isGenerating) {
-          setShowImageAfterLoad(true);
-        }
-      }, 300); // Small delay to ensure smooth transition
+      // Preload the new image and show it only when ready
+      preloadImage(image)
+        .then(() => {
+          // Extra safety check: only show image if we're still not generating
+          // This prevents showing the image if loading started again during preload
+          if (!isGenerating) {
+            setShowImageAfterLoad(true);
+            setIsImageLoading(false);
+            // Play completion sound when image is ready and displayed
+            playImageCompleteSound();
+          }
+        })
+        .catch((error) => {
+          console.warn('Failed to preload image, showing anyway:', error);
+          // Show the image even if preloading failed, but add a small delay
+          fadeTimeoutRef.current = setTimeout(() => {
+            if (!isGenerating) {
+              setShowImageAfterLoad(true);
+              setIsImageLoading(false);
+              // Play completion sound even if preloading failed
+              playImageCompleteSound();
+            }
+          }, 300);
+        });
     }
     
     // When loading starts again, immediately hide the image
     if (isGenerating && !previousLoadingState) {
       setShowImageAfterLoad(false);
+      setIsImageLoading(false);
     }
     
     setPreviousLoadingState(isGenerating);
-  }, [isGenerating, previousLoadingState, image]);
+  }, [isGenerating, previousLoadingState, image, preloadImage]);
 
   // Reset state when it's a new panel or image changes
   React.useEffect(() => {
     if (isNew) {
       setShowImageAfterLoad(false);
       setCurrentImage(image);
+      setIsImageLoading(false);
     }
   }, [isNew, image]);
 
   // Handle image changes during non-loading states
   React.useEffect(() => {
-    if (!isGenerating && !isNew && image !== currentImage) {
-      setCurrentImage(image);
-      setShowImageAfterLoad(true);
+    if (!isGenerating && !isNew && !isImageLoading && image !== currentImage) {
+      setIsImageLoading(true);
+      
+      // Preload the new image before showing it
+      preloadImage(image)
+        .then(() => {
+          setCurrentImage(image);
+          setShowImageAfterLoad(true);
+          setIsImageLoading(false);
+          // Play completion sound when image update is ready
+          playImageCompleteSound();
+        })
+        .catch((error) => {
+          console.warn('Failed to preload image during update, showing anyway:', error);
+          setCurrentImage(image);
+          setShowImageAfterLoad(true);
+          setIsImageLoading(false);
+          // Play completion sound even if preloading failed during update
+          playImageCompleteSound();
+        });
     }
-  }, [image, currentImage, isGenerating, isNew]);
+  }, [image, currentImage, isGenerating, isNew, isImageLoading, preloadImage]);
 
-  // Handle image changes during fade timeout - update the image immediately
+  // Handle image changes during fade timeout - preload and update the image
   React.useEffect(() => {
-    if (fadeTimeoutRef.current && image !== currentImage && !isGenerating) {
-      // Clear the existing timeout and update image immediately
+    if (fadeTimeoutRef.current && image !== currentImage && !isGenerating && !isImageLoading) {
+      // Clear the existing timeout and preload the new image
       clearTimeout(fadeTimeoutRef.current);
       fadeTimeoutRef.current = null;
-      setCurrentImage(image);
-      setShowImageAfterLoad(true);
+      
+      setIsImageLoading(true);
+      
+      preloadImage(image)
+        .then(() => {
+          setCurrentImage(image);
+          setShowImageAfterLoad(true);
+          setIsImageLoading(false);
+          // Play completion sound when timeout handling completes
+          playImageCompleteSound();
+        })
+        .catch((error) => {
+          console.warn('Failed to preload image during timeout handling, showing anyway:', error);
+          setCurrentImage(image);
+          setShowImageAfterLoad(true);
+          setIsImageLoading(false);
+          // Play completion sound even if preloading failed during timeout handling
+          playImageCompleteSound();
+        });
     }
-  }, [image, currentImage, isGenerating]);
+  }, [image, currentImage, isGenerating, isImageLoading, preloadImage]);
 
   // Cleanup timeout on unmount
   React.useEffect(() => {
@@ -137,7 +203,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
       className
     )}>
       <div className="flex-1 min-h-0 relative">
-        {(isNew || isGenerating) ? (
+        {(isNew || isGenerating || isImageLoading) ? (
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
             {/* Loading Animation Container */}
             <div 
@@ -173,7 +239,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                     ✨ Creating Magic ✨
                   </div>
                   <div className="text-gray-600 text-sm animate-pulse">
-                    Your adventure image is being crafted...
+                    {isImageLoading ? 'Finalizing your adventure image...' : 'Your adventure image is being crafted...'}
                   </div>
                 </div>
                 

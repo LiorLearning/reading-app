@@ -107,26 +107,26 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
     // For full passages (longer content), use more lenient matching
     if (sentence && sentence.length > 100) {
-      console.log('🔍 SpellBox: Processing long passage for word:', word);
+      // console.log('🔍 SpellBox: Processing long passage for word:', word);
       // First try strict matching
       if (containsWord(sentence, true)) {
-        console.log('✅ SpellBox: Found word with strict matching in long passage');
+        // console.log('✅ SpellBox: Found word with strict matching in long passage');
         return sentence;
       }
       // Then try lenient matching for longer passages
       if (containsWord(sentence, false)) {
-        console.log('✅ SpellBox: Found word with lenient matching in long passage');
+        // console.log('✅ SpellBox: Found word with lenient matching in long passage');
         return sentence;
       }
       // Last attempt: extract sentence containing the word
       const sentences = sentence.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
       for (const sent of sentences) {
         if (containsWord(sent, false)) {
-          console.log('✅ SpellBox: Found word in extracted sentence:', sent);
+          // console.log('✅ SpellBox: Found word in extracted sentence:', sent);
           return sent;
         }
       }
-      console.log('❌ SpellBox: Could not find word in long passage');
+      // console.log('❌ SpellBox: Could not find word in long passage');
     } else {
       // For shorter content, use strict matching
       if (sentence && containsWord(sentence, true)) {
@@ -146,21 +146,21 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Get the working sentence - this ensures we always have something to work with
   const workingSentence = ensureSpellingSentence(targetWord, sentence, questionText);
   
-  console.log('🎯 SpellBox Debug:', { 
-    sentence, 
-    sentenceLength: sentence?.length,
-    targetWord, 
-    questionText, 
-    workingSentence,
-    workingSentenceLength: workingSentence?.length,
-    hasQuestion: !!question 
-  });
+  // console.log('🎯 SpellBox Debug:', { 
+  //   sentence, 
+  //   sentenceLength: sentence?.length,
+  //   targetWord, 
+  //   questionText, 
+  //   workingSentence,
+  //   workingSentenceLength: workingSentence?.length,
+  //   hasQuestion: !!question 
+  // });
   
 
   // Debug: Check if target word is found in working sentence
   const wordFoundInSentence = workingSentence && targetWord && 
     workingSentence.toLowerCase().includes(targetWord.toLowerCase());
-  console.log(`🔍 SpellBox: Target word "${targetWord}" found in sentence: ${wordFoundInSentence}`);
+  // console.log(`🔍 SpellBox: Target word "${targetWord}" found in sentence: ${wordFoundInSentence}`);
   
   if (!wordFoundInSentence && targetWord && workingSentence) {
     console.error(`❌ SpellBox CRITICAL: Target word "${targetWord}" NOT found in sentence: "${workingSentence}"`);
