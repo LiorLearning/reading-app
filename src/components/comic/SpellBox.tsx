@@ -530,42 +530,23 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
       className
     )}>
-      <div className="spellbox-container pointer-events-auto bg-white/95 backdrop-blur-sm rounded-3xl p-6 border-4 border-purple-200 shadow-2xl max-w-md w-full mx-4">
-        <div style={{ fontFamily: 'Quicksand, sans-serif', fontSize: 18, fontWeight: 500, lineHeight: 1.6 }}>
-          {/* Progress indicator */}
-          {showProgress && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px', 
-              marginBottom: '16px',
-              padding: '8px 12px',
-              background: 'linear-gradient(135deg, #F8F5FF 0%, #EDE9FE 100%)',
-              borderRadius: '12px',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
-              animation: 'fadeSlideIn 0.3s ease-out'
-            }}>
-              <span style={{ fontSize: '16px' }}>📚</span>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: '#6B46C1' }}>
-                Question {currentQuestionIndex + 1} of {totalQuestions}
-              </span>
-            </div>
-          )}
+      <div className="spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4">
+        <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
 
           {/* Question text */}
 
           {workingSentence && (
 
-            <div className="mb-6 text-center px-4 py-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border-2 border-indigo-100 shadow-inner">
-              <div className="text-lg text-gray-800" style={{ 
-                fontFamily: 'Quicksand, sans-serif',
-                lineHeight: 1.8,
-                letterSpacing: '0.01em',
+            <div className="mb-8 text-center">
+              <div className="text-xl text-gray-800" style={{ 
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                lineHeight: 1.6,
+                letterSpacing: 'normal',
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px'
+                gap: '8px'
               }}>
 
                 {workingSentence.split(' ').map((word, idx) => {
@@ -610,16 +591,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   const isWordIncorrectNow = isWordIncorrect(userAnswer, part.answer || '', expectedLength);
                                   
                                   let boxStyle: React.CSSProperties = {
-                                    width: '32px',
-                                    height: '40px',
+                                    width: '36px',
+                                    height: '44px',
                                     padding: '0',
                                     borderRadius: '8px',
-                                    fontSize: '20px',
-                                    fontFamily: 'Quicksand, sans-serif',
-                                    fontWeight: '700',
+                                    fontSize: '22px',
+                                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                                    fontWeight: '600',
                                     textAlign: 'center',
                                     outline: 'none',
-                                    transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                    transition: 'all 0.15s ease-out',
                                     textTransform: 'uppercase',
                                     cursor: 'pointer'
                                   };
@@ -718,9 +699,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         }
                                         if (!isWordCorrectNow && !isWordIncorrectNow) {
                                           e.target.style.borderStyle = 'solid';
-                                          e.target.style.borderColor = '#6366F1';
-                                          e.target.style.boxShadow = '0 0 0 4px rgba(99, 102, 241, 0.2)';
-                                          e.target.style.transform = 'scale(1.05)';
+                                          e.target.style.borderColor = '#8B5CF6';
+                                          e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.2)';
+                                          e.target.style.transform = 'scale(1.02)';
                                         }
                                       }}
                                       onBlur={(e) => {
@@ -733,16 +714,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         
                                         if (isCorrectNow) {
                                           e.target.style.borderColor = '#22C55E';
-                                          e.target.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.2)';
+                                          e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
                                         } else if (isIncorrectNow) {
                                           e.target.style.borderColor = '#EF4444';
-                                          e.target.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.2)';
+                                          e.target.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.2)';
                                         } else if (hasValue) {
                                           e.target.style.borderColor = '#0EA5E9';
-                                          e.target.style.boxShadow = '0 4px 12px rgba(14, 165, 233, 0.2)';
+                                          e.target.style.boxShadow = '0 2px 4px rgba(14, 165, 233, 0.2)';
                                         } else {
                                           e.target.style.borderColor = '#94A3B8';
-                                          e.target.style.boxShadow = '0 4px 12px rgba(148, 163, 184, 0.1)';
+                                          e.target.style.boxShadow = '0 1px 2px rgba(148, 163, 184, 0.1)';
                                         }
                                       }}
                                       data-letter={letterIndex}
@@ -755,8 +736,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   onClick={playWordAudio}
                                   id="spellbox-speaker-button"
                                   style={{
-                                    width: '40px',
-                                    height: '40px',
+                                    width: '44px',
+                                    height: '44px',
                                     borderRadius: '8px',
                                     border: 'none',
                                     background: isSpeaking 
@@ -767,11 +748,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '20px',
+                                    fontSize: '24px',
                                     boxShadow: isSpeaking 
                                       ? '0 4px 12px rgba(220, 38, 38, 0.3)'
                                       : '0 4px 12px rgba(99, 102, 241, 0.3)',
-                                    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                    transition: 'all 0.15s ease-out',
                                     opacity: 1,
                                     transform: 'scale(1)',
                                     position: 'relative'
@@ -779,12 +760,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   title={isSpeaking ? "Stop audio" : "Listen to this word"}
                                   onMouseEnter={(e) => {
                                     if (!isSpeaking) {
-                                      e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
+                                      e.currentTarget.style.transform = 'scale(1.05)';
                                     }
                                   }}
                                   onMouseLeave={(e) => {
                                     if (!isSpeaking) {
-                                      e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+                                      e.currentTarget.style.transform = 'scale(1)';
                                     }
                                   }}
                                 >
@@ -796,9 +777,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         })}
                       </div>
                     ) : (
-                      <span className="inline-block animate-float" 
+                      <span className="inline-block" 
                         style={{ 
-                          animationDelay: `${idx * 0.1}s`,
                           fontWeight: '400'
                         }}>
                         {word}
@@ -824,42 +804,101 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               borderRadius: '16px',
               padding: '16px 20px',
               marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
+              position: 'relative',
               animation: 'bounceIn 0.5s ease-out',
               boxShadow: '0 4px 12px rgba(251, 146, 60, 0.15)'
             }}>
-              <span style={{ fontSize: '24px' }}>🤖</span>
-              <div style={{ 
-                fontSize: '15px', 
-                fontWeight: 500, 
-                color: '#C2410C', 
-                lineHeight: 1.5,
-                flex: 1,
-                fontFamily: 'Quicksand, sans-serif'
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
               }}>
-                {isGeneratingHint ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{
-                      width: '16px',
-                      height: '16px',
-                      border: '2px solid #FB923C',
-                      borderTop: '2px solid transparent',
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite'
-                    }}></div>
-                    <span>Thinking of a helpful hint...</span>
+                <span style={{ fontSize: '24px' }}></span>
+                <div style={{ 
+                  fontSize: '16px', 
+                  fontWeight: 500, 
+                  color: '#C2410C', 
+                  lineHeight: 1.5,
+                  flex: 1,
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  gap: '8px'
+                }}>
+                  <div style={{ flex: 1 }}>
+                    {isGeneratingHint ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid #FB923C',
+                          borderTop: '2px solid transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite'
+                        }}></div>
+                        <span>Thinking of a helpful hint...</span>
+                      </div>
+                    ) : aiHint ? (
+                      <div>
+                        <strong></strong> {aiHint}
+                      </div>
+                    ) : (
+                      <div>
+                        <strong>Friendly Hint:</strong> This word has {targetWord.length} magical letters!
+                      </div>
+                    )}
                   </div>
-                ) : aiHint ? (
-                  <div>
-                    <strong>AI Tutor:</strong> {aiHint}
-                  </div>
-                ) : (
-                  <div>
-                    <strong>Friendly Hint:</strong> This word has {targetWord.length} magical letters!
-                  </div>
-                )}
+                  
+                  {/* Speaker button inline with text - bottom right */}
+                  {(aiHint || (!isGeneratingHint && !aiHint)) && (
+                    <button
+                      onClick={async () => {
+                        playClickSound();
+                        const hintText = aiHint || `Friendly hint: This word has ${targetWord.length} magical letters!`;
+                        const hintMessageId = `spellbox-hint-${Date.now()}`;
+                        
+                        try {
+                          await ttsService.speak(hintText, {
+                            stability: 0.7,
+                            similarity_boost: 0.9,
+                            speed: 0.8,
+                            messageId: hintMessageId
+                          });
+                        } catch (error) {
+                          console.error('Error playing hint audio:', error);
+                        }
+                      }}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
+                        color: 'white',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        boxShadow: '0 2px 4px rgba(251, 146, 60, 0.3)',
+                        transition: 'all 0.15s ease-out',
+                        opacity: 0.8,
+                        flexShrink: 0
+                      }}
+                      title="Listen to hint"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                        e.currentTarget.style.opacity = '1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.opacity = '0.8';
+                      }}
+                    >
+                      🔊
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -876,23 +915,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </button>
             */}
             
-            {isComplete && !isCorrect && showHints && (
-              <button
-                onClick={() => {
-                  setUserAnswer('');
-                  setIsCorrect(false);
-                  setIsComplete(false);
-                  setShowHint(false);
-                  setAiHint('');
-                  setAttempts(prev => prev + 1);
-                  playClickSound();
-                }}
-                className="px-6 py-3 text-base font-semibold text-indigo-600 hover:text-indigo-800 transition-all rounded-xl hover:bg-indigo-50"
-                style={{ fontFamily: 'Quicksand, sans-serif' }}
-              >
-                Try Again 🌟
-              </button>
-            )}
 
             {isCorrect && onNext && (
               <button
@@ -900,8 +922,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   playClickSound();
                   onNext();
                 }}
-                className="px-6 py-3 text-base font-semibold bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 hover:shadow-lg"
-                style={{ fontFamily: 'Quicksand, sans-serif' }}
+                className="px-8 py-4 text-lg font-medium bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-102 hover:shadow-md"
+                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
               >
                 Next Question ✨
               </button>
@@ -940,17 +962,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               }
             }
 
-            @keyframes float {
-              0% {
-                transform: translateY(0px);
-              }
-              50% {
-                transform: translateY(-4px);
-              }
-              100% {
-                transform: translateY(0px);
-              }
-            }
 
             @keyframes spin {
               0% {
@@ -961,9 +972,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               }
             }
 
-            .animate-float {
-              animation: float 2s ease-in-out infinite;
-            }
           `}</style>
         </div>
 
