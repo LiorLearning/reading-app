@@ -952,15 +952,45 @@ const Index = () => {
         }
       });
       
-      // Prevent multiple simultaneous requests
+      // 🛠️ IMPROVED: Better handling of stuck streaming state
       if (unifiedAIStreaming.isStreaming) {
-        console.log('⚠️ Unified system already streaming - ignoring duplicate request');
-        return;
+        console.log('⚠️ Unified system appears to be streaming');
+        
+        // 🔧 Check if this is a stuck state by looking for suspicious conditions
+        const streamingTimeout = 30000; // 30 seconds max streaming time
+        const lastMessageTime = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].timestamp : Date.now();
+        const timeSinceLastMessage = Date.now() - lastMessageTime;
+        
+        if (timeSinceLastMessage > streamingTimeout) {
+          console.log('🚨 STUCK STATE DETECTED: Streaming for too long, forcing reset');
+          
+          // Force abort the stuck stream
+          try {
+            unifiedAIStreaming.abortStream();
+          } catch (abortError) {
+            console.warn('Failed to abort stuck stream:', abortError);
+          }
+          
+          // Small delay to let abort complete, then continue with new request
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          console.log('✅ Stuck state cleared, proceeding with new request');
+        } else {
+          // Normal case - actually streaming, ignore duplicate request
+          console.log('⚠️ Valid streaming in progress - ignoring duplicate request');
+          return;
+        }
       }
       
       // Check if user is asking for image generation using intent-based detection
       const detectImageIntent = (text: string): boolean => {
         const lowerText = text.toLowerCase().trim();
+        
+        // 🛠️ CRITICAL: Always detect "create image:" format from button clicks
+        if (lowerText.startsWith('create image:')) {
+          console.log('✅ Detected "create image:" format from button click');
+          return true;
+        }
         
         // Direct image request patterns
         const directImagePatterns = [
@@ -1012,36 +1042,45 @@ const Index = () => {
           if (unifiedResponse && unifiedResponse.textContent) {
             console.log(`✅ Unified AI image response: ${unifiedResponse.hasImages ? 'with images' : 'text only'}`);
             
-            // Add user message
-            const userMessage: ChatMessage = {
-              type: 'user',
-              content: text,
-              timestamp: Date.now()
-            };
-            
-            // Add AI message (no spelling properties for image responses)
-            const aiMessage: ChatMessage = {
-              type: 'ai', 
-              content: unifiedResponse.textContent,
-              timestamp: Date.now()
-            };
-            
-            setChatMessages(prev => {
-              setLastMessageCount(prev.length + 2);
-              playMessageSound();
+            // 🛠️ CRITICAL FIX: For image requests, only accept responses that actually contain images
+            if (unifiedResponse.hasImages && unifiedResponse.imageUrls.length > 0) {
+              // Add user message
+              const userMessage: ChatMessage = {
+                type: 'user',
+                content: text,
+                timestamp: Date.now()
+              };
               
-              // Auto-speak the AI message
-              const messageId = `index-chat-${aiMessage.timestamp}-${prev.length + 1}`;
-              ttsService.speakAIMessage(aiMessage.content, messageId);
+              // Add AI message (no spelling properties for image responses)
+              const aiMessage: ChatMessage = {
+                type: 'ai', 
+                content: unifiedResponse.textContent,
+                timestamp: Date.now()
+              };
               
-              return [...prev, userMessage, aiMessage];
-            });
-            
-            // Save updated adventure
-            saveUserAdventure([...chatMessages, userMessage, aiMessage]);
-            
-            // Note: Images are automatically handled by the onNewImage callback
-            return; // Exit early - unified system handled image request
+              setChatMessages(prev => {
+                setLastMessageCount(prev.length + 2);
+                playMessageSound();
+                
+                // Auto-speak the AI message
+                const messageId = `index-chat-${aiMessage.timestamp}-${prev.length + 1}`;
+                ttsService.speakAIMessage(aiMessage.content, messageId);
+                
+                return [...prev, userMessage, aiMessage];
+              });
+              
+              // Save updated adventure
+              saveUserAdventure([...chatMessages, userMessage, aiMessage]);
+              
+              // Note: Images are automatically handled by the onNewImage callback
+              return; // Exit early - unified system handled image request WITH images
+            } else {
+              // Unified system returned text but NO IMAGES for an image request - fall through to legacy
+              console.log('⚠️ Unified system returned text-only response for image request - falling back to legacy image generation');
+            }
+          } else {
+            // Unified system returned null - fall through to legacy image generation
+            console.log('⚠️ Unified system returned null for image request - falling back to legacy image generation');
           }
           
         } catch (unifiedError) {

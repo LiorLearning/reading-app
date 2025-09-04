@@ -1206,6 +1206,12 @@ Return ONLY the new reading passage, nothing else.`;
     // Set generation flag to prevent simultaneous calls
     this.isGeneratingImage = true;
 
+    // 🛠️ Safety timeout to prevent permanent stuck state
+    const safetyTimeout = setTimeout(() => {
+      console.log('🚨 SAFETY TIMEOUT: Clearing stuck isGeneratingImage flag after 40 seconds');
+      this.isGeneratingImage = false;
+    }, 40000);
+
     try {
       console.log('🌟 Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
 
@@ -1239,6 +1245,7 @@ Return ONLY the new reading passage, nothing else.`;
         
         if (imageUrl) {
           console.log(`✅ PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
+          clearTimeout(safetyTimeout); // Clear safety timeout
           this.isGeneratingImage = false; // Clear generation flag
           return { imageUrl, usedPrompt: finalPrompt };
         }
@@ -1282,6 +1289,7 @@ Return ONLY the new reading passage, nothing else.`;
           
           if (imageUrl) {
             console.log(`✅ Fallback DALL-E prompt ${i + 1} succeeded`);
+            clearTimeout(safetyTimeout); // Clear safety timeout
             this.isGeneratingImage = false; // Clear generation flag
             return { imageUrl, usedPrompt: finalPrompt };
           }
@@ -1300,10 +1308,12 @@ Return ONLY the new reading passage, nothing else.`;
       throw new Error('All adventure prompt options failed');
     } catch (error) {
       console.error('DALL-E API error for adventure image:', error);
+      clearTimeout(safetyTimeout); // Clear safety timeout
       this.isGeneratingImage = false; // Clear generation flag on error
       return null;
     } finally {
       // Ensure flag is always cleared (backup safety measure)
+      clearTimeout(safetyTimeout);
       this.isGeneratingImage = false;
     }
   }

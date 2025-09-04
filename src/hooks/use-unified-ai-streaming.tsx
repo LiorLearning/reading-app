@@ -159,13 +159,27 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       return null;
     }
     
-    // Prevent multiple simultaneous requests
+    // 🛠️ IMPROVED: Better handling of existing streaming state
     if (streamingState.isStreaming) {
       console.log('⚠️ Already streaming - aborting previous request');
-      aiService.abortUnifiedStream(sessionId);
       
-      // Small delay to let the abort complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      try {
+        aiService.abortUnifiedStream(sessionId);
+        
+        // Immediately reset streaming state to prevent stuck conditions
+        setStreamingState(prev => ({
+          ...prev,
+          isStreaming: false,
+          isGeneratingImage: false,
+          error: null
+        }));
+        
+        // Small delay to let the abort complete
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (abortError) {
+        console.warn('Failed to abort previous stream:', abortError);
+        // Continue anyway - don't let abort failure block new requests
+      }
     }
     
     console.log('🎯 Starting new unified streaming request:', {
@@ -185,8 +199,28 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       lastResponse: null
     }));
     
+    // 🛠️ Set up a safety timeout to prevent permanently stuck state
+    let streamingTimeout: NodeJS.Timeout | null = null;
+    
     try {
       console.log('🚀 Sending message through unified AI system:', message.substring(0, 50));
+      
+      streamingTimeout = setTimeout(() => {
+        console.log('🚨 STREAMING TIMEOUT: Force-resetting stuck state after 35 seconds');
+        setStreamingState(prev => ({
+          ...prev,
+          isStreaming: false,
+          isGeneratingImage: false,
+          error: 'Request timed out - please try again'
+        }));
+        
+        // Also abort the service-level stream
+        try {
+          aiService.abortUnifiedStream(sessionId);
+        } catch (err) {
+          console.warn('Failed to abort timed-out stream:', err);
+        }
+      }, 35000); // 35 second timeout
       
       // Generate unified response
       const response = await aiService.generateUnifiedResponse(
@@ -197,15 +231,22 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         sessionId
       );
       
+      // Clear the timeout since request completed successfully
+      if (streamingTimeout) {
+        clearTimeout(streamingTimeout);
+      }
+      
       console.log(`✅ Unified response received with ${response.imageUrls.length} images`);
       
       // Update final state
       setStreamingState(prev => ({
         ...prev,
         isStreaming: false,
+        isGeneratingImage: false, // Ensure this is also reset
         lastResponse: response,
         currentText: response.textContent,
-        generatedImages: response.imageUrls
+        generatedImages: response.imageUrls,
+        error: null // Clear any previous errors
       }));
       
       // Call completion callback
@@ -216,6 +257,11 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       return response;
       
     } catch (error) {
+      // 🛠️ IMPROVED: Always clear timeout on any error
+      if (streamingTimeout) {
+        clearTimeout(streamingTimeout);
+      }
+      
       // Handle aborted requests gracefully
       if (error instanceof Error && (error.name === 'APIUserAbortError' || error.message.includes('aborted'))) {
         console.log('ℹ️ Request aborted (new message sent or component unmounted)');
@@ -229,6 +275,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         // Stop any loading sound when request is aborted
         stopImageLoadingSound();
         
+        // 🛠️ CRITICAL: Always reset streaming state on abort
         setStreamingState(prev => ({
           ...prev,
           isStreaming: false,
@@ -241,9 +288,12 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       console.error('❌ Unified streaming error:', error);
       
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // 🛠️ CRITICAL: Always reset streaming state on any error
       setStreamingState(prev => ({
         ...prev,
         isStreaming: false,
+        isGeneratingImage: false,
         error: errorMessage
       }));
       
