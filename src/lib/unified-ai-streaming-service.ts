@@ -319,8 +319,8 @@ Adventure Guidelines:
 - End with excitement and either a cliffhanger or engaging question
 - Always incorporate the spelling word naturally into the adventure
 
-Current Spelling Word: ${spellingQuestion.audio} (use this word naturally in your response)
-Spelling Context: ${spellingQuestion.questionText}
+Current Spelling Word: ${spellingQuestion.word} (use this word naturally in your response)
+Spelling Context: ${spellingQuestion.audio}
 
 Remember: I'm your loyal companion - speak as "I" and refer to the student as "you". Make the adventure thrilling and mysterious!`;
     
