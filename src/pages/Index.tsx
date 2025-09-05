@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-ai-streaming";
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
+import { useCoins } from "@/pages/coinSystem";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -31,6 +32,7 @@ import MCQScreenTypeA from "./MCQScreenTypeA";
 import TopicSelection from "./TopicSelection";
   import UserOnboarding from "./UserOnboarding";
   import HomePage from "./HomePage";
+  import { PetPage } from "./PetPage";
   import { 
     cacheAdventureImage, 
     loadCachedAdventureImages, 
@@ -135,6 +137,9 @@ const Index = () => {
   // NEW: Unified AI streaming system status
   const { isUnifiedSystemReady, hasImageGeneration } = useUnifiedAIStatus();
 
+  // Coin system integration
+  const { coins, addCoins } = useCoins();
+
   // Auto-migrate localStorage data to Firebase when user authenticates
   React.useEffect(() => {
     if (user?.uid) {
@@ -231,7 +236,7 @@ const Index = () => {
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-    const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(() => {
+    const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3 | 4>(() => {
     // If user exists but no userData yet, start at loading state (don't show topic selection)
     if (user && !userData) return -1;
     // If userData exists and user is already setup, go to home
@@ -1535,6 +1540,17 @@ const Index = () => {
     }
   }, [autoAssignTopicAndNavigate]);
 
+  // Handle pet page navigation
+  const handlePetNavigation = React.useCallback(() => {
+    playClickSound();
+    
+    // Stop any ongoing TTS before navigation
+    console.log('🔧 Pet navigation cleanup: Stopping TTS');
+    ttsService.stop();
+    
+    setCurrentScreen(4); // Go to pet page
+  }, []);
+
   // Handle chat summary generation (every 2 messages)
   const handleSummaryGeneration = useCallback(async (sessionId: string, currentMessages: ChatMessage[]) => {
     try {
@@ -2294,6 +2310,9 @@ const Index = () => {
     playClickSound();
     
     if (isCorrect) {
+      // Award 10 coins for correct spelling answer
+      addCoins(10);
+      
       // Update progress
       setSpellProgress(prev => ({
         ...prev,
@@ -2309,10 +2328,10 @@ const Index = () => {
         // Add adventure story
         setChatMessages(prev => {
           
-          // Create the adventure story message
+          // Create the adventure story message with coin reward notification
           const adventureStoryMessage: ChatMessage = {
             type: 'ai',
-            content: latestAIResponse.content_after_spelling,
+            content: `🎉 Great job! You earned 10 coins! 🪙\n\n${latestAIResponse.content_after_spelling}`,
             timestamp: Date.now() + 1 // Ensure it comes after success message
           };
           
@@ -2395,6 +2414,39 @@ const Index = () => {
       return [...prev, nextMessage];
     });
   }, [setChatMessages]);
+
+  // Special handling for pet page - render full screen without header
+  if (currentScreen === 4) {
+    return (
+      <div className="h-screen w-screen overflow-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        
+        {/* Home Button for Pet Page */}
+        <div className="absolute top-4 left-4 z-50">
+          <Button 
+            variant="default" 
+            onClick={async () => {
+              playClickSound();
+              await handleCloseSession(); // Save current adventure before going home
+              
+              // Trigger a re-render by briefly updating screen state to refresh homepage data
+              setCurrentScreen(0);
+              setTimeout(() => setCurrentScreen(-1), 100);
+            }}
+            className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4 shadow-xl"
+            style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+          >
+            🏠 Home
+          </Button>
+        </div>
+        
+        <PetPage />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
@@ -2769,6 +2821,19 @@ const Index = () => {
                 >
                   Adventure
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(4);
+                  }}
+                  disabled={false}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Pets
+                </Button>
               </>
             )}
             
@@ -2777,10 +2842,15 @@ const Index = () => {
                 {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
                  userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
                  currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
-                 currentScreen === 1 ? 'YOUR ADVENTURE' : 
+                 currentScreen === 1 ? (
+                   <div className="flex items-center justify-center gap-2">
+                     <span className="text-2xl">🪙</span>
+                     <span>{coins}</span>
+                   </div>
+                 ) : 
                  'QUIZ TIME'}
               </h1>
-              {userData && !devToolsVisible && (
+              {userData && !devToolsVisible && currentScreen !== 1 && (
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <span className="text-sm lg:text-base font-semibold text-primary/80">
                     🎓 {selectedGradeFromDropdown || userData.gradeDisplayName}
@@ -2853,21 +2923,19 @@ const Index = () => {
               </PopoverContent>
             </Popover>
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                  <HelpCircle className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>How to use</DialogTitle>
-                  <DialogDescription>
-                    Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              aria-label="Pet Page" 
+              className="border-2 bg-white btn-animate" 
+              style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} 
+              onClick={() => {
+                playClickSound();
+                setCurrentScreen(4); // Navigate to pet page
+              }}
+            >
+              <span className="text-lg">🐶</span>
+            </Button>
             
             <Dialog>
               <DialogTrigger asChild>
@@ -2929,6 +2997,7 @@ const Index = () => {
             onStartAdventure={handleStartAdventure} 
             onContinueSpecificAdventure={handleContinueSpecificAdventure}
             selectedTopicFromPreference={selectedTopicFromPreference}
+            onPetNavigation={handlePetNavigation}
           />
         ) : currentScreen === 0 ? (
           <TopicSelection onTopicSelect={handleTopicSelect} />
