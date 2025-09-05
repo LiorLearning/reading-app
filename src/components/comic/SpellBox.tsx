@@ -71,7 +71,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // First-time instruction state
   const [showFirstTimeInstruction, setShowFirstTimeInstruction] = useState(false);
   const [hasShownFirstTimeInstruction, setHasShownFirstTimeInstruction] = useState(false);
-  const [speakerButtonPosition, setSpeakerButtonPosition] = useState<{x: number, y: number} | null>(null);
+  // const [speakerButtonPosition, setSpeakerButtonPosition] = useState<{x: number, y: number} | null>(null);
 
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
@@ -166,23 +166,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     console.error(`❌ SpellBox CRITICAL: Target word "${targetWord}" NOT found in sentence: "${workingSentence}"`);
   }
   
-  // Get audio text with context from working sentence
-  const audioText = (() => {
-    if (!workingSentence) return targetWord;
-
-    
-    const words = workingSentence.split(' ');
-    // More robust word matching - remove punctuation for comparison
-    const targetIndex = words.findIndex(w => 
-      w.toLowerCase().replace(/[^\w]/g, '') === targetWord.toLowerCase().replace(/[^\w]/g, '')
-    );
-    if (targetIndex === -1) return targetWord;
-    
-    // Get target word and up to 2 words after it
-    return words
-      .slice(targetIndex, targetIndex + 3)
-      .join(' ');
-  })();
+  // Get audio text - just the target word for spelling
+  const audioText = targetWord;
 
   
   const explanation = question?.explanation;
@@ -251,40 +236,40 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const isInstructionSpeaking = useTTSSpeaking(instructionMessageId);
 
   // Calculate speaker button position dynamically
-  const calculateSpeakerButtonPosition = useCallback(() => {
-    const speakerButton = document.getElementById('spellbox-speaker-button');
-    const spellBoxContainer = document.querySelector('.spellbox-container');
-    
-    if (speakerButton && spellBoxContainer) {
-      const buttonRect = speakerButton.getBoundingClientRect();
-      const containerRect = spellBoxContainer.getBoundingClientRect();
-      
-      const relativeX = buttonRect.left - containerRect.left + (buttonRect.width / 2);
-      const relativeY = buttonRect.top - containerRect.top + (buttonRect.height / 2);
-      
-      setSpeakerButtonPosition({ x: relativeX, y: relativeY });
-      console.log('📍 Speaker button position calculated:', { 
-        x: relativeX, 
-        y: relativeY,
-        buttonRect: {
-          left: buttonRect.left,
-          top: buttonRect.top,
-          width: buttonRect.width,
-          height: buttonRect.height
-        },
-        containerRect: {
-          left: containerRect.left,
-          top: containerRect.top,
-          width: containerRect.width,
-          height: containerRect.height
-        }
-      });
-    } else {
-      console.warn('⚠️ Speaker button or container not found for positioning');
-      // Fallback to center-based positioning
-      setSpeakerButtonPosition({ x: 300, y: 200 }); // Default fallback
-    }
-  }, []);
+  // const calculateSpeakerButtonPosition = useCallback(() => {
+  //   const speakerButton = document.getElementById('spellbox-speaker-button');
+  //   const spellBoxContainer = document.querySelector('.spellbox-container');
+  //   
+  //   if (speakerButton && spellBoxContainer) {
+  //     const buttonRect = speakerButton.getBoundingClientRect();
+  //     const containerRect = spellBoxContainer.getBoundingClientRect();
+  //     
+  //     const relativeX = buttonRect.left - containerRect.left + (buttonRect.width / 2);
+  //     const relativeY = buttonRect.top - containerRect.top + (buttonRect.height / 2);
+  //     
+  //     setSpeakerButtonPosition({ x: relativeX, y: relativeY });
+  //     console.log('📍 Speaker button position calculated:', { 
+  //       x: relativeX, 
+  //       y: relativeY,
+  //       buttonRect: {
+  //         left: buttonRect.left,
+  //         top: buttonRect.top,
+  //         width: buttonRect.width,
+  //         height: buttonRect.height
+  //       },
+  //       containerRect: {
+  //         left: containerRect.left,
+  //         top: containerRect.top,
+  //         width: containerRect.width,
+  //         height: containerRect.height
+  //       }
+  //     });
+  //   } else {
+  //     console.warn('⚠️ Speaker button or container not found for positioning');
+  //     // Fallback to center-based positioning
+  //     setSpeakerButtonPosition({ x: 300, y: 200 }); // Default fallback
+  //   }
+  // }, []);
 
   // Generate AI hint for incorrect spelling
   const generateAIHint = useCallback(async (incorrectAttempt: string) => {
@@ -479,46 +464,46 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   }, [targetWord]);
 
   // Play instruction audio when first-time instruction shows
-  useEffect(() => {
-    if (showFirstTimeInstruction) {
-      // Calculate speaker button position first
-      const positionTimer = setTimeout(() => {
-        calculateSpeakerButtonPosition();
-      }, 100);
-      
-      // Wait longer before trying to play audio to allow chat TTS to complete
-      const audioTimer = setTimeout(() => {
-        playInstructionAudio();
-      }, 1500); // Increased delay to allow chat audio to complete
-      
-      return () => {
-        clearTimeout(positionTimer);
-        clearTimeout(audioTimer);
-      };
-    }
-  }, [showFirstTimeInstruction, playInstructionAudio, calculateSpeakerButtonPosition]);
+  // useEffect(() => {
+  //   if (showFirstTimeInstruction) {
+  //     // Calculate speaker button position first
+  //     const positionTimer = setTimeout(() => {
+  //       calculateSpeakerButtonPosition();
+  //     }, 100);
+  //     
+  //     // Wait longer before trying to play audio to allow chat TTS to complete
+  //     const audioTimer = setTimeout(() => {
+  //       playInstructionAudio();
+  //     }, 1500); // Increased delay to allow chat audio to complete
+  //     
+  //     return () => {
+  //       clearTimeout(positionTimer);
+  //       clearTimeout(audioTimer);
+  //     };
+  //   }
+  // }, [showFirstTimeInstruction, playInstructionAudio, calculateSpeakerButtonPosition]);
 
   // Retry position calculation if not found initially
-  useEffect(() => {
-    if (showFirstTimeInstruction && !speakerButtonPosition) {
-      const retryTimer = setTimeout(() => {
-        calculateSpeakerButtonPosition();
-      }, 200);
-      return () => clearTimeout(retryTimer);
-    }
-  }, [showFirstTimeInstruction, speakerButtonPosition, calculateSpeakerButtonPosition]);
+  // useEffect(() => {
+  //   if (showFirstTimeInstruction && !speakerButtonPosition) {
+  //     const retryTimer = setTimeout(() => {
+  //       calculateSpeakerButtonPosition();
+  //     }, 200);
+  //     return () => clearTimeout(retryTimer);
+  //   }
+  // }, [showFirstTimeInstruction, speakerButtonPosition, calculateSpeakerButtonPosition]);
 
   // Recalculate position on window resize
-  useEffect(() => {
-    if (showFirstTimeInstruction) {
-      const handleResize = () => {
-        calculateSpeakerButtonPosition();
-      };
-      
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, [showFirstTimeInstruction, calculateSpeakerButtonPosition]);
+  // useEffect(() => {
+  //   if (showFirstTimeInstruction) {
+  //     const handleResize = () => {
+  //       calculateSpeakerButtonPosition();
+  //     };
+  //     
+  //     window.addEventListener('resize', handleResize);
+  //     return () => window.removeEventListener('resize', handleResize);
+  //   }
+  // }, [showFirstTimeInstruction, calculateSpeakerButtonPosition]);
 
 
   // Don't render if we don't have the basic requirements, but be more lenient about sentence
@@ -975,8 +960,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           `}</style>
         </div>
 
-        {/* First-time instruction overlay - pointing finger only */}
-        {showFirstTimeInstruction && (
+        {/* First-time instruction overlay - pointing finger functionality commented out */}
+        {/*
+        showFirstTimeInstruction && (
           <div 
             style={{
               position: 'absolute',
@@ -998,32 +984,27 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             }}
             onClick={handleFirstTimeInstructionComplete}
           >
-            {/* Speaker button highlight circle */}
-            {speakerButtonPosition && (
-              <div style={{
-                position: 'absolute',
-                left: `${Math.max(0, speakerButtonPosition.x - 25)}px`,
-                top: `${Math.max(0, speakerButtonPosition.y - 25)}px`,
-                width: '50px',
-                height: '50px',
-                borderRadius: '50%',
-                background: 'rgba(99, 102, 241, 0.3)',
-                animation: 'speakerHighlight 2s ease-in-out infinite',
-                zIndex: 999,
-                pointerEvents: 'none'
-              }} />
-            )}
-
-            {/* Pointing finger positioned relative to speaker button */}
+            <div style={{
+              position: 'absolute',
+              left: `${Math.max(0, speakerButtonPosition.x - 25)}px`,
+              top: `${Math.max(0, speakerButtonPosition.y - 25)}px`,
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+              background: 'rgba(99, 102, 241, 0.3)',
+              animation: 'speakerHighlight 2s ease-in-out infinite',
+              zIndex: 999,
+              pointerEvents: 'none'
+            }} />
+            
             <div 
               className="pointing-finger"
               style={{
                 position: 'absolute',
-                fontSize: 'clamp(40px, 8vw, 52px)', // Responsive font size
+                fontSize: 'clamp(40px, 8vw, 52px)',
                 animation: 'pointToSpeaker 1.5s ease-in-out infinite',
                 filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4))',
                 zIndex: 1001,
-                // Position relative to dynamic speaker button location (pointing towards it)
                 left: speakerButtonPosition ? `${Math.max(10, speakerButtonPosition.x - 60)}px` : '50%',
                 top: speakerButtonPosition ? `${speakerButtonPosition.y - 15}px` : '50%',
                 transform: speakerButtonPosition ? 'none' : 'translate(70px, -10px)',
@@ -1034,7 +1015,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               👉
             </div>
 
-            {/* Pointing animation styles */}
             <style>{`
               @keyframes pointToSpeaker {
                 0%, 100% {
@@ -1067,22 +1047,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   background: rgba(99, 102, 241, 0.5);
                 }
               }
-
-              /* Responsive adjustments for smaller screens */
-              @media (max-width: 480px) {
-                .pointing-finger {
-                  font-size: 36px !important;
-                }
-              }
-
-              @media (max-width: 320px) {
-                .pointing-finger {
-                  font-size: 32px !important;
-                }
-              }
             `}</style>
           </div>
-        )}
+        )
+        */}
       </div>
     </div>
   );

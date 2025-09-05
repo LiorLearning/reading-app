@@ -399,24 +399,50 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
   async generateInitialMessage(
     adventureMode: 'new' | 'continue',
     chatHistory: ChatMessage[] = [],
-    currentAdventure?: any,
+    currentAdventure?: {name: string, summary: string} | any,
     storyEventsContext?: string,
     summary?: string,
     userData?: { username: string; [key: string]: any } | null
   ): Promise<string> {
     // If not initialized or no API key, use fallback
     if (!this.isInitialized || !this.client) {
-      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData);
+      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData, currentAdventure);
     }
 
     try {
       // Build context for initial message generation
       const adventureState = adventureMode === 'new' ? 'new' : 'continue';
       
-      // Create system message using the main adventure prompt
-      const systemMessage = {
-        role: "system" as const,
-        content: `You are a story-creating assistant for children aged 6–11. You help create imaginative adventures.
+      // Special handling for continuing specific adventures
+      const isSpecificAdventure = adventureMode === 'continue' && currentAdventure && currentAdventure.name;
+      
+      // Create system message with special handling for specific adventures
+      let systemContent: string;
+      
+      if (isSpecificAdventure) {
+        // Special prompt for continuing a specific adventure
+        systemContent = `You are welcoming the user back to their specific adventure: "${currentAdventure.name}".
+
+IMPORTANT CONTEXT:
+- Adventure Name: ${currentAdventure.name}
+- Adventure Summary: ${currentAdventure.summary}
+- This is a RETURN to an existing story, not starting fresh
+- User has been away and is coming back to continue this specific adventure
+
+YOUR TASK:
+- Generate a fun, contextual welcome message that references this specific adventure
+- Reference elements from the adventure summary (characters, settings, situations)
+- Make it feel like a natural continuation, not a restart
+- Show excitement to continue THEIR story
+- Ask an engaging question about what happens next in THEIR adventure
+- DO NOT ask about topics or interests (they already have an adventure)
+- Keep it under 40 words
+- Use the user's name: ${userData?.username || 'adventurer'}
+
+${chatHistory.length > 0 ? `Previous conversation context: ${chatHistory.slice(-2).map(m => `${m.type}: ${m.content}`).join(' | ')}` : ''}`;
+      } else {
+        // Standard prompt for new adventures or general continue
+        systemContent = `You are a story-creating assistant for children aged 6–11. You help create imaginative adventures.
 
 Role & Perspective:
 - Be my story-creating assistant in an imaginative adventure for children aged 6–11. Speak in the first person as my companion.
@@ -485,15 +511,22 @@ Current Adventure Details:
 - Setting: ${currentAdventure?.setting || 'Unknown'}
 - Goal: ${currentAdventure?.goal || 'To be discovered'}
 
-IMPORTANT: This is the very first message to start our adventure conversation. Generate an enthusiastic greeting that follows the adventure state guidelines above.`
+IMPORTANT: This is the very first message to start our adventure conversation. Generate an enthusiastic greeting that follows the adventure state guidelines above.`;
+      }
+
+      const systemMessage = {
+        role: "system" as const,
+        content: systemContent
       };
 
       // For initial message, we send just the system prompt and ask for a greeting
       const userMessage = {
         role: "user" as const,
-        content: adventureMode === 'new' 
-          ? "Hi! I'm ready to start a new adventure!" 
-          : "Hi! I'm ready to continue our adventure!"
+        content: isSpecificAdventure 
+          ? `Hi! I'm back to continue my adventure: "${currentAdventure.name}"`
+          : adventureMode === 'new' 
+            ? "Hi! I'm ready to start a new adventure!" 
+            : "Hi! I'm ready to continue our adventure!"
       };
 
       const messages = [systemMessage, userMessage];
@@ -517,12 +550,12 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
     } catch (error) {
       console.error('OpenAI API error for initial message:', error);
       // Return fallback response on error
-      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData);
+      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData, currentAdventure);
     }
   }
 
   // Fallback responses for initial messages when API is not available
-  private getFallbackInitialMessage(adventureMode: 'new' | 'continue', chatHistory: ChatMessage[], userData?: { username: string; [key: string]: any } | null): string {
+  private getFallbackInitialMessage(adventureMode: 'new' | 'continue', chatHistory: ChatMessage[], userData?: { username: string; [key: string]: any } | null, currentAdventure?: {name: string, summary: string} | any): string {
     if (adventureMode === 'new') {
       const userName = userData?.username || 'adventurer';
       const newAdventureMessages = [
@@ -534,10 +567,22 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
       return newAdventureMessages[Math.floor(Math.random() * newAdventureMessages.length)];
     } else {
       // Continue adventure fallbacks
+      const userName = userData?.username || 'adventurer';
+      
+      // Special case for specific adventures
+      if (currentAdventure && currentAdventure.name) {
+        const specificAdventureMessages = [
+          `🎯 Welcome back to "${currentAdventure.name}", ${userName}! I've been waiting for you to continue this epic tale! What happens next? ⭐`,
+          `🚀 ${userName}! Great to see you return to "${currentAdventure.name}"! I can't wait to see what amazing twist you'll add next! 🌟`,
+          `⚡ You're back, ${userName}! "${currentAdventure.name}" was just getting exciting! Ready to jump back into your adventure? What's your next move? 🎭`,
+          `🌈 Welcome back, ${userName}! I've been thinking about "${currentAdventure.name}" and all the possibilities ahead! What direction should we take it now? 🚀`
+        ];
+        return specificAdventureMessages[Math.floor(Math.random() * specificAdventureMessages.length)];
+      }
+      
+      // General continue adventure fallbacks
       const recentMessages = chatHistory.slice(-3);
       const hasRecentContext = recentMessages.length > 0;
-      
-      const userName = userData?.username || 'adventurer';
       
       if (hasRecentContext) {
         const contextMessages = [

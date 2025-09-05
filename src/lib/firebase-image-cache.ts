@@ -1,4 +1,20 @@
 import { firebaseImageService, StoredImage } from './firebase-image-service';
+import { firebaseImageUrlService, StoredImageUrl } from './firebase-image-url-service';
+
+// Helper function to safely convert Firebase timestamps to milliseconds
+function safeTimestampToMillis(timestamp: any): number {
+  try {
+    if (timestamp && typeof timestamp.toMillis === 'function') {
+      return timestamp.toMillis();
+    }
+    if (timestamp?.seconds) {
+      return timestamp.seconds * 1000;
+    }
+    return Date.now();
+  } catch {
+    return Date.now();
+  }
+}
 
 export interface FirebaseCachedImage {
   id: string;
@@ -18,19 +34,19 @@ export const cacheAdventureImageFirebase = async (
   prompt: string, 
   adventureContext: string = '',
   adventureId?: string
-): Promise<boolean> => {
+): Promise<string | null> => {
   try {
     // Don't cache if URL is null, empty, or a local asset
     if (!url || url.startsWith('/') || url.startsWith('data:')) {
-      return false;
+      return null;
     }
 
     if (!adventureId) {
       console.warn('No adventureId provided for Firebase image caching');
-      return false;
+      return null;
     }
 
-
+    // Try to upload the actual image file to Firebase Storage
     const storedImage = await firebaseImageService.uploadGeneratedImage(
       userId,
       adventureId,
@@ -39,16 +55,32 @@ export const cacheAdventureImageFirebase = async (
       adventureContext
     );
 
-    if (storedImage) {
+    // Always store the URL metadata for retrieval, regardless of file upload success
+    let finalImageUrl = url; // Default to original URL
+    if (storedImage && storedImage.imageUrl) {
+      finalImageUrl = storedImage.imageUrl; // Use permanent Firebase URL if available
+    }
 
-      return true;
+    // Store image URL metadata in the URL service for retrieval
+    const urlMetadata = await firebaseImageUrlService.storeImageUrl(
+      userId,
+      adventureId,
+      finalImageUrl,
+      prompt,
+      adventureContext,
+      storedImage ? 'local' : 'dalle' // Mark as 'local' if we have permanent Firebase URL, 'dalle' if temporary
+    );
+
+    if (urlMetadata) {
+      console.log(`🔄 Image cached to Firebase with metadata: ${prompt.substring(0, 30)}...`);
+      return finalImageUrl;
     } else {
-      console.warn('Failed to cache adventure image to Firebase');
-      return false;
+      console.warn('Failed to store image URL metadata to Firebase');
+      return storedImage ? storedImage.imageUrl : null;
     }
   } catch (error) {
     console.error('Error caching adventure image to Firebase:', error);
-    return false;
+    return null;
   }
 };
 
@@ -59,14 +91,14 @@ export const loadCachedAdventureImagesFirebase = async (
   userId: string
 ): Promise<FirebaseCachedImage[]> => {
   try {
-    const storedImages = await firebaseImageService.getUserImages(userId, 50);
+    const storedImages = await firebaseImageUrlService.getUserImageUrls(userId, 50);
     
-    return storedImages.map((img: StoredImage): FirebaseCachedImage => ({
+    return storedImages.map((img: StoredImageUrl): FirebaseCachedImage => ({
       id: img.id || crypto.randomUUID(),
       url: img.imageUrl,
       prompt: img.prompt,
       adventureContext: img.adventureContext,
-      timestamp: img.timestamp.toMillis(),
+      timestamp: safeTimestampToMillis(img.timestamp),
       adventureId: img.adventureId
     }));
   } catch (error) {
@@ -90,7 +122,7 @@ export const getCachedImagesForAdventureFirebase = async (
       url: img.imageUrl,
       prompt: img.prompt,
       adventureContext: img.adventureContext,
-      timestamp: img.timestamp.toMillis(),
+      timestamp: safeTimestampToMillis(img.timestamp),
       adventureId: img.adventureId
     }));
   } catch (error) {
@@ -114,7 +146,7 @@ export const getRecentCachedAdventureImagesFirebase = async (
       url: img.imageUrl,
       prompt: img.prompt,
       adventureContext: img.adventureContext,
-      timestamp: img.timestamp.toMillis(),
+      timestamp: safeTimestampToMillis(img.timestamp),
       adventureId: img.adventureId
     }));
   } catch (error) {
@@ -131,7 +163,6 @@ export const clearCachedAdventureImagesFirebase = async (
 ): Promise<void> => {
   try {
     await firebaseImageUrlService.clearAllUserImageUrls(userId);
-
   } catch (error) {
     console.error('Failed to clear cached adventure image URLs from Firebase:', error);
   }
@@ -182,10 +213,10 @@ export const cacheAdventureImageHybrid = async (
   adventureContext: string = '',
   adventureId?: string,
   fallbackToLocalStorage: boolean = true
-): Promise<void> => {
+): Promise<string | null> => {
   // Try Firebase first if user is authenticated
   if (userId && adventureId) {
-    const success = await cacheAdventureImageFirebase(
+    const permanentUrl = await cacheAdventureImageFirebase(
       userId, 
       url, 
       prompt, 
@@ -193,8 +224,8 @@ export const cacheAdventureImageHybrid = async (
       adventureId
     );
     
-    if (success) {
-      return; // Successfully cached to Firebase
+    if (permanentUrl) {
+      return permanentUrl; // Return the permanent Firebase URL
     }
   }
 
@@ -203,4 +234,7 @@ export const cacheAdventureImageHybrid = async (
     const { cacheAdventureImage } = await import('./utils');
     cacheAdventureImage(url, prompt, adventureContext, adventureId);
   }
+  
+  // Return original URL if Firebase failed (will be temporary DALL-E URL)
+  return url;
 };

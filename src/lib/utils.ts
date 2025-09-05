@@ -111,6 +111,43 @@ export interface ComicPanel {
   text: string;
 }
 
+// Utility to remove undefined values from objects (Firebase doesn't support undefined)
+export function sanitizeForFirebase<T>(obj: T): T {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+
+  // Preserve Firebase special objects (serverTimestamp, Timestamp, etc.)
+  if (typeof obj === 'object' && obj !== null) {
+    // Check if this is a Firebase serverTimestamp or Timestamp object
+    if (
+      (obj as any).constructor?.name === 'FirestoreDataConverter' ||
+      (obj as any).isEqual ||  // Timestamp objects have isEqual method
+      (obj as any).toMillis || // Timestamp objects have toMillis method  
+      (obj as any)._methodName === 'FieldValue.serverTimestamp' || // serverTimestamp check
+      typeof (obj as any).toString === 'function' && (obj as any).toString().includes('ServerTimestamp')
+    ) {
+      return obj; // Return Firebase objects as-is
+    }
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => sanitizeForFirebase(item)) as T;
+  }
+
+  if (typeof obj === 'object') {
+    const sanitized: any = {};
+    Object.entries(obj).forEach(([key, value]) => {
+      if (value !== undefined) {
+        sanitized[key] = sanitizeForFirebase(value);
+      }
+    });
+    return sanitized;
+  }
+
+  return obj;
+}
+
 // Adventure storage types and utilities
 export interface SavedAdventure {
   id: string;
@@ -169,7 +206,16 @@ export const loadSavedAdventures = (): SavedAdventure[] => {
     }
     
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    
+    // Sort by lastPlayedAt in descending order (newest first) to match Firebase behavior
+    return parsed.sort((a, b) => {
+      const aLastPlayed = a.lastPlayedAt || 0;
+      const bLastPlayed = b.lastPlayedAt || 0;
+      return bLastPlayed - aLastPlayed;
+    });
   } catch (error) {
     console.warn('Failed to load saved adventures from local storage:', error);
     return [];
@@ -198,7 +244,16 @@ export const loadAdventureSummaries = (): AdventureSummary[] => {
     }
     
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    
+    // Sort by lastPlayedAt in descending order (newest first) to match Firebase behavior
+    return parsed.sort((a, b) => {
+      const aLastPlayed = a.lastPlayedAt || 0;
+      const bLastPlayed = b.lastPlayedAt || 0;
+      return bLastPlayed - aLastPlayed;
+    });
   } catch (error) {
     console.warn('Failed to load adventure summaries from local storage:', error);
     return [];
