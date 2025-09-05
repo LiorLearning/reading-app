@@ -13,7 +13,7 @@ import {
   getDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { ChatMessage } from './utils';
+import { ChatMessage, sanitizeForFirebase } from './utils';
 import { ChatSummary, chatSummaryService } from './chat-summary-service';
 
 export interface MCQAnswer {
@@ -157,12 +157,14 @@ class AdventureSessionService {
         const currentSession = sessionDoc.data() as AdventureSession;
         const updatedMessages = [...currentSession.chatMessages, message];
         
-        await updateDoc(sessionRef, {
+        const updateData = sanitizeForFirebase({
           chatMessages: updatedMessages,
           totalChatMessages: updatedMessages.length,
           updatedAt: serverTimestamp(),
           lastActivityAt: serverTimestamp()
         });
+        
+        await updateDoc(sessionRef, updateData);
 
         console.log(`💬 Saved message to session: ${message.type}`);
       }
@@ -185,7 +187,7 @@ class AdventureSessionService {
         const updatedAnswers = [...currentSession.mcqAnswers, mcqAnswer];
         const newCorrectCount = currentSession.correctAnswers + (mcqAnswer.isCorrect ? 1 : 0);
         
-        await updateDoc(sessionRef, {
+        const updateData = sanitizeForFirebase({
           mcqAnswers: updatedAnswers,
           totalQuestionsAnswered: updatedAnswers.length,
           correctAnswers: newCorrectCount,
@@ -193,6 +195,8 @@ class AdventureSessionService {
           updatedAt: serverTimestamp(),
           lastActivityAt: serverTimestamp()
         });
+        
+        await updateDoc(sessionRef, updateData);
 
         console.log(`✅ Saved MCQ answer to session: Q${mcqAnswer.questionId}, Correct: ${mcqAnswer.isCorrect}`);
       }
@@ -209,12 +213,14 @@ class AdventureSessionService {
     try {
       const sessionRef = doc(db, this.COLLECTION_NAME, sessionId);
       
-      await updateDoc(sessionRef, {
+      const updateData = sanitizeForFirebase({
         chatSummary: summary,
         lastSummaryMessageCount: summary.messageCount,
         updatedAt: serverTimestamp(),
         lastActivityAt: serverTimestamp()
       });
+      
+      await updateDoc(sessionRef, updateData);
 
       console.log(`🧠 Updated chat summary for session (${summary.messageCount} messages)`);
     } catch (error) {
@@ -257,11 +263,13 @@ class AdventureSessionService {
     try {
       const sessionRef = doc(db, this.COLLECTION_NAME, sessionId);
       
-      await updateDoc(sessionRef, {
+      const updateData = sanitizeForFirebase({
         ...updates,
         updatedAt: serverTimestamp(),
         lastActivityAt: serverTimestamp()
       });
+      
+      await updateDoc(sessionRef, updateData);
 
       console.log(`📊 Updated adventure state for session`);
     } catch (error) {
@@ -353,13 +361,15 @@ class AdventureSessionService {
     try {
       const sessionRef = doc(db, this.COLLECTION_NAME, sessionId);
       
-      await updateDoc(sessionRef, {
+      const updateData = sanitizeForFirebase({
         chatMessages: messages,
         totalChatMessages: messages.length,
         ...adventureState,
         updatedAt: serverTimestamp(),
         lastActivityAt: serverTimestamp()
       });
+      
+      await updateDoc(sessionRef, updateData);
 
       console.log(`🔄 Synced current state to session`);
     } catch (error) {

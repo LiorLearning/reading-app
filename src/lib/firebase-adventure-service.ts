@@ -13,7 +13,7 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { ChatMessage, SavedAdventure, AdventureSummary, ComicPanel } from './utils';
+import { ChatMessage, SavedAdventure, AdventureSummary, ComicPanel, sanitizeForFirebase } from './utils';
 
 export interface FirebaseSavedAdventure {
   id: string;
@@ -59,8 +59,11 @@ class FirebaseAdventureService {
         firebaseAdventure.comicPanels = adventure.comicPanels;
       }
 
+      // Sanitize the entire object to remove any undefined values (Firebase doesn't support undefined)
+      const sanitizedAdventure = sanitizeForFirebase(firebaseAdventure);
+
       // Use adventure.id as document ID for consistent syncing
-      await setDoc(doc(db, this.COLLECTION_NAME, adventure.id), firebaseAdventure);
+      await setDoc(doc(db, this.COLLECTION_NAME, adventure.id), sanitizedAdventure);
     } catch (error) {
       console.error('Failed to save adventure to Firebase:', error);
       // Fallback to localStorage
@@ -86,13 +89,34 @@ class FirebaseAdventureService {
 
       querySnapshot.docs.forEach(doc => {
         const data = doc.data() as any; // Use any to handle optional fields
+        
+        // Handle timestamps gracefully - check if they have toMillis method
+        let createdAt: number;
+        let lastPlayedAt: number;
+        
+        try {
+          createdAt = data.createdAt && typeof data.createdAt.toMillis === 'function' 
+            ? data.createdAt.toMillis() 
+            : (data.createdAt?.seconds ? data.createdAt.seconds * 1000 : Date.now());
+        } catch {
+          createdAt = Date.now();
+        }
+        
+        try {
+          lastPlayedAt = data.lastPlayedAt && typeof data.lastPlayedAt.toMillis === 'function'
+            ? data.lastPlayedAt.toMillis()
+            : (data.lastPlayedAt?.seconds ? data.lastPlayedAt.seconds * 1000 : Date.now());
+        } catch {
+          lastPlayedAt = Date.now();
+        }
+        
         adventures.push({
           id: doc.id,
           name: data.name,
           summary: data.summary,
           messages: data.messages,
-          createdAt: data.createdAt.toMillis(),
-          lastPlayedAt: data.lastPlayedAt.toMillis(),
+          createdAt,
+          lastPlayedAt,
           comicPanelImage: data.comicPanelImage || undefined,
           topicId: data.topicId || undefined,
           comicPanels: data.comicPanels || undefined
@@ -145,13 +169,33 @@ class FirebaseAdventureService {
           return null;
         }
 
+        // Handle timestamps gracefully - check if they have toMillis method
+        let createdAt: number;
+        let lastPlayedAt: number;
+        
+        try {
+          createdAt = data.createdAt && typeof data.createdAt.toMillis === 'function' 
+            ? data.createdAt.toMillis() 
+            : (data.createdAt?.seconds ? data.createdAt.seconds * 1000 : Date.now());
+        } catch {
+          createdAt = Date.now();
+        }
+        
+        try {
+          lastPlayedAt = data.lastPlayedAt && typeof data.lastPlayedAt.toMillis === 'function'
+            ? data.lastPlayedAt.toMillis()
+            : (data.lastPlayedAt?.seconds ? data.lastPlayedAt.seconds * 1000 : Date.now());
+        } catch {
+          lastPlayedAt = Date.now();
+        }
+
         return {
           id: docSnap.id,
           name: data.name,
           summary: data.summary,
           messages: data.messages,
-          createdAt: data.createdAt.toMillis(),
-          lastPlayedAt: data.lastPlayedAt.toMillis(),
+          createdAt,
+          lastPlayedAt,
           comicPanelImage: data.comicPanelImage || undefined,
           topicId: data.topicId || undefined,
           comicPanels: data.comicPanels || undefined

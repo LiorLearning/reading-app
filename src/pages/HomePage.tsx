@@ -233,7 +233,7 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
               </div>
               
               {/* Show existing adventures if any */}
-              {savedAdventures.length > 0 && savedAdventures.slice().reverse().map((adventure) => { // Reverse to show newest first
+              {savedAdventures.length > 0 && savedAdventures.map((adventure) => { // Already ordered by lastPlayedAt desc from Firebase
                 // Get adventure theme emoji based on name
                 const getAdventureEmoji = (name: string) => {
                   const lowerName = name.toLowerCase();

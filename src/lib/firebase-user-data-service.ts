@@ -77,10 +77,19 @@ class FirebaseUserDataService {
         const data = docSnap.data() as FirebaseUserProgress;
         
         // Convert Firestore timestamps back to numbers for compatibility
+        let lastPlayedAt: number;
+        try {
+          lastPlayedAt = data.lastPlayedAt && typeof data.lastPlayedAt.toMillis === 'function'
+            ? data.lastPlayedAt.toMillis()
+            : (data.lastPlayedAt?.seconds ? data.lastPlayedAt.seconds * 1000 : Date.now());
+        } catch {
+          lastPlayedAt = Date.now();
+        }
+        
         return {
           completedTopics: data.completedTopics,
           totalTopicsCompleted: data.totalTopicsCompleted,
-          lastPlayedAt: data.lastPlayedAt.toMillis()
+          lastPlayedAt
         };
       }
 
