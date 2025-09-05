@@ -282,6 +282,7 @@ export class UnifiedAIStreamingService {
 
 🎨 IMAGE GENERATION RULES - RESPOND TO CLEAR IMAGE REQUESTS:
 - Use <generateImage>detailed prompt</generateImage> when the user makes EXPLICIT visual requests
+- ALWAYS include in your generateImage prompts: "There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image"
 - GENERATE IMAGES when the child uses these CLEAR SIGNALS:
   * Direct creation requests: "create", "make", "generate", "build", "design"
   * Direct requests: "show me", "what does it look like", "I want to see", "draw", "picture"

@@ -1429,7 +1429,7 @@ Return ONLY the new reading passage, nothing else.`;
     console.log('Weighted content (80% user input, 10% latest AI response, 10% other context):', weightedContent);
 
     // Create exciting, adventurous images that kids will love while maintaining safety
-    const enhancedPrompt = `Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
+    const enhancedPrompt = `Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     
     console.log('PRIMARY adventure prompt:', enhancedPrompt);
     console.log('WEIGHTING: 80% User Input + 10% Latest AI Response + 10% Other Context');
@@ -1451,11 +1451,11 @@ Return ONLY the new reading passage, nothing else.`;
     const prompts: string[] = [];
 
     // Fallback Option 1: Epic and dynamic cinematic adventure
-    const sanitizedEnhancedPrompt1 = `Create an epic, high-quality image: ${weightedContent}. Style: dynamic and cinematic with vivid colors, dramatic lighting, and amazing magical details. Make it look awesome and thrilling - the kind of image kids would want as their wallpaper. Ensure no nudity, sexual content, or sexually inappropriate material whatsoever. Strictly avoid text on the images.`;
+    const sanitizedEnhancedPrompt1 = `Create an epic, high-quality image: ${weightedContent}. Style: dynamic and cinematic with vivid colors, dramatic lighting, and amazing magical details. Make it look awesome and thrilling - the kind of image kids would want as their wallpaper. Ensure no nudity, sexual content, or sexually inappropriate material whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     prompts.push(sanitizedEnhancedPrompt1);
 
     // Fallback Option 2: Thrilling adventure with safe content
-    const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cinematic and realistic with vibrant details, exciting atmosphere, and captivating elements. Make it visually stunning and engaging for children while keeping all content completely family-friendly. No inappropriate content or text on the images.`;
+    const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cinematic and realistic with vibrant details, exciting atmosphere, and captivating elements. Make it visually stunning and engaging for children while keeping all content completely family-friendly. No inappropriate content whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     prompts.push(sanitizedEnhancedPrompt2);
     
     console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
@@ -1463,7 +1463,7 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
-      const simpleFallback = `Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content, no text on images.`;
+      const simpleFallback = `Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
       prompts.push(simpleFallback);
       console.log('Final fallback prompt (Simple Safe):', simpleFallback);
     }
