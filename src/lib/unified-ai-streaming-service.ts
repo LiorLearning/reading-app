@@ -150,18 +150,15 @@ export class UnifiedAIStreamingService {
       });
       
       if (!hasImages) {
-        // Simple text-only response
-        console.log('📝 AI response contains text only - no images will be generated');
-        return {
-          hasImages: false,
-          textContent: aiResponse,
-          imageUrls: [],
-          streamEvents: [{
-            type: 'text',
-            content: aiResponse,
-            timestamp: Date.now()
-          }]
-        };
+        // Fallback to legacy system instead of text-only response
+        console.log('📝 Unified system detected no image requests - falling back to legacy system...');
+        return await this.callLegacySystemAsFallback(
+          userMessage, 
+          chatHistory, 
+          spellingQuestion, 
+          userId, 
+          aiResponse
+        );
       }
       
       // Process response with image generation
@@ -280,9 +277,25 @@ export class UnifiedAIStreamingService {
     // Enhanced system prompt that includes image generation instructions
     const systemPrompt = `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
 
-🎨 IMAGE GENERATION RULES - RESPOND TO CLEAR IMAGE REQUESTS:
+🎨 CRITICAL IMAGE GENERATION RULES - MANDATORY COMPLIANCE:
 - Use <generateImage>detailed prompt</generateImage> when the user makes EXPLICIT visual requests
 - ALWAYS include in your generateImage prompts: "There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image"
+
+🚨 MANDATORY IMAGE GENERATION - NO EXCEPTIONS:
+These phrases ALWAYS require <generateImage> tags:
+  * ANY message starting with "create image:" → MUST use <generateImage>
+  * "create an image" → MUST use <generateImage>
+  * "make a picture" → MUST use <generateImage>
+  * "generate a drawing" → MUST use <generateImage>
+  * "show me" → MUST use <generateImage>
+  * "what does it look like" → MUST use <generateImage>
+  * "I want to see" → MUST use <generateImage>
+
+📋 EXPLICIT EXAMPLES - FOLLOW EXACTLY:
+  * User: "create image: create an image" → You: "🎨 <generateImage>creative scene with adventure elements</generateImage>"
+  * User: "create image: dragon" → You: "🎨 <generateImage>mighty dragon breathing fire in a mystical landscape</generateImage>"
+  * User: "show me the robot" → You: "🎨 <generateImage>futuristic robot with glowing eyes</generateImage>"
+
 - GENERATE IMAGES when the child uses these CLEAR SIGNALS:
   * Direct creation requests: "create", "make", "generate", "build", "design"
   * Direct requests: "show me", "what does it look like", "I want to see", "draw", "picture"
@@ -296,16 +309,6 @@ export class UnifiedAIStreamingService {
   * Action choices: "I choose Batman", "let's investigate", "attack the robot"
   * General adventure dialogue or narration
   * Continuing existing scenes or familiar elements
-
-- CRITICAL RULE: When in doubt, DO NOT generate an image. Only generate when 100% certain the child wants to see something specific.
-
-- Examples of CLEAR SIGNALS that warrant images:
-  * "Create an image of a dragon" → <generateImage>...</generateImage>
-  * "Make a picture of the spaceship" → <generateImage>...</generateImage>
-  * "Generate a pikachu as a mummy" → <generateImage>...</generateImage>
-  * "What does the dragon look like?" → <generateImage>...</generateImage>
-  * "Show me the spaceship" → <generateImage>...</generateImage>
-  * "I want to see the robot" → <generateImage>...</generateImage>
 
 - Examples of NO IMAGE needed:
   * "Let's fight the dragon" → NO image (action, not visual request)
@@ -422,6 +425,113 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
     }
   }
   
+  /**
+   * Fallback to legacy system when unified system doesn't generate images
+   */
+  private async callLegacySystemAsFallback(
+    userMessage: string,
+    chatHistory: ChatMessage[],
+    spellingQuestion: SpellingQuestion,
+    userId: string,
+    aiResponse: string
+  ): Promise<UnifiedAIResponse> {
+    try {
+      console.log('🔄 Calling legacy AI service as fallback...');
+      
+      // Import AI service dynamically to avoid circular dependencies
+      const { aiService } = await import('./ai-service');
+      
+      // Try legacy image generation if the content seems visual
+      const shouldTryLegacyImage = this.shouldTryLegacyImageGeneration(userMessage, aiResponse);
+      
+      if (shouldTryLegacyImage) {
+        console.log('🎨 Legacy system attempting image generation...');
+        
+        try {
+          const legacyImageResult = await aiService.generateAdventureImage(
+            userMessage,
+            chatHistory,
+            "adventure scene"
+          );
+          
+          if (legacyImageResult?.imageUrl) {
+            console.log('✅ Legacy system generated image successfully');
+            
+            return {
+              hasImages: true,
+              textContent: aiResponse,
+              imageUrls: [legacyImageResult.imageUrl],
+              streamEvents: [
+                {
+                  type: 'text',
+                  content: aiResponse,
+                  timestamp: Date.now()
+                },
+                {
+                  type: 'image_complete',
+                  content: 'Image generated by legacy system',
+                  metadata: {
+                    imageUrl: legacyImageResult.imageUrl,
+                    prompt: legacyImageResult.usedPrompt || userMessage,
+                    provider: 'legacy-system'
+                  },
+                  timestamp: Date.now()
+                }
+              ]
+            };
+          }
+        } catch (legacyError) {
+          console.warn('⚠️ Legacy image generation failed:', legacyError);
+          // Continue to text-only response
+        }
+      }
+      
+      // Return text-only response if no image was generated
+      console.log('📝 Fallback: Returning text-only response');
+      return {
+        hasImages: false,
+        textContent: aiResponse,
+        imageUrls: [],
+        streamEvents: [{
+          type: 'text',
+          content: aiResponse,
+          timestamp: Date.now()
+        }]
+      };
+      
+    } catch (error) {
+      console.error('❌ Legacy fallback failed:', error);
+      return this.getFallbackUnifiedResponse(userMessage);
+    }
+  }
+
+  /**
+   * Determine if we should try legacy image generation
+   */
+  private shouldTryLegacyImageGeneration(userMessage: string, aiResponse: string): boolean {
+    const userLower = userMessage.toLowerCase();
+    const aiLower = aiResponse.toLowerCase();
+    
+    // Check for visual keywords in user message or AI response
+    const visualKeywords = [
+      'see', 'look', 'show', 'image', 'picture', 'draw', 'create', 'make',
+      'robot', 'dragon', 'space', 'adventure', 'scene', 'character',
+      'world', 'place', 'location', 'creature', 'vehicle', 'building'
+    ];
+    
+    const hasVisualKeywords = visualKeywords.some(keyword => 
+      userLower.includes(keyword) || aiLower.includes(keyword)
+    );
+    
+    console.log('🔍 Legacy image generation check:', {
+      userMessage: userMessage.substring(0, 50),
+      hasVisualKeywords,
+      foundKeywords: visualKeywords.filter(k => userLower.includes(k) || aiLower.includes(k))
+    });
+    
+    return hasVisualKeywords;
+  }
+
   /**
    * Fallback response when AI is not available
    */
