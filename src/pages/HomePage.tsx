@@ -6,6 +6,7 @@ import { loadUserProgress, getNextTopic, hasUserProgress, UserProgress, loadAdve
 import { loadAdventureSummariesHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { useAuth } from "@/hooks/use-auth";
+import { firebaseImageService } from "@/lib/firebase-image-service";
 
 interface UserData {
   username: string;
@@ -64,6 +65,9 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
   const [nextTopicId, setNextTopicId] = useState<string | null>(null);
   const [savedAdventures, setSavedAdventures] = useState<AdventureSummary[]>([]);
   
+  // State to track Firebase cover images
+  const [firebaseCoverImages, setFirebaseCoverImages] = useState<{ [adventureId: string]: string }>({});
+  
   // Load user progress and saved adventures on component mount
   useEffect(() => {
     const progress = loadUserProgress();
@@ -89,6 +93,24 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
   const refreshSavedAdventures = async () => {
     const adventures = await loadAdventureSummariesHybrid(user?.uid || null);
     setSavedAdventures(adventures);
+    
+    // Also refresh Firebase cover images when we have a user
+    if (user) {
+      await refreshFirebaseCoverImages();
+    }
+  };
+
+  // Function to load Firebase cover images
+  const refreshFirebaseCoverImages = async () => {
+    if (!user) return;
+    
+    try {
+      const latestImages = await firebaseImageService.getLatestAdventureImages(user.uid);
+      console.log(`🖼️ Loaded ${Object.keys(latestImages).length} Firebase cover images for adventures`);
+      setFirebaseCoverImages(latestImages);
+    } catch (error) {
+      console.error('⚠️ Failed to load Firebase cover images:', error);
+    }
   };
 
   // Expose refresh function to parent component via ref or callback
@@ -99,6 +121,8 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
         const currentAdventures = await loadAdventureSummariesHybrid(user.uid);
         if (currentAdventures.length !== savedAdventures.length) {
           setSavedAdventures(currentAdventures);
+          // Also refresh Firebase cover images when adventures change
+          await refreshFirebaseCoverImages();
         }
       }
       
@@ -241,6 +265,39 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                   if (lowerName.includes('pirate')) return '🏴‍☠️';
                   return '🎭'; // Default adventure emoji
                 };
+                
+                // Helper function to determine if a URL is an expired OpenAI/DALL-E URL
+                const isExpiredDalleUrl = (url: string): boolean => {
+                  return url.includes('oaidalleapiprodscus.blob.core.windows.net') ||
+                         url.includes('dalle-api') ||
+                         url.includes('dalle') && url.includes('.windows.net');
+                };
+
+                // Get the best cover image: Firebase image if available, otherwise fallback to stored image
+                const getCoverImageUrl = (adventure: AdventureSummary): string | null => {
+                  // First priority: Firebase image
+                  const firebaseImage = firebaseCoverImages[adventure.id];
+                  if (firebaseImage) {
+                    console.log(`🖼️ Using Firebase cover image for ${adventure.name}: ${firebaseImage.substring(0, 50)}...`);
+                    return firebaseImage;
+                  }
+                  
+                  // Second priority: Non-expired stored image
+                  if (adventure.comicPanelImage && !isExpiredDalleUrl(adventure.comicPanelImage)) {
+                    console.log(`🖼️ Using stored cover image for ${adventure.name}: ${adventure.comicPanelImage.substring(0, 50)}...`);
+                    return adventure.comicPanelImage;
+                  }
+                  
+                  // Third priority: Expired URL (with warning)
+                  if (adventure.comicPanelImage && isExpiredDalleUrl(adventure.comicPanelImage)) {
+                    console.warn(`⚠️ Using expired DALL-E URL for ${adventure.name} (Firebase image not found): ${adventure.comicPanelImage.substring(0, 50)}...`);
+                    return adventure.comicPanelImage;
+                  }
+                  
+                  return null;
+                };
+                
+                const coverImageUrl = getCoverImageUrl(adventure);
 
                 const formatDate = (timestamp: number) => {
                   const date = new Date(timestamp);
@@ -265,12 +322,32 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
                     style={{ width: '280px' }}
                   >
                     <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-gray-200 h-full">
-                      {adventure.comicPanelImage ? (
+                      {coverImageUrl ? (
                         <div className="aspect-video relative">
                           <img 
-                            src={adventure.comicPanelImage} 
+                            src={coverImageUrl} 
                             alt={adventure.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // If image fails to load (e.g., expired), show gradient fallback
+                              const target = e.target as HTMLImageElement;
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 relative">
+                                    <div class="absolute inset-0 bg-black/20"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                      <div class="text-white text-4xl font-bold">${getAdventureEmoji(adventure.name)}</div>
+                                    </div>
+                                    <div class="absolute top-3 left-3">
+                                      <div class="bg-white/90 backdrop-blur-sm rounded-full p-2">
+                                        <span class="text-2xl">${getAdventureEmoji(adventure.name)}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                `;
+                              }
+                            }}
                           />
                           <div className="absolute inset-0 bg-black/20"></div>
                           <div className="absolute top-3 left-3">

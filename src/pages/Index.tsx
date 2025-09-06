@@ -39,6 +39,7 @@ import TopicSelection from "./TopicSelection";
   } from "@/lib/utils";
 
 import { cacheAdventureImageHybrid, getCachedImagesForAdventureFirebase } from "@/lib/firebase-image-cache";
+import { useFirebaseImage, useCurrentAdventureId } from "@/hooks/use-firebase-image";
 
 import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
@@ -93,6 +94,46 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
   );
 };
 
+// Component for panel image figure with Firebase image resolution (Index.tsx version)
+const IndexPanelImageFigure: React.FC<{
+  panel: { id: string; image: string; text: string };
+  index: number;
+  oneLiner: string;
+}> = ({ panel, index, oneLiner }) => {
+  // Get current adventure ID for Firebase image resolution
+  const currentAdventureId = useCurrentAdventureId();
+  
+  // Resolve Firebase image if needed
+  const { url: resolvedImageUrl, isExpiredUrl } = useFirebaseImage(panel.image, currentAdventureId || undefined);
+  
+  React.useEffect(() => {
+    if (isExpiredUrl && resolvedImageUrl !== panel.image) {
+      console.log(`🔄 Index Panel ${index + 1}: Resolved expired image to Firebase URL: ${resolvedImageUrl.substring(0, 50)}...`);
+    }
+  }, [resolvedImageUrl, panel.image, index, isExpiredUrl]);
+
+  return (
+    <figure className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+      <img 
+        src={resolvedImageUrl} 
+        alt={`Panel ${index + 1}`} 
+        className="w-full h-auto object-cover border-2 rounded-t-lg" 
+        style={{ borderColor: 'hsla(var(--primary), 0.9)' }}
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          if (!target.src.includes('placeholder')) {
+            console.warn(`⚠️ Failed to load index panel image ${index + 1}, using fallback`);
+            target.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            target.style.minHeight = '200px';
+            target.alt = `Panel ${index + 1} (image unavailable)`;
+          }
+        }}
+      />
+      <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
+    </figure>
+  );
+};
+
 // Component for handling async one-liner loading in the comic panel modal
 const PanelOneLinerFigure: React.FC<{
   panel: { id: string; image: string; text: string };
@@ -122,10 +163,7 @@ const PanelOneLinerFigure: React.FC<{
   }, [panel.text]);
 
   return (
-    <figure className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
-      <img src={panel.image} alt={`Panel ${index + 1}`} className="w-full h-auto object-cover border-2 rounded-t-lg" style={{ borderColor: 'hsla(var(--primary), 0.9)' }} />
-      <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
-    </figure>
+    <IndexPanelImageFigure panel={panel} index={index} oneLiner={oneLiner} />
   );
 };
 
