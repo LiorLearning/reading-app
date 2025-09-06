@@ -46,6 +46,7 @@ import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-mi
 
 import { getRandomSpellingQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
+import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 
 
 // Legacy user data interface for backwards compatibility
@@ -210,6 +211,10 @@ const Index = () => {
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
   
+  // AI Sanitized Prompt for legacy fallback
+  const [aiSanitizedPrompt, setAiSanitizedPrompt] = React.useState<SanitizedPromptResult | null>(null);
+  const [sanitizationInProgress, setSanitizationInProgress] = React.useState<boolean>(false);
+  
   // Optional session tracking for Firebase (won't break existing functionality)
   const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
   
@@ -303,6 +308,17 @@ const Index = () => {
   // Feedback modal state
   const [showFeedbackModal, setShowFeedbackModal] = React.useState<boolean>(false);
   
+  // Helper function to build image context for AI sanitizer
+  const buildImageContext = useCallback(() => {
+    const recentMessages = chatMessages.slice(-4).map(msg => 
+      `${msg.type}: ${msg.content.substring(0, 100)}...`
+    ).join('; ');
+    
+    const userInfo = userData ? `Grade ${userData.grade}, Level ${userData.level}` : 'Elementary student';
+    
+    return `Context for ${userInfo}: Recent conversation: ${recentMessages}`;
+  }, [chatMessages, userData]);
+
   // Handle feedback submission
   const handleFeedbackSubmit = async (feedbackData: {enjoymentAnswer: string}) => {
     // Close modal immediately regardless of API success/failure
@@ -894,6 +910,44 @@ const Index = () => {
     
     console.log('✅ LEGACY FALLBACK: Image keywords detected, proceeding with legacy generation');
     
+    // 🧹 START AI SANITIZATION WITH TIMEOUT
+    const originalPrompt = imageSubject || text;
+    console.log('🧹 LEGACY FALLBACK: Starting AI prompt sanitization for:', originalPrompt.substring(0, 50) + '...');
+    setSanitizationInProgress(true);
+    
+    // Extract adventure context for full sanitization
+    const adventureContext = chatMessages.slice(-5).map(msg => `${msg.type}: ${msg.content}`).join('; ');
+    
+    // Start sanitization but with timeout - WAIT for result before proceeding 
+    let sanitizationResult: any = null;
+    try {
+      console.log('🧹 LEGACY FALLBACK: Waiting for AI sanitization (max 8 seconds)...');
+      const startTime = Date.now();
+      
+      sanitizationResult = await Promise.race([
+        aiPromptSanitizer.sanitizePromptAndContext(originalPrompt, adventureContext),
+        new Promise<null>((_, reject) => setTimeout(() => reject(new Error('AI sanitization timeout')), 8000))
+      ]);
+      
+      const elapsed = Date.now() - startTime;
+      if (sanitizationResult) {
+        console.log(`✅ AI Full Sanitization completed in ${elapsed}ms:`, sanitizationResult.sanitizedPrompt?.substring(0, 80) + '...');
+        if (sanitizationResult.sanitizedContext) {
+          console.log('✅ Adventure context also sanitized:', sanitizationResult.sanitizedContext.substring(0, 80) + '...');
+        }
+        setAiSanitizedPrompt(sanitizationResult);
+      }
+    } catch (error: any) {
+      if (error.message === 'AI sanitization timeout') {
+        console.error('⏰ AI sanitization timed out after 8 seconds - proceeding with legacy only');
+      } else {
+        console.error('❌ AI Full Sanitization failed:', error.message);
+      }
+      setAiSanitizedPrompt(null);
+    } finally {
+      setSanitizationInProgress(false);
+    }
+    
     try {
       // 🛠️ CRITICAL FIX: Mark legacy system as running to prevent sync interference
       setIsLegacySystemRunning(true);
@@ -908,10 +962,30 @@ const Index = () => {
       const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
       
       console.log('🎨 LEGACY FALLBACK: Calling legacy aiService.generateAdventureImage()');
+      
+      // Use the fresh sanitizationResult instead of state (which might be stale)
+      const finalSanitizedResult = sanitizationResult || aiSanitizedPrompt;
+      
+      // Debug sanitization state
+      console.log('🧹 LEGACY DEBUG: finalSanitizedResult state:', finalSanitizedResult ? 'PRESENT' : 'NULL');
+      if (finalSanitizedResult) {
+        console.log('🧹 LEGACY DEBUG: sanitizedPrompt preview:', finalSanitizedResult.sanitizedPrompt?.substring(0, 100) + '...');
+        console.log('🧹 LEGACY DEBUG: sanitizedContext preview:', finalSanitizedResult.sanitizedContext?.substring(0, 100) + '...');
+        console.log('🧹 LEGACY DEBUG: sanitization success:', finalSanitizedResult.success);
+      }
+      
+      const sanitizedResult = finalSanitizedResult ? {
+        sanitizedPrompt: finalSanitizedResult.sanitizedPrompt,
+        sanitizedContext: finalSanitizedResult.sanitizedContext
+      } : undefined;
+      
+      console.log('🧹 LEGACY DEBUG: Passing sanitizedResult to generateAdventureImage:', sanitizedResult ? 'PRESENT' : 'UNDEFINED');
+      
       const generatedImageResult = await aiService.generateAdventureImage(
         imagePrompt,
         chatMessages,
-        "adventure scene"
+        "adventure scene",
+        sanitizedResult
       );
       
       if (generatedImageResult) {

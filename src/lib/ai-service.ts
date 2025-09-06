@@ -1225,7 +1225,8 @@ Return ONLY the new reading passage, nothing else.`;
   async generateAdventureImage(
     prompt: string,
     userAdventure: ChatMessage[],
-    fallbackPrompt: string = "adventure scene"
+    fallbackPrompt: string = "adventure scene",
+    aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string }
   ): Promise<{ imageUrl: string; usedPrompt: string } | null> {
     // If not initialized or no API key, return null (will show placeholder)
     if (!this.isInitialized || !this.client) {
@@ -1298,7 +1299,7 @@ Return ONLY the new reading passage, nothing else.`;
 
       // Only if primary fails, generate fallback prompts
       console.log('🔄 Generating fallback prompts (primary prompt failed)');
-      const fallbackPrompts = this.generateFallbackAdventurePrompts(prompt, userAdventure, fallbackPrompt);
+      const fallbackPrompts = this.generateFallbackAdventurePrompts(prompt, userAdventure, fallbackPrompt, aiSanitizedResult);
 
       console.log('Generated fallback prompt options:', fallbackPrompts);
 
@@ -1309,7 +1310,14 @@ Return ONLY the new reading passage, nothing else.`;
             ? fallbackPrompts[i].substring(0, 390) + "..." 
             : fallbackPrompts[i];
           
-          console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}:`, finalPrompt);
+          // Enhanced logging to identify which attempt this is
+          let promptType = '';
+          if (i === 0) promptType = ' (Epic Dynamic)';
+          else if (i === 1) promptType = ' (Thrilling Safe)';
+          else if (i === 2) promptType = ' (AI Sanitized ✨)';
+          else if (i === 3) promptType = ' (Simple Safe)';
+          
+          console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}${promptType}:`, finalPrompt.substring(0, 200) + '...');
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -1323,7 +1331,8 @@ Return ONLY the new reading passage, nothing else.`;
           const imageUrl = response.data[0]?.url;
           
           if (imageUrl) {
-            console.log(`✅ Fallback DALL-E prompt ${i + 1} succeeded`);
+            const promptType = i === 0 ? ' (Epic Dynamic)' : i === 1 ? ' (Thrilling Safe)' : i === 2 ? ' (AI Sanitized ✨)' : ' (Simple Safe)';
+            console.log(`✅ Fallback DALL-E prompt ${i + 1}${promptType} succeeded! 🎉`);
             clearTimeout(safetyTimeout); // Clear safety timeout
             this.isGeneratingImage = false; // Clear generation flag
             return { imageUrl, usedPrompt: finalPrompt };
@@ -1477,17 +1486,27 @@ Create a very realistic, high-quality image: ${weightedContent}. Style: Realisti
   }
 
   // Helper: Generate fallback adventure prompts (only used if primary fails)
-  private generateFallbackAdventurePrompts(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string): string[] {
+  private generateFallbackAdventurePrompts(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string, aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string }): string[] {
     console.log('=== FALLBACK ADVENTURE PROMPTS GENERATION ===');
     console.log('Function: AIService.generateFallbackAdventurePrompts');
     console.log('Current input prompt:', prompt);
+    console.log('🧹 AI Sanitized Result:', aiSanitizedResult ? 'PRESENT' : 'MISSING');
+    if (aiSanitizedResult) {
+      console.log('🧹 Sanitized prompt preview:', aiSanitizedResult.sanitizedPrompt?.substring(0, 80) + '...');
+      console.log('🧹 Sanitized context preview:', aiSanitizedResult.sanitizedContext?.substring(0, 80) + '...');
+      console.log('🧹 Has valid sanitized prompt:', !!aiSanitizedResult.sanitizedPrompt);
+      console.log('🧹 Has valid sanitized context:', !!aiSanitizedResult.sanitizedContext);
+    }
 
     // Get conversation history for weighted prompt generation
     const conversationHistory = this.getLastConversationMessages(userAdventure);
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
 
     // Build context from conversation for better image generation
-    const conversationContext = this.buildImageGenerationContext(userAdventure);
+    // Use sanitized context if available, otherwise use original
+    const conversationContext = aiSanitizedResult?.sanitizedContext || this.buildImageGenerationContext(userAdventure);
+    
+    console.log('🧹 Using context:', aiSanitizedResult?.sanitizedContext ? 'SANITIZED' : 'ORIGINAL');
 
     const prompts: string[] = [];
 
@@ -1506,6 +1525,19 @@ Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cin
     console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
     console.log('Fallback prompt 2 (Thrilling Safe):', sanitizedEnhancedPrompt2);
 
+    // Add AI-sanitized prompt as 4th attempt if available (highest success chance)
+    if (aiSanitizedResult?.sanitizedPrompt) {
+      console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 4! ✨');
+      // Use the sanitized context we already selected above
+      const aiSanitizedWithContext = `${conversationContext}
+
+${aiSanitizedResult.sanitizedPrompt}. Style: family-friendly and engaging for children. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+      prompts.push(aiSanitizedWithContext);
+      console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
+    } else {
+      console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
+    }
+
     // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
       const simpleFallback = `${conversationContext}
@@ -1516,6 +1548,7 @@ Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realisti
     }
 
     console.log('================================================');
+    console.log(`🎯 Generated ${prompts.length} fallback prompt options total`);
     return prompts;
   }
 
