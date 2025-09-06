@@ -1020,20 +1020,45 @@ const Index = () => {
         
         console.log('✅ LEGACY FALLBACK: Successfully generated image and added panel');
         
-        // Add AI message to chat
-        const aiMessage: ChatMessage = {
-          type: 'ai',
-          content: contextualResponse,
-          timestamp: Date.now()
-        };
-        
+        // Add AI message to chat with proper side effects (TTS, sounds, etc.)
         const userMessage: ChatMessage = {
           type: 'user',
           content: text,
           timestamp: Date.now()
         };
         
-        setChatMessages(prev => [...prev, userMessage, aiMessage]);
+        const aiMessage: ChatMessage = {
+          type: 'ai',
+          content: contextualResponse,
+          timestamp: Date.now()
+        };
+        
+        setChatMessages(prev => {
+          const updatedMessages = [...prev, userMessage, aiMessage];
+          
+          // Trigger all the same side effects as regular AI messages
+          setLastMessageCount(updatedMessages.length);
+          playMessageSound();
+          
+          // Auto-speak the AI message (TTS)
+          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length + 1}`;
+          ttsService.speakAIMessage(aiMessage.content, messageId).catch(error => 
+            console.error('TTS error for legacy AI message:', error)
+          );
+          
+          console.log('🔊 LEGACY FALLBACK: Triggered TTS for AI message');
+          
+          // Optional: Save AI message to Firebase session
+          if (currentSessionId) {
+            adventureSessionService.addChatMessage(currentSessionId, userMessage);
+            adventureSessionService.addChatMessage(currentSessionId, aiMessage);
+            
+            // Check if we should generate a chat summary
+            handleSummaryGeneration(currentSessionId, updatedMessages);
+          }
+          
+          return updatedMessages;
+        });
         
       } else {
         console.log('⚠️ LEGACY FALLBACK: Image generation failed, using fallback image');
