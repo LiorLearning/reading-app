@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useCoins } from '@/pages/coinSystem';
 import { ttsService } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
+import { usePetData } from '@/lib/pet-data-service';
 
 type Props = {};
 
@@ -18,13 +19,17 @@ export function PetPage({}: Props): JSX.Element {
   // Use shared coin system
   const { coins, spendCoins, hasEnoughCoins, setCoins } = useCoins();
   
-  // Pet care system
-  const [careLevel, setCareLevel] = useState(0); // 0 to 6 (number of actions performed)
+  // Use shared pet data system
+  const { careLevel, ownedPets, audioEnabled, setCareLevel, addOwnedPet, setAudioEnabled, isPetOwned, getCoinsSpentForCurrentStage, getPetCoinsSpent, addPetCoinsSpent } = usePetData();
+  
+  // State for which pet is currently being displayed
+  const [currentPet, setCurrentPet] = useState('dog'); // Default to dog
+  
+  // Local state for UI interactions
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const [previousCoins, setPreviousCoins] = useState(coins);
+  const [previousCoinsSpentForStage, setPreviousCoinsSpentForStage] = useState(0);
   const [showPetShop, setShowPetShop] = useState(false);
-  const [ownedPets, setOwnedPets] = useState<string[]>(['dog']); // Start with dog
-  const [audioEnabled, setAudioEnabled] = useState(true);
   const [lastSpokenMessage, setLastSpokenMessage] = useState('');
   
   // Streak system for dog evolution unlocks - based on consecutive calendar days (US timezone)
@@ -118,7 +123,7 @@ export function PetPage({}: Props): JSX.Element {
     return newStreak;
   };
 
-  // Initialize streak on component mount
+  // Initialize streak and previous coins spent on component mount
   useEffect(() => {
     const streakData = getStreakData();
     if (streakData.lastFeedDate) {
@@ -137,6 +142,9 @@ export function PetPage({}: Props): JSX.Element {
         saveStreakData(resetStreakData);
       }
     }
+    
+    // Initialize previous coins spent for current stage
+    setPreviousCoinsSpentForStage(getCoinsSpentForCurrentStage(currentStreak));
   }, []);
   
   // TTS message ID for tracking speaking state
@@ -169,7 +177,10 @@ export function PetPage({}: Props): JSX.Element {
 
     // Deduct coins and increase care level
     spendCoins(10);
-    setCareLevel(prev => Math.min(prev + 1, 6)); // Max 6 actions
+    setCareLevel(Math.min(careLevel + 1, 6), currentStreak); // Max 6 actions, pass current streak
+    
+    // Track coins spent on current pet
+    addPetCoinsSpent(currentPet, 10);
     
     // Update streak based on calendar days
     const newStreak = updateStreak();
@@ -254,29 +265,76 @@ export function PetPage({}: Props): JSX.Element {
     }
   };
 
+  // Get Bobo images based on coins spent
+  const getBoboImage = (coinsSpent: number) => {
+    if (coinsSpent >= 50) {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011137_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else if (coinsSpent >= 30) {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011115_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else if (coinsSpent >= 10) {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011058_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011043_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    }
+  };
+
   const getPetImage = () => {
-    // Calculate total coins spent on feeding (10 coins per feeding action)
-    const coinsSpentOnFeeding = careLevel * 10;
+    // Check if Bobo is owned and being displayed
+    if (currentPet === 'bobo' && isPetOwned('bobo')) {
+      // For Bobo, use pet-specific coin tracking
+      const boboCoinsSpent = getPetCoinsSpent('bobo');
+      return getBoboImage(boboCoinsSpent);
+    }
     
-    // Pet images based on coins spent on feeding
-    // 0 coins spent: first image, 30+ coins spent: second image, 50+ coins spent: third image
-    const currentImage = coinsSpentOnFeeding >= 50 
-      ? "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
-      : coinsSpentOnFeeding >= 30 
-        ? "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
-        : "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    // Calculate coins spent on feeding for current evolution stage (for dog)
+    const coinsSpentOnFeeding = getCoinsSpentForCurrentStage(currentStreak);
     
-    // Check if pet evolved and play sound based on care level changes
-    if (previousCoins !== coins) {
-      const previousCareLevel = Math.floor((previousCoins === coins ? careLevel - 1 : careLevel));
-      const previousCoinsSpent = Math.max(0, previousCareLevel * 10);
-      
-      // Play sound when crossing evolution thresholds (spending more coins on feeding)
-      if ((previousCoinsSpent < 30 && coinsSpentOnFeeding >= 30) || 
-          (previousCoinsSpent < 50 && coinsSpentOnFeeding >= 50)) {
+    // Check streak level for different dog evolution tiers
+    let currentImage;
+    
+    if (currentStreak >= 3) {
+      // Fully evolved dog versions for users with 3+ day streak
+      if (coinsSpentOnFeeding >= 50) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (coinsSpentOnFeeding >= 30) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001847_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (coinsSpentOnFeeding >= 10) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001814_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001757_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      }
+    } else if (currentStreak >= 2) {
+      // Grown dog versions for users with 2+ day streak
+      if (coinsSpentOnFeeding >= 50) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001500_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (coinsSpentOnFeeding >= 30) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001443_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (coinsSpentOnFeeding >= 10) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001432_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_001417_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      }
+    } else {
+      // Original small pup images for users with <2 day streak
+      if (coinsSpentOnFeeding >= 50) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (coinsSpentOnFeeding >= 30) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (coinsSpentOnFeeding >= 10) {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else {
+        currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      }
+    }
+    
+    // Check if pet evolved and play sound based on coins spent in current stage
+    if (previousCoinsSpentForStage !== coinsSpentOnFeeding) {
+      // Play sound when crossing evolution thresholds within current stage
+      if ((previousCoinsSpentForStage < 30 && coinsSpentOnFeeding >= 30) || 
+          (previousCoinsSpentForStage < 50 && coinsSpentOnFeeding >= 50)) {
         setTimeout(() => playEvolutionSound(), 400); // Delay to sync with animation
       }
-      setPreviousCoins(coins);
+      setPreviousCoinsSpentForStage(coinsSpentOnFeeding);
     }
     
     return currentImage;
@@ -288,14 +346,17 @@ export function PetPage({}: Props): JSX.Element {
       return;
     }
 
-    if (ownedPets.includes(petType)) {
+    if (isPetOwned(petType)) {
       alert("You already own this pet!");
       return;
     }
 
     // Deduct coins and add pet to owned pets
     spendCoins(cost);
-    setOwnedPets(prev => [...prev, petType]);
+    addOwnedPet(petType);
+    
+    // Switch to the newly purchased pet
+    setCurrentPet(petType);
     
     // Play purchase sound (reuse evolution sound for now)
     playEvolutionSound();
@@ -338,46 +399,143 @@ export function PetPage({}: Props): JSX.Element {
   };
 
   const getPetThought = () => {
-    // Calculate total coins spent on feeding (10 coins per feeding action)
-    const coinsSpentOnFeeding = careLevel * 10;
+    // Helper function to randomly select from an array of thoughts
+    const getRandomThought = (thoughts: string[]) => {
+      return thoughts[Math.floor(Math.random() * thoughts.length)];
+    };
+    
+    // Different thoughts for different pets
+    if (currentPet === 'bobo' && isPetOwned('bobo')) {
+      const boboCoinsSpent = getPetCoinsSpent('bobo');
+      
+      if (boboCoinsSpent === 0) {
+        const hungryThoughts = [
+          "Oook ook! 🐵 I'm Bobo! My banana belly is empty... can you feed me some cookies?",
+          "Hey there, Callee! 🍌 Bobo here! I'm swinging from hunger... got any treats?",
+          "Oook! It's me, your monkey friend Bobo! 🐵 My tummy is rumbling for some cookies!",
+          "Hi Callee! Bobo needs some yummy cookies! 🍪 My monkey appetite is huge!",
+          "Oook ook! 🐵 Bobo is starving! Can you help your monkey friend with some treats?",
+          "Callee! 🍌 Your monkey Bobo is so hungry... cookies would make me do happy flips!"
+        ];
+        return getRandomThought(hungryThoughts);
+      } else if (boboCoinsSpent < 30) {
+        const satisfiedThoughts = [
+          "Mmm banana-licious! 🍌 More cookies will make this monkey swing with joy!",
+          "Oook ook! Those cookies were amazing! 🐵 But Bobo could eat more!",
+          "Yum yum! 🍪 These treats are perfect for a growing monkey like me!",
+          "Oook! Those cookies hit the spot! 🐵 But my monkey appetite is still growing!",
+          "Thank you, Callee! 🥰 Those cookies were perfect, but Bobo is still a little peckish!",
+          "Delicious! 🍪 My tail is wagging so fast! More cookies would make me flip with happiness!"
+        ];
+        return getRandomThought(satisfiedThoughts);
+      } else if (boboCoinsSpent < 50) {
+        const growingThoughts = [
+          "Oook ook! I'm growing stronger! 🐵 Keep feeding me - I'm getting bigger and more agile!",
+          "Look at me swing! 💪 I can feel myself getting stronger with each cookie!",
+          "Amazing! I'm growing so fast! 🌱 More cookies will help me become the ultimate monkey!",
+          "Callee, I feel so energetic! ⚡ These cookies are making me bigger and more acrobatic!",
+          "Oook ook! I'm transforming! 🦋 Keep the cookies coming - I'm almost ready for the next stage!",
+          "Incredible! My monkey body is changing! 🐵 More cookies will help me reach my full potential!"
+        ];
+        return getRandomThought(growingThoughts);
+      } else {
+        const happyThoughts = [
+          "Oook ook! 🥳 I feel amazing, Callee! Now... could you get me some monkey friends to play with!",
+          "Oook ook! I'm so strong now! 💪 Maybe it's time to find some playmates to swing with?",
+          "I feel fantastic! 🌟 All those cookies worked! Now I'm ready for some monkey business with friends!",
+          "Amazing! I'm at my best! ✨ Callee, can you help me find some buddies to climb trees with?",
+          "Hooray! I'm fully grown! 🎉 Can you help me find some monkey friends to play with?",
+          "Perfect! I feel incredible! 🚀 Maybe it's time to find some playmates for jungle adventures?"
+        ];
+        return getRandomThought(happyThoughts);
+      }
+    }
+    
+    // Default dog thoughts
+    const coinsSpentOnFeeding = getCoinsSpentForCurrentStage(currentStreak);
     
     // Pet thoughts based on coins spent on feeding
     if (coinsSpentOnFeeding === 0) {
       // No coins spent on feeding yet
-      if (coins < 10) {
-        return "Hi Callee! I'm April 🐶… my tummy's rumbling! Can you feed me some cookies?";
-      } else {
-        return "Hi Callee! I'm April 🐶… my tummy's rumbling! Can you feed me some cookies?";
-      }
+      const hungryThoughts = [
+        "Hi Callee... I'm April 🐶 and my tummy's rumbling sadly. Could you please feed me some cookies?",
+        "Woof... It's me, April! 🐕 I'm so hungry and feeling down... could you spare some cookies for me?",
+        "Hey there, Callee... April here 🐶 My belly is making sad noises... feed me, please?",
+        "Hi friend... I'm April and I'm starving... 🍪 Do you have any cookies to cheer me up?",
+        "Callee... It's your puppy April! 🐶 I haven't eaten yet and I'm feeling so low... can you help me out?",
+        "Callee... 🐕 My tummy feels so empty and sad... cookies would really lift my spirits!"
+      ];
+      return getRandomThought(hungryThoughts);
     } else if (coinsSpentOnFeeding < 30) {
       // 10-20 coins spent on feeding (1-2 feedings)
-      return "Mmm… yummy! 🍪 More cookies will make me wag my tail even faster!";
+      const satisfiedThoughts = [
+        "Mmm… yummy! 🍪 More cookies will make me wag my tail even faster!",
+        "That was delicious! 😋 But I could definitely eat more cookies, Callee!",
+        "Nom nom nom! 🍪 These cookies are amazing! Can I have another one?",
+        "Woof! Those cookies hit the spot! 🐶 But my appetite is still growing!",
+        "Thank you, Callee! 🥰 Those cookies were perfect, but I'm still a little peckish!",
+        "Yum yum! 🍪 My tail is wagging so fast! More cookies would make me even happier!"
+      ];
+      return getRandomThought(satisfiedThoughts);
     } else if (coinsSpentOnFeeding < 50) {
       // 30-40 coins spent on feeding (3-4 feedings)
-      return "Woof woof! I'm growing stronger! 🐶 Keep feeding me - I'm getting bigger!";
+      const growingThoughts = [
+        "Woof woof! I'm growing stronger! 🐶 Keep feeding me - I'm getting bigger!",
+        "Look at me go! 💪 I can feel myself getting stronger with each cookie!",
+        "Amazing! I'm growing so fast! 🌱 More cookies will help me grow even more!",
+        "Callee, I feel so energetic! ⚡ These cookies are making me bigger and stronger!",
+        "Wag wag! I'm transforming! 🦋 Keep the cookies coming - I'm almost ready for the next stage!",
+        "Incredible! My body is changing! 🐕 More cookies will help me reach my full potential!"
+      ];
+      return getRandomThought(growingThoughts);
     } else {
       // 50+ coins spent on feeding (5+ feedings)
-      return "Yippee! 🥳 I feel amazing, Callee! Now… could you get me some friends to play with!";
+      const happyThoughts = [
+        "Yippee! 🥳 I feel amazing, Callee! Now… could you get me some friends to play with!",
+        "Woof woof! I'm so strong now! 💪 Maybe it's time to find some playmates?",
+        "I feel fantastic! 🌟 All those cookies worked! Now I'm ready for some friends!",
+        "Amazing! I'm at my best! ✨ Callee, can you help me find some buddies to play with?",
+        "Hooray! I'm fully grown! 🎉 Can you help me find some buddies to play with?",
+        "Perfect! I feel incredible! 🚀 Maybe it's time to find some playmates?"
+      ];
+      return getRandomThought(happyThoughts);
     }
   };
 
+  // Get coins spent for current pet
+  const getCurrentPetCoinsSpent = () => {
+    if (currentPet === 'dog') {
+      return getCoinsSpentForCurrentStage(currentStreak);
+    } else {
+      return getPetCoinsSpent(currentPet);
+    }
+  };
+
+  // Get current pet coins spent value
+  const currentPetCoinsSpent = getCurrentPetCoinsSpent();
+
+  // Memoize the pet thought so it only changes when the actual state changes
+  const currentPetThought = useMemo(() => {
+    return getPetThought();
+  }, [currentPet, getCoinsSpentForCurrentStage(currentStreak), getPetCoinsSpent(currentPet)]);
+
   // Handle audio playback when message changes
   useEffect(() => {
-    const currentMessage = getPetThought();
+    // Stop any currently playing audio when pet state changes
+    ttsService.stop();
     
     // Only speak when:
     // 1. Not in pet shop
     // 2. Audio is enabled
     // 3. Message has changed
-    // 4. There's no current audio playing
-    if (!showPetShop && audioEnabled && currentMessage !== lastSpokenMessage && !isSpeaking) {
+    if (!showPetShop && audioEnabled && currentPetThought !== lastSpokenMessage) {
       const timer = setTimeout(() => {
-        speakText(currentMessage);
+        speakText(currentPetThought);
       }, 500); // Small delay for smooth UX
       
       return () => clearTimeout(timer);
     }
-  }, [coins, careLevel, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking]);
+  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage]);
 
   return (
     <div className="min-h-screen flex flex-col" style={{
@@ -409,14 +567,34 @@ export function PetPage({}: Props): JSX.Element {
         </div>
       </div>
 
-      {/* Testing Button - Refill Coins (Development Only) */}
-      <div className="absolute bottom-5 left-5 z-20">
+      {/* Testing Buttons - Development Only */}
+      <div className="absolute bottom-5 left-5 z-20 flex flex-col gap-2">
         <button
           onClick={() => setCoins(100)}
           className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
           title="Testing: Refill coins to 100"
         >
           🔄
+        </button>
+      </div>
+
+      {/* Testing Button - Increase Streak (Development Only) */}
+      <div className="absolute bottom-5 right-5 z-20">
+        <button
+          onClick={() => {
+            const newStreak = currentStreak + 1;
+            const streakData = getStreakData();
+            const newStreakData = {
+              ...streakData,
+              streak: newStreak,
+              lastFeedDate: getCurrentUSDate()
+            };
+            saveStreakData(newStreakData);
+          }}
+          className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
+          title="Testing: Increase streak by 1"
+        >
+          🔥
         </button>
       </div>
 
@@ -435,7 +613,7 @@ export function PetPage({}: Props): JSX.Element {
             {/* Heart outline */}
             <div style={{
               position: 'absolute',
-              fontSize: 64,
+              fontSize: 84,
               color: '#E5E7EB'
             }}>
               🤍
@@ -443,9 +621,9 @@ export function PetPage({}: Props): JSX.Element {
             {/* Filled heart (blood) */}
             <div style={{
               position: 'absolute',
-              fontSize: 64,
+              fontSize: 84,
               color: '#DC2626',
-              clipPath: `inset(${100 - (careLevel / 6 * 100)}% 0 0 0)`,
+              clipPath: `inset(${Math.max(0, 100 - (currentPetCoinsSpent * 1.8 + 5))}% 0 0 0)`,
               transition: 'clip-path 500ms ease'
             }}>
               ❤️
@@ -514,7 +692,7 @@ export function PetPage({}: Props): JSX.Element {
             </div>
 
             <div className="text-sm text-slate-800 font-medium leading-relaxed text-center">
-              {getPetThought()}
+              {currentPetThought}
             </div>
           </div>
         )}
@@ -657,6 +835,34 @@ export function PetPage({}: Props): JSX.Element {
         {audioEnabled ? '🔊' : '🔇'}
       </button>
 
+      {/* Pet Switcher - Only show if user owns multiple pets */}
+      {ownedPets.length > 1 && (
+        <div className="fixed top-24 left-6 z-20 flex flex-col gap-2">
+          <div className="text-xs font-semibold text-white drop-shadow-md mb-1">
+            Your Pets:
+          </div>
+          {ownedPets.map((petId) => {
+            const petEmoji = petId === 'dog' ? '🐶' : petId === 'bobo' ? '🐵' : petId === 'feather' ? '🦜' : '🐾';
+            const isActive = currentPet === petId;
+            
+            return (
+              <button
+                key={petId}
+                onClick={() => setCurrentPet(petId)}
+                className={`w-12 h-12 rounded-xl border-2 text-2xl flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 ${
+                  isActive 
+                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white text-white' 
+                    : 'bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30'
+                }`}
+                title={`Switch to ${petId === 'dog' ? 'Dog' : petId === 'bobo' ? 'Bobo' : petId === 'feather' ? 'Feather' : petId}`}
+              >
+                {petEmoji}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Pet Shop Overlay */}
       {showPetShop && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -677,6 +883,9 @@ export function PetPage({}: Props): JSX.Element {
               <p className="text-sm text-gray-600 font-medium">
                 Adopt new animal friends!
               </p>
+              <p className="text-xs text-blue-600 font-medium mt-2">
+                ✨ All pets evolve as you feed them cookies! ✨
+              </p>
             </div>
 
 
@@ -689,7 +898,7 @@ export function PetPage({}: Props): JSX.Element {
               marginBottom: 16
             }}>
               {availablePets.map((pet) => {
-                const isOwned = ownedPets.includes(pet.id);
+                const isOwned = isPetOwned(pet.id);
                 const canAfford = hasEnoughCoins(pet.cost);
                 
                 return (
