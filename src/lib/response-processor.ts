@@ -64,6 +64,40 @@ export class ResponseProcessor {
    * Process AI response that may contain image generation instructions
    * Returns async generator that yields text and image content as it becomes available
    */
+  /**
+   * Build conversation context for better image generation
+   */
+  private static buildConversationContext(adventureContext: ChatMessage[]): string {
+    if (!adventureContext || adventureContext.length === 0) {
+      return "";
+    }
+
+    // Extract last two user messages for recent context
+    const userMessages = adventureContext
+      .filter(msg => msg.type === 'user')
+      .slice(-2)
+      .map(msg => msg.content.substring(0, 100)); // Limit length
+
+    // Create a brief summary of the conversation
+    const totalMessages = adventureContext.length;
+    const lastFewMessages = adventureContext
+      .slice(-4)
+      .map(msg => `${msg.type}: ${msg.content.substring(0, 80)}`)
+      .join('; ');
+
+    let context = "Context for image generation:\n";
+    
+    if (userMessages.length > 0) {
+      context += `Recent user requests: ${userMessages.join(' | ')}\n`;
+    }
+    
+    if (totalMessages > 0) {
+      context += `Adventure summary: ${lastFewMessages}\n`;
+    }
+    
+    return context;
+  }
+
   static async *processResponseWithImages(
     response: string,
     userId: string,
@@ -200,12 +234,18 @@ export class ResponseProcessor {
         // Use original user message for image generation instead of AI-generated description
         const rawPrompt = originalUserMessage || prompt;
         
-        // Apply enhanced safety prompt as PRIMARY attempt
-        const enhancedPrompt = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+        // Extract context from adventure history for better image generation
+        const conversationContext = this.buildConversationContext(adventureContext);
+        
+        // Apply enhanced safety prompt as PRIMARY attempt with conversation context
+        const enhancedPrompt = `${conversationContext}
+
+Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
         
         const startTime = Date.now();
         console.log(`🎯 Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
         console.log(`📝 Raw user input: ${rawPrompt}`);
+        console.log(`🗣️ Conversation context: ${conversationContext.substring(0, 200)}${conversationContext.length > 200 ? '...' : ''}`);
         console.log(`🛡️ Enhanced prompt: ${enhancedPrompt}`);
         
         const result = await imageGenerator.generateWithFallback(enhancedPrompt, userId, {

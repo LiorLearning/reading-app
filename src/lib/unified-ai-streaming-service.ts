@@ -280,6 +280,10 @@ export class UnifiedAIStreamingService {
 🎨 CRITICAL IMAGE GENERATION RULES - MANDATORY COMPLIANCE:
 - Use <generateImage>detailed prompt</generateImage> when the user makes EXPLICIT visual requests
 - ALWAYS include in your generateImage prompts: "There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image"
+- AFTER using generateImage tags, ALWAYS provide 2-3 exciting sentences describing what you're creating for them
+- Explain what they'll see in the image and how it connects to their adventure story
+- Don't just respond with emojis - give them rich descriptive text that makes the visual come alive!
+- Be enthusiastic and immersive: "I'm bringing your mighty dragon to life, soaring through storm clouds!" not just "🐉"
 
 🚨 MANDATORY IMAGE GENERATION - NO EXCEPTIONS:
 These phrases ALWAYS require <generateImage> tags:

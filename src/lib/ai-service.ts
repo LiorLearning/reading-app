@@ -1414,6 +1414,38 @@ Return ONLY the new reading passage, nothing else.`;
     }
   }
 
+  // Helper: Build conversation context for better image generation
+  private buildImageGenerationContext(userAdventure: ChatMessage[]): string {
+    if (!userAdventure || userAdventure.length === 0) {
+      return "";
+    }
+
+    // Extract last two user messages for recent context
+    const userMessages = userAdventure
+      .filter(msg => msg.type === 'user')
+      .slice(-2)
+      .map(msg => msg.content.substring(0, 100)); // Limit length
+
+    // Create a brief summary of the conversation
+    const totalMessages = userAdventure.length;
+    const lastFewMessages = userAdventure
+      .slice(-4)
+      .map(msg => `${msg.type}: ${msg.content.substring(0, 80)}`)
+      .join('; ');
+
+    let context = "Context for image generation:\n";
+    
+    if (userMessages.length > 0) {
+      context += `Recent user requests: ${userMessages.join(' | ')}\n`;
+    }
+    
+    if (totalMessages > 0) {
+      context += `Adventure summary: ${lastFewMessages}\n`;
+    }
+    
+    return context;
+  }
+
   // Helper: Generate the primary optimized adventure prompt (used first)
   private generatePrimaryAdventurePrompt(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string): string {
     console.log('=== PRIMARY ADVENTURE PROMPT GENERATION ===');
@@ -1428,8 +1460,14 @@ Return ONLY the new reading passage, nothing else.`;
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
     console.log('Weighted content (80% user input, 10% latest AI response, 10% other context):', weightedContent);
 
+    // Build context from conversation for better image generation
+    const conversationContext = this.buildImageGenerationContext(userAdventure);
+    console.log('Conversation context for image:', conversationContext.substring(0, 200));
+
     // Create exciting, adventurous images that kids will love while maintaining safety
-    const enhancedPrompt = `Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+    const enhancedPrompt = `${conversationContext}
+
+Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     
     console.log('PRIMARY adventure prompt:', enhancedPrompt);
     console.log('WEIGHTING: 80% User Input + 10% Latest AI Response + 10% Other Context');
@@ -1448,14 +1486,21 @@ Return ONLY the new reading passage, nothing else.`;
     const conversationHistory = this.getLastConversationMessages(userAdventure);
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
 
+    // Build context from conversation for better image generation
+    const conversationContext = this.buildImageGenerationContext(userAdventure);
+
     const prompts: string[] = [];
 
     // Fallback Option 1: Epic and dynamic cinematic adventure
-    const sanitizedEnhancedPrompt1 = `Create an epic, high-quality image: ${weightedContent}. Style: dynamic and cinematic with vivid colors, dramatic lighting, and amazing magical details. Make it look awesome and thrilling - the kind of image kids would want as their wallpaper. Ensure no nudity, sexual content, or sexually inappropriate material whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+    const sanitizedEnhancedPrompt1 = `${conversationContext}
+
+Create an epic, high-quality image: ${weightedContent}. Style: dynamic and cinematic with vivid colors, dramatic lighting, and amazing magical details. Make it look awesome and thrilling - the kind of image kids would want as their wallpaper. Ensure no nudity, sexual content, or sexually inappropriate material whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     prompts.push(sanitizedEnhancedPrompt1);
 
     // Fallback Option 2: Thrilling adventure with safe content
-    const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cinematic and realistic with vibrant details, exciting atmosphere, and captivating elements. Make it visually stunning and engaging for children while keeping all content completely family-friendly. No inappropriate content whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+    const sanitizedEnhancedPrompt2 = `${conversationContext}
+
+Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cinematic and realistic with vibrant details, exciting atmosphere, and captivating elements. Make it visually stunning and engaging for children while keeping all content completely family-friendly. No inappropriate content whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     prompts.push(sanitizedEnhancedPrompt2);
     
     console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
@@ -1463,7 +1508,9 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
-      const simpleFallback = `Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+      const simpleFallback = `${conversationContext}
+
+Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
       prompts.push(simpleFallback);
       console.log('Final fallback prompt (Simple Safe):', simpleFallback);
     }
