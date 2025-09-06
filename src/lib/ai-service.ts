@@ -1225,7 +1225,7 @@ Return ONLY the new reading passage, nothing else.`;
   async generateAdventureImage(
     prompt: string,
     userAdventure: ChatMessage[],
-    fallbackPrompt: string = "space adventure scene"
+    fallbackPrompt: string = "adventure scene"
   ): Promise<{ imageUrl: string; usedPrompt: string } | null> {
     // If not initialized or no API key, return null (will show placeholder)
     if (!this.isInitialized || !this.client) {

@@ -260,10 +260,10 @@ Remove parts that make it moderated. Reduce intensity of violence or eliminate s
           console.log(`✅ Image ${index + 1} generated successfully in ${duration}ms`);
           hasGeneratedSuccessfulImage = true; // Mark as successful, stop generating more
           
-          // Stop loading sound and play completion sound
-          console.log('🎵 Stopping loading sound and playing completion sound...');
+          // Stop loading sound - completion sound now handled by unified streaming hook
+          console.log('🎵 Stopping loading sound...');
           stopImageLoadingSound();
-          playImageCompleteSound();
+          // playImageCompleteSound(); // Removed - now handled by unified streaming hook timeout
           
           // Stream the completed image
           yield { 

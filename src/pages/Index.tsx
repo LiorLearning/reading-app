@@ -383,7 +383,10 @@ const Index = () => {
     if (currentScreen === -1 && imageGenerationController.current) {
       console.log('🏠 Navigating to home page - cleaning up image generation');
       imageGenerationController.current = null;
-      setIsGeneratingAdventureImage(false);
+      // Only reset loading state if unified system is not actively generating
+      if (!unifiedAIStreaming.isGeneratingImage) {
+        setIsGeneratingAdventureImage(false);
+      }
       setIsExplicitImageRequest(false);
     }
     
@@ -802,17 +805,34 @@ const Index = () => {
       console.log(`🎨 PANEL DEBUG: Adding new panel with image: ${imageUrl.substring(0, 60)}...`);
       addPanel(newPanel);
       
-      // Play completion sound (redundant but harmless - already handled in processor)
-      playImageCompleteSound();
+      // Completion sound is now handled by the unified streaming hook timeout
     },
     onResponseComplete: (response) => {
       console.log('✅ NEW: Unified AI response completed:', response);
     }
   });
   
+  // Track when legacy system is running independently to avoid sync conflicts
+  const [isLegacySystemRunning, setIsLegacySystemRunning] = React.useState(false);
+  
   // Sync legacy loading state with unified system for UI consistency
   React.useEffect(() => {
+    // 🛠️ CRITICAL FIX: Don't sync when legacy system is running independently
+    if (isLegacySystemRunning) {
+      console.log('🚫 SYNC BLOCKED: Legacy system is running independently, skipping sync');
+      return;
+    }
+    
+    console.log('🎯 🚨 CRITICAL SYNC: unifiedAIStreaming.isGeneratingImage changed from', isGeneratingAdventureImage, 'to', unifiedAIStreaming.isGeneratingImage);
     setIsGeneratingAdventureImage(unifiedAIStreaming.isGeneratingImage);
+  }, [unifiedAIStreaming.isGeneratingImage, isGeneratingAdventureImage, isLegacySystemRunning]);
+
+  // 🚨 CRITICAL SYNC: Monitor unified AI streaming state changes with detailed logging
+  React.useEffect(() => {
+    console.log('🚨 CRITICAL SYNC: unifiedAIStreaming.isGeneratingImage changed to:', unifiedAIStreaming.isGeneratingImage);
+    if (unifiedAIStreaming.isGeneratingImage) {
+      console.log('🎯 NEW MESSAGE: Current isGeneratingImage state: true');
+    }
   }, [unifiedAIStreaming.isGeneratingImage]);
 
   const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion | null): Promise<AdventureResponse> => {
@@ -875,6 +895,9 @@ const Index = () => {
     console.log('✅ LEGACY FALLBACK: Image keywords detected, proceeding with legacy generation');
     
     try {
+      // 🛠️ CRITICAL FIX: Mark legacy system as running to prevent sync interference
+      setIsLegacySystemRunning(true);
+      
       // Set loading state
       setIsGeneratingAdventureImage(true);
       
@@ -888,7 +911,7 @@ const Index = () => {
       const generatedImageResult = await aiService.generateAdventureImage(
         imagePrompt,
         chatMessages,
-        "space adventure scene"
+        "adventure scene"
       );
       
       if (generatedImageResult) {
@@ -917,7 +940,8 @@ const Index = () => {
         });
         setNewlyCreatedPanelId(newPanelId);
         
-        // Play completion sound
+        // Completion sound will be handled by individual systems (not unified)
+        // For legacy fallback, this generates images immediately without loading delay
         playImageCompleteSound();
         
         console.log('✅ LEGACY FALLBACK: Successfully generated image and added panel');
@@ -967,9 +991,15 @@ const Index = () => {
       setNewlyCreatedPanelId(newPanelId);
       
     } finally {
+      // 🛠️ CRITICAL FIX: Always stop loading state in legacy fallback
+      // The unified system has already failed, so we need to clear the loading state
+      console.log('🔄 LEGACY FALLBACK: Clearing loading state in finally block');
       setIsGeneratingAdventureImage(false);
+      
+      // 🛠️ CRITICAL FIX: Mark legacy system as no longer running to re-enable sync
+      setIsLegacySystemRunning(false);
     }
-  }, [chatMessages, aiService, user?.uid, currentAdventureId, addPanel, images, playImageCompleteSound]);
+  }, [chatMessages, aiService, user?.uid, currentAdventureId, addPanel, images, playImageCompleteSound, setIsLegacySystemRunning]);
 
 
 
@@ -987,7 +1017,7 @@ const Index = () => {
       // Use the prompt or generate from recent context
       const imagePrompt = prompt || 
           chatMessages.slice(-3).map(msg => msg.content).join(" ") || 
-          "space adventure with rocket";
+          "adventure with rocket";
         
         // Extract adventure context for caching
         const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
@@ -1042,11 +1072,12 @@ const Index = () => {
       });
       setNewlyCreatedPanelId(newPanelId);
       
-      // Stop loading sound and play completion sound when image is ready
+      // Stop loading sound - completion sound handled by unified system timeout
       stopImageLoadingSound();
-      playImageCompleteSound();
+      // playImageCompleteSound(); // Removed - now handled by unified streaming hook
       // Stop loading animation only for automatic generation, not explicit requests
-      if (!isExplicitImageRequest) {
+      // Also check that unified system is not actively generating
+      if (!isExplicitImageRequest && !unifiedAIStreaming.isGeneratingImage) {
         setIsGeneratingAdventureImage(false);
       }
       
@@ -1069,7 +1100,8 @@ const Index = () => {
       // Stop loading sound on error
       stopImageLoadingSound();
       // Stop loading animation only for automatic generation, not explicit requests
-      if (!isExplicitImageRequest) {
+      // Also check that unified system is not actively generating
+      if (!isExplicitImageRequest && !unifiedAIStreaming.isGeneratingImage) {
         setIsGeneratingAdventureImage(false);
       }
       
@@ -1470,7 +1502,10 @@ const Index = () => {
             setLastMessageCount(prev.length + 1);
             playMessageSound();
             // Stop loading animation and reset explicit request flag
-            setIsGeneratingAdventureImage(false);
+            // Only stop if unified system is not actively generating
+            if (!unifiedAIStreaming.isGeneratingImage) {
+              setIsGeneratingAdventureImage(false);
+            }
             setIsExplicitImageRequest(false);
             // Auto-speak the AI message
             const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
@@ -1486,7 +1521,10 @@ const Index = () => {
         } catch (error) {
           console.error('Error in image request handling:', error);
           // Stop loading animation and sound on error, reset explicit request flag
-          setIsGeneratingAdventureImage(false);
+          // Only stop if unified system is not actively generating
+          if (!unifiedAIStreaming.isGeneratingImage) {
+            setIsGeneratingAdventureImage(false);
+          }
           setIsExplicitImageRequest(false);
           stopImageLoadingSound();
           
