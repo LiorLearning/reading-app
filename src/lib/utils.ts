@@ -266,6 +266,73 @@ export const loadAdventureSummaries = (): AdventureSummary[] => {
 export const generateAdventureSummary = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "An empty adventure waiting to be filled with excitement!";
   
+  // Check if OpenAI API key is available for AI generation
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    // Fallback to rule-based generation
+    return generateAdventureSummaryFallback(messages);
+  }
+
+  try {
+    const OpenAI = (await import('openai')).default;
+    const client = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true
+    });
+
+    // Get a sample of the conversation for AI analysis
+    const conversationSample = messages
+      .slice(-10) // Last 10 messages to understand current state
+      .map(msg => `${msg.type === 'user' ? 'Child' : 'Assistant'}: ${msg.content}`)
+      .join('\n');
+
+    const systemPrompt = `You are creating a brief, engaging description for a child's adventure story. 
+
+Based on the conversation below, create a short description (30-50 words) that captures:
+- The main characters or hero
+- The setting or world
+- The central conflict or adventure theme
+- The child-friendly, exciting tone
+
+Rules:
+- Keep it under 50 words
+- Use simple, exciting language for ages 6-11
+- Focus on the adventure elements, not the conversation
+- Make it sound like a book description that would excite a child
+
+Conversation:
+${conversationSample}
+
+Generate a short, exciting adventure description:`;
+
+    const response = await client.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: systemPrompt }
+      ],
+      max_tokens: 100,
+      temperature: 0.7
+    });
+
+    const aiDescription = response.choices[0]?.message?.content?.trim();
+    
+    if (aiDescription && aiDescription.length > 10) {
+      console.log('✨ AI-generated adventure description:', aiDescription);
+      return aiDescription;
+    } else {
+      console.warn('⚠️ AI description too short or empty, using fallback');
+      return generateAdventureSummaryFallback(messages);
+    }
+
+  } catch (error) {
+    console.warn('⚠️ Failed to generate AI description, using fallback:', error);
+    return generateAdventureSummaryFallback(messages);
+  }
+};
+
+// Fallback function for when AI is not available
+const generateAdventureSummaryFallback = (messages: ChatMessage[]): string => {
   // Get user messages to understand the adventure content
   const userMessages = messages
     .filter(msg => msg.type === 'user')
@@ -283,11 +350,81 @@ export const generateAdventureSummary = async (messages: ChatMessage[]): Promise
 };
 
 /**
- * Generate adventure name from messages
+ * Generate adventure name from messages using AI
  */
 export const generateAdventureName = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "Untitled Adventure";
   
+  // Check if OpenAI API key is available for AI generation
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    // Fallback to rule-based generation
+    return generateAdventureNameFallback(messages);
+  }
+
+  try {
+    const OpenAI = (await import('openai')).default;
+    const client = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true
+    });
+
+    // Get key conversation elements for AI analysis
+    const conversationSample = messages
+      .slice(0, 8) // First 8 messages to understand the adventure beginning
+      .map(msg => `${msg.type === 'user' ? 'Child' : 'Assistant'}: ${msg.content}`)
+      .join('\n');
+
+    const systemPrompt = `You are creating a catchy, exciting title for a child's adventure story.
+
+Based on the conversation below, create a short title (2-4 words) that captures:
+- The main character or hero type
+- The key setting or theme
+- An adventure-focused feeling
+
+Rules:
+- Keep it 2-4 words maximum
+- Use exciting, child-friendly language
+- Make it sound like a cool book title
+- Avoid generic words like "story" or "tale"
+- Focus on action words or exciting nouns
+- Examples of good titles: "Dragon Riders", "Space Heroes", "Magic Forest Quest", "Robot Battle"
+
+Conversation:
+${conversationSample}
+
+Generate an exciting adventure title (2-4 words):`;
+
+    const response = await client.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: systemPrompt }
+      ],
+      max_tokens: 50,
+      temperature: 0.8
+    });
+
+    const aiTitle = response.choices[0]?.message?.content?.trim();
+    
+    if (aiTitle && aiTitle.length > 3 && aiTitle.length < 50) {
+      // Clean up the title (remove quotes if AI added them)
+      const cleanTitle = aiTitle.replace(/^["']|["']$/g, '');
+      console.log('✨ AI-generated adventure title:', cleanTitle);
+      return cleanTitle;
+    } else {
+      console.warn('⚠️ AI title invalid length, using fallback');
+      return generateAdventureNameFallback(messages);
+    }
+
+  } catch (error) {
+    console.warn('⚠️ Failed to generate AI title, using fallback:', error);
+    return generateAdventureNameFallback(messages);
+  }
+};
+
+// Fallback function for when AI is not available
+const generateAdventureNameFallback = (messages: ChatMessage[]): string => {
   // Get first few user messages for naming
   const firstMessages = messages
     .filter(msg => msg.type === 'user')
