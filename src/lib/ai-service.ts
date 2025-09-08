@@ -1274,8 +1274,9 @@ Return ONLY the new reading passage, nothing else.`;
     prompt: string,
     userAdventure: ChatMessage[],
     fallbackPrompt: string = "adventure scene",
-    aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string }
-  ): Promise<{ imageUrl: string; usedPrompt: string } | null> {
+    aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string },
+    adventureId?: string // Add adventure ID parameter for race condition prevention
+  ): Promise<{ imageUrl: string; usedPrompt: string; adventureId?: string } | null> {
     // If not initialized or no API key, return null (will show placeholder)
     if (!this.isInitialized || !this.client) {
       return null;
@@ -1289,6 +1290,10 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Set generation flag to prevent simultaneous calls
     this.isGeneratingImage = true;
+    
+    // 🛡️ Track current adventure ID for race condition prevention
+    const currentAdventureId = adventureId;
+    console.log(`🎯 ADVENTURE TRACKING: Starting image generation for adventure ID: ${currentAdventureId || 'unknown'}`);
 
     // 🛠️ Safety timeout to prevent permanent stuck state
     const safetyTimeout = setTimeout(() => {
@@ -1331,7 +1336,7 @@ Return ONLY the new reading passage, nothing else.`;
           console.log(`✅ PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
           clearTimeout(safetyTimeout); // Clear safety timeout
           this.isGeneratingImage = false; // Clear generation flag
-          return { imageUrl, usedPrompt: finalPrompt };
+          return { imageUrl, usedPrompt: finalPrompt, adventureId };
         }
       } catch (primaryError: any) {
         console.log(`❌ Primary adventure prompt failed:`, primaryError.message);
@@ -1383,7 +1388,7 @@ Return ONLY the new reading passage, nothing else.`;
             console.log(`✅ Fallback DALL-E prompt ${i + 1}${promptType} succeeded! 🎉`);
             clearTimeout(safetyTimeout); // Clear safety timeout
             this.isGeneratingImage = false; // Clear generation flag
-            return { imageUrl, usedPrompt: finalPrompt };
+            return { imageUrl, usedPrompt: finalPrompt, adventureId };
           }
         } catch (promptError: any) {
           console.log(`❌ Fallback DALL-E prompt ${i + 1} failed:`, promptError.message);
@@ -2179,7 +2184,8 @@ Generate a hint at level ${hintLevel}:`;
     chatHistory: ChatMessage[] = [], 
     spellingQuestion: SpellingQuestion,
     userId: string,
-    sessionId: string = crypto.randomUUID()
+    sessionId: string = crypto.randomUUID(),
+    adventureId?: string
   ): Promise<UnifiedAIResponse> {
     console.log('🚀 Using NEW unified AI response generation system');
     
@@ -2188,7 +2194,8 @@ Generate a hint at level ${hintLevel}:`;
       chatHistory,
       spellingQuestion,
       userId,
-      sessionId
+      sessionId,
+      adventureId
     );
   }
   

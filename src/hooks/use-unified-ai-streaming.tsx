@@ -7,6 +7,7 @@ import { stopImageLoadingSound, playImageCompleteSound } from '@/lib/sounds';
 
 export interface UseUnifiedAIStreamingOptions {
   userId: string;
+  adventureId?: string;
   onNewImage?: (imageUrl: string, prompt: string) => void;
   onResponseComplete?: (response: UnifiedAIResponse) => void;
 }
@@ -26,7 +27,7 @@ export interface UnifiedStreamingState {
  * This is the new system that lets AI decide when to generate images
  */
 export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
-  const { userId, onNewImage, onResponseComplete } = options;
+  const { userId, adventureId, onNewImage, onResponseComplete } = options;
   
   // State management
   const [streamingState, setStreamingState] = useState<UnifiedStreamingState>({
@@ -262,7 +263,8 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         chatHistory,
         spellingQuestion,
         userId,
-        sessionId
+        sessionId,
+        adventureId
       );
       
       // Clear the timeout since request completed successfully

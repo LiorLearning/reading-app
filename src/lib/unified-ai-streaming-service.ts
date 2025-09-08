@@ -98,7 +98,8 @@ export class UnifiedAIStreamingService {
     chatHistory: ChatMessage[],
     spellingQuestion: SpellingQuestion,
     userId: string,
-    sessionId: string
+    sessionId: string,
+    adventureId?: string
   ): Promise<UnifiedAIResponse> {
     
     if (!this.isInitialized || !this.client) {
@@ -161,7 +162,8 @@ export class UnifiedAIStreamingService {
           chatHistory, 
           spellingQuestion, 
           userId, 
-          aiResponse
+          aiResponse,
+          adventureId
         );
       }
       
@@ -441,7 +443,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
     chatHistory: ChatMessage[],
     spellingQuestion: SpellingQuestion,
     userId: string,
-    aiResponse: string
+    aiResponse: string,
+    adventureId?: string
   ): Promise<UnifiedAIResponse> {
     try {
       console.log('🔄 Calling legacy AI service as fallback...');
@@ -463,7 +466,9 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
           const legacyImageResult = await aiService.generateAdventureImage(
             userMessage,
             chatHistory,
-            "adventure scene"
+            "adventure scene",
+            undefined,
+            adventureId
           );
           
           if (legacyImageResult?.imageUrl) {
