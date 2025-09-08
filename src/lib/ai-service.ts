@@ -212,7 +212,7 @@ SENTENCE PLACEMENT RULE: The word "${spellingWord}" MUST appear in your FIRST or
 ❌ WRONG: Putting "${spellingWord}" in sentence 3, 4, or later
 ✅ CORRECT: "${spellingWord}" appears in sentence 1 OR sentence 2
 
-This is mandatory for the educational system to function properly. The word "${spellingWord}" must be exactly as written (no variations, synonyms, or plurals).
+This is mandatory for the educational system to function properly. The word "${spellingWord}" must be exactly as written (no variations, synonyms, or plurals).Always return the "${spellingWord}"  exactly as given, without hyphens or extra letters. The word must appear as a separate word surrounded by spaces.
 
 REMEMBER: First two sentences = ✅ | Later sentences = ❌` : ''}
 
