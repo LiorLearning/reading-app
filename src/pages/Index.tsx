@@ -2433,16 +2433,7 @@ const Index = () => {
   const [lastAutoImageMessageCount, setLastAutoImageMessageCount] = useState(0);
   const AUTO_IMAGE_TRIGGER_INTERVAL = 4; // Generate image every 4 user messages
   
-  console.log(`🔥 AUTO IMAGE SYSTEM STATUS:`, {
-    isAutoImageGenerationActive,
-    lastAutoImageMessageCount, 
-    AUTO_IMAGE_TRIGGER_INTERVAL,
-    currentUserMessageCount: chatMessages.filter(msg => msg.type === 'user').length,
-    currentAdventureId,
-    currentScreen,
-    isInAdventureMode: currentScreen === 1,
-    timestamp: Date.now()
-  });
+  
 
   // Reset auto image counter when adventure changes
   React.useEffect(() => {
