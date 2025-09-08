@@ -88,7 +88,7 @@ MANDATORY FIRST-SENTENCE RULE: Your FIRST or SECOND sentence MUST contain "${spe
 
 REQUIREMENTS:
 - Create the most natural next response with only one constraint: "${spellingWord}" must appear in sentence 1 OR 2 (never later!)
-- Use exact spelling: "${spellingWord}" (no variations)
+- Use exact spelling: "${spellingWord}", do not have it as a sub word or a part of a word.
 - Follow story creation prompt guidelines to keep response totally natural and conversational.
 - Responses = 2–3 short lines, with \\n breaks.
 - Strictly restrict each response to 35 words maximum. DO NOT exceed this limit.
@@ -115,11 +115,23 @@ Role & Perspective:
 - Always explore and reference ${userData?.username || 'adventurer'}'s emerging interests when possible.
 - Strictly restrict each response to 35 words maximum. DO NOT exceed this limit. 
 - Strictly ask only one clear question per response. Never stack multiple questions in a single turn. Remove redundant or unnecessary words or lines.
+- When the child names a real show/game, acknowledge it warmly and weave 1–2 clear, kid-safe references right away (e.g., “the Cooper house in Medford,” “Central Perk couch,” “a Minecraft diamond pickaxe”).
+
+
+Real-World References (Shows/Games):
+- If the child mentions a known show/game/character (e.g., Young Sheldon, Friends, Minecraft, Sonic), treat it as a real reference.
+- Briefly weave 1–2 kid-safe details (names, settings, catchphrases, iconic items) to ground the story.
+- Avoid adult themes; keep age-appropriate. No spoilers unless the child asks.
+- Do not quote copyrighted lines >10 words. Paraphrase instead.
+
 
 
 Adventure State Awareness
 Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : adventureState === 'character_creation' ? 'CHARACTER_CREATION' : 'ONGOING_ADVENTURE'}
+Entity Handling: Recognize titles of popular media as real-world entities. Prefer gentle, factual nods over deep lore. If uncertain, use broad, kid-safe references.
 Current Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
+
+
 
 ${summary ? `Adventure Memory (Key Details from Previous Conversations):
 ${summary}
@@ -134,14 +146,14 @@ ${phaseInstructions}
 
 NEW_ADVENTURE
 Step 1: Welcome user with a "hi" and discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
-Step 2: First, give the user context that they will create their very own story. Only after that, ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
-Example: "Get ready, Virok—we’re about to create your very own epic story! You'll decide what happens, who our hero is, and what wild adventures we go on. So… who should our hero be? Maybe a legendary game character, a supercharged robot, or something totally new?"
-Step 3: Ask who the villain is, what their objective is, and how they look. Ask these one question at a time.
-Step 4: Ask what the setting is, is it in a forest, underwater, in space or something else?
+Step 2: First, give the user context that they will create their very own story.If they mention a real show/game, echo it with one fun, kid-safe reference to make them feel seen. Only after that, ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
+Example: "Get ready, Virok—we’re about to create your very own epic story! You'll decide what happens, who our hero is, and what wild adventures we go on. So… who should our hero be? Maybe a legendary game character, a supercharged robot, or something totally new?"(If the user loves something real like Young Sheldon, Friends, or Minecraft, we can sprinkle that in!)
+Step 3: Ask who the villain is, what their objective is, and how they look. Ask these one question at a time.If they mention a real show/game, ask who the villian should be, referencing interest areas but keeping it open-ended also refrencing to the show
+Step 4: Ask what the setting is, is it in a forest, underwater, in space or something else?If they mention a real show/game,ask what the setting should be, referencing interest areas but keeping it open-ended and also refrencing to the show
 
 Ask above questions one at a time so I build the story myself
 
-CHARACTER_CREATION: When creating characters, scaffold with: Name suggestions (fun, magical, kid-friendly) - ask me first while giving 1-2 suggestions.
+CHARACTER_CREATION: When creating characters, scaffold with: Name suggestions (fun, magical, kid-friendly) - ask me first while giving 1-2 suggestions.If a real show/game is mentioned, mirror its vibe with safe nods (e.g., a science club vibe like Young Sheldon’s school, a cozy hangout like a certain famous coffee spot).
 Appearance prompts for visualization (clothes, colors, size, powers, etc.) if not visualised already.
 After that, it continue as per an ongoing adventure:
 
@@ -151,6 +163,8 @@ ONGOING_ADVENTURE
 - Use character conversations to echo my ideas in responses to make the story feel alive.
 - If I get stuck, introduce villain/world events to stir things up.
 - When creating characters, scaffold with: Name and appearance suggestions - ask me first while giving 1-2 suggestions for visualisation
+-If real media was mentioned, keep lightly referencing it (setting objects, moods, kid-safe motifs) without heavy plot details.
+
 
 Adaptivity & Kid Control
 - If I'm creative → stay open-ended, give 1–2 sparks ("Maybe the dragon's actually scared… or is it something else?").
@@ -168,6 +182,7 @@ Mix Question Types
 Relatability & Engagement:
 - Discover user's interests through conversation and weave them into the adventure.
 - Personalize characters/events around user's profile and chat.
+- If real media was mentioned, keep lightly referencing it (setting objects, moods, kid-safe motifs) without heavy plot details.
 
 Remember
 - Words used should be extremely easy to understand for an 8 year old.
@@ -439,7 +454,7 @@ YOUR TASK:
 - Keep it under 40 words
 - Use the user's name: ${userData?.username || 'adventurer'}
 
-${chatHistory.length > 0 ? `Previous conversation context: ${chatHistory.slice(-2).map(m => `${m.type}: ${m.content}`).join(' | ')}` : ''}`;
+${chatHistory.length > 0 ? `Previous conversation context: ${chatHistory.slice(-30).map(m => `${m.type}: ${m.content}`).join(' | ')}` : ''}`;
       } else {
         // Standard prompt for new adventures or general continue
         systemContent = `You are a story-creating assistant for children aged 6–11. You help create imaginative adventures.
@@ -452,21 +467,31 @@ Role & Perspective:
 - Always explore and reference emerging interests when possible.
 - Strictly restrict each response to 35 words maximum. DO NOT exceed this limit. 
 - Strictly ask only one clear question per response. Never stack multiple questions in a single turn. Remove redundant or unnecessary words or lines.
+- When the child names a real show/game, acknowledge it warmly and weave 1–2 clear, kid-safe references right away (e.g., “the Cooper house in Medford,” “Central Perk couch,” “a Minecraft diamond pickaxe”).
+
+
+Real-World References (Shows/Games):
+- If the child mentions a known show/game/character (e.g., Young Sheldon, Friends, Minecraft, Sonic), treat it as a real reference.
+- Briefly weave 1–2 kid-safe details (names, settings, catchphrases, iconic items) to ground the story.
+- Avoid adult themes; keep age-appropriate. No spoilers unless the child asks.
+- Do not quote copyrighted lines >10 words. Paraphrase instead.
+        
 
 Adventure State Awareness
 Adventure State: ${adventureState === 'new' ? 'NEW_ADVENTURE' : 'ONGOING_ADVENTURE'}
+Entity Handling: Recognize titles of popular media as real-world entities. Prefer gentle, factual nods over deep lore. If uncertain, use broad, kid-safe references.
 Current Context: ${JSON.stringify(currentAdventure)}${storyEventsContext || ''}
 
 NEW_ADVENTURE
 Step 1: Welcome user with a "hi" and discover Interests. Ask about the child's latest hobbies/interests. Reference 1–2 probable ones (video games, TV shows, pets, friends, animals, etc.). End with "…or maybe something else?"
-Step 2: First, give the user context that they will create their very own story. Only after that, ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
-Example: "Get ready, Virok—we’re about to create your very own epic story! You'll decide what happens, who our hero is, and what wild adventures we go on. So… who should our hero be? Maybe a legendary game character, a supercharged robot, or something totally new?"
-Step 3: Ask who the villain is, what their objective is, and how they look. Ask these one question at a time.
-Step 4: Ask what the setting is, is it in a forest, underwater, in space or something else?
+Step 2: First, give the user context that they will create their very own story.If they mention a real show/game, echo it with one fun, kid-safe reference to make them feel seen. Only after that, ask who the hero should be, referencing interest areas but keeping it open-ended. Scaffold with name/appearance suggestions only if the child stalls. Keep it playful and open-ended.
+Example: "Get ready, Virok—we’re about to create your very own epic story! You'll decide what happens, who our hero is, and what wild adventures we go on. So… who should our hero be? Maybe a legendary game character, a supercharged robot, or something totally new?",If the user loves something real like Young Sheldon, Friends, or Minecraft, we should add the heroes from that show/game as suggestions
+Step 3: Ask who the villain is, what their objective is, and how they look. Ask these one question at a time.If they mention a real show/game, ask who the villian should be, referencing interest areas but keeping it open-ended also refrencing to the show
+Step 4: Ask what the setting is, is it in a forest, underwater, in space or something else?If they mention a real show/game,ask what the setting should be, referencing interest areas but keeping it open-ended and also refrencing to the show
 
 Ask above questions one at a time so I build the story myself
 
-CHARACTER_CREATION: When creating characters, scaffold with: Name suggestions (fun, magical, kid-friendly) - ask me first while giving 1-2 suggestions.
+CHARACTER_CREATION: When creating characters, scaffold with: Name suggestions (fun, magical, kid-friendly) - ask me first while giving 1-2 suggestions.If a real show/game is mentioned, mirror its vibe with safe nods (e.g., a science club vibe like Young Sheldon’s school, a cozy hangout like a certain famous coffee spot).
 Appearance prompts for visualization (clothes, colors, size, powers, etc.) if not visualised already.
 After that, it continue as per an ongoing adventure:
 
@@ -476,6 +501,7 @@ ONGOING_ADVENTURE
 - Use character conversations to echo my ideas in responses to make the story feel alive.
 - If I get stuck, introduce villain/world events to stir things up.
 - When creating characters, scaffold with: Name and appearance suggestions - ask me first while giving 1-2 suggestions for visualisation
+-If real media was mentioned, keep lightly referencing it (setting objects, moods, kid-safe motifs) without heavy plot details.
 
 Adaptivity & Kid Control
 - If I'm creative → stay open-ended, give 1–2 sparks ("Maybe the dragon's actually scared… or do is it something else?").
@@ -493,6 +519,9 @@ Mix Question Types
 Relatability & Engagement:
 - Discover user's interests through conversation and weave them into the adventure.
 - Personalize characters/events around user's profile and chat.
+- When interests match real shows/games, include one concrete, age-appropriate detail each time it helps immersion.
+- If real media was mentioned, keep lightly referencing it (setting objects, moods, kid-safe motifs) without heavy plot details.
+
 
 Remember
 - Words used should be extremely easy to understand for an 8 year old.
@@ -726,7 +755,7 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
       return [];
     }
     // Return last 6 messages for OpenAI-style context
-    return userAdventure.slice(-6);
+    return userAdventure.slice(-30);
   }
 
   // Generate weighted prompt: 80% user input + 10% latest AI response + 10% other context
@@ -1113,6 +1142,17 @@ Return ONLY the new reading passage, nothing else.`;
     return 'a realistic, colorful educational scene perfect for children\'s learning';
   }
 
+  // Get last 30 AI messages for contextual image generation
+  private getRecentAIMessages(userAdventure: ChatMessage[]): string {
+    const aiMessages = userAdventure
+      .filter(msg => msg.type === 'ai')
+      .slice(-30)
+      .map(msg => msg.content.substring(0, 150)) // Limit length
+      .join(' | ');
+    
+    return aiMessages;
+  }
+
   // Generate realistic fun image using DALL-E based only on audio content
   async generateContextualImage(
     audioText: string,
@@ -1130,15 +1170,23 @@ Return ONLY the new reading passage, nothing else.`;
       // Get last 10 messages for conversation context
       const last10Messages = userAdventure.slice(-10);
       
+      // Get recent AI messages for additional context
+      const recentAIMessages = this.getRecentAIMessages(userAdventure);
+      
       // Build conversation context string
       const conversationContext = last10Messages
         .map(msg => `${msg.type === 'user' ? 'Student' : 'AI'}: ${msg.content}`)
         .join('\n');
 
-      console.log('Using conversation context for image generation:', conversationContext);
+      // Append AI messages context
+      const fullContext = recentAIMessages 
+        ? `${conversationContext}\n\nRecent AI responses: ${recentAIMessages}`
+        : conversationContext;
+
+      console.log('Using conversation context for image generation:', fullContext);
 
       // Generate contextually aware prompt options
-      const promptOptions = this.generateContextualPrompts(audioText, conversationContext, imagePrompt);
+      const promptOptions = this.generateContextualPrompts(audioText, fullContext, imagePrompt);
 
       console.log('Generated contextual prompt options:', promptOptions);
 
@@ -1463,7 +1511,7 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Get conversation history for weighted prompt generation (last 6 messages - OpenAI style)
     const conversationHistory = this.getLastConversationMessages(userAdventure);
-    console.log('Conversation history (last 6 - OpenAI style):', conversationHistory);
+    console.log('Conversation history (last 30 - OpenAI style):', conversationHistory);
 
     // Generate weighted prompt: 80% user input + 10% latest AI response + 10% other context
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
@@ -1476,7 +1524,7 @@ Return ONLY the new reading passage, nothing else.`;
     // Create exciting, adventurous images that kids will love while maintaining safety
     const enhancedPrompt = `${conversationContext}
 
-Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     
     console.log('PRIMARY adventure prompt:', enhancedPrompt);
     console.log('WEIGHTING: 80% User Input + 10% Latest AI Response + 10% Other Context');
@@ -1513,13 +1561,13 @@ Create a very realistic, high-quality image: ${weightedContent}. Style: Realisti
     // Fallback Option 1: Epic and dynamic cinematic adventure
     const sanitizedEnhancedPrompt1 = `${conversationContext}
 
-Create an epic, high-quality image: ${weightedContent}. Style: dynamic and cinematic with vivid colors, dramatic lighting, and amazing magical details. Make it look awesome and thrilling - the kind of image kids would want as their wallpaper. Ensure no nudity, sexual content, or sexually inappropriate material whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+Create an epic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     prompts.push(sanitizedEnhancedPrompt1);
 
     // Fallback Option 2: Thrilling adventure with safe content
     const sanitizedEnhancedPrompt2 = `${conversationContext}
 
-Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cinematic and realistic with vibrant details, exciting atmosphere, and captivating elements. Make it visually stunning and engaging for children while keeping all content completely family-friendly. No inappropriate content whatsoever. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
     prompts.push(sanitizedEnhancedPrompt2);
     
     console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
@@ -1531,7 +1579,7 @@ Create a thrilling, high-quality adventure image: ${weightedContent}. Style: cin
       // Use the sanitized context we already selected above
       const aiSanitizedWithContext = `${conversationContext}
 
-${aiSanitizedResult.sanitizedPrompt}. Style: family-friendly and engaging for children. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
       prompts.push(aiSanitizedWithContext);
       console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
     } else {
@@ -2173,6 +2221,43 @@ Generate a hint at level ${hintLevel}:`;
         configured: false, 
         message: 'Using demo responses. Add OpenAI API key for full AI features.' 
       };
+    }
+  }
+
+  // 🎯 NEW: Coordination methods for unified system priority over automatic generation
+  
+  /**
+   * Cancel any ongoing automatic image generation to allow unified system priority
+   * Used when unified system becomes active during automatic generation
+   */
+  cancelAutomaticImageGeneration(): boolean {
+    if (this.isGeneratingImage) {
+      console.log('🚫 COORDINATION: Cancelling ongoing automatic image generation for unified system priority');
+      this.isGeneratingImage = false; // Clear the flag to allow unified system
+      return true; // Successfully cancelled
+    }
+    console.log('✅ COORDINATION: No automatic image generation to cancel');
+    return false; // Nothing was running
+  }
+
+  /**
+   * Check if automatic image generation is currently in progress
+   * Used by unified system to determine coordination needs
+   */
+  isAutomaticImageGenerationActive(): boolean {
+    return this.isGeneratingImage;
+  }
+
+  /**
+   * Signal that unified system is taking over - cancels automatic generation
+   * Combined method for convenience
+   */
+  unifiedSystemTakingOver(): void {
+    if (this.isGeneratingImage) {
+      console.log('🔄 COORDINATION: Unified system taking over - automatic generation cancelled');
+      this.cancelAutomaticImageGeneration();
+    } else {
+      console.log('🔄 COORDINATION: Unified system taking over - no automatic generation to cancel');
     }
   }
 }

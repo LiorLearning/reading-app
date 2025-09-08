@@ -122,6 +122,10 @@ export class UnifiedAIStreamingService {
     try {
       console.log('🚀 Generating unified AI response with potential images...');
       
+      // 🎯 NEW: Signal automatic generation cancellation at start of unified session
+      const { aiService } = await import('./ai-service');
+      aiService.unifiedSystemTakingOver();
+      
       // Get AI response using enhanced prompt that includes image generation instructions
       const aiResponse = await this.getEnhancedAIResponse(
         userMessage, 
@@ -441,9 +445,13 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
   ): Promise<UnifiedAIResponse> {
     try {
       console.log('🔄 Calling legacy AI service as fallback...');
+      console.log('🎯 COORDINATION: Legacy fallback - session remains active, automatic generation blocked');
       
       // Import AI service dynamically to avoid circular dependencies
       const { aiService } = await import('./ai-service');
+      
+      // 🎯 NEW: Signal that unified system (including legacy fallback) is taking over
+      aiService.unifiedSystemTakingOver();
       
       // Try legacy image generation if the content seems visual
       const shouldTryLegacyImage = this.shouldTryLegacyImageGeneration(userMessage, aiResponse);

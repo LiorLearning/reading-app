@@ -65,6 +65,23 @@ export class ResponseProcessor {
    * Returns async generator that yields text and image content as it becomes available
    */
   /**
+   * Get last 30 AI messages for context
+   */
+  private static getRecentAIMessages(adventureContext: ChatMessage[]): string {
+    if (!adventureContext || adventureContext.length === 0) {
+      return "";
+    }
+
+    const aiMessages = adventureContext
+      .filter(msg => msg.type === 'ai')
+      .slice(-30)
+      .map(msg => msg.content.substring(0, 150)) // Limit length
+      .join(' | ');
+
+    return aiMessages;
+  }
+
+  /**
    * Build conversation context for better image generation
    */
   private static buildConversationContext(adventureContext: ChatMessage[]): string {
@@ -75,8 +92,11 @@ export class ResponseProcessor {
     // Extract last two user messages for recent context
     const userMessages = adventureContext
       .filter(msg => msg.type === 'user')
-      .slice(-2)
+      .slice(-30)
       .map(msg => msg.content.substring(0, 100)); // Limit length
+
+    // Get recent AI messages
+    const aiMessages = this.getRecentAIMessages(adventureContext);
 
     // Create a brief summary of the conversation
     const totalMessages = adventureContext.length;
@@ -89,6 +109,10 @@ export class ResponseProcessor {
     
     if (userMessages.length > 0) {
       context += `Recent user requests: ${userMessages.join(' | ')}\n`;
+    }
+    
+    if (aiMessages) {
+      context += `Recent AI responses: ${aiMessages}\n`;
     }
     
     if (totalMessages > 0) {

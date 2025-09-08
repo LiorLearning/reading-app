@@ -207,13 +207,28 @@ export class MultiProviderImageGenerator {
   }
   
   /**
+   * Get recent AI messages for context
+   */
+  private getRecentAIMessages(context: ChatMessage[]): string {
+    return context
+      .filter(msg => msg.type === 'ai')
+      .slice(-30)
+      .map(msg => msg.content.substring(0, 150))
+      .join(' | ');
+  }
+
+  /**
    * Build context string for Firebase storage
    */
   private buildAdventureContextString(context: ChatMessage[]): string {
-    return context
-      .slice(-5) // Last 5 messages
+    const userMessages = context
+      .slice(-30) // Last 30 messages
       .map(msg => msg.content.substring(0, 100)) // Truncate for storage
       .join(' | ');
+    
+    const aiMessages = this.getRecentAIMessages(context);
+    
+    return aiMessages ? `${userMessages} | AI Context: ${aiMessages}` : userMessages;
   }
 }
 

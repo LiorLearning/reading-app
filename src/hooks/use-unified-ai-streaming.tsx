@@ -14,6 +14,7 @@ export interface UseUnifiedAIStreamingOptions {
 export interface UnifiedStreamingState {
   isStreaming: boolean;
   isGeneratingImage: boolean;
+  isUnifiedSessionActive: boolean; // NEW: Track entire unified session (including legacy fallback)
   currentText: string;
   generatedImages: string[];
   error: string | null;
@@ -31,6 +32,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   const [streamingState, setStreamingState] = useState<UnifiedStreamingState>({
     isStreaming: false,
     isGeneratingImage: false,
+    isUnifiedSessionActive: false, // NEW: Track entire unified session
     currentText: '',
     generatedImages: [],
     error: null,
@@ -87,7 +89,8 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             playImageCompleteSound();
             setStreamingState(prevState => ({
               ...prevState,
-              isGeneratingImage: false
+              isGeneratingImage: false,
+              isUnifiedSessionActive: false // NEW: Session fully complete after image delay
             }));
           }, 5000);
           
@@ -97,6 +100,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         case 'error':
           newState.error = event.content;
           newState.isGeneratingImage = false;
+          newState.isUnifiedSessionActive = false; // NEW: Reset session state on error
           // Clear any delay timeout on error
           if (delayTimeoutRef.current) {
             clearTimeout(delayTimeoutRef.current);
@@ -124,7 +128,8 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             playImageCompleteSound();
             setStreamingState(prevState => ({
               ...prevState,
-              isGeneratingImage: false
+              isGeneratingImage: false,
+              isUnifiedSessionActive: false // NEW: Session fully complete after delay
             }));
             // Stop sound after delay
             stopImageLoadingSound();
@@ -197,6 +202,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           ...prev,
           isStreaming: false,
           isGeneratingImage: false,
+          isUnifiedSessionActive: false, // NEW: Reset session state too
           error: null
         }));
         
@@ -219,6 +225,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       ...prev,
       isStreaming: true,
       isGeneratingImage: false,
+      isUnifiedSessionActive: true, // NEW: Mark session as active from start
       currentText: '',
       generatedImages: [],
       error: null,
@@ -237,6 +244,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           ...prev,
           isStreaming: false,
           isGeneratingImage: false,
+          isUnifiedSessionActive: false, // NEW: Reset session state on timeout
           error: 'Request timed out - please try again'
         }));
         
@@ -269,6 +277,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         ...prev,
         isStreaming: false,
         // isGeneratingImage: false, // REMOVED - let the timeout handle this
+        // isUnifiedSessionActive: true, // KEEP: Session stays active until all processing complete
         lastResponse: response,
         currentText: response.textContent,
         generatedImages: response.imageUrls,
@@ -306,6 +315,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           ...prev,
           isStreaming: false,
           isGeneratingImage: false,
+          isUnifiedSessionActive: false, // NEW: Reset session state on abort
           error: null // Don't show error for intentional aborts
         }));
         
@@ -326,6 +336,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         ...prev,
         isStreaming: false,
         isGeneratingImage: false,
+        isUnifiedSessionActive: false, // NEW: Reset session state on error
         error: errorMessage
       }));
       
@@ -355,7 +366,8 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
     setStreamingState(prev => ({
       ...prev,
       isStreaming: false,
-      isGeneratingImage: false
+      isGeneratingImage: false,
+      isUnifiedSessionActive: false // NEW: Reset session state when aborting
     }));
   }, [sessionId]);
   
