@@ -278,12 +278,32 @@ export function PetPage({}: Props): JSX.Element {
     }
   };
 
+  // Get Feather images based on coins spent
+  const getFeatherImage = (coinsSpent: number) => {
+    if (coinsSpent >= 50) {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154758_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else if (coinsSpent >= 30) {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else if (coinsSpent >= 10) {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else {
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    }
+  };
+
   const getPetImage = () => {
     // Check if Bobo is owned and being displayed
     if (currentPet === 'bobo' && isPetOwned('bobo')) {
       // For Bobo, use pet-specific coin tracking
       const boboCoinsSpent = getPetCoinsSpent('bobo');
       return getBoboImage(boboCoinsSpent);
+    }
+    
+    // Check if Feather is owned and being displayed
+    if (currentPet === 'feather' && isPetOwned('feather')) {
+      // For Feather, use pet-specific coin tracking
+      const featherCoinsSpent = getPetCoinsSpent('feather');
+      return getFeatherImage(featherCoinsSpent);
     }
     
     // Calculate coins spent on feeding for current evolution stage (for dog)
@@ -446,6 +466,53 @@ export function PetPage({}: Props): JSX.Element {
           "Amazing! I'm at my best! ✨ Callee, can you help me find some buddies to climb trees with?",
           "Hooray! I'm fully grown! 🎉 Can you help me find some monkey friends to play with?",
           "Perfect! I feel incredible! 🚀 Maybe it's time to find some playmates for jungle adventures?"
+        ];
+        return getRandomThought(happyThoughts);
+      }
+    }
+
+    // Feather-specific thoughts based on coins spent
+    if (currentPet === 'feather' && isPetOwned('feather')) {
+      const featherCoinsSpent = getPetCoinsSpent('feather');
+      
+      if (featherCoinsSpent === 0) {
+        const hungryThoughts = [
+          "Chirp chirp! 🦜 I'm Feather! My little bird belly is empty... can you feed me some seeds?",
+          "Tweet tweet! 🌟 Feather here! I'm fluttering from hunger... got any treats?",
+          "Chirp! It's me, your feathered friend Feather! 🦜 My tummy is chirping for some seeds!",
+          "Hi Callee! Feather needs some yummy seeds! 🌱 My bird appetite is huge!",
+          "Tweet tweet! 🦜 Feather is starving! Can you help your bird friend with some treats?",
+          "Callee! 🌟 Your bird Feather is so hungry... seeds would make me sing beautiful songs!"
+        ];
+        return getRandomThought(hungryThoughts);
+      } else if (featherCoinsSpent < 30) {
+        const satisfiedThoughts = [
+          "Tweet tweet! 🌱 More seeds will make this bird sing with joy!",
+          "Chirp chirp! Those seeds were amazing! 🦜 But Feather could eat more!",
+          "Yum yum! 🌾 These treats are perfect for a growing bird like me!",
+          "Tweet! Those seeds hit the spot! 🦜 But my bird appetite is still growing!",
+          "Thank you, Callee! 🥰 Those seeds were perfect, but Feather is still a little peckish!",
+          "Delicious! 🌱 My wings are flapping so fast! More seeds would make me soar with happiness!"
+        ];
+        return getRandomThought(satisfiedThoughts);
+      } else if (featherCoinsSpent < 50) {
+        const growingThoughts = [
+          "Tweet tweet! I'm growing stronger! 🦜 Keep feeding me - I'm getting bigger and more colorful!",
+          "Look at me fly! 💪 I can feel myself getting stronger with each seed!",
+          "Amazing! I'm growing so fast! 🌱 More seeds will help me become the ultimate bird!",
+          "Callee, I feel so energetic! ⚡ These seeds are making me bigger and more graceful!",
+          "Tweet tweet! I'm transforming! 🦋 Keep the seeds coming - I'm almost ready for the next stage!",
+          "Incredible! My feathers are changing! 🦜 More seeds will help me reach my full potential!"
+        ];
+        return getRandomThought(growingThoughts);
+      } else {
+        const happyThoughts = [
+          "Tweet tweet! 🥳 I feel amazing, Callee! Now... could you get me some bird friends to fly with!",
+          "Tweet tweet! I'm so strong now! 💪 Maybe it's time to find some playmates to soar with?",
+          "I feel fantastic! 🌟 All those seeds worked! Now I'm ready for some aerial adventures with friends!",
+          "Amazing! I'm at my best! ✨ Callee, can you help me find some buddies to fly through clouds with?",
+          "Hooray! I'm fully grown! 🎉 Can you help me find some bird friends to play with?",
+          "Perfect! I feel incredible! 🚀 Maybe it's time to find some playmates for sky adventures?"
         ];
         return getRandomThought(happyThoughts);
       }
