@@ -1079,7 +1079,7 @@ const Index = () => {
         
         const aiMessage: ChatMessage = {
           type: 'ai',
-          content: contextualResponse,
+          content: `![Legacy Image](${generatedImageResult.imageUrl})\n\n${contextualResponse}`,
           timestamp: Date.now()
         };
         
@@ -2700,17 +2700,24 @@ const Index = () => {
         panelText = "A new scene unfolds in your adventure...";
       }
       
-      // 🎯 ENHANCED: Final check before displaying - unified system takes priority
-      if (unifiedAIStreaming.isGeneratingImage || unifiedAIStreaming.isUnifiedSessionActive) {
-        console.log('🚫 AUTO IMAGE: RESULT DISCARDED - Unified system has priority, discarding automatic image');
+      // 🎯 ENHANCED: Final check before displaying - unified/legacy systems take priority
+      const hasLegacyImageInChat = chatMessages.some(msg => 
+        msg.type === 'ai' && 
+        msg.content?.includes('![Legacy Image]') &&
+        (Date.now() - (msg.timestamp || 0)) < 30000 // Within last 30 seconds
+      );
+
+      if (unifiedAIStreaming.isGeneratingImage || unifiedAIStreaming.isUnifiedSessionActive || hasLegacyImageInChat) {
+        console.log('🚫 AUTO IMAGE: RESULT DISCARDED - Unified/Legacy system has priority, discarding automatic image');
         console.log('🔍 AUTO IMAGE COORDINATION: Session state at discard:', {
           isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
           isStreaming: unifiedAIStreaming.isStreaming,
           isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+          hasLegacyImageInChat: hasLegacyImageInChat,
           generatedImageUrl: image.substring(0, 50) + '...',
-          reason: 'unified_system_priority_discard'
+          reason: hasLegacyImageInChat ? 'legacy_system_priority_discard' : 'unified_system_priority_discard'
         });
-        return; // Discard the result completely - unified system has priority
+        return; // Discard the result completely - unified/legacy system has priority
       }
       
       const newPanelId = crypto.randomUUID();
@@ -2876,11 +2883,13 @@ const Index = () => {
     const latestUserMessage = filteredUserMessages[filteredUserMessages.length - 1];
     
     // Check if there's an AI response to this latest user message that contains an image
+    // This includes both unified system success AND legacy fallback success
     const unifiedCalledForCurrentMessage = latestUserMessage && chatMessages.some(msg => 
       msg.type === 'ai' && 
       msg.timestamp && latestUserMessage.timestamp &&
       msg.timestamp > latestUserMessage.timestamp && // AI message came after user message
-      msg.content?.includes('![Generated Image]') // Contains generated image
+      (msg.content?.includes('![Generated Image]') || // Unified system success
+       msg.content?.includes('![Legacy Image]')) // Legacy fallback success
     );
     
     const shouldGenerate = isExactInterval && notAlreadyGenerated && !unifiedCalledForCurrentMessage;
