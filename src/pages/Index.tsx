@@ -2524,32 +2524,42 @@ const Index = () => {
       // 🔍 CRITICAL: Add stack trace to see where this is being called from
       console.log(`🔍 [generateAutoImage()] CALL STACK:`, new Error().stack?.split('\n').slice(1, 4).join('\n'));
       
-      // 🛡️ ABSOLUTE OVERRIDE: Block ALL auto generation if unified system has recent activity
+      // 🛡️ ABSOLUTE OVERRIDE: Block ALL auto generation if unified/legacy system has recent activity
       const hasRecentUnifiedActivity = unifiedAIStreaming.lastResponse && 
         (Date.now() - unifiedAIStreaming.lastResponse.timestamp < 10000); // 10 seconds
+      
+      const hasRecentLegacyImage = chatMessages.some(msg => 
+        msg.type === 'ai' && 
+        msg.content?.includes('![Legacy Image]') &&
+        (Date.now() - (msg.timestamp || 0)) < 5000 // Within last 5 seconds
+      );
       
       console.log(`🔍 [generateAutoImage()] ABSOLUTE COORDINATION CHECK:`, {
         isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
         isStreaming: unifiedAIStreaming.isStreaming,
         isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
         hasRecentUnifiedActivity: hasRecentUnifiedActivity,
+        hasRecentLegacyImage: hasRecentLegacyImage,
         lastResponseTimestamp: unifiedAIStreaming.lastResponse?.timestamp,
         timeSinceLastResponse: unifiedAIStreaming.lastResponse ? Date.now() - unifiedAIStreaming.lastResponse.timestamp : 'N/A',
         currentAdventureId: currentAdventureId,
         chatMessagesLength: chatMessages.length
       });
       
-      // 🚫 ABSOLUTE BLOCK: If unified system is active OR has recent activity, don't generate
+      // 🚫 ABSOLUTE BLOCK: If unified system is active OR legacy system recently ran, don't generate
       if (unifiedAIStreaming.isUnifiedSessionActive || 
           unifiedAIStreaming.isStreaming || 
           unifiedAIStreaming.isGeneratingImage || 
-          hasRecentUnifiedActivity) {
-        console.log(`🚫 [generateAutoImage()] ABSOLUTE BLOCK - Unified system active or recent activity detected`);
+          hasRecentUnifiedActivity ||
+          hasRecentLegacyImage) {
+        console.log(`🚫 [generateAutoImage()] ABSOLUTE BLOCK - Unified/Legacy system active or recent activity detected`);
         console.log(`🚫 [generateAutoImage()] Blocking reason:`, {
           isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
           isStreaming: unifiedAIStreaming.isStreaming,
           isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-          hasRecentUnifiedActivity: hasRecentUnifiedActivity
+          hasRecentUnifiedActivity: hasRecentUnifiedActivity,
+          hasRecentLegacyImage: hasRecentLegacyImage,
+          blockingSystem: hasRecentLegacyImage ? 'legacy' : 'unified'
         });
         return; // Exit without generating
       }
@@ -2704,7 +2714,7 @@ const Index = () => {
       const hasLegacyImageInChat = chatMessages.some(msg => 
         msg.type === 'ai' && 
         msg.content?.includes('![Legacy Image]') &&
-        (Date.now() - (msg.timestamp || 0)) < 30000 // Within last 30 seconds
+        (Date.now() - (msg.timestamp || 0)) < 5000 // Within last 30 seconds
       );
 
       if (unifiedAIStreaming.isGeneratingImage || unifiedAIStreaming.isUnifiedSessionActive || hasLegacyImageInChat) {
@@ -2717,6 +2727,11 @@ const Index = () => {
           generatedImageUrl: image.substring(0, 50) + '...',
           reason: hasLegacyImageInChat ? 'legacy_system_priority_discard' : 'unified_system_priority_discard'
         });
+        
+        // 🧹 CRITICAL: Clear loading states when discarding to prevent infinite loading
+        setIsGeneratingAdventureImage(false);
+        console.log('🧹 AUTO IMAGE: Cleared loading states after discard');
+        
         return; // Discard the result completely - unified/legacy system has priority
       }
       
