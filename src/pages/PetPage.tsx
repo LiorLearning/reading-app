@@ -22,6 +22,51 @@ export function PetPage({}: Props): JSX.Element {
   // Use shared pet data system
   const { careLevel, ownedPets, audioEnabled, setCareLevel, addOwnedPet, setAudioEnabled, isPetOwned, getCoinsSpentForCurrentStage, getPetCoinsSpent, addPetCoinsSpent } = usePetData();
   
+  // Den and accessories state (stored in localStorage)
+  const [ownedDens, setOwnedDens] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('owned_dens');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+  
+  const [ownedAccessories, setOwnedAccessories] = useState<{[key: string]: string[]}>(() => {
+    try {
+      const stored = localStorage.getItem('owned_accessories');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+  
+  // Helper functions for dens and accessories
+  const isDenOwned = (petType: string) => ownedDens.includes(`${petType}_den`);
+  const isAccessoryOwned = (petType: string, accessoryId: string) => {
+    return ownedAccessories[petType]?.includes(accessoryId) || false;
+  };
+  
+  const purchaseDen = (petType: string, cost: number) => {
+    if (!hasEnoughCoins(cost)) return false;
+    spendCoins(cost);
+    const newOwnedDens = [...ownedDens, `${petType}_den`];
+    setOwnedDens(newOwnedDens);
+    localStorage.setItem('owned_dens', JSON.stringify(newOwnedDens));
+    return true;
+  };
+  
+  const purchaseAccessory = (petType: string, accessoryId: string, cost: number) => {
+    if (!hasEnoughCoins(cost)) return false;
+    spendCoins(cost);
+    const newAccessories = { ...ownedAccessories };
+    if (!newAccessories[petType]) newAccessories[petType] = [];
+    newAccessories[petType].push(accessoryId);
+    setOwnedAccessories(newAccessories);
+    localStorage.setItem('owned_accessories', JSON.stringify(newAccessories));
+    return true;
+  };
+  
   // State for which pet is currently being displayed
   const [currentPet, setCurrentPet] = useState('dog'); // Default to dog
   
@@ -31,6 +76,30 @@ export function PetPage({}: Props): JSX.Element {
   const [previousCoinsSpentForStage, setPreviousCoinsSpentForStage] = useState(0);
   const [showPetShop, setShowPetShop] = useState(false);
   const [lastSpokenMessage, setLastSpokenMessage] = useState('');
+  
+  // Pet store state
+  const [selectedStorePet, setSelectedStorePet] = useState('dog'); // Which pet's store section is shown
+  const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
+  
+  // Sleep state management with localStorage persistence
+  const [sleepClicks, setSleepClicks] = useState(() => {
+    try {
+      const stored = localStorage.getItem('pet_sleep_data');
+      if (stored) {
+        const sleepData = JSON.parse(stored);
+        const now = Date.now();
+        const eightHours = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+        
+        // Check if 8 hours have passed since last sleep update
+        if (sleepData.timestamp && (now - sleepData.timestamp) < eightHours) {
+          return sleepData.clicks || 0;
+        }
+      }
+      return 0;
+    } catch {
+      return 0;
+    }
+  });
   
   // Streak system for dog evolution unlocks - based on consecutive calendar days (US timezone)
   const [currentStreak, setCurrentStreak] = useState(() => {
@@ -145,19 +214,78 @@ export function PetPage({}: Props): JSX.Element {
     
     // Initialize previous coins spent for current stage
     setPreviousCoinsSpentForStage(getCoinsSpentForCurrentStage(currentStreak));
+    
+    // Check if sleep should be reset due to 8-hour timeout
+    checkSleepTimeout();
   }, []);
+
+  // Periodically check for sleep timeout (every minute when component is active)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkSleepTimeout();
+    }, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Update action states when den ownership or sleep state changes
+  useEffect(() => {
+    setActionStates(getActionStates());
+  }, [currentPet, sleepClicks, ownedDens]);
+
+  // Reset sleep when switching pets
+  useEffect(() => {
+    resetSleep();
+  }, [currentPet]);
   
   // TTS message ID for tracking speaking state
   const petMessageId = 'pet-message';
   const isSpeaking = useTTSSpeaking(petMessageId);
   
-  // Pet action states
-  const [actionStates, setActionStates] = useState<ActionButton[]>([
-    { id: 'water', icon: '🍪', status: 'sad', label: 'Food' },
-    { id: 'more', icon: '🐾', status: 'neutral', label: 'More' }
-  ]);
+  // Pet action states - dynamically updated based on den ownership and sleep state
+  const getActionStates = () => {
+    const baseActions = [
+      { id: 'water', icon: '🍪', status: 'sad' as ActionStatus, label: 'Food' },
+    ];
+    
+    // Add sleep button if den is owned and sleep clicks < 5
+    if (isDenOwned(currentPet) && sleepClicks < 5) {
+      const sleepLabel = sleepClicks === 0 ? 'Sleep' : `Sleep ${sleepClicks}/5`;
+      baseActions.push({ id: 'sleep', icon: '😴', status: 'neutral' as ActionStatus, label: sleepLabel });
+    }
+    
+    // Always add more button at the end
+    baseActions.push({ id: 'more', icon: '🐾', status: 'neutral' as ActionStatus, label: 'More' });
+    
+    return baseActions;
+  };
+
+  const [actionStates, setActionStates] = useState<ActionButton[]>(getActionStates());
 
   const handleActionClick = (actionId: string) => {
+    // Handle sleep action
+    if (actionId === 'sleep') {
+      if (!isDenOwned(currentPet)) {
+        alert("You need to buy a den first before your pet can sleep!");
+        return;
+      }
+      
+      // Increment sleep clicks (max 5)
+      if (sleepClicks < 5) {
+        updateSleepClicks(sleepClicks + 1);
+        // Play a gentle sleep sound
+        playFeedingSound(); // Reuse feeding sound for now
+        
+        // Trigger heart animation for sleep progress
+        setShowHeartAnimation(true);
+        setTimeout(() => setShowHeartAnimation(false), 1000);
+        
+        // Stop any current audio when pet gets sleepier
+        ttsService.stop();
+      }
+      return;
+    }
+
     // Don't deduct coins for "More" action - always open pet shop
     if (actionId === 'more') {
       // Stop any current audio when opening pet shop
@@ -195,6 +323,52 @@ export function PetPage({}: Props): JSX.Element {
         ? { ...action, status: 'happy' }
         : action
     ));
+  };
+
+  // Save sleep data to localStorage
+  const saveSleepData = (clicks: number) => {
+    try {
+      const sleepData = {
+        clicks: clicks,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('pet_sleep_data', JSON.stringify(sleepData));
+    } catch (error) {
+      console.warn('Failed to save sleep data:', error);
+    }
+  };
+
+  // Update sleep clicks and save to localStorage
+  const updateSleepClicks = (newClicks: number) => {
+    setSleepClicks(newClicks);
+    saveSleepData(newClicks);
+  };
+
+  // Reset sleep when needed (e.g., when switching pets or after full sleep cycle)
+  const resetSleep = () => {
+    setSleepClicks(0);
+    saveSleepData(0);
+  };
+
+  // Check if sleep should be reset due to 8-hour timeout
+  const checkSleepTimeout = () => {
+    try {
+      const stored = localStorage.getItem('pet_sleep_data');
+      if (stored) {
+        const sleepData = JSON.parse(stored);
+        const now = Date.now();
+        const eightHours = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+        
+        // If 8 hours have passed, reset sleep
+        if (sleepData.timestamp && (now - sleepData.timestamp) >= eightHours) {
+          resetSleep();
+          return true; // Sleep was reset
+        }
+      }
+      return false; // No reset needed
+    } catch {
+      return false;
+    }
   };
 
   const getStatusEmoji = (status: ActionStatus) => {
@@ -291,7 +465,29 @@ export function PetPage({}: Props): JSX.Element {
     }
   };
 
+  // Get sleepy pet images based on sleep clicks
+  const getSleepyPetImage = (clicks: number) => {
+    if (clicks >= 5) {
+      // TBD - will be added later (fully asleep)
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else if (clicks >= 3) {
+      // TBD - will be added later (deep sleep)
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else if (clicks >= 1) {
+      // 1+ clicks (getting sleepy)
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    } else {
+      // 0 clicks (starting to sleep)
+      return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162533_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+    }
+  };
+
   const getPetImage = () => {
+    // If pet is in sleep mode (sleepClicks > 0), show sleepy images
+    if (sleepClicks > 0 && currentPet === 'dog') {
+      return getSleepyPetImage(sleepClicks);
+    }
+    
     // Check if Bobo is owned and being displayed
     if (currentPet === 'bobo' && isPetOwned('bobo')) {
       // For Bobo, use pet-specific coin tracking
@@ -390,10 +586,74 @@ export function PetPage({}: Props): JSX.Element {
     }
   };
 
-  const availablePets = [
-    { id: 'bobo', emoji: '🐵', name: 'Bobo', cost: 60 },
-    { id: 'feather', emoji: '🦜', name: 'Feather', cost: 60 }
-  ];
+  // Pet store data structure - dynamically updated with current ownership status
+  const getPetStoreData = () => {
+    // Use storeRefreshTrigger and ownedPets to force re-evaluation when pets are purchased
+    const currentOwnedPets = ownedPets; // This ensures we use the latest owned pets from the hook
+    storeRefreshTrigger; // This ensures the function re-runs when trigger changes
+    
+    // Ensure we use the latest pet ownership data
+    
+    return {
+    dog: {
+      id: 'dog',
+      emoji: '🐶',
+      name: 'April',
+      owned: true, // Dog is always owned by default
+      cost: 0,
+      den: {
+        id: 'cozy_doghouse',
+        name: 'Cozy Doghouse Den',
+        emoji: '🏠',
+        cost: 50,
+        description: 'A warm, comfortable space for April to rest and play'
+      },
+      accessories: [
+        { id: 'chew_toys', name: 'Chew Toys', emoji: '🦴', cost: 10, description: 'Durable toys to keep April entertained', locked: true },
+        { id: 'tennis_ball', name: 'Tennis Ball', emoji: '🥎', cost: 15, description: 'A bouncy ball for fetch games', locked: true },
+        { id: 'luxury_bed', name: 'Luxury Dog Bed', emoji: '🛏️', cost: 30, description: 'Premium comfort for the best sleep', locked: true }
+      ]
+    },
+    bobo: {
+      id: 'bobo',
+      emoji: '🐵',
+      name: 'Bobo',
+      owned: isPetOwned('bobo'),
+      cost: 60,
+      den: {
+        id: 'jungle_treehouse',
+        name: 'Jungle Treehouse Den',
+        emoji: '🌳',
+        cost: 50,
+        description: 'A treetop paradise with swinging vines and banana storage'
+      },
+      accessories: [
+        { id: 'banana_stash', name: 'Banana Stash', emoji: '🍌', cost: 20, description: 'Fresh bananas always within reach' },
+        { id: 'vine_swings', name: 'Vine Swings', emoji: '🌿', cost: 25, description: 'Natural swings for acrobatic fun' },
+        { id: 'coconut_toys', name: 'Coconut Toys', emoji: '🥥', cost: 15, description: 'Interactive coconut puzzle toys' }
+      ]
+    },
+    feather: {
+      id: 'feather',
+      emoji: '🦜',
+      name: 'Feather',
+      owned: isPetOwned('feather'),
+      cost: 60,
+      den: {
+        id: 'sky_nest',
+        name: 'Sky Nest Den',
+        emoji: '☁️',
+        cost: 50,
+        description: 'A floating nest among the clouds with endless sky views'
+      },
+      accessories: [
+        { id: 'seed_dispenser', name: 'Seed Dispenser', emoji: '🌱', cost: 20, description: 'Automatic feeder with premium seeds' },
+        { id: 'perch_collection', name: 'Perch Collection', emoji: '🪶', cost: 25, description: 'Various perches for different moods' },
+        { id: 'mirror_toy', name: 'Mirror Toy', emoji: '🪞', cost: 15, description: 'Interactive mirror for social play' }
+      ]
+    }
+    };
+  };
 
   // ElevenLabs Text-to-Speech function using the proper TTS service
   const speakText = async (text: string) => {
@@ -423,6 +683,38 @@ export function PetPage({}: Props): JSX.Element {
     const getRandomThought = (thoughts: string[]) => {
       return thoughts[Math.floor(Math.random() * thoughts.length)];
     };
+    
+    // If pet is sleeping, show sleep-related thoughts
+    if (sleepClicks > 0) {
+      const sleepThoughts = [
+        "Zzz... 😴 I'm getting so sleepy... this feels nice...",
+        "💤 Yawn... I'm drifting off to dreamland...",
+        "😴 So cozy and warm... perfect for a nap...",
+        "Zzz... 💭 I'm dreaming of cookies and adventures...",
+        "😴 This is the best sleep ever... so peaceful...",
+        "💤 Sweet dreams... I feel so relaxed and happy..."
+      ];
+      
+      if (sleepClicks >= 5) {
+        const deepSleepThoughts = [
+          "💤💤💤 Zzz... completely asleep... dreaming peacefully...",
+          "😴 Deep in dreamland... having the most wonderful dreams...",
+          "💤 Fully rested... sleeping like a baby...",
+          "Zzz... 🌙 In the deepest, most comfortable sleep..."
+        ];
+        return getRandomThought(deepSleepThoughts);
+      } else if (sleepClicks >= 3) {
+        const drowsyThoughts = [
+          "😴 Getting very drowsy... almost fully asleep...",
+          "💤 So sleepy... my eyelids are getting heavy...",
+          "Zzz... 😴 Drifting deeper into sleep...",
+          "💤 Almost there... feeling so relaxed and sleepy..."
+        ];
+        return getRandomThought(drowsyThoughts);
+      } else {
+        return getRandomThought(sleepThoughts);
+      }
+    }
     
     // Different thoughts for different pets
     if (currentPet === 'bobo' && isPetOwned('bobo')) {
@@ -558,12 +850,12 @@ export function PetPage({}: Props): JSX.Element {
     } else {
       // 50+ coins spent on feeding (5+ feedings)
       const happyThoughts = [
-        "Yippee! 🥳 I feel amazing, Callee! Now… could you get me some friends to play with!",
-        "Woof woof! I'm so strong now! 💪 Maybe it's time to find some playmates?",
-        "I feel fantastic! 🌟 All those cookies worked! Now I'm ready for some friends!",
-        "Amazing! I'm at my best! ✨ Callee, can you help me find some buddies to play with?",
-        "Hooray! I'm fully grown! 🎉 Can you help me find some buddies to play with?",
-        "Perfect! I feel incredible! 🚀 Maybe it's time to find some playmates?"
+        "Yippee! 🥳 I feel amazing, Callee! Now… could you put me to sleep?",
+        "Woof woof! I'm so strong now! 💪 Maybe it's time for a nice nap?",
+        "I feel fantastic! 🌟 All those cookies worked! Now I'm ready for some sleep!",
+        "Amazing! I'm at my best! ✨ Callee, can you help me get some rest?",
+        "Hooray! I'm fully grown! 🎉 Can you help me go to sleep?",
+        "Perfect! I feel incredible! 🚀 Maybe it's time for a cozy nap?"
       ];
       return getRandomThought(happyThoughts);
     }
@@ -581,10 +873,29 @@ export function PetPage({}: Props): JSX.Element {
   // Get current pet coins spent value
   const currentPetCoinsSpent = getCurrentPetCoinsSpent();
 
+  // Calculate heart fill percentage based on coins and sleep (if sleep is available)
+  const getHeartFillPercentage = () => {
+    const hasSleepButton = isDenOwned(currentPet);
+    
+    if (hasSleepButton) {
+      // When sleep is available, heart fill requires both coins (50%) and sleep (50%)
+      const coinProgress = Math.min(currentPetCoinsSpent / 50, 1); // Max 50 coins = 100% of coin portion
+      const sleepProgress = Math.min(sleepClicks / 5, 1); // Max 5 clicks = 100% of sleep portion
+      
+      // Each contributes 50% to the total heart fill
+      const totalProgress = (coinProgress * 0.5) + (sleepProgress * 0.5);
+      return Math.min(totalProgress * 100, 100); // Convert to percentage, max 100%
+    } else {
+      // When sleep is not available, heart fill is based only on coins
+      const coinProgress = Math.min(currentPetCoinsSpent / 50, 1);
+      return Math.min(coinProgress * 100, 100);
+    }
+  };
+
   // Memoize the pet thought so it only changes when the actual state changes
   const currentPetThought = useMemo(() => {
     return getPetThought();
-  }, [currentPet, getCoinsSpentForCurrentStage(currentStreak), getPetCoinsSpent(currentPet)]);
+  }, [currentPet, getCoinsSpentForCurrentStage(currentStreak), getPetCoinsSpent(currentPet), sleepClicks]);
 
   // Handle audio playback when message changes
   useEffect(() => {
@@ -690,7 +1001,7 @@ export function PetPage({}: Props): JSX.Element {
               position: 'absolute',
               fontSize: 84,
               color: '#DC2626',
-              clipPath: `inset(${Math.max(0, 100 - (currentPetCoinsSpent * 1.8 + 5))}% 0 0 0)`,
+              clipPath: `inset(${Math.max(0, 100 - getHeartFillPercentage())}% 0 0 0)`,
               transition: 'clip-path 500ms ease'
             }}>
               ❤️
@@ -745,17 +1056,29 @@ export function PetPage({}: Props): JSX.Element {
 
       {/* Main pet area - moved down slightly */}
       <div className="flex-1 flex flex-col items-center justify-center relative pb-20 px-4 z-10 mt-16">
-        {/* Pet Thought Bubble - Only show when pet shop is closed, moved down */}
+        {/* Pet Thought Bubble - Only show when pet shop is closed */}
         {!showPetShop && (
-          <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-5 mb-8 border-3 border-blue-400 shadow-xl max-w-md w-full mx-4 backdrop-blur-sm bg-white/90">
+          <div className={`relative rounded-3xl p-5 mb-8 border-3 shadow-xl max-w-md w-full mx-4 backdrop-blur-sm ${
+            sleepClicks > 0 
+              ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-400 bg-purple-50/90'
+              : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400 bg-white/90'
+          }`}>
             {/* Speech bubble tail */}
-            <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[12px] border-l-transparent border-r-transparent border-t-blue-400"></div>
+            <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[12px] border-l-transparent border-r-transparent ${
+              sleepClicks > 0 ? 'border-t-purple-400' : 'border-t-blue-400'
+            }`}></div>
             
             {/* Thought bubble dots */}
             <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-1">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{animationDelay: '0s'}}></div>
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{animationDelay: '0.3s'}}></div>
-              <div className="w-1 h-1 rounded-full bg-blue-400 animate-bounce" style={{animationDelay: '0.6s'}}></div>
+              <div className={`w-2 h-2 rounded-full animate-bounce ${
+                sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+              }`} style={{animationDelay: '0s'}}></div>
+              <div className={`w-1.5 h-1.5 rounded-full animate-bounce ${
+                sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+              }`} style={{animationDelay: '0.3s'}}></div>
+              <div className={`w-1 h-1 rounded-full animate-bounce ${
+                sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+              }`} style={{animationDelay: '0.6s'}}></div>
             </div>
 
             <div className="text-sm text-slate-800 font-medium leading-relaxed text-center">
@@ -769,12 +1092,36 @@ export function PetPage({}: Props): JSX.Element {
           <img 
             src={getPetImage()}
             alt="Pet"
-            className="w-80 h-80 object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105"
+            className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
+              sleepClicks > 0 ? 'w-96 h-96 mt-8' : 'w-80 h-80'
+            }`}
             style={{
               animation: careLevel * 10 >= 30 && careLevel * 10 < 50 ? 'petGrow 800ms ease-out' : 
                         careLevel * 10 >= 50 ? 'petEvolve 800ms ease-out' : 'none'
             }}
           />
+          
+          {/* Sleep indicator */}
+          {sleepClicks > 0 && (
+            <>
+              {/* Sleep counter */}
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-bold text-gray-800 shadow-lg">
+                😴 {sleepClicks}/5
+              </div>
+              
+              {/* Floating Z's animation */}
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-2xl animate-bounce">
+                💤
+              </div>
+              
+              {/* Fully asleep message */}
+              {sleepClicks >= 5 && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-400 to-purple-500 text-white px-4 py-2 rounded-xl font-bold shadow-lg">
+                  😴 Fully Asleep
+                </div>
+              )}
+            </>
+          )}
         </div>
         
         {/* Food bowl */}
@@ -851,7 +1198,7 @@ export function PetPage({}: Props): JSX.Element {
       {/* Bottom Action Buttons */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
         <div className="flex gap-4 px-4 py-2 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl">
-        {actionStates.map((action) => (
+        {getActionStates().map((action) => (
           <button
             key={action.id}
             onClick={() => handleActionClick(action.id)}
@@ -878,6 +1225,13 @@ export function PetPage({}: Props): JSX.Element {
             {action.id === 'water' && (
               <div className="text-xs font-semibold text-yellow-300 drop-shadow-md">
                 🪙 10
+              </div>
+            )}
+            
+            {/* Free indicator for Sleep action */}
+            {action.id === 'sleep' && (
+              <div className="text-xs font-semibold text-green-300 drop-shadow-md">
+                Free
               </div>
             )}
           </button>
@@ -933,129 +1287,176 @@ export function PetPage({}: Props): JSX.Element {
       {/* Pet Shop Overlay */}
       {showPetShop && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl p-6 max-w-md w-11/12 max-h-[85vh] overflow-y-auto shadow-2xl relative border-2 border-gray-200">
+          <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl max-w-5xl w-11/12 max-h-[85vh] shadow-2xl relative border-2 border-gray-200 flex overflow-hidden">
             {/* Close button */}
             <button
               onClick={() => setShowPetShop(false)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white border-none cursor-pointer text-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white border-none cursor-pointer text-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-10"
             >
               ×
             </button>
 
-            {/* Header */}
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                🏪 Pet Shop
-              </h2>
-              <p className="text-sm text-gray-600 font-medium">
-                Adopt new animal friends!
-              </p>
-              <p className="text-xs text-blue-600 font-medium mt-2">
-                ✨ All pets evolve as you feed them cookies! ✨
-              </p>
+            {/* Left Column: Pet Selection */}
+            <div className="w-1/4 bg-gradient-to-b from-blue-50 to-indigo-100 p-4 border-r-2 border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                🐾
+              </h3>
+              <div className="space-y-2">
+                {Object.values(getPetStoreData()).map((pet) => (
+                  <button
+                    key={pet.id}
+                    onClick={() => setSelectedStorePet(pet.id)}
+                    className={`w-full p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center ${
+                      selectedStorePet === pet.id
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 border-white text-white shadow-lg'
+                        : 'bg-white/50 border-gray-300 text-gray-700 hover:bg-white/80 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="text-4xl">{pet.emoji}</div>
+                  </button>
+                ))}
+              </div>
+              
+              {/* Current coins display */}
+              <div className="mt-4 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold text-center shadow-lg">
+                💰 {coins}
+              </div>
             </div>
 
-
-
-            {/* Available Pets */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-              gap: 16,
-              marginBottom: 16
-            }}>
-              {availablePets.map((pet) => {
-                const isOwned = isPetOwned(pet.id);
-                const canAfford = hasEnoughCoins(pet.cost);
+            {/* Right Column: Pet-Specific Store */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              {(() => {
+                const petStoreData = getPetStoreData();
+                const selectedPet = petStoreData[selectedStorePet as keyof typeof petStoreData];
                 
                 return (
-                  <div
-                    key={pet.id}
-                    style={{
-                      background: isOwned 
-                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                        : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                      borderRadius: 16,
-                      padding: '16px',
-                      textAlign: 'center',
-                      position: 'relative',
-                      cursor: isOwned ? 'default' : canAfford ? 'pointer' : 'not-allowed',
-                      transition: 'all 200ms ease',
-                      border: '2px solid rgba(255,255,255,0.2)',
-                      opacity: isOwned ? 1 : canAfford ? 0.9 : 0.6
-                    }}
-                    onClick={() => !isOwned && canAfford && handlePetPurchase(pet.id, pet.cost)}
-                    onMouseEnter={(e) => {
-                      if (!isOwned && canAfford) {
-                        e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                        e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isOwned && canAfford) {
-                        e.currentTarget.style.transform = 'translateY(0px) scale(1)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }
-                    }}
-                  >
-                    {/* Lock overlay for all unowned pets */}
-                    {!isOwned && (
-                      <div style={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        width: 40,
-                        height: 40,
-                        background: canAfford ? 'rgba(59, 130, 246, 0.9)' : 'rgba(0,0,0,0.7)',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 20,
-                        border: '2px solid white',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-                      }}>
-                        {canAfford ? '💰' : '🔒'}
+                  <div>
+            {/* Header */}
+            <div className="text-center mb-6">
+                      <div className="text-6xl mb-4">{selectedPet.emoji}</div>
+                      <h2 className="text-3xl font-bold text-gray-800">
+                        {selectedPet.name}
+              </h2>
+            </div>
+
+                    {/* Pet Adoption Section (if not owned) */}
+                    {!selectedPet.owned && (
+                      <div className="mb-6">
+                        {/* Large Pet Display for Unowned Pets */}
+                        <div className="text-center mb-4 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
+                          <div className="text-8xl mb-4 animate-bounce">{selectedPet.emoji}</div>
+                        </div>
+                        
+                        <div className="p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl border-2 border-purple-300">
+                          <button
+                            onClick={() => {
+                              handlePetPurchase(selectedPet.id, selectedPet.cost);
+                              // Refresh the store data to reflect new ownership
+                              setStoreRefreshTrigger(prev => prev + 1);
+                            }}
+                            disabled={!hasEnoughCoins(selectedPet.cost)}
+                            className={`w-full p-4 rounded-xl font-bold text-xl transition-all duration-200 ${
+                              hasEnoughCoins(selectedPet.cost)
+                                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:scale-105 shadow-lg'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
+                          >
+                            {hasEnoughCoins(selectedPet.cost) 
+                              ? `🎉 🪙 ${selectedPet.cost}`
+                              : `🔒 🪙 ${selectedPet.cost}`
+                            }
+                          </button>
+                        </div>
                       </div>
                     )}
 
-                    {/* Pet emoji */}
-                    <div style={{
-                      fontSize: 48,
-                      marginBottom: 8,
-                      filter: isOwned ? 'none' : !canAfford ? 'grayscale(100%) opacity(0.7)' : 'grayscale(50%) opacity(0.9)'
-                    }}>
-                      {pet.emoji}
-                    </div>
+                    {/* Den Section */}
+                    {selectedPet.owned && (
+                      <div className="mb-6">
+                        <h3 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+                          🏠
+                        </h3>
+                        <div className={`p-6 rounded-xl border-2 ${
+                          selectedPet.id === 'dog' 
+                            ? 'bg-gradient-to-br from-green-50 to-emerald-100 border-green-300'
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300 opacity-60'
+                        }`}>
+                          <div className="text-center">
+                            <div className={`text-6xl mb-4 ${selectedPet.id !== 'dog' ? 'grayscale' : ''}`}>
+                              {selectedPet.den.emoji}
+                            </div>
+                            <button
+                              onClick={() => {
+                                if (selectedPet.id === 'dog') {
+                                  if (purchaseDen(selectedPet.id, selectedPet.den.cost)) {
+                                    playEvolutionSound();
+                                    alert(`🎉 You bought the den!`);
+                                  } else {
+                                    alert(`Not enough coins! You need ${selectedPet.den.cost} coins.`);
+                                  }
+                                }
+                              }}
+                              disabled={selectedPet.id !== 'dog' || isDenOwned(selectedPet.id) || !hasEnoughCoins(selectedPet.den.cost)}
+                              className={`px-6 py-3 rounded-xl font-bold text-xl transition-all duration-200 ${
+                                selectedPet.id !== 'dog'
+                                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                  : isDenOwned(selectedPet.id)
+                                  ? 'bg-green-500 text-white cursor-default'
+                                  : hasEnoughCoins(selectedPet.den.cost)
+                                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:scale-105 shadow-lg'
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
+                            >
+                              {selectedPet.id !== 'dog'
+                                ? '🔒'
+                                : isDenOwned(selectedPet.id)
+                                ? '✅'
+                                : hasEnoughCoins(selectedPet.den.cost)
+                                ? `🪙 ${selectedPet.den.cost}`
+                                : `🔒 🪙 ${selectedPet.den.cost}`
+                              }
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                    {/* Pet name */}
-                    <h3 style={{
-                      fontSize: 18,
-                      fontWeight: 600,
-                      color: 'white',
-                      margin: 0,
-                      marginBottom: 6,
-                      fontFamily: 'Quicksand, system-ui, sans-serif'
-                    }}>
-                      {pet.name}
+                    {/* Accessories Section */}
+                    {selectedPet.owned && (
+                      <div>
+                        <h3 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+                          🎁
                     </h3>
-
-                    {/* Status/Price */}
-                    <div style={{
-                      fontSize: 14,
-                      color: 'rgba(255,255,255,0.9)',
-                      fontWeight: 500
-                    }}>
-                      {isOwned ? '✅ Owned' : canAfford ? `🪙 ${pet.cost} coins` : `🔒 Need ${pet.cost} coins`}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          {selectedPet.accessories.map((accessory) => {
+                            // All accessories are now locked
+                            const isLocked = true;
+                            
+                            return (
+                              <div
+                                key={accessory.id}
+                                className="p-4 rounded-xl border-2 bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300 opacity-60"
+                              >
+                                <div className="text-center">
+                                  <div className="text-4xl grayscale mb-2">
+                                    {accessory.emoji}
+                                  </div>
+                                  <button
+                                    disabled={true}
+                                    className="px-3 py-2 rounded-lg text-lg font-bold bg-gray-400 text-gray-600 cursor-not-allowed"
+                                  >
+                                    🔒
+                                  </button>
                     </div>
                   </div>
                 );
               })}
             </div>
-
-            {/* Current coins display */}
-            <div className="text-center p-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold text-base shadow-lg">
-              💰 Your coins: {coins}
+            </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
