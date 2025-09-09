@@ -238,6 +238,22 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
     return [systemMessage, ...recentMessages, currentMessage];
   }
 
+  /**
+   * Check if a sentence can create fill-in-the-blanks for the target word
+   * This mimics the logic used in SpellBox component
+   */
+  private canCreateFillInTheBlanks(sentence: string, targetWord: string): boolean {
+    if (!sentence || !targetWord) return false;
+    
+    // Split sentence by spaces and check if any word matches the target word
+    const words = sentence.split(' ');
+    return words.some(word => {
+      const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
+      const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');
+      return normalizedWord === normalizedTarget;
+    });
+  }
+
   async generateResponse(userText: string, chatHistory: ChatMessage[] = [], spellingQuestion: SpellingQuestion | null, userData?: { username: string; [key: string]: any } | null, adventureState?: string, currentAdventure?: any, storyEventsContext?: string, summary?: string): Promise<AdventureResponse> {
     console.log('🤖 AI Service generateResponse called:', { 
       userText, 
@@ -258,9 +274,14 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
 
     // Remove temporary test - now using real AI generation
 
-    try {
-      console.log('🚀 Building chat context with spelling word:', stringSpellingWord);
-      const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData);
+    // Retry logic for fill-in-the-blanks
+    const maxRetries = 2;
+    let attempt = 0;
+
+    while (attempt <= maxRetries) {
+      try {
+        console.log(`🚀 Building chat context with spelling word: ${stringSpellingWord} (attempt ${attempt + 1}/${maxRetries + 1})`);
+        const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData);
       
       console.log('📤 Sending request to OpenAI with', messages.length, 'messages');
       const completion = await this.client.chat.completions.create({
@@ -316,8 +337,8 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
           
           // More detailed debugging
           console.log(`🔍 Searching for word: "${spellingWord.toLowerCase()}" in text: "${adventureText.toLowerCase()}"`);
-          const wordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
-          console.log(`🔍 Word index in text: ${wordIndex}`);
+          const debugWordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
+          console.log(`🔍 Word index in text: ${debugWordIndex}`);
           
           if (!wordFoundInResponse) {
             console.error(`❌ CRITICAL ERROR: Word "${spellingWord}" should have been included by pre-processing but wasn't found!`);
@@ -352,46 +373,69 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
               cleanSentence += '.';
             }
             
-            console.log(`✅ Extracted spelling sentence: "${cleanSentence}"`);
-            return {
-              spelling_sentence: cleanSentence,
-              adventure_story: adventureText
-            };
-          } else {
-            // Enhanced fallback: try to find the word anywhere and create a sentence around it
-            const wordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
-            if (wordIndex !== -1) {
-              // Find sentence boundaries around the word
-              const beforeWord = adventureText.substring(0, wordIndex);
-              const afterWord = adventureText.substring(wordIndex);
-              
-              const sentenceStart = Math.max(
-                beforeWord.lastIndexOf('.'),
-                beforeWord.lastIndexOf('!'),
-                beforeWord.lastIndexOf('?')
-              ) + 1;
-              
-              const sentenceEndMatch = afterWord.match(/[.!?]/);
-              const sentenceEnd = sentenceEndMatch ? 
-                wordIndex + afterWord.indexOf(sentenceEndMatch[0]) + 1 : 
-                adventureText.length;
-              
-              const extractedSentence = adventureText.substring(sentenceStart, sentenceEnd).trim();
-              const finalSentence = extractedSentence || adventureText;
-              
+            // Check if this sentence can actually create fill-in-the-blanks
+            const canCreateBlanks = this.canCreateFillInTheBlanks(cleanSentence, spellingWord);
+            console.log(`🔍 Can create fill-in-the-blanks for "${spellingWord}" in "${cleanSentence}": ${canCreateBlanks}`);
+            
+            if (canCreateBlanks) {
+              console.log(`✅ Extracted spelling sentence: "${cleanSentence}"`);
+              return {
+                spelling_sentence: cleanSentence,
+                adventure_story: adventureText
+              };
+            } else {
+              console.log(`⚠️ Sentence found but cannot create blanks, will retry if attempts remain`);
+              // Continue to retry logic below
+            }
+          }
+          
+          // If we reach here, either no sentence was found or the sentence can't create blanks
+          // Try enhanced fallback: find the word anywhere and create a sentence around it
+          const wordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
+          if (wordIndex !== -1) {
+            // Find sentence boundaries around the word
+            const beforeWord = adventureText.substring(0, wordIndex);
+            const afterWord = adventureText.substring(wordIndex);
+            
+            const sentenceStart = Math.max(
+              beforeWord.lastIndexOf('.'),
+              beforeWord.lastIndexOf('!'),
+              beforeWord.lastIndexOf('?')
+            ) + 1;
+            
+            const sentenceEndMatch = afterWord.match(/[.!?]/);
+            const sentenceEnd = sentenceEndMatch ? 
+              wordIndex + afterWord.indexOf(sentenceEndMatch[0]) + 1 : 
+              adventureText.length;
+            
+            const extractedSentence = adventureText.substring(sentenceStart, sentenceEnd).trim();
+            const finalSentence = extractedSentence || adventureText;
+            
+            // Check if this fallback sentence can create blanks
+            const canCreateBlanks = this.canCreateFillInTheBlanks(finalSentence, spellingWord);
+            console.log(`🔍 Fallback sentence can create blanks: ${canCreateBlanks}`);
+            
+            if (canCreateBlanks) {
               console.log(`✅ Fallback extracted sentence: "${finalSentence}"`);
               return {
                 spelling_sentence: finalSentence,
                 adventure_story: adventureText
               };
-            } else {
-              // Final fallback: use the full adventure text
-              console.warn(`⚠️ Could not find word "${spellingWord}" in response, using full text`);
-              return {
-                spelling_sentence: adventureText,
-                adventure_story: adventureText
-              };
             }
+          }
+          
+          // If we still can't create blanks and have retries left, try again
+          if (attempt < maxRetries) {
+            console.log(`🔄 Cannot create fill-in-the-blanks, retrying... (attempt ${attempt + 1}/${maxRetries + 1})`);
+            attempt++;
+            continue; // Go to next iteration of while loop
+          } else {
+            // Final fallback after all retries exhausted
+            console.warn(`⚠️ All retries exhausted, using emergency fallback`);
+            return {
+              spelling_sentence: `The ${spellingWord} awaits your discovery!`,
+              adventure_story: `${adventureText} The ${spellingWord} awaits your discovery!`
+            };
           }
         } else {
           // No spelling question - pure adventure mode
@@ -403,11 +447,23 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
       } else {
         throw new Error('No response content received');
       }
-    } catch (error) {
-      console.error('OpenAI API error:', error);
-      // Return fallback response on error
-      return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+      } catch (error) {
+        console.error(`OpenAI API error on attempt ${attempt + 1}:`, error);
+        
+        // If this is the last attempt or not a spelling question, return fallback
+        if (attempt >= maxRetries || !spellingQuestion) {
+          return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+        }
+        
+        // Otherwise, try again
+        console.log(`🔄 Error occurred, retrying... (attempt ${attempt + 1}/${maxRetries + 1})`);
+        attempt++;
+        continue;
+      }
     }
+    
+    // This should never be reached, but just in case
+    return this.getFallbackResponse(userText, userData, !!spellingQuestion);
   }
 
   // Generate initial AI message for starting conversations
