@@ -2700,17 +2700,17 @@ const Index = () => {
         panelText = "A new scene unfolds in your adventure...";
       }
       
-      // 🎯 NEW: Final check before displaying - unified system might have taken over during generation
-      if (unifiedAIStreaming.isUnifiedSessionActive) {
-        console.log('🚫 AUTO IMAGE: RESULT DISCARDED - Unified session became active during generation, discarding automatic image');
+      // 🎯 ENHANCED: Final check before displaying - unified system takes priority
+      if (unifiedAIStreaming.isGeneratingImage || unifiedAIStreaming.isUnifiedSessionActive) {
+        console.log('🚫 AUTO IMAGE: RESULT DISCARDED - Unified system has priority, discarding automatic image');
         console.log('🔍 AUTO IMAGE COORDINATION: Session state at discard:', {
           isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
           isStreaming: unifiedAIStreaming.isStreaming,
           isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
           generatedImageUrl: image.substring(0, 50) + '...',
-          reason: 'unified_session_took_priority_during_generation'
+          reason: 'unified_system_priority_discard'
         });
-        return; // Discard the result completely
+        return; // Discard the result completely - unified system has priority
       }
       
       const newPanelId = crypto.randomUUID();
