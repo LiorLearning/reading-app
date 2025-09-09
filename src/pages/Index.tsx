@@ -2493,7 +2493,7 @@ const Index = () => {
    const getRecentAIMessages = useCallback(() => {
     const aiMessages = chatMessages
       .filter(msg => msg.type === 'ai')
-      .slice(-30)
+      .slice(-5)
       .map(msg => msg.content.substring(0, 150))
       .join(' | ');
     return aiMessages;
@@ -2880,7 +2880,7 @@ const Index = () => {
       msg.type === 'ai' && 
       msg.timestamp && latestUserMessage.timestamp &&
       msg.timestamp > latestUserMessage.timestamp && // AI message came after user message
-      msg.text?.includes('![Generated Image]') // Contains generated image
+      msg.content?.includes('![Generated Image]') // Contains generated image
     );
     
     const shouldGenerate = isExactInterval && notAlreadyGenerated && !unifiedCalledForCurrentMessage;
@@ -2895,7 +2895,7 @@ const Index = () => {
       isExactInterval,
       notAlreadyGenerated,
       unifiedCalledForCurrentMessage,
-      latestUserMessageId: latestUserMessage?.id,
+      latestUserMessageId: latestUserMessage?.timestamp,
       shouldGenerate,
       explanation: shouldGenerate ? 'EXACT_INTERVAL_MATCH' : unifiedCalledForCurrentMessage ? 'SKIPPED_DUE_TO_UNIFIED_CLASH' : 'NOT_INTERVAL_OR_ALREADY_GENERATED'
     });

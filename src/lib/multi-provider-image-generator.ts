@@ -219,7 +219,7 @@ export class MultiProviderImageGenerator {
   private getRecentAIMessages(context: ChatMessage[]): string {
     return context
       .filter(msg => msg.type === 'ai')
-      .slice(-30)
+      .slice(-6)
       .map(msg => msg.content.substring(0, 150))
       .join(' | ');
   }
@@ -276,6 +276,7 @@ class OpenAIProvider implements ImageProvider {
     console.log(`📝 [OpenAIProvider.generate()] Full prompt: "${prompt}"`);
     console.log(`👤 [OpenAIProvider.generate()] User ID: ${userId}`);
     console.log(`⚙️ [OpenAIProvider.generate()] Options:`, options);
+    console.log(`🎯 dall-e prompt multi-provider: ${prompt}`);
     
     const response = await this.client.images.generate({
       model: "dall-e-3",
@@ -335,6 +336,7 @@ class AzureOpenAIProvider implements ImageProvider {
     console.log(`📝 [AzureOpenAIProvider.generate()] Full prompt: "${prompt}"`);
     console.log(`👤 [AzureOpenAIProvider.generate()] User ID: ${userId}`);
     console.log(`⚙️ [AzureOpenAIProvider.generate()] Options:`, options);
+    console.log(`🎯 dall-e prompt azure: ${prompt}`);
     
     const response = await this.client.images.generate({
       model: "dall-e-3",

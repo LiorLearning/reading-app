@@ -632,75 +632,49 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
     }
   }
 
-  // Extract and filter relevant adventure context with weighted recent messages
+  // Extract and filter relevant adventure context with recent 6 messages (60% latest user + 20% latest AI + 20% conversation history)
   private extractAdventureContext(userAdventure: ChatMessage[]): string {
     if (!userAdventure || userAdventure.length === 0) {
       return "";
     }
 
-    // Get recent messages (last 10 messages) and apply decreasing weights
-    const recentMessages = userAdventure.slice(-10);
+    // Get recent 6 messages (both AI and user)
+    const recentMessages = userAdventure.slice(-6);
     
-    // Create weighted context - most recent messages have higher importance
-    let weightedContext = "";
-    recentMessages.reverse().forEach((msg, index) => {
-      // Weight: 1.0 for most recent, then 0.9, 0.8, 0.7, etc.
-      const weight = Math.max(0.1, 1.0 - (index * 0.1));
-      const repetitions = Math.ceil(weight * 3); // Repeat important messages more
-      
-      for (let i = 0; i < repetitions; i++) {
-        weightedContext += msg.content + " ";
+    // Get latest AI message for 20% weight
+    const latestAiMessage = userAdventure.filter(msg => msg.type === 'ai').slice(-1)[0];
+    
+    // Create weighted context components
+    const conversationHistory = recentMessages.length > 0 
+      ? `Recent conversation (20% context weight): ${recentMessages.map(msg => `${msg.type}: ${msg.content.substring(0, 100)}`).join(' | ')}`
+      : '';
+    
+    const latestAiContext = latestAiMessage 
+      ? `Latest AI response (20% context weight): ${latestAiMessage.content.substring(0, 200)}`
+      : '';
+    
+    // Build weighted context in order: 60% user (handled separately), 20% AI, 20% conversation
+    let context = '';
+    
+    if (latestAiContext) {
+      context = latestAiContext;
+    }
+    
+    if (conversationHistory) {
+      if (context) {
+        context += `\n\n${conversationHistory}`;
+      } else {
+        context = conversationHistory;
       }
+    }
+
+    console.log('Extracted recent 6 messages context with 60/20/20 weighting:', {
+      recentMessages: recentMessages.length,
+      hasLatestAi: !!latestAiMessage,
+      context: context.substring(0, 200) + '...'
     });
     
-    // Extract key story elements from weighted context
-    const storyElements = weightedContext.toLowerCase();
-
-    // Look for story elements like characters, settings, objects
-    const characters = this.extractStoryElements(storyElements, [
-      'captain', 'explorer', 'astronaut', 'hero', 'friend', 'krafty', 'robot', 'alien', 
-      'pikachu', 'pokemon', 'character', 'wizard', 'princess', 'prince', 'knight',
-      'pirate', 'dragon', 'fairy', 'unicorn', 'mage', 'warrior', 'scientist'
-    ]);
-    
-    const settings = this.extractStoryElements(storyElements, [
-      'space', 'planet', 'rocket', 'spaceship', 'adventure', 'mission', 'quest', 
-      'journey', 'castle', 'forest', 'ocean', 'mountain', 'island', 'city', 'school',
-      'cave', 'temple', 'kingdom', 'galaxy', 'laboratory', 'treasure hunt', 'expedition'
-    ]);
-    
-    const objects = this.extractStoryElements(storyElements, [
-      'treasure', 'map', 'key', 'sword', 'shield', 'book', 'magic', 'crystal',
-      'potion', 'gem', 'artifact', 'spell', 'portal', 'compass', 'telescope'
-    ]);
-
-    // Build contextual summary with emphasis on most recent elements
-    let context = "";
-    if (characters.length > 0) {
-      context += `Characters: ${characters.join(", ")}. `;
-    }
-    if (settings.length > 0) {
-      context += `Setting: ${settings.join(", ")}. `;
-    }
-    if (objects.length > 0) {
-      context += `Objects: ${objects.join(", ")}. `;
-    }
-
-    // Add the most recent user message directly for highest priority
-    const lastUserMessage = userAdventure.filter(msg => msg.type === 'user').slice(-1)[0];
-    if (lastUserMessage) {
-      context = `Recent focus: ${lastUserMessage.content}. ` + context;
-    }
-
-    console.log('Extracted weighted adventure context:', {
-      characters,
-      settings,
-      objects,
-      lastUserMessage: lastUserMessage?.content,
-      fullContext: context
-    });
-
-    return context.trim();
+    return context;
   }
 
   // Extract the last 4-5 user messages with minimal AI context for question contextualization
@@ -738,16 +712,6 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
     return formattedContext;
   }
 
-  // Helper method to extract story elements
-  private extractStoryElements(text: string, keywords: string[]): string[] {
-    const found = [];
-    for (const keyword of keywords) {
-      if (text.includes(keyword)) {
-        found.push(keyword);
-      }
-    }
-    return [...new Set(found)]; // Remove duplicates
-  }
 
   // Get last 6 conversation messages for OpenAI-style weighting
   private getLastConversationMessages(userAdventure: ChatMessage[]): ChatMessage[] {
@@ -755,39 +719,28 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
       return [];
     }
     // Return last 6 messages for OpenAI-style context
-    return userAdventure.slice(-30);
+    return userAdventure.slice(-6);
   }
 
-  // Generate weighted prompt: 80% user input + 10% latest AI response + 10% other context
+  // Generate weighted prompt: 60% user input + 20% latest AI response (20% conversation history handled in context building)
   private generateWeightedPrompt(currentText: string, conversationHistory: ChatMessage[]): string {
     if (!conversationHistory || conversationHistory.length === 0) {
       return currentText;
     }
 
-    // Extract latest AI response (10% weight)
+    // Extract latest AI response (20% weight)
     const latestAiMessage = conversationHistory
       .slice()
       .reverse()
       .find(msg => msg.type === 'ai');
     
-    const latestAiContext = latestAiMessage ? latestAiMessage.content.substring(0, 100) : '';
+    const latestAiContext = latestAiMessage ? latestAiMessage.content.substring(0, 150) : '';
 
-    // Extract other context from conversation history (10% weight)
-    const otherContextMessages = conversationHistory
-      .filter(msg => msg.type === 'user' || (msg.type === 'ai' && msg !== latestAiMessage))
-      .map(msg => msg.content)
-      .join(' ')
-      .substring(0, 100);
-
-    // 80% current text + 10% latest AI + 10% other context
-    let weightedContent = currentText;
+    // 60% current text + 20% latest AI (20% conversation history handled in context building)
+    let weightedContent = currentText; // 60% weight (primary focus)
     
     if (latestAiContext) {
       weightedContent += `. Latest AI context: ${latestAiContext}`;
-    }
-    
-    if (otherContextMessages) {
-      weightedContent += `. Other context: ${otherContextMessages}`;
     }
     
     return weightedContent;
@@ -1146,7 +1099,7 @@ Return ONLY the new reading passage, nothing else.`;
   private getRecentAIMessages(userAdventure: ChatMessage[]): string {
     const aiMessages = userAdventure
       .filter(msg => msg.type === 'ai')
-      .slice(-30)
+      .slice(-6)
       .map(msg => msg.content.substring(0, 150)) // Limit length
       .join(' | ');
     
@@ -1325,6 +1278,7 @@ Return ONLY the new reading passage, nothing else.`;
         console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
         console.log(`📝 [AIService.generateAdventureImage()] Final prompt length: ${finalPrompt.length} characters`);
         console.log(`📝 [AIService.generateAdventureImage()] Final prompt: ${finalPrompt}`);
+        console.log(`🎯 dall-e prompt primary final: ${finalPrompt}`);
 
         const response = await this.client.images.generate({
           model: "dall-e-3",
@@ -1377,6 +1331,7 @@ Return ONLY the new reading passage, nothing else.`;
           else if (i === 3) promptType = ' (Simple Safe)';
           
           console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}${promptType}:`, finalPrompt.substring(0, 200) + '...');
+          console.log(`🎯 fallback${i + 1} dalle prompt: ${finalPrompt}`);
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -1482,33 +1437,40 @@ Return ONLY the new reading passage, nothing else.`;
     }
   }
 
-  // Helper: Build conversation context for better image generation
+  // Helper: Build conversation context for better image generation (60% latest user + 20% latest AI + 20% conversation history)
   private buildImageGenerationContext(userAdventure: ChatMessage[]): string {
     if (!userAdventure || userAdventure.length === 0) {
       return "";
     }
 
-    // Extract last two user messages for recent context
-    const userMessages = userAdventure
-      .filter(msg => msg.type === 'user')
-      .slice(-2)
-      .map(msg => msg.content.substring(0, 100)); // Limit length
-
-    // Create a brief summary of the conversation
-    const totalMessages = userAdventure.length;
-    const lastFewMessages = userAdventure
-      .slice(-4)
-      .map(msg => `${msg.type}: ${msg.content.substring(0, 80)}`)
-      .join('; ');
-
-    let context = "Context for image generation:\n";
+    // Get recent 6 messages (both AI and user)
+    const recentMessages = userAdventure.slice(-6);
     
-    if (userMessages.length > 0) {
-      context += `Recent user requests: ${userMessages.join(' | ')}\n`;
+    // Get latest AI message for 20% weight
+    const latestAiMessage = userAdventure.filter(msg => msg.type === 'ai').slice(-1)[0];
+    
+    // Create weighted context components
+    const conversationHistory = recentMessages.length > 0 
+      ? `Recent conversation (20% context weight): ${recentMessages.map(msg => `${msg.type}: ${msg.content.substring(0, 100)}`).join(' | ')}`
+      : '';
+    
+    const latestAiContext = latestAiMessage 
+      ? `Latest AI response (20% context weight): ${latestAiMessage.content.substring(0, 200)}`
+      : '';
+    
+    // Build weighted context in order: 60% user (handled separately), 20% AI, 20% conversation
+    let context = '';
+    
+    if (latestAiContext) {
+      context = latestAiContext;
     }
     
-    if (totalMessages > 0) {
-      context += `Adventure summary: ${lastFewMessages}\n`;
+    if (conversationHistory) {
+      if (context) {
+        context += `\n\n${conversationHistory}`;
+      } else {
+        context = conversationHistory;
+      }
     }
     
     return context;
@@ -1522,23 +1484,23 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Get conversation history for weighted prompt generation (last 6 messages - OpenAI style)
     const conversationHistory = this.getLastConversationMessages(userAdventure);
-    console.log('Conversation history (last 30 - OpenAI style):', conversationHistory);
+    console.log('Conversation history (last 6 - OpenAI style):', conversationHistory);
 
-    // Generate weighted prompt: 80% user input + 10% latest AI response + 10% other context
+    // Generate weighted prompt: 60% user input + 20% latest AI response + 20% conversation history
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
-    console.log('Weighted content (80% user input, 10% latest AI response, 10% other context):', weightedContent);
+    console.log('Weighted content (60% user input, 20% latest AI response, 20% conversation history in context):', weightedContent);
 
     // Build context from conversation for better image generation
     const conversationContext = this.buildImageGenerationContext(userAdventure);
     console.log('Conversation context for image:', conversationContext.substring(0, 200));
 
     // Create exciting, adventurous images that kids will love while maintaining safety
-    const enhancedPrompt = `${conversationContext}
-
-Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+    const enhancedPrompt = ` Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
+    ${conversationContext}
+    `;
     
     console.log('PRIMARY adventure prompt:', enhancedPrompt);
-    console.log('WEIGHTING: 80% User Input + 10% Latest AI Response + 10% Other Context');
+    console.log('WEIGHTING: 60% User Input + 20% Latest AI Response + 20% Conversation History');
     console.log('================================================');
 
     return enhancedPrompt;
@@ -1570,15 +1532,15 @@ Create a very realistic, high-quality image: ${weightedContent}. Style: Realisti
     const prompts: string[] = [];
 
     // Fallback Option 1: Epic and dynamic cinematic adventure
-    const sanitizedEnhancedPrompt1 = `${conversationContext}
+    const sanitizedEnhancedPrompt1 = `Create an epic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
-Create an epic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt1);
 
     // Fallback Option 2: Thrilling adventure with safe content
-    const sanitizedEnhancedPrompt2 = `${conversationContext}
+    const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
-Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt2);
     
     console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
@@ -1588,9 +1550,9 @@ Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Rea
     if (aiSanitizedResult?.sanitizedPrompt) {
       console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 4! ✨');
       // Use the sanitized context we already selected above
-      const aiSanitizedWithContext = `${conversationContext}
+      const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
-${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+${conversationContext}`;
       prompts.push(aiSanitizedWithContext);
       console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
     } else {
@@ -1599,9 +1561,9 @@ ${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and eng
 
     // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
-      const simpleFallback = `${conversationContext}
+      const simpleFallback = `Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
-Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
+${conversationContext}`;
       prompts.push(simpleFallback);
       console.log('Final fallback prompt (Simple Safe):', simpleFallback);
     }

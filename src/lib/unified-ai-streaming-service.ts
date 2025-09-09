@@ -349,14 +349,35 @@ Spelling Context: ${spellingQuestion.questionText}
 
 Remember: I'm your loyal companion - speak as "I" and refer to the student as "you". Make the adventure thrilling and mysterious!`;
     
-    // Build conversation context
+    // Build conversation context with recent 6 messages (60% latest user + 20% latest AI + 20% conversation history)
+    const recentMessages = chatHistory.slice(-30);
+    
+    // Get latest AI message for 20% weight
+    const latestAiMessage = chatHistory.filter(msg => msg.type === 'ai').slice(-1)[0];
+    
+    // Create weighted context components
+    const conversationHistory = recentMessages.length > 0 
+      ? `Recent conversation (20% context weight): ${recentMessages.map(msg => `${msg.type}: ${msg.content}`).join(' | ')}`
+      : '';
+    
+    const latestAiContext = latestAiMessage 
+      ? `Latest AI response (10% context weight): ${latestAiMessage.content}`
+      : '';
+    
+    // Enhanced user message with weighted context
+    let enhancedUserMessage = `Current user request (70% context weight): ${userMessage}`;
+    
+    if (latestAiContext) {
+      enhancedUserMessage = `${latestAiContext}\n\n${enhancedUserMessage}`;
+    }
+    
+    if (conversationHistory) {
+      enhancedUserMessage = `${conversationHistory}\n\n${enhancedUserMessage}`;
+    }
+    
     const messages = [
       { role: "system", content: systemPrompt },
-      ...chatHistory.map(msg => ({
-        role: msg.type === 'user' ? 'user' : 'assistant',
-        content: msg.content
-      })),
-      { role: "user", content: userMessage }
+      { role: "user", content: enhancedUserMessage }
     ];
     
     console.log('🤖 Calling OpenAI with enhanced image-aware prompt...');
@@ -474,9 +495,12 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
         console.log('🎨 Legacy system attempting image generation...');
         
         try {
+          // Use recent 6 messages instead of full chatHistory for legacy fallback
+          const recentMessages = chatHistory.slice(-6);
+          
           const legacyImageResult = await aiService.generateAdventureImage(
             userMessage,
-            chatHistory,
+            recentMessages,
             "adventure scene",
             undefined,
             adventureId
@@ -506,7 +530,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
                   },
                   timestamp: Date.now()
                 }
-              ]
+              ],
+              timestamp: Date.now()
             };
           }
         } catch (legacyError) {
@@ -525,7 +550,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
           type: 'text',
           content: aiResponse,
           timestamp: Date.now()
-        }]
+        }],
+        timestamp: Date.now()
       };
       
     } catch (error) {
