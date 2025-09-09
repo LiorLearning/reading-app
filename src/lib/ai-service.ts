@@ -1302,16 +1302,19 @@ Return ONLY the new reading passage, nothing else.`;
     }, 40000);
 
     try {
-      console.log('🌟 Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
+      console.log('🌟 [AIService.generateAdventureImage()] Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
+      console.log('📝 [AIService.generateAdventureImage()] Input prompt:', prompt);
+      console.log('👤 [AIService.generateAdventureImage()] Adventure ID:', adventureId);
+      console.log('📜 [AIService.generateAdventureImage()] User adventure context length:', userAdventure.length);
 
       // Extract adventure context with high priority on recent messages
       const adventureContext = this.extractAdventureContext(userAdventure);
-      console.log('Adventure context for image:', adventureContext);
+      console.log('[AIService.generateAdventureImage()] Adventure context for image:', adventureContext);
 
       // Generate one optimized prompt first, then fallback prompts if needed
       const primaryPrompt = this.generatePrimaryAdventurePrompt(prompt, userAdventure, fallbackPrompt);
       
-      console.log('🎯 Trying PRIMARY adventure prompt first:', primaryPrompt);
+      console.log('🎯 [AIService.generateAdventureImage()] Trying PRIMARY adventure prompt first:', primaryPrompt);
 
       // Try primary prompt first
       try {
@@ -1319,7 +1322,9 @@ Return ONLY the new reading passage, nothing else.`;
           ? primaryPrompt.substring(0, 390) + "..." 
           : primaryPrompt;
         
-        console.log(`🎨 Generating with primary prompt`);
+        console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
+        console.log(`📝 [AIService.generateAdventureImage()] Final prompt length: ${finalPrompt.length} characters`);
+        console.log(`📝 [AIService.generateAdventureImage()] Final prompt: ${finalPrompt}`);
 
         const response = await this.client.images.generate({
           model: "dall-e-3",
@@ -1333,13 +1338,14 @@ Return ONLY the new reading passage, nothing else.`;
         const imageUrl = response.data[0]?.url;
         
         if (imageUrl) {
-          console.log(`✅ PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
+          console.log(`✅ [AIService.generateAdventureImage()] PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
+          console.log(`🖼️ [AIService.generateAdventureImage()] Generated image URL: ${imageUrl}`);
           clearTimeout(safetyTimeout); // Clear safety timeout
           this.isGeneratingImage = false; // Clear generation flag
           return { imageUrl, usedPrompt: finalPrompt, adventureId };
         }
       } catch (primaryError: any) {
-        console.log(`❌ Primary adventure prompt failed:`, primaryError.message);
+        console.log(`❌ [AIService.generateAdventureImage()] Primary adventure prompt failed:`, primaryError.message);
         
         // Only proceed to fallback if it's a safety/policy issue
         if (!primaryError.message?.includes('safety system')) {
@@ -1347,11 +1353,11 @@ Return ONLY the new reading passage, nothing else.`;
           throw primaryError;
         }
         
-        console.log('🔄 Primary prompt blocked by safety system - trying fallback prompts');
+        console.log('🔄 [AIService.generateAdventureImage()] Primary prompt blocked by safety system - trying fallback prompts');
       }
 
       // Only if primary fails, generate fallback prompts
-      console.log('🔄 Generating fallback prompts (primary prompt failed)');
+      console.log('🔄 [AIService.generateAdventureImage()] Generating fallback prompts (primary prompt failed)');
       const fallbackPrompts = this.generateFallbackAdventurePrompts(prompt, userAdventure, fallbackPrompt, aiSanitizedResult);
 
       console.log('Generated fallback prompt options:', fallbackPrompts);

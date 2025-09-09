@@ -149,7 +149,7 @@ export class ResponseProcessor {
         // Apply enhanced safety prompt to fallback as well
         const enhancedFallbackPrompt = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawFallbackPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
         
-        console.log(`🎨 Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
+        console.log(`🎨 [ResponseProcessor.processResponseWithImages()] Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
         console.log(`📝 Raw fallback: ${rawFallbackPrompt}`);
         console.log(`🛡️ Enhanced fallback: ${enhancedFallbackPrompt}`);
         
@@ -238,7 +238,7 @@ export class ResponseProcessor {
       
       // If we already generated a successful image, skip this image prompt but continue with text
       if (hasGeneratedSuccessfulImage) {
-        console.log(`🛑 Skipping image ${index + 1} - already generated a successful image`);
+        console.log(`🛑 [ResponseProcessor.processResponseWithImages()] Skipping image ${index + 1} - already generated a successful image`);
         // Skip the image tag content but continue with the loop to process remaining text
         lastEnd = end;
         continue;
@@ -267,10 +267,10 @@ export class ResponseProcessor {
 Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.`;
         
         const startTime = Date.now();
-        console.log(`🎯 Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
-        console.log(`📝 Raw user input: ${rawPrompt}`);
-        console.log(`🗣️ Conversation context: ${conversationContext.substring(0, 200)}${conversationContext.length > 200 ? '...' : ''}`);
-        console.log(`🛡️ Enhanced prompt: ${enhancedPrompt}`);
+        console.log(`🎯 [ResponseProcessor.processResponseWithImages()] Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
+        console.log(`📝 [ResponseProcessor.processResponseWithImages()] Raw user input: ${rawPrompt}`);
+        console.log(`🗣️ [ResponseProcessor.processResponseWithImages()] Conversation context: ${conversationContext.substring(0, 200)}${conversationContext.length > 200 ? '...' : ''}`);
+        console.log(`🛡️ [ResponseProcessor.processResponseWithImages()] Enhanced prompt: ${enhancedPrompt}`);
         
         const result = await imageGenerator.generateWithFallback(enhancedPrompt, userId, {
           adventureContext,
@@ -281,7 +281,9 @@ Remove parts that make it moderated. Reduce intensity of violence or eliminate s
         const duration = Date.now() - startTime;
         
         if (result.success && result.imageUrl) {
-          console.log(`✅ Image ${index + 1} generated successfully in ${duration}ms`);
+          console.log(`✅ [ResponseProcessor.processResponseWithImages()] Image ${index + 1} generated successfully in ${duration}ms`);
+          console.log(`🖼️ [ResponseProcessor.processResponseWithImages()] Generated image URL: ${result.imageUrl}`);
+          console.log(`🏢 [ResponseProcessor.processResponseWithImages()] Provider used: ${result.provider}`);
           hasGeneratedSuccessfulImage = true; // Mark as successful, stop generating more
           
           // Stop loading sound - completion sound now handled by unified streaming hook

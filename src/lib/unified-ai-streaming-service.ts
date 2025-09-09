@@ -22,6 +22,7 @@ export interface UnifiedAIResponse {
   textContent: string;
   imageUrls: string[];
   streamEvents: StreamEvent[];
+  timestamp: number; // When the response was completed
 }
 
 /**
@@ -121,7 +122,11 @@ export class UnifiedAIStreamingService {
     console.log(`🎯 Created new AbortController for session: ${sessionId}`);
     
     try {
-      console.log('🚀 Generating unified AI response with potential images...');
+      console.log('🚀 [UnifiedAIStreamingService.generateUnifiedResponse()] Generating unified AI response with potential images...');
+      console.log('📝 [UnifiedAIStreamingService.generateUnifiedResponse()] User message:', userMessage);
+      console.log('👤 [UnifiedAIStreamingService.generateUnifiedResponse()] User ID:', userId);
+      console.log('🎯 [UnifiedAIStreamingService.generateUnifiedResponse()] Session ID:', sessionId);
+      console.log('🎨 [UnifiedAIStreamingService.generateUnifiedResponse()] Adventure ID:', adventureId);
       
       // 🎯 NEW: Signal automatic generation cancellation at start of unified session
       const { aiService } = await import('./ai-service');
@@ -143,7 +148,7 @@ export class UnifiedAIStreamingService {
       // Pass user message for fallback visual detection, not AI response content
       const hasImages = ResponseProcessor.containsImageRequests(aiResponse, userMessage);
       
-      console.log('🔍 Image generation analysis:', {
+      console.log('🔍 [UnifiedAIStreamingService.generateUnifiedResponse()] Image generation analysis:', {
         userMessage: userMessage,
         responsePreview: aiResponse.substring(0, 200) + '...',
         hasExplicitTags: aiResponse.includes('<generateImage>'),
@@ -216,13 +221,19 @@ export class UnifiedAIStreamingService {
         callback(completionEvent);
       }
       
-      console.log(`✅ Unified response generated with ${imageUrls.length} images`);
+      const completionTimestamp = Date.now();
+      console.log(`✅ [UnifiedAIStreamingService.generateUnifiedResponse()] Unified response generated with ${imageUrls.length} images`);
+      console.log(`⏰ [UnifiedAIStreamingService.generateUnifiedResponse()] Completion timestamp: ${completionTimestamp}`);
+      if (imageUrls.length > 0) {
+        console.log(`🖼️ [UnifiedAIStreamingService.generateUnifiedResponse()] Generated image URLs:`, imageUrls);
+      }
       
       return {
         hasImages: true,
         textContent,
         imageUrls,
-        streamEvents
+        streamEvents,
+        timestamp: completionTimestamp
       };
       
     } catch (error) {
@@ -472,7 +483,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
           );
           
           if (legacyImageResult?.imageUrl) {
-            console.log('✅ Legacy system generated image successfully');
+            console.log('✅ [UnifiedAIStreamingService.generateUnifiedResponse()] Legacy system generated image successfully');
+            console.log('🖼️ [UnifiedAIStreamingService.generateUnifiedResponse()] Legacy image URL:', legacyImageResult.imageUrl);
             
             return {
               hasImages: true,
@@ -570,7 +582,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
         type: 'text',
         content: textContent,
         timestamp: Date.now()
-      }]
+      }],
+      timestamp: Date.now()
     };
   }
   

@@ -237,7 +237,13 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
     let streamingTimeout: NodeJS.Timeout | null = null;
     
     try {
-      console.log('🚀 Sending message through unified AI system:', message.substring(0, 50));
+      console.log('🚀 [UnifiedAIStreaming.sendMessage()] Sending message through unified AI system:', message.substring(0, 50));
+      console.log('🔍 [UnifiedAIStreaming.sendMessage()] Current state before processing:', {
+        isStreaming: streamingState.isStreaming,
+        isGeneratingImage: streamingState.isGeneratingImage,
+        isUnifiedSessionActive: streamingState.isUnifiedSessionActive,
+        sessionId: sessionId
+      });
       
       streamingTimeout = setTimeout(() => {
         console.log('🚨 STREAMING TIMEOUT: Force-resetting stuck state after 35 seconds');

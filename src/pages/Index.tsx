@@ -1172,7 +1172,8 @@ const Index = () => {
         const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
         
         // 🚫 DISABLED: Legacy image generation to prevent duplicates with unified system
-        console.log('🚫 Skipping legacy manual image generation - unified system handles this now');
+        console.log('🚫 [Index.onGenerateImage()] Skipping legacy manual image generation - unified system handles this now');
+        console.log('📝 [Index.onGenerateImage()] Requested prompt:', imagePrompt);
         const generatedImageResult = null;
         
         // ORIGINAL CODE (DISABLED):
@@ -2517,8 +2518,43 @@ const Index = () => {
   // Auto image generation function using adventure summary + last 3 messages
   const generateAutoImage = useCallback(async () => {
     try {
-      console.log(`🎨 AUTO IMAGE: === STARTING GENERATION PROCESS ===`);
-      console.log(`🎨 AUTO IMAGE: Function called at:`, new Date().toISOString());
+      console.log(`🎨 [generateAutoImage()] === STARTING GENERATION PROCESS ===`);
+      console.log(`🎨 [generateAutoImage()] Function called at:`, new Date().toISOString());
+      
+      // 🔍 CRITICAL: Add stack trace to see where this is being called from
+      console.log(`🔍 [generateAutoImage()] CALL STACK:`, new Error().stack?.split('\n').slice(1, 4).join('\n'));
+      
+      // 🛡️ ABSOLUTE OVERRIDE: Block ALL auto generation if unified system has recent activity
+      const hasRecentUnifiedActivity = unifiedAIStreaming.lastResponse && 
+        (Date.now() - unifiedAIStreaming.lastResponse.timestamp < 10000); // 10 seconds
+      
+      console.log(`🔍 [generateAutoImage()] ABSOLUTE COORDINATION CHECK:`, {
+        isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+        isStreaming: unifiedAIStreaming.isStreaming,
+        isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+        hasRecentUnifiedActivity: hasRecentUnifiedActivity,
+        lastResponseTimestamp: unifiedAIStreaming.lastResponse?.timestamp,
+        timeSinceLastResponse: unifiedAIStreaming.lastResponse ? Date.now() - unifiedAIStreaming.lastResponse.timestamp : 'N/A',
+        currentAdventureId: currentAdventureId,
+        chatMessagesLength: chatMessages.length
+      });
+      
+      // 🚫 ABSOLUTE BLOCK: If unified system is active OR has recent activity, don't generate
+      if (unifiedAIStreaming.isUnifiedSessionActive || 
+          unifiedAIStreaming.isStreaming || 
+          unifiedAIStreaming.isGeneratingImage || 
+          hasRecentUnifiedActivity) {
+        console.log(`🚫 [generateAutoImage()] ABSOLUTE BLOCK - Unified system active or recent activity detected`);
+        console.log(`🚫 [generateAutoImage()] Blocking reason:`, {
+          isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+          isStreaming: unifiedAIStreaming.isStreaming,
+          isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+          hasRecentUnifiedActivity: hasRecentUnifiedActivity
+        });
+        return; // Exit without generating
+      }
+      
+      console.log(`✅ [generateAutoImage()] ABSOLUTE COORDINATION PASSED - Safe to proceed with generation`);
       
       // Get current adventure summary from session
       let adventureSummary = '';
@@ -2829,45 +2865,89 @@ const Index = () => {
       return;
     }
     
-    // Check if enough user messages have passed since last auto image
-    const messagesSinceLastAuto = currentMessageCount - lastAutoImageMessageCount;
-    const shouldGenerate = messagesSinceLastAuto >= AUTO_IMAGE_TRIGGER_INTERVAL;
+    // 🎯 IMPROVED LOGIC: Only generate when message count is exactly divisible by interval
+    // and we haven't already generated for this count (prevents duplicate triggers)
+    const isExactInterval = currentMessageCount > 0 && currentMessageCount % AUTO_IMAGE_TRIGGER_INTERVAL === 0;
+    const notAlreadyGenerated = lastAutoImageMessageCount !== currentMessageCount;
     
-    console.log(`🎨 AUTO IMAGE CALCULATION:`, {
+    // 🚫 CLASH DETECTION: Check if unified system was called for the current message cycle
+    // Get the latest user message (the one that would trigger auto generation)
+    const filteredUserMessages = chatMessages.filter(msg => msg.type === 'user');
+    const latestUserMessage = filteredUserMessages[filteredUserMessages.length - 1];
+    
+    // Check if there's an AI response to this latest user message that contains an image
+    const unifiedCalledForCurrentMessage = latestUserMessage && chatMessages.some(msg => 
+      msg.type === 'ai' && 
+      msg.timestamp && latestUserMessage.timestamp &&
+      msg.timestamp > latestUserMessage.timestamp && // AI message came after user message
+      msg.text?.includes('![Generated Image]') // Contains generated image
+    );
+    
+    const shouldGenerate = isExactInterval && notAlreadyGenerated && !unifiedCalledForCurrentMessage;
+
+    const messagesSinceLastAuto = currentMessageCount - lastAutoImageMessageCount;
+    
+    console.log(`🎨 AUTO IMAGE CALCULATION (IMPROVED):`, {
       currentMessageCount,
       lastAutoImageMessageCount,
       messagesSinceLastAuto,
       AUTO_IMAGE_TRIGGER_INTERVAL,
-      shouldGenerate
+      isExactInterval,
+      notAlreadyGenerated,
+      unifiedCalledForCurrentMessage,
+      latestUserMessageId: latestUserMessage?.id,
+      shouldGenerate,
+      explanation: shouldGenerate ? 'EXACT_INTERVAL_MATCH' : unifiedCalledForCurrentMessage ? 'SKIPPED_DUE_TO_UNIFIED_CLASH' : 'NOT_INTERVAL_OR_ALREADY_GENERATED'
     });
     
-    // 🎯 NEW: Check if unified session is active before auto-generation
+    // 🛡️ LAYER 1 COORDINATION: Check if unified session is active before scheduling
+    console.log('🔍 [AUTO IMAGE COORDINATION] LAYER 1 - Checking unified system state before scheduling:', {
+      isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+      isStreaming: unifiedAIStreaming.isStreaming,
+      isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+      shouldGenerate: shouldGenerate,
+      currentSessionId: unifiedAIStreaming.sessionId
+    });
+    
     if (unifiedAIStreaming.isUnifiedSessionActive) {
-      console.log('🚫 AUTO IMAGE: BLOCKED - Unified session is active, skipping auto-generation');
-      console.log('🔍 AUTO IMAGE COORDINATION: Unified session state:', {
+      console.log('🚫 [AUTO IMAGE COORDINATION] LAYER 1 BLOCKED - Unified session is active, skipping scheduling');
+      console.log('🔍 [AUTO IMAGE COORDINATION] LAYER 1 - Unified session state:', {
         isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
         isStreaming: unifiedAIStreaming.isStreaming,
         isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
         reason: 'unified_system_priority'
       });
-      return; // Exit early - don't generate automatically
+      return; // Exit early - don't schedule generation
+    }
+    
+    if (unifiedAIStreaming.isStreaming || unifiedAIStreaming.isGeneratingImage) {
+      console.log('🚫 [AUTO IMAGE COORDINATION] LAYER 1 BLOCKED - Unified system is busy, skipping scheduling');
+      return; // Exit early - don't schedule generation
     }
     
     if (shouldGenerate) {
-      console.log(`✅ AUTO IMAGE: TRIGGERING! After ${messagesSinceLastAuto} user messages (threshold: ${AUTO_IMAGE_TRIGGER_INTERVAL})`);
-      console.log(`🎨 AUTO IMAGE: Setting lastAutoImageMessageCount from ${lastAutoImageMessageCount} to ${currentMessageCount}`);
+      console.log(`✅ [AUTO IMAGE COORDINATION] LAYER 1 PASSED - Scheduling generation for message count ${currentMessageCount}`);
+      console.log(`🎨 [AUTO IMAGE COORDINATION] Setting lastAutoImageMessageCount from ${lastAutoImageMessageCount} to ${currentMessageCount}`);
       
-      // Update the counter first to prevent duplicate triggers
+      // Update the counter IMMEDIATELY to prevent duplicate triggers
       setLastAutoImageMessageCount(currentMessageCount);
       
-      // Small delay to ensure message rendering is complete
+      // Small delay to ensure message rendering is complete, then run Layer 2 check
       setTimeout(() => {
-        console.log(`🎨 AUTO IMAGE: Calling generateAutoImage() now...`);
+        console.log(`🎨 [AUTO IMAGE COORDINATION] 1-second delay complete, executing generateAutoImage() with Layer 2 check...`);
         generateAutoImage();
       }, 1000);
     } else {
-      const remaining = AUTO_IMAGE_TRIGGER_INTERVAL - messagesSinceLastAuto;
-      console.log(`⏳ AUTO IMAGE: Waiting for ${remaining} more user messages (${messagesSinceLastAuto}/${AUTO_IMAGE_TRIGGER_INTERVAL})`);
+      if (unifiedCalledForCurrentMessage && isExactInterval) {
+        // Skip this cycle due to clash, wait for next cycle
+        const nextTrigger = currentMessageCount + AUTO_IMAGE_TRIGGER_INTERVAL;
+        console.log(`🚫 AUTO IMAGE: UNIFIED CLASH DETECTED - Skipping cycle ${currentMessageCount}, will generate at message ${nextTrigger} instead`);
+        console.log(`🔍 AUTO IMAGE: Unified system already generated image for message ${currentMessageCount}, avoiding duplicate generation`);
+      } else {
+        const nextTrigger = Math.ceil(currentMessageCount / AUTO_IMAGE_TRIGGER_INTERVAL) * AUTO_IMAGE_TRIGGER_INTERVAL;
+        const remaining = nextTrigger - currentMessageCount;
+        console.log(`⏳ AUTO IMAGE: Waiting for next interval. Current: ${currentMessageCount}, Next trigger: ${nextTrigger}, Remaining: ${remaining} messages`);
+      }
     }
   }, [
     chatMessages.filter(msg => msg.type === 'user').length, 
