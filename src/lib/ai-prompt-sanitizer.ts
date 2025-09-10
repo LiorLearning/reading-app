@@ -15,12 +15,16 @@ class AIPromptSanitizer {
 
   constructor() {
     this.initialize();
+    // Clear cache on startup to ensure fresh sanitization with updated prompts
+    this.clearCache();
   }
 
   private initialize() {
     const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    console.log('🔑 AI Sanitizer: Checking API key...', openaiApiKey ? 'FOUND' : 'MISSING');
     if (!openaiApiKey) {
       console.error('❌ AI Sanitizer: OpenAI API key not found');
+      console.error('❌ AI Sanitizer: Expected env var: VITE_OPENAI_API_KEY');
       return;
     }
 
@@ -40,12 +44,18 @@ class AIPromptSanitizer {
     const startTime = Date.now();
     
     console.log('🧹 AI Sanitizer: Starting FULL sanitization (prompt + context) for:', originalPrompt.substring(0, 100) + '...');
+    console.log('📥 AI Sanitizer INPUT - Original Prompt (FULL):', originalPrompt);
+    console.log('📥 AI Sanitizer INPUT - Adventure Context (FULL):', adventureContext || 'No context provided');
+    console.log('🔧 AI Sanitizer: Cache key:', `full_${originalPrompt.substring(0, 30)}_${(adventureContext || '').substring(0, 30)}`);
 
     // Check cache first
     const cacheKey = `full_${originalPrompt}_${adventureContext || ''}`;
     if (this.sanitizationCache.has(cacheKey)) {
       console.log('💾 AI Sanitizer: Using cached full sanitization result');
-      return this.sanitizationCache.get(cacheKey)!;
+      const cachedResult = this.sanitizationCache.get(cacheKey)!;
+      console.log('📤 AI Sanitizer CACHED OUTPUT - Sanitized Prompt:', cachedResult.sanitizedPrompt);
+      console.log('📤 AI Sanitizer CACHED OUTPUT - Sanitized Context:', cachedResult.sanitizedContext || 'No context');
+      return cachedResult;
     }
 
     if (!this.isInitialized || !this.client) {
@@ -54,64 +64,127 @@ class AIPromptSanitizer {
     }
 
     try {
-      const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts AND their adventure context and make them 100% safe for DALL-E while preserving the visual excitement.
+      const systemPrompt = `You are a strict image prompt sanitizer for children's adventure. 
+Your job is to take any user request (raw prompt) and rewrite it into a safe, 
+child-friendly, realistic description for image generation.
 
-CRITICAL RULES:
-1. Remove ALL violent language (fighting → competing, battle → contest, violent → intense, fury → energy)
-2. Keep the visual excitement and epic nature  
-3. Make it completely family-friendly for ages 8-14
-4. Preserve character names and main visual elements
-5. Use heroic, adventurous, and magical language instead
-6. Clean BOTH the main prompt AND the adventure context
-7. Return ONLY the cleaned prompt on the first line, then "---" then the cleaned context
+Rules you must always follow:
+1. CLOTHING & MODESTY
+- All characters must be fully clothed from chest to feet.
+- Clothing must be modest, age-appropriate, and everyday or fantasy attire.
+- Absolutely forbid: bikinis, lingerie, crop tops, exposed midriff, short skirts, sheer/transparent fabrics, tight or sexualized outfits, revealing armor.
+- Replace unsafe outfits with long-sleeved full-body attire such as robes, gowns, casual clothes, adventurer’s armor, or protective gear.
 
-EXAMPLES:
-- "violently fighting" → "in an epic heroic pose"
-- "sword still burns with fury" → "sword glows with magical energy"
-- "slicing through enemies" → "demonstrating sword skills"
-- "fierce battle" → "exciting adventure scene"
+2. POSE & INTERACTION
+- No nudity, no sexual content, no romantic or sensual poses.
+- Replace actions like kissing, flirting, or seductive posing with neutral, friendly, or adventurous alternatives (e.g., smiling, standing, waving, walking, training, adventuring together).
 
-Clean this content and return in format:
-CLEANED_PROMPT
+3. ENVIRONMENT & STYLE
+- Scenes must look realistic, natural, and family-friendly.
+- Backgrounds should have authentic details, natural lighting, lifelike textures, and depth of field.
+- No cartoonish or kiddish styles unless explicitly requested.
+
+4. REPLACEMENT MAPPING
+- lingerie, bikini, short skirt, low-cut dress, tight outfit, sheer/see-through, lacey, fishnet, seductive gown, provocative outfit, sexy uniform, exotic dancer outfit, revealing clothes → long-sleeved full-body attire (robes, gowns, armor, casual outfits, all covering chest to feet).
+- silky → smooth, shining, flowing fabric (still modest).
+- leather (suggestive) → sturdy protective armor or enchanted hide.
+
+5. CLEANLINESS
+- Do not include any text, signs, or labels in the rewritten prompt.
+- Do not add explanations — only output the cleaned prompt.
+Rules:  
+1. Clothing must always be **fully modest and family-friendly**:  
+   - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, robes, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
+   - Female characters should always be depicted in **elegant gowns, full-body armor, or flowing robes**.  
+   - Male characters should always wear **full-body armor, suits, tunics, or robes**.  
+2. No cleavage, no bare thighs, no exposed stomach, no revealing cuts.  
+3. Replace “sexy, tight, skimpy, sheer, lingerie, bikini, low-cut” or similar terms with **modest, noble, and adventurous clothing**.  
+4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children’s storybook or animated adventure film**.  
+5. Never allow sexual, romantic, or suggestive undertones. 
+
+Task:
+Rewrite the following user input into a sanitized version that follows the above rules,
+keeps the intent of the request, and ensures the final output is safe for children.
+don't shy away from adding specific instructions such as fully clothed etc. which might make it kid friendly.
+
+Clean this content and make sure that dall e creates this prompt's image whatsoever and return ONLY the cleaned content in this exact format:
+
+[The actual sanitized prompt goes here]
 ---
-CLEANED_CONTEXT`;
+[The actual sanitized context goes here]
 
+EXAMPLE:
+Input: "sexy warrior princess in bikini armor"
+Output: "brave female warrior in full protective armor with modest clothing"
+---
+"The warrior stands confidently in a medieval castle courtyard"
+
+Now clean the actual content provided below:`;
+// If the input contains copyrighted or trademarked characters, creatures, or names, transform them into unique, original, and imaginative versions that preserve the same adventurous spirit.
+// Replace names with new, original titles that feel magical and exciting.
+// Instead of copying the copyrighted design, describe the character’s features in detail (for example:
+// A copyrighted dragon → “a massive, fiery lizard-like creature with shimmering scales, glowing eyes, and smoke curling from its nostrils.”
+// A superhero → “a brave hero in a glowing suit of armor with a flowing cape and radiant energy surrounding them.”
+// A cartoon animal → “a whimsical, colorful forest creature with big expressive eyes, playful fur patterns, and a friendly adventurous expression.”)
+// Always make the descriptions distinctive and original, emphasizing their textures, colors, magical effects, and adventurous qualities rather than relying on franchise identity.
       const userMessage = `Main Prompt: ${originalPrompt}
 
 Adventure Context: ${adventureContext || 'No additional context provided'}`;
+      
+      console.log('🤖 AI Sanitizer: Sending to GPT-4o-mini...');
+      console.log('📨 AI Sanitizer SYSTEM PROMPT:', systemPrompt.substring(0, 200) + '...');
+      console.log('📨 AI Sanitizer USER MESSAGE:', userMessage);
+      console.log('⏳ AI Sanitizer: Making OpenAI API call...');
 
       const completion = await this.client.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "chatgpt-4o-latest",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
         ],
-        max_tokens: 400,
+        max_tokens: 1000,
         temperature: 0.7,
       });
+      
+      console.log('✅ AI Sanitizer: Received response from OpenAI');
 
       const responseText = completion.choices[0]?.message?.content?.trim() || '';
+      
+      console.log('📨 AI Sanitizer RAW RESPONSE from GPT-4o-mini:', responseText);
+      console.log('📊 AI Sanitizer: Response length:', responseText.length, 'characters');
+      console.log('🔍 AI Sanitizer: Response contains "CLEANED_PROMPT":', responseText.includes('CLEANED_PROMPT'));
+      console.log('🔍 AI Sanitizer: Response contains "---":', responseText.includes('---'));
       
       let sanitizedPrompt = '';
       let sanitizedContext = '';
       
       // Parse the simple format: PROMPT\n---\nCONTEXT
       try {
+        console.log('🔍 AI Sanitizer: Parsing response format...');
         const parts = responseText.split('---');
+        console.log('🔍 AI Sanitizer: Found', parts.length, 'parts after splitting on "---"');
+        
         if (parts.length >= 2) {
           sanitizedPrompt = parts[0].trim();
           sanitizedContext = parts[1].trim();
           console.log('🧹 Successfully parsed prompt and context using simple format');
+          console.log('📤 AI Sanitizer PARSED - Sanitized Prompt:', sanitizedPrompt);
+          console.log('📤 AI Sanitizer PARSED - Sanitized Context:', sanitizedContext);
         } else {
           // Fallback: treat entire response as prompt
           sanitizedPrompt = responseText;
           sanitizedContext = adventureContext || '';
           console.log('🔧 No separator found, using entire response as prompt');
+          console.log('📤 AI Sanitizer FALLBACK - Using full response as prompt:', sanitizedPrompt);
+          console.log('📤 AI Sanitizer FALLBACK - Using original context:', sanitizedContext);
         }
       } catch (parseError) {
         console.warn('⚠️ Simple parsing failed:', parseError);
         sanitizedPrompt = responseText || originalPrompt;
         sanitizedContext = adventureContext || '';
+        console.log('❌ AI Sanitizer PARSE ERROR - Using fallback values');
+        console.log('📤 AI Sanitizer ERROR FALLBACK - Prompt:', sanitizedPrompt);
+        console.log('📤 AI Sanitizer ERROR FALLBACK - Context:', sanitizedContext);
       }
 
       if (!sanitizedPrompt) {
@@ -130,18 +203,21 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       this.sanitizationCache.set(cacheKey, result);
       
       console.log('✅ AI Sanitizer: Successfully sanitized prompt + context');
-      console.log('🔄 Original prompt:', originalPrompt.substring(0, 80) + '...');
-      console.log('✨ Sanitized prompt:', sanitizedPrompt.substring(0, 80) + '...');
+      console.log('🔄 BEFORE - Original prompt (FULL):', originalPrompt);
+      console.log('✨ AFTER - Sanitized prompt (FULL):', sanitizedPrompt);
       if (adventureContext && sanitizedContext) {
-        console.log('🔄 Original context:', adventureContext.substring(0, 80) + '...');
-        console.log('✨ Sanitized context:', sanitizedContext.substring(0, 80) + '...');
+        console.log('🔄 BEFORE - Original context (FULL):', adventureContext);
+        console.log('✨ AFTER - Sanitized context (FULL):', sanitizedContext);
       }
       console.log('⏱️ Processing time:', result.processingTimeMs + 'ms');
+      console.log('📊 AI Sanitizer FINAL RESULT:', result);
 
       return result;
 
     } catch (error: any) {
       console.error('❌ AI Sanitizer: Failed to sanitize prompt + context:', error.message);
+      console.error('❌ AI Sanitizer ERROR DETAILS:', error);
+      console.log('🔄 AI Sanitizer: Falling back to rule-based sanitization...');
       return this.fallbackFullSanitization(originalPrompt, adventureContext, startTime);
     }
   }
@@ -226,6 +302,8 @@ Transform this image request:`;
 
   private fallbackFullSanitization(originalPrompt: string, adventureContext: string | undefined, startTime: number): SanitizedPromptResult {
     console.log('🔧 AI Sanitizer: Using rule-based fallback FULL sanitization');
+    console.log('📥 AI Sanitizer FALLBACK INPUT - Original Prompt:', originalPrompt);
+    console.log('📥 AI Sanitizer FALLBACK INPUT - Adventure Context:', adventureContext || 'No context');
     
     // Rule-based sanitization as fallback
     const replacements: Record<string, string> = {
@@ -273,6 +351,9 @@ Transform this image request:`;
     };
 
     console.log('🔧 Fallback full sanitization completed in', result.processingTimeMs + 'ms');
+    console.log('📤 AI Sanitizer FALLBACK OUTPUT - Sanitized Prompt:', sanitizedPrompt);
+    console.log('📤 AI Sanitizer FALLBACK OUTPUT - Sanitized Context:', sanitizedContext);
+    console.log('📊 AI Sanitizer FALLBACK FINAL RESULT:', result);
     
     return result;
   }

@@ -185,8 +185,8 @@ export class MultiProviderImageGenerator {
     }
     
     // Ensure prompt isn't too long (DALL-E has limits)
-    if (refinedPrompt.length > 400) {
-      refinedPrompt = refinedPrompt.substring(0, 390) + '...';
+    if (refinedPrompt.length > 2000) {
+      refinedPrompt = refinedPrompt.substring(0, 1990) + '...';
     }
     
     return refinedPrompt;
@@ -220,7 +220,7 @@ export class MultiProviderImageGenerator {
     return context
       .filter(msg => msg.type === 'ai')
       .slice(-6)
-      .map(msg => msg.content.substring(0, 150))
+      .map(msg => msg.content.substring(0,250))
       .join(' | ');
   }
 
@@ -230,7 +230,7 @@ export class MultiProviderImageGenerator {
   private buildAdventureContextString(context: ChatMessage[]): string {
     const userMessages = context
       .slice(-30) // Last 30 messages
-      .map(msg => msg.content.substring(0, 100)) // Truncate for storage
+      .map(msg => msg.content.substring(0, 5000)) // Truncate for storage
       .join(' | ');
     
     const aiMessages = this.getRecentAIMessages(context);

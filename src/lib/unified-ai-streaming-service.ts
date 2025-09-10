@@ -290,6 +290,25 @@ export class UnifiedAIStreamingService {
     if (!this.client) {
       throw new Error('AI client not initialized');
     }
+
+    // 🧹 NEW: Sanitize the user prompt upfront before processing
+    console.log('🧹 Sanitizing user prompt before unified processing...');
+    const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
+    
+    let sanitizedUserMessage = userMessage;
+    try {
+      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userMessage);
+      if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
+        sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
+        console.log('✅ Prompt sanitized successfully');
+        console.log('🔄 Original:', userMessage.substring(0, 100) + '...');
+        console.log('✨ Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
+      } else {
+        console.log('⚠️ Sanitization failed, using original prompt');
+      }
+    } catch (sanitizationError) {
+      console.warn('⚠️ Prompt sanitization error, using original prompt:', sanitizationError);
+    }
     
     // Enhanced system prompt that includes image generation instructions
     const systemPrompt = `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
@@ -364,8 +383,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
       ? `Latest AI response (10% context weight): ${latestAiMessage.content}`
       : '';
     
-    // Enhanced user message with weighted context
-    let enhancedUserMessage = `Current user request (70% context weight): ${userMessage}`;
+    // Enhanced user message with weighted context (using sanitized message)
+    let enhancedUserMessage = `Current user request (70% context weight): ${sanitizedUserMessage}`;
     
     if (latestAiContext) {
       enhancedUserMessage = `${latestAiContext}\n\n${enhancedUserMessage}`;
@@ -382,7 +401,8 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
     
     console.log('🤖 Calling OpenAI with enhanced image-aware prompt...');
     console.log('📝 System prompt preview:', systemPrompt.substring(0, 200) + '...');
-    console.log('💬 User message:', userMessage);
+    console.log('💬 Original user message:', userMessage);
+    console.log('🧹 Sanitized user message:', sanitizedUserMessage);
     
     const response = await this.client.chat.completions.create({
       model: "gpt-4o", // Use GPT-4o for best image decision making
@@ -482,14 +502,33 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
       console.log('🔄 Calling legacy AI service as fallback...');
       console.log('🎯 COORDINATION: Legacy fallback - session remains active, automatic generation blocked');
       
+      // 🧹 NEW: Sanitize the user prompt for legacy system too
+      console.log('🧹 Sanitizing user prompt for legacy fallback...');
+      const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
+      
+      let sanitizedUserMessage = userMessage;
+      try {
+        const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userMessage);
+        if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
+          sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
+          console.log('✅ Legacy fallback: Prompt sanitized successfully');
+          console.log('🔄 Legacy Original:', userMessage.substring(0, 100) + '...');
+          console.log('✨ Legacy Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
+        } else {
+          console.log('⚠️ Legacy fallback: Sanitization failed, using original prompt');
+        }
+      } catch (sanitizationError) {
+        console.warn('⚠️ Legacy fallback: Prompt sanitization error, using original prompt:', sanitizationError);
+      }
+      
       // Import AI service dynamically to avoid circular dependencies
       const { aiService } = await import('./ai-service');
       
       // 🎯 NEW: Signal that unified system (including legacy fallback) is taking over
       aiService.unifiedSystemTakingOver();
       
-      // Try legacy image generation if the content seems visual
-      const shouldTryLegacyImage = this.shouldTryLegacyImageGeneration(userMessage, aiResponse);
+      // Try legacy image generation if the content seems visual (using sanitized message)
+      const shouldTryLegacyImage = this.shouldTryLegacyImageGeneration(sanitizedUserMessage, aiResponse);
       
       if (shouldTryLegacyImage) {
         console.log('🎨 Legacy system attempting image generation...');
@@ -499,7 +538,7 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
           const recentMessages = chatHistory.slice(-6);
           
           const legacyImageResult = await aiService.generateAdventureImage(
-            userMessage,
+            sanitizedUserMessage,
             recentMessages,
             "adventure scene",
             undefined,
@@ -525,7 +564,7 @@ Remember: I'm your loyal companion - speak as "I" and refer to the student as "y
                   content: 'Image generated by legacy system',
                   metadata: {
                     imageUrl: legacyImageResult.imageUrl,
-                    prompt: legacyImageResult.usedPrompt || userMessage,
+                    prompt: legacyImageResult.usedPrompt || sanitizedUserMessage,
                     provider: 'legacy-system'
                   },
                   timestamp: Date.now()

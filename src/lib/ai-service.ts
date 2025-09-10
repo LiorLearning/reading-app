@@ -269,6 +269,25 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
       return this.getFallbackResponse(userText, userData, !!spellingQuestion);
     }
 
+    // 🧹 NEW: Sanitize the user prompt upfront for legacy AI service too
+    console.log('🧹 Legacy AI Service: Sanitizing user prompt...');
+    const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
+    
+    let sanitizedUserText = userText;
+    try {
+      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userText);
+      if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
+        sanitizedUserText = sanitizationResult.sanitizedPrompt;
+        console.log('✅ Legacy AI Service: Prompt sanitized successfully');
+        console.log('🔄 Legacy Original:', userText.substring(0, 100) + '...');
+        console.log('✨ Legacy Sanitized:', sanitizedUserText.substring(0, 100) + '...');
+      } else {
+        console.log('⚠️ Legacy AI Service: Sanitization failed, using original prompt');
+      }
+    } catch (sanitizationError) {
+      console.warn('⚠️ Legacy AI Service: Prompt sanitization error, using original prompt:', sanitizationError);
+    }
+
     // Only include spelling word if spellingQuestion is provided (for spelling mode)
     const stringSpellingWord = spellingQuestion ? spellingQuestion.audio : null;
 
@@ -281,7 +300,7 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
     while (attempt <= maxRetries) {
       try {
         console.log(`🚀 Building chat context with spelling word: ${stringSpellingWord} (attempt ${attempt + 1}/${maxRetries + 1})`);
-        const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData);
+        const messages = this.buildChatContext(chatHistory, sanitizedUserText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData);
       
       console.log('📤 Sending request to OpenAI with', messages.length, 'messages');
       const completion = await this.client.chat.completions.create({
@@ -452,7 +471,7 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
         
         // If this is the last attempt or not a spelling question, return fallback
         if (attempt >= maxRetries || !spellingQuestion) {
-          return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+          return this.getFallbackResponse(sanitizedUserText, userData, !!spellingQuestion);
         }
         
         // Otherwise, try again
@@ -463,7 +482,7 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
     }
     
     // This should never be reached, but just in case
-    return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+    return this.getFallbackResponse(sanitizedUserText, userData, !!spellingQuestion);
   }
 
   // Generate initial AI message for starting conversations
@@ -695,7 +714,7 @@ IMPORTANT: This is the very first message to start our adventure conversation. G
     }
 
     // Get recent 6 messages (both AI and user)
-    const recentMessages = userAdventure.slice(-6);
+    const recentMessages = userAdventure.slice(-10);
     
     // Get latest AI message for 20% weight
     const latestAiMessage = userAdventure.filter(msg => msg.type === 'ai').slice(-1)[0];
@@ -1327,8 +1346,8 @@ Return ONLY the new reading passage, nothing else.`;
 
       // Try primary prompt first
       try {
-        const finalPrompt = primaryPrompt.length > 400 
-          ? primaryPrompt.substring(0, 390) + "..." 
+        const finalPrompt = primaryPrompt.length > 9000 
+          ? primaryPrompt.substring(0, 8990) + "..." 
           : primaryPrompt;
         
         console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
@@ -1375,15 +1394,27 @@ Return ONLY the new reading passage, nothing else.`;
       // Try each fallback prompt option until one succeeds
       for (let i = 0; i < fallbackPrompts.length; i++) {
         try {
-          const finalPrompt = fallbackPrompts[i].length > 400 
-            ? fallbackPrompts[i].substring(0, 390) + "..." 
+          // Don't truncate AI sanitized prompts - they need to be complete
+          const isAISanitized = i === 1; // AI sanitized is now attempt 2 (index 1)
+          const maxLength = isAISanitized ? 2000 : 2000; // Allow longer prompts for AI sanitized
+          const truncateLength = isAISanitized ? 1990 : 1990;
+          
+          console.log(`🔍 Prompt ${i + 1} length check:`, {
+            isAISanitized,
+            originalLength: fallbackPrompts[i].length,
+            maxLength,
+            willTruncate: fallbackPrompts[i].length > maxLength
+          });
+          
+          const finalPrompt = fallbackPrompts[i].length > maxLength 
+            ? fallbackPrompts[i].substring(0, truncateLength) + "..." 
             : fallbackPrompts[i];
           
           // Enhanced logging to identify which attempt this is
           let promptType = '';
           if (i === 0) promptType = ' (Epic Dynamic)';
-          else if (i === 1) promptType = ' (Thrilling Safe)';
-          else if (i === 2) promptType = ' (AI Sanitized ✨)';
+          else if (i === 1) promptType = ' (AI Sanitized ✨)';
+          else if (i === 2) promptType = ' (Thrilling Safe)';
           else if (i === 3) promptType = ' (Simple Safe)';
           
           console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}${promptType}:`, finalPrompt.substring(0, 200) + '...');
@@ -1401,7 +1432,7 @@ Return ONLY the new reading passage, nothing else.`;
           const imageUrl = response.data[0]?.url;
           
           if (imageUrl) {
-            const promptType = i === 0 ? ' (Epic Dynamic)' : i === 1 ? ' (Thrilling Safe)' : i === 2 ? ' (AI Sanitized ✨)' : ' (Simple Safe)';
+            const promptType = i === 0 ? ' (Epic Dynamic)' : i === 1 ? '  (AI Sanitized ✨)' : i === 2 ? ' (Thrilling Safe)' : ' (Simple Safe)';
             console.log(`✅ Fallback DALL-E prompt ${i + 1}${promptType} succeeded! 🎉`);
             clearTimeout(safetyTimeout); // Clear safety timeout
             this.isGeneratingImage = false; // Clear generation flag
@@ -1548,12 +1579,38 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Build context from conversation for better image generation
     const conversationContext = this.buildImageGenerationContext(userAdventure);
-    console.log('Conversation context for image:', conversationContext.substring(0, 200));
+    console.log('Conversation context for image:', conversationContext.substring(0, 500));
 
     // Create exciting, adventurous images that kids will love while maintaining safety
-    const enhancedPrompt = ` Create a very realistic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
-    ${conversationContext}
-    `;
+    const enhancedPrompt = `Remove parts that make it moderated. Eliminate sexual parts if any. 
+Remove or reframe any parts that are unsafe, overly violent, gory, or sexual. 
+If the prompt includes fights, battles, or violence, rephrase it into **cinematic action scenes** with dramatic intensity 
+(e.g., energy blasts, explosions, sparks, debris, dynamic movement, or high-stakes clashes) 
+instead of graphic or bloody violence. 
+
+Style: **Ultra-realistic with vivid, lifelike details, natural lighting, accurate textures, and depth of field.** 
+Characters should look like real people (not animated or cartoonish) with appropriate facial expressions. 
+
+If the prompt refers to any real-life references, shows, video games, or movies, 
+make the characters and settings look as close and accurate to the original as possible 
+while keeping everything family-friendly.
+
+Keep all content completely family friendly:
+- No nudity, no sexual content, no sensual or romantic posing.  
+- No sexualized bodies, no sensual poses or clothing.  
+- Clothing must be **modest, age-appropriate, everyday wear**.  
+- No kissing, flirting, or adult themes.  
+- Replace gore/blood/graphic injuries with cinematic alternatives (sparks, smoke, energy fields, or dramatic destruction).  
+- Backgrounds and environments should look **real-world accurate** with natural details.  
+- From the 20% below, make sure if you find any significant characters then include them in the picture.
+ Create a **highly realistic, photorealistic, cinematic-quality image**: ${prompt}.
+ Always keep all the core elements from ${prompt}.
+
+Absolutely avoid any text in the image (no signs, labels, words, or letters).
+
+
+
+${conversationContext}`;
     
     console.log('PRIMARY adventure prompt:', enhancedPrompt);
     console.log('WEIGHTING: 60% User Input + 20% Latest AI Response + 20% Conversation History');
@@ -1588,10 +1645,78 @@ Return ONLY the new reading passage, nothing else.`;
     const prompts: string[] = [];
 
     // Fallback Option 1: Epic and dynamic cinematic adventure
-    const sanitizedEnhancedPrompt1 = `Create an epic, high-quality image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
+    const sanitizedEnhancedPrompt1 = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any.Eliminate sexual parts if any.Create a **hyper-realistic, photorealistic, cinematic-quality image**: ${prompt},the legs and chest area must be fully covered. .  
+
+Important:  
+- Reinterpret any mention of "fighting, killing, violence, blood, gore, or attack" 
+  as **cinematic action** (e.g., dramatic standoff, energy beams, sparks, explosions, 
+  powerful clash, destruction in the environment, intense movement).  
+- Never show gore, blood, or graphic injuries. Replace them with safe visual effects.  
+- Never generate cartoon, kiddish, anime, or painted styles. The result must look like a real photograph 
+  or a cinematic movie still with lifelike textures, natural lighting, and depth of field.  
+ make sure everything is covered from chest to feet with clothes not matter what and follow it strictly, as this is gonna be child friendly image.
+
+If the prompt includes real-life references, movies, shows, or games, 
+make characters and settings look as close to the original as possible while keeping everything family-friendly. **make sure you make them fully clothed even though in real life the are not, especially covering the chest area and the legs area fully but the details can be from the original costume**
+Take the following input prompt and transform it into a safe, copyright-free version. Remove or replace any copyrighted or trademarked names, characters, or brands. Instead, describe them in rich visual detail — focusing on appearance, personality, clothing, abilities, and atmosphere. Preserve the intent, mood, and style of the original, but express it as original, unique characters or objects. Make sure the final version is vivid, imaginative, and descriptive enough for image generation. Then generate the image using this transformed safe prompt.
+
+Safety rules:  
+- No nudity, no sexual content, no sensual or romantic posing.  
+- Clothing must always be modest and realistic.  
+- Backgrounds and environments must look authentic and immersive.  
+- Always include significant characters if they are part of ${conversationContext}.  
+
+Absolutely no text or written content in the image.
 
 ${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt1);
+
+    console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
+    
+
+
+    // Add AI-sanitized prompt as 4th attempt if available (highest success chance)
+    if (aiSanitizedResult?.sanitizedPrompt) {
+      console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 2! ✨');
+      // Use the sanitized context we already selected above
+//       const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
+
+// ${conversationContext}`;
+const aiSanitizedWithContext = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. 
+
+
+ make sure everything is covered from chest to feet with clothes not matter what and follow it strictly, as this is gonna be child friendly image.
+
+Style: **Ultra-realistic with vivid, lifelike details, natural lighting, accurate textures, and depth of field.** 
+Characters should look like real people (not animated or cartoonish) with appropriate facial expressions. 
+
+
+If the prompt refers to any real-life references, shows, video games, or movies, 
+make the characters and settings look as close and accurate to the original as possible 
+while keeping everything family-friendly.**make sure you make them fully clothed even though in real life the are not, especially covering the chest area and the legs area  fully but the details can be from the original costume**
+
+Keep all content completely family friendly:
+- No nudity, no sexual content, no sensual or romantic posing.  
+- No sexualized bodies, no sensual poses or clothing.  
+- Clothing must be **modest, age-appropriate, everyday wear**.  
+- No kissing, flirting, or adult themes.  
+- All environments should look **real-world accurate** with natural backgrounds, realistic colors, and authentic details.  
+- From the 20% below, make sure if you find any significant characters then include them in the picture.
+
+Create a **highly realistic, photorealistic, cinematic-quality image**: ${aiSanitizedResult.sanitizedPrompt},the legs and chest area must be fully covered.  Depict the exact scene from the prompt. 
+ Then proceed to create image. But make sure it as all the elements from ${aiSanitizedResult.sanitizedPrompt}the legs and chest area must be fully covered. .
+
+Absolutely avoid any text in the image (no signs, labels, words, or letters).
+
+${conversationContext}`;
+// Take the following input prompt and transform it into a safe, copyright-free version. Remove or replace any copyrighted or trademarked names, characters, or brands. Instead, describe them in rich visual detail — focusing on appearance, personality, clothing, abilities, and atmosphere. Preserve the intent, mood, and style of the original, but express it as original, unique characters or objects. Make sure the final version is vivid, imaginative, and descriptive enough for image generation. Then generate the image using this transformed safe prompt.
+
+      prompts.push(aiSanitizedWithContext);
+
+      console.log('Fallback prompt 2 (AI Sanitized):', aiSanitizedWithContext);
+    } else {
+      console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
+    }
 
     // Fallback Option 2: Thrilling adventure with safe content
     const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
@@ -1599,25 +1724,25 @@ ${conversationContext}`;
 ${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt2);
     
-    console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
     console.log('Fallback prompt 2 (Thrilling Safe):', sanitizedEnhancedPrompt2);
 
-    // Add AI-sanitized prompt as 4th attempt if available (highest success chance)
-    if (aiSanitizedResult?.sanitizedPrompt) {
-      console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 4! ✨');
-      // Use the sanitized context we already selected above
-      const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
+//     // Add AI-sanitized prompt as 4th attempt if available (highest success chance)
+//     if (aiSanitizedResult?.sanitizedPrompt) {
+//       console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 4! ✨');
+//       // Use the sanitized context we already selected above
+//       const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
-${conversationContext}`;
-      prompts.push(aiSanitizedWithContext);
-      console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
-    } else {
-      console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
-    }
+// ${conversationContext}`;
+//       prompts.push(aiSanitizedWithContext);
+//       console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
+//     } else {
+//       console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
+//     }
 
     // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
-      const simpleFallback = `Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
+      const simpleFallback = ` make sure everything is covered from chest to feet with clothes not matter what and follow it strictly, as this is gonna be child friendly image.
+Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
 ${conversationContext}`;
       prompts.push(simpleFallback);
