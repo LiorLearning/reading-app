@@ -4,6 +4,7 @@ import { playClickSound } from '@/lib/sounds';
 import { ttsService } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
+import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 
 interface WordPart {
@@ -68,10 +69,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [aiHint, setAiHint] = useState<string>('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
   
-  // First-time instruction state
+  // Tutorial system integration
+  const {
+    showTutorial,
+    tutorialStep,
+    needsFillInBlanksTutorial,
+    isFirstTimeAdventurer,
+    nextTutorialStep,
+    skipTutorial,
+  } = useFillInBlanksTutorial();
+
+  // Legacy first-time instruction state (for backward compatibility)
   const [showFirstTimeInstruction, setShowFirstTimeInstruction] = useState(false);
   const [hasShownFirstTimeInstruction, setHasShownFirstTimeInstruction] = useState(false);
-  // const [speakerButtonPosition, setSpeakerButtonPosition] = useState<{x: number, y: number} | null>(null);
 
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
@@ -426,6 +436,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         // Trigger confetti celebration for correct answer
         triggerConfetti();
         
+        // Complete tutorial if this is the first time
+        if (showTutorial) {
+          nextTutorialStep();
+        }
+        
         if (onComplete) {
           // Enhanced callback includes user answer
           onComplete(true, newAnswer);
@@ -511,11 +526,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   if (!isVisible || !targetWord) return null;
 
   return (
-    <div className={cn(
-      "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
-      className
-    )}>
-      <div className="spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4">
+    <>
+      {/* Tutorial overlay for first-time users */}
+      {showTutorial && (
+        <div className="tutorial-overlay" />
+      )}
+      
+      <div className={cn(
+        "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
+        className
+      )}>
+        <div className={cn(
+          "spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4",
+          showTutorial && "tutorial-spotlight",
+          showTutorial && tutorialStep === 'expand' && "tutorial-expand",
+          showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
+        )}>
         <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
 
           {/* Question text */}
@@ -960,6 +986,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           `}</style>
         </div>
 
+        {/* Tutorial message for first-time users */}
+        {showTutorial && tutorialStep === 'expand' && (
+          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg z-50">
+            <div className="text-center">
+              <div className="text-xs opacity-90 mb-1">✨ First Adventure Tutorial ✨</div>
+              <div>Fill in the blanks to spell the word!</div>
+            </div>
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-purple-600"></div>
+          </div>
+        )}
+
         {/* First-time instruction overlay - pointing finger functionality commented out */}
         {/*
         showFirstTimeInstruction && (
@@ -1053,6 +1090,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         */}
       </div>
     </div>
+    </>
   );
 };
 

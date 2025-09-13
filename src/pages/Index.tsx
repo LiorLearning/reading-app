@@ -48,6 +48,7 @@ import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-mi
 import { getRandomSpellingQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
+import { useTutorial } from "@/hooks/use-tutorial";
 
 
 // Legacy user data interface for backwards compatibility
@@ -170,6 +171,9 @@ const PanelOneLinerFigure: React.FC<{
 const Index = () => {
   // Firebase auth integration - must be at the top
   const { user, userData, signOut } = useAuth();
+  
+  // Tutorial system integration
+  const { isFirstTimeAdventurer, completeAdventureTutorial } = useTutorial();
   
   // NEW: Unified AI streaming system status
   const { isUnifiedSystemReady, hasImageGeneration } = useUnifiedAIStatus();
@@ -2310,6 +2314,12 @@ const Index = () => {
       setCanAccessQuestions(false);
       setIsRetryMode(false);
       setRetryQuestionIndex(0);
+      
+      // Complete adventure tutorial for first-time users
+      if (isFirstTimeAdventurer) {
+        completeAdventureTutorial();
+        console.log('🎓 Completed adventure tutorial for first-time user');
+      }
       
       console.log('🚀 Started new adventure with default rocket image and reset all flow states');
     } else {
