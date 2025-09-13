@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService } from '@/lib/tts-service';
+import { voiceAgentService } from '@/lib/voice-agent-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
 import confetti from 'canvas-confetti';
@@ -67,6 +68,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [attempts, setAttempts] = useState(0);
   const [aiHint, setAiHint] = useState<string>('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
+  const [hasVoiceFeedback, setHasVoiceFeedback] = useState(false);
   
   // First-time instruction state
   const [showFirstTimeInstruction, setShowFirstTimeInstruction] = useState(false);
@@ -271,17 +273,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   //   }
   // }, []);
 
-  // Generate AI hint for incorrect spelling
+  // Generate AI hint for incorrect spelling (simplified - voice agent handles teaching)
   const generateAIHint = useCallback(async (incorrectAttempt: string) => {
     if (!targetWord || !incorrectAttempt) return;
     
     setIsGeneratingHint(true);
     try {
-      const hint = await aiService.generateSpellingHint(targetWord, incorrectAttempt);
-      setAiHint(hint);
+      // Simple fallback hint - voice agent will provide the main teaching
+      setAiHint(`Let me help you learn the correct spelling of "${targetWord}"!`);
     } catch (error) {
       console.error('Error generating AI hint:', error);
-      setAiHint(`That's close! Try thinking about the sounds in "${targetWord}". What letters make those sounds?`);
+      setAiHint(`Let me help you learn the correct spelling!`);
     } finally {
       setIsGeneratingHint(false);
     }
@@ -414,8 +416,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   }, [audioText, targetWord, messageId, isSpeaking]);
 
   // Handle answer change
-  const handleAnswerChange = useCallback((newAnswer: string) => {
+  const handleAnswerChange = useCallback(async (newAnswer: string) => {
     setUserAnswer(newAnswer);
+    
+    // Reset voice feedback when user starts typing a new answer
+    if (newAnswer.length < userAnswer.length) {
+      setHasVoiceFeedback(false);
+    }
     
     if (isWordComplete(newAnswer, targetWord.length)) {
       const correct = isWordCorrect(newAnswer, targetWord);
@@ -433,12 +440,27 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       } else {
         // Generate AI hint for incorrect answer
         generateAIHint(newAnswer);
+        
+        // Trigger voice agent for incorrect spelling (every incorrect attempt)
+        try {
+          console.log('🎓 SpellBox: Triggering voice agent for incorrect spelling');
+          await voiceAgentService.handleIncorrectAnswer(
+            question?.id?.toString() || 'spellbox-' + targetWord,
+            targetWord,
+            newAnswer,
+            questionText || `Spell the word: ${targetWord}`
+          );
+          setHasVoiceFeedback(true);
+          console.log('🎓 SpellBox: Voice feedback state set to true');
+        } catch (error) {
+          console.error('Error triggering voice agent for spelling:', error);
+        }
       }
     } else {
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isWordComplete, isWordCorrect, triggerConfetti, generateAIHint]);
+  }, [targetWord, onComplete, isWordComplete, isWordCorrect, triggerConfetti, generateAIHint, question?.id, questionText, hasVoiceFeedback, userAnswer]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
@@ -461,6 +483,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setAttempts(0);
     setAiHint('');
     setIsGeneratingHint(false);
+    setHasVoiceFeedback(false); // Reset voice feedback state
   }, [targetWord]);
 
   // Play instruction audio when first-time instruction shows
@@ -881,6 +904,47 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                       }}
                     >
                       🔊
+                    </button>
+                  )}
+                  
+                  {/* Voice Agent Replay Button - only show for incorrect answers with voice feedback */}
+                  {console.log('🎓 SpellBox: hasVoiceFeedback =', hasVoiceFeedback, 'should show replay button:', hasVoiceFeedback)}
+                  {hasVoiceFeedback && (
+                    <button
+                      onClick={async () => {
+                        playClickSound();
+                        console.log('🔄 Replay button clicked');
+                        await voiceAgentService.replayLastSpoken();
+                      }}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                        color: 'white',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+                        transition: 'all 0.15s ease-out',
+                        opacity: 0.8,
+                        flexShrink: 0,
+                        marginLeft: '4px'
+                      }}
+                      title="Replay AI Voice Teaching"
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)';
+                        e.currentTarget.style.opacity = '1';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.opacity = '0.8';
+                      }}
+                    >
+                      🔄
                     </button>
                   )}
                 </div>

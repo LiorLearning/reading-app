@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X, ChevronRight, Volume2 } from 'lucide-react';
+import { Check, X, ChevronRight, Volume2, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { playClickSound, playMessageSound } from '@/lib/sounds';
+import { voiceAgentService } from '@/lib/voice-agent-service';
 
 interface MCQQuestion {
   id: number;
@@ -46,8 +47,9 @@ const MCQComponent: React.FC<MCQComponentProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [hasVoiceFeedback, setHasVoiceFeedback] = useState(false);
 
-  const handleAnswerSelect = useCallback((optionIndex: number) => {
+  const handleAnswerSelect = useCallback(async (optionIndex: number) => {
     if (isAnswered) return; // Prevent changing answer after submission
     
     playClickSound();
@@ -62,11 +64,31 @@ const MCQComponent: React.FC<MCQComponentProps> = ({
       playMessageSound();
     }, 300);
     
+    // Trigger voice agent for incorrect answers
+    if (!isCorrect) {
+      try {
+        const correctAnswer = question.options[question.correctAnswer];
+        const userAnswer = question.options[optionIndex];
+        const questionContext = question.questionText;
+        
+        // Trigger voice agent with teaching response
+        await voiceAgentService.handleIncorrectAnswer(
+          question.id.toString(),
+          correctAnswer,
+          userAnswer,
+          questionContext
+        );
+        setHasVoiceFeedback(true);
+      } catch (error) {
+        console.error('Error triggering voice agent:', error);
+      }
+    }
+    
     // Call parent callback if provided
     if (onAnswerComplete) {
       onAnswerComplete(question.id, isCorrect, optionIndex);
     }
-  }, [isAnswered, question.correctAnswer, question.id, onAnswerComplete]);
+  }, [isAnswered, question.correctAnswer, question.id, question.options, question.questionText, onAnswerComplete]);
 
   const handleNextQuestion = useCallback(() => {
     playClickSound();
@@ -284,6 +306,24 @@ const MCQComponent: React.FC<MCQComponentProps> = ({
             <p className="text-lg text-gray-700 mb-4">
               {question.explanation}
             </p>
+            
+            {/* Voice Agent Replay Button - only show for incorrect answers with voice feedback */}
+            {selectedAnswer !== question.correctAnswer && hasVoiceFeedback && voiceAgentService.hasLastSpokenText() && (
+              <div className="mb-4">
+                <Button
+                  onClick={async () => {
+                    playClickSound();
+                    await voiceAgentService.replayLastSpoken();
+                  }}
+                  variant="outline"
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 px-4 py-2 rounded-lg border-2 border-black font-medium"
+                  style={{ boxShadow: '0 2px 0 black' }}
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Replay AI Voice
+                </Button>
+              </div>
+            )}
             
             {showNextButton && (
               <Button

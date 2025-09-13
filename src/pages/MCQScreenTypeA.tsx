@@ -7,6 +7,7 @@ import ChatAvatar from "@/components/comic/ChatAvatar";
 import InputBar from "@/components/comic/InputBar";
 import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
+import { voiceAgentService } from "@/lib/voice-agent-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import TopicComplete from "./TopicComplete";
 import PracticeNeeded from "./PracticeNeeded";
@@ -501,6 +502,23 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     } else {
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying other options
+      
+      // Trigger voice agent for incorrect answers
+      try {
+        const correctAnswer = (currentQuestion as MCQQuestion).options[Number(currentQuestion.correctAnswer)];
+        const userAnswer = (currentQuestion as MCQQuestion).options[answerIndex];
+        const questionContext = displayQuestionText;
+        
+        // Trigger voice agent with teaching response
+        await voiceAgentService.handleIncorrectAnswer(
+          currentQuestion.id.toString(),
+          correctAnswer,
+          userAnswer,
+          questionContext
+        );
+      } catch (error) {
+        console.error('Error triggering voice agent:', error);
+      }
       
       try {
         // Generate AI reflection response using the question context

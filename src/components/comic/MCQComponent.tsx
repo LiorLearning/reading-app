@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Volume2, ChevronRight } from 'lucide-react';
+import { Volume2, ChevronRight, RotateCcw } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
+import { voiceAgentService } from '@/lib/voice-agent-service';
 
 // Types for the MCQ structure
 interface AIHook {
@@ -65,6 +66,7 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
   const [score, setScore] = useState<number>(0);
   const [questionsAnswered, setQuestionsAnswered] = useState<number>(0);
   const [isReading, setIsReading] = useState<boolean>(false);
+  const [hasVoiceFeedback, setHasVoiceFeedback] = useState<boolean>(false);
 
   // Load MCQ data from JSON
   useEffect(() => {
@@ -103,7 +105,7 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
     : null;
 
   // Handle option selection
-  const handleOptionSelect = useCallback((optionIndex: number) => {
+  const handleOptionSelect = useCallback(async (optionIndex: number) => {
     if (isAnswered) return;
     
     playClickSound();
@@ -117,6 +119,26 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
     }
     
     setQuestionsAnswered(prev => prev + 1);
+    
+    // Trigger voice agent for incorrect answers
+    if (!isCorrect && currentQuestion) {
+      try {
+        const correctAnswer = currentQuestion.options[currentQuestion.correctAnswer];
+        const userAnswer = currentQuestion.options[optionIndex];
+        const questionContext = currentQuestion.questionText;
+        
+        // Trigger voice agent with teaching response
+        await voiceAgentService.handleIncorrectAnswer(
+          currentQuestion.id.toString(),
+          correctAnswer,
+          userAnswer,
+          questionContext
+        );
+        setHasVoiceFeedback(true);
+      } catch (error) {
+        console.error('Error triggering voice agent:', error);
+      }
+    }
     
     // Notify parent component
     if (onQuestionAnswered && currentQuestion) {
@@ -345,6 +367,24 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
               </p>
               <p className="text-white text-lg">{currentQuestion.explanation}</p>
             </div>
+            
+            {/* Voice Agent Replay Button - only show for incorrect answers with voice feedback */}
+            {selectedAnswer !== currentQuestion.correctAnswer && hasVoiceFeedback && voiceAgentService.hasLastSpokenText() && (
+              <div className="mb-4">
+                <Button
+                  onClick={async () => {
+                    playClickSound();
+                    await voiceAgentService.replayLastSpoken();
+                  }}
+                  variant="outline"
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300 px-4 py-2 rounded-lg border-2 border-black font-medium"
+                  style={{ boxShadow: '0 2px 0 black' }}
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Replay AI Voice
+                </Button>
+              </div>
+            )}
             
             {currentQuestionNumber < totalQuestions ? (
               <Button
