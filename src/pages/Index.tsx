@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection } from "@/lib/utils";
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
@@ -302,7 +302,11 @@ const Index = () => {
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
   const [selectedTopicFromPreference, setSelectedTopicFromPreference] = React.useState<string | null>(null);
-  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(null);
+  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(() => {
+    // Load saved grade selection on initialization
+    const savedGrade = loadGradeSelection();
+    return savedGrade?.gradeDisplayName || null;
+  });
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   // Automatic Flow Control System
@@ -675,6 +679,15 @@ const Index = () => {
     changeTheme(selectedTheme);
   }, [selectedTheme, changeTheme]);
   
+  // Ensure grade selection is loaded from localStorage on mount
+  useEffect(() => {
+    const savedGrade = loadGradeSelection();
+    if (savedGrade && !selectedGradeFromDropdown) {
+      console.log(`🔄 Loading saved grade selection on mount: ${savedGrade.gradeDisplayName}`);
+      setSelectedGradeFromDropdown(savedGrade.gradeDisplayName);
+    }
+  }, []); // Run once on mount
+
   // Grade selection logic (for HomePage only)
   useEffect(() => {
     if (userData && currentScreen === -1) { // Only on HomePage
@@ -701,12 +714,16 @@ const Index = () => {
       setSelectedPreference(preferenceLevel);
       
       // Initialize the combined grade and level selection for proper highlighting
-      if (preferenceLevel && userData?.gradeDisplayName) {
+      // Use saved grade selection if available, otherwise fall back to userData
+      const savedGrade = loadGradeSelection();
+      const gradeToUse = savedGrade?.gradeDisplayName || userData?.gradeDisplayName;
+      
+      if (preferenceLevel && gradeToUse) {
         setSelectedGradeAndLevel({ 
-          grade: userData.gradeDisplayName, 
+          grade: gradeToUse, 
           level: preferenceLevel 
         });
-        console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
+        console.log('Initialized selectedGradeAndLevel:', { grade: gradeToUse, level: preferenceLevel, source: savedGrade ? 'localStorage' : 'Firebase' });
       }
       
       // First, check if there's a current topic saved from previous selection
@@ -1378,7 +1395,9 @@ const Index = () => {
         
         try {
           // Get current spelling question for context
-          const currentSpellingQuestion = getRandomSpellingQuestion();
+          // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
+          const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+          const currentSpellingQuestion = getRandomSpellingQuestion(currentGrade);
           
           // Send message through unified system for image generation
           const unifiedResponse = await unifiedAIStreaming.sendMessage(
@@ -1713,7 +1732,15 @@ const Index = () => {
         
         // Implement 3-3 pattern: 3 pure adventure messages, then 3 with spelling questions
         const isSpellingPhase = messageCycleCount >= 3; // Messages 3, 4, 5 have spelling
-        const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion() : null;
+        // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
+        const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
+        
+        // Additional debug info
+        const savedGradeFromStorage = loadGradeSelection();
+        console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
+        console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
+        const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion(currentGrade) : null;
         
         console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
         
@@ -2321,6 +2348,8 @@ const Index = () => {
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
+      // Save grade selection to localStorage for persistence
+      saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
     }

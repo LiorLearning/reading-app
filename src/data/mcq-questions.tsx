@@ -21035,7 +21035,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'bed'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_bed"
+          audio: "bed"
         },
         {
           id: 2,
@@ -21060,7 +21060,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'sheet'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_sheet"
+          audio: "sheet"
         },
         {
           id: 3,
@@ -21085,7 +21085,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'pet'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_pet"
+          audio: "pet"
         },
         {
           id: 4,
@@ -21110,7 +21110,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'feet'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_feet"
+          audio: "feet"
         },
         {
           id: 5,
@@ -21135,7 +21135,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'pen'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_pen"
+          audio: "pen"
         },
         {
           id: 6,
@@ -21160,7 +21160,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'beet'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_beet"
+          audio: "beet"
         },
         {
           id: 7,
@@ -21185,7 +21185,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'net'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_net"
+          audio: "net"
         },
         {
           id: 8,
@@ -21210,7 +21210,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'meet'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_meet"
+          audio: "meet"
         },
         {
           id: 9,
@@ -21235,7 +21235,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'bet'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_bet"
+          audio: "bet"
         },
         {
           id: 10,
@@ -21260,7 +21260,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Which picture matches the word 'seal'?",
             imagePrompt: "Educational scene showing match the short e and long e words to pictures concepts"
           },
-          audio: "image_of_seal"
+          audio: "seal"
         }
       ]
     },
@@ -22340,7 +22340,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: cl__",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ue"
+          audio: "clue"
         },
         {
           id: 2,
@@ -22365,7 +22365,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: fr__ze",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ee"
+          audio: "freeze"
         },
         {
           id: 3,
@@ -22390,7 +22390,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: s__k",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "oa"
+          audio: "soak"
         },
         {
           id: 4,
@@ -22415,7 +22415,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: tr__n",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ai"
+          audio: "train"
         },
         {
           id: 5,
@@ -22440,7 +22440,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: l__f",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ea"
+          audio: "leaf"
         },
         {
           id: 6,
@@ -22465,7 +22465,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: b__t",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "oa"
+          audio: "boat"
         },
         {
           id: 7,
@@ -22490,7 +22490,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: ch__f",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ie"
+          audio: "chief"
         },
         {
           id: 8,
@@ -22515,7 +22515,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: s__t",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ui"
+          audio: "suit"
         },
         {
           id: 9,
@@ -22540,7 +22540,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: c__n",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "oi"
+          audio: "coin"
         },
         {
           id: 10,
@@ -22565,7 +22565,7 @@ export const sampleMCQData: MCQData = {
             questionLine: "Complete the word: t__m",
             imagePrompt: "Educational scene showing complete the word with the correct vowel team concepts"
           },
-          audio: "ea"
+          audio: "team"
         }
       ]
     },

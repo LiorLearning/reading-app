@@ -1,4 +1,5 @@
 import { sampleMCQData } from '@/data/mcq-questions';
+import { mapSelectedGradeToContentGrade } from './utils';
 
 // Interface for spelling question data
 export interface SpellingQuestion {
@@ -57,14 +58,38 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
 };
 
 /**
- * Get a random spelling question from the question bank
+ * Get a random spelling question from the question bank, optionally filtered by grade
  */
-export const getRandomSpellingQuestion = (): SpellingQuestion | null => {
-  const spellingQuestions = getAllSpellingQuestions();
-  console.log('🎲 Available spelling questions:', spellingQuestions.length);
+export const getRandomSpellingQuestion = (gradeDisplayName?: string): SpellingQuestion | null => {
+  const allSpellingQuestions = getAllSpellingQuestions();
+  console.log('🎲 Total available spelling questions:', allSpellingQuestions.length);
+  console.log('🎓 Grade display name received:', gradeDisplayName);
   
-  if (spellingQuestions.length === 0) {
+  if (allSpellingQuestions.length === 0) {
     return null;
+  }
+  
+  let spellingQuestions = allSpellingQuestions;
+  
+  // Filter by grade if provided
+  if (gradeDisplayName) {
+    // Use the existing utility function to map display name to content grade
+    const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+    
+    // Filter questions by grade prefix
+    const gradeFilteredQuestions = allSpellingQuestions.filter(question => {
+      return question.topicId.startsWith(`${contentGrade}-`);
+    });
+    
+    console.log(`🎯 Grade filtering - Display: ${gradeDisplayName} → Content: ${contentGrade}`);
+    console.log(`🔍 Filtered spelling questions for grade ${contentGrade}:`, gradeFilteredQuestions.length);
+    
+    // Use filtered questions if available, otherwise fall back to all questions
+    if (gradeFilteredQuestions.length > 0) {
+      spellingQuestions = gradeFilteredQuestions;
+    } else {
+      console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
+    }
   }
   
   const randomIndex = Math.floor(Math.random() * spellingQuestions.length);
@@ -72,9 +97,11 @@ export const getRandomSpellingQuestion = (): SpellingQuestion | null => {
   
   console.log('🎯 Selected spelling question:', {
     id: selectedQuestion.id,
+    topicId: selectedQuestion.topicId,
     word: selectedQuestion.word,
     audio: selectedQuestion.audio,
-    questionText: selectedQuestion.questionText
+    questionText: selectedQuestion.questionText,
+    gradeFilter: gradeDisplayName || 'none'
   });
   
   return selectedQuestion;

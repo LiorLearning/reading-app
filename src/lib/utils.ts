@@ -674,9 +674,15 @@ export const getTopicScore = (topicId: string): number | null => {
 
 // Topic preference storage for grade level selection
 const TOPIC_PREFERENCE_KEY = 'readingapp_topic_preference';
+const GRADE_SELECTION_KEY = 'readingapp_grade_selection';
 
 export interface TopicPreference {
   level: 'start' | 'middle';
+  lastSelected: number;
+}
+
+export interface GradeSelection {
+  gradeDisplayName: string;
   lastSelected: number;
 }
 
@@ -756,6 +762,51 @@ export const loadTopicPreference = (): TopicPreference | null => {
     return null;
   } catch (error) {
     console.warn('Failed to load topic preference from local storage:', error);
+    return null;
+  }
+};
+
+/**
+ * Save user's grade selection preference
+ */
+export const saveGradeSelection = (gradeDisplayName: string): void => {
+  try {
+    const gradeSelection: GradeSelection = {
+      gradeDisplayName,
+      lastSelected: Date.now()
+    };
+    localStorage.setItem(GRADE_SELECTION_KEY, JSON.stringify(gradeSelection));
+    console.log(`💾 Saved grade selection: ${gradeDisplayName}`);
+  } catch (error) {
+    console.warn('Failed to save grade selection to local storage:', error);
+  }
+};
+
+/**
+ * Load user's grade selection preference
+ */
+export const loadGradeSelection = (): GradeSelection | null => {
+  try {
+    const stored = localStorage.getItem(GRADE_SELECTION_KEY);
+    if (!stored) {
+      return null;
+    }
+    
+    const parsed = JSON.parse(stored);
+    
+    if (
+      typeof parsed === 'object' && 
+      parsed !== null &&
+      typeof parsed.gradeDisplayName === 'string' &&
+      typeof parsed.lastSelected === 'number'
+    ) {
+      console.log(`📖 Loaded grade selection: ${parsed.gradeDisplayName}`);
+      return parsed as GradeSelection;
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Failed to load grade selection from local storage:', error);
     return null;
   }
 };
