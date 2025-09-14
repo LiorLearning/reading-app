@@ -509,6 +509,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         const userAnswer = (currentQuestion as MCQQuestion).options[answerIndex];
         const questionContext = displayQuestionText;
         
+        console.log('🎓 MCQScreenTypeA: Triggering voice agent for incorrect MCQ answer');
+        console.log('🎓 Question ID:', currentQuestion.id.toString());
+        console.log('🎓 Correct Answer:', correctAnswer);
+        console.log('🎓 User Answer:', userAnswer);
+        console.log('🎓 Question Context:', questionContext);
+        
         // Trigger voice agent with teaching response
         await voiceAgentService.handleIncorrectAnswer(
           currentQuestion.id.toString(),
@@ -516,8 +522,10 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
           userAnswer,
           questionContext
         );
+        
+        console.log('✅ MCQScreenTypeA: Voice agent successfully triggered');
       } catch (error) {
-        console.error('Error triggering voice agent:', error);
+        console.error('❌ MCQScreenTypeA: Error triggering voice agent:', error);
       }
       
       try {
@@ -546,18 +554,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       } catch (error) {
         console.error('Error generating reflection prompt:', error);
-        
-        // Fallback to a simple message if AI fails
-        const fallbackMessage = {
-          type: 'ai' as const,
-          content: `🤔 Great effort on this ${currentQuestion.topicName.replace(/_/g, ' ').toLowerCase()} question! Can you tell me what made you choose "${(currentQuestion as MCQQuestion).options[answerIndex]}"? Let's look at the question again together.`,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages((prev: any) => [...prev, fallbackMessage]);
-        playMessageSound();
-        const fallbackMessageId = `mcq-chat-${fallbackMessage.timestamp}-${chatMessages.length}`;
-        await ttsService.speakAIMessage(fallbackMessage.content, fallbackMessageId);
+        console.log('🚫 MCQScreenTypeA: Removed fallback TTS - relying on voice agent only');
       }
       
       // Clear the wrong answer visual feedback after a brief moment
@@ -674,18 +671,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         await ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       } catch (error) {
         console.error('Error generating reflection prompt for fill-blank:', error);
-        
-        // Fallback to a simple message if AI fails
-        const fallbackMessage = {
-          type: 'ai' as const,
-          content: `🌟 Nice try with your ${currentQuestion.topicName.replace(/_/g, ' ').toLowerCase()} work! Can you think about what sounds you hear when you say "${fillBlankAnswer.trim()}"? What other word might fit better here?`,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages((prev: any) => [...prev, fallbackMessage]);
-        playMessageSound();
-        const fallbackMessageId = `mcq-chat-${fallbackMessage.timestamp}-${chatMessages.length}`;
-        await ttsService.speakAIMessage(fallbackMessage.content, fallbackMessageId);
+        console.log('🚫 MCQScreenTypeA: Removed fallback TTS for fill-blank - relying on voice agent only');
       }
       
       // Clear the wrong answer after a brief moment
@@ -830,6 +816,11 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       playMessageSound();
     }
   }, [currentQuestion, hintCount, setChatMessages, loadUserAdventure]);
+
+  // Add message directly to chat (for immediate feedback during transcription)
+  const onAddMessage = useCallback((message: { type: 'user' | 'ai'; content: string; timestamp: number }) => {
+    setChatMessages(prev => [...prev, message]);
+  }, [setChatMessages]);
 
   // Wrapper for onGenerate to handle reflection mode and help requests
   const handleGenerate = useCallback(async (text: string) => {
@@ -1590,18 +1581,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
         await ttsService.speakAIMessage(hintMessage.content, hintMessageId);
       } catch (error) {
         console.error('Error generating reflection prompt for drag-drop:', error);
-        
-        // Fallback to a simple message if AI fails
-        const fallbackMessage = {
-          type: 'ai' as const,
-          content: `🤔 Interesting sorting work on ${currentQuestion.topicName.replace(/_/g, ' ').toLowerCase()}! Can you tell me what rule you're using to sort these words? What sounds do you hear in each word?`,
-          timestamp: Date.now()
-        };
-        
-        setChatMessages((prev: any) => [...prev, fallbackMessage]);
-        playMessageSound();
-        const fallbackMessageId = `mcq-chat-${fallbackMessage.timestamp}-${chatMessages.length}`;
-        await ttsService.speakAIMessage(fallbackMessage.content, fallbackMessageId);
+        console.log('🚫 MCQScreenTypeA: Removed fallback TTS for drag-drop - relying on voice agent only');
       }
       
       // Allow retry
@@ -2457,7 +2437,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                   
                   {/* Input Bar */}
                   <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                    <InputBar onGenerate={handleGenerate} onGenerateImage={onGenerateImage} />
+                    <InputBar onGenerate={handleGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
                   </div>
                 </>
               )}

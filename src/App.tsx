@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
+import ElevenLabsVoiceAgent from "@/components/ElevenLabsVoiceAgent";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -19,6 +20,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <CameraWidget />
+          <ElevenLabsVoiceAgent />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={
