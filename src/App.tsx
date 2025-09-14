@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
+import { VoiceAgentTest } from "@/components/VoiceAgentTest";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -24,6 +25,11 @@ const App = () => (
               <Route path="/" element={
                 <AuthGuard>
                   <Index />
+                </AuthGuard>
+              } />
+              <Route path="/voice-test" element={
+                <AuthGuard>
+                  <VoiceAgentTest />
                 </AuthGuard>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

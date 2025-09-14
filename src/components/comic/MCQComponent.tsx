@@ -1,53 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Volume2, ChevronRight } from 'lucide-react';
+import { Volume2, ChevronRight, Mic } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
-
-// Types for the MCQ structure
-interface AIHook {
-  targetWord: string;
-  intent: string;
-  questionLine: string;
-  imagePrompt: string;
-}
-
-interface MCQQuestion {
-  id: number;
-  topicId: string;
-  topicName: string;
-  questionElements: string;
-  answerElements: string;
-  templateType: string;
-  word: string;
-  imageUrl: string | null;
-  explanation: string;
-  questionText: string;
-  options: string[];
-  correctAnswer: number;
-  template: string;
-  isSpacing: boolean;
-  isSorting: boolean;
-  isSpelling: boolean;
-  aiHook: AIHook;
-}
-
-interface TopicInfo {
-  topicId: string;
-  topicName: string;
-  questionElements: string;
-  answerElements: string;
-  templateType: string;
-}
-
-interface Topic {
-  topicInfo: TopicInfo;
-  questions: MCQQuestion[];
-}
-
-interface MCQData {
-  topics: Record<string, Topic>;
-}
+import { useVoiceFeedback } from '@/hooks/use-voice-feedback';
+import type { MCQData, MCQQuestion, Topic } from '@/data/mcq-questions';
 
 interface MCQComponentProps {
   onComplete?: (score: number, total: number) => void;
@@ -65,15 +22,22 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
   const [score, setScore] = useState<number>(0);
   const [questionsAnswered, setQuestionsAnswered] = useState<number>(0);
   const [isReading, setIsReading] = useState<boolean>(false);
+  
+  // Voice feedback integration
+  const { triggerIncorrectAnswerFeedback, isConnected } = useVoiceFeedback({
+    onConnect: () => console.log('Voice feedback connected for comic MCQ'),
+    onDisconnect: () => console.log('Voice feedback disconnected for comic MCQ'),
+    onError: (error) => console.error('Voice feedback error in comic MCQ:', error)
+  });
 
   // Load MCQ data from JSON
   useEffect(() => {
     const loadMCQData = async () => {
       try {
         // Try importing directly from src first
-        const data = await import('../../data/mcq-questions.json');
-        setMcqData(data.default || data);
-        const firstTopicId = Object.keys((data.default || data).topics)[0];
+        const data = await import('@/data/mcq-questions');
+        setMcqData(data.sampleMCQData);
+        const firstTopicId = Object.keys(data.sampleMCQData.topics)[0];
         setCurrentTopicId(firstTopicId);
       } catch (error) {
         console.error('Error loading MCQ data:', error);
@@ -93,9 +57,9 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
     loadMCQData();
   }, []);
 
-  // Get current question
+  // Get current question (filter for MCQ questions only)
   const currentQuestion = mcqData && currentTopicId 
-    ? mcqData.topics[currentTopicId]?.questions[currentQuestionIndex]
+    ? mcqData.topics[currentTopicId]?.questions[currentQuestionIndex] as MCQQuestion | undefined
     : null;
 
   const currentTopic = mcqData && currentTopicId 
@@ -103,17 +67,49 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
     : null;
 
   // Handle option selection
-  const handleOptionSelect = useCallback((optionIndex: number) => {
-    if (isAnswered) return;
+  const handleOptionSelect = useCallback(async (optionIndex: number) => {
+    if (isAnswered || !currentQuestion || !currentQuestion.options) return;
     
     playClickSound();
     setSelectedAnswer(optionIndex);
     setIsAnswered(true);
     setShowFeedback(true);
     
-    const isCorrect = optionIndex === currentQuestion?.correctAnswer;
+    const isCorrect = optionIndex === currentQuestion.correctAnswer;
     if (isCorrect) {
       setScore(prev => prev + 1);
+    } else {
+      // Log incorrect attempts and trigger voice feedback
+      if (currentQuestion) {
+        const userAnswer = currentQuestion.options[optionIndex];
+        const correctAnswer = currentQuestion.options[currentQuestion.correctAnswer];
+        const questionText = currentQuestion.questionText;
+        
+        // Console log the incorrect attempt
+        console.log('❌ Incorrect Answer Detected (Comic MCQ):', {
+          questionId: currentQuestion.id,
+          questionText: questionText,
+          userAnswer: userAnswer,
+          correctAnswer: correctAnswer,
+          timestamp: new Date().toISOString()
+        });
+        
+        try {
+          await triggerIncorrectAnswerFeedback(userAnswer, correctAnswer, questionText);
+        } catch (error) {
+          console.error('Failed to trigger voice feedback:', error);
+        }
+      }
+    }
+    
+    // Log correct attempts too
+    if (isCorrect && currentQuestion) {
+      console.log('✅ Correct Answer (Comic MCQ):', {
+        questionId: currentQuestion.id,
+        questionText: currentQuestion.questionText,
+        userAnswer: currentQuestion.options[optionIndex],
+        timestamp: new Date().toISOString()
+      });
     }
     
     setQuestionsAnswered(prev => prev + 1);
@@ -122,7 +118,7 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
     if (onQuestionAnswered && currentQuestion) {
       onQuestionAnswered(currentQuestion.id, isCorrect);
     }
-  }, [isAnswered, currentQuestion, onQuestionAnswered]);
+  }, [isAnswered, currentQuestion, onQuestionAnswered, triggerIncorrectAnswerFeedback]);
 
   // Handle next question
   const handleNextQuestion = useCallback(() => {
@@ -344,6 +340,12 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
                 {selectedAnswer === currentQuestion.correctAnswer ? "Correct! 🎉" : "Try again! 😊"}
               </p>
               <p className="text-white text-lg">{currentQuestion.explanation}</p>
+              {selectedAnswer !== currentQuestion.correctAnswer && isConnected && (
+                <div className="flex items-center justify-center gap-1 mt-2">
+                  <Mic className="h-4 w-4 text-white" />
+                  <span className="text-sm text-white">Voice feedback active</span>
+                </div>
+              )}
             </div>
             
             {currentQuestionNumber < totalQuestions ? (

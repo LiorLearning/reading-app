@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, X, ChevronRight, Volume2 } from 'lucide-react';
+import { Check, X, ChevronRight, Volume2, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { playClickSound, playMessageSound } from '@/lib/sounds';
+import { useVoiceFeedback } from '@/hooks/use-voice-feedback';
 
 interface MCQQuestion {
   id: number;
@@ -46,8 +47,15 @@ const MCQComponent: React.FC<MCQComponentProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
+  
+  // Voice feedback integration
+  const { triggerIncorrectAnswerFeedback, isConnected } = useVoiceFeedback({
+    onConnect: () => console.log('Voice feedback connected for MCQ'),
+    onDisconnect: () => console.log('Voice feedback disconnected for MCQ'),
+    onError: (error) => console.error('Voice feedback error in MCQ:', error)
+  });
 
-  const handleAnswerSelect = useCallback((optionIndex: number) => {
+  const handleAnswerSelect = useCallback(async (optionIndex: number) => {
     if (isAnswered) return; // Prevent changing answer after submission
     
     playClickSound();
@@ -62,11 +70,41 @@ const MCQComponent: React.FC<MCQComponentProps> = ({
       playMessageSound();
     }, 300);
     
+    // Log incorrect attempts and trigger voice feedback
+    if (!isCorrect) {
+      const userAnswer = question.options[optionIndex];
+      const correctAnswer = question.options[question.correctAnswer];
+      const questionText = question.questionText;
+      
+      // Console log the incorrect attempt
+      console.log('❌ Incorrect Answer Detected:', {
+        questionId: question.id,
+        questionText: questionText,
+        userAnswer: userAnswer,
+        correctAnswer: correctAnswer,
+        timestamp: new Date().toISOString()
+      });
+      
+      try {
+        await triggerIncorrectAnswerFeedback(userAnswer, correctAnswer, questionText);
+      } catch (error) {
+        console.error('Failed to trigger voice feedback:', error);
+      }
+    } else {
+      // Log correct attempts too
+      console.log('✅ Correct Answer:', {
+        questionId: question.id,
+        questionText: question.questionText,
+        userAnswer: question.options[optionIndex],
+        timestamp: new Date().toISOString()
+      });
+    }
+    
     // Call parent callback if provided
     if (onAnswerComplete) {
       onAnswerComplete(question.id, isCorrect, optionIndex);
     }
-  }, [isAnswered, question.correctAnswer, question.id, onAnswerComplete]);
+  }, [isAnswered, question.correctAnswer, question.id, question.options, question.questionText, onAnswerComplete, triggerIncorrectAnswerFeedback]);
 
   const handleNextQuestion = useCallback(() => {
     playClickSound();
@@ -276,6 +314,12 @@ const MCQComponent: React.FC<MCQComponentProps> = ({
                   <div>
                     <h3 className="text-xl font-bold text-red-800">Try Again!</h3>
                     <p className="text-red-700">Keep learning! 📚</p>
+                    {isConnected && (
+                      <div className="flex items-center justify-center gap-1 mt-1">
+                        <Mic className="h-3 w-3 text-red-600" />
+                        <span className="text-xs text-red-600">Voice feedback active</span>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
