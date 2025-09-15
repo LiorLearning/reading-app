@@ -7,6 +7,12 @@ import { loadAdventureSummariesHybrid } from '@/lib/firebase-adventure-cache';
 import { useAuth } from '@/hooks/use-auth';
 import { PetSelectionFlow } from '@/components/PetSelectionFlow';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
+import { GraduationCap, ChevronDown } from 'lucide-react';
+import { playClickSound } from '@/lib/sounds';
+import { sampleMCQData } from '../data/mcq-questions';
+import { loadUserProgress, saveTopicPreference, loadTopicPreference } from '@/lib/utils';
 
 type Props = {
   onStartAdventure?: (topicId: string, mode: 'new' | 'continue') => void;
@@ -95,6 +101,12 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
+  
+  // ADDED FOR HOME PAGE FUNCTIONALITY: Grade selection state
+  const [selectedPreference, setSelectedPreference] = useState<'start' | 'middle' | null>(null);
+  const [selectedTopicFromPreference, setSelectedTopicFromPreference] = useState<string | null>(null);
+  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = useState<string | null>(null);
+  const [selectedGradeAndLevel, setSelectedGradeAndLevel] = useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   // Sleep timer state
   const [sleepTimeRemaining, setSleepTimeRemaining] = useState(0); // in milliseconds
@@ -221,6 +233,24 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Migrate existing users to cumulative care system
     migrateToCumulativeCareSystem();
     
+    // SYNC: Initialize current pet from PetProgressStorage to localStorage for pet-avatar-service
+    try {
+      const currentSelectedPet = PetProgressStorage.getCurrentSelectedPet();
+      if (currentSelectedPet) {
+        // Sync to localStorage for pet-avatar-service
+        localStorage.setItem('current_pet', currentSelectedPet);
+        setCurrentPet(currentSelectedPet);
+        
+        // Sync to PetDataService if pet is owned in PetProgressStorage
+        const petData = PetProgressStorage.getPetProgress(currentSelectedPet);
+        if (petData.generalData.isOwned && !isPetOwned(currentSelectedPet)) {
+          addOwnedPet(currentSelectedPet);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to sync current pet from PetProgressStorage:', error);
+    }
+    
     const streakData = getStreakData();
     if (streakData.lastFeedDate) {
       const currentDate = getCurrentUSDate();
@@ -316,6 +346,46 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     
     checkFirstTimeUser();
   }, []);
+  
+  // ADDED FOR HOME PAGE FUNCTIONALITY: Grade selection logic
+  useEffect(() => {
+    if (userData) {
+      // Load user progress to check for current topic
+      const userProgress = loadUserProgress();
+      
+      // Load saved preference
+      const savedPreference = loadTopicPreference();
+      let preferenceLevel: 'start' | 'middle' | null = null;
+      
+      if (savedPreference && savedPreference.level) {
+        preferenceLevel = savedPreference.level;
+      } else if (userData.level) {
+        // Fallback to userData level if no saved preference
+        preferenceLevel = userData.level as 'start' | 'middle';
+      }
+      
+      console.log('Setting selectedPreference to:', preferenceLevel);
+      setSelectedPreference(preferenceLevel);
+      
+      // Initialize the combined grade and level selection for proper highlighting
+      if (preferenceLevel && userData?.gradeDisplayName) {
+        setSelectedGradeAndLevel({ 
+          grade: userData.gradeDisplayName, 
+          level: preferenceLevel 
+        });
+        console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
+      }
+      
+      // First, check if there's a current topic saved from previous selection
+      if (userProgress?.currentTopicId) {
+        console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
+        setSelectedTopicFromPreference(userProgress.currentTopicId);
+      } else if (savedPreference && savedPreference.topicId) {
+        console.log('Loading saved topic from preference:', savedPreference.topicId);
+        setSelectedTopicFromPreference(savedPreference.topicId);
+      }
+    }
+  }, [userData]);
   
   // Pet action states - dynamically updated based on den ownership and sleep state
   const getActionStates = () => {
@@ -682,25 +752,25 @@ const getSleepyPetImage = (clicks: number) => {
       cat: {
         1: {
           // Level 1 Cat images - using placeholder images for now
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234455_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_155438_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_160705_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
         }
       },
       hamster: {
         1: {
-          // Level 1 Hamster images - using placeholder images for now
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011043_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011058_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011115_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011137_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+          // Level 1 Hamster images - using correct hamster images from pet-avatar-service
+          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163423_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163334_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_164339_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_165002_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
         }
       },
       dragon: {
@@ -884,13 +954,23 @@ const getSleepyPetImage = (clicks: number) => {
 
   // Handle pet selection from the first-time flow
   const handlePetSelection = (petId: string, petName: string) => {
-    // Set pet ownership and name
+    // Set pet ownership and name in PetProgressStorage
     PetProgressStorage.setPetOwnership(petId, true);
     PetProgressStorage.setPetName(petId, petName);
     
-    // Set as current selected pet
+    // Set as current selected pet in PetProgressStorage
     PetProgressStorage.setCurrentSelectedPet(petId);
     setCurrentPet(petId);
+    
+    // SYNC WITH PetDataService: Add pet to owned pets list
+    addOwnedPet(petId);
+    
+    // SYNC WITH pet-avatar-service: Set current pet in localStorage
+    try {
+      localStorage.setItem('current_pet', petId);
+    } catch (error) {
+      console.warn('Failed to save current pet to localStorage:', error);
+    }
     
     // Hide the selection flow
     setShowPetSelection(false);
@@ -898,6 +978,36 @@ const getSleepyPetImage = (clicks: number) => {
     // Trigger store refresh to update UI
     setStoreRefreshTrigger(prev => prev + 1);
   };
+  
+  // ADDED FOR HOME PAGE FUNCTIONALITY: Grade selection handlers
+  const handleGradeSelection = React.useCallback((gradeDisplayName: string) => {
+    playClickSound();
+    setSelectedGradeFromDropdown(gradeDisplayName);
+  }, []);
+
+  const handlePreferenceSelection = React.useCallback((level: 'start' | 'middle', gradeDisplayName?: string) => {
+    playClickSound();
+    
+    // Update selected grade if provided
+    if (gradeDisplayName) {
+      setSelectedGradeFromDropdown(gradeDisplayName);
+      // Track the combined grade and level selection for highlighting
+      setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+    }
+    
+    // Get all available topic IDs from MCQ data in order
+    const allTopicIds = Object.keys(sampleMCQData.topics);
+    
+    // Save preference and get the specific topic immediately
+    const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
+    
+    console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
+    
+    setSelectedPreference(level);
+    setSelectedTopicFromPreference(specificTopic);
+    
+    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
+  }, []);
 
   const handlePetPurchase = (petType: string, cost: number) => {
     // Use regular coin checking since feeding is now free
@@ -918,6 +1028,13 @@ const getSleepyPetImage = (clicks: number) => {
     
     // Switch to the newly purchased pet
     setCurrentPet(petType);
+    
+    // Sync to localStorage for pet-avatar-service
+    try {
+      localStorage.setItem('current_pet', petType);
+    } catch (error) {
+      console.warn('Failed to save current pet to localStorage:', error);
+    }
     
     // Play purchase sound (reuse evolution sound for now)
     playEvolutionSound();
@@ -1095,9 +1212,9 @@ const getSleepyPetImage = (clicks: number) => {
     
     // Different thoughts for different pets
     if (currentPet === 'cat' && isPetOwned('cat')) {
-      const catCoinsSpent = getPetCoinsSpent('cat');
+      const { feedingCount, adventureCoins } = cumulativeCare;
       
-      if (catCoinsSpent === 0) {
+      if (feedingCount === 0) {
         const hungryThoughts = [
           `Meow meow! 🐱 I'm ${petName}! My heart aches with hunger, ${userName}... I need your love and some treats to feel whole again! 💔`,
           `Oh ${userName}! 🐾 ${petName} here, feeling so lonely and empty inside... My soul yearns for your care and some yummy snacks! 😿`,
@@ -1107,43 +1224,66 @@ const getSleepyPetImage = (clicks: number) => {
           `${userName}! 🐾 Your precious cat ${petName} feels so fragile and hungry... treats would make my heart overflow with pure joy! ✨`
         ];
         return getRandomThought(hungryThoughts);
-      } else if (catCoinsSpent < 30) {
-        const satisfiedThoughts = [
-          `Purr purr! 🐾 Oh ${userName}, my heart is warming up! More treats would make this kitty's soul dance with pure bliss! 💖`,
-          `Meow meow! Those treats touched my very soul! 🐱 But ${petName} still feels a tender longing for more of your love!`,
-          `Yum yum! 🍪 These treats are healing my heart, dear ${userName}! I feel myself growing stronger with your care!`,
-          `Meow! Those treats filled a piece of my heart! 🐱 But my spirit still yearns for more of your beautiful kindness!`,
-          `Thank you, beloved ${userName}! 🥰 Those treats were like sunshine to my soul, but ${petName} still feels a gentle hunger for more love!`,
-          `Delicious! 🍪 My tail is swishing with overwhelming joy! More treats would make me leap to the stars with happiness! ✨`
+      } else if (feedingCount === 1) {
+        const stillHungryThoughts = [
+          `Purr purr! 🐾 Oh ${userName}, that treat was like sunshine to my kitty heart! But I'm still yearning for more of your love... could I have one more treat to feel complete?`,
+          `Meow meow! Those treats touched my very soul! 🐱 But ${petName} still feels a tender longing for more of your beautiful kindness!`,
+          `Yum yum! 🍪 That treat was perfect medicine for my heart, dear ${userName}! But I'm still quite hungry for your love... can you feed my soul again?`,
+          `Thank you, beloved ${userName}! 🥰 That treat was like sunshine to my soul, but ${petName} still feels a gentle hunger for more love!`,
+          `Delicious! 🍪 My tail swished with joy! But more treats would make me leap to the stars with happiness! ✨`
         ];
-        return getRandomThought(satisfiedThoughts);
-      } else if (catCoinsSpent < 50) {
-        const growingThoughts = [
-          `Meow meow! I'm growing stronger, ${userName}! 🐱 Your love is transforming me - I feel my spirit becoming more graceful and powerful!`,
-          `Look at me pounce with such passion! 💪 I can feel my heart expanding with strength from each precious treat you give me!`,
-          `Amazing! I'm growing so fast, dear ${userName}! 🌱 More treats will help me become the most magnificent cat for you!`,
-          `${userName}, I feel electricity in my soul! ⚡ These treats are making me bigger, more graceful, and overflowing with love for you!`,
-          `Meow meow! I'm transforming into something beautiful! 🦋 Keep the treats coming - my heart is almost ready to reach new heights!`,
-          `Incredible! My whiskers are tingling with pure joy! 🐱 More treats will help me reach my full potential and make you so proud! ✨`
+        return getRandomThought(stillHungryThoughts);
+      } else if (feedingCount >= 2 && adventureCoins === 0) {
+        const fullAndAdventurousThoughts = [
+          `Meow meow! 🥳 I'm overflowing with love and energy now, ${userName}! Those treats filled my kitty heart completely! Now my soul is burning with desire for adventure!`,
+          `Purr purr! Thank you, beloved ${userName}! 😋 My heart is singing with joy and my spirit is soaring! Can we go on a magical cat adventure now? 🚀`,
+          `I feel absolutely radiant! Those treats healed my heart perfectly, dear ${userName}! Adventure time? My feline soul is ready to explore! ✨`,
+          `Hooray! I'm not hungry anymore and my heart is bursting with happiness! 🎉 Now I'm ready for the most exciting cat adventures with you!`,
+          `Perfect! My kitty heart is full and dancing with pure bliss! 💖 Let's go explore the world together, ${userName}! 🌟`,
+          `Yippee! Those treats were exactly what my cat soul needed! 🍪 Now... adventure awaits us, and my heart can't contain its excitement! 🚀`
         ];
-        return getRandomThought(growingThoughts);
+        return getRandomThought(fullAndAdventurousThoughts);
+      } else if (feedingCount >= 2 && adventureCoins > 0 && adventureCoins < 100) {
+        const needMoreAdventureThoughts = [
+          `Oh ${userName}, I'm feeling a bit restless... 😴 Let's continue our cat adventures for a bit before I take a cozy nap? My heart yearns for more exploration!`,
+          `Dear ${userName}, my feline spirit is getting drowsy but I'm not quite ready to sleep yet... 🌙 Could we go on a few more adventures to tire me out properly?`,
+          `${userName}, I'm starting to feel sleepy but my adventurous cat heart wants more! 🚀 Let's explore a little longer before I curl up for a peaceful rest?`,
+          `Sweet ${userName}, I'm getting a bit tired but my soul craves more adventure! ⭐ Just a bit more exploring before I drift off to dreamland?`,
+          `${userName}, my eyelids are getting heavy but my heart still wants to play! 🎯 Could we adventure a little more before I take my well-deserved cat nap?`
+        ];
+        return getRandomThought(needMoreAdventureThoughts);
+      } else if (adventureCoins < 50) {
+        const adventuringThoughts = [
+          `These cat adventures are filling my soul with pure magic, ${userName}! 🚀 I'm getting stronger and my heart is overflowing with each quest!`,
+          `I love exploring with you so deeply, ${userName}! 🌟 Every adventure makes my feline spirit dance with overwhelming happiness!`,
+          `Adventure time is the most beautiful thing ever! ⚡ I can feel my cat heart growing more confident and radiant with each moment!`,
+          `These quests are absolutely enchanting, dear ${userName}! 🎯 I'm learning so much and my soul is bursting with joy!`,
+          `Exploring with you is pure bliss! 🗺️ Each adventure fills my kitty heart with such profound joy and love! ✨`
+        ];
+        return getRandomThought(adventuringThoughts);
+      } else if (adventureCoins < 100) {
+        const experiencedAdventurerThoughts = [
+          `Wow! I've earned so many precious coins on our magical cat adventures, ${userName}! 🪙 I feel like the most accomplished feline explorer and my heart is singing!`,
+          `Look how much we've accomplished together, dear ${userName}! 🌟 These adventures are making my cat soul incredibly strong and radiant!`,
+          `I'm becoming such an experienced adventurer! 🎯 My confidence is soaring and I feel ready for even bigger challenges with you!`,
+          `These adventures have made me so wise and strong, ${userName}! 💪 I'm ready for whatever comes next in our journey together!`
+        ];
+        return getRandomThought(experiencedAdventurerThoughts);
       } else {
-        const happyThoughts = [
-          `Meow meow! 🥳 I feel absolutely radiant, ${userName}! My heart is bursting with love! Now... could you get me some cat friends to share this joy with?`,
-          `Purr purr! I'm so magnificently strong now! 💪 My soul is overflowing with gratitude! Maybe it's time to find playmates to spread this happiness?`,
-          `I feel absolutely fantastic, dear ${userName}! 🌟 All those treats filled my heart completely! Now I'm ready for magical cat adventures with friends!`,
-          `Amazing! I'm at my most beautiful self! ✨ ${userName}, can you help me find some buddies to share this overwhelming joy with?`,
-          `Hooray! I'm fully grown and my heart is singing! 🎉 Can you help me find some cat friends to celebrate this love with?`,
-          `Perfect! I feel incredibly blessed by your care! 🚀 Maybe it's time to find playmates for the most wonderful adventures ever! 💖`
+        const readyForSleepThoughts = [
+          `Oh ${userName}, I'm feeling wonderfully drowsy after all our amazing adventures... 😴 I think it's time for this kitty to take a peaceful, well-deserved nap!`,
+          `Yawn... 🥱 All those adventures have made me so beautifully tired, dear ${userName}! Could you help me drift off to the most wonderful cat dreams?`,
+          `I feel so accomplished and sleepy, ${userName}! 💤 Those adventures filled my heart completely... now I'm ready for the sweetest slumber!`,
+          `Purr... I'm getting so drowsy from all our magical quests! 😴 Time for this adventurous cat to curl up and dream of our wonderful times together!`
         ];
-        return getRandomThought(happyThoughts);
+        return getRandomThought(readyForSleepThoughts);
       }
     }
 
     if (currentPet === 'hamster' && isPetOwned('hamster')) {
-      const hamsterCoinsSpent = getPetCoinsSpent('hamster');
+      const { feedingCount, adventureCoins } = cumulativeCare;
       
-      if (hamsterCoinsSpent === 0) {
+      if (feedingCount === 0) {
         const hungryThoughts = [
           `Squeak squeak! 🐹 I'm ${petName}! My tiny heart feels so empty and fragile, ${userName}... can you fill my soul with some seeds? 💔`,
           `Oh dear ${userName}! 🥜 ${petName} here, feeling so small and vulnerable... I'm trembling from hunger... got any treats to warm my heart?`,
@@ -1153,36 +1293,59 @@ const getSleepyPetImage = (clicks: number) => {
           `${userName}! 🥜 Your precious hamster ${petName} feels so delicate and hungry... seeds would make my little heart burst with pure joy! ✨`
         ];
         return getRandomThought(hungryThoughts);
-      } else if (hamsterCoinsSpent < 30) {
-        const satisfiedThoughts = [
-          `Squeak squeak! 🌱 Oh ${userName}, my little heart is glowing! More seeds would make this hamster's spirit soar with bliss! 💖`,
+      } else if (feedingCount === 1) {
+        const stillHungryThoughts = [
+          `Squeak squeak! 🌱 Oh ${userName}, that seed was like sunshine to my tiny heart! But I'm still yearning for more of your love... could I have one more treat to feel complete?`,
           `Nom nom! Those seeds touched my tiny soul! 🐹 But ${petName} still feels a sweet longing for more of your precious love!`,
-          `Yum yum! 🥜 These treats are like magic to my heart, dear ${userName}! I feel myself growing stronger with your tender care!`,
-          `Squeak! Those seeds warmed my little heart! 🐹 But my spirit still yearns for more of your beautiful kindness!`,
-          `Thank you, beloved ${userName}! 🥰 Those seeds were like tiny miracles, but ${petName} still feels a gentle hunger for more love!`,
-          `Delicious! 🌱 My cheeks are full but my heart wants to overflow! More seeds would make me spin with pure ecstasy! ✨`
+          `Yum yum! 🥜 That treat was perfect medicine for my little heart, dear ${userName}! But I'm still quite hungry for your love... can you feed my soul again?`,
+          `Thank you, beloved ${userName}! 🥰 That seed was like a tiny miracle, but ${petName} still feels a gentle hunger for more love!`,
+          `Delicious! 🌱 My cheeks are getting full but my heart wants to overflow! More seeds would make me spin with pure ecstasy! ✨`
         ];
-        return getRandomThought(satisfiedThoughts);
-      } else if (hamsterCoinsSpent < 50) {
-        const growingThoughts = [
-          `Squeak squeak! I'm growing stronger, ${userName}! 🐹 Your love is transforming me - I feel my tiny spirit becoming mighty and swift!`,
-          `Look at me run with such passion! 💪 I can feel my little heart expanding with power from each precious seed you give me!`,
-          `Amazing! I'm growing so fast, dear ${userName}! 🌱 More seeds will help me become the most incredible hamster for you!`,
-          `${userName}, I feel lightning in my tiny soul! ⚡ These seeds are making me bigger, more active, and overflowing with love for you!`,
-          `Squeak squeak! I'm transforming into something magnificent! 🦋 Keep the seeds coming - my heart is almost ready to reach new heights!`,
-          `Incredible! My whiskers are vibrating with pure joy! 🐹 More seeds will help me reach my full potential and make you so proud! ✨`
+        return getRandomThought(stillHungryThoughts);
+      } else if (feedingCount >= 2 && adventureCoins === 0) {
+        const fullAndAdventurousThoughts = [
+          `Squeak squeak! 🥳 I'm overflowing with love and energy now, ${userName}! Those seeds filled my tiny heart completely! Now my soul is burning with desire for adventure!`,
+          `Squeak squeak! Thank you, beloved ${userName}! 😋 My heart is singing with joy and my spirit is soaring! Can we go on a magical hamster adventure now? 🚀`,
+          `I feel absolutely radiant! Those seeds healed my heart perfectly, dear ${userName}! Adventure time? My hamster soul is ready to explore! ✨`,
+          `Hooray! I'm not hungry anymore and my heart is bursting with happiness! 🎉 Now I'm ready for the most exciting hamster adventures with you!`,
+          `Perfect! My tiny heart is full and dancing with pure bliss! 💖 Let's go explore the world together, ${userName}! 🌟`,
+          `Yippee! Those seeds were exactly what my hamster soul needed! 🥜 Now... adventure awaits us, and my heart can't contain its excitement! 🚀`
         ];
-        return getRandomThought(growingThoughts);
+        return getRandomThought(fullAndAdventurousThoughts);
+      } else if (feedingCount >= 2 && adventureCoins > 0 && adventureCoins < 100) {
+        const needMoreAdventureThoughts = [
+          `Oh ${userName}, I'm feeling a bit restless... 😴 Let's continue our hamster adventures for a bit before I take a cozy nap? My heart yearns for more exploration!`,
+          `Dear ${userName}, my tiny spirit is getting drowsy but I'm not quite ready to sleep yet... 🌙 Could we go on a few more adventures to tire me out properly?`,
+          `${userName}, I'm starting to feel sleepy but my adventurous hamster heart wants more! 🚀 Let's explore a little longer before I curl up for a peaceful rest?`,
+          `Sweet ${userName}, I'm getting a bit tired but my soul craves more adventure! ⭐ Just a bit more exploring before I drift off to dreamland?`,
+          `${userName}, my eyelids are getting heavy but my heart still wants to play! 🎯 Could we adventure a little more before I take my well-deserved hamster nap?`
+        ];
+        return getRandomThought(needMoreAdventureThoughts);
+      } else if (adventureCoins < 50) {
+        const adventuringThoughts = [
+          `These hamster adventures are filling my soul with pure magic, ${userName}! 🚀 I'm getting stronger and my heart is overflowing with each quest!`,
+          `I love exploring with you so deeply, ${userName}! 🌟 Every adventure makes my tiny spirit dance with overwhelming happiness!`,
+          `Adventure time is the most beautiful thing ever! ⚡ I can feel my hamster heart growing more confident and radiant with each moment!`,
+          `These quests are absolutely enchanting, dear ${userName}! 🎯 I'm learning so much and my soul is bursting with joy!`,
+          `Exploring with you is pure bliss! 🗺️ Each adventure fills my little heart with such profound joy and love! ✨`
+        ];
+        return getRandomThought(adventuringThoughts);
+      } else if (adventureCoins < 100) {
+        const experiencedAdventurerThoughts = [
+          `Wow! I've earned so many precious coins on our magical hamster adventures, ${userName}! 🪙 I feel like the most accomplished tiny explorer and my heart is singing!`,
+          `Look how much we've accomplished together, dear ${userName}! 🌟 These adventures are making my hamster soul incredibly strong and radiant!`,
+          `I'm becoming such an experienced adventurer! 🎯 My confidence is soaring and I feel ready for even bigger challenges with you!`,
+          `These adventures have made me so wise and strong, ${userName}! 💪 I'm ready for whatever comes next in our journey together!`
+        ];
+        return getRandomThought(experiencedAdventurerThoughts);
       } else {
-        const happyThoughts = [
-          `Squeak squeak! 🥳 I feel absolutely radiant, ${userName}! My tiny heart is bursting with immense love! Now... could you get me some hamster friends to share this joy with?`,
-          `Squeak squeak! I'm so magnificently strong now! 💪 My soul is overflowing with gratitude! Maybe it's time to find playmates to spread this happiness?`,
-          `I feel absolutely fantastic, dear ${userName}! 🌟 All those seeds filled my heart completely! Now I'm ready for magical hamster adventures with friends!`,
-          `Amazing! I'm at my most beautiful self! ✨ ${userName}, can you help me find some buddies to share this overwhelming joy with?`,
-          `Hooray! I'm fully grown and my heart is singing! 🎉 Can you help me find some hamster friends to celebrate this love with?`,
-          `Perfect! I feel incredibly blessed by your care! 🚀 Maybe it's time to find playmates for the most wonderful wheel adventures ever! 💖`
+        const readyForSleepThoughts = [
+          `Oh ${userName}, I'm feeling wonderfully drowsy after all our amazing adventures... 😴 I think it's time for this little hamster to take a peaceful, well-deserved nap!`,
+          `Yawn... 🥱 All those adventures have made me so beautifully tired, dear ${userName}! Could you help me drift off to the most wonderful hamster dreams?`,
+          `I feel so accomplished and sleepy, ${userName}! 💤 Those adventures filled my heart completely... now I'm ready for the sweetest slumber!`,
+          `Squeak... I'm getting so drowsy from all our magical quests! 😴 Time for this adventurous hamster to curl up and dream of our wonderful times together!`
         ];
-        return getRandomThought(happyThoughts);
+        return getRandomThought(readyForSleepThoughts);
       }
     }
     
@@ -1498,6 +1661,260 @@ const getSleepyPetImage = (clicks: number) => {
       
       {/* Glass overlay for better contrast */}
       <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
+
+      {/* ADDED FOR HOME PAGE FUNCTIONALITY: Grade Selection Button - Top Left */}
+      {userData && (
+        <div className="absolute top-5 left-5 z-30">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="default"
+                className={`border-2 ${selectedPreference ? 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'} text-white rounded-xl px-4 py-3 font-semibold btn-animate flex items-center gap-2 shadow-lg transition-all duration-300`}
+                style={{ boxShadow: selectedPreference ? '0 4px 0 #15803d' : '0 4px 0 #1d4ed8' }}
+                onClick={() => playClickSound()}
+              >
+                <GraduationCap className="h-5 w-5" />
+                {(() => {
+                  const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName || 'Grade';
+                  const buttonText = selectedTopicFromPreference 
+                    ? `Next: ${selectedTopicFromPreference}` 
+                    : selectedPreference 
+                      ? `${currentGrade} ${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` 
+                      : 'Grade Selection';
+                  return buttonText;
+                })()}
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              className="w-64 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+              align="start"
+            >
+              {/* Kindergarten */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' ? 'bg-blue-100' : ''}`}>
+                  <span className="text-lg">🎓</span>
+                  <span className="font-semibold">Kindergarten</span>
+                  {selectedGradeAndLevel?.grade === 'K' && (
+                    <span className="ml-auto text-blue-600 text-sm">✓</span>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent 
+                  className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', 'K')}
+                  >
+                    <span className="text-lg">🌱</span>
+                    <div>
+                      <div className="font-semibold">Start</div>
+                      <div className="text-sm text-gray-500">Beginning level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', 'K')}
+                  >
+                    <span className="text-lg">🚀</span>
+                    <div>
+                      <div className="font-semibold">Middle</div>
+                      <div className="text-sm text-gray-500">Intermediate level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* 1st Grade */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' ? 'bg-blue-100' : ''}`}>
+                  <span className="text-lg">🎓</span>
+                  <span className="font-semibold">1st Grade</span>
+                  {selectedGradeAndLevel?.grade === '1st' && (
+                    <span className="ml-auto text-blue-600 text-sm">✓</span>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent 
+                  className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '1st')}
+                  >
+                    <span className="text-lg">🌱</span>
+                    <div>
+                      <div className="font-semibold">Start</div>
+                      <div className="text-sm text-gray-500">Beginning level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '1st')}
+                  >
+                    <span className="text-lg">🚀</span>
+                    <div>
+                      <div className="font-semibold">Middle</div>
+                      <div className="text-sm text-gray-500">Intermediate level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* 2nd Grade */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' ? 'bg-blue-100' : ''}`}>
+                  <span className="text-lg">🎓</span>
+                  <span className="font-semibold">2nd Grade</span>
+                  {selectedGradeAndLevel?.grade === '2nd' && (
+                    <span className="ml-auto text-blue-600 text-sm">✓</span>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent 
+                  className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '2nd')}
+                  >
+                    <span className="text-lg">🌱</span>
+                    <div>
+                      <div className="font-semibold">Start</div>
+                      <div className="text-sm text-gray-500">Beginning level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '2nd')}
+                  >
+                    <span className="text-lg">🚀</span>
+                    <div>
+                      <div className="font-semibold">Middle</div>
+                      <div className="text-sm text-gray-500">Intermediate level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* 3rd Grade */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' ? 'bg-blue-100' : ''}`}>
+                  <span className="text-lg">🎓</span>
+                  <span className="font-semibold">3rd Grade</span>
+                  {selectedGradeAndLevel?.grade === '3rd' && (
+                    <span className="ml-auto text-blue-600 text-sm">✓</span>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent 
+                  className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '3rd')}
+                  >
+                    <span className="text-lg">🌱</span>
+                    <div>
+                      <div className="font-semibold">Start</div>
+                      <div className="text-sm text-gray-500">Beginning level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '3rd')}
+                  >
+                    <span className="text-lg">🚀</span>
+                    <div>
+                      <div className="font-semibold">Middle</div>
+                      <div className="text-sm text-gray-500">Intermediate level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* 4th Grade */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' ? 'bg-blue-100' : ''}`}>
+                  <span className="text-lg">🎓</span>
+                  <span className="font-semibold">4th Grade</span>
+                  {selectedGradeAndLevel?.grade === '4th' && (
+                    <span className="ml-auto text-blue-600 text-sm">✓</span>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent 
+                  className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '4th')}
+                  >
+                    <span className="text-lg">🌱</span>
+                    <div>
+                      <div className="font-semibold">Start</div>
+                      <div className="text-sm text-gray-500">Beginning level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '4th')}
+                  >
+                    <span className="text-lg">🚀</span>
+                    <div>
+                      <div className="font-semibold">Middle</div>
+                      <div className="text-sm text-gray-500">Intermediate level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* 5th Grade */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' ? 'bg-blue-100' : ''}`}>
+                  <span className="text-lg">🎓</span>
+                  <span className="font-semibold">5th Grade</span>
+                  {selectedGradeAndLevel?.grade === '5th' && (
+                    <span className="ml-auto text-blue-600 text-sm">✓</span>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent 
+                  className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                >
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '5th')}
+                  >
+                    <span className="text-lg">🌱</span>
+                    <div>
+                      <div className="font-semibold">Start</div>
+                      <div className="text-sm text-gray-500">Beginning level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '5th')}
+                  >
+                    <span className="text-lg">🚀</span>
+                    <div>
+                      <div className="font-semibold">Middle</div>
+                      <div className="text-sm text-gray-500">Intermediate level</div>
+                    </div>
+                    {selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
 
       {/* Top UI - Heart Progress Bar */}
       <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-20">
@@ -1938,7 +2355,15 @@ const getSleepyPetImage = (clicks: number) => {
             return (
               <button
                 key={petId}
-                onClick={() => setCurrentPet(petId)}
+                onClick={() => {
+                  setCurrentPet(petId);
+                  // Sync to localStorage for pet-avatar-service
+                  try {
+                    localStorage.setItem('current_pet', petId);
+                  } catch (error) {
+                    console.warn('Failed to save current pet to localStorage:', error);
+                  }
+                }}
                 className={`w-12 h-12 rounded-xl border-2 text-2xl flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 ${
                   isActive 
                     ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white text-white' 
