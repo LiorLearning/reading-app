@@ -28,7 +28,7 @@ export class PetDataService {
   private static readonly STORAGE_KEY = 'litkraft_pet_data';
   private static readonly DEFAULT_DATA: PetData = {
     careLevel: 0,
-    ownedPets: ['dog'], // Start with dog
+    ownedPets: [], // Start with no pets - user must choose/buy them
     audioEnabled: true,
     lastUpdated: Date.now(),
     coinsSpentPerStage: {

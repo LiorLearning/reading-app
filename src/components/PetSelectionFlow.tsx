@@ -20,21 +20,21 @@ const PET_OPTIONS: PetOption[] = [
     id: 'dog',
     name: 'Dog',
     emoji: '🐕',
-    description: 'Loyal and adventurous companion',
+    description: '',
     defaultNames: ['Buddy', 'Max', 'Luna', 'Charlie', 'Bella']
   },
   {
     id: 'cat',
     name: 'Cat',
     emoji: '🐱',
-    description: 'Independent and curious explorer',
+    description: '',
     defaultNames: ['Whiskers', 'Shadow', 'Mittens', 'Felix', 'Cleo']
   },
   {
     id: 'hamster',
     name: 'Hamster',
     emoji: '🐹',
-    description: 'Small but mighty adventurer',
+    description: '',
     defaultNames: ['Peanut', 'Nibbles', 'Squeaky', 'Hazel', 'Pip']
   }
 ];
@@ -66,10 +66,10 @@ export function PetSelectionFlow({ onPetSelected }: PetSelectionFlowProps) {
         <Card className="w-full max-w-2xl bg-white">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-purple-600">
-              🎉 Welcome to the Pet Shop! 🎉
+              Choose your pet! 🎉 
             </CardTitle>
             <CardDescription className="text-lg">
-              Choose your perfect adventure companion!
+              
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -77,10 +77,10 @@ export function PetSelectionFlow({ onPetSelected }: PetSelectionFlowProps) {
               {PET_OPTIONS.map((pet) => (
                 <Card 
                   key={pet.id}
-                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-purple-300"
+                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-purple-300 h-64"
                   onClick={() => handlePetChoice(pet)}
                 >
-                  <CardContent className="p-6 text-center">
+                  <CardContent className="p-6 text-center h-full flex flex-col justify-center">
                     <div className="text-6xl mb-3">{pet.emoji}</div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">{pet.name}</h3>
                     <p className="text-sm text-gray-600">{pet.description}</p>

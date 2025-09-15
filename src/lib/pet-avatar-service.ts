@@ -1,4 +1,5 @@
 import { usePetData } from '@/lib/pet-data-service';
+import { useState, useEffect } from 'react';
 
 // Get Bobo images based on feeding count (since feeding is now free)
 const getBoboImage = (feedingCount: number) => {
@@ -74,7 +75,7 @@ const getSleepyPetImage = (clicks: number, petType: string = 'dog') => {
 };
 
 /**
- * Get cumulative care image for April based on care progression
+ * Get cumulative care image for April (dog) based on care progression
  */
 const getCumulativeCareImage = (feedingCount: number, adventureCoins: number) => {
   // Determine current care stage and image based on your requirements:
@@ -117,21 +118,100 @@ export const getCurrentPetAvatarImage = (
   
   // Check if Bobo is owned and being displayed
   if (currentPet === 'bobo' && isPetOwned('bobo')) {
-    // For Bobo, use feeding count (since feeding is now free)
+    // For Bobo, use unified care system (same as PetPage logic)
+    if (getCumulativeCareLevel) {
+      const cumulativeCare = getCumulativeCareLevel();
+      const { feedingCount, adventureCoins } = cumulativeCare;
+      
+      // Use the same care stage logic as PetPage for consistency
+      if (adventureCoins >= 100) {
+        return getBoboImage(5); // Map to highest feeding level for ready_for_sleep
+      } else if (adventureCoins >= 50) {
+        return getBoboImage(3); // Map to adventurous level
+      } else if (feedingCount >= 1) {
+        return getBoboImage(1); // Map to fed level
+      } else {
+        return getBoboImage(0); // Map to hungry level
+      }
+    }
+    // Fallback to old logic if getCumulativeCareLevel is not available
     const feedingCount = getCumulativeCareLevel ? getCumulativeCareLevel().feedingCount : 0;
     return getBoboImage(feedingCount);
   }
   
   // Check if Feather is owned and being displayed
   if (currentPet === 'feather' && isPetOwned('feather')) {
-    // For Feather, use feeding count (since feeding is now free)
+    // For Feather, use unified care system (same as PetPage logic)
+    if (getCumulativeCareLevel) {
+      const cumulativeCare = getCumulativeCareLevel();
+      const { feedingCount, adventureCoins } = cumulativeCare;
+      
+      // Use the same care stage logic as PetPage for consistency
+      if (adventureCoins >= 100) {
+        return getFeatherImage(5); // Map to highest feeding level for ready_for_sleep
+      } else if (adventureCoins >= 50) {
+        return getFeatherImage(3); // Map to adventurous level
+      } else if (feedingCount >= 1) {
+        return getFeatherImage(1); // Map to fed level
+      } else {
+        return getFeatherImage(0); // Map to hungry level
+      }
+    }
+    // Fallback to old logic if getCumulativeCareLevel is not available
     const feedingCount = getCumulativeCareLevel ? getCumulativeCareLevel().feedingCount : 0;
     return getFeatherImage(feedingCount);
   }
   
+  // Check if Cat is owned and being displayed
+  if (currentPet === 'cat' && isPetOwned('cat')) {
+    // For Cat, use unified care system (same as PetPage logic)
+    if (getCumulativeCareLevel) {
+      const cumulativeCare = getCumulativeCareLevel();
+      const { feedingCount, adventureCoins } = cumulativeCare;
+      
+      // Use the same care stage logic as PetPage for consistency
+      if (adventureCoins >= 100) {
+        // ready_for_sleep
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (adventureCoins >= 50) {
+        // adventurous
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else if (feedingCount >= 1) {
+        // fed
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234455_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      } else {
+        // hungry
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+      }
+    }
+    // Fallback
+    return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+  }
+  
   // Check if Hamster is owned and being displayed
   if (currentPet === 'hamster' && isPetOwned('hamster')) {
-    // For Hamster, use feeding count (since feeding is now free)
+    // For Hamster, use unified care system (same as PetPage logic)
+    if (getCumulativeCareLevel) {
+      const cumulativeCare = getCumulativeCareLevel();
+      const { feedingCount, adventureCoins } = cumulativeCare;
+      
+      // Use the same care stage logic as PetPage:
+      // Stage 4: 100+ adventure coins (ready for sleep)
+      // Stage 3: 50+ adventure coins (adventurous) 
+      // Stage 2: Fed once (first feeding triggers image change)
+      // Stage 1: Initial hungry/sad state (feeding count 0)
+      
+      if (adventureCoins >= 100) {
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // ready_for_sleep
+      } else if (adventureCoins >= 50) {
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163423_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // adventurous
+      } else if (feedingCount >= 1) {
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // fed
+      } else {
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // hungry
+      }
+    }
+    // Fallback to old logic if getCumulativeCareLevel is not available
     const feedingCount = getCumulativeCareLevel ? getCumulativeCareLevel().feedingCount : 0;
     return getHamsterImage(feedingCount);
   }
@@ -192,15 +272,41 @@ export const getCurrentPetAvatarImage = (
 export const useCurrentPetAvatarImage = () => {
   const { isPetOwned, getPetCoinsSpent, getCoinsSpentForCurrentStage, getCumulativeCareLevel, petData } = usePetData();
   
-  // Get current pet from localStorage (same logic as PetPage)
-  const getCurrentPet = () => {
+  // State for current pet - reactive to changes
+  const [currentPetId, setCurrentPetId] = useState(() => {
     try {
       const stored = localStorage.getItem('current_pet');
       return stored || 'dog';
     } catch {
       return 'dog';
     }
-  };
+  });
+  
+  // Listen for changes to current pet selection
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem('current_pet');
+        setCurrentPetId(stored || 'dog');
+      } catch {
+        setCurrentPetId('dog');
+      }
+    };
+    
+    // Listen for storage events (from other tabs/windows)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Listen for custom events (from same tab)
+    window.addEventListener('currentPetChanged', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('currentPetChanged', handleStorageChange);
+    };
+  }, []);
+  
+  // Get current pet from state (now reactive)
+  const getCurrentPet = () => currentPetId;
 
   // Get current streak from localStorage (same logic as PetPage)
   const getCurrentStreak = () => {
@@ -223,11 +329,22 @@ export const useCurrentPetAvatarImage = () => {
       if (stored) {
         const sleepData = JSON.parse(stored);
         const now = Date.now();
-        const eightHours = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
         
-        // Check if 8 hours have passed since last sleep update
-        if (sleepData.timestamp && (now - sleepData.timestamp) < eightHours) {
+        // Check if sleep end time has passed (new logic)
+        if (sleepData.sleepEndTime && now >= sleepData.sleepEndTime) {
+          // Sleep period has ended, return 0
+          return 0;
+        }
+        // Use new sleep end time if available
+        else if (sleepData.sleepEndTime && now < sleepData.sleepEndTime) {
           return sleepData.clicks || 0;
+        }
+        // Fallback to old logic for backward compatibility
+        else if (sleepData.timestamp && !sleepData.sleepEndTime) {
+          const eightHours = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+          if ((now - sleepData.timestamp) < eightHours) {
+            return sleepData.clicks || 0;
+          }
         }
       }
       return 0;

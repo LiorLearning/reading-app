@@ -139,10 +139,10 @@ export class PetProgressStorage {
         milestones: [],
       },
       generalData: {
-        isOwned: petId === 'dog', // Dog is owned by default
+        isOwned: false, // Start with no pets owned by default
         audioEnabled: true,
         lastUpdated: now,
-        isCurrentlySelected: petId === 'dog',
+        isCurrentlySelected: false,
       },
     };
   }
@@ -534,7 +534,7 @@ export class PetProgressStorage {
     }
     
     return {
-      currentSelectedPet: 'dog',
+      currentSelectedPet: '', // No pet selected by default
       globalAudioEnabled: true,
       lastGlobalUpdate: Date.now(),
     };

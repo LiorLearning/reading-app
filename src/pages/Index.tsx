@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ComicPanelComponent from "@/components/comic/ComicPanel";
 import InputBar from "@/components/comic/InputBar";
 import MessengerChat from "@/components/comic/MessengerChat";
@@ -132,7 +133,15 @@ const PanelOneLinerFigure: React.FC<{
   );
 };
 
-const Index = () => {
+interface IndexProps {
+  initialAdventureProps?: {topicId?: string, mode?: 'new' | 'continue', adventureId?: string} | null;
+  onBackToPetPage?: () => void;
+}
+
+const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
+  // React Router navigation
+  const navigate = useNavigate();
+  
   // Firebase auth integration - must be at the top
   const { user, userData, signOut } = useAuth();
   
@@ -167,6 +176,7 @@ const Index = () => {
       (window as any).autoMigrateOnLogin = () => autoMigrateOnLogin(user?.uid || 'anonymous');
     }
   }, [user]);
+
 
   const jsonLd = useMemo(
     () => ({
@@ -242,6 +252,8 @@ const Index = () => {
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
     const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3 | 4>(() => {
+    // If we're coming from Pet Page with adventure props, start directly in Adventure to avoid home flash
+    if (initialAdventureProps) return 1;
     // If user exists but no userData yet, start at loading state (don't show topic selection)
     if (user && !userData) return -1;
     // If userData exists and user is already setup, go to home
@@ -1993,6 +2005,19 @@ const Index = () => {
     setCurrentScreen(1); // Go to adventure screen first to show AI response
   }, [currentAdventureId, reset, initialPanels, user]);
 
+  // Handle initial adventure props from parent component
+  React.useEffect(() => {
+    if (initialAdventureProps) {
+      if (initialAdventureProps.adventureId) {
+        // Continue specific adventure
+        handleContinueSpecificAdventure(initialAdventureProps.adventureId);
+      } else if (initialAdventureProps.topicId && initialAdventureProps.mode) {
+        // Start new or continue adventure with topic
+        handleStartAdventure(initialAdventureProps.topicId, initialAdventureProps.mode);
+      }
+    }
+  }, [initialAdventureProps, handleStartAdventure, handleContinueSpecificAdventure]);
+
   // Handle grade selection (for HomePage dropdown display)
   const handleGradeSelection = React.useCallback((gradeDisplayName: string) => {
     playClickSound();
@@ -2599,24 +2624,6 @@ const Index = () => {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         
-        {/* Home Button for Pet Page */}
-        <div className="absolute top-4 left-4 z-50">
-          <Button 
-            variant="default" 
-            onClick={async () => {
-              playClickSound();
-              await handleCloseSession(); // Save current adventure before going home
-              
-              // Trigger a re-render by briefly updating screen state to refresh homepage data
-              setCurrentScreen(0);
-              setTimeout(() => setCurrentScreen(-1), 100);
-            }}
-            className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4 shadow-xl"
-            style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
-          >
-            🏠 Home
-          </Button>
-        </div>
         
         <PetPage 
           onStartAdventure={handleStartAdventure}
@@ -2656,9 +2663,12 @@ const Index = () => {
                   playClickSound();
                   await handleCloseSession(); // Save current adventure before going home
                   
-                  // Trigger a re-render by briefly updating screen state to refresh homepage data
-                  setCurrentScreen(0);
-                  setTimeout(() => setCurrentScreen(-1), 100);
+                  // Navigate back to pet page (home)
+                  if (onBackToPetPage) {
+                    onBackToPetPage();
+                  } else {
+                    navigate('/');
+                  }
                 }}
                 className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
                 style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
@@ -3021,9 +3031,56 @@ const Index = () => {
                  userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
                  currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
                  currentScreen === 1 ? (
-                   <div className="flex items-center justify-center gap-2">
-                     <span className="text-2xl">🪙</span>
-                     <span>{coins}</span>
+                   <div className="flex items-center justify-center gap-4">
+                     {/* Clean Progress bar */}
+                     <div className="flex items-center gap-4">
+                       {/* Progress bar container */}
+                       <div className="relative">
+                         {(() => {
+                           // Get daily progress (resets daily)
+                           const today = new Date().toDateString();
+                           const dailyProgressKey = `daily_progress_${today}`;
+                           const storedDailyProgress = localStorage.getItem(dailyProgressKey);
+                           const dailyCoins = storedDailyProgress ? parseInt(storedDailyProgress, 10) : 0;
+                           
+                           // Update daily progress with current coins
+                           const currentDailyCoins = Math.max(dailyCoins, coins);
+                           localStorage.setItem(dailyProgressKey, currentDailyCoins.toString());
+                           
+                           // Calculate progress percentage (can exceed 100%)
+                           const progressPercentage = (currentDailyCoins / 100) * 100;
+                           const displayPercentage = Math.round(progressPercentage);
+                           const isOverflow = progressPercentage > 100;
+                           
+                           return (
+                             <>
+                               {/* Progress bar background */}
+                               <div className="relative w-80 h-8 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-full border border-slate-400/30 overflow-hidden">
+                                 {/* Progress fill */}
+                                 <div 
+                                   className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 transition-all duration-700 ease-out"
+                                   style={{ width: `${Math.min(100, progressPercentage)}%` }}
+                                 />
+                               </div>
+                               
+                               {/* Progress percentage - clean text */}
+                               <div className="absolute inset-0 flex items-center justify-center">
+                                 <span className="text-white text-base font-bold">
+                                   {displayPercentage}%
+                                 </span>
+                               </div>
+                             </>
+                           );
+                         })()}
+                       </div>
+                       
+                       {/* Sleep emoji when ready */}
+                       {coins >= 100 && (
+                         <div className="text-3xl animate-bounce">
+                           😴
+                         </div>
+                       )}
+                     </div>
                    </div>
                  ) : 
                  'QUIZ TIME'}
@@ -3137,22 +3194,6 @@ const Index = () => {
               </DialogContent>
             </Dialog>
             
-            {/* End Session Button - only show when adventure is active */}
-            {currentScreen === 1 && (
-              <Button 
-                variant="destructive" 
-                size="icon"
-                aria-label="End Session" 
-                className="border-2 bg-red-500 text-white btn-animate hover:bg-red-600 rounded-full w-12 h-12" 
-                style={{ borderColor: 'hsl(from hsl(0 84% 55%) h s 25%)', boxShadow: '0 4px 0 black' }} 
-                onClick={() => {
-                  playClickSound();
-                  setShowFeedbackModal(true);
-                }}
-              >
-                <X className="h-6 w-6" />
-              </Button>
-            )}
           </div>
         </header>
 

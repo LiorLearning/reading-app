@@ -8,10 +8,50 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-// TEMPORARY CHANGE: Import PetPage to make it the home page
+// Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
+
+// Unified component that seamlessly switches between pet page and adventure
+const UnifiedPetAdventureApp = () => {
+  const [isInAdventure, setIsInAdventure] = useState(false);
+  const [adventureProps, setAdventureProps] = useState<{topicId?: string, mode?: 'new' | 'continue', adventureId?: string} | null>(null);
+
+  // Adventure handlers that switch modes seamlessly without route changes
+  const handleStartAdventure = (topicId: string, mode: 'new' | 'continue' = 'new') => {
+    setAdventureProps({ topicId, mode });
+    setIsInAdventure(true);
+  };
+
+  const handleContinueSpecificAdventure = (adventureId: string) => {
+    setAdventureProps({ adventureId });
+    setIsInAdventure(true);
+  };
+
+  const handleBackToPetPage = () => {
+    setIsInAdventure(false);
+    setAdventureProps(null);
+  };
+
+  if (isInAdventure) {
+    return (
+      <Index 
+        initialAdventureProps={adventureProps}
+        onBackToPetPage={handleBackToPetPage}
+      />
+    );
+  }
+
+  return (
+    <PetPage 
+      onStartAdventure={handleStartAdventure}
+      onContinueSpecificAdventure={handleContinueSpecificAdventure}
+    />
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -23,18 +63,18 @@ const App = () => (
           <CameraWidget />
           <BrowserRouter>
             <Routes>
-              {/* TEMPORARY CHANGE: Make PetPage the home page instead of Index */}
+              {/* Unified pet page and adventure experience */}
               <Route path="/" element={
                 <AuthGuard>
-                  <PetPage />
+                  <UnifiedPetAdventureApp />
                 </AuthGuard>
               } />
-              {/* COMMENTED OUT: Original Index route - uncomment to restore */}
-              {/* <Route path="/" element={
+              {/* Keep adventure route for backward compatibility (redirects to home) */}
+              <Route path="/adventure" element={
                 <AuthGuard>
-                  <Index />
+                  <UnifiedPetAdventureApp />
                 </AuthGuard>
-              } /> */}
+              } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
