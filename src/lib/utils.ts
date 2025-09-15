@@ -1122,6 +1122,90 @@ export const getStartingQuestionIndex = (topicId: string): number => {
   return 0;
 };
 
+// Spelling Progress persistence - sequential spelling question tracking
+const SPELLING_PROGRESS_KEY = 'readingapp_spelling_progress';
+
+export interface SpellingProgress {
+  gradeDisplayName: string;
+  currentSpellingIndex: number; // Track current position in sequential order
+  completedSpellingIds: number[]; // Track completed questions to avoid repeats
+  timestamp: number;
+}
+
+/**
+ * Save current spelling progress for a grade
+ */
+export const saveSpellingProgress = (gradeDisplayName: string, currentIndex: number, completedIds: number[] = []): void => {
+  try {
+    const progress: SpellingProgress = {
+      gradeDisplayName,
+      currentSpellingIndex: currentIndex,
+      completedSpellingIds: completedIds,
+      timestamp: Date.now()
+    };
+    
+    // Store progress per grade using a composite key
+    const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
+    localStorage.setItem(key, JSON.stringify(progress));
+    console.log(`📝 Saved spelling progress: Grade ${gradeDisplayName}, Index ${currentIndex}, Completed: ${completedIds.length}`);
+  } catch (error) {
+    console.warn('Failed to save spelling progress to localStorage:', error);
+  }
+};
+
+/**
+ * Load spelling progress for a specific grade
+ */
+export const loadSpellingProgress = (gradeDisplayName?: string): SpellingProgress | null => {
+  if (!gradeDisplayName) {
+    return null;
+  }
+  
+  try {
+    const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) {
+      return null;
+    }
+    
+    const progress = JSON.parse(stored) as SpellingProgress;
+    
+    // Only return progress if it's less than 7 days old to avoid stale progress
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+    if (Date.now() - progress.timestamp < oneWeek) {
+      return progress;
+    }
+    
+    // Clear stale progress
+    clearSpellingProgress(gradeDisplayName);
+    return null;
+  } catch (error) {
+    console.warn('Failed to load spelling progress from localStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear spelling progress for a specific grade
+ */
+export const clearSpellingProgress = (gradeDisplayName: string): void => {
+  try {
+    const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
+    localStorage.removeItem(key);
+    console.log(`🗑️ Cleared spelling progress for grade ${gradeDisplayName}`);
+  } catch (error) {
+    console.warn('Failed to clear spelling progress from localStorage:', error);
+  }
+};
+
+/**
+ * Reset spelling progress for a grade (start over)
+ */
+export const resetSpellingProgress = (gradeDisplayName: string): void => {
+  saveSpellingProgress(gradeDisplayName, 0, []);
+  console.log(`🔄 Reset spelling progress for grade ${gradeDisplayName}`);
+};
+
 /**
  * Format AI messages by converting markdown-style formatting to HTML
  * Returns HTML that can be safely rendered using dangerouslySetInnerHTML

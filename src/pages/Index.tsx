@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress } from "@/lib/utils";
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
@@ -45,7 +45,7 @@ import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
-import { getRandomSpellingQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
+import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, SpellingQuestion } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
@@ -355,6 +355,23 @@ const Index = () => {
   // SpellBox state management
   const [showSpellBox, setShowSpellBox] = React.useState<boolean>(false);
   const [currentSpellQuestion, setCurrentSpellQuestion] = React.useState<SpellingQuestion | null>(null);
+  
+  // Sequential spelling progress tracking
+  const [spellingProgressIndex, setSpellingProgressIndex] = React.useState<number>(() => {
+    // Initialize with saved progress for current grade
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    const savedProgress = loadSpellingProgress(currentGrade);
+    return savedProgress?.currentSpellingIndex || 0;
+  });
+  
+  const [completedSpellingIds, setCompletedSpellingIds] = React.useState<number[]>(() => {
+    // Initialize with saved completed IDs for current grade
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    const savedProgress = loadSpellingProgress(currentGrade);
+    return savedProgress?.completedSpellingIds || [];
+  });
+  
+  // Legacy spell progress for backward compatibility (can be removed later)
   const [spellProgress, setSpellProgress] = React.useState<{totalQuestions: number, currentIndex: number}>({
     totalQuestions: 10,
     currentIndex: 0
@@ -628,6 +645,25 @@ const Index = () => {
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
+  
+  // Handle spelling progress reset when grade changes
+  React.useEffect(() => {
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    
+    // Only reset if we have a grade and it's different from what we initialized with
+    if (currentGrade) {
+      const savedProgress = loadSpellingProgress(currentGrade);
+      const expectedIndex = savedProgress?.currentSpellingIndex || 0;
+      const expectedCompletedIds = savedProgress?.completedSpellingIds || [];
+      
+      // If current state doesn't match saved progress for this grade, update it
+      if (spellingProgressIndex !== expectedIndex || completedSpellingIds.length !== expectedCompletedIds.length) {
+        console.log(`🔄 Grade changed to ${currentGrade}, updating spelling progress from index ${spellingProgressIndex} to ${expectedIndex}`);
+        setSpellingProgressIndex(expectedIndex);
+        setCompletedSpellingIds(expectedCompletedIds);
+      }
+    }
+  }, [selectedGradeFromDropdown, userData?.gradeDisplayName, spellingProgressIndex, completedSpellingIds]);
   
   // Check for A+S+D combination
   React.useEffect(() => {
@@ -1416,7 +1452,7 @@ const Index = () => {
           // Get current spelling question for context
           // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
-          const currentSpellingQuestion = getRandomSpellingQuestion(currentGrade);
+          const currentSpellingQuestion = getSequentialSpellingQuestion(currentGrade, spellingProgressIndex);
           
           // Send message through unified system for image generation
           const unifiedResponse = await unifiedAIStreaming.sendMessage(
@@ -1759,7 +1795,7 @@ const Index = () => {
         const savedGradeFromStorage = loadGradeSelection();
         console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
         console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
-        const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion(currentGrade) : null;
+        const spellingQuestion = isSpellingPhase ? getSequentialSpellingQuestion(currentGrade, spellingProgressIndex) : null;
         
         console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
         
@@ -3042,7 +3078,22 @@ const Index = () => {
     playClickSound();
     
     if (isCorrect) {
-      // Update progress
+      // Update sequential spelling progress
+      const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+      const nextIndex = spellingProgressIndex + 1;
+      const updatedCompletedIds = currentSpellQuestion ? [...completedSpellingIds, currentSpellQuestion.id] : completedSpellingIds;
+      
+      // Update local state
+      setSpellingProgressIndex(nextIndex);
+      setCompletedSpellingIds(updatedCompletedIds);
+      
+      // Save progress to localStorage
+      if (currentGrade) {
+        saveSpellingProgress(currentGrade, nextIndex, updatedCompletedIds);
+        console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
+      }
+      
+      // Update legacy progress for backward compatibility
       setSpellProgress(prev => ({
         ...prev,
         currentIndex: prev.currentIndex + 1
@@ -3101,7 +3152,7 @@ const Index = () => {
         return [...prev, encouragementMessage];
       });
     }
-  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService]);
+  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
 
   const handleSpellSkip = useCallback(() => {
     playClickSound();

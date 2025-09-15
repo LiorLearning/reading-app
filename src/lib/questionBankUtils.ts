@@ -106,3 +106,95 @@ export const getRandomSpellingQuestion = (gradeDisplayName?: string): SpellingQu
   
   return selectedQuestion;
 };
+
+/**
+ * Get a sequential spelling question from the question bank, filtered by grade
+ * This function returns questions in a consistent order for sequential learning
+ */
+export const getSequentialSpellingQuestion = (
+  gradeDisplayName?: string, 
+  currentIndex: number = 0
+): SpellingQuestion | null => {
+  const allSpellingQuestions = getAllSpellingQuestions();
+  console.log('📚 Total available spelling questions:', allSpellingQuestions.length);
+  console.log('🎓 Grade display name received:', gradeDisplayName);
+  console.log('📍 Current index:', currentIndex);
+  
+  if (allSpellingQuestions.length === 0) {
+    console.log('❌ No spelling questions found in question bank');
+    return null;
+  }
+  
+  let spellingQuestions = allSpellingQuestions;
+  
+  // Filter by grade if provided
+  if (gradeDisplayName) {
+    // Use the existing utility function to map display name to content grade
+    const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+    
+    // Filter questions by grade prefix
+    const gradeFilteredQuestions = allSpellingQuestions.filter(question => {
+      return question.topicId.startsWith(`${contentGrade}-`);
+    });
+    
+    console.log(`🎯 Grade filtering - Display: ${gradeDisplayName} → Content: ${contentGrade}`);
+    console.log(`🔍 Filtered spelling questions for grade ${contentGrade}:`, gradeFilteredQuestions.length);
+    
+    // Use filtered questions if available, otherwise fall back to all questions
+    if (gradeFilteredQuestions.length > 0) {
+      spellingQuestions = gradeFilteredQuestions;
+    } else {
+      console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
+    }
+  }
+  
+  // Sort questions by topicId and then by id to ensure consistent order
+  spellingQuestions.sort((a, b) => {
+    if (a.topicId !== b.topicId) {
+      return a.topicId.localeCompare(b.topicId);
+    }
+    return a.id - b.id;
+  });
+  
+  console.log(`📋 Sorted spelling questions: ${spellingQuestions.length} total`);
+  
+  // Return question at current index, or null if we've reached the end
+  if (currentIndex >= spellingQuestions.length) {
+    console.log(`🏁 Reached end of spelling questions for grade ${gradeDisplayName}. Index ${currentIndex} >= Length ${spellingQuestions.length}`);
+    return null; // All questions completed
+  }
+  
+  const selectedQuestion = spellingQuestions[currentIndex];
+  
+  console.log('🎯 Selected sequential spelling question:', {
+    index: currentIndex,
+    totalQuestions: spellingQuestions.length,
+    id: selectedQuestion.id,
+    topicId: selectedQuestion.topicId,
+    word: selectedQuestion.word,
+    audio: selectedQuestion.audio,
+    questionText: selectedQuestion.questionText,
+    gradeFilter: gradeDisplayName || 'none',
+    progress: `${currentIndex + 1}/${spellingQuestions.length}`
+  });
+  
+  return selectedQuestion;
+};
+
+/**
+ * Get the total count of spelling questions for a specific grade
+ */
+export const getSpellingQuestionCount = (gradeDisplayName?: string): number => {
+  const allSpellingQuestions = getAllSpellingQuestions();
+  
+  if (!gradeDisplayName) {
+    return allSpellingQuestions.length;
+  }
+  
+  const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+  const gradeFilteredQuestions = allSpellingQuestions.filter(question => {
+    return question.topicId.startsWith(`${contentGrade}-`);
+  });
+  
+  return gradeFilteredQuestions.length;
+};
