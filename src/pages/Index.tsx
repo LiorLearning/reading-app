@@ -23,6 +23,8 @@ import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-a
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
 import { useCoins } from "@/pages/coinSystem";
+import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
+import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -138,7 +140,10 @@ const Index = () => {
   const { isUnifiedSystemReady, hasImageGeneration } = useUnifiedAIStatus();
 
   // Coin system integration
-  const { coins, addCoins } = useCoins();
+  const { coins, addCoins, addAdventureCoins } = useCoins();
+  
+  // Get current pet avatar image
+  const currentPetAvatarImage = useCurrentPetAvatarImage();
 
   // Auto-migrate localStorage data to Firebase when user authenticates
   React.useEffect(() => {
@@ -453,6 +458,10 @@ const Index = () => {
       // Generate initial AI message using real-time AI generation
       const generateInitialResponse = async () => {
         try {
+          // Get current pet name for AI context
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+          
           // Generate initial message using AI service with adventure prompt
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
@@ -460,7 +469,8 @@ const Index = () => {
             currentAdventureContext, // Pass adventure context for specific adventures
             undefined, // storyEventsContext - can be added later if needed
             currentAdventureContext?.summary, // Pass adventure summary
-            userData   // user data from Firebase
+            userData,   // user data from Firebase
+            petName     // pet name
           );
 
           // Mark that we've sent the initial response for this session
@@ -818,7 +828,11 @@ const Index = () => {
         }
       }
 
-      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData });
+      // Get current pet name for AI context
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+      const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+      
+      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName });
       
       const result = await aiService.generateResponse(
         userText, 
@@ -828,7 +842,8 @@ const Index = () => {
         undefined, // adventureState
         undefined, // currentAdventure  
         undefined, // storyEventsContext
-        currentSummary // summary
+        currentSummary, // summary
+        petName // petName
       );
       
       console.log('✅ AI service returned:', result);
@@ -2469,8 +2484,8 @@ const Index = () => {
     playClickSound();
     
     if (isCorrect) {
-      // Award 10 coins for correct spelling answer
-      addCoins(10);
+      // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
+      addAdventureCoins(10);
       
       // Update progress
       setSpellProgress(prev => ({
@@ -2490,7 +2505,8 @@ const Index = () => {
           // Create the adventure story message with coin reward notification
           const adventureStoryMessage: ChatMessage = {
             type: 'ai',
-            content: `🎉 Great job! You earned 10 coins! 🪙\n\n${latestAIResponse.content_after_spelling}`,
+            // Removed reward blurb to preserve adventure flow
+            content: `${latestAIResponse.content_after_spelling}`,
             timestamp: Date.now() + 1 // Ensure it comes after success message
           };
           
@@ -2602,7 +2618,10 @@ const Index = () => {
           </Button>
         </div>
         
-        <PetPage />
+        <PetPage 
+          onStartAdventure={handleStartAdventure}
+          onContinueSpecificAdventure={handleContinueSpecificAdventure}
+        />
       </div>
     );
   }
@@ -3424,7 +3443,7 @@ const Index = () => {
                         {/* Darker theme film for avatar section */}
                         <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
                         <div className="relative z-10">
-                          <ChatAvatar />
+                          <ChatAvatar avatar={currentPetAvatarImage} />
                         </div>
                       </div>
                     
@@ -3512,29 +3531,8 @@ const Index = () => {
                       
                       {/* Input Bar */}
                       <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                        {/* NEW: Unified AI System Status Indicator */}
-                        {isUnifiedSystemReady && (
-                          <div className="mb-2 flex items-center gap-2 text-xs text-green-600 bg-green-50 rounded-full px-3 py-1 animate-pulse">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>🤖 Smart AI with Auto-Images Active</span>
-                          </div>
-                        )}
-                        
-                                {/* Loading indicator for unified system */}
-        {unifiedAIStreaming.isStreaming && (
-          <div className="mb-2 flex items-center gap-2 text-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-            <span>{unifiedAIStreaming.isGeneratingImage ? '🎨 Creating magical visuals...' : '💭 Thinking...'}</span>
-          </div>
-        )}
+                        {/* Status indicators removed to save space for chat */}
         
-        {/* Show legacy loading state if unified system is generating images */}
-        {unifiedAIStreaming.isGeneratingImage && (
-          <div className="mb-2 flex items-center gap-2 text-xs text-orange-600 bg-orange-50 rounded-full px-3 py-1">
-            <div className="w-2 h-2 bg-orange-500 rounded-full animate-spin"></div>
-            <span>🎵 Loading sounds active</span>
-          </div>
-        )}
                         
                         <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
                       </div>

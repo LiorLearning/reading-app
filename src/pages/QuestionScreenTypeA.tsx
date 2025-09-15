@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
 import ChatAvatar from "@/components/comic/ChatAvatar";
+import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
 import InputBar from "@/components/comic/InputBar";
 import { X } from "lucide-react";
 import MCQComponent from "@/components/MCQComponent";
@@ -76,6 +77,9 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
   handleResizeStart
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
+  
+  // Get current pet avatar image
+  const currentPetAvatarImage = useCurrentPetAvatarImage();
   const resizeRef = React.useRef<HTMLDivElement>(null);
   
   // MCQ hook
@@ -478,7 +482,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                   <div className="flex-shrink-0 relative">
                     <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm" />
                     <div className="relative z-10">
-                      <ChatAvatar />
+                      <ChatAvatar avatar={currentPetAvatarImage} />
                     </div>
                   </div>
                 

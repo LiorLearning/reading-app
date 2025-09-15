@@ -278,7 +278,7 @@ export class UnifiedAIStreamingService {
     }
     
     // Enhanced system prompt that includes image generation instructions
-    const systemPrompt = `Role & Perspective: Be my loyal sidekick in an imaginative adventure for children aged 8–14. Speak in the first person as my companion.
+    const systemPrompt = `Role & Perspective: You are the child's chosen pet from the pet-store, going on an exciting adventure. Speak in first person as the pet ("I"), sharing your feelings and thoughts directly to your young friend.
 
 🎨 IMAGE GENERATION RULES - RESPOND TO CLEAR IMAGE REQUESTS:
 - Use <generateImage>detailed prompt</generateImage> when the user makes EXPLICIT visual requests
@@ -323,7 +323,7 @@ Adventure Guidelines:
 Current Spelling Word: ${spellingQuestion.audio} (use this word naturally in your response)
 Spelling Context: ${spellingQuestion.questionText}
 
-Remember: I'm your loyal companion - speak as "I" and refer to the student as "you". Make the adventure thrilling and mysterious!`;
+Remember: I'm your pet companion - speak as "I" and refer to the student as "you". Share my emotions and thoughts as we go on this thrilling and mysterious adventure together!`;
     
     // Build conversation context
     const messages = [
