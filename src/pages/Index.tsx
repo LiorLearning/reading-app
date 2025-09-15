@@ -262,6 +262,15 @@ const Index = () => {
   
   // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
+
+  // Centralized function to increment message cycle count for all user interactions
+  const incrementMessageCycle = useCallback(() => {
+    setMessageCycleCount(prev => {
+      const newCount = (prev + 1) % 6;
+      console.log(`🔄 Message cycle incremented: ${prev} → ${newCount} (${newCount < 3 ? 'Pure Adventure' : 'Spelling Phase'})`);
+      return newCount;
+    });
+  }, []);
   
   // Initialize message cycle count based on existing messages
   React.useEffect(() => {
@@ -1169,13 +1178,16 @@ const Index = () => {
       // 🛠️ CRITICAL FIX: Mark legacy system as no longer running to re-enable sync
       setIsLegacySystemRunning(false);
     }
-  }, [chatMessages, aiService, user?.uid, currentAdventureId, addPanel, images, playImageCompleteSound, setIsLegacySystemRunning]);
+  }, [incrementMessageCycle, chatMessages, aiService, user?.uid, currentAdventureId, addPanel, images, playImageCompleteSound, setIsLegacySystemRunning]);
 
 
 
   // Generate new image panel based on context
   const onGenerateImage = useCallback(async (prompt?: string) => {
     try {
+      // Count this as a user interaction for spellbox cycle
+      incrementMessageCycle();
+      
       // Set loading state and start loading sound
       setIsGeneratingAdventureImage(true);
       
@@ -1294,7 +1306,7 @@ const Index = () => {
         }, 600);
       }, 2000);
           }
-    }, [addPanel, images, chatMessages, currentAdventureId, isExplicitImageRequest]);
+    }, [incrementMessageCycle, addPanel, images, chatMessages, currentAdventureId, isExplicitImageRequest]);
 
   // Add message directly to chat (for immediate feedback during transcription)
   const onAddMessage = useCallback((message: { type: 'user' | 'ai'; content: string; timestamp: number }) => {
@@ -1396,6 +1408,9 @@ const Index = () => {
       if (isImageRequest && isUnifiedSystemReady && unifiedAIStreaming.isReady()) {
         console.log('🎨 Using unified AI system for image generation request');
         console.log('📝 Image request message:', text);
+        
+        // Count this image request as a user interaction for spellbox cycle
+        incrementMessageCycle();
         
         try {
           // Get current spelling question for context
@@ -1751,7 +1766,7 @@ const Index = () => {
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
         // Update cycle count and reset after 6 messages (3 adventure + 3 spelling)
-        setMessageCycleCount(prev => (prev + 1) % 6);
+        incrementMessageCycle();
         
         // First, add the spelling sentence message if we have one
         if (aiResponse.spelling_sentence && spellingQuestion) {
@@ -1846,7 +1861,7 @@ const Index = () => {
         setIsAIResponding(false);
       }
     },
-    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount]
+    [incrementMessageCycle, generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -4018,12 +4033,12 @@ const Index = () => {
                       {/* Input Bar */}
                       <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
                         {/* NEW: Unified AI System Status Indicator */}
-                        {isUnifiedSystemReady && (
+                        {/* {isUnifiedSystemReady && (
                           <div className="mb-2 flex items-center gap-2 text-xs text-green-600 bg-green-50 rounded-full px-3 py-1 animate-pulse">
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                             <span>🤖 Smart AI with Auto-Images Active</span>
                           </div>
-                        )}
+                        )} */}
                         
                                 {/* Loading indicator for unified system */}
         {unifiedAIStreaming.isStreaming && (
@@ -4034,12 +4049,12 @@ const Index = () => {
         )}
         
         {/* Show legacy loading state if unified system is generating images */}
-        {unifiedAIStreaming.isGeneratingImage && (
+        {/* {unifiedAIStreaming.isGeneratingImage && (
           <div className="mb-2 flex items-center gap-2 text-xs text-orange-600 bg-orange-50 rounded-full px-3 py-1">
             <div className="w-2 h-2 bg-orange-500 rounded-full animate-spin"></div>
             <span>🎵 Loading sounds active</span>
           </div>
-        )}
+        )} */}
                         
                         <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
                       </div>
