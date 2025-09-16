@@ -26,6 +26,8 @@ interface MCQQuestion {
   aiHook: AIHook;
   passage?: string; // Optional for reading comprehension
   audio: string; // Audio text for speaker button
+  isPrefilled?: boolean; // Optional: whether this spelling question has prefilled characters
+  prefilledIndexes?: number[]; // Optional: array of character indexes that are prefilled
 }
 
 interface DragDropQuestion {
@@ -49,6 +51,8 @@ interface DragDropQuestion {
   aiHook: AIHook;
   passage?: string; // Optional for reading comprehension
   audio: string; // Audio text for speaker button
+  isPrefilled?: boolean; // Optional: whether this spelling question has prefilled characters
+  prefilledIndexes?: number[]; // Optional: array of character indexes that are prefilled
 }
 
 interface FillBlankQuestion {
@@ -70,6 +74,8 @@ interface FillBlankQuestion {
   aiHook: AIHook;
   passage?: string; // Optional for reading comprehension
   audio: string; // Audio text for speaker button
+  isPrefilled?: boolean; // Optional: whether this spelling question has prefilled characters
+  prefilledIndexes?: number[]; // Optional: array of character indexes that are prefilled
 }
 
 interface TopicInfo {
@@ -116,7 +122,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Which sentence is spaced correctly?",
@@ -141,7 +148,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Identify the correctly spaced sentence.",
@@ -166,7 +174,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Select the sentence with the correct spacing.",
@@ -191,7 +200,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Find the correctly spaced sentence.",
@@ -216,7 +226,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Which of these sentences is spaced correctly?",
@@ -241,7 +252,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Choose the sentence that is spaced correctly.",
@@ -266,7 +278,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Select the sentence with the proper spacing.",
@@ -291,7 +304,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Find the sentence with correct spacing.",
@@ -316,7 +330,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Which sentence has the correct spacing?",
@@ -341,7 +356,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Pick the sentence that is spaced correctly.",
@@ -378,7 +394,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'elephant',
             intent: 'mcq',
             questionLine: "Listen to the word 'elephant.' How many syllables does it have?",
@@ -403,7 +420,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'banana',
             intent: 'mcq',
             questionLine: "Listen to the word 'banana.' How many syllables does it have?",
@@ -428,7 +446,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'computer',
             intent: 'mcq',
             questionLine: "Listen to the word 'computer.' How many syllables does it have?",
@@ -453,7 +472,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'umbrella',
             intent: 'mcq',
             questionLine: "Listen to the word 'umbrella.' How many syllables does it have?",
@@ -478,7 +498,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'giraffe',
             intent: 'mcq',
             questionLine: "Listen to the word 'giraffe.' How many syllables does it have?",
@@ -503,7 +524,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'cucumber',
             intent: 'mcq',
             questionLine: "Listen to the word 'cucumber.' How many syllables does it have?",
@@ -528,7 +550,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'chocolate',
             intent: 'mcq',
             questionLine: "Listen to the word 'chocolate.' How many syllables does it have?",
@@ -553,7 +576,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'dinosaur',
             intent: 'mcq',
             questionLine: "Listen to the word 'dinosaur.' How many syllables does it have?",
@@ -578,7 +602,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'avocado',
             intent: 'mcq',
             questionLine: "Listen to the word 'avocado.' How many syllables does it have?",
@@ -603,7 +628,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'butterfly',
             intent: 'mcq',
             questionLine: "Listen to the word 'butterfly.' How many syllables does it have?",
@@ -639,7 +665,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -664,7 +691,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -689,7 +717,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -714,7 +743,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -739,7 +769,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -764,7 +795,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -789,7 +821,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -814,7 +847,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -839,7 +873,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -864,7 +899,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -900,7 +936,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -925,7 +962,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -950,7 +988,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -975,7 +1014,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1000,7 +1040,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1025,7 +1066,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1050,7 +1092,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1075,7 +1118,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1100,7 +1144,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1125,7 +1170,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1161,7 +1207,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1186,7 +1233,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1211,7 +1259,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1236,7 +1285,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1261,7 +1311,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1286,7 +1337,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1311,7 +1363,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1336,7 +1389,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1361,7 +1415,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1386,7 +1441,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word matches the picture?",
@@ -1424,7 +1480,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'fin' and 'fine' by their vowel sounds.",
@@ -1450,7 +1507,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'fell' and 'feel' by their vowel sounds.",
@@ -1476,7 +1534,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'back' and 'bake' by their vowel sounds.",
@@ -1502,7 +1561,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'hot' and 'hope' by their vowel sounds.",
@@ -1528,7 +1588,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'cub' and 'cube' by their vowel sounds.",
@@ -1554,7 +1615,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'bit' and 'bite' by their vowel sounds.",
@@ -1580,7 +1642,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'pet' and 'peat' by their vowel sounds.",
@@ -1606,7 +1669,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'cot' and 'coat' by their vowel sounds.",
@@ -1632,7 +1696,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'tub' and 'tube' by their vowel sounds.",
@@ -1658,7 +1723,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words 'cat' and 'cake' by their vowel sounds.",
@@ -1694,7 +1760,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1719,7 +1786,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1744,7 +1812,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1769,7 +1838,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1794,7 +1864,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1819,7 +1890,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1844,7 +1916,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1869,7 +1942,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1894,7 +1968,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1919,7 +1994,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
             questionLine: "Listen to the word. Which sound does it start with?",
@@ -1955,7 +2031,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'cat'. Which vowel sound does it have?",
@@ -1980,7 +2057,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'bed'. Which vowel sound does it have?",
@@ -2005,7 +2083,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'fish'. Which vowel sound does it have?",
@@ -2030,7 +2109,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'dog'. Which vowel sound does it have?",
@@ -2055,7 +2135,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'cup'. Which vowel sound does it have?",
@@ -2080,7 +2161,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'bat'. Which vowel sound does it have?",
@@ -2105,7 +2187,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'pen'. Which vowel sound does it have?",
@@ -2130,7 +2213,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'sit'. Which vowel sound does it have?",
@@ -2155,7 +2239,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'log'. Which vowel sound does it have?",
@@ -2180,7 +2265,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sound',
             intent: 'mcq',
             questionLine: "Listen to the word 'mud'. Which vowel sound does it have?",
@@ -2216,7 +2302,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'bat'?",
@@ -2241,7 +2328,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'cat'?",
@@ -2266,7 +2354,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'dog'?",
@@ -2291,7 +2380,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'fish'?",
@@ -2316,7 +2406,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'hat'?",
@@ -2341,7 +2432,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'log'?",
@@ -2366,7 +2458,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'net'?",
@@ -2391,7 +2484,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'pen'?",
@@ -2416,7 +2510,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'rat'?",
@@ -2441,7 +2536,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
             questionLine: "Listen to the word. What is the first sound in the word 'sun'?",
@@ -2477,7 +2573,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ank",
@@ -2502,7 +2599,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _at",
@@ -2527,7 +2625,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ip",
@@ -2552,7 +2651,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ick",
@@ -2577,7 +2677,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _eese",
@@ -2602,7 +2703,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _row",
@@ -2627,7 +2729,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ip",
@@ -2652,7 +2755,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ark",
@@ -2677,7 +2781,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _ain",
@@ -2702,7 +2807,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _eel",
@@ -2737,6 +2843,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2761,6 +2869,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2785,6 +2895,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2809,6 +2921,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2833,6 +2947,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2857,6 +2973,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2881,6 +2999,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -2905,7 +3025,9 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
-        aiHook: {
+         isPrefilled: true,
+        prefilledIndexes: [2,3,4],
+aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ock",
@@ -2929,7 +3051,9 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
-        aiHook: {
+         isPrefilled: true,
+        prefilledIndexes: [2,3],
+aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _op",
@@ -2953,7 +3077,9 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
-        aiHook: {
+         isPrefilled: true,
+        prefilledIndexes: [2,3],
+aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
           questionLine: "Complete the word to match the picture: _ip",
@@ -2990,7 +3116,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3015,7 +3142,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3040,7 +3168,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3065,7 +3194,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3090,7 +3220,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3115,7 +3246,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3140,7 +3272,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3165,7 +3298,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3190,7 +3324,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3215,7 +3350,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word starts with a consonant blend?",
@@ -3251,6 +3387,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3275,6 +3413,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3299,6 +3439,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3323,6 +3465,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3347,6 +3491,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3371,6 +3517,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3395,6 +3543,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3419,6 +3569,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3443,6 +3595,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3467,6 +3621,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'blend',
           intent: 'fill_blank',
@@ -3504,7 +3660,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word ends with a consonant blend?",
@@ -3529,7 +3686,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Select the word that ends with a consonant blend.",
@@ -3554,7 +3712,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which of these words ends with a consonant blend?",
@@ -3579,7 +3738,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Identify the word that ends with a consonant blend.",
@@ -3604,7 +3764,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Choose the word that ends with a consonant blend.",
@@ -3629,7 +3790,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word ends with a consonant blend?",
@@ -3654,7 +3816,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Select the word that ends with a consonant blend.",
@@ -3679,7 +3842,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which of these words ends with a consonant blend?",
@@ -3704,7 +3868,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Identify the word that ends with a consonant blend.",
@@ -3729,7 +3894,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Choose the word that ends with a consonant blend.",
@@ -3766,7 +3932,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3791,7 +3958,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3816,7 +3984,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3841,7 +4010,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3866,7 +4036,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3891,7 +4062,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3916,7 +4088,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3941,7 +4114,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3966,7 +4140,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -3991,7 +4166,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4028,7 +4204,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4053,7 +4230,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4078,7 +4256,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4103,7 +4282,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel sorting',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4128,7 +4308,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4153,7 +4334,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel sorting',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4178,7 +4360,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4203,7 +4386,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4228,7 +4412,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel sorting',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4253,7 +4438,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -4289,13 +4475,15 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
           questionLine: "Fill in the blank to complete the word: _at (Hint: A flying mammal)",
           imagePrompt: 'Educational scene showing complete_the_short_a_word concepts'
         },
-          audio: "ram"
+          audio: "bat"
         },
       {
         id: 2,
@@ -4313,6 +4501,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4337,6 +4527,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4361,6 +4553,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4385,6 +4579,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4409,6 +4605,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4433,6 +4631,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4457,6 +4657,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4481,6 +4683,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4505,6 +4709,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2],
         aiHook: {
           targetWord: 'short a sounds',
           intent: 'fill_blank',
@@ -4542,7 +4748,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4567,7 +4774,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4592,7 +4800,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4617,7 +4826,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4642,7 +4852,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4667,7 +4878,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4692,7 +4904,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4717,7 +4930,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4742,7 +4956,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4767,7 +4982,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -4804,7 +5020,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
@@ -4829,7 +5046,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _eg",
@@ -4854,7 +5072,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _eb",
@@ -4879,7 +5098,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
@@ -4904,7 +5124,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
@@ -4929,7 +5150,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
@@ -4954,7 +5176,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
@@ -4979,7 +5202,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
@@ -5004,7 +5228,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _en",
@@ -5029,7 +5254,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _et",
@@ -5066,7 +5292,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5091,7 +5318,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5116,7 +5344,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5141,7 +5370,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5166,7 +5396,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5191,7 +5422,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5216,7 +5448,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5241,7 +5474,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5266,7 +5500,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5291,7 +5526,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5328,7 +5564,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5353,7 +5590,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5378,7 +5616,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5403,7 +5642,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5428,7 +5668,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5453,7 +5694,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5478,7 +5720,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5503,7 +5746,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5528,7 +5772,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5553,7 +5798,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5590,7 +5836,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5615,7 +5862,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5640,7 +5888,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5665,7 +5914,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5690,7 +5940,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5715,7 +5966,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5740,7 +5992,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5765,7 +6018,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5790,7 +6044,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5815,7 +6070,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -5852,7 +6108,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5877,7 +6134,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5902,7 +6160,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5927,7 +6186,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5952,7 +6212,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -5977,7 +6238,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6002,7 +6264,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6027,7 +6290,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6052,7 +6316,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6077,7 +6342,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6114,7 +6380,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
@@ -6139,7 +6406,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
@@ -6164,7 +6432,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
@@ -6189,7 +6458,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
@@ -6214,7 +6484,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
@@ -6239,7 +6510,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
@@ -6264,7 +6536,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
@@ -6289,7 +6562,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
@@ -6314,7 +6588,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _un",
@@ -6339,7 +6614,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
           questionLine: "Listen to the word. Then, fill in the missing letter: _un",
@@ -6376,7 +6652,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6401,7 +6678,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6426,7 +6704,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6451,7 +6730,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6476,7 +6756,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6501,7 +6782,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6526,7 +6808,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6551,7 +6834,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6576,7 +6860,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6601,7 +6886,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -6638,7 +6924,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: h_t",
@@ -6663,7 +6950,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: r_g",
@@ -6688,7 +6976,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: g_s",
@@ -6713,7 +7002,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: p_n",
@@ -6738,7 +7028,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: l_p",
@@ -6763,7 +7054,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: p_t",
@@ -6788,7 +7080,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: c_p",
@@ -6813,7 +7106,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: b_d",
@@ -6838,7 +7132,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: p_t",
@@ -6863,7 +7158,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
           questionLine: "Listen to the word and fill in the missing letter: l_g",
@@ -6900,7 +7196,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -6925,7 +7222,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -6950,7 +7248,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -6975,7 +7274,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7000,7 +7300,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7025,7 +7326,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7050,7 +7352,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7075,7 +7378,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7100,7 +7404,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7125,7 +7430,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7162,7 +7468,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7187,7 +7494,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7212,7 +7520,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7237,7 +7546,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7262,7 +7572,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7287,7 +7598,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7312,7 +7624,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7337,7 +7650,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7362,7 +7676,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7387,7 +7702,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7424,7 +7740,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7449,7 +7766,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7474,7 +7792,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7499,7 +7818,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7524,7 +7844,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7549,7 +7870,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7574,7 +7896,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7599,7 +7922,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7624,7 +7948,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7649,7 +7974,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
           questionLine: "Which sentence matches the picture?",
@@ -7686,7 +8012,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'fur',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7711,7 +8038,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'hard',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7736,7 +8064,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'cart',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7761,7 +8090,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'bird',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7786,7 +8116,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'star',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7811,7 +8142,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'corn',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7836,7 +8168,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'fork',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7861,7 +8194,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'barn',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7886,7 +8220,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'horn',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7911,7 +8246,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'curl',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -7947,6 +8283,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'farm',
           intent: 'fill_blank',
@@ -7971,6 +8309,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'bark',
           intent: 'fill_blank',
@@ -7995,6 +8335,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
         aiHook: {
           targetWord: 'clerk',
           intent: 'fill_blank',
@@ -8019,6 +8361,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'bird',
           intent: 'fill_blank',
@@ -8043,6 +8387,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'corn',
           intent: 'fill_blank',
@@ -8067,6 +8413,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'burn',
           intent: 'fill_blank',
@@ -8091,6 +8439,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
         aiHook: {
           targetWord: 'star',
           intent: 'fill_blank',
@@ -8115,6 +8465,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
         aiHook: {
           targetWord: 'shirt',
           intent: 'fill_blank',
@@ -8139,6 +8491,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'turn',
           intent: 'fill_blank',
@@ -8163,6 +8517,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
         aiHook: {
           targetWord: 'horn',
           intent: 'fill_blank',
@@ -8200,7 +8556,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8225,7 +8582,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8250,7 +8608,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8275,7 +8634,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8300,7 +8660,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8325,7 +8686,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8350,7 +8712,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8375,7 +8738,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8400,7 +8764,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8425,7 +8790,8 @@ export const sampleMCQData: MCQData = {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
           questionLine: "Which word matches the picture?",
@@ -8462,7 +8828,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Sam have?",
@@ -8488,7 +8855,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What kind of stamps does Cam like?",
@@ -8514,7 +8882,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "Where is Sam standing?",
@@ -8540,7 +8909,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What is on some of the stamps?",
@@ -8566,7 +8936,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What is Sam standing on?",
@@ -8592,7 +8963,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "Who likes the bat stamps?",
@@ -8618,7 +8990,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "Who stands by the plants?",
@@ -8644,7 +9017,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Gramps have a stack of?",
@@ -8670,7 +9044,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What helps Sam?",
@@ -8696,7 +9071,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Cam say thanks for?",
@@ -8734,7 +9110,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Len see in the den?",
@@ -8760,7 +9137,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "Where does Ben put the pens?",
@@ -8786,7 +9164,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Jen sweep?",
@@ -8812,7 +9191,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "Where is the den located?",
@@ -8838,7 +9218,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "Where does Ben put his jet?",
@@ -8864,7 +9245,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "Who helps Miss Dell?",
@@ -8890,7 +9272,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "What do Ken and Len decide to do?",
@@ -8916,7 +9299,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Ben go to get from under the bed?",
@@ -8942,7 +9326,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "Where does Jen put the ten things?",
@@ -8968,7 +9353,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
             questionLine: "What animals does Len see in the den?",
@@ -9006,7 +9392,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Sid give Jill?",
@@ -9032,7 +9419,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Lin add to the dip?",
@@ -9058,7 +9446,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What does mom get for her gift?",
@@ -9084,7 +9473,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "How big is the hat for Sid?",
@@ -9110,7 +9500,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What ingredient does Lin use in the dip?",
@@ -9136,7 +9527,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What do Kim and Tim decide to buy?",
@@ -9162,7 +9554,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Sid give Jill after getting the hat?",
@@ -9188,7 +9581,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "How does Lin feel about the dip with the chips?",
@@ -9214,7 +9608,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What final gift do they choose for mom?",
@@ -9240,7 +9635,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Jill decide to do for Sid?",
@@ -9278,7 +9674,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What do Ron and Tod do together?",
@@ -9304,7 +9701,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What is on Lon's new blocks?",
@@ -9330,7 +9728,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Jon spot?",
@@ -9356,7 +9755,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Tom do at his job?",
@@ -9382,7 +9782,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Bob do with his top?",
@@ -9408,7 +9809,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Molly do with the pot?",
@@ -9434,7 +9836,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Don do with the blocks?",
@@ -9460,7 +9863,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Rob's frog do?",
@@ -9486,7 +9890,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Spot do at the park?",
@@ -9512,7 +9917,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Dot do in the garden?",
@@ -9550,7 +9956,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Russ do before settling in bed?",
@@ -9576,7 +9983,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "How can Russ help Gus?",
@@ -9602,7 +10010,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "Where does the skunk drag her stuff?",
@@ -9628,7 +10037,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "How is Russ at the end of the story?",
@@ -9654,7 +10064,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "When does Russ hum?",
@@ -9680,7 +10091,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "What does the skunk find?",
@@ -9706,7 +10118,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "What does Russ receive before settling down?",
@@ -9732,7 +10145,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "How does Gus feel about humming?",
@@ -9758,7 +10172,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "What is the skunk doing?",
@@ -9784,7 +10199,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
             questionLine: "What does she do to help Russ sleep?",
@@ -9822,7 +10238,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Why can't Pete and Kate pick the grapes at first?",
@@ -9848,7 +10265,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Where are Gabe's skates?",
@@ -9874,7 +10292,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do Jane and Luke do first in the race?",
@@ -9900,7 +10319,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do Pete and Kate do before they pick grapes?",
@@ -9926,7 +10346,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do Pig and Gabe decide to do after getting the skates?",
@@ -9952,7 +10373,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do Jane and Luke do at the end of the race?",
@@ -9978,7 +10400,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What color do the grapes turn when they are ripe?",
@@ -10004,7 +10427,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What does Pig prefer to do instead of racing?",
@@ -10030,7 +10454,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Who wins the race?",
@@ -10056,7 +10481,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do Pete and Kate do after picking the grapes?",
@@ -10094,7 +10520,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What does Snail think of the tea?",
@@ -10120,7 +10547,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What does Flea give Snail to eat?",
@@ -10146,7 +10574,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What does Snail ask for after the meal?",
@@ -10172,7 +10601,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "How does Flea feel about the meal?",
@@ -10198,7 +10628,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What do Snail and Flea have for their meal?",
@@ -10224,7 +10655,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What is Lee excited to eat at the picnic?",
@@ -10250,7 +10682,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "Which animals come to the picnic?",
@@ -10276,7 +10709,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What does Lee shout at the animals?",
@@ -10302,7 +10736,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "What happens after Lee shouts at the animals?",
@@ -10328,7 +10763,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
             questionLine: "Why do Finn and Lee cheer at the end?",
@@ -10366,7 +10802,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10392,7 +10829,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10418,7 +10856,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10444,7 +10883,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10470,7 +10910,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10496,7 +10937,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10522,7 +10964,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10548,7 +10991,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10574,7 +11018,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10600,7 +11045,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10638,7 +11084,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10664,7 +11111,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10690,7 +11138,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10716,7 +11165,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10742,7 +11192,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10768,7 +11219,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10794,7 +11246,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10820,7 +11273,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10846,7 +11300,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10872,7 +11327,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10910,7 +11366,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10936,7 +11393,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10962,7 +11420,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -10988,7 +11447,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11014,7 +11474,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11040,7 +11501,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11066,7 +11528,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11092,7 +11555,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11118,7 +11582,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11144,7 +11609,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11182,7 +11648,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11208,7 +11675,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11234,7 +11702,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11260,7 +11729,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11286,7 +11756,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11312,7 +11783,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11338,7 +11810,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11364,7 +11837,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11390,7 +11864,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11416,7 +11891,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11454,7 +11930,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11480,7 +11957,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11506,7 +11984,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11532,7 +12011,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11558,7 +12038,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11584,7 +12065,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11610,7 +12092,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11636,7 +12119,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11662,7 +12146,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11688,7 +12173,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
             questionLine: "Sort the words by their vowel patterns.",
@@ -11725,7 +12211,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11750,7 +12237,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11775,7 +12263,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11800,7 +12289,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11825,7 +12315,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11850,7 +12341,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11875,7 +12367,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11900,7 +12393,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11925,7 +12419,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11950,7 +12445,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the present?",
@@ -11987,7 +12483,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12012,7 +12509,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12037,7 +12535,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12062,7 +12561,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12087,7 +12587,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12112,7 +12613,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12137,7 +12639,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12162,7 +12665,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12187,7 +12691,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12212,7 +12717,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
             questionLine: "Which sentence tells about the past?",
@@ -12249,7 +12755,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'again',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12274,7 +12781,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'each',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12299,7 +12807,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'from',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12324,7 +12833,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'may',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12349,7 +12859,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'stop',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12374,7 +12885,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'than',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12399,7 +12911,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'when',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12424,7 +12937,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'again',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12449,7 +12963,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'each',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12474,7 +12989,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'from',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12511,7 +13027,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'has',
             intent: 'mcq',
             questionLine: "Listen to the word. Which one do you hear?",
@@ -12536,7 +13053,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'gave',
             intent: 'mcq',
             questionLine: "Click on the sound. Which word do you hear?",
@@ -12561,7 +13079,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'them',
             intent: 'mcq',
             questionLine: "Play the audio. Which word is it?",
@@ -12586,7 +13105,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'after',
             intent: 'mcq',
             questionLine: "Listen to the button sound. Which word do you hear?",
@@ -12611,7 +13131,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'best',
             intent: 'mcq',
             questionLine: "Play the audio. What word do you hear?",
@@ -12636,7 +13157,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'once',
             intent: 'mcq',
             questionLine: "Click to hear the word. Which one is it?",
@@ -12661,7 +13183,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'were',
             intent: 'mcq',
             questionLine: "Listen to the audio clip. Which word do you hear?",
@@ -12686,7 +13209,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'has',
             intent: 'mcq',
             questionLine: "Click to play the sound. Which word do you hear?",
@@ -12711,7 +13235,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'gave',
             intent: 'mcq',
             questionLine: "Listen to the button sound. Which one do you hear?",
@@ -12736,7 +13261,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'them',
             intent: 'mcq',
             questionLine: "Play the sound. Which word is it?",
@@ -12773,7 +13299,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'as',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12798,7 +13325,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'by',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12823,7 +13351,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'four',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12848,7 +13377,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'her',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12873,7 +13403,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'more',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12898,7 +13429,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'some',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12923,7 +13455,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'think',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12948,7 +13481,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'way',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12973,7 +13507,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'her',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -12998,7 +13533,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'more',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13035,7 +13571,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'from',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13060,7 +13597,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'after',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13085,7 +13623,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'them',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13110,7 +13649,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'once',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13135,7 +13675,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'way',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13160,7 +13701,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'best',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13185,7 +13727,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'gave',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13210,7 +13753,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'more',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13235,7 +13779,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'think',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13260,7 +13805,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'as',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13297,7 +13843,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13322,7 +13869,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13347,7 +13895,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13372,7 +13921,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13397,7 +13947,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13422,7 +13973,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13447,7 +13999,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13472,7 +14025,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13497,7 +14051,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13522,7 +14077,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13559,7 +14115,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'ask',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13584,7 +14141,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'five',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13609,7 +14167,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'just',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13634,7 +14193,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13659,7 +14219,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'read',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13684,7 +14245,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'then',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13709,7 +14271,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'want',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13734,7 +14297,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'ask',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13759,7 +14323,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'five',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13784,7 +14349,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'long',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13821,7 +14387,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'any',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13846,7 +14413,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'give',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13871,7 +14439,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'his',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13896,7 +14465,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'new',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13921,7 +14491,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'open',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13946,7 +14517,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sleep',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13971,7 +14543,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'wish',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -13996,7 +14569,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'give',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -14021,7 +14595,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'his',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -14046,7 +14621,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'new',
             intent: 'mcq',
             questionLine: "Click on the button. Which word do you hear?",
@@ -14083,7 +14659,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'also',
             intent: 'mcq',
             questionLine: "Which word means 'in addition'?",
@@ -14108,7 +14685,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'fly',
             intent: 'mcq',
             questionLine: "Which word describes what birds do in the sky?",
@@ -14133,7 +14711,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'know',
             intent: 'mcq',
             questionLine: "Which word means to be aware of something?",
@@ -14158,7 +14737,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'live',
             intent: 'mcq',
             questionLine: "Which word means to reside or exist?",
@@ -14183,7 +14763,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'old',
             intent: 'mcq',
             questionLine: "Which word refers to something that has existed for a long time?",
@@ -14208,7 +14789,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'soon',
             intent: 'mcq',
             questionLine: "Which word means in a short time?",
@@ -14233,7 +14815,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'why',
             intent: 'mcq',
             questionLine: "Which word is used to ask for a reason?",
@@ -14258,7 +14841,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'also',
             intent: 'mcq',
             questionLine: "Which word means in addition to?",
@@ -14283,7 +14867,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'fly',
             intent: 'mcq',
             questionLine: "Which word describes what insects and birds do?",
@@ -14308,7 +14893,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'live',
             intent: 'mcq',
             questionLine: "Which word means to exist or reside?",
@@ -14345,7 +14931,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Which sentence is correctly spaced?",
@@ -14370,7 +14957,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Choose the correct word to complete: 'I like to ___ my smoothie with fruits.'",
@@ -14395,7 +14983,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word has a long 'a' sound?",
@@ -14420,7 +15009,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'mcq',
             questionLine: "Which word has a short 'a' sound?",
@@ -14445,7 +15035,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word recognition',
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'We went over ___ to play.'?",
@@ -14470,7 +15061,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
             questionLine: "Which word is a question word?",
@@ -14495,7 +15087,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'word recognition',
             intent: 'mcq',
             questionLine: "Select the sight word from the options below.",
@@ -14520,7 +15113,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word usage',
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'Can you ___ the door?'",
@@ -14545,7 +15139,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'contextual usage',
             intent: 'mcq',
             questionLine: "Which word fits: 'I ___ in a big city.'?",
@@ -14570,7 +15165,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'recognition',
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'I like apples and ___ oranges.'?",
@@ -14607,7 +15203,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Which sentence is correctly spaced?",
@@ -14632,7 +15229,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Which word completes the sentence: 'I can ___ the colors together'?",
@@ -14657,7 +15255,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word has a short 'a' sound?",
@@ -14682,7 +15281,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'mcq',
             questionLine: "Select the word with a short 'a' sound.",
@@ -14707,7 +15307,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Choose the word that completes the sentence: 'Mix and ___ the ingredients well.'",
@@ -14732,7 +15333,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Which sentence has correct spacing?",
@@ -14757,7 +15359,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
             questionLine: "Which word includes a short 'a' sound?",
@@ -14782,7 +15385,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Find the word that fits: 'We need to ___ the paints.'",
@@ -14807,7 +15411,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'mcq',
             questionLine: "Which word contains a short 'a' sound?",
@@ -14832,7 +15437,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
             questionLine: "Choose the correctly spaced sentence.",
@@ -14870,7 +15476,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'context clue',
             intent: 'reading_comprehension',
             questionLine: "Why does Mouse always find Lion?",
@@ -14896,7 +15503,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'context clue',
             intent: 'reading_comprehension',
             questionLine: "How does Nate know he can skate on the lake?",
@@ -14922,7 +15530,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'context clue',
             intent: 'reading_comprehension',
             questionLine: "What is Andy looking for?",
@@ -14948,7 +15557,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'main idea',
             intent: 'reading_comprehension',
             questionLine: "What is the main idea of 'Play Time'?",
@@ -14974,7 +15584,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'sequence',
             intent: 'reading_comprehension',
             questionLine: "What happens after Nate's mother checks the ice?",
@@ -15000,7 +15611,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'characters',
             intent: 'reading_comprehension',
             questionLine: "Who are the main characters in 'Play Time'?",
@@ -15026,7 +15638,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'setting',
             intent: 'reading_comprehension',
             questionLine: "Where does 'Ice Skating Day' take place?",
@@ -15052,7 +15665,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'problem',
             intent: 'reading_comprehension',
             questionLine: "What problem is Andy facing in 'The Lost Ball'?",
@@ -15078,7 +15692,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'solution',
             intent: 'reading_comprehension',
             questionLine: "How does Barb help solve the problem in 'The Lost Ball'?",
@@ -15104,7 +15719,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'prediction',
             intent: 'reading_comprehension',
             questionLine: "What might happen next after Mouse finds Lion?",
@@ -15142,7 +15758,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character actions',
             intent: 'reading_comprehension',
             questionLine: "What kind of book did Leo read today?",
@@ -15168,7 +15785,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character motivation',
             intent: 'reading_comprehension',
             questionLine: "Why doesn't Nora want to go to Ben's house?",
@@ -15194,7 +15812,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character feelings',
             intent: 'reading_comprehension',
             questionLine: "What does Chen think about the sleepover?",
@@ -15220,7 +15839,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'plot understanding',
             intent: 'reading_comprehension',
             questionLine: "What does Cara ask Leo?",
@@ -15246,7 +15866,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character interaction',
             intent: 'reading_comprehension',
             questionLine: "What does Mom suggest to Nora?",
@@ -15272,7 +15893,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character decision',
             intent: 'reading_comprehension',
             questionLine: "What does Leo decide to do at the table?",
@@ -15298,7 +15920,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'conflict resolution',
             intent: 'reading_comprehension',
             questionLine: "How does Mom help Nora with her problem?",
@@ -15324,7 +15947,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character reassurance',
             intent: 'reading_comprehension',
             questionLine: "How does Mom reassure Chen about his sleepover?",
@@ -15350,7 +15974,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'story setting',
             intent: 'reading_comprehension',
             questionLine: "Where does the story with Leo take place?",
@@ -15376,7 +16001,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'character preference',
             intent: 'reading_comprehension',
             questionLine: "What does Nora prefer to do instead of playing Cupcake Store?",
@@ -15414,7 +16040,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'magical flute',
             intent: 'reading_comprehension',
             questionLine: "What does the woman use to make the rats go away?",
@@ -15440,7 +16067,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'tricks',
             intent: 'reading_comprehension',
             questionLine: "What has Fox done before?",
@@ -15466,7 +16094,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'money',
             intent: 'reading_comprehension',
             questionLine: "What does Hans need?",
@@ -15492,7 +16121,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'rats',
             intent: 'reading_comprehension',
             questionLine: "Why were the people mad?",
@@ -15518,7 +16148,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'flute',
             intent: 'reading_comprehension',
             questionLine: "What does the woman use to help the town?",
@@ -15544,7 +16175,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'shoes',
             intent: 'reading_comprehension',
             questionLine: "What did Hans make in his store?",
@@ -15570,7 +16202,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'trick',
             intent: 'reading_comprehension',
             questionLine: "What had Fox done to Lion before?",
@@ -15596,7 +16229,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'fast',
             intent: 'reading_comprehension',
             questionLine: "How did Hans need to think to solve his problem?",
@@ -15622,7 +16256,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'king',
             intent: 'reading_comprehension',
             questionLine: "Who needed help to get rid of the rats?",
@@ -15648,7 +16283,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'walk',
             intent: 'reading_comprehension',
             questionLine: "What was Fox doing when she saw Lion?",
@@ -15686,7 +16322,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What are rays?",
@@ -15712,7 +16349,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Arctic foxes use their tails to ________.",
@@ -15738,7 +16376,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "How are most rays shaped?",
@@ -15764,7 +16403,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Where do Arctic foxes live?",
@@ -15790,7 +16430,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do the fins of rays look like?",
@@ -15816,7 +16457,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What kind of tails do Arctic foxes have?",
@@ -15842,7 +16484,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "How do rays appear in the water?",
@@ -15868,7 +16511,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What do Arctic foxes do with their tails when they sleep?",
@@ -15894,7 +16538,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What helps rays swim?",
@@ -15920,7 +16565,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What keeps Arctic foxes warm?",
@@ -15958,7 +16604,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "How many players can a volleyball team have on their side?",
@@ -15984,7 +16631,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What equipment is needed to play tennis?",
@@ -16010,7 +16658,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What is used to play soccer?",
@@ -16036,7 +16685,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Where is basketball played?",
@@ -16062,7 +16712,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Where do people usually swim?",
@@ -16088,7 +16739,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "Where are running races held?",
@@ -16114,7 +16766,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What is used to play ice hockey?",
@@ -16140,7 +16793,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What equipment is needed to play baseball?",
@@ -16166,7 +16820,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What skills are important in gymnastics?",
@@ -16192,7 +16847,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
             questionLine: "What is used to play golf?",
@@ -16230,7 +16886,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Big Ben',
             intent: 'reading_comprehension',
             questionLine: "What is Big Ben known for?",
@@ -16256,7 +16913,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Lisbon',
             intent: 'reading_comprehension',
             questionLine: "What is a popular mode of transportation in Lisbon?",
@@ -16282,7 +16940,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Eiffel Tower',
             intent: 'reading_comprehension',
             questionLine: "What type of structure is the Eiffel Tower?",
@@ -16308,7 +16967,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Statue of Liberty',
             intent: 'reading_comprehension',
             questionLine: "What is the Statue of Liberty?",
@@ -16334,7 +16994,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Great Wall of China',
             intent: 'reading_comprehension',
             questionLine: "What is the Great Wall of China?",
@@ -16360,7 +17021,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Sydney Opera House',
             intent: 'reading_comprehension',
             questionLine: "What is the Sydney Opera House known for?",
@@ -16386,7 +17048,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Pyramids of Giza',
             intent: 'reading_comprehension',
             questionLine: "What are the Pyramids of Giza?",
@@ -16412,7 +17075,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Colosseum',
             intent: 'reading_comprehension',
             questionLine: "What was the Colosseum used for?",
@@ -16438,7 +17102,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Taj Mahal',
             intent: 'reading_comprehension',
             questionLine: "What is the Taj Mahal?",
@@ -16464,7 +17129,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: 'Machu Picchu',
             intent: 'reading_comprehension',
             questionLine: "What is Machu Picchu?",
@@ -16500,6 +17166,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
           aiHook: {
             targetWord: "cake",
             intent: "fill_blank",
@@ -16524,6 +17192,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2],
           aiHook: {
             targetWord: "cat",
             intent: "fill_blank",
@@ -16548,6 +17218,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
           aiHook: {
             targetWord: "bike",
             intent: "fill_blank",
@@ -16572,6 +17244,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2],
           aiHook: {
             targetWord: "sit",
             intent: "fill_blank",
@@ -16596,6 +17270,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
           aiHook: {
             targetWord: "rope",
             intent: "fill_blank",
@@ -16620,6 +17296,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2],
           aiHook: {
             targetWord: "dog",
             intent: "fill_blank",
@@ -16644,6 +17322,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
           aiHook: {
             targetWord: "tree",
             intent: "fill_blank",
@@ -16668,6 +17348,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2],
           aiHook: {
             targetWord: "bed",
             intent: "fill_blank",
@@ -16692,6 +17374,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
           aiHook: {
             targetWord: "note",
             intent: "fill_blank",
@@ -16716,6 +17400,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2],
           aiHook: {
             targetWord: "cup",
             intent: "fill_blank",
@@ -16751,6 +17437,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "meat",
             intent: "fill_blank",
@@ -16775,6 +17463,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "seal",
             intent: "fill_blank",
@@ -16799,6 +17489,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,4],
           aiHook: {
             targetWord: "treat",
             intent: "fill_blank",
@@ -16823,6 +17515,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "team",
             intent: "fill_blank",
@@ -16847,6 +17541,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "dream",
             intent: "fill_blank",
@@ -16871,6 +17567,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,5],
           aiHook: {
             targetWord: "stream",
             intent: "fill_blank",
@@ -16895,6 +17593,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
           targetWord: "cream",
             intent: "fill_blank",
@@ -16919,6 +17619,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "peach",
             intent: "fill_blank",
@@ -16943,6 +17645,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "beach",
             intent: "fill_blank",
@@ -16967,6 +17671,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
                     targetWord: "beam",
             intent: "fill_blank",
@@ -17002,6 +17708,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "cake",
             intent: "fill_blank",
@@ -17026,6 +17734,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "train",
             intent: "fill_blank",
@@ -17050,6 +17760,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "play",
             intent: "fill_blank",
@@ -17074,6 +17786,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "bake",
             intent: "fill_blank",
@@ -17098,6 +17812,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "rain",
             intent: "fill_blank",
@@ -17122,6 +17838,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "day",
             intent: "fill_blank",
@@ -17146,6 +17864,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "plane",
             intent: "fill_blank",
@@ -17170,6 +17890,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "sail",
             intent: "fill_blank",
@@ -17194,6 +17916,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "stay",
             intent: "fill_blank",
@@ -17218,6 +17942,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "wave",
             intent: "fill_blank",
@@ -17253,6 +17979,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "teeth",
             intent: "fill_blank",
@@ -17277,6 +18005,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "beach",
             intent: "fill_blank",
@@ -17301,6 +18031,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "speak",
             intent: "fill_blank",
@@ -17325,6 +18057,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "sheep",
             intent: "fill_blank",
@@ -17349,6 +18083,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "beetle",
             intent: "fill_blank",
@@ -17373,6 +18109,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "dream",
             intent: "fill_blank",
@@ -17397,6 +18135,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,5],
           aiHook: {
             targetWord: "screen",
             intent: "fill_blank",
@@ -17421,6 +18161,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "leap",
             intent: "fill_blank",
@@ -17445,6 +18187,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "feast",
             intent: "fill_blank",
@@ -17469,6 +18213,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "green",
             intent: "fill_blank",
@@ -17504,6 +18250,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "kite",
             intent: "fill_blank",
@@ -17528,6 +18276,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "spy",
             intent: "fill_blank",
@@ -17552,6 +18302,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "pie",
             intent: "fill_blank",
@@ -17576,6 +18328,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "bike",
             intent: "fill_blank",
@@ -17600,6 +18354,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "fly",
             intent: "fill_blank",
@@ -17624,6 +18380,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "lie",
             intent: "fill_blank",
@@ -17648,6 +18406,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+          prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "dime",
             intent: "fill_blank",
@@ -17672,6 +18432,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "cry",
             intent: "fill_blank",
@@ -17696,6 +18458,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "tie",
             intent: "fill_blank",
@@ -17720,6 +18484,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "lime",
             intent: "fill_blank",
@@ -17755,6 +18521,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "cone",
             intent: "fill_blank",
@@ -17779,6 +18547,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "coat",
             intent: "fill_blank",
@@ -17803,6 +18573,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "bowl",
             intent: "fill_blank",
@@ -17827,6 +18599,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "stone",
             intent: "fill_blank",
@@ -17851,6 +18625,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "goat",
             intent: "fill_blank",
@@ -17875,6 +18651,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "blow",
             intent: "fill_blank",
@@ -17890,22 +18668,24 @@ export const sampleMCQData: MCQData = {
           questionElements: 'audio + image',
           answerElements: 'text',
           templateType: 'fill_blank',
-          word: "bone",
+          word: "bones",
           imageUrl: null,
           explanation: "Nice! 'Bone' ends with a silent 'e'.",
           questionText: "Spell the word: Inside your body, you have many b___s.",
-          correctAnswer: "bone",
+          correctAnswer: "bones",
           template: 'fill_blank',
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,4],
           aiHook: {
             targetWord: "bone",
             intent: "fill_blank",
             questionLine: "Spell the word: Inside your body, you have many b___s.",
             imagePrompt: "Educational scene showing spell the long o word silent e oa ow concepts"
           },
-          audio: "bone"
+          audio: "bones"
         },
         {
           id: 8,
@@ -17923,6 +18703,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "float",
             intent: "fill_blank",
@@ -17947,6 +18729,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "crow",
             intent: "fill_blank",
@@ -17971,6 +18755,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "stove",
             intent: "fill_blank",
@@ -18006,6 +18792,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "blue",
             intent: "fill_blank",
@@ -18030,6 +18818,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "glue",
             intent: "fill_blank",
@@ -18054,6 +18844,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "clue",
             intent: "fill_blank",
@@ -18078,6 +18870,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "flute",
             intent: "fill_blank",
@@ -18102,6 +18896,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "mood",
             intent: "fill_blank",
@@ -18126,6 +18922,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "chew",
             intent: "fill_blank",
@@ -18150,6 +18948,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+            isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "stew",
             intent: "fill_blank",
@@ -18174,6 +18974,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "moon",
             intent: "fill_blank",
@@ -18198,6 +19000,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "rude",
             intent: "fill_blank",
@@ -18222,6 +19026,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "tune",
             intent: "fill_blank",
@@ -18257,6 +19063,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "cow",
             intent: "fill_blank",
@@ -18281,6 +19089,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "coin",
             intent: "fill_blank",
@@ -18305,6 +19115,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "toy",
             intent: "fill_blank",
@@ -18329,6 +19141,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "mouse",
             intent: "fill_blank",
@@ -18353,6 +19167,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "boil",
             intent: "fill_blank",
@@ -18377,6 +19193,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "cloud",
             intent: "fill_blank",
@@ -18401,6 +19219,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "plow",
             intent: "fill_blank",
@@ -18425,6 +19245,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "soil",
             intent: "fill_blank",
@@ -18449,6 +19271,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "crown",
             intent: "fill_blank",
@@ -18473,6 +19297,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "house",
             intent: "fill_blank",
@@ -18508,6 +19334,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18532,6 +19360,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18556,6 +19386,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18580,6 +19412,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18604,6 +19438,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18628,6 +19464,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18652,6 +19490,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18676,6 +19516,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18700,6 +19542,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18724,6 +19568,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "vowel blend",
             intent: "fill_blank",
@@ -18759,6 +19605,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "basket",
             intent: "fill_blank",
@@ -18783,6 +19631,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "minus",
             intent: "fill_blank",
@@ -18807,6 +19657,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "shiny",
             intent: "fill_blank",
@@ -18831,6 +19683,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "rocket",
             intent: "fill_blank",
@@ -18855,6 +19709,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "open",
             intent: "fill_blank",
@@ -18879,6 +19735,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "music",
             intent: "fill_blank",
@@ -18903,6 +19761,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "hotel",
             intent: "fill_blank",
@@ -18927,6 +19787,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "tablet",
             intent: "fill_blank",
@@ -18951,6 +19813,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "pilot",
             intent: "fill_blank",
@@ -18975,6 +19839,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "cabin",
             intent: "fill_blank",
@@ -19010,6 +19876,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "candle",
             intent: "fill_blank",
@@ -19034,6 +19902,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3,4],
           aiHook: {
             targetWord: "nibble",
             intent: "fill_blank",
@@ -19058,6 +19928,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "bottle",
             intent: "fill_blank",
@@ -19082,6 +19954,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "castle",
             intent: "fill_blank",
@@ -19106,6 +19980,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "puzzle",
             intent: "fill_blank",
@@ -19130,6 +20006,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "ripple",
             intent: "fill_blank",
@@ -19154,6 +20032,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+          prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "fiddle",
             intent: "fill_blank",
@@ -19178,6 +20058,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "jungle",
             intent: "fill_blank",
@@ -19202,6 +20084,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "humble",
             intent: "fill_blank",
@@ -19226,6 +20110,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "turtle",
             intent: "fill_blank",
@@ -19261,6 +20147,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "laptop",
             intent: "fill_blank",
@@ -19285,6 +20173,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "sunset",
             intent: "fill_blank",
@@ -19309,6 +20199,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "bathtub",
             intent: "fill_blank",
@@ -19333,6 +20225,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "backpack",
             intent: "fill_blank",
@@ -19357,6 +20251,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+            isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "basket",
             intent: "fill_blank",
@@ -19381,6 +20277,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "bedroom",
             intent: "fill_blank",
@@ -19405,6 +20303,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "sunflower",
             intent: "fill_blank",
@@ -19429,6 +20329,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "football",
             intent: "fill_blank",
@@ -19453,6 +20355,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "notebook",
             intent: "fill_blank",
@@ -19477,6 +20381,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "bookmark",
             intent: "fill_blank",
@@ -19512,6 +20418,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "sunrise",
             intent: "fill_blank",
@@ -19536,6 +20444,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "mailbox",
             intent: "fill_blank",
@@ -19560,6 +20470,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "puppet",
             intent: "fill_blank",
@@ -19584,6 +20496,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "backpack",
             intent: "fill_blank",
@@ -19608,6 +20522,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "baseball",
             intent: "fill_blank",
@@ -19632,6 +20548,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+                isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "footprint",
             intent: "fill_blank",
@@ -19656,6 +20574,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "notebook",
             intent: "fill_blank",
@@ -19680,6 +20600,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "raincoat",
             intent: "fill_blank",
@@ -19704,6 +20626,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "sandbox",
             intent: "fill_blank",
@@ -19728,6 +20652,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
           aiHook: {
             targetWord: "starfish",
             intent: "fill_blank",
@@ -19763,6 +20689,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "cabin",
             intent: "fill_blank",
@@ -19787,6 +20715,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "traffic",
             intent: "fill_blank",
@@ -19811,6 +20741,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "helmet",
             intent: "fill_blank",
@@ -19835,6 +20767,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "drumstick",
             intent: "fill_blank",
@@ -19859,6 +20793,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "planet",
             intent: "fill_blank",
@@ -19883,6 +20819,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "hundred",
             intent: "fill_blank",
@@ -19907,6 +20845,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "insect",
             intent: "fill_blank",
@@ -19931,6 +20871,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "rocket",
             intent: "fill_blank",
@@ -19955,6 +20897,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "basket",
             intent: "fill_blank",
@@ -19979,8 +20923,10 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
-            targetWord: "picnic",
+            targetWord: "picnic", 
             intent: "fill_blank",
             questionLine: "Complete the word: pic___",
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
@@ -20014,6 +20960,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2,3],
           aiHook: {
             targetWord: "knot",
             intent: "fill_blank",
@@ -20038,6 +20986,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2,3,4],
           aiHook: {
             targetWord: "knock",
             intent: "fill_blank",
@@ -20062,6 +21012,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "climb",
             intent: "fill_blank",
@@ -20086,6 +21038,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2,3,4],
           aiHook: {
             targetWord: "wrist",
             intent: "fill_blank",
@@ -20110,6 +21064,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "lamb",
             intent: "fill_blank",
@@ -20134,6 +21090,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "thumb",
             intent: "fill_blank",
@@ -20158,6 +21116,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2,3,4,5],
           aiHook: {
             targetWord: "honest",
             intent: "fill_blank",
@@ -20182,6 +21142,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [1,2,3,4],
           aiHook: {
             targetWord: "ghost",
             intent: "fill_blank",
@@ -20206,6 +21168,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3,4,5],
           aiHook: {
             targetWord: "island",
             intent: "fill_blank",
@@ -20230,6 +21194,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3,5,6],
           aiHook: {
             targetWord: "plumber",
             intent: "fill_blank",
@@ -20265,6 +21231,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "car",
             intent: "fill_blank",
@@ -20289,6 +21257,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "bird",
             intent: "fill_blank",
@@ -20313,6 +21283,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "fur",
             intent: "fill_blank",
@@ -20337,6 +21309,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "fork",
             intent: "fill_blank",
@@ -20361,6 +21335,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "her",
             intent: "fill_blank",
@@ -20385,6 +21361,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "barn",
             intent: "fill_blank",
@@ -20409,6 +21387,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "shirt",
             intent: "fill_blank",
@@ -20433,6 +21413,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "turn",
             intent: "fill_blank",
@@ -20457,6 +21439,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "corn",
             intent: "fill_blank",
@@ -20481,6 +21465,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "herd",
             intent: "fill_blank",
@@ -20516,6 +21502,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "germ",
             intent: "fill_blank",
@@ -20540,6 +21528,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "bird",
             intent: "fill_blank",
@@ -20564,6 +21554,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4,5],
           aiHook: {
             targetWord: "turtle",
             intent: "fill_blank",
@@ -20588,6 +21580,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "nurse",
             intent: "fill_blank",
@@ -20612,6 +21606,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "shirt",
             intent: "fill_blank",
@@ -20636,6 +21632,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "fur",
             intent: "fill_blank",
@@ -20660,6 +21658,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "her",
             intent: "fill_blank",
@@ -20684,6 +21684,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "stir",
             intent: "fill_blank",
@@ -20708,6 +21710,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "curl",
             intent: "fill_blank",
@@ -20732,6 +21736,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "term",
             intent: "fill_blank",
@@ -20768,7 +21774,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "short a sounds",
             intent: "mcq",
             questionLine: "Which word matches the picture of a cat?",
@@ -20793,7 +21800,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "long a sounds",
             intent: "mcq",
             questionLine: "Which word matches the picture of a cake?",
@@ -20818,7 +21826,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which word matches the picture of a bat?",
@@ -20843,7 +21852,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "Which word matches the picture of a plane?",
@@ -20868,7 +21878,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "mcq",
             questionLine: "Which word matches the picture of a hat?",
@@ -20893,7 +21904,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "short a sounds",
             intent: "mcq",
             questionLine: "Which word matches the picture of a map?",
@@ -20918,7 +21930,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "long a sounds",
             intent: "mcq",
             questionLine: "Which word matches the picture of a rake?",
@@ -20943,7 +21956,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which word matches the picture of a van?",
@@ -20968,7 +21982,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "Which word matches the picture of a cane?",
@@ -20993,7 +22008,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "mcq",
             questionLine: "Which word matches the picture of a fan?",
@@ -21029,7 +22045,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'bed'?",
@@ -21054,7 +22071,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'sheet'?",
@@ -21079,7 +22097,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'pet'?",
@@ -21104,7 +22123,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'feet'?",
@@ -21129,7 +22149,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'pen'?",
@@ -21154,7 +22175,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'beet'?",
@@ -21179,7 +22201,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'net'?",
@@ -21204,7 +22227,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'meet'?",
@@ -21229,7 +22253,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'bet'?",
@@ -21254,7 +22279,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
             questionLine: "Which picture matches the word 'seal'?",
@@ -21290,7 +22316,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "kit",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21315,7 +22342,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bike",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21340,7 +22368,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "fin",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21365,7 +22394,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "slide",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21390,7 +22420,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "lip",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21415,7 +22446,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "pin",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21440,7 +22472,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "line",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21465,7 +22498,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sip",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21490,7 +22524,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "kite",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21515,7 +22550,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "slip",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21551,7 +22587,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "con",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21576,7 +22613,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sock",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21601,7 +22639,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "joke",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21626,7 +22665,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "rope",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21651,7 +22691,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "mop",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21676,7 +22717,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "hop",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21701,7 +22743,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "hole",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21726,7 +22769,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "robe",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21751,7 +22795,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                   targetWord: "log",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21776,7 +22821,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "coke",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21812,7 +22858,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21837,7 +22884,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "hug",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21862,7 +22910,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "mutt",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21887,7 +22936,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vulge",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21912,7 +22962,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21937,7 +22988,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sum",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21962,7 +23014,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "rump",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -21987,7 +23040,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "tune",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -22012,7 +23066,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -22037,7 +23092,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                 targetWord: "bug",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -22073,7 +23129,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "glue",
             intent: "mcq",
             questionLine: "Which picture matches the word 'glue'?",
@@ -22098,7 +23155,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "treat",
             intent: "mcq",
             questionLine: "Which picture matches the word 'treat'?",
@@ -22123,7 +23181,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "rail",
             intent: "mcq",
             questionLine: "Which picture matches the word 'rail'?",
@@ -22148,7 +23207,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "leaf",
             intent: "mcq",
             questionLine: "Which picture matches the word 'leaf'?",
@@ -22173,7 +23233,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
             questionLine: "Which picture matches the word 'boat'?",
@@ -22198,7 +23259,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "beach",
             intent: "mcq",
             questionLine: "Which picture matches the word 'beach'?",
@@ -22223,7 +23285,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "rain",
             intent: "mcq",
             questionLine: "Which picture matches the word 'rain'?",
@@ -22248,7 +23311,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "peach",
             intent: "mcq",
             questionLine: "Which picture matches the word 'peach'?",
@@ -22273,7 +23337,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "train",
             intent: "mcq",
             questionLine: "Which picture matches the word 'train'?",
@@ -22298,7 +23363,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "team",
             intent: "mcq",
             questionLine: "Which picture matches the word 'team'?",
@@ -22334,7 +23400,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "clue",
             intent: "mcq",
             questionLine: "Complete the word: cl__",
@@ -22359,7 +23426,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "freeze",
             intent: "mcq",
             questionLine: "Complete the word: fr__ze",
@@ -22384,7 +23452,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                           targetWord: "soak",
             intent: "mcq",
             questionLine: "Complete the word: s__k",
@@ -22409,7 +23478,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "train",
             intent: "mcq",
             questionLine: "Complete the word: tr__n",
@@ -22434,7 +23504,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "leaf",
             intent: "mcq",
             questionLine: "Complete the word: l__f",
@@ -22459,7 +23530,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
             questionLine: "Complete the word: b__t",
@@ -22484,7 +23556,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "chief",
             intent: "mcq",
             questionLine: "Complete the word: ch__f",
@@ -22509,7 +23582,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "suit",
             intent: "mcq",
             questionLine: "Complete the word: s__t",
@@ -22534,7 +23608,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                 targetWord: "coin",
             intent: "mcq",
             questionLine: "Complete the word: c__n",
@@ -22559,7 +23634,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "team",
             intent: "mcq",
             questionLine: "Complete the word: t__m",
@@ -22595,7 +23671,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cat",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22620,7 +23697,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "dog",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22645,7 +23723,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel team",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22670,7 +23749,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bird",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22695,7 +23775,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "children",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22720,7 +23801,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                 targetWord: "car",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22745,7 +23827,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "wind",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22770,7 +23853,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "farmer",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22795,7 +23879,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "chef",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22820,7 +23905,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                           targetWord: "boy",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -22856,7 +23942,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cake",
             intent: "mcq",
             questionLine: "Find the one word with the long 'a' sound.",
@@ -22881,7 +23968,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "tree",
             intent: "mcq",
             questionLine: "Find the one word with the long 'e' sound.",
@@ -22906,7 +23994,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
             questionLine: "Find the one word with the long 'o' sound.",
@@ -22931,7 +24020,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "kite",
             intent: "mcq",
             questionLine: "Find the one word with the long 'i' sound.",
@@ -22956,7 +24046,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
             questionLine: "Find the one word with the long 'u' sound.",
@@ -22981,7 +24072,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bake",
             intent: "mcq",
             questionLine: "Find the one word with the long 'a' sound.",
@@ -23006,7 +24098,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bee",
             intent: "mcq",
             questionLine: "Find the one word with the long 'e' sound.",
@@ -23031,7 +24124,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cone",
             intent: "mcq",
             questionLine: "Find the one word with the long 'o' sound.",
@@ -23056,7 +24150,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "pie",
             intent: "mcq",
             questionLine: "Find the one word with the long 'i' sound.",
@@ -23081,7 +24176,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "flute",
             intent: "mcq",
             questionLine: "Find the one word with the long 'u' sound.",
@@ -23117,7 +24213,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "joy",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23142,7 +24239,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "howl",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23167,7 +24265,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "boil",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23192,7 +24291,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "coin",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23217,7 +24317,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cow",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23242,7 +24343,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soil",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23267,7 +24369,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "toy",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23292,7 +24395,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "loud",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23317,7 +24421,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                     targetWord: "brown",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23342,7 +24447,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cloud",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -23378,7 +24484,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "The boy has lots of coins with him.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23403,7 +24510,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "Ms. Boyle points out an owl for the scouts.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23428,7 +24536,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "The water comes out of the owl's mouth!",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23453,7 +24562,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "The toy has lots of foil on it.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23478,7 +24588,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                 targetWord: "The boy has lots of coins with him.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23503,7 +24614,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "The water comes out of the owl's mouth!",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23528,7 +24640,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "Ms. Boyle points out an owl for the scouts.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23553,7 +24666,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "The water comes out of the owl's mouth!",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23578,7 +24692,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "The boy has lots of coins with him.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23603,7 +24718,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                     targetWord: "Ms. Boyle points out an owl for the scouts.",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -23639,7 +24755,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "health",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23664,7 +24781,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reach",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23689,7 +24807,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "loud",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23714,7 +24833,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "boot",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23739,7 +24859,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bike",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23764,7 +24885,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                 targetWord: "love",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23789,7 +24911,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "home",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23814,7 +24937,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "gave",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23839,7 +24963,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23864,7 +24989,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                   targetWord: "bread",
             intent: "mcq",
             questionLine: "Listen to each word. Which one has a different vowel sound?",
@@ -23900,7 +25026,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "escape",
             intent: "mcq",
             questionLine: "Make the fence taller so the horses will not ______ again.",
@@ -23925,7 +25052,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sunrise",
             intent: "mcq",
             questionLine: "I woke up before ______ because Dave knocked on my door.",
@@ -23950,7 +25078,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "railroad",
             intent: "mcq",
             questionLine: "How long was the first ______ track in the U.S.?",
@@ -23975,7 +25104,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "notebook",
             intent: "mcq",
             questionLine: "I wrote my notes in my ______ during class.",
@@ -24000,7 +25130,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sunset",
             intent: "mcq",
             questionLine: "We watched the beautiful ______ from the hilltop.",
@@ -24025,7 +25156,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
                 targetWord: "basket",
             intent: "mcq",
             questionLine: "She carried a ______ full of apples from the orchard.",
@@ -24050,7 +25182,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "mountain",
             intent: "mcq",
             questionLine: "We climbed to the top of the ______ yesterday.",
@@ -24075,7 +25208,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "pencil",
             intent: "mcq",
             questionLine: "Please sharpen your ______ before the test starts.",
@@ -24100,7 +25234,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "kitchen",
             intent: "mcq",
             questionLine: "The delicious smell came from the ______.",
@@ -24125,7 +25260,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "market",
             intent: "mcq",
             questionLine: "We went to the ______ to buy some fresh vegetables.",
@@ -24161,7 +25297,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "happy",
             intent: "mcq",
             questionLine: "What is the base word in unhappy?",
@@ -24186,7 +25323,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
               targetWord: "preview",
             intent: "mcq",
             questionLine: "What is the prefix in preview?",
@@ -24211,7 +25349,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "happiness", 
             intent: "mcq",
             questionLine: "What is the suffix in happiness?",
@@ -24236,7 +25375,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "run",
             intent: "mcq",
             questionLine: "What is the base word in running?",
@@ -24261,7 +25401,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "disagree",
             intent: "mcq",
             questionLine: "What is the prefix in disagree?",
@@ -24286,7 +25427,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sadness",
             intent: "mcq",
             questionLine: "What is the suffix in sadness?",
@@ -24311,7 +25453,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "play",
             intent: "mcq",
             questionLine: "What is the base word in player?",
@@ -24336,7 +25479,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "misunderstand",
             intent: "mcq",
             questionLine: "What is the prefix in misunderstand?",
@@ -24361,7 +25505,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "quickly",
             intent: "mcq",
             questionLine: "What is the suffix in quickly?",
@@ -24386,7 +25531,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "thinking",
             intent: "mcq",
             questionLine: "What is the base word in thinking?",
@@ -24422,7 +25568,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "preview",
             intent: "mcq",
             questionLine: "What does preview mean?",
@@ -24447,7 +25594,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "misunderstand",
             intent: "mcq",
             questionLine: "What does misunderstand mean?",
@@ -24472,7 +25620,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "preheat",
             intent: "mcq",
             questionLine: "What does preheat mean?",
@@ -24497,7 +25646,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "rewrite",
             intent: "mcq",
             questionLine: "What does rewrite mean?",
@@ -24522,7 +25672,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "misplace",
             intent: "mcq",
             questionLine: "What does misplace mean?",
@@ -24547,7 +25698,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "prepay",
             intent: "mcq",
             questionLine: "What does prepay mean?",
@@ -24572,7 +25724,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "remake",
             intent: "mcq",
             questionLine: "What does remake mean?",
@@ -24597,7 +25750,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "misjudge",
             intent: "mcq",
             questionLine: "What does misjudge mean?",
@@ -24622,7 +25776,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "revisit",
             intent: "mcq",
             questionLine: "What does revisit mean?",
@@ -24647,7 +25802,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "view",
             intent: "mcq",
             questionLine: "What does preview mean?",
@@ -24684,7 +25840,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "fearful",
             intent: "mcq",
             questionLine: "What does fearful mean?",
@@ -24709,7 +25866,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "thoughtful",
             intent: "mcq",
             questionLine: "What does thoughtful mean?",
@@ -24734,7 +25892,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "colorless",
             intent: "mcq",
             questionLine: "What does colorless mean?",
@@ -24759,7 +25918,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "joyful",
             intent: "mcq",
             questionLine: "What does joyful mean?",
@@ -24784,7 +25944,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "hopeless",
             intent: "mcq",
             questionLine: "What does hopeless mean?",
@@ -24809,7 +25970,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "careful",
             intent: "mcq",
             questionLine: "What does careful mean?",
@@ -24834,7 +25996,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "restless",
             intent: "mcq",
             questionLine: "What does restless mean?",
@@ -24859,7 +26022,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "painful",
             intent: "mcq",
             questionLine: "What does painful mean?",
@@ -24884,7 +26048,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "endless",
             intent: "mcq",
             questionLine: "What does endless mean?",
@@ -24909,7 +26074,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "grateful",
             intent: "mcq",
             questionLine: "What does grateful mean?",
@@ -24945,7 +26111,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "unhappy",
             intent: "mcq",
             questionLine: "What does unhappy mean?",
@@ -24970,7 +26137,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "hopeful",
             intent: "mcq",
             questionLine: "What does hopeful mean?",
@@ -24995,7 +26163,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "careless",
             intent: "mcq",
             questionLine: "What does careless mean?",
@@ -25020,7 +26189,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "invisible",
             intent: "mcq",
             questionLine: "What does invisible mean?",
@@ -25045,7 +26215,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "disagree",
             intent: "mcq",
             questionLine: "What does disagree mean?",
@@ -25070,7 +26241,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "preheat",
             intent: "mcq",
             questionLine: "What does preheat mean?",
@@ -25095,7 +26267,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "rewrite",
             intent: "mcq",
             questionLine: "What does rewrite mean?",
@@ -25120,7 +26293,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "unfold",
             intent: "mcq",
             questionLine: "What does unfold mean?",
@@ -25145,7 +26319,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "kindness",
             intent: "mcq",
             questionLine: "What does kindness mean?",
@@ -25170,7 +26345,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "impossible",
             intent: "mcq",
             questionLine: "What does impossible mean?",
@@ -25206,7 +26382,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? The ____ exciting part of the trip was the roller coaster.",
@@ -25231,7 +26408,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? The ____ of the party greeted everyone warmly.",
@@ -25256,7 +26434,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? The ____ of the new phone was quite high.",
@@ -25281,7 +26460,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? She decided to ____ the letter tomorrow.",
@@ -25306,7 +26486,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? This is the ____ beautiful sunset I've ever seen.",
@@ -25331,7 +26512,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? The ____ was very welcoming to all guests.",
@@ -25356,7 +26538,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? The ____ of living in the city is very high.",
@@ -25381,7 +26564,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? Don't forget to ____ the announcement on the board.",
@@ -25406,7 +26590,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? That was the ____ delicious cake I've ever tasted.",
@@ -25431,7 +26616,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
             questionLine: "Which word makes more sense in the sentence? The ____ invited everyone to join the celebration.",
@@ -25467,7 +26653,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25492,7 +26679,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25517,7 +26705,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25542,7 +26731,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25567,7 +26757,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25592,7 +26783,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25617,7 +26809,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25642,7 +26835,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25667,7 +26861,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25692,7 +26887,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25728,7 +26924,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "flour/flower",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25753,7 +26950,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "flu/flew",
             intent: "mcq",
             questionLine: "Which word matches the picture?",
@@ -25778,7 +26976,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sea/see",
             intent: "mcq",
             questionLine: "Which word matches the picture of the ocean?",
@@ -25803,7 +27002,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "knight/night",
             intent: "mcq",
             questionLine: "Which word matches the picture of the moon and stars?",
@@ -25828,7 +27028,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bear/bare",
             intent: "mcq",
             questionLine: "Which word matches the picture of the animal?",
@@ -25853,7 +27054,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "pair/pear",
             intent: "mcq",
             questionLine: "Which word matches the picture of the fruit?",
@@ -25878,7 +27080,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "right/write",
             intent: "mcq",
             questionLine: "Which word matches the picture of a pencil?",
@@ -25903,7 +27106,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "son/sun",
             intent: "mcq",
             questionLine: "Which word matches the picture of the bright object in the sky?",
@@ -25928,7 +27132,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "whole/hole",
             intent: "mcq",
             questionLine: "Which word matches the picture of a gap in the ground?",
@@ -25953,7 +27158,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "plane/plain",
             intent: "mcq",
             questionLine: "Which word matches the picture of the object that flies?",
@@ -25989,7 +27195,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bye",
             intent: "mcq",
             questionLine: "Select the homophone of 'bye'.",
@@ -26014,7 +27221,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sea",
             intent: "mcq",
             questionLine: "Select the homophone of 'sea'.",
@@ -26039,7 +27247,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "pair",
             intent: "mcq",
             questionLine: "Select the homophone of 'pair'.",
@@ -26064,7 +27273,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "knight",
             intent: "mcq",
             questionLine: "Select the homophone of 'knight'.",
@@ -26089,7 +27299,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "flower",
             intent: "mcq",
             questionLine: "Select the homophone of 'flower'.",
@@ -26114,7 +27325,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "right",
             intent: "mcq",
             questionLine: "Select the homophone of 'right'.",
@@ -26139,7 +27351,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "two",
             intent: "mcq",
             questionLine: "Select the homophone of 'two'.",
@@ -26164,7 +27377,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "break",
             intent: "mcq",
             questionLine: "Select the homophone of 'break'.",
@@ -26189,7 +27403,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "bear",
             intent: "mcq",
             questionLine: "Select the homophone of 'bear'.",
@@ -26214,7 +27429,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "cent",
             intent: "mcq",
             questionLine: "Select the homophone of 'cent'.",
@@ -26250,7 +27466,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26275,7 +27492,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26300,7 +27518,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26325,7 +27544,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26350,7 +27570,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26375,7 +27596,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26400,7 +27622,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26425,7 +27648,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26450,7 +27674,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26475,7 +27700,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
             questionLine: "Click on the button. Which word do you hear?",
@@ -26511,7 +27737,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "It is hard to find new _____ to cook.",
@@ -26536,7 +27763,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "I made a wish _____ a star.",
@@ -26561,7 +27789,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "We eat lunch at the _____ table.",
@@ -26586,7 +27815,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "I like this book _____ it is exciting.",
@@ -26611,7 +27841,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "She is _____ on time.",
@@ -26636,7 +27867,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "The cat is hiding _____ the bed.",
@@ -26661,7 +27893,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "He can't play _____ his guitar.",
@@ -26686,7 +27919,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "We walked _____ the park.",
@@ -26711,7 +27945,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "She ran _____ the street.",
@@ -26736,7 +27971,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
             questionLine: "The tree is leaning _____ the wall.",
@@ -26772,7 +28008,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "character feelings",
             intent: "mcq",
             questionLine: "How does Nat feel about living on the moon?",
@@ -26797,7 +28034,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "character development",
             intent: "mcq",
             questionLine: "What is probably true about Lee?",
@@ -26822,7 +28060,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "setting description",
             intent: "mcq",
             questionLine: "What unusual feature does the playground have?",
@@ -26847,7 +28086,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "theme",
             intent: "mcq",
             questionLine: "What is a theme of Nat's story?",
@@ -26872,7 +28112,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "plot",
             intent: "mcq",
             questionLine: "What surprises Lee at the playground?",
@@ -26897,7 +28138,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "setting",
             intent: "mcq",
             questionLine: "Where is Nat's story set?",
@@ -26922,7 +28164,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "character action",
             intent: "mcq",
             questionLine: "What does Ms. Wood plan to do?",
@@ -26947,7 +28190,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "science fiction element",
             intent: "mcq",
             questionLine: "What is a unique element in Nat's story?",
@@ -26972,7 +28216,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "conflict",
             intent: "mcq",
             questionLine: "What does Nat miss from Earth?",
@@ -26997,7 +28242,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "imagination",
             intent: "mcq",
             questionLine: "How does Lee show her imagination?",
@@ -27033,7 +28279,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "The kids enjoy playing in the pool and creating a big ____.",
@@ -27058,7 +28305,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "In the spring, the seeds will begin to ____.",
@@ -27083,7 +28331,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "The car drove down the busy ____.",
@@ -27108,7 +28357,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "Be careful not to ____ the car against the wall.",
@@ -27133,7 +28383,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "I need a piece of ____ to tie the package.",
@@ -27158,7 +28409,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "After the accident, the doctor put a ____ on his leg.",
@@ -27183,7 +28435,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "You need to ____ the floor to remove the stains.",
@@ -27208,7 +28461,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "The zebra is known for its black and white ____.",
@@ -27233,7 +28487,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "A shooting star left a bright ____ across the sky.",
@@ -27258,7 +28513,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
             questionLine: "Please make sure to ____ your helmet before riding.",
@@ -27294,7 +28550,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27319,7 +28576,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27344,7 +28602,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27369,7 +28628,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27394,7 +28654,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27419,7 +28680,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27444,7 +28706,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27469,7 +28732,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27494,7 +28758,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27519,7 +28784,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27555,7 +28821,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27580,7 +28847,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27605,7 +28873,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27630,7 +28899,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27655,7 +28925,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27680,7 +28951,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27705,7 +28977,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27730,7 +29003,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27755,7 +29029,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27780,7 +29055,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
             questionLine: "Which sentence matches the picture?",
@@ -27816,7 +29092,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The boy _____ to school every day.",
@@ -27841,7 +29118,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The cat _____ the mouse quickly.",
@@ -27866,7 +29144,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: Sarah _____ her name on the paper.",
@@ -27891,7 +29170,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The frog _____ over the log.",
@@ -27916,7 +29196,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The rabbit _____ a carrot.",
@@ -27941,7 +29222,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The baby _____ milk from a bottle.",
@@ -27966,7 +29248,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: Timmy _____ a picture of his family.",
@@ -27991,7 +29274,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The fish _____ in the pond.",
@@ -28016,7 +29300,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: Emily _____ her favorite book.",
@@ -28041,7 +29326,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
             questionLine: "Complete the sentence with the action verb: The teacher _____ to the students.",
@@ -28077,7 +29363,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: Deb turned off the _____ music.",
@@ -28102,7 +29389,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The song Laura and Simon sang sounded _____.",
@@ -28127,7 +29415,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: Mrs. Yang talks with a very _____ voice.",
@@ -28152,7 +29441,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The table felt _____ under my hands.",
@@ -28177,7 +29467,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The candy tasted very _____.",
@@ -28202,7 +29493,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The medicine was very _____.",
@@ -28227,7 +29519,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The sun was shining _____ in the sky.",
@@ -28252,7 +29545,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The chips were too _____.",
@@ -28277,7 +29571,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The rock felt _____ under my feet.",
@@ -28302,7 +29597,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
             questionLine: "Complete the sentence with the best adjective: The ice cream was very _____.",
@@ -28339,7 +29635,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "Who does Ape help by the lake?",
@@ -28365,7 +29662,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Ape say at the end of the day?",
@@ -28391,7 +29689,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Cole do after the fish is made?",
@@ -28417,7 +29716,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Cole do to the lime?",
@@ -28443,7 +29743,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "Who does Ape help dig a hole?",
@@ -28469,7 +29770,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Eve joke about?",
@@ -28495,7 +29797,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Ape grab in the morning?",
@@ -28521,7 +29824,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Cole prepare for dinner?",
@@ -28547,7 +29851,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Ape find at home?",
@@ -28573,7 +29878,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "Who tastes the fish?",
@@ -28610,7 +29916,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "long vowel sounds",
             intent: "reading_comprehension",
             questionLine: "What happens to Kate's kite?",
@@ -28636,7 +29943,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "reading_comprehension",
             questionLine: "What does Mom show Reed how to do?",
@@ -28662,7 +29970,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "reading_comprehension",
             questionLine: "How does the crow help Kate?",
@@ -28688,7 +29997,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What does Reed do first with the peaches?",
@@ -28714,7 +30024,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "long e sounds",
             intent: "reading_comprehension",
             questionLine: "What color is Kate's kite?",
@@ -28740,7 +30051,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "short a sounds",
             intent: "reading_comprehension",
             questionLine: "What does Reed suggest to add on top of the pie?",
@@ -28766,7 +30078,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "short i sounds",
             intent: "reading_comprehension",
             questionLine: "Where does Kate fly her kite?",
@@ -28792,7 +30105,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence blending",
             intent: "reading_comprehension",
             questionLine: "What does Reed do after peeling the peaches?",
@@ -28818,7 +30132,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "long o sounds",
             intent: "reading_comprehension",
             questionLine: "What is special about the kite's tail?",
@@ -28844,7 +30159,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "vowel blend",
             intent: "reading_comprehension",
             questionLine: "What do Reed and Mom do after the pie is done?",
@@ -28881,7 +30197,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What does Chipmunk love? Look for clues in the story.",
@@ -28907,7 +30224,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "How does Chipmunk feel about the river? Look for clues in the story.",
@@ -28933,7 +30251,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What is Chipmunk trying to do? Look for clues in the story.",
@@ -28959,7 +30278,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "Why is Chipmunk worried about the river? Look for clues in the story.",
@@ -28985,7 +30305,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What is Chipmunk thinking about when he sees the river? Look for clues in the story.",
@@ -29011,7 +30332,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What is Chipmunk trying to do about the river? Look for clues in the story.",
@@ -29037,7 +30359,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What might Chipmunk be thinking of doing to cross the river? Look for clues in the story.",
@@ -29063,7 +30386,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "How does Chipmunk feel about the situation with the river? Look for clues in the story.",
@@ -29089,7 +30413,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What is Chipmunk's reaction to the river blocking his way? Look for clues in the story.",
@@ -29115,7 +30440,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
             questionLine: "What is Chipmunk's feeling about the river? Look for clues in the story.",
@@ -29152,7 +30478,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "character motivation",
             intent: "reading_comprehension",
             questionLine: "What does Rosie anticipate doing at Aunt Sarah's house?",
@@ -29178,7 +30505,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "setting",
             intent: "reading_comprehension",
             questionLine: "What is the main setting of 'The Big Game'?",
@@ -29204,7 +30532,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "plot",
             intent: "reading_comprehension",
             questionLine: "What is the main problem Rosie faces in the story?",
@@ -29230,7 +30559,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "theme",
             intent: "reading_comprehension",
             questionLine: "What is the main theme of 'The Big Game'?",
@@ -29256,7 +30586,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "character trait",
             intent: "reading_comprehension",
             questionLine: "Which character trait best describes Rosie?",
@@ -29282,7 +30613,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "conflict",
             intent: "reading_comprehension",
             questionLine: "What internal conflict does Lila experience?",
@@ -29308,7 +30640,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "resolution",
             intent: "reading_comprehension",
             questionLine: "How does Rosie plan to resolve her concern about being a picky eater?",
@@ -29334,7 +30667,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "anticipation",
             intent: "reading_comprehension",
             questionLine: "What does Lila anticipate about the game?",
@@ -29360,7 +30694,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "mood",
             intent: "reading_comprehension",
             questionLine: "What mood is created in the story 'Aunt Sarah's House'?",
@@ -29386,7 +30721,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "confidence",
             intent: "reading_comprehension",
             questionLine: "How does Lila show confidence before the game?",
@@ -29423,7 +30759,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "How does a roseate spoonbill catch food?",
@@ -29449,7 +30786,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What do hedgehogs do when they are scared?",
@@ -29475,7 +30813,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "Where do hedgehogs sometimes hunt for food?",
@@ -29501,7 +30840,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What happens to spoonbills' feathers as they grow?",
@@ -29527,7 +30867,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What is 'sky gazing' in spoonbills?",
@@ -29553,7 +30894,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "How is a spoonbill's beak shaped?",
@@ -29579,7 +30921,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What do hedgehogs use their claws for?",
@@ -29605,7 +30948,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What do hedgehogs sound like when they make noises?",
@@ -29631,7 +30975,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "Why is a spoonbill's beak useful for catching food?",
@@ -29657,7 +31002,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What do hedgehogs look like they are covered with?",
@@ -29694,7 +31040,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
             questionLine: "How do surfers 'catch' waves?",
@@ -29720,7 +31067,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "toy voyaging",
             intent: "reading_comprehension",
             questionLine: "What is toy voyaging?",
@@ -29746,7 +31094,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comic books",
             intent: "reading_comprehension",
             questionLine: "What tells most of the story in a comic book?",
@@ -29772,7 +31121,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
             questionLine: "What is a 'snap' in surfing?",
@@ -29798,7 +31148,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "toy voyaging",
             intent: "reading_comprehension",
             questionLine: "What happens to your toy in toy voyaging?",
@@ -29824,7 +31175,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comic books",
             intent: "reading_comprehension",
             questionLine: "How do people keep comic books safe?",
@@ -29850,7 +31202,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
             questionLine: "Why do surfers use a leg rope?",
@@ -29876,7 +31229,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "toy voyaging",
             intent: "reading_comprehension",
             questionLine: "What can you do if you miss your toy during toy voyaging?",
@@ -29902,7 +31256,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "comic books",
             intent: "reading_comprehension",
             questionLine: "What do some people do with their old or rare comic books?",
@@ -29928,7 +31283,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
             questionLine: "What is it called when surfers stand up and ride the wave?",
@@ -29965,7 +31321,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What is special about many of the houses in Stone Town?",
@@ -29991,7 +31348,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What is special about the Chauvet Cave paintings?",
@@ -30017,7 +31375,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What is the Atacama Desert known for?",
@@ -30043,7 +31402,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What material are the doors in Stone Town made from?",
@@ -30069,7 +31429,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What animals are shown in the Chauvet Cave paintings?",
@@ -30095,7 +31456,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "Why is the Atacama Desert a special place at night?",
@@ -30121,7 +31483,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "How did Stone Town get its name?",
@@ -30147,7 +31510,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "When were the Chauvet Cave paintings discovered?",
@@ -30173,7 +31537,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What happens in the Atacama Desert after it rains?",
@@ -30199,7 +31564,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
             questionLine: "What did people use to create the black marks on the Chauvet Cave paintings?",
@@ -30236,7 +31602,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What did Theodor Geisel do in his writing?",
@@ -30262,7 +31629,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "Why did Jane Goodall move to Africa?",
@@ -30288,7 +31656,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What did Yo-Yo's father do?",
@@ -30314,7 +31683,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "Which book did Theodor Geisel write with only fifty words?",
@@ -30340,7 +31710,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What did Jane Goodall discover about chimps?",
@@ -30366,7 +31737,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "Which instrument is Yo-Yo Ma famous for playing?",
@@ -30392,7 +31764,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What was Theodor Geisel's profession?",
@@ -30418,7 +31791,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "What did people think about chimps before Jane's studies?",
@@ -30444,7 +31818,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "How old was Yo-Yo Ma when he gave his first show?",
@@ -30470,7 +31845,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-          aiHook: {
+        isPrefilled: false,
+        prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
             questionLine: "How did Theodor Geisel feel about words and music?",
@@ -30505,6 +31881,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [3,4],
           aiHook: {
             targetWord: "plane",
             intent: "fill_blank",
@@ -30529,6 +31907,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "train",
             intent: "fill_blank",
@@ -30553,6 +31933,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "play",
             intent: "fill_blank",
@@ -30577,6 +31959,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "great",
             intent: "fill_blank",
@@ -30601,6 +31985,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,4,5],
           aiHook: {
             targetWord: "weight",
             intent: "fill_blank",
@@ -30625,6 +32011,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3],
           aiHook: {
             targetWord: "pale",
             intent: "fill_blank",
@@ -30649,6 +32037,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "rain",
             intent: "fill_blank",
@@ -30673,6 +32063,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0],
           aiHook: {
             targetWord: "say",
             intent: "fill_blank",
@@ -30697,6 +32089,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "break",
             intent: "fill_blank",
@@ -30721,6 +32115,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
           aiHook: {
             targetWord: "eight",
             intent: "fill_blank",
@@ -30756,6 +32152,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3,4,5,6],
           aiHook: {
             targetWord: "believe",
             intent: "fill_blank",
@@ -30780,6 +32178,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3,4],
           aiHook: {
             targetWord: "peace",
             intent: "fill_blank",
@@ -30804,6 +32204,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,3,4],
           aiHook: {
             targetWord: "theme",
             intent: "fill_blank",
@@ -30828,6 +32230,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3,4],
           aiHook: {
             targetWord: "field",
             intent: "fill_blank",
@@ -30852,6 +32256,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3],
           aiHook: {
             targetWord: "meet",
             intent: "fill_blank",
@@ -30876,6 +32282,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3],
           aiHook: {
             targetWord: "leaf",
             intent: "fill_blank",
@@ -30900,6 +32308,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3,4,5],
           aiHook: {
             targetWord: "piece",
             intent: "fill_blank",
@@ -30924,6 +32334,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,3,4,5,6],
           aiHook: {
             targetWord: "breathe",
             intent: "fill_blank",
@@ -30948,6 +32360,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3],
           aiHook: {
             targetWord: "seem",
             intent: "fill_blank",
@@ -30972,6 +32386,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,3,4],
           aiHook: {
             targetWord: "steal",
             intent: "fill_blank",
@@ -31007,6 +32423,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "kite",
             intent: "fill_blank",
@@ -31031,6 +32449,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "light",
             intent: "fill_blank",
@@ -31055,6 +32475,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "pie",
             intent: "fill_blank",
@@ -31079,6 +32501,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "find",
             intent: "fill_blank",
@@ -31103,6 +32527,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "ride",
             intent: "fill_blank",
@@ -31127,6 +32553,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "high",
             intent: "fill_blank",
@@ -31151,6 +32579,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "tie",
             intent: "fill_blank",
@@ -31175,6 +32605,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "slide",
             intent: "fill_blank",
@@ -31199,6 +32631,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "blind",
             intent: "fill_blank",
@@ -31223,6 +32657,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "smile",
             intent: "fill_blank",
@@ -31258,6 +32694,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "rose",
             intent: "fill_blank",
@@ -31282,6 +32720,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "goal",
             intent: "fill_blank",
@@ -31306,6 +32746,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "float",
             intent: "fill_blank",
@@ -31330,6 +32772,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "toe",
             intent: "fill_blank",
@@ -31354,6 +32798,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "blow",
             intent: "fill_blank",
@@ -31378,6 +32824,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "bone",
             intent: "fill_blank",
@@ -31402,6 +32850,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "coat",
             intent: "fill_blank",
@@ -31426,6 +32876,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+              isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "note",
             intent: "fill_blank",
@@ -31450,6 +32902,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+          isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "crow",
             intent: "fill_blank",
@@ -31474,6 +32928,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "stone",
             intent: "fill_blank",
@@ -31509,6 +32965,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "glue",
             intent: "fill_blank",
@@ -31533,6 +32991,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "blue",
             intent: "fill_blank",
@@ -31557,6 +33017,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,3],
           aiHook: {
             targetWord: "flute",
             intent: "fill_blank",
@@ -31581,6 +33043,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "chew",
             intent: "fill_blank",
@@ -31605,6 +33069,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,4],
           aiHook: {
             targetWord: "juice",
             intent: "fill_blank",
@@ -31629,6 +33095,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "true",
             intent: "fill_blank",
@@ -31653,6 +33121,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "glue",
             intent: "fill_blank",
@@ -31677,6 +33147,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "suit",
             intent: "fill_blank",
@@ -31701,6 +33173,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,2,3],
           aiHook: {
             targetWord: "tube",
             intent: "fill_blank",
@@ -31725,6 +33199,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "clue",
             intent: "fill_blank",
@@ -31760,6 +33236,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "pilot",
             intent: "fill_blank",
@@ -31784,6 +33262,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "music",
             intent: "fill_blank",
@@ -31808,6 +33288,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "robot",
             intent: "fill_blank",
@@ -31832,6 +33314,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "silent",
             intent: "fill_blank",
@@ -31856,6 +33340,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "lemon",
             intent: "fill_blank",
@@ -31880,6 +33366,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "tiger",
             intent: "fill_blank",
@@ -31904,6 +33392,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "camel",
             intent: "fill_blank",
@@ -31928,6 +33418,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "focus",
             intent: "fill_blank",
@@ -31952,6 +33444,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "melon",
             intent: "fill_blank",
@@ -31976,6 +33470,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "cabin",
             intent: "fill_blank",
@@ -32011,6 +33507,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "apple",
             intent: "fill_blank",
@@ -32035,6 +33533,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "puzzle",
             intent: "fill_blank",
@@ -32059,6 +33559,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "bottle",
             intent: "fill_blank",
@@ -32083,6 +33585,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "candle",
             intent: "fill_blank",
@@ -32107,6 +33611,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "jungle",
             intent: "fill_blank",
@@ -32131,6 +33637,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "giggle",
             intent: "fill_blank",
@@ -32155,6 +33663,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "rattle",
             intent: "fill_blank",
@@ -32179,6 +33689,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "noodle",
             intent: "fill_blank",
@@ -32203,6 +33715,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "handle",
             intent: "fill_blank",
@@ -32227,6 +33741,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "simple",
             intent: "fill_blank",
@@ -32262,6 +33778,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "elephant",
             intent: "fill_blank",
@@ -32286,6 +33804,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "banana",
             intent: "fill_blank",
@@ -32310,6 +33830,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "computer",
             intent: "fill_blank",
@@ -32334,6 +33856,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "umbrella",
             intent: "fill_blank",
@@ -32358,6 +33882,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "crocodile",
             intent: "fill_blank",
@@ -32382,6 +33908,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "butterfly",
             intent: "fill_blank",
@@ -32406,6 +33934,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "television",
             intent: "fill_blank",
@@ -32430,6 +33960,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+                isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "avocado",
             intent: "fill_blank",
@@ -32454,6 +33986,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "calculator",
             intent: "fill_blank",
@@ -32478,6 +34012,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "helicopter",
             intent: "fill_blank",
@@ -32513,6 +34049,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "said",
             intent: "fill_blank",
@@ -32537,6 +34075,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,5,6],
           aiHook: {
             targetWord: "because",
             intent: "fill_blank",
@@ -32561,6 +34101,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "could",
             intent: "fill_blank",
@@ -32585,6 +34127,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,5],
           aiHook: {
             targetWord: "people",
             intent: "fill_blank",
@@ -32609,6 +34153,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "their",
             intent: "fill_blank",
@@ -32633,6 +34179,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,5],
           aiHook: {
             targetWord: "friend",
             intent: "fill_blank",
@@ -32657,6 +34205,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "other",
             intent: "fill_blank",
@@ -32681,6 +34231,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "which",
             intent: "fill_blank",
@@ -32705,6 +34257,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "know",
             intent: "fill_blank",
@@ -32729,6 +34283,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,1,2,3,6],
           aiHook: {
             targetWord: "through",
             intent: "fill_blank",
@@ -32764,6 +34320,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "through",
             intent: "fill_blank",
@@ -32788,6 +34346,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "their",
             intent: "fill_blank",
@@ -32812,6 +34372,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "because",
             intent: "fill_blank",
@@ -32836,6 +34398,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "friend",
             intent: "fill_blank",
@@ -32860,6 +34424,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "people",
             intent: "fill_blank",
@@ -32884,6 +34450,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "where",
             intent: "fill_blank",
@@ -32908,6 +34476,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+                isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "again",
             intent: "fill_blank",
@@ -32932,6 +34502,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "know",
             intent: "fill_blank",
@@ -32956,6 +34528,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "could",
             intent: "fill_blank",
@@ -32980,6 +34554,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
           aiHook: {
             targetWord: "every",
             intent: "fill_blank",

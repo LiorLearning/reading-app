@@ -355,6 +355,8 @@ const Index = () => {
   // SpellBox state management
   const [showSpellBox, setShowSpellBox] = React.useState<boolean>(false);
   const [currentSpellQuestion, setCurrentSpellQuestion] = React.useState<SpellingQuestion | null>(null);
+  // Store the original spelling question from question bank (with prefilled data)
+  const [originalSpellingQuestion, setOriginalSpellingQuestion] = React.useState<SpellingQuestion | null>(null);
   
   // Sequential spelling progress tracking
   const [spellingProgressIndex, setSpellingProgressIndex] = React.useState<number>(() => {
@@ -431,26 +433,69 @@ const Index = () => {
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
     if (currentSpellingWord && currentScreen === 1) {
-      // Convert the spelling word to a SpellingQuestion format
-      const spellQuestion: SpellingQuestion = {
-        id: Date.now(),
-        topicId: selectedTopicId,
-        topicName: selectedTopicId,
-        templateType: 'spelling',
-        word: currentSpellingWord,
-        questionText: currentSpellingSentence,
-        correctAnswer: currentSpellingWord.toUpperCase(),
-        audio: currentSpellingWord,
-        explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`
-      };
+      console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
+        currentSpellingWord,
+        hasOriginalQuestion: !!originalSpellingQuestion,
+        originalQuestionWord: originalSpellingQuestion?.word,
+        originalQuestionAudio: originalSpellingQuestion?.audio,
+        actualSpellingWord: originalSpellingQuestion?.audio,
+        originalQuestionIsPrefilled: originalSpellingQuestion?.isPrefilled,
+        originalQuestionPrefilledIndexes: originalSpellingQuestion?.prefilledIndexes,
+        wordsMatch: originalSpellingQuestion?.audio.toLowerCase() === currentSpellingWord.toLowerCase(),
+        messageCycleCount
+      });
       
-      setCurrentSpellQuestion(spellQuestion);
+      // Use the original spelling question (with prefilled data) if available and matches
+      // Compare against the audio field (actual spelling word), not the word field
+      if (originalSpellingQuestion && originalSpellingQuestion.audio.toLowerCase() === currentSpellingWord.toLowerCase()) {
+        console.log('🔤 USING ORIGINAL SPELLING QUESTION WITH PREFILLED DATA:', {
+          id: originalSpellingQuestion.id,
+          word: originalSpellingQuestion.word,
+          audio: originalSpellingQuestion.audio,
+          actualSpellingWord: originalSpellingQuestion.audio,
+          isPrefilled: originalSpellingQuestion.isPrefilled,
+          prefilledIndexes: originalSpellingQuestion.prefilledIndexes
+        });
+        
+        // Update the question text with the AI-generated sentence but keep all other data
+        // IMPORTANT: Use the audio field (actual spelling word) as the word field for SpellBox
+        const enhancedQuestion: SpellingQuestion = {
+          ...originalSpellingQuestion,
+          word: originalSpellingQuestion.audio, // Use actual spelling word for SpellBox
+          questionText: currentSpellingSentence || originalSpellingQuestion.questionText
+        };
+        
+        setCurrentSpellQuestion(enhancedQuestion);
+      } else {
+        // Fallback: Convert the spelling word to a SpellingQuestion format (no prefilled data)
+        console.log('🔤 FALLBACK: Creating new spelling question without prefilled data', {
+          reason: !originalSpellingQuestion ? 'No original question stored' : 'Word mismatch',
+          currentSpellingWord,
+          originalQuestionWord: originalSpellingQuestion?.word,
+          originalQuestionAudio: originalSpellingQuestion?.audio,
+          actualSpellingWord: originalSpellingQuestion?.audio
+        });
+        const spellQuestion: SpellingQuestion = {
+          id: Date.now(),
+          topicId: selectedTopicId,
+          topicName: selectedTopicId,
+          templateType: 'spelling',
+          word: currentSpellingWord,
+          questionText: currentSpellingSentence,
+          correctAnswer: currentSpellingWord.toUpperCase(),
+          audio: currentSpellingWord,
+          explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`
+        };
+        
+        setCurrentSpellQuestion(spellQuestion);
+      }
+      
       setShowSpellBox(true);
     } else {
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
     }
-  }, [currentSpellingWord, currentScreen]);
+  }, [currentSpellingWord, currentScreen, originalSpellingQuestion, messageCycleCount]);
   
   // Auto-collapse sidebar when switching to Screen 3 (MCQ)
   React.useEffect(() => {
@@ -1454,6 +1499,19 @@ const Index = () => {
           const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
           const currentSpellingQuestion = getSequentialSpellingQuestion(currentGrade, spellingProgressIndex);
           
+          // Store the original spelling question (with prefilled data) for later use
+          if (currentSpellingQuestion) {
+            console.log('🔤 STORING ORIGINAL SPELLING QUESTION (UNIFIED):', {
+              id: currentSpellingQuestion.id,
+              word: currentSpellingQuestion.word,
+              audio: currentSpellingQuestion.audio,
+              actualSpellingWord: currentSpellingQuestion.audio,
+              isPrefilled: currentSpellingQuestion.isPrefilled,
+              prefilledIndexes: currentSpellingQuestion.prefilledIndexes
+            });
+            setOriginalSpellingQuestion(currentSpellingQuestion);
+          }
+          
           // Send message through unified system for image generation
           const unifiedResponse = await unifiedAIStreaming.sendMessage(
             text,
@@ -1797,11 +1855,25 @@ const Index = () => {
         console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
         const spellingQuestion = isSpellingPhase ? getSequentialSpellingQuestion(currentGrade, spellingProgressIndex) : null;
         
+        // Store the original spelling question (with prefilled data) for later use
+        if (spellingQuestion) {
+          console.log('🔤 STORING ORIGINAL SPELLING QUESTION:', {
+            id: spellingQuestion.id,
+            word: spellingQuestion.word,
+            audio: spellingQuestion.audio,
+            actualSpellingWord: spellingQuestion.audio,
+            isPrefilled: spellingQuestion.isPrefilled,
+            prefilledIndexes: spellingQuestion.prefilledIndexes
+          });
+          setOriginalSpellingQuestion(spellingQuestion);
+        }
+        
         console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
         
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
         // Update cycle count and reset after 6 messages (3 adventure + 3 spelling)
+        // Note: We increment AFTER storing the original question and generating AI response
         incrementMessageCycle();
         
         // First, add the spelling sentence message if we have one

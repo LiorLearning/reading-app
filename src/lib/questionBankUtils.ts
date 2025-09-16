@@ -12,6 +12,8 @@ export interface SpellingQuestion {
   audio: string;
   explanation: string;
   templateType: string;
+  isPrefilled?: boolean;
+  prefilledIndexes?: number[];
 }
 
 // Interface for generated story context message
@@ -39,7 +41,7 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
           spellingTarget = question.word;
         }
         
-        spellingQuestions.push({
+        const spellingQuestion = {
           id: question.id,
           topicId: question.topicId,
           topicName: question.topicName,
@@ -48,8 +50,25 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
           correctAnswer: question.correctAnswer.toString(),
           audio: spellingTarget, // Use the determined spelling target
           explanation: question.explanation,
-          templateType: question.templateType
-        });
+          templateType: question.templateType,
+          isPrefilled: question.isPrefilled,
+          prefilledIndexes: question.prefilledIndexes
+        };
+        
+        // Debug: Log prefilled questions
+        if (spellingQuestion.isPrefilled) {
+          console.log('🔤 PREFILLED QUESTION LOADED:', {
+            id: spellingQuestion.id,
+            word: spellingQuestion.word,
+            isPrefilled: spellingQuestion.isPrefilled,
+            prefilledIndexes: spellingQuestion.prefilledIndexes,
+            expectedDisplay: spellingQuestion.word.split('').map((char, i) => 
+              spellingQuestion.prefilledIndexes?.includes(i) ? char : '_'
+            ).join('')
+          });
+        }
+        
+        spellingQuestions.push(spellingQuestion);
       }
     });
   });
