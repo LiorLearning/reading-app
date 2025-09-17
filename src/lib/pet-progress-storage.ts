@@ -439,7 +439,7 @@ export class PetProgressStorage {
   // Check if pet is available for sleep (has enough adventure coins)
   static isPetReadyForSleep(petId: string): boolean {
     const petData = this.getPetProgress(petId);
-    return petData.heartData.adventureCoins >= 100 && !petData.sleepData.isAsleep;
+    return petData.heartData.adventureCoins >= 50 && !petData.sleepData.isAsleep;
   }
 
   // Get heart fill percentage (0-100)
@@ -514,6 +514,12 @@ export class PetProgressStorage {
     };
     
     return defaultNames[petId] || petId;
+  }
+
+  // Get pet type from pet ID
+  static getPetType(petId: string): string {
+    const petData = this.getPetProgress(petId);
+    return petData.petType || petId; // fallback to petId if petType is not set
   }
 
   // Check if pet is owned
@@ -650,9 +656,15 @@ export class PetProgressStorage {
     window.dispatchEvent(new CustomEvent('petDataReset', { detail: { petId } }));
   }
 
-  // Level calculation based on adventure coins (matching PetPage logic)
+  // Level calculation based on adventure coins (updated progression system)
   private static calculateLevel(totalAdventureCoins: number): number {
-    const levelThresholds = [0, 200, 500, 1000]; // Level thresholds
+    // New level progression:
+    // Level 1: 0 coins (start)
+    // Level 2: 50 coins (5 questions answered)
+    // Level 3: 120 coins (12 questions answered)
+    // Level 4: 200 coins (20 questions answered)
+    // Level 5: 300 coins (30 questions answered)
+    const levelThresholds = [0, 50, 120, 200, 300]; // Level thresholds
     
     for (let i = levelThresholds.length - 1; i >= 0; i--) {
       if (totalAdventureCoins >= levelThresholds[i]) {
@@ -669,8 +681,8 @@ export class PetProgressStorage {
     const currentLevel = petData.levelData.currentLevel;
     const totalCoins = petData.levelData.totalAdventureCoinsEarned;
     
-    const levelThresholds = [0, 200, 500, 1000];
-    const nextLevelThreshold = levelThresholds[currentLevel] || 1000; // Cap at level 4
+    const levelThresholds = [0, 50, 120, 200, 300];
+    const nextLevelThreshold = levelThresholds[currentLevel] || 300; // Cap at level 5
     
     let progress = 0;
     if (currentLevel < levelThresholds.length) {

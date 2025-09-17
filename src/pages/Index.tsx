@@ -26,6 +26,7 @@ import { chatSummaryService } from "@/lib/chat-summary-service";
 import { useCoins } from "@/pages/coinSystem";
 import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
+import { usePetData } from "@/lib/pet-data-service";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -150,6 +151,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Coin system integration
   const { coins, addCoins, addAdventureCoins } = useCoins();
+  
+  // Pet data integration
+  const { petData, isSleepAvailable } = usePetData();
   
   // Get current pet avatar image
   const currentPetAvatarImage = useCurrentPetAvatarImage();
@@ -470,9 +474,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Generate initial AI message using real-time AI generation
       const generateInitialResponse = async () => {
         try {
-          // Get current pet name for AI context
+          // Get current pet name and type for AI context
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+          const petType = PetProgressStorage.getPetType(currentPetId);
           
           // Generate initial message using AI service with adventure prompt
           const initialMessage = await aiService.generateInitialMessage(
@@ -482,7 +487,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             undefined, // storyEventsContext - can be added later if needed
             currentAdventureContext?.summary, // Pass adventure summary
             userData,   // user data from Firebase
-            petName     // pet name
+            petName,    // pet name
+            petType     // pet type
           );
 
           // Mark that we've sent the initial response for this session
@@ -840,11 +846,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
       }
 
-      // Get current pet name for AI context
+      // Get current pet name and type for AI context
       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
       const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+      const petType = PetProgressStorage.getPetType(currentPetId);
       
-      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName });
+      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType });
       
       const result = await aiService.generateResponse(
         userText, 
@@ -855,7 +862,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         undefined, // currentAdventure  
         undefined, // storyEventsContext
         currentSummary, // summary
-        petName // petName
+        petName, // petName
+        petType  // petType
       );
       
       console.log('✅ AI service returned:', result);
@@ -3033,53 +3041,93 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                  currentScreen === 1 ? (
                    <div className="flex items-center justify-center gap-4">
                      {/* Clean Progress bar */}
-                     <div className="flex items-center gap-4">
-                       {/* Progress bar container */}
-                       <div className="relative">
-                         {(() => {
-                           // Get daily progress (resets daily)
-                           const today = new Date().toDateString();
-                           const dailyProgressKey = `daily_progress_${today}`;
-                           const storedDailyProgress = localStorage.getItem(dailyProgressKey);
-                           const dailyCoins = storedDailyProgress ? parseInt(storedDailyProgress, 10) : 0;
-                           
-                           // Update daily progress with current coins
-                           const currentDailyCoins = Math.max(dailyCoins, coins);
-                           localStorage.setItem(dailyProgressKey, currentDailyCoins.toString());
-                           
-                           // Calculate progress percentage (can exceed 100%)
-                           const progressPercentage = (currentDailyCoins / 100) * 100;
-                           const displayPercentage = Math.round(progressPercentage);
-                           const isOverflow = progressPercentage > 100;
-                           
-                           return (
-                             <>
-                               {/* Progress bar background */}
-                               <div className="relative w-80 h-8 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-full border border-slate-400/30 overflow-hidden">
-                                 {/* Progress fill */}
-                                 <div 
-                                   className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 transition-all duration-700 ease-out"
-                                   style={{ width: `${Math.min(100, progressPercentage)}%` }}
-                                 />
-                               </div>
-                               
-                               {/* Progress percentage - clean text */}
-                               <div className="absolute inset-0 flex items-center justify-center">
-                                 <span className="text-white text-base font-bold">
-                                   {displayPercentage}%
-                                 </span>
-                               </div>
-                             </>
-                           );
+                     <div className="flex flex-col items-center gap-2">
+                       {/* Level indicator above progress bar */}
+                       <div className="text-white font-bold text-lg drop-shadow-md">
+                         Pet Level {(() => {
+                           const { adventureCoins } = petData.cumulativeCareLevel;
+                           const levelThresholds = [0, 50, 120, 200, 300];
+                           let currentLevel = 1;
+                           for (let i = 1; i < levelThresholds.length; i++) {
+                             if (adventureCoins >= levelThresholds[i]) {
+                               currentLevel = i + 1;
+                             } else {
+                               break;
+                             }
+                           }
+                           if (currentLevel >= levelThresholds.length) {
+                             currentLevel = 5;
+                           }
+                           return currentLevel;
                          })()}
                        </div>
                        
-                       {/* Sleep emoji when ready */}
-                       {coins >= 100 && (
-                         <div className="text-3xl animate-bounce">
-                           😴
+                       <div className="flex items-center gap-4">
+                         {/* Progress bar container */}
+                         <div className="relative">
+                           {(() => {
+                             // Use level-based progression system (same as PetPage)
+                             const { adventureCoins } = petData.cumulativeCareLevel;
+                             
+                             const levelThresholds = [0, 50, 120, 200, 300]; // Level thresholds
+                             
+                             // Find current level based on adventure coins earned
+                             let currentLevel = 1;
+                             let coinsInCurrentLevel = adventureCoins;
+                             let coinsNeededForNextLevel = 50; // Default for Level 1 to 2
+                             
+                             for (let i = 1; i < levelThresholds.length; i++) {
+                               if (adventureCoins >= levelThresholds[i]) {
+                                 currentLevel = i + 1;
+                               } else {
+                                 // Calculate progress within current level
+                                 const previousThreshold = levelThresholds[i - 1];
+                                 const nextThreshold = levelThresholds[i];
+                                 coinsInCurrentLevel = adventureCoins - previousThreshold;
+                                 coinsNeededForNextLevel = nextThreshold - previousThreshold;
+                                 break;
+                               }
+                             }
+                             
+                             // If we're at max level (Level 5)
+                             if (currentLevel >= levelThresholds.length) {
+                               currentLevel = 5; // Cap at Level 5
+                               coinsInCurrentLevel = adventureCoins - levelThresholds[levelThresholds.length - 1];
+                               coinsNeededForNextLevel = 100; // Arbitrary value for max level
+                             }
+                             
+                             const progressPercentage = Math.min(100, (coinsInCurrentLevel / coinsNeededForNextLevel) * 100);
+                             const displayPercentage = Math.round(progressPercentage);
+                             
+                             return (
+                               <>
+                                 {/* Progress bar background */}
+                                 <div className="relative w-80 h-8 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-full border border-slate-400/30 overflow-hidden">
+                                   {/* Progress fill */}
+                                   <div 
+                                     className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 transition-all duration-700 ease-out"
+                                     style={{ width: `${Math.min(100, progressPercentage)}%` }}
+                                   />
+                                 </div>
+                                 
+                                 {/* Progress percentage - clean text */}
+                                 <div className="absolute inset-0 flex items-center justify-center">
+                                   <span className="text-white text-base font-bold">
+                                     {displayPercentage}%
+                                   </span>
+                                 </div>
+                               </>
+                             );
+                           })()}
                          </div>
-                       )}
+                         
+                         {/* Sleep emoji when ready */}
+                         {isSleepAvailable() && (
+                           <div className="text-3xl animate-bounce">
+                             😴
+                           </div>
+                         )}
+                       </div>
                      </div>
                    </div>
                  ) : 

@@ -82,14 +82,11 @@ const getCumulativeCareImage = (feedingCount: number, adventureCoins: number) =>
   // Feeding count 0 = initial image
   // Feeding count 1 = image change
   // 50 adventure coins earned = image change
-  // 100 adventure coins earned = image change
+  // 50 adventure coins earned = ready for sleep
   
-  if (adventureCoins >= 100) {
-    // Stage 4: 100+ adventure coins (ready for sleep)
+  if (adventureCoins >= 50) {
+    // Stage 3: 50+ adventure coins (ready for sleep)
     return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
-  } else if (adventureCoins >= 50) {
-    // Stage 3: 50+ adventure coins (experienced adventurer)
-    return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
   } else if (feedingCount >= 1) {
     // Stage 2: Fed once (first feeding triggers image change)
     return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
@@ -196,15 +193,12 @@ export const getCurrentPetAvatarImage = (
       const { feedingCount, adventureCoins } = cumulativeCare;
       
       // Use the same care stage logic as PetPage:
-      // Stage 4: 100+ adventure coins (ready for sleep)
-      // Stage 3: 50+ adventure coins (adventurous) 
+      // Stage 3: 50+ adventure coins (ready for sleep)
       // Stage 2: Fed once (first feeding triggers image change)
       // Stage 1: Initial hungry/sad state (feeding count 0)
       
-      if (adventureCoins >= 100) {
+      if (adventureCoins >= 50) {
         return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // ready_for_sleep
-      } else if (adventureCoins >= 50) {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163423_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // adventurous
       } else if (feedingCount >= 1) {
         return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // fed
       } else {

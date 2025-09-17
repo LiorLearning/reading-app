@@ -9,7 +9,7 @@ import { PetSelectionFlow } from '@/components/PetSelectionFlow';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown } from 'lucide-react';
+import { GraduationCap, ChevronDown, LogOut } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference } from '@/lib/utils';
@@ -33,7 +33,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const { coins, spendCoins, hasEnoughCoins, canSpendForFeeding, setCoins } = useCoins();
   
   // Get Firebase authenticated user for adventure loading and user data for personalized pet thoughts
-  const { user, userData } = useAuth();
+  const { user, userData, signOut } = useAuth();
   
   // Use shared pet data system
   const { careLevel, ownedPets, audioEnabled, setCareLevel, addOwnedPet, setAudioEnabled, isPetOwned, getCoinsSpentForCurrentStage, getPetCoinsSpent, addPetCoinsSpent, incrementFeedingCount, addAdventureCoins, setSleepCompleted, getCumulativeCarePercentage, getCumulativeCareLevel, isSleepAvailable, resetCumulativeCareLevel, migrateToCumulativeCareSystem, checkAndPerform24HourReset, checkAndPerform8HourReset } = usePetData();
@@ -432,7 +432,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Pet action states - dynamically updated based on den ownership and sleep state
   const getActionStates = () => {
     const baseActions = [
-      { id: 'water', icon: '🍪', status: 'sad' as ActionStatus, label: 'Food' },
+      // { id: 'water', icon: '', status: 'sad' as ActionStatus, label: '' },
     ];
     
     // Add adventure button - disabled until pet is fed at least 2 times, or when loading
@@ -443,13 +443,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     if (isAdventureLoading) {
       adventureStatus = 'disabled';
       adventureLabel = 'Loading...';
-    } else if (cumulativeCare.feedingCount >= 2) {
-      adventureStatus = 'neutral';
     } else {
-      adventureStatus = 'disabled';
+      adventureStatus = 'neutral';
     }
     
-    baseActions.push({ id: 'adventure', icon: '🚀', status: adventureStatus, label: adventureLabel });
+    baseActions.push({ id: 'adventure', icon: '🍪', status: adventureStatus, label: 'Food' });
     
     // Add sleep button (always visible and clickable)
     let sleepLabel, sleepStatus;
@@ -481,13 +479,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // Set loading state at the start
       setIsAdventureLoading(true);
 
-      // Check if pet has been fed at least 2 times
+      // Adventure is now available immediately
       const cumulativeCare = getCumulativeCareLevel();
-      if (cumulativeCare.feedingCount < 2) {
-        const feedingsNeeded = 2 - cumulativeCare.feedingCount;
-        alert(`Your pet needs to be fed ${feedingsNeeded} more time${feedingsNeeded > 1 ? 's' : ''} before going on adventures! 🍪`);
-        return;
-      }
       
       // Stop any current audio
       ttsService.stop();
@@ -539,11 +532,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
       
-      // Check if sleep is available (100 adventure coins since last sleep)
+      // Check if sleep is available (50 adventure coins since last sleep)
       if (!isSleepAvailable()) {
         const cumulativeCare = getCumulativeCareLevel();
         const coinsSinceLastSleep = cumulativeCare.adventureCoins - cumulativeCare.adventureCoinsAtLastSleep;
-        const coinsNeeded = 100 - coinsSinceLastSleep;
+        const coinsNeeded = 50 - coinsSinceLastSleep;
         alert(`Sleep is not available yet! You need ${coinsNeeded} more adventure coins. Go on adventures to earn more coins! 🚀`);
         return;
       }
@@ -860,11 +853,11 @@ const getSleepyPetImage = (clicks: number) => {
     const petImages = {
       dog: {
         1: {
-          // Level 1 Dog images - same care state progression as other pets
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          // Level 1 Dog images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
@@ -872,11 +865,11 @@ const getSleepyPetImage = (clicks: number) => {
       },
       cat: {
         1: {
-          // Level 1 Cat images - using placeholder images for now
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234455_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          // Level 1 Cat images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234455_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_155438_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_160705_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
@@ -884,11 +877,11 @@ const getSleepyPetImage = (clicks: number) => {
       },
       hamster: {
         1: {
-          // Level 1 Hamster images - using correct hamster images from pet-avatar-service
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163423_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          // Level 1 Hamster images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163423_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163334_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_164339_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_165002_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
@@ -896,11 +889,11 @@ const getSleepyPetImage = (clicks: number) => {
       },
       dragon: {
         1: {
-          // Level 1 Dragon images - using placeholder images for now
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154758_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          // Level 1 Dragon images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154758_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
@@ -908,11 +901,11 @@ const getSleepyPetImage = (clicks: number) => {
       },
       unicorn: {
         1: {
-          // Level 1 Unicorn images - using placeholder images for now
-          hungry: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          fed: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          adventurous: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          ready_for_sleep: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          // Level 1 Unicorn images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
@@ -927,7 +920,7 @@ const getSleepyPetImage = (clicks: number) => {
     }
 
     const levelImages = petLevelImages[level as keyof typeof petLevelImages] || petLevelImages[1];
-    return levelImages[careState as keyof typeof levelImages] || levelImages.hungry;
+    return levelImages[careState as keyof typeof levelImages] || levelImages.coins_0;
   };
 
   // Determine care state based on current pet and progress
@@ -938,20 +931,16 @@ const getSleepyPetImage = (clicks: number) => {
       return 'sleep1';
     }
 
-    // All pets now use the same cumulative care system based on feeding count and adventure coins
-    const cumulativeCare = getCumulativeCareLevel();
-    const { feedingCount, adventureCoins } = cumulativeCare;
+    // Coin-based progression system:
+    // 0 coins: initial state
+    // 10+ coins: first upgrade
+    // 30+ coins: second upgrade  
+    // 50+ coins: third upgrade
     
-    // Care stages based on the cumulative care system:
-    // Stage 1: Initial hungry/sad state (feeding count 0)
-    // Stage 2: Fed once (first feeding triggers image change) 
-    // Stage 3: 50+ adventure coins (experienced adventurer)
-    // Stage 4: 100+ adventure coins (ready for sleep)
-    
-    if (adventureCoins >= 100) return 'ready_for_sleep';
-    if (adventureCoins >= 50) return 'adventurous';
-    if (feedingCount >= 1) return 'fed';
-    return 'hungry';
+    if (coins >= 50) return 'coins_50';
+    if (coins >= 30) return 'coins_30';
+    if (coins >= 10) return 'coins_10';
+    return 'coins_0';
   };
 
   const getPetImage = () => {
@@ -960,33 +949,30 @@ const getSleepyPetImage = (clicks: number) => {
     return getLevelBasedPetImage(currentPet, currentLevel, careState);
   };
 
-  // Get cumulative care image for April based on care progression
+  // Get cumulative care image for April based on coin progression
   const getCumulativeCareImage = () => {
-    const cumulativeCare = getCumulativeCareLevel();
-    const { feedingCount, adventureCoins } = cumulativeCare;
-    
     // Debug logging
-    console.log('🐶 Cumulative Care Debug:', { feedingCount, adventureCoins, carePercentage: getCumulativeCarePercentage() });
+    console.log('🐶 Coin-based Care Debug:', { coins, carePercentage: getCumulativeCarePercentage() });
     
     let currentImage;
     let previousCareStage = 0; // Track previous stage for animation
     
-    // Determine current care stage and image
-    if (adventureCoins >= 100) {
-      // Stage 4: 100+ adventure coins (ready for sleep) - 80% care
-      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // PLACEHOLDER - will be replaced
+    // Determine current care stage and image based on coins
+    if (coins >= 50) {
+      // Stage 4: 50+ coins
+      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160214_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       previousCareStage = 4;
-    } else if (adventureCoins >= 50) {
-      // Stage 3: 50+ adventure coins (experienced adventurer) - 60% care
-      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // PLACEHOLDER - will be replaced
+    } else if (coins >= 30) {
+      // Stage 3: 30+ coins
+      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_000902_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       previousCareStage = 3;
-    } else if (feedingCount >= 1) {
-      // Stage 2: Fed once (first feeding triggers image change)
-      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // PLACEHOLDER - will be replaced
+    } else if (coins >= 10) {
+      // Stage 2: 10+ coins
+      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160535_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       previousCareStage = 2;
     } else {
-      // Stage 1: Initial hungry/sad state - 0% care
-      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // PLACEHOLDER - will be replaced
+      // Stage 1: 0 coins - initial state
+      currentImage = "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       previousCareStage = 1;
     }
     
@@ -1044,6 +1030,16 @@ const getSleepyPetImage = (clicks: number) => {
       } else {
         return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       }
+    }
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      playClickSound();
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   };
 
@@ -1107,6 +1103,21 @@ const getSleepyPetImage = (clicks: number) => {
   }, []);
 
   const handlePetPurchase = (petType: string, cost: number) => {
+    // Get pet data to check level requirements
+    const petStoreData = getPetStoreData();
+    const petData = petStoreData[petType];
+    
+    if (!petData) {
+      alert("Pet not found!");
+      return;
+    }
+
+    // Check level requirement first
+    if (petData.isLocked) {
+      alert(`🔒 This pet requires Level ${petData.requiredLevel} to unlock! Keep playing adventures to level up!`);
+      return;
+    }
+
     // Use regular coin checking since feeding is now free
     if (!hasEnoughCoins(cost)) {
       // Feeding is now free, so no need to reserve coins for feeding
@@ -1139,8 +1150,7 @@ const getSleepyPetImage = (clicks: number) => {
     playEvolutionSound();
     
     // Get pet name from store data
-    const petStoreData = getPetStoreData();
-    const petName = petStoreData[petType]?.name || petType;
+    const petName = petData.name || petType;
     alert(`🎉 Congratulations! You bought ${petName}!`);
   };
 
@@ -1150,41 +1160,54 @@ const getSleepyPetImage = (clicks: number) => {
     const currentOwnedPets = ownedPets; // This ensures we use the latest owned pets from the hook
     storeRefreshTrigger; // This ensures the function re-runs when trigger changes
     
+    // Get current user level for unlock requirements
+    const { currentLevel } = getLevelInfo();
+    
     return {
       dog: {
         id: 'dog',
         emoji: '🐶',
         name: 'Buddy',
         owned: isPetOwned('dog'),
-        cost: 200
+        cost: 200,
+        requiredLevel: 2,
+        isLocked: currentLevel < 2
       },
       cat: {
         id: 'cat',
         emoji: '🐱',
         name: 'Whiskers',
         owned: isPetOwned('cat'),
-        cost: 200
+        cost: 200,
+        requiredLevel: 2,
+        isLocked: currentLevel < 2
       },
       hamster: {
         id: 'hamster',
         emoji: '🐹',
         name: 'Peanut',
         owned: isPetOwned('hamster'),
-        cost: 200
+        cost: 200,
+        requiredLevel: 2,
+        isLocked: currentLevel < 2
       },
       dragon: {
         id: 'dragon',
         emoji: '🐉',
         name: 'Ember',
         owned: isPetOwned('dragon'),
-        cost: 400
+        cost: 400,
+        requiredLevel: 5,
+        isLocked: currentLevel < 5
       },
       unicorn: {
         id: 'unicorn',
         emoji: '🦄',
         name: 'Stardust',
         owned: isPetOwned('unicorn'),
-        cost: 400
+        cost: 400,
+        requiredLevel: 5,
+        isLocked: currentLevel < 5
       }
     };
   };
@@ -1276,7 +1299,18 @@ const getSleepyPetImage = (clicks: number) => {
     const { feedingCount, adventureCoins, sleepCompleted } = cumulativeCare;
     
     // Pet thoughts based on cumulative care progress
-    if (feedingCount === 0) {
+    // Priority: If adventure coins >= 50, show sleepy thoughts regardless of feeding status
+    if (adventureCoins >= 50 && !sleepCompleted) {
+      const readyForSleepThoughts = [
+        `Wow! We've had magical adventures, ${userName}! 🌟 Now I'm getting sleepy... 😴`,
+        `What an incredible journey we've had! 🚀 I'm wonderfully tired now... 💤`,
+        `I feel accomplished after our quests! 🏆 My soul yawns with contentment... 😴`,
+        `Amazing! Look at all my coins! 🪙 Ready for a cozy nap... 💤`,
+        `Perfect! Our adventures filled my soul! ✨ I'm deliciously drowsy now... 😴`,
+        `Incredible adventures, beloved ${userName}! 🎯 My eyelids grow heavy... 💤`
+      ];
+      return getRandomThought(readyForSleepThoughts);
+    } else if (feedingCount === 0) {
       // No feeding yet - initial state (sad and hungry)
       const hungryThoughts = [
         `Hi ${userName}... my tummy's rumbling! Could you share some treats with me? 🍪`,
@@ -1329,8 +1363,9 @@ const getSleepyPetImage = (clicks: number) => {
         `Exploring with you is bliss! 🗺️ Each adventure fills my heart! ✨`
       ];
       return getRandomThought(adventuringThoughts);
-    } else if (adventureCoins < 100) {
-      // 50+ adventure coins (60% care level)
+    } else if (!sleepCompleted) {
+      // This case is now handled by the 50+ coins check at the top
+      // Fallback for any edge cases
       const experiencedAdventurerThoughts = [
         `Wow! So many precious coins from our adventures, ${userName}! 🪙 My heart sings!`,
         `Look what we've accomplished together, ${userName}! 🌟 My soul feels strong!`,
@@ -1339,17 +1374,6 @@ const getSleepyPetImage = (clicks: number) => {
         `I feel accomplished and blessed! 🏆 Every adventure makes me grateful! ✨`
       ];
       return getRandomThought(experiencedAdventurerThoughts);
-    } else if (!sleepCompleted) {
-      // 100+ adventure coins but not slept yet (80% care level)
-      const readyForSleepThoughts = [
-        `Wow! We've had magical adventures, ${userName}! 🌟 Now I'm getting sleepy... 😴`,
-        `What an incredible journey we've had! 🚀 I'm wonderfully tired now... 💤`,
-        `I feel accomplished after our quests! 🏆 My soul yawns with contentment... 😴`,
-        `Amazing! Look at all my coins! 🪙 Ready for a cozy nap... 💤`,
-        `Perfect! Our adventures filled my soul! ✨ I'm deliciously drowsy now... 😴`,
-        `Incredible adventures, beloved ${userName}! 🎯 My eyelids grow heavy... 💤`
-      ];
-      return getRandomThought(readyForSleepThoughts);
     } else {
       // Sleep completed - 100% care level
       const fullyLovedThoughts = [
@@ -1395,20 +1419,21 @@ const getSleepyPetImage = (clicks: number) => {
 
   // Level system calculation based on adventure coins earned
   const getLevelInfo = () => {
-    // New level progression based on adventure coins:
-    // Level 1: 0 adventure coins
-    // Level 2: 200 adventure coins
-    // Level 3: 500 adventure coins  
-    // Level 4: 1000 adventure coins
+    // Updated level progression based on adventure coins:
+    // Level 1: 0 adventure coins (start)
+    // Level 2: 50 adventure coins (5 questions answered)
+    // Level 3: 120 adventure coins (12 questions answered)
+    // Level 4: 200 adventure coins (20 questions answered)
+    // Level 5: 300 adventure coins (30 questions answered)
     
     const adventureCoins = getCumulativeCareLevel().adventureCoins;
     
-    const levelThresholds = [0, 200, 500, 1000]; // Level thresholds
+    const levelThresholds = [0, 50, 120, 200, 300]; // Level thresholds
     
     // Find current level based on adventure coins earned
     let currentLevel = 1;
     let coinsInCurrentLevel = adventureCoins;
-    let coinsNeededForNextLevel = 200; // Default for Level 1 to 2
+    let coinsNeededForNextLevel = 50; // Default for Level 1 to 2
     
     for (let i = 1; i < levelThresholds.length; i++) {
       if (adventureCoins >= levelThresholds[i]) {
@@ -1423,11 +1448,11 @@ const getSleepyPetImage = (clicks: number) => {
       }
     }
     
-    // If we're at max level (Level 4)
+    // If we're at max level (Level 5)
     if (currentLevel >= levelThresholds.length) {
-      currentLevel = 4; // Cap at Level 4
+      currentLevel = 5; // Cap at Level 5
       coinsInCurrentLevel = adventureCoins - levelThresholds[levelThresholds.length - 1];
-      coinsNeededForNextLevel = 500; // Arbitrary value for max level
+      coinsNeededForNextLevel = 100; // Arbitrary value for max level
     }
     
     const progressPercentage = Math.min(100, (coinsInCurrentLevel / coinsNeededForNextLevel) * 100);
@@ -1742,6 +1767,17 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              
+              {/* Logout Button */}
+              <div className="border-t border-gray-200 mt-2 pt-2">
+                <DropdownMenuItem 
+                  className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg text-red-600"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="font-semibold">Log Out</span>
+                </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -1879,8 +1915,8 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         </div>
         
-        {/* Daily Heart Fill Indicator */}
-        <div className="w-20 h-20 rounded-full flex items-center justify-center relative">
+        {/* Daily Heart Fill Indicator - Temporarily commented out */}
+        {/* <div className="w-20 h-20 rounded-full flex items-center justify-center relative">
           <div style={{
             position: 'relative',
             width: 40,
@@ -1890,7 +1926,7 @@ const getSleepyPetImage = (clicks: number) => {
             justifyContent: 'center'
           }}>
             {/* Heart outline */}
-            <div style={{
+            {/* <div style={{
               position: 'absolute',
               fontSize: 84,
               color: '#E5E7EB'
@@ -1898,7 +1934,7 @@ const getSleepyPetImage = (clicks: number) => {
               🤍
             </div>
             {/* Filled heart (blood) - based on daily care */}
-            <div style={{
+            {/* <div style={{
               position: 'absolute',
               fontSize: 84,
               color: '#DC2626',
@@ -1908,7 +1944,7 @@ const getSleepyPetImage = (clicks: number) => {
               ❤️
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Animated hearts moving from pet to daily heart */}
         {showHeartAnimation && (
@@ -2236,6 +2272,8 @@ const getSleepyPetImage = (clicks: number) => {
                     className={`relative p-6 rounded-xl border-2 transition-all duration-200 text-center ${
                       pet.owned
                         ? 'bg-gradient-to-br from-green-50 to-emerald-100 border-green-300'
+                        : pet.isLocked
+                        ? 'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300 opacity-75'
                         : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:scale-105'
                     }`}
                   >
@@ -2246,13 +2284,31 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     )}
                     
-                    {/* Pet Emoji */}
-                    <div className="text-6xl mb-4">{pet.emoji}</div>
+                    {/* Level Lock Badge */}
+                    {pet.isLocked && !pet.owned && (
+                      <div className="absolute -top-2 -left-2 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                        L{pet.requiredLevel}
+                      </div>
+                    )}
                     
-                    {/* Purchase Button or Owned Status */}
+                    {/* Pet Emoji */}
+                    <div className={`text-6xl mb-4 ${pet.isLocked && !pet.owned ? 'grayscale' : ''}`}>
+                      {pet.emoji}
+                    </div>
+                    
+                    {/* Pet Name */}
+                    <div className={`text-lg font-semibold mb-3 ${pet.isLocked && !pet.owned ? 'text-gray-500' : 'text-gray-800'}`}>
+                      {pet.name}
+                    </div>
+                    
+                    {/* Purchase Button or Status */}
                     {pet.owned ? (
                       <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">
                         ✅ Owned
+                      </div>
+                    ) : pet.isLocked ? (
+                      <div className="w-full px-4 py-3 rounded-xl font-bold text-lg bg-gray-400 text-gray-600 cursor-not-allowed">
+                        🔒 Level {pet.requiredLevel}
                       </div>
                     ) : (
                       <button
@@ -2260,7 +2316,7 @@ const getSleepyPetImage = (clicks: number) => {
                           handlePetPurchase(pet.id, pet.cost);
                           setStoreRefreshTrigger(prev => prev + 1);
                         }}
-                        disabled={!hasEnoughCoins(pet.cost)}
+                        disabled={!hasEnoughCoins(pet.cost) || pet.isLocked}
                         className={`w-full px-4 py-3 rounded-xl font-bold text-lg transition-all duration-200 ${
                           hasEnoughCoins(pet.cost)
                             ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:scale-105 shadow-lg'

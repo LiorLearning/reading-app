@@ -289,12 +289,12 @@ export class PetDataService {
     return this.getPetData().cumulativeCareLevel;
   }
 
-  // Check if sleep is available (100 adventure coins since last sleep or first time)
+  // Check if sleep is available (50 adventure coins since last sleep or first time)
   static isSleepAvailable(): boolean {
     const data = this.getPetData();
     const { adventureCoins, adventureCoinsAtLastSleep } = data.cumulativeCareLevel;
     const coinsSinceLastSleep = adventureCoins - adventureCoinsAtLastSleep;
-    return coinsSinceLastSleep >= 100;
+    return coinsSinceLastSleep >= 50;
   }
 
   static resetCumulativeCareLevel(): void {
