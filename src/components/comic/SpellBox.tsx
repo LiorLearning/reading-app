@@ -17,7 +17,7 @@ interface SpellBoxProps {
   // Basic props
   word?: string;
   sentence?: string;
-  onComplete?: (isCorrect: boolean, userAnswer?: string) => void;
+  onComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSkip?: () => void;
   onNext?: () => void;
   className?: string;
@@ -619,11 +619,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         }
         
         if (onComplete) {
-          // Enhanced callback includes complete word
-          onComplete(true, completeWord);
+          // Enhanced callback includes complete word and attempt count
+          onComplete(true, completeWord, attempts + 1);
         }
       } else {
         console.log('❌ SPELLBOX: Incorrect answer, generating hint');
+        // Increment attempts for incorrect answer
+        setAttempts(prev => prev + 1);
         // Generate AI hint for incorrect answer
         generateAIHint(completeWord);
       }

@@ -1,5 +1,5 @@
 import { sampleMCQData } from '@/data/mcq-questions';
-import { mapSelectedGradeToContentGrade } from './utils';
+import { mapSelectedGradeToContentGrade, getNextSpellboxTopic, getSpellboxTopicProgress } from './utils';
 
 // Interface for spelling question data
 export interface SpellingQuestion {
@@ -216,4 +216,106 @@ export const getSpellingQuestionCount = (gradeDisplayName?: string): number => {
   });
   
   return gradeFilteredQuestions.length;
+};
+
+/**
+ * Get all unique topic IDs for spelling questions in a specific grade
+ */
+export const getSpellingTopicIds = (gradeDisplayName?: string): string[] => {
+  const allSpellingQuestions = getAllSpellingQuestions();
+  
+  let filteredQuestions = allSpellingQuestions;
+  
+  if (gradeDisplayName) {
+    const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+    filteredQuestions = allSpellingQuestions.filter(question => {
+      return question.topicId.startsWith(`${contentGrade}-`);
+    });
+  }
+  
+  // Get unique topic IDs
+  const topicIds = [...new Set(filteredQuestions.map(q => q.topicId))];
+  
+  // Sort topic IDs for consistent ordering
+  return topicIds.sort();
+};
+
+/**
+ * Get spelling questions for a specific topic
+ */
+export const getSpellingQuestionsByTopic = (topicId: string): SpellingQuestion[] => {
+  const allSpellingQuestions = getAllSpellingQuestions();
+  return allSpellingQuestions.filter(question => question.topicId === topicId);
+};
+
+/**
+ * Get the next spelling question based on Spellbox topic progression
+ * This function respects the 70% first-attempt requirement and topic-based progression
+ */
+export const getNextSpellboxQuestion = (
+  gradeDisplayName?: string,
+  completedQuestionIds: number[] = []
+): SpellingQuestion | null => {
+  if (!gradeDisplayName) {
+    console.warn('🚫 getNextSpellboxQuestion: No grade provided');
+    return null;
+  }
+
+  // Topic progress functions are now imported at the top of the file
+  
+  // Get all topic IDs for this grade
+  const allTopicIds = getSpellingTopicIds(gradeDisplayName);
+  
+  if (allTopicIds.length === 0) {
+    console.warn(`🚫 getNextSpellboxQuestion: No topics found for grade ${gradeDisplayName}`);
+    return null;
+  }
+  
+  // Get the current topic based on progression logic
+  const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds);
+  
+  if (!currentTopicId) {
+    console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
+    return null;
+  }
+  
+  // Get questions for the current topic
+  const topicQuestions = getSpellingQuestionsByTopic(currentTopicId);
+  
+  if (topicQuestions.length === 0) {
+    console.warn(`🚫 getNextSpellboxQuestion: No questions found for topic ${currentTopicId}`);
+    return null;
+  }
+  
+  // Get topic progress to see how many questions have been attempted
+  const topicProgress = getSpellboxTopicProgress(gradeDisplayName, currentTopicId);
+  const questionsAttempted = topicProgress?.questionsAttempted || 0;
+  
+  // If topic is completed but didn't pass, we'll let the progress system handle the restart
+  // The topic will be restarted when updateSpellboxTopicProgress detects a failed topic
+  if (topicProgress?.isCompleted && topicProgress.successRate < 70) {
+    console.log(`🔄 getNextSpellboxQuestion: Topic ${currentTopicId} needs restart (${topicProgress.successRate.toFixed(1)}% < 70%)`);
+    // Return first question of this topic - the progress will be reset when the next question is answered
+    const firstQuestion = topicQuestions[0];
+    console.log(`🎯 getNextSpellboxQuestion: Selected first question for restart of topic ${currentTopicId}:`, {
+      id: firstQuestion.id,
+      word: firstQuestion.word,
+      topicName: firstQuestion.topicName
+    });
+    return firstQuestion;
+  }
+  
+  // For ongoing topics, select the next question in sequence (up to 10 questions max)
+  const questionIndex = Math.min(questionsAttempted, 9); // Max 10 questions (0-9 index)
+  const selectedQuestion = topicQuestions[questionIndex] || topicQuestions[0];
+  
+  console.log(`🎯 getNextSpellboxQuestion: Selected question ${questionIndex + 1}/10 for topic ${currentTopicId}:`, {
+    id: selectedQuestion.id,
+    word: selectedQuestion.word,
+    topicName: selectedQuestion.topicName,
+    questionsAttempted,
+    topicProgress: topicProgress?.successRate?.toFixed(1) + '%' || 'New topic'
+  });
+  
+  return selectedQuestion;
 };

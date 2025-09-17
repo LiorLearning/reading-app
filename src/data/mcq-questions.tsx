@@ -32309,7 +32309,7 @@ aiHook: {
           isSorting: false,
           isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0,2,3,4,5],
+        prefilledIndexes: [0,2,3,4],
           aiHook: {
             targetWord: "piece",
             intent: "fill_blank",

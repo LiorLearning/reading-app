@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic } from "@/lib/utils";
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
@@ -45,7 +45,7 @@ import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
-import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, SpellingQuestion } from "@/lib/questionBankUtils";
+import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
@@ -1497,7 +1497,8 @@ const Index = () => {
           // Get current spelling question for context
           // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
-          const currentSpellingQuestion = getSequentialSpellingQuestion(currentGrade, spellingProgressIndex);
+          // NEW: Use topic-based question selection for Spellbox progression
+          const currentSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds);
           
           // Store the original spelling question (with prefilled data) for later use
           if (currentSpellingQuestion) {
@@ -1853,7 +1854,8 @@ const Index = () => {
         const savedGradeFromStorage = loadGradeSelection();
         console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
         console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
-        const spellingQuestion = isSpellingPhase ? getSequentialSpellingQuestion(currentGrade, spellingProgressIndex) : null;
+        // NEW: Use topic-based question selection for Spellbox progression
+        const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds) : null;
         
         // Store the original spelling question (with prefilled data) for later use
         if (spellingQuestion) {
@@ -3146,11 +3148,11 @@ const Index = () => {
   ]);
 
   // SpellBox event handlers
-  const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string) => {
+  const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
     playClickSound();
     
     if (isCorrect) {
-      // Update sequential spelling progress
+      // Update sequential spelling progress (keep existing system intact)
       const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
       const nextIndex = spellingProgressIndex + 1;
       const updatedCompletedIds = currentSpellQuestion ? [...completedSpellingIds, currentSpellQuestion.id] : completedSpellingIds;
@@ -3163,6 +3165,54 @@ const Index = () => {
       if (currentGrade) {
         saveSpellingProgress(currentGrade, nextIndex, updatedCompletedIds);
         console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
+      }
+      
+      // NEW: Update Spellbox topic progress with Firebase sync
+      if (currentGrade && currentSpellQuestion) {
+        const isFirstAttempt = attemptCount === 1;
+        
+        // Use async update with Firebase sync for authenticated users
+        updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
+          .then((topicProgress) => {
+            // Check if topic is completed and show appropriate message
+            if (topicProgress.isCompleted) {
+              const passedTopic = isSpellboxTopicPassingGrade(topicProgress);
+              if (passedTopic) {
+                // Topic completed with 70%+ success rate
+                const congratsMessage: ChatMessage = {
+                  type: 'ai',
+                  content: `🎉 Fantastic! You've completed the topic! You're ready for the next challenge! ✨`,
+                  timestamp: Date.now()
+                };
+                
+                setChatMessages(prev => {
+                  playMessageSound();
+                  const messageId = `index-chat-${congratsMessage.timestamp}-${prev.length}`;
+                  ttsService.speakAIMessage(congratsMessage.content, messageId)
+                    .catch(error => console.error('TTS error:', error));
+                  return [...prev, congratsMessage];
+                });
+              } else {
+                // Topic completed but below 70%
+                const encouragementMessage: ChatMessage = {
+                  type: 'ai',
+                  content: `Good effort! You completed the "${currentSpellQuestion.topicName}" topic with ${topicProgress.successRate.toFixed(1)}% first-attempt accuracy. Let's practice more to reach 70% and unlock the next topic! 💪`,
+                  timestamp: Date.now()
+                };
+                
+                setChatMessages(prev => {
+                  playMessageSound();
+                  const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
+                  ttsService.speakAIMessage(encouragementMessage.content, messageId)
+                    .catch(error => console.error('TTS error:', error));
+                  return [...prev, encouragementMessage];
+                });
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Failed to update Spellbox topic progress:', error);
+          });
       }
       
       // Update legacy progress for backward compatibility
@@ -3890,7 +3940,7 @@ const Index = () => {
             )}
 
             {/* Right Arrow Navigation - Outside the main container */}
-            {currentScreen === 1 && isInQuestionMode === false && (
+            {false && (
               <div 
                 className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:right-8"
                 style={{
