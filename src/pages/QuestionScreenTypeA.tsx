@@ -10,6 +10,7 @@ import { X } from "lucide-react";
 import MCQComponent from "@/components/MCQComponent";
 import { useMCQ } from "@/hooks/use-mcq";
 import { ttsService } from "@/lib/tts-service";
+import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 
 // TypeScript declarations for Speech Recognition API
 
@@ -477,68 +478,75 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
               )}
             
               {!sidebarCollapsed && (
-                <>
-                  {/* Avatar Section */}
-                  <div className="flex-shrink-0 relative">
-                    <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm" />
-                    <div className="relative z-10">
-                      <ChatAvatar avatar={currentPetAvatarImage} />
+                <ResizableChatLayout
+                  defaultPetRatio={0.65}
+                  minPetRatio={0.25}
+                  maxPetRatio={0.8}
+                  petContent={
+                    <div className="relative h-full">
+                      <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm" />
+                      <div className="relative z-10 h-full">
+                        <ChatAvatar avatar={currentPetAvatarImage} size="responsive" />
+                      </div>
                     </div>
-                  </div>
-                
-                  {/* Messages */}
-                  <div className="flex-1 min-h-0 relative">
-                    <div 
-                      ref={messagesScrollRef}
-                      className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
-                    >
-                      {chatMessages.length === 0 ? (
-                        <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-                          <p>🚀 Welcome to Screen 2! Chat with Krafty!</p>
-                        </div>
-                      ) : (
-                        chatMessages.map((message, index) => (
-                          <div
-                            key={`${message.timestamp}-${index}`}
-                            className={cn(
-                              "flex animate-slide-up-smooth",
-                              message.type === 'user' ? "justify-end" : "justify-start"
-                            )}
-                            style={{ 
-                              animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
-                            }}
-                          >
-                            <div
-                              className={cn(
-                                "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
-                                message.type === 'user' 
-                                  ? "bg-primary text-primary-foreground" 
-                                  : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
-                              )}
-                              style={{}}
-                            >
-                              <div className="font-medium text-xs mb-1 opacity-70">
-                                {message.type === 'user' ? 'You' : '🤖 Krafty'}
-                              </div>
-                              <div>
-                                {message.type === 'ai' ? (
-                                  <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
-                                ) : (
-                                  message.content
-                                )}
-                              </div>
+                  }
+                  chatContent={
+                    <div className="flex flex-col h-full">
+                      {/* Messages */}
+                      <div className="flex-1 min-h-0 relative">
+                        <div 
+                          ref={messagesScrollRef}
+                          className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
+                        >
+                          {chatMessages.length === 0 ? (
+                            <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                              <p>🚀 Welcome to Screen 2! Chat with Krafty!</p>
                             </div>
-                          </div>
-                        ))
-                      )}
+                          ) : (
+                            chatMessages.map((message, index) => (
+                              <div
+                                key={`${message.timestamp}-${index}`}
+                                className={cn(
+                                  "flex animate-slide-up-smooth",
+                                  message.type === 'user' ? "justify-end" : "justify-start"
+                                )}
+                                style={{ 
+                                  animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
+                                }}
+                              >
+                                <div
+                                  className={cn(
+                                    "max-w-[80%] rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                                    message.type === 'user' 
+                                      ? "bg-primary text-primary-foreground" 
+                                      : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
+                                  )}
+                                  style={{}}
+                                >
+                                  <div className="font-medium text-xs mb-1 opacity-70">
+                                    {message.type === 'user' ? 'You' : '🤖 Krafty'}
+                                  </div>
+                                  <div>
+                                    {message.type === 'ai' ? (
+                                      <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content) }} />
+                                    ) : (
+                                      message.content
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Input Bar */}
+                      <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+                        <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Input Bar */}
-                  <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                    <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
-                  </div>
-                </>
+                  }
+                />
               )}
               
               {/* Resize Handle */}
