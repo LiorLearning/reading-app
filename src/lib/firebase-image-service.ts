@@ -286,6 +286,101 @@ class FirebaseImageService {
   }
 
   /**
+   * Get latest image for each adventure (for cover image display)
+   * Uses fallback approach if composite index not available
+   */
+  async getLatestAdventureImages(userId: string): Promise<{ [adventureId: string]: string }> {
+    try {
+      // First try the optimized query (requires composite index)
+      const q = query(
+        collection(db, this.COLLECTION_NAME),
+        where('userId', '==', userId),
+        orderBy('timestamp', 'desc'),
+        limit(100) // Get enough to cover multiple adventures
+      );
+
+      const querySnapshot = await getDocs(q);
+      const latestImages: { [adventureId: string]: string } = {};
+      
+      querySnapshot.docs.forEach(doc => {
+        const data = doc.data() as StoredImage;
+        // Only store the first (latest) image for each adventure
+        if (!latestImages[data.adventureId]) {
+          latestImages[data.adventureId] = data.imageUrl;
+        }
+      });
+
+      console.log(`🖼️ Successfully fetched ${Object.keys(latestImages).length} adventure cover images via optimized query`);
+      return latestImages;
+    } catch (error) {
+      console.warn('⚠️ Optimized query failed (likely missing composite index), trying fallback approach...');
+      
+      // Fallback: Use simple query without orderBy (doesn't require composite index)
+      try {
+        const fallbackQuery = query(
+          collection(db, this.COLLECTION_NAME),
+          where('userId', '==', userId),
+          limit(200) // Get more since we can't order by timestamp
+        );
+
+        const fallbackSnapshot = await getDocs(fallbackQuery);
+        const imagesByAdventure: { [adventureId: string]: StoredImage[] } = {};
+        
+        // Group images by adventure
+        fallbackSnapshot.docs.forEach(doc => {
+          const data = doc.data() as StoredImage;
+          if (!imagesByAdventure[data.adventureId]) {
+            imagesByAdventure[data.adventureId] = [];
+          }
+          imagesByAdventure[data.adventureId].push(data);
+        });
+        
+        // Get the latest image for each adventure (sort client-side)
+        const latestImages: { [adventureId: string]: string } = {};
+        Object.entries(imagesByAdventure).forEach(([adventureId, images]) => {
+          // Sort by timestamp descending to get the latest
+          const sortedImages = images.sort((a, b) => {
+            const aTime = a.timestamp?.toMillis?.() || 0;
+            const bTime = b.timestamp?.toMillis?.() || 0;
+            return bTime - aTime;
+          });
+          
+          if (sortedImages.length > 0) {
+            latestImages[adventureId] = sortedImages[0].imageUrl;
+          }
+        });
+
+        console.log(`🖼️ Successfully fetched ${Object.keys(latestImages).length} adventure cover images via fallback query`);
+        
+        // Log the index creation instruction
+        if (Object.keys(latestImages).length > 0) {
+          console.log('📝 To improve performance, create a composite index in Firebase Console:');
+          console.log('📝 Collection: adventureImages, Fields: userId (Ascending), timestamp (Descending)');
+          console.log('📝 Or visit: https://console.firebase.google.com/project/litkraft-8d090/firestore/indexes');
+        }
+        
+        return latestImages;
+      } catch (fallbackError) {
+        console.error('❌ Both optimized and fallback queries failed:', fallbackError);
+        return {};
+      }
+    }
+  }
+
+  /**
+   * Get latest image for a specific adventure (for cover display)
+   */
+  async getLatestAdventureImage(userId: string, adventureId: string): Promise<string | null> {
+    try {
+      const images = await this.getAdventureImages(userId, adventureId);
+      return images.length > 0 ? images[0].imageUrl : null; // First image is latest (ordered by timestamp desc)
+    } catch (error) {
+      console.error(`⚠️ Failed to fetch latest image for adventure ${adventureId}:`, error);
+      return null;
+    }
+  }
+
+  /**
    * Get storage statistics for a user
    */
   async getStorageStats(userId: string): Promise<{

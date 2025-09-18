@@ -69,7 +69,12 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ## Step 7: Update Firebase Security Rules
 
+### Firestore Security Rules
+
 Update your Firestore security rules to allow authenticated users to read/write their own data:
+
+1. Go to **Firestore Database** > **Rules** in Firebase Console
+2. Replace with:
 
 ```javascript
 rules_version = '2';
@@ -80,10 +85,59 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Add other collection rules as needed
+    // Adventure sessions - users can read/write their own sessions
+    match /adventureSessions/{sessionId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Adventure image URLs - users can read/write their own image URLs
+    match /adventureImageUrls/{imageId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Temporary: Allow all authenticated users (for development)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
   }
 }
 ```
+
+### Firebase Storage Security Rules
+
+**CRITICAL:** Also configure Firebase Storage rules for image access:
+
+1. Go to **Storage** > **Rules** in Firebase Console
+2. Replace with:
+
+```javascript
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow authenticated users to read and write their own adventure images
+    match /adventure-images/{userId}/{adventureId}/{imageFile} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read their own test files
+    match /test/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Temporary: Allow all authenticated users to read images (for development)
+    // Remove this in production and use specific rules above
+    match /{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
+
+3. Click **Publish** for both Firestore and Storage rules
 
 ## Step 8: Deploy to Vercel
 
@@ -123,6 +177,11 @@ service cloud.firestore {
 ### Firestore Permission Denied
 - Update your security rules to allow authenticated users
 - Make sure you're signed in when trying to write data
+
+### Preview Images Not Loading (403 Errors)
+- Configure Firebase Storage security rules (see Step 7)
+- Ensure you're signed in when viewing images
+- Check browser console for specific storage permission errors
 
 ## Security Best Practices
 

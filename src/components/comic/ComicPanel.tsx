@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { playClickSound, playImageCompleteSound } from "@/lib/sounds";
 import SpellBox from "./SpellBox";
+import { useFirebaseImage, useCurrentAdventureId } from "@/hooks/use-firebase-image";
 
 interface ComicPanelProps {
   image: string;
@@ -18,7 +19,7 @@ interface ComicPanelProps {
   // Spell box props
   spellWord?: string;
   spellSentence?: string;
-  onSpellComplete?: (isCorrect: boolean, userAnswer?: string) => void;
+  onSpellComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSpellSkip?: () => void;
   onSpellNext?: () => void;
   showSpellBox?: boolean;
@@ -60,11 +61,25 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   showHints = true,
   showExplanation = true
 }) => {
+  // Get current adventure ID for Firebase image resolution
+  const currentAdventureId = useCurrentAdventureId();
+  
+  // Resolve Firebase image if needed
+  const { url: resolvedImageUrl, isLoading: isResolvingImage, isExpiredUrl } = useFirebaseImage(image, currentAdventureId || undefined);
+  
   const [showImageAfterLoad, setShowImageAfterLoad] = React.useState(false);
   const [previousLoadingState, setPreviousLoadingState] = React.useState(isGenerating);
-  const [currentImage, setCurrentImage] = React.useState(image);
+  const [currentImage, setCurrentImage] = React.useState(resolvedImageUrl);
   const [isImageLoading, setIsImageLoading] = React.useState(false);
   const fadeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  
+  // Update current image when resolved URL changes
+  React.useEffect(() => {
+    if (resolvedImageUrl !== currentImage) {
+      console.log(`🔄 ComicPanel: Image resolved from ${isExpiredUrl ? 'expired DALL-E URL' : 'original'} to: ${resolvedImageUrl.substring(0, 50)}...`);
+      setCurrentImage(resolvedImageUrl);
+    }
+  }, [resolvedImageUrl, currentImage, isExpiredUrl]);
 
   // Preload image and wait for it to fully load before showing
   const preloadImage = React.useCallback((imageUrl: string): Promise<void> => {

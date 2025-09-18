@@ -12,6 +12,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
   className = "" 
 }) => {
   return (
+
     <div className={`flex flex-col items-center gap-4 py-6 bg-transparent ${className}`}>
       {/* Avatar Image */}
       <div className="w-32 h-32 flex items-center justify-center hover:scale-105 transition-all duration-200">
@@ -21,7 +22,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
           className="w-full h-full object-contain rounded-lg"
         />
       </div>
-      
+
     </div>
   );
 };
