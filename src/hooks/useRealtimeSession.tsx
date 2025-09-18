@@ -74,8 +74,7 @@ banana
 the student is Subit you are teaching spelling to her who is in grade 1
 
 be polite and encouraging to her
-
-talk to her sometimes and help her by calling her name out`
+Do not greet and don't speak till a message is sent`
   } = callbacks;
   
   // Core session state
