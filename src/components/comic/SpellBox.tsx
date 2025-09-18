@@ -1071,7 +1071,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                      playClickSound();
                      if (sendMessage && targetWord) {
                        console.log('🎤 SPELLBOX HINT: Sending target word to realtime session:', targetWord);
-                       sendMessage(targetWord);
+                       sendMessage(`correct answer is ${targetWord} and the user answer is ${reconstructCompleteWord(userAnswer)}`)
                      }
                    }}
                    style={{
