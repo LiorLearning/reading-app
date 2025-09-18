@@ -636,8 +636,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         generateAIHint(completeWord);
         // Send target word to realtime session for pronunciation help
         if (sendMessage && targetWord) {
-          console.log('🎤 SPELLBOX: Sending target word to realtime session:', targetWord);
-          sendMessage(targetWord);
+          console.log('🎤 SPELLBOX: Sending target word to realtime session:', targetWord, completeWord);
+          sendMessage(`correct answer is ${targetWord} and the user answer is ${completeWord}`);
         }
       }
     } else {
