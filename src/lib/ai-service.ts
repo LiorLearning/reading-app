@@ -1423,8 +1423,8 @@ Return ONLY the new reading passage, nothing else.`;
 
       // Try primary prompt first
       try {
-        const finalPrompt = primaryPrompt.length > 9000 
-          ? primaryPrompt.substring(0, 8990) + "..." 
+        const finalPrompt = primaryPrompt.length > 4000 
+          ? primaryPrompt.substring(0, 3990) + "..." 
           : primaryPrompt;
         
         console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
