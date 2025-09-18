@@ -1598,9 +1598,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Handle onboarding completion
   const handleOnboardingComplete = React.useCallback(() => {
-    setCurrentScreen(-1); // Redirect to home page
     playClickSound();
-  }, []);
+    // After onboarding is complete, we should transition back to the main app
+    // The UnifiedPetAdventureApp will now route to PetPage, which will handle pet selection
+    if (onBackToPetPage) {
+      onBackToPetPage();
+    } else {
+      setCurrentScreen(-1); // Fallback to home page
+    }
+  }, [onBackToPetPage]);
 
   // Handle homepage navigation
   const handleHomeNavigation = React.useCallback((path: 'start' | 'middle' | 'topics') => {
