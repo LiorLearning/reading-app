@@ -727,7 +727,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
   const getStatusEmoji = (status: ActionStatus) => {
     switch (status) {
-      case 'happy': return '🤩';
+      case 'happy': return '✅';
       case 'sad': return '😢';
       case 'neutral': return '😐';
       case 'disabled': return '';

@@ -1422,17 +1422,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 2-2 pattern starting at message 1: first 1 pure adventure, then alternating 2-2
-        // Message 0: Pure adventure (no spelling)
-        // Messages 1,2: With spelling questions  
-        // Messages 3,4: Pure adventure (no spelling)
-        // Messages 5,6: With spelling questions, etc.
+        // Implement 2-1 pattern starting at message 1: initial message has no spelling, then 2-1 pattern
+        // Message 0: Pure adventure (no spelling) - initial message
+        // Messages 1,2: With spelling questions (2 with spelling)
+        // Message 3: Pure adventure (no spelling) (1 without spelling)
+        // Messages 4,5: With spelling questions (2 with spelling)
+        // Message 6: Pure adventure (no spelling) (1 without spelling), etc.
         let isSpellingPhase = false;
-        if (messageCycleCount >= 2) {
-          // After the first message (cycle count 1), use 2-2 alternating pattern
-          const cyclePosition = (messageCycleCount - 2) % 4;
-          isSpellingPhase = cyclePosition < 2; // First 2 of each 4-message cycle have spelling
-        }
+        const cyclePosition = (messageCycleCount - 2) % 3;
+        isSpellingPhase = cyclePosition >= 0 && cyclePosition < 2; // First 2 of each 3-message cycle have spelling
         
         const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion() : null;
         
