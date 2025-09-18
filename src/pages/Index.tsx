@@ -4113,6 +4113,8 @@ const Index = () => {
                     currentQuestionIndex={spellProgress.currentIndex}
                     showHints={true}
                     showExplanation={true}
+                    // Realtime session integration
+                    sendMessage={sendMessage}
                   />
                 </div>
               </section>

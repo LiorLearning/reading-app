@@ -41,6 +41,9 @@ interface SpellBoxProps {
   currentQuestionIndex?: number;
   showHints?: boolean;
   showExplanation?: boolean;
+  
+  // Realtime session integration
+  sendMessage?: (text: string) => void;
 }
 
 const SpellBox: React.FC<SpellBoxProps> = ({
@@ -61,7 +64,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   totalQuestions = 1,
   currentQuestionIndex = 0,
   showHints = true,
-  showExplanation = true
+  showExplanation = true,
+  
+  // Realtime session integration
+  sendMessage
 }) => {
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [showHint, setShowHint] = useState(false);
@@ -628,13 +634,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         setAttempts(prev => prev + 1);
         // Generate AI hint for incorrect answer
         generateAIHint(completeWord);
+        // Send target word to realtime session for pronunciation help
+        if (sendMessage && targetWord) {
+          console.log('🎤 SPELLBOX: Sending target word to realtime session:', targetWord);
+          sendMessage(targetWord);
+        }
       }
     } else {
       console.log('🔤 SPELLBOX: User input not complete yet');
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer]);
+  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, sendMessage]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
@@ -1039,98 +1050,60 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               animation: 'bounceIn 0.5s ease-out',
               boxShadow: '0 4px 12px rgba(251, 146, 60, 0.15)'
             }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}>
-                <span style={{ fontSize: '24px' }}></span>
-                <div style={{ 
-                  fontSize: '16px', 
-                  fontWeight: 500, 
-                  color: '#C2410C', 
-                  lineHeight: 1.5,
-                  flex: 1,
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  gap: '8px'
-                }}>
-                  <div style={{ flex: 1 }}>
-                    {isGeneratingHint ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{
-                          width: '16px',
-                          height: '16px',
-                          border: '2px solid #FB923C',
-                          borderTop: '2px solid transparent',
-                          borderRadius: '50%',
-                          animation: 'spin 1s linear infinite'
-                        }}></div>
-                        <span>Thinking of a helpful hint...</span>
-                      </div>
-                    ) : aiHint ? (
-                      <div>
-                        <strong></strong> {aiHint}
-                      </div>
-                    ) : (
-                      <div>
-                        <strong>Friendly Hint:</strong> This word has {targetWord.length} magical letters!
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Speaker button inline with text - bottom right */}
-                  {(aiHint || (!isGeneratingHint && !aiHint)) && (
-                    <button
-                      onClick={async () => {
-                        playClickSound();
-                        const hintText = aiHint || `Friendly hint: This word has ${targetWord.length} magical letters!`;
-                        const hintMessageId = `spellbox-hint-${Date.now()}`;
-                        
-                        try {
-                          await ttsService.speak(hintText, {
-                            stability: 0.7,
-                            similarity_boost: 0.9,
-                            speed: 0.8,
-                            messageId: hintMessageId
-                          });
-                        } catch (error) {
-                          console.error('Error playing hint audio:', error);
-                        }
-                      }}
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
-                        color: 'white',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        boxShadow: '0 2px 4px rgba(251, 146, 60, 0.3)',
-                        transition: 'all 0.15s ease-out',
-                        opacity: 0.8,
-                        flexShrink: 0
-                      }}
-                      title="Listen to hint"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                        e.currentTarget.style.opacity = '1';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.opacity = '0.8';
-                      }}
-                    >
-                      🔊
-                    </button>
-                  )}
-                </div>
-              </div>
+               <div style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 gap: '8px'
+               }}>
+                 <div style={{ 
+                   fontSize: '16px', 
+                   fontWeight: 500, 
+                   color: '#C2410C', 
+                   fontFamily: 'system-ui, -apple-system, sans-serif'
+                 }}>
+                   <strong>HINT</strong>
+                 </div>
+                 
+                 {/* Hint button */}
+                 <button
+                   onClick={() => {
+                     playClickSound();
+                     if (sendMessage && targetWord) {
+                       console.log('🎤 SPELLBOX HINT: Sending target word to realtime session:', targetWord);
+                       sendMessage(targetWord);
+                     }
+                   }}
+                   style={{
+                     width: '24px',
+                     height: '24px',
+                     borderRadius: '4px',
+                     border: 'none',
+                     background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
+                     color: 'white',
+                     cursor: 'pointer',
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                     fontSize: '12px',
+                     boxShadow: '0 2px 4px rgba(251, 146, 60, 0.3)',
+                     transition: 'all 0.15s ease-out',
+                     opacity: 0.8,
+                     flexShrink: 0
+                   }}
+                   title="Get pronunciation help"
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.transform = 'scale(1.1)';
+                     e.currentTarget.style.opacity = '1';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.transform = 'scale(1)';
+                     e.currentTarget.style.opacity = '0.8';
+                   }}
+                 >
+                   🎤
+                 </button>
+               </div>
             </div>
           )}
 

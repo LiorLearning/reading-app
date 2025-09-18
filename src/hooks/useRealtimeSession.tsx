@@ -71,7 +71,7 @@ banana
 - Segment IPA by syllables with a short pause between.
 - End with the whole spoken word, not the spelling.
 
-the student is irene you are teaching spelling to her who is in grade 1
+the student is Subit you are teaching spelling to her who is in grade 1
 
 be polite and encouraging to her
 

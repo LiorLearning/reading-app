@@ -36,6 +36,8 @@ interface ComicPanelProps {
   currentQuestionIndex?: number;
   showHints?: boolean;
   showExplanation?: boolean;
+  // Realtime session integration
+  sendMessage?: (text: string) => void;
 }
 
 const ComicPanel: React.FC<ComicPanelProps> = ({ 
@@ -59,7 +61,9 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   totalQuestions = 1,
   currentQuestionIndex = 0,
   showHints = true,
-  showExplanation = true
+  showExplanation = true,
+  // Realtime session integration
+  sendMessage
 }) => {
   // Get current adventure ID for Firebase image resolution
   const currentAdventureId = useCurrentAdventureId();
@@ -339,6 +343,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             showProgress={showProgress}
             totalQuestions={totalQuestions}
             currentQuestionIndex={currentQuestionIndex}
+            sendMessage={sendMessage}
             showHints={showHints}
             showExplanation={showExplanation}
           />
