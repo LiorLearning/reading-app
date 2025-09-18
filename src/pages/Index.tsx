@@ -27,6 +27,8 @@ import { useCoins } from "@/pages/coinSystem";
 import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { usePetData } from "@/lib/pet-data-service";
+import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
+import { useSessionCoins } from "@/hooks/use-session-coins";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -157,6 +159,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Get current pet avatar image
   const currentPetAvatarImage = useCurrentPetAvatarImage();
+  
+  // Session coin tracking for feeding progress
+  const { sessionCoins, resetSessionCoins } = useSessionCoins();
 
   // Auto-migrate localStorage data to Firebase when user authenticates
   React.useEffect(() => {
@@ -237,14 +242,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Optional session tracking for Firebase (won't break existing functionality)
   const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
   
-  // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
+  // Track message cycle for 2-2 pattern starting at chat 3 (2 pure adventure, then 2 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
   
   // Initialize message cycle count based on existing messages
   React.useEffect(() => {
     // Count AI messages to determine current cycle position
     const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
-    setMessageCycleCount(aiMessageCount % 6);
+    setMessageCycleCount(aiMessageCount);
   }, []); // Only run on mount
   
   // Show onboarding if user is authenticated but hasn't completed setup
@@ -277,10 +282,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Track if initial AI response has been sent for current session
   const initialResponseSentRef = React.useRef<string | null>(null);
+  // Guard to prevent duplicate initial generation on re-renders
+  const isGeneratingInitialRef = React.useRef<boolean>(false);
   
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
   const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
+  // Guard: prevent duplicate starts and duplicate session creation
+  const isStartingAdventureRef = React.useRef<boolean>(false);
+  const sessionCreatedForAdventureIdRef = React.useRef<string | null>(null);
   
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
@@ -462,18 +472,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Generate initial AI response when entering adventure screen
   React.useEffect(() => {
-    if (currentScreen === 1 && selectedTopicId && adventureMode) {
-      // Create unique session key to prevent duplicate messages
-      const sessionKey = `${selectedTopicId}-${adventureMode}`;
+    if (currentScreen === 1 && adventureMode) {
+      // Prefer adventure id for stability; fallback to topic id
+      const keyPart = currentAdventureId || selectedTopicId || 'unknown';
+      const sessionKey = `${keyPart}-${adventureMode}`;
       
       // Check if we've already sent an initial response for this session
-      if (initialResponseSentRef.current === sessionKey) {
+      if (initialResponseSentRef.current === sessionKey || isGeneratingInitialRef.current) {
         return;
       }
       
       // Generate initial AI message using real-time AI generation
       const generateInitialResponse = async () => {
         try {
+          // Mark as generating immediately to prevent duplicate triggers
+          isGeneratingInitialRef.current = true;
+          initialResponseSentRef.current = sessionKey;
+
           // Get current pet name and type for AI context
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petName = PetProgressStorage.getPetDisplayName(currentPetId);
@@ -490,9 +505,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             petName,    // pet name
             petType     // pet type
           );
-
-          // Mark that we've sent the initial response for this session
-          initialResponseSentRef.current = sessionKey;
 
           // Add the initial AI message
           const aiMessage: ChatMessage = {
@@ -511,6 +523,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             );
             return [...prev, aiMessage];
           });
+          
+          // Update message cycle count for the initial AI message
+          setMessageCycleCount(prev => prev + 1);
         } catch (error) {
           console.error('Error generating initial AI message:', error);
           
@@ -518,9 +533,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           const fallbackMessage = adventureMode === 'new' 
             ? "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀"
             : "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟";
-          
-          // Mark that we've sent the initial response for this session
-          initialResponseSentRef.current = sessionKey;
 
           // Add the fallback AI message
           const aiMessage: ChatMessage = {
@@ -539,12 +551,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             );
             return [...prev, aiMessage];
           });
+          
+          // Update message cycle count for the fallback AI message
+          setMessageCycleCount(prev => prev + 1);
+        } finally {
+          isGeneratingInitialRef.current = false;
         }
       };
 
       generateInitialResponse();
     }
-  }, [currentScreen, selectedTopicId, adventureMode, currentAdventureContext, userData]);
+  }, [currentScreen, currentAdventureId, adventureMode, userData?.username]);
   
   React.useEffect(() => {
     
@@ -1405,16 +1422,26 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 3-3 pattern: 3 pure adventure messages, then 3 with spelling questions
-        const isSpellingPhase = messageCycleCount >= 3; // Messages 3, 4, 5 have spelling
+        // Implement 2-2 pattern starting at message 1: first 1 pure adventure, then alternating 2-2
+        // Message 0: Pure adventure (no spelling)
+        // Messages 1,2: With spelling questions  
+        // Messages 3,4: Pure adventure (no spelling)
+        // Messages 5,6: With spelling questions, etc.
+        let isSpellingPhase = false;
+        if (messageCycleCount >= 2) {
+          // After the first message (cycle count 1), use 2-2 alternating pattern
+          const cyclePosition = (messageCycleCount - 2) % 4;
+          isSpellingPhase = cyclePosition < 2; // First 2 of each 4-message cycle have spelling
+        }
+        
         const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion() : null;
         
-        console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
+        console.log(`🔄 Message cycle: ${messageCycleCount}, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 2 ? 'Initial Pure Adventure' : isSpellingPhase ? 'Spelling Questions' : 'Pure Adventure'})`);
         
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
-        // Update cycle count and reset after 6 messages (3 adventure + 3 spelling)
-        setMessageCycleCount(prev => (prev + 1) % 6);
+        // Update cycle count (no modulo, just increment)
+        setMessageCycleCount(prev => prev + 1);
         
         // First, add the spelling sentence message if we have one
         if (aiResponse.spelling_sentence && spellingQuestion) {
@@ -1959,6 +1986,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Handle start adventure from progress tracking
   const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new') => {
+    // Prevent rapid duplicate invocations
+    if (isStartingAdventureRef.current) {
+      return;
+    }
+    isStartingAdventureRef.current = true;
     playClickSound();
     setSelectedTopicId(topicId);
     setAdventureMode(mode);
@@ -1989,6 +2021,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setIsRetryMode(false);
       setRetryQuestionIndex(0);
       
+      // Reset session coins for new adventure
+      resetSessionCoins();
+      
       console.log('🚀 Started new adventure with default rocket image and reset all flow states');
     } else {
       // For continuing, keep existing adventure ID or create new one
@@ -2000,17 +2035,26 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // Optional Firebase session creation (non-blocking)
     if (user) {
-      const sessionId = await adventureSessionService.createAdventureSession(
-        user.uid,
-        mode === 'new' ? 'new_adventure' : 'continue_adventure',
-        adventureId,
-        topicId,
-        mode
-      );
-      setCurrentSessionId(sessionId);
+      // Only create one session per adventureId
+      if (sessionCreatedForAdventureIdRef.current !== adventureId) {
+        const sessionId = await adventureSessionService.createAdventureSession(
+          user.uid,
+          mode === 'new' ? 'new_adventure' : 'continue_adventure',
+          adventureId,
+          topicId,
+          mode
+        );
+        setCurrentSessionId(sessionId);
+        sessionCreatedForAdventureIdRef.current = adventureId;
+      }
     }
     
     setCurrentScreen(1); // Go to adventure screen first to show AI response
+    
+    // Release the start guard slightly later to avoid double-taps
+    setTimeout(() => {
+      isStartingAdventureRef.current = false;
+    }, 250);
   }, [currentAdventureId, reset, initialPanels, user]);
 
   // Handle initial adventure props from parent component
@@ -3034,105 +3078,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             )}
             
             <div className="text-center">
-              <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
-                {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
-                 userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
-                 currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
-                 currentScreen === 1 ? (
-                   <div className="flex items-center justify-center gap-4">
-                     {/* Clean Progress bar */}
-                     <div className="flex flex-col items-center gap-2">
-                       {/* Level indicator above progress bar */}
-                       <div className="text-white font-bold text-lg drop-shadow-md">
-                         Pet Level {(() => {
-                           const { adventureCoins } = petData.cumulativeCareLevel;
-                           const levelThresholds = [0, 50, 120, 200, 300];
-                           let currentLevel = 1;
-                           for (let i = 1; i < levelThresholds.length; i++) {
-                             if (adventureCoins >= levelThresholds[i]) {
-                               currentLevel = i + 1;
-                             } else {
-                               break;
-                             }
-                           }
-                           if (currentLevel >= levelThresholds.length) {
-                             currentLevel = 5;
-                           }
-                           return currentLevel;
-                         })()}
-                       </div>
-                       
-                       <div className="flex items-center gap-4">
-                         {/* Progress bar container */}
-                         <div className="relative">
-                           {(() => {
-                             // Use level-based progression system (same as PetPage)
-                             const { adventureCoins } = petData.cumulativeCareLevel;
-                             
-                             const levelThresholds = [0, 50, 120, 200, 300]; // Level thresholds
-                             
-                             // Find current level based on adventure coins earned
-                             let currentLevel = 1;
-                             let coinsInCurrentLevel = adventureCoins;
-                             let coinsNeededForNextLevel = 50; // Default for Level 1 to 2
-                             
-                             for (let i = 1; i < levelThresholds.length; i++) {
-                               if (adventureCoins >= levelThresholds[i]) {
-                                 currentLevel = i + 1;
-                               } else {
-                                 // Calculate progress within current level
-                                 const previousThreshold = levelThresholds[i - 1];
-                                 const nextThreshold = levelThresholds[i];
-                                 coinsInCurrentLevel = adventureCoins - previousThreshold;
-                                 coinsNeededForNextLevel = nextThreshold - previousThreshold;
-                                 break;
-                               }
-                             }
-                             
-                             // If we're at max level (Level 5)
-                             if (currentLevel >= levelThresholds.length) {
-                               currentLevel = 5; // Cap at Level 5
-                               coinsInCurrentLevel = adventureCoins - levelThresholds[levelThresholds.length - 1];
-                               coinsNeededForNextLevel = 100; // Arbitrary value for max level
-                             }
-                             
-                             const progressPercentage = Math.min(100, (coinsInCurrentLevel / coinsNeededForNextLevel) * 100);
-                             const displayPercentage = Math.round(progressPercentage);
-                             
-                             return (
-                               <>
-                                 {/* Progress bar background */}
-                                 <div className="relative w-80 h-8 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-full border border-slate-400/30 overflow-hidden">
-                                   {/* Progress fill */}
-                                   <div 
-                                     className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 transition-all duration-700 ease-out"
-                                     style={{ width: `${Math.min(100, progressPercentage)}%` }}
-                                   />
-                                 </div>
-                                 
-                                 {/* Progress percentage - clean text */}
-                                 <div className="absolute inset-0 flex items-center justify-center">
-                                   <span className="text-white text-base font-bold">
-                                     {displayPercentage}%
-                                   </span>
-                                 </div>
-                               </>
-                             );
-                           })()}
-                         </div>
-                         
-                         {/* Sleep emoji when ready */}
-                         {isSleepAvailable() && (
-                           <div className="text-3xl animate-bounce">
-                             😴
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                   </div>
-                 ) : 
-                 'QUIZ TIME'}
-              </h1>
+              {currentScreen === 1 ? (
+                <div className="flex items-center justify-center">
+                  {/* Adventure Feeding Progress */}
+                  <AdventureFeedingProgress 
+                    sessionCoins={sessionCoins}
+                    targetCoins={50}
+                  />
+                </div>
+              ) : (
+                <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
+                  {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
+                   userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
+                   currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
+                   'QUIZ TIME'}
+                </h1>
+              )}
               {userData && !devToolsVisible && currentScreen !== 1 && (
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <span className="text-sm lg:text-base font-semibold text-primary/80">
@@ -3770,6 +3731,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     setCanAccessQuestions(false);
                     setIsRetryMode(false);
                     setRetryQuestionIndex(0);
+                    
+                    // Reset session coins for new adventure
+                    resetSessionCoins();
                     
                     // Reset initial response ref
                     initialResponseSentRef.current = null;

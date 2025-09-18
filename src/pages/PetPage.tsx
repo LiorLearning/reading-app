@@ -9,7 +9,7 @@ import { PetSelectionFlow } from '@/components/PetSelectionFlow';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, LogOut } from 'lucide-react';
+import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference } from '@/lib/utils';
@@ -19,7 +19,7 @@ type Props = {
   onContinueSpecificAdventure?: (adventureId: string) => void;
 };
 
-type ActionStatus = 'happy' | 'sad' | 'neutral' | 'disabled';
+type ActionStatus = 'happy' | 'sad' | 'neutral' | 'disabled' | 'no-emoji';
 
 interface ActionButton {
   id: string;
@@ -355,10 +355,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     }
   }, [sleepClicks]);
 
-  // Update action states when pet, sleep state, adventure coins, or feeding count change
+  // Update action states when pet, sleep state, or adventure coins change
   useEffect(() => {
     setActionStates(getActionStates());
-  }, [currentPet, sleepClicks, getCumulativeCareLevel().adventureCoins, getCumulativeCareLevel().feedingCount]);
+  }, [currentPet, sleepClicks, getCumulativeCareLevel().adventureCoins]);
 
   // Reset sleep when switching pets (skip on initial mount)
   const hasMountedRef = useRef(false);
@@ -435,33 +435,37 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // { id: 'water', icon: '', status: 'sad' as ActionStatus, label: '' },
     ];
     
-    // Add adventure button - disabled until pet is fed at least 2 times, or when loading
+    // Add food button - show sad when no adventures, happy when has adventure coins
     const cumulativeCare = getCumulativeCareLevel();
-    let adventureStatus: ActionStatus;
-    let adventureLabel = 'Adventure';
+    let foodStatus: ActionStatus;
     
-    if (isAdventureLoading) {
-      adventureStatus = 'disabled';
-      adventureLabel = 'Loading...';
+    if (cumulativeCare.adventureCoins === 0) {
+      foodStatus = 'sad'; // Pet is hungry for adventure
     } else {
-      adventureStatus = 'neutral';
+      foodStatus = 'happy'; // Pet has been on adventures
     }
     
-    baseActions.push({ id: 'adventure', icon: '🍪', status: adventureStatus, label: 'Food' });
+    baseActions.push({ id: 'food', icon: '🍪', status: foodStatus, label: 'Food' });
     
-    // Add sleep button (always visible and clickable)
-    let sleepLabel, sleepStatus;
+    // Add sleep button - show sad when available but not done, happy when completed
+    let sleepLabel, sleepStatus: ActionStatus;
     if (sleepClicks >= 3) {
       sleepLabel = 'Sleeping';
-      sleepStatus = 'neutral'; // Always clickable when fully asleep
+      sleepStatus = 'happy'; // Pet is fully asleep and happy
+    } else if (isSleepAvailable()) {
+      sleepLabel = sleepClicks === 0 ? 'Sleep' : `Sleep ${sleepClicks}/3`;
+      sleepStatus = 'sad'; // Sleep is available but pet needs to sleep
     } else {
       sleepLabel = sleepClicks === 0 ? 'Sleep' : `Sleep ${sleepClicks}/3`;
-      sleepStatus = isSleepAvailable() ? 'neutral' : 'disabled';
+      sleepStatus = 'disabled'; // Sleep not available yet
     }
-    baseActions.push({ id: 'sleep', icon: '😴', status: sleepStatus as ActionStatus, label: sleepLabel });
+    baseActions.push({ id: 'sleep', icon: '😴', status: sleepStatus, label: sleepLabel });
     
-    // Always add more button at the end
+    // Add more button
     baseActions.push({ id: 'more', icon: '🐾', status: 'neutral' as ActionStatus, label: 'More' });
+    
+    // Always add shop button at the end (rightmost)
+    baseActions.push({ id: 'shop', icon: '🛒', status: 'no-emoji' as ActionStatus, label: 'Shop' });
     
     return baseActions;
   };
@@ -493,30 +497,14 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
 
-      // Try to get the most recent adventure to continue
-      const savedAdventures = await loadAdventureSummariesHybrid(user?.uid || null);
-      
-      if (savedAdventures && savedAdventures.length > 0) {
-        // Continue the most recent adventure
-        const lastAdventure = savedAdventures[0]; // Already sorted by lastPlayedAt desc
-        console.log('🚀 Continuing last adventure:', lastAdventure.name);
-        
-        if (onContinueSpecificAdventure) {
-          onContinueSpecificAdventure(lastAdventure.id);
-        } else {
-          // Fallback to continue mode with a default topic
-          onStartAdventure('space_exploration', 'continue');
-        }
-      } else {
-        // No saved adventures, start a new one
-        console.log('🚀 Starting new adventure (no saved adventures found)');
-        onStartAdventure('space_exploration', 'new');
-      }
+      // Always start a new adventure (no longer continue previous ones)
+      console.log('🚀 Starting new adventure');
+      onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new');
     } catch (error) {
       console.error('Failed to handle adventure click:', error);
       // Fallback to starting a new adventure
       if (onStartAdventure) {
-        onStartAdventure('space_exploration', 'new');
+        onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new');
       }
     } finally {
       // Clear loading state when done (or on error)
@@ -573,17 +561,24 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return;
     }
 
-    // Handle adventure action
-    if (actionId === 'adventure') {
+    // Handle food action - always starts new adventure
+    if (actionId === 'food') {
       handleAdventureClick();
       return;
     }
 
-    // Don't deduct coins for "More" action - always open pet shop
-    if (actionId === 'more') {
+    // Don't deduct coins for "Shop" action - always open pet shop
+    if (actionId === 'shop') {
       // Stop any current audio when opening pet shop
       ttsService.stop();
       setShowPetShop(true);
+      return;
+    }
+
+    // Handle more action - placeholder for future functionality
+    if (actionId === 'more') {
+      // Placeholder for future functionality
+      console.log('More button clicked - functionality to be added later');
       return;
     }
 
@@ -732,10 +727,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
   const getStatusEmoji = (status: ActionStatus) => {
     switch (status) {
-      // case 'happy': return '😊';
-      // case 'sad': return '😢';
-      case 'neutral': return '';
-      case 'disabled': return '🔒';
+      case 'happy': return '🤩';
+      case 'sad': return '😢';
+      case 'neutral': return '😐';
+      case 'disabled': return '';
+      case 'no-emoji': return '';
       default: return '';
     }
   };
@@ -867,7 +863,7 @@ const getSleepyPetImage = (clicks: number) => {
         1: {
           // Level 1 Cat images - coin-based progression
           coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234455_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250918_002119_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
@@ -1170,8 +1166,8 @@ const getSleepyPetImage = (clicks: number) => {
         name: 'Buddy',
         owned: isPetOwned('dog'),
         cost: 200,
-        requiredLevel: 2,
-        isLocked: currentLevel < 2
+        requiredLevel: 3,
+        isLocked: currentLevel < 3
       },
       cat: {
         id: 'cat',
@@ -1179,8 +1175,8 @@ const getSleepyPetImage = (clicks: number) => {
         name: 'Whiskers',
         owned: isPetOwned('cat'),
         cost: 200,
-        requiredLevel: 2,
-        isLocked: currentLevel < 2
+        requiredLevel: 3,
+        isLocked: currentLevel < 3
       },
       hamster: {
         id: 'hamster',
@@ -1188,8 +1184,8 @@ const getSleepyPetImage = (clicks: number) => {
         name: 'Peanut',
         owned: isPetOwned('hamster'),
         cost: 200,
-        requiredLevel: 2,
-        isLocked: currentLevel < 2
+        requiredLevel: 3,
+        isLocked: currentLevel < 3
       },
       dragon: {
         id: 'dragon',
@@ -2137,19 +2133,21 @@ const getSleepyPetImage = (clicks: number) => {
                 : 'cursor-pointer hover:bg-white/20 hover:-translate-y-1 active:scale-95'
             }`}
           >
-            {/* Status emoji */}
-            {getStatusEmoji(action.status) && (
-              <div className="absolute -top-2 -right-2 text-lg bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md">
-                {getStatusEmoji(action.status)}
+            {/* Action icon with grouped status emoji */}
+            <div className="relative">
+              <div className="text-4xl drop-shadow-lg">
+                {action.id === 'food' && isAdventureLoading ? (
+                  <div className="animate-spin text-4xl">⏳</div>
+                ) : (
+                  action.icon
+                )}
               </div>
-            )}
-            
-            {/* Action icon */}
-            <div className="text-4xl drop-shadow-lg">
-              {action.id === 'adventure' && isAdventureLoading ? (
-                <div className="animate-spin text-4xl">⏳</div>
-              ) : (
-                action.icon
+              
+              {/* Status emoji - always visible for non-shop buttons, grouped with main icon */}
+              {action.id !== 'shop' && (
+                <div className="absolute -top-3 -right-2 text-lg bg-white rounded-full w-6 h-6 flex items-center justify-center shadow-md">
+                  {getStatusEmoji(action.status) || '😐'}
+                </div>
               )}
             </div>
             
@@ -2172,8 +2170,8 @@ const getSleepyPetImage = (clicks: number) => {
               </div>
             )}
             
-            {/* Free indicator for Adventure action */}
-            {action.id === 'adventure' && (
+            {/* Free indicator for Food action */}
+            {action.id === 'food' && (
               <div className="text-xs font-semibold text-blue-300 drop-shadow-md">
                 
               </div>

@@ -119,6 +119,9 @@ export class CoinSystem {
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('petDataChanged', { detail: petData }));
       
+      // Dispatch event for session coin tracking
+      window.dispatchEvent(new CustomEvent('adventureCoinsAdded', { detail: { amount } }));
+      
       console.log(`🪙 Added ${amount} adventure coins. Total: ${petData.cumulativeCareLevel.adventureCoins}`);
     } catch (error) {
       console.warn('Failed to track adventure coins for pet care:', error);

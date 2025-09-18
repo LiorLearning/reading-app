@@ -148,7 +148,7 @@ export class PetProgressStorage {
   }
 
   // Get pet progress data
-  static getPetProgress(petId: string, petType: string = 'dog'): PetProgressData {
+  static getPetProgress(petId: string, petType: string = petId): PetProgressData {
     try {
       const stored = localStorage.getItem(this.getPetStorageKey(petId));
       if (stored) {
@@ -192,9 +192,16 @@ export class PetProgressStorage {
     const defaultData = this.getDefaultPetProgress(petId, petType);
     
     // Ensure all required fields exist
+    // Resolve and correct petType mismatches from older data
+    const knownPetIds = ['dog', 'cat', 'hamster', 'bobo', 'feather'];
+    let resolvedPetType = data.petType || petType || petId;
+    if (knownPetIds.includes(petId) && resolvedPetType !== petId) {
+      resolvedPetType = petId;
+    }
+
     return {
       petId: data.petId || petId,
-      petType: data.petType || petType,
+      petType: resolvedPetType,
       petName: data.petName || undefined, // Preserve existing pet name
       cumulativeCoinsSpent: data.cumulativeCoinsSpent || 0,
       heartData: {

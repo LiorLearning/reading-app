@@ -15,6 +15,7 @@ import confetti from 'canvas-confetti';
 // Updated import from the correct file
 import { sampleMCQData, type MCQData, type MCQQuestion, type DragDropQuestion, type FillBlankQuestion, type TopicInfo, type Topic, type AIHook } from '../data/mcq-questions';
 import { adventureSessionService } from '@/lib/adventure-session-service';
+import { useCoins } from '@/pages/coinSystem';
 
 // Remove duplicate interface definitions (lines 16-105) since they're now imported
 
@@ -199,6 +200,9 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const currentPetAvatarImage = useCurrentPetAvatarImage();
   const resizeRef = React.useRef<HTMLDivElement>(null);
   const nextButtonRef = React.useRef<HTMLButtonElement>(null);
+  
+  // Coin system integration
+  const { addAdventureCoins } = useCoins();
   
   // MCQ state - Initialize with starting index if provided
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(startingQuestionIndex || 0);
@@ -474,6 +478,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // but only if it wasn't already answered correctly
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
+        // Award 10 coins for correct MCQ answer (same as spelling questions)
+        addAdventureCoins(10);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -602,6 +608,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // but only if it wasn't already answered correctly
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
+        // Award 10 coins for correct MCQ answer (same as spelling questions)
+        addAdventureCoins(10);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -1526,6 +1534,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       // but only if it wasn't already answered correctly
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
+        // Award 10 coins for correct MCQ answer (same as spelling questions)
+        addAdventureCoins(10);
       }
       
       // Enhanced score tracking - save to localStorage and update state

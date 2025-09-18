@@ -11,8 +11,8 @@ interface VoiceSelectorProps {
 }
 
 const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
-  const [selectedVoice, setSelectedVoice] = useState<Voice>(ttsService.getSelectedVoice());
-  const [selectedSpeed, setSelectedSpeed] = useState<number>(ttsService.getSelectedSpeed());
+  const [selectedVoice, setSelectedVoice] = useState<Voice>(() => ttsService.getSelectedVoice());
+  const [selectedSpeed, setSelectedSpeed] = useState<number>(() => ttsService.getSelectedSpeed());
   const [isPreviewPlaying, setIsPreviewPlaying] = useState<string | null>(null);
 
   const handleVoiceSelect = async (voice: Voice) => {

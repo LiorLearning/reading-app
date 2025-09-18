@@ -1,0 +1,75 @@
+import React from 'react';
+import { cn } from '@/lib/utils';
+
+interface AdventureFeedingProgressProps {
+  sessionCoins: number;
+  targetCoins?: number;
+  className?: string;
+}
+
+const AdventureFeedingProgress: React.FC<AdventureFeedingProgressProps> = ({
+  sessionCoins,
+  targetCoins = 50,
+  className
+}) => {
+  // Calculate progress percentage (0-100)
+  const progressPercentage = Math.min(100, (sessionCoins / targetCoins) * 100);
+  
+  // Determine pet state based on progress
+  const getPetState = () => {
+    if (progressPercentage >= 100) return { emoji: '😋', state: 'full', message: 'Pet is well fed!' };
+    if (progressPercentage >= 75) return { emoji: '😊', state: 'satisfied', message: 'Pet is getting satisfied!' };
+    if (progressPercentage >= 50) return { emoji: '🙂', state: 'content', message: 'Pet is feeling better!' };
+    if (progressPercentage >= 25) return { emoji: '😐', state: 'neutral', message: 'Pet is getting some food!' };
+    return { emoji: '😟', state: 'hungry', message: 'Pet is hungry!' };
+  };
+
+  const petState = getPetState();
+
+  // Generate gradient colors based on progress
+  const getGradientColors = () => {
+    if (progressPercentage >= 100) {
+      return 'from-green-400 via-green-500 to-green-600';
+    } else if (progressPercentage >= 75) {
+      return 'from-yellow-400 via-green-400 to-green-500';
+    } else if (progressPercentage >= 50) {
+      return 'from-orange-400 via-yellow-400 to-green-400';
+    } else if (progressPercentage >= 25) {
+      return 'from-red-400 via-orange-400 to-yellow-400';
+    } else {
+      return 'from-red-500 via-red-400 to-red-300';
+    }
+  };
+
+  return (
+    <div className={cn("flex items-center justify-center gap-3", className)}>
+      {/* Emoji indicator on the left */}
+      <div className="text-2xl transition-all duration-700 ease-out flex items-center justify-center min-w-[2rem]">
+        {petState.emoji}
+      </div>
+      
+      {/* Progress bar - wider and cleaner */}
+      <div className="relative w-80 h-8 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-full border border-slate-400/30 overflow-hidden">
+        {/* Progress fill with dynamic gradient */}
+        <div 
+          className={cn(
+            "h-full bg-gradient-to-r transition-all duration-700 ease-out",
+            getGradientColors()
+          )}
+          style={{ width: `${progressPercentage}%` }}
+        />
+        
+        {/* Shine effect */}
+        <div 
+          className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          style={{
+            transform: `translateX(${progressPercentage - 100}%)`,
+            transition: 'transform 0.7s ease-out'
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default AdventureFeedingProgress;
