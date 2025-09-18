@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic } from "@/lib/utils";
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
@@ -45,9 +45,10 @@ import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
-import { getRandomSpellingQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
+import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
+import { useTutorial } from "@/hooks/use-tutorial";
 
 
 // Legacy user data interface for backwards compatibility
@@ -171,6 +172,9 @@ const Index = () => {
   // Firebase auth integration - must be at the top
   const { user, userData, signOut } = useAuth();
   
+  // Tutorial system integration
+  const { isFirstTimeAdventurer, completeAdventureTutorial } = useTutorial();
+  
   // NEW: Unified AI streaming system status
   const { isUnifiedSystemReady, hasImageGeneration } = useUnifiedAIStatus();
 
@@ -258,6 +262,15 @@ const Index = () => {
   
   // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
+
+  // Centralized function to increment message cycle count for all user interactions
+  const incrementMessageCycle = useCallback(() => {
+    setMessageCycleCount(prev => {
+      const newCount = (prev + 1) % 6;
+      console.log(`🔄 Message cycle incremented: ${prev} → ${newCount} (${newCount < 3 ? 'Pure Adventure' : 'Spelling Phase'})`);
+      return newCount;
+    });
+  }, []);
   
   // Initialize message cycle count based on existing messages
   React.useEffect(() => {
@@ -302,7 +315,11 @@ const Index = () => {
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
   const [selectedTopicFromPreference, setSelectedTopicFromPreference] = React.useState<string | null>(null);
-  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(null);
+  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(() => {
+    // Load saved grade selection on initialization
+    const savedGrade = loadGradeSelection();
+    return savedGrade?.gradeDisplayName || null;
+  });
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   // Automatic Flow Control System
@@ -338,6 +355,25 @@ const Index = () => {
   // SpellBox state management
   const [showSpellBox, setShowSpellBox] = React.useState<boolean>(false);
   const [currentSpellQuestion, setCurrentSpellQuestion] = React.useState<SpellingQuestion | null>(null);
+  // Store the original spelling question from question bank (with prefilled data)
+  const [originalSpellingQuestion, setOriginalSpellingQuestion] = React.useState<SpellingQuestion | null>(null);
+  
+  // Sequential spelling progress tracking
+  const [spellingProgressIndex, setSpellingProgressIndex] = React.useState<number>(() => {
+    // Initialize with saved progress for current grade
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    const savedProgress = loadSpellingProgress(currentGrade);
+    return savedProgress?.currentSpellingIndex || 0;
+  });
+  
+  const [completedSpellingIds, setCompletedSpellingIds] = React.useState<number[]>(() => {
+    // Initialize with saved completed IDs for current grade
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    const savedProgress = loadSpellingProgress(currentGrade);
+    return savedProgress?.completedSpellingIds || [];
+  });
+  
+  // Legacy spell progress for backward compatibility (can be removed later)
   const [spellProgress, setSpellProgress] = React.useState<{totalQuestions: number, currentIndex: number}>({
     totalQuestions: 10,
     currentIndex: 0
@@ -397,26 +433,69 @@ const Index = () => {
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
     if (currentSpellingWord && currentScreen === 1) {
-      // Convert the spelling word to a SpellingQuestion format
-      const spellQuestion: SpellingQuestion = {
-        id: Date.now(),
-        topicId: selectedTopicId,
-        topicName: selectedTopicId,
-        templateType: 'spelling',
-        word: currentSpellingWord,
-        questionText: currentSpellingSentence,
-        correctAnswer: currentSpellingWord.toUpperCase(),
-        audio: currentSpellingWord,
-        explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`
-      };
+      console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
+        currentSpellingWord,
+        hasOriginalQuestion: !!originalSpellingQuestion,
+        originalQuestionWord: originalSpellingQuestion?.word,
+        originalQuestionAudio: originalSpellingQuestion?.audio,
+        actualSpellingWord: originalSpellingQuestion?.audio,
+        originalQuestionIsPrefilled: originalSpellingQuestion?.isPrefilled,
+        originalQuestionPrefilledIndexes: originalSpellingQuestion?.prefilledIndexes,
+        wordsMatch: originalSpellingQuestion?.audio.toLowerCase() === currentSpellingWord.toLowerCase(),
+        messageCycleCount
+      });
       
-      setCurrentSpellQuestion(spellQuestion);
+      // Use the original spelling question (with prefilled data) if available and matches
+      // Compare against the audio field (actual spelling word), not the word field
+      if (originalSpellingQuestion && originalSpellingQuestion.audio.toLowerCase() === currentSpellingWord.toLowerCase()) {
+        console.log('🔤 USING ORIGINAL SPELLING QUESTION WITH PREFILLED DATA:', {
+          id: originalSpellingQuestion.id,
+          word: originalSpellingQuestion.word,
+          audio: originalSpellingQuestion.audio,
+          actualSpellingWord: originalSpellingQuestion.audio,
+          isPrefilled: originalSpellingQuestion.isPrefilled,
+          prefilledIndexes: originalSpellingQuestion.prefilledIndexes
+        });
+        
+        // Update the question text with the AI-generated sentence but keep all other data
+        // IMPORTANT: Use the audio field (actual spelling word) as the word field for SpellBox
+        const enhancedQuestion: SpellingQuestion = {
+          ...originalSpellingQuestion,
+          word: originalSpellingQuestion.audio, // Use actual spelling word for SpellBox
+          questionText: currentSpellingSentence || originalSpellingQuestion.questionText
+        };
+        
+        setCurrentSpellQuestion(enhancedQuestion);
+      } else {
+        // Fallback: Convert the spelling word to a SpellingQuestion format (no prefilled data)
+        console.log('🔤 FALLBACK: Creating new spelling question without prefilled data', {
+          reason: !originalSpellingQuestion ? 'No original question stored' : 'Word mismatch',
+          currentSpellingWord,
+          originalQuestionWord: originalSpellingQuestion?.word,
+          originalQuestionAudio: originalSpellingQuestion?.audio,
+          actualSpellingWord: originalSpellingQuestion?.audio
+        });
+        const spellQuestion: SpellingQuestion = {
+          id: Date.now(),
+          topicId: selectedTopicId,
+          topicName: selectedTopicId,
+          templateType: 'spelling',
+          word: currentSpellingWord,
+          questionText: currentSpellingSentence,
+          correctAnswer: currentSpellingWord.toUpperCase(),
+          audio: currentSpellingWord,
+          explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`
+        };
+        
+        setCurrentSpellQuestion(spellQuestion);
+      }
+      
       setShowSpellBox(true);
     } else {
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
     }
-  }, [currentSpellingWord, currentScreen]);
+  }, [currentSpellingWord, currentScreen, originalSpellingQuestion, messageCycleCount]);
   
   // Auto-collapse sidebar when switching to Screen 3 (MCQ)
   React.useEffect(() => {
@@ -612,6 +691,25 @@ const Index = () => {
     };
   }, []);
   
+  // Handle spelling progress reset when grade changes
+  React.useEffect(() => {
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    
+    // Only reset if we have a grade and it's different from what we initialized with
+    if (currentGrade) {
+      const savedProgress = loadSpellingProgress(currentGrade);
+      const expectedIndex = savedProgress?.currentSpellingIndex || 0;
+      const expectedCompletedIds = savedProgress?.completedSpellingIds || [];
+      
+      // If current state doesn't match saved progress for this grade, update it
+      if (spellingProgressIndex !== expectedIndex || completedSpellingIds.length !== expectedCompletedIds.length) {
+        console.log(`🔄 Grade changed to ${currentGrade}, updating spelling progress from index ${spellingProgressIndex} to ${expectedIndex}`);
+        setSpellingProgressIndex(expectedIndex);
+        setCompletedSpellingIds(expectedCompletedIds);
+      }
+    }
+  }, [selectedGradeFromDropdown, userData?.gradeDisplayName, spellingProgressIndex, completedSpellingIds]);
+  
   // Check for A+S+D combination
   React.useEffect(() => {
     if (pressedKeys.has('a') && pressedKeys.has('s') && pressedKeys.has('d')) {
@@ -675,6 +773,15 @@ const Index = () => {
     changeTheme(selectedTheme);
   }, [selectedTheme, changeTheme]);
   
+  // Ensure grade selection is loaded from localStorage on mount
+  useEffect(() => {
+    const savedGrade = loadGradeSelection();
+    if (savedGrade && !selectedGradeFromDropdown) {
+      console.log(`🔄 Loading saved grade selection on mount: ${savedGrade.gradeDisplayName}`);
+      setSelectedGradeFromDropdown(savedGrade.gradeDisplayName);
+    }
+  }, []); // Run once on mount
+
   // Grade selection logic (for HomePage only)
   useEffect(() => {
     if (userData && currentScreen === -1) { // Only on HomePage
@@ -701,12 +808,16 @@ const Index = () => {
       setSelectedPreference(preferenceLevel);
       
       // Initialize the combined grade and level selection for proper highlighting
-      if (preferenceLevel && userData?.gradeDisplayName) {
+      // Use saved grade selection if available, otherwise fall back to userData
+      const savedGrade = loadGradeSelection();
+      const gradeToUse = savedGrade?.gradeDisplayName || userData?.gradeDisplayName;
+      
+      if (preferenceLevel && gradeToUse) {
         setSelectedGradeAndLevel({ 
-          grade: userData.gradeDisplayName, 
+          grade: gradeToUse, 
           level: preferenceLevel 
         });
-        console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
+        console.log('Initialized selectedGradeAndLevel:', { grade: gradeToUse, level: preferenceLevel, source: savedGrade ? 'localStorage' : 'Firebase' });
       }
       
       // First, check if there's a current topic saved from previous selection
@@ -1148,13 +1259,16 @@ const Index = () => {
       // 🛠️ CRITICAL FIX: Mark legacy system as no longer running to re-enable sync
       setIsLegacySystemRunning(false);
     }
-  }, [chatMessages, aiService, user?.uid, currentAdventureId, addPanel, images, playImageCompleteSound, setIsLegacySystemRunning]);
+  }, [incrementMessageCycle, chatMessages, aiService, user?.uid, currentAdventureId, addPanel, images, playImageCompleteSound, setIsLegacySystemRunning]);
 
 
 
   // Generate new image panel based on context
   const onGenerateImage = useCallback(async (prompt?: string) => {
     try {
+      // Count this as a user interaction for spellbox cycle
+      incrementMessageCycle();
+      
       // Set loading state and start loading sound
       setIsGeneratingAdventureImage(true);
       
@@ -1273,7 +1387,7 @@ const Index = () => {
         }, 600);
       }, 2000);
           }
-    }, [addPanel, images, chatMessages, currentAdventureId, isExplicitImageRequest]);
+    }, [incrementMessageCycle, addPanel, images, chatMessages, currentAdventureId, isExplicitImageRequest]);
 
   // Add message directly to chat (for immediate feedback during transcription)
   const onAddMessage = useCallback((message: { type: 'user' | 'ai'; content: string; timestamp: number }) => {
@@ -1376,9 +1490,28 @@ const Index = () => {
         console.log('🎨 Using unified AI system for image generation request');
         console.log('📝 Image request message:', text);
         
+        // Count this image request as a user interaction for spellbox cycle
+        incrementMessageCycle();
+        
         try {
           // Get current spelling question for context
-          const currentSpellingQuestion = getRandomSpellingQuestion();
+          // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
+          const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+          // NEW: Use topic-based question selection for Spellbox progression
+          const currentSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds);
+          
+          // Store the original spelling question (with prefilled data) for later use
+          if (currentSpellingQuestion) {
+            console.log('🔤 STORING ORIGINAL SPELLING QUESTION (UNIFIED):', {
+              id: currentSpellingQuestion.id,
+              word: currentSpellingQuestion.word,
+              audio: currentSpellingQuestion.audio,
+              actualSpellingWord: currentSpellingQuestion.audio,
+              isPrefilled: currentSpellingQuestion.isPrefilled,
+              prefilledIndexes: currentSpellingQuestion.prefilledIndexes
+            });
+            setOriginalSpellingQuestion(currentSpellingQuestion);
+          }
           
           // Send message through unified system for image generation
           const unifiedResponse = await unifiedAIStreaming.sendMessage(
@@ -1713,14 +1846,37 @@ const Index = () => {
         
         // Implement 3-3 pattern: 3 pure adventure messages, then 3 with spelling questions
         const isSpellingPhase = messageCycleCount >= 3; // Messages 3, 4, 5 have spelling
-        const spellingQuestion = isSpellingPhase ? getRandomSpellingQuestion() : null;
+        // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
+        const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
+        
+        // Additional debug info
+        const savedGradeFromStorage = loadGradeSelection();
+        console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
+        console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
+        // NEW: Use topic-based question selection for Spellbox progression
+        const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds) : null;
+        
+        // Store the original spelling question (with prefilled data) for later use
+        if (spellingQuestion) {
+          console.log('🔤 STORING ORIGINAL SPELLING QUESTION:', {
+            id: spellingQuestion.id,
+            word: spellingQuestion.word,
+            audio: spellingQuestion.audio,
+            actualSpellingWord: spellingQuestion.audio,
+            isPrefilled: spellingQuestion.isPrefilled,
+            prefilledIndexes: spellingQuestion.prefilledIndexes
+          });
+          setOriginalSpellingQuestion(spellingQuestion);
+        }
         
         console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
         
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
         // Update cycle count and reset after 6 messages (3 adventure + 3 spelling)
-        setMessageCycleCount(prev => (prev + 1) % 6);
+        // Note: We increment AFTER storing the original question and generating AI response
+        incrementMessageCycle();
         
         // First, add the spelling sentence message if we have one
         if (aiResponse.spelling_sentence && spellingQuestion) {
@@ -1815,7 +1971,7 @@ const Index = () => {
         setIsAIResponding(false);
       }
     },
-    [generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount]
+    [incrementMessageCycle, generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -2284,6 +2440,12 @@ const Index = () => {
       setIsRetryMode(false);
       setRetryQuestionIndex(0);
       
+      // Complete adventure tutorial for first-time users
+      if (isFirstTimeAdventurer) {
+        completeAdventureTutorial();
+        console.log('🎓 Completed adventure tutorial for first-time user');
+      }
+      
       console.log('🚀 Started new adventure with default rocket image and reset all flow states');
     } else {
       // For continuing, keep existing adventure ID or create new one
@@ -2321,6 +2483,8 @@ const Index = () => {
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
+      // Save grade selection to localStorage for persistence
+      saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
     }
@@ -2984,11 +3148,74 @@ const Index = () => {
   ]);
 
   // SpellBox event handlers
-  const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string) => {
+  const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
     playClickSound();
     
     if (isCorrect) {
-      // Update progress
+      // Update sequential spelling progress (keep existing system intact)
+      const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+      const nextIndex = spellingProgressIndex + 1;
+      const updatedCompletedIds = currentSpellQuestion ? [...completedSpellingIds, currentSpellQuestion.id] : completedSpellingIds;
+      
+      // Update local state
+      setSpellingProgressIndex(nextIndex);
+      setCompletedSpellingIds(updatedCompletedIds);
+      
+      // Save progress to localStorage
+      if (currentGrade) {
+        saveSpellingProgress(currentGrade, nextIndex, updatedCompletedIds);
+        console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
+      }
+      
+      // NEW: Update Spellbox topic progress with Firebase sync
+      if (currentGrade && currentSpellQuestion) {
+        const isFirstAttempt = attemptCount === 1;
+        
+        // Use async update with Firebase sync for authenticated users
+        updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
+          .then((topicProgress) => {
+            // Check if topic is completed and show appropriate message
+            if (topicProgress.isCompleted) {
+              const passedTopic = isSpellboxTopicPassingGrade(topicProgress);
+              if (passedTopic) {
+                // Topic completed with 70%+ success rate
+                const congratsMessage: ChatMessage = {
+                  type: 'ai',
+                  content: `🎉 Fantastic! You've completed the topic! You're ready for the next challenge! ✨`,
+                  timestamp: Date.now()
+                };
+                
+                setChatMessages(prev => {
+                  playMessageSound();
+                  const messageId = `index-chat-${congratsMessage.timestamp}-${prev.length}`;
+                  ttsService.speakAIMessage(congratsMessage.content, messageId)
+                    .catch(error => console.error('TTS error:', error));
+                  return [...prev, congratsMessage];
+                });
+              } else {
+                // Topic completed but below 70%
+                const encouragementMessage: ChatMessage = {
+                  type: 'ai',
+                  content: `Good effort! You completed the "${currentSpellQuestion.topicName}" topic with ${topicProgress.successRate.toFixed(1)}% first-attempt accuracy. Let's practice more to reach 70% and unlock the next topic! 💪`,
+                  timestamp: Date.now()
+                };
+                
+                setChatMessages(prev => {
+                  playMessageSound();
+                  const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
+                  ttsService.speakAIMessage(encouragementMessage.content, messageId)
+                    .catch(error => console.error('TTS error:', error));
+                  return [...prev, encouragementMessage];
+                });
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Failed to update Spellbox topic progress:', error);
+          });
+      }
+      
+      // Update legacy progress for backward compatibility
       setSpellProgress(prev => ({
         ...prev,
         currentIndex: prev.currentIndex + 1
@@ -3047,7 +3274,7 @@ const Index = () => {
         return [...prev, encouragementMessage];
       });
     }
-  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService]);
+  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
 
   const handleSpellSkip = useCallback(() => {
     playClickSound();
@@ -3713,7 +3940,7 @@ const Index = () => {
             )}
 
             {/* Right Arrow Navigation - Outside the main container */}
-            {currentScreen === 1 && isInQuestionMode === false && (
+            {false && (
               <div 
                 className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:right-8"
                 style={{
@@ -3979,12 +4206,12 @@ const Index = () => {
                       {/* Input Bar */}
                       <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
                         {/* NEW: Unified AI System Status Indicator */}
-                        {isUnifiedSystemReady && (
+                        {/* {isUnifiedSystemReady && (
                           <div className="mb-2 flex items-center gap-2 text-xs text-green-600 bg-green-50 rounded-full px-3 py-1 animate-pulse">
                             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                             <span>🤖 Smart AI with Auto-Images Active</span>
                           </div>
-                        )}
+                        )} */}
                         
                                 {/* Loading indicator for unified system */}
         {unifiedAIStreaming.isStreaming && (
@@ -3995,12 +4222,12 @@ const Index = () => {
         )}
         
         {/* Show legacy loading state if unified system is generating images */}
-        {unifiedAIStreaming.isGeneratingImage && (
+        {/* {unifiedAIStreaming.isGeneratingImage && (
           <div className="mb-2 flex items-center gap-2 text-xs text-orange-600 bg-orange-50 rounded-full px-3 py-1">
             <div className="w-2 h-2 bg-orange-500 rounded-full animate-spin"></div>
             <span>🎵 Loading sounds active</span>
           </div>
-        )}
+        )} */}
                         
                         <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
                       </div>

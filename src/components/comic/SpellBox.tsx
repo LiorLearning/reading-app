@@ -5,6 +5,7 @@ import { ttsService } from '@/lib/tts-service';
 import { voiceAgentService } from '@/lib/voice-agent-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
+import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 
 interface WordPart {
@@ -17,7 +18,7 @@ interface SpellBoxProps {
   // Basic props
   word?: string;
   sentence?: string;
-  onComplete?: (isCorrect: boolean, userAnswer?: string) => void;
+  onComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSkip?: () => void;
   onNext?: () => void;
   className?: string;
@@ -31,6 +32,8 @@ interface SpellBoxProps {
     correctAnswer: string;
     audio: string;
     explanation: string;
+    isPrefilled?: boolean;
+    prefilledIndexes?: number[];
   };
   
   // UI options
@@ -70,10 +73,20 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
   const [hasVoiceFeedback, setHasVoiceFeedback] = useState(false);
   
-  // First-time instruction state
+  
+  // Tutorial system integration
+  const {
+    showTutorial,
+    tutorialStep,
+    needsFillInBlanksTutorial,
+    isFirstTimeAdventurer,
+    nextTutorialStep,
+    skipTutorial,
+  } = useFillInBlanksTutorial();
+
+  // Legacy first-time instruction state (for backward compatibility)
   const [showFirstTimeInstruction, setShowFirstTimeInstruction] = useState(false);
   const [hasShownFirstTimeInstruction, setHasShownFirstTimeInstruction] = useState(false);
-  // const [speakerButtonPosition, setSpeakerButtonPosition] = useState<{x: number, y: number} | null>(null);
 
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
@@ -176,12 +189,89 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
   // Parse the word into parts (text and blanks)
   const parseWord = useCallback((word: string): WordPart[] => {
-    // For now, we'll make the entire word a blank to spell
-    // You can extend this to support mixed text/blank patterns
+    console.log('🔤 SPELLBOX parseWord called:', {
+      word,
+      isPrefilled: question?.isPrefilled,
+      prefilledIndexes: question?.prefilledIndexes
+    });
+    
+    // Check if this question has prefilled characters
+    if (question?.isPrefilled && question?.prefilledIndexes && question.prefilledIndexes.length > 0) {
+      console.log('🔤 SPELLBOX: Using prefilled mode');
+      const parts: WordPart[] = [];
+      const upperWord = word.toUpperCase();
+      const prefilledSet = new Set(question.prefilledIndexes);
+      
+      let currentTextPart = '';
+      let currentBlankPart = '';
+      
+      for (let i = 0; i < upperWord.length; i++) {
+        const char = upperWord[i];
+        const isPrefilled = prefilledSet.has(i);
+        
+        console.log(`🔤 SPELLBOX: Processing char ${i}: "${char}" (prefilled: ${isPrefilled})`);
+        
+        if (isPrefilled) {
+          // If we have accumulated blank characters, add them as a blank part
+          if (currentBlankPart) {
+            parts.push({ type: 'blank', answer: currentBlankPart });
+            console.log(`🔤 SPELLBOX: Added blank part: "${currentBlankPart}"`);
+            currentBlankPart = '';
+          }
+          // Add this character to the text part
+          currentTextPart += char;
+        } else {
+          // If we have accumulated text characters, add them as a text part
+          if (currentTextPart) {
+            parts.push({ type: 'text', content: currentTextPart });
+            console.log(`🔤 SPELLBOX: Added text part: "${currentTextPart}"`);
+            currentTextPart = '';
+          }
+          // Add this character to the blank part
+          currentBlankPart += char;
+        }
+      }
+      
+      // Add any remaining parts
+      if (currentTextPart) {
+        parts.push({ type: 'text', content: currentTextPart });
+        console.log(`🔤 SPELLBOX: Added final text part: "${currentTextPart}"`);
+      }
+      if (currentBlankPart) {
+        parts.push({ type: 'blank', answer: currentBlankPart });
+        console.log(`🔤 SPELLBOX: Added final blank part: "${currentBlankPart}"`);
+      }
+      
+      console.log('🔤 SPELLBOX: Final parts array:', parts);
+      console.log('🔤 SPELLBOX: Expected display:', parts.map(p => 
+        p.type === 'text' ? p.content : '_'.repeat(p.answer?.length || 0)
+      ).join(''));
+      
+      return parts;
+    }
+    
+    console.log('🔤 SPELLBOX: Using default mode (all blanks)');
+    // Default behavior: make the entire word a blank to spell
     return [
       { type: 'blank', answer: word.toUpperCase() }
     ];
-  }, []);
+  }, [question]);
+
+  // Helper function to get the expected length for user input (excluding prefilled characters)
+  const getExpectedUserInputLength = useCallback((): number => {
+    const expectedLength = question?.isPrefilled && question?.prefilledIndexes 
+      ? targetWord.length - question.prefilledIndexes.length 
+      : targetWord.length;
+    
+    console.log('🔤 SPELLBOX getExpectedUserInputLength:', {
+      targetWordLength: targetWord.length,
+      prefilledCount: question?.prefilledIndexes?.length || 0,
+      expectedUserInputLength: expectedLength,
+      isPrefilled: question?.isPrefilled
+    });
+    
+    return expectedLength;
+  }, [question, targetWord]);
 
   const parts = parseWord(targetWord);
   const totalBlanks = parts.filter(part => part.type === 'blank').length;
@@ -193,6 +283,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     totalBlanks,
     partsLength: parts.length
   });
+
+  // Debug: Log component initialization with prefilled info
+  React.useEffect(() => {
+    if (question) {
+      console.log('🔤 SPELLBOX COMPONENT INITIALIZED:', {
+        targetWord,
+        isPrefilled: question.isPrefilled,
+        prefilledIndexes: question.prefilledIndexes,
+        questionId: question.id,
+        expectedUserInputLength: getExpectedUserInputLength(),
+        totalParts: parts.length,
+        textParts: parts.filter(p => p.type === 'text').length,
+        blankParts: parts.filter(p => p.type === 'blank').length
+      });
+    }
+  }, [question, targetWord, parts, getExpectedUserInputLength]);
 
   // Check if word is complete
   const isWordComplete = useCallback((answer: string, expectedLength: number): boolean => {
@@ -208,6 +314,72 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const isWordIncorrect = useCallback((answer: string, correctAnswer: string, expectedLength: number): boolean => {
     return isWordComplete(answer, expectedLength) && !isWordCorrect(answer, correctAnswer);
   }, [isWordComplete, isWordCorrect]);
+
+  // Helper function to reconstruct the complete word from user input and prefilled characters
+  const reconstructCompleteWord = useCallback((userInput: string): string => {
+    if (!question?.isPrefilled || !question?.prefilledIndexes) {
+      console.log('🔤 SPELLBOX reconstructCompleteWord: Using default mode, returning userInput as-is:', userInput);
+      return userInput;
+    }
+    
+    const upperWord = targetWord.toUpperCase();
+    const prefilledSet = new Set(question.prefilledIndexes);
+    let result = '';
+    let userInputIndex = 0;
+    
+    console.log('🔤 SPELLBOX reconstructCompleteWord: Starting reconstruction:', {
+      userInput,
+      targetWord: upperWord,
+      prefilledIndexes: question.prefilledIndexes
+    });
+    
+    for (let i = 0; i < upperWord.length; i++) {
+      if (prefilledSet.has(i)) {
+        // Use prefilled character
+        result += upperWord[i];
+        console.log(`🔤 SPELLBOX: Position ${i}: Using prefilled "${upperWord[i]}"`);
+      } else {
+        // Use user input character (or empty if not provided)
+        const userChar = userInput[userInputIndex] || '';
+        result += userChar;
+        console.log(`🔤 SPELLBOX: Position ${i}: Using user input "${userChar}" (userInputIndex: ${userInputIndex})`);
+        userInputIndex++;
+      }
+    }
+    
+    console.log('🔤 SPELLBOX reconstructCompleteWord: Final result:', result);
+    return result;
+  }, [question, targetWord]);
+
+  // Helper function to check if user input is complete (all blank positions filled)
+  const isUserInputComplete = useCallback((userInput: string): boolean => {
+    const expectedLength = getExpectedUserInputLength();
+    const isComplete = userInput.length === expectedLength && !userInput.includes(' ');
+    
+    console.log('🔤 SPELLBOX isUserInputComplete:', {
+      userInput,
+      userInputLength: userInput.length,
+      expectedLength,
+      isComplete,
+      hasSpaces: userInput.includes(' ')
+    });
+    
+    return isComplete;
+  }, [getExpectedUserInputLength]);
+
+  // Helper function to get user input character at a specific blank position
+  const getUserInputAtBlankIndex = useCallback((blankIndex: number): string => {
+    return userAnswer[blankIndex] || '';
+  }, [userAnswer]);
+
+  // Helper function to update user input at a specific blank position
+  const updateUserInputAtBlankIndex = useCallback((blankIndex: number, newValue: string): string => {
+    const expectedLength = getExpectedUserInputLength();
+    const newUserAnswer = Array.from({ length: expectedLength }, (_, i) => 
+      i === blankIndex ? newValue : (userAnswer[i] || '')
+    );
+    return newUserAnswer.join('');
+  }, [userAnswer, getExpectedUserInputLength]);
 
   // Check for first-time instruction display
   const shouldShowFirstTimeInstruction = currentQuestionIndex === 0 && !hasShownFirstTimeInstruction;
@@ -417,6 +589,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
   // Handle answer change
   const handleAnswerChange = useCallback(async (newAnswer: string) => {
+    console.log('🔤 SPELLBOX handleAnswerChange called:', {
+      newAnswer,
+      previousUserAnswer: userAnswer,
+      targetWord
+    });
+    
     setUserAnswer(newAnswer);
     
     // Reset voice feedback when user starts typing a new answer
@@ -424,22 +602,45 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setHasVoiceFeedback(false);
     }
     
-    if (isWordComplete(newAnswer, targetWord.length)) {
-      const correct = isWordCorrect(newAnswer, targetWord);
+    // Reset voice feedback when user starts typing a new answer
+    if (newAnswer.length < userAnswer.length) {
+      setHasVoiceFeedback(false);
+    }
+    
+    if (isUserInputComplete(newAnswer)) {
+      const completeWord = reconstructCompleteWord(newAnswer);
+      const correct = isWordCorrect(completeWord, targetWord);
+      
+      console.log('🔤 SPELLBOX: User input complete!', {
+        userInput: newAnswer,
+        reconstructedWord: completeWord,
+        targetWord,
+        isCorrect: correct
+      });
+      
       setIsCorrect(correct);
       setIsComplete(true);
       
       if (correct) {
+        console.log('🎉 SPELLBOX: CORRECT ANSWER! Triggering celebration');
         // Trigger confetti celebration for correct answer
         triggerConfetti();
         
+        // Complete tutorial if this is the first time
+        if (showTutorial) {
+          nextTutorialStep();
+        }
+        
         if (onComplete) {
-          // Enhanced callback includes user answer
-          onComplete(true, newAnswer);
+          // Enhanced callback includes complete word and attempt count
+          onComplete(true, completeWord, attempts + 1);
         }
       } else {
+        console.log('❌ SPELLBOX: Incorrect answer, generating hint');
+        // Increment attempts for incorrect answer
+        setAttempts(prev => prev + 1);
         // Generate AI hint for incorrect answer
-        generateAIHint(newAnswer);
+        generateAIHint(completeWord);
         
         // Trigger voice agent for incorrect spelling (every incorrect attempt)
         try {
@@ -457,10 +658,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         }
       }
     } else {
+      console.log('🔤 SPELLBOX: User input not complete yet');
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isWordComplete, isWordCorrect, triggerConfetti, generateAIHint, question?.id, questionText, hasVoiceFeedback, userAnswer]);
+  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, question?.id, questionText, hasVoiceFeedback, userAnswer]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
@@ -534,11 +736,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   if (!isVisible || !targetWord) return null;
 
   return (
-    <div className={cn(
-      "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
-      className
-    )}>
-      <div className="spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4">
+    <>
+      {/* Tutorial overlay for first-time users */}
+      {showTutorial && (
+        <div className="tutorial-overlay" />
+      )}
+      
+      <div className={cn(
+        "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
+        className
+      )}>
+        <div className={cn(
+          "spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4",
+          showTutorial && "tutorial-spotlight",
+          showTutorial && tutorialStep === 'expand' && "tutorial-expand",
+          showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
+        )}>
         <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
 
           {/* Question text */}
@@ -581,11 +794,48 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         {parts.map((part, partIndex) => {
                           console.log('🎨 Rendering part:', { partIndex, part, type: part.type });
                           
+                          // Debug: Log current state for this part
+                          console.log('🔤 SPELLBOX RENDER STATE:', {
+                            partIndex,
+                            partType: part.type,
+                            partContent: part.content,
+                            partAnswer: part.answer,
+                            currentUserAnswer: userAnswer,
+                            isComplete,
+                            isCorrect,
+                            targetWord
+                          });
+                          
                           if (part.type === 'text') {
+                            // Render each prefilled character in its own dotted box
                             return (
-                              <span key={partIndex} style={{ whiteSpace: 'pre-wrap' }}>
-                                {part.content}
-                              </span>
+                              <React.Fragment key={partIndex}>
+                                {part.content?.split('').map((char, charIndex) => (
+                                  <div
+                                    key={`${partIndex}-${charIndex}`}
+                                    style={{
+                                      width: '36px',
+                                      height: '44px',
+                                      borderRadius: '8px',
+                                      fontSize: '22px',
+                                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                                      fontWeight: '700',
+                                      textAlign: 'center',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      textTransform: 'uppercase',
+                                      color: '#1F2937',
+                                      background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)',
+                                      border: '2px dashed #9CA3AF',
+                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                                      transition: 'all 0.15s ease-out'
+                                    }}
+                                  >
+                                    {char}
+                                  </div>
+                                ))}
+                              </React.Fragment>
                             );
                           } else {
                             const expectedLength = part.answer?.length || 5;
@@ -593,10 +843,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             return (
                               <div key={partIndex} className="flex items-center gap-2">
                                 {Array.from({ length: expectedLength }, (_, letterIndex) => {
-                                  const letterValue = userAnswer[letterIndex] || '';
-                                  const isWordCompleteNow = isWordComplete(userAnswer, expectedLength);
-                                  const isWordCorrectNow = isWordCompleteNow && isWordCorrect(userAnswer, part.answer || '');
-                                  const isWordIncorrectNow = isWordIncorrect(userAnswer, part.answer || '', expectedLength);
+                                  const letterValue = getUserInputAtBlankIndex(letterIndex);
+                                  const completeWord = reconstructCompleteWord(userAnswer);
+                                  const isWordCompleteNow = isUserInputComplete(userAnswer);
+                                  const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
+                                  const isWordIncorrectNow = isWordCompleteNow && !isWordCorrectNow;
                                   
                                   let boxStyle: React.CSSProperties = {
                                     width: '36px',
@@ -660,17 +911,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         if (isWordCorrectNow) return;
                                         
                                         const newValue = e.target.value.toUpperCase();
+                                        console.log(`🔤 SPELLBOX INPUT onChange: letterIndex=${letterIndex}, newValue="${newValue}"`);
+                                        
                                         if (newValue.match(/[A-Z]/) || newValue === '') {
-                                          const newWord = Array.from({ length: expectedLength }, (_, i) => 
-                                            i === letterIndex ? newValue : (userAnswer[i] || '')
-                                          );
-                                          const finalWord = newWord.join('');
-                                          handleAnswerChange(finalWord);
+                                          const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, newValue);
+                                          console.log(`🔤 SPELLBOX INPUT: Updated user answer from "${userAnswer}" to "${newUserAnswer}"`);
+                                          
+                                          handleAnswerChange(newUserAnswer);
                                           playClickSound();
                                           
                                           if (newValue && letterIndex < expectedLength - 1) {
                                             const nextBox = document.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement;
                                             if (nextBox) {
+                                              console.log(`🔤 SPELLBOX INPUT: Moving focus to next box (${letterIndex + 1})`);
                                               setTimeout(() => nextBox.focus(), 10);
                                             }
                                           }
@@ -680,11 +933,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         if (e.key === 'Backspace') {
                                           if (letterValue) {
                                             e.preventDefault();
-                                            const newWord = Array.from({ length: expectedLength }, (_, i) => 
-                                              i === letterIndex ? '' : (userAnswer[i] || '')
-                                            );
-                                            const finalWord = newWord.join('');
-                                            handleAnswerChange(finalWord);
+                                            const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, '');
+                                            handleAnswerChange(newUserAnswer);
                                           } else if (letterIndex > 0) {
                                             const prevBox = document.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement;
                                             if (prevBox) {
@@ -714,8 +964,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       }}
                                       onBlur={(e) => {
                                         const hasValue = e.target.value.trim() !== '';
-                                        const isCorrectNow = isWordComplete(userAnswer, expectedLength) && isWordCorrect(userAnswer, part.answer || '');
-                                        const isIncorrectNow = isWordIncorrect(userAnswer, part.answer || '', expectedLength);
+                                        const completeWordNow = reconstructCompleteWord(userAnswer);
+                                        const isCorrectNow = isUserInputComplete(userAnswer) && isWordCorrect(completeWordNow, targetWord);
+                                        const isIncorrectNow = isUserInputComplete(userAnswer) && !isCorrectNow;
                                         
                                         e.target.style.transform = 'scale(1)';
                                         e.target.style.borderStyle = hasValue ? 'solid' : 'dashed';
@@ -738,51 +989,52 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     />
                                   );
                                 })}
-                                
-                                {/* Audio button with ElevenLabs TTS */}
-                                <button
-                                  onClick={playWordAudio}
-                                  id="spellbox-speaker-button"
-                                  style={{
-                                    width: '44px',
-                                    height: '44px',
-                                    borderRadius: '8px',
-                                    border: 'none',
-                                    background: isSpeaking 
-                                      ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)'
-                                      : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '24px',
-                                    boxShadow: isSpeaking 
-                                      ? '0 4px 12px rgba(220, 38, 38, 0.3)'
-                                      : '0 4px 12px rgba(99, 102, 241, 0.3)',
-                                    transition: 'all 0.15s ease-out',
-                                    opacity: 1,
-                                    transform: 'scale(1)',
-                                    position: 'relative'
-                                  }}
-                                  title={isSpeaking ? "Stop audio" : "Listen to this word"}
-                                  onMouseEnter={(e) => {
-                                    if (!isSpeaking) {
-                                      e.currentTarget.style.transform = 'scale(1.05)';
-                                    }
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    if (!isSpeaking) {
-                                      e.currentTarget.style.transform = 'scale(1)';
-                                    }
-                                  }}
-                                >
-                                  {isSpeaking ? '⏹️' : '🔊'}
-                                </button>
                               </div>
                             );
                           }
                         })}
+                        
+                        {/* Audio button with ElevenLabs TTS - positioned after the complete word */}
+                        <button
+                          onClick={playWordAudio}
+                          id="spellbox-speaker-button"
+                          style={{
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '8px',
+                            border: 'none',
+                            background: isSpeaking 
+                              ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)'
+                              : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                            color: 'white',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '24px',
+                            boxShadow: isSpeaking 
+                              ? '0 4px 12px rgba(220, 38, 38, 0.3)'
+                              : '0 4px 12px rgba(99, 102, 241, 0.3)',
+                            transition: 'all 0.15s ease-out',
+                            opacity: 1,
+                            transform: 'scale(1)',
+                            position: 'relative',
+                            marginLeft: '8px'
+                          }}
+                          title={isSpeaking ? "Stop audio" : "Listen to this word"}
+                          onMouseEnter={(e) => {
+                            if (!isSpeaking) {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSpeaking) {
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }
+                          }}
+                        >
+                          {isSpeaking ? '⏹️' : '🔊'}
+                        </button>
                       </div>
                     ) : (
                       <span className="inline-block" 
@@ -1024,6 +1276,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           `}</style>
         </div>
 
+        {/* Tutorial message for first-time users */}
+        {showTutorial && tutorialStep === 'expand' && (
+          <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg z-50">
+            <div className="text-center">
+              <div className="text-xs opacity-90 mb-1">✨ First Adventure Tutorial ✨</div>
+              <div>Fill in the blanks to spell the word!</div>
+            </div>
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-purple-600"></div>
+          </div>
+        )}
+
         {/* First-time instruction overlay - pointing finger functionality commented out */}
         {/*
         showFirstTimeInstruction && (
@@ -1117,6 +1380,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         */}
       </div>
     </div>
+    </>
   );
 };
 

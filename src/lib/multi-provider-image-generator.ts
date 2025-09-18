@@ -209,7 +209,7 @@ export class MultiProviderImageGenerator {
    */
   private extractAdventureId(context: ChatMessage[]): string {
     // Since ChatMessage doesn't have metadata, generate a consistent ID based on context
-    const contextHash = context.slice(-6).map(msg => msg.content).join('').length;
+    const contextHash = context.slice(-10).map(msg => msg.content).join('').length;
     return `adventure-${contextHash}-${Date.now()}`;
   }
   

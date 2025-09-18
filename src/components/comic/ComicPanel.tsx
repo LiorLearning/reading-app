@@ -19,7 +19,7 @@ interface ComicPanelProps {
   // Spell box props
   spellWord?: string;
   spellSentence?: string;
-  onSpellComplete?: (isCorrect: boolean, userAnswer?: string) => void;
+  onSpellComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSpellSkip?: () => void;
   onSpellNext?: () => void;
   showSpellBox?: boolean;

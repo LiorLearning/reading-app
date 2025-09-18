@@ -220,7 +220,7 @@ CRITICAL: During spelling phases, NEVER create riddles, word puzzles, or ask stu
     };
 
     // Include recent message history for context (last 6 messages max)
-    const recentMessages = messages.slice(-6).map(msg => ({
+    const recentMessages = messages.slice(-15).map(msg => ({
       role: msg.type === 'user' ? 'user' : 'assistant',
       content: msg.content
     }));

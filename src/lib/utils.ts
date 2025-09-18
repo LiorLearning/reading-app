@@ -674,9 +674,15 @@ export const getTopicScore = (topicId: string): number | null => {
 
 // Topic preference storage for grade level selection
 const TOPIC_PREFERENCE_KEY = 'readingapp_topic_preference';
+const GRADE_SELECTION_KEY = 'readingapp_grade_selection';
 
 export interface TopicPreference {
   level: 'start' | 'middle';
+  lastSelected: number;
+}
+
+export interface GradeSelection {
+  gradeDisplayName: string;
   lastSelected: number;
 }
 
@@ -756,6 +762,51 @@ export const loadTopicPreference = (): TopicPreference | null => {
     return null;
   } catch (error) {
     console.warn('Failed to load topic preference from local storage:', error);
+    return null;
+  }
+};
+
+/**
+ * Save user's grade selection preference
+ */
+export const saveGradeSelection = (gradeDisplayName: string): void => {
+  try {
+    const gradeSelection: GradeSelection = {
+      gradeDisplayName,
+      lastSelected: Date.now()
+    };
+    localStorage.setItem(GRADE_SELECTION_KEY, JSON.stringify(gradeSelection));
+    console.log(`💾 Saved grade selection: ${gradeDisplayName}`);
+  } catch (error) {
+    console.warn('Failed to save grade selection to local storage:', error);
+  }
+};
+
+/**
+ * Load user's grade selection preference
+ */
+export const loadGradeSelection = (): GradeSelection | null => {
+  try {
+    const stored = localStorage.getItem(GRADE_SELECTION_KEY);
+    if (!stored) {
+      return null;
+    }
+    
+    const parsed = JSON.parse(stored);
+    
+    if (
+      typeof parsed === 'object' && 
+      parsed !== null &&
+      typeof parsed.gradeDisplayName === 'string' &&
+      typeof parsed.lastSelected === 'number'
+    ) {
+      console.log(`📖 Loaded grade selection: ${parsed.gradeDisplayName}`);
+      return parsed as GradeSelection;
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Failed to load grade selection from local storage:', error);
     return null;
   }
 };
@@ -1069,6 +1120,343 @@ export const getStartingQuestionIndex = (topicId: string): number => {
   
   // Otherwise start from the beginning
   return 0;
+};
+
+// Spelling Progress persistence - sequential spelling question tracking
+const SPELLING_PROGRESS_KEY = 'readingapp_spelling_progress';
+
+export interface SpellingProgress {
+  gradeDisplayName: string;
+  currentSpellingIndex: number; // Track current position in sequential order
+  completedSpellingIds: number[]; // Track completed questions to avoid repeats
+  timestamp: number;
+}
+
+/**
+ * Save current spelling progress for a grade
+ */
+export const saveSpellingProgress = (gradeDisplayName: string, currentIndex: number, completedIds: number[] = []): void => {
+  try {
+    const progress: SpellingProgress = {
+      gradeDisplayName,
+      currentSpellingIndex: currentIndex,
+      completedSpellingIds: completedIds,
+      timestamp: Date.now()
+    };
+    
+    // Store progress per grade using a composite key
+    const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
+    localStorage.setItem(key, JSON.stringify(progress));
+    console.log(`📝 Saved spelling progress: Grade ${gradeDisplayName}, Index ${currentIndex}, Completed: ${completedIds.length}`);
+  } catch (error) {
+    console.warn('Failed to save spelling progress to localStorage:', error);
+  }
+};
+
+/**
+ * Load spelling progress for a specific grade
+ */
+export const loadSpellingProgress = (gradeDisplayName?: string): SpellingProgress | null => {
+  if (!gradeDisplayName) {
+    return null;
+  }
+  
+  try {
+    const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) {
+      return null;
+    }
+    
+    const progress = JSON.parse(stored) as SpellingProgress;
+    
+    // Only return progress if it's less than 7 days old to avoid stale progress
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
+    if (Date.now() - progress.timestamp < oneWeek) {
+      return progress;
+    }
+    
+    // Clear stale progress
+    clearSpellingProgress(gradeDisplayName);
+    return null;
+  } catch (error) {
+    console.warn('Failed to load spelling progress from localStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear spelling progress for a specific grade
+ */
+export const clearSpellingProgress = (gradeDisplayName: string): void => {
+  try {
+    const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
+    localStorage.removeItem(key);
+    console.log(`🗑️ Cleared spelling progress for grade ${gradeDisplayName}`);
+  } catch (error) {
+    console.warn('Failed to clear spelling progress from localStorage:', error);
+  }
+};
+
+/**
+ * Reset spelling progress for a grade (start over)
+ */
+export const resetSpellingProgress = (gradeDisplayName: string): void => {
+  saveSpellingProgress(gradeDisplayName, 0, []);
+  console.log(`🔄 Reset spelling progress for grade ${gradeDisplayName}`);
+};
+
+// Spellbox Topic Progress System - separate from main topic progress
+const SPELLBOX_TOPIC_PROGRESS_KEY = 'readingapp_spellbox_topic_progress';
+
+export interface SpellboxTopicProgress {
+  topicId: string;
+  questionsAttempted: number;
+  firstAttemptCorrect: number;
+  totalQuestions: number;
+  isCompleted: boolean;
+  completedAt?: number;
+  successRate: number; // Calculated field for convenience
+}
+
+export interface SpellboxGradeProgress {
+  gradeDisplayName: string;
+  currentTopicId: string | null;
+  topicProgress: Record<string, SpellboxTopicProgress>;
+  timestamp: number;
+}
+
+/**
+ * Save Spellbox topic progress for a specific grade
+ */
+export const saveSpellboxTopicProgress = (gradeDisplayName: string, progress: SpellboxGradeProgress): void => {
+  try {
+    const key = `${SPELLBOX_TOPIC_PROGRESS_KEY}_${gradeDisplayName}`;
+    localStorage.setItem(key, JSON.stringify(progress));
+    console.log(`📝 Saved Spellbox topic progress: Grade ${gradeDisplayName}, Current Topic: ${progress.currentTopicId}`);
+  } catch (error) {
+    console.warn('Failed to save Spellbox topic progress to localStorage:', error);
+  }
+};
+
+/**
+ * Load Spellbox topic progress for a specific grade
+ * Now supports Firebase loading for authenticated users
+ */
+export const loadSpellboxTopicProgress = (gradeDisplayName?: string, userId?: string): SpellboxGradeProgress | null => {
+  if (!gradeDisplayName) {
+    return null;
+  }
+  
+  // For authenticated users, we'll load from Firebase in the background
+  // but return localStorage data immediately for performance
+  if (userId) {
+    // Async load from Firebase (don't block UI)
+    import('./firebase-spellbox-cache').then(({ loadSpellboxProgressHybrid }) => {
+      loadSpellboxProgressHybrid(userId, gradeDisplayName).catch(error => {
+        console.warn('Background Firebase load failed:', error);
+      });
+    }).catch(error => {
+      console.warn('Failed to import Firebase cache:', error);
+    });
+  }
+  
+  // Always return localStorage data immediately for UI responsiveness
+  try {
+    const key = `${SPELLBOX_TOPIC_PROGRESS_KEY}_${gradeDisplayName}`;
+    const stored = localStorage.getItem(key);
+    if (!stored) {
+      return null;
+    }
+    
+    const progress = JSON.parse(stored) as SpellboxGradeProgress;
+    
+    // Only return progress if it's less than 30 days old to avoid stale progress
+    const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+    if (Date.now() - progress.timestamp < thirtyDays) {
+      return progress;
+    }
+    
+    // Clear stale progress
+    clearSpellboxTopicProgress(gradeDisplayName);
+    return null;
+  } catch (error) {
+    console.warn('Failed to load Spellbox topic progress from localStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Load Spellbox topic progress for a specific grade with Firebase priority
+ * This is the async version that waits for Firebase data
+ */
+export const loadSpellboxTopicProgressAsync = async (
+  gradeDisplayName: string, 
+  userId?: string
+): Promise<SpellboxGradeProgress | null> => {
+  if (userId) {
+    try {
+      const { loadSpellboxProgressHybrid } = await import('./firebase-spellbox-cache');
+      return await loadSpellboxProgressHybrid(userId, gradeDisplayName);
+    } catch (error) {
+      console.warn('Failed to load from Firebase, falling back to localStorage:', error);
+    }
+  }
+  
+  // Fallback to localStorage
+  return loadSpellboxTopicProgress(gradeDisplayName);
+};
+
+/**
+ * Clear Spellbox topic progress for a specific grade
+ */
+export const clearSpellboxTopicProgress = (gradeDisplayName: string): void => {
+  try {
+    const key = `${SPELLBOX_TOPIC_PROGRESS_KEY}_${gradeDisplayName}`;
+    localStorage.removeItem(key);
+    console.log(`🗑️ Cleared Spellbox topic progress for grade ${gradeDisplayName}`);
+  } catch (error) {
+    console.warn('Failed to clear Spellbox topic progress from localStorage:', error);
+  }
+};
+
+/**
+ * Get Spellbox topic progress for a specific topic
+ */
+export const getSpellboxTopicProgress = (gradeDisplayName: string, topicId: string): SpellboxTopicProgress | null => {
+  const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) return null;
+  
+  return gradeProgress.topicProgress[topicId] || null;
+};
+
+/**
+ * Update Spellbox topic progress when a question is attempted
+ * Now supports Firebase sync for authenticated users
+ */
+export const updateSpellboxTopicProgress = async (
+  gradeDisplayName: string, 
+  topicId: string, 
+  isFirstAttemptCorrect: boolean,
+  userId?: string
+): Promise<SpellboxTopicProgress> => {
+  let gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  
+  // Initialize grade progress if it doesn't exist
+  if (!gradeProgress) {
+    gradeProgress = {
+      gradeDisplayName,
+      currentTopicId: topicId,
+      topicProgress: {},
+      timestamp: Date.now()
+    };
+  }
+  
+  // Initialize topic progress if it doesn't exist OR reset if topic was completed but failed
+  const existingProgress = gradeProgress.topicProgress[topicId];
+  if (!existingProgress || (existingProgress.isCompleted && existingProgress.successRate < 70)) {
+    if (existingProgress?.isCompleted && existingProgress.successRate < 70) {
+      console.log(`🔄 Resetting failed topic ${topicId} (${existingProgress.successRate.toFixed(1)}% < 70%)`);
+    }
+    
+    gradeProgress.topicProgress[topicId] = {
+      topicId,
+      questionsAttempted: 0,
+      firstAttemptCorrect: 0,
+      totalQuestions: 10, // Fixed at 10 questions per topic
+      isCompleted: false,
+      successRate: 0
+    };
+  }
+  
+  const topicProgress = gradeProgress.topicProgress[topicId];
+  
+  // Update progress
+  topicProgress.questionsAttempted++;
+  if (isFirstAttemptCorrect) {
+    topicProgress.firstAttemptCorrect++;
+  }
+  
+  // Calculate success rate
+  topicProgress.successRate = (topicProgress.firstAttemptCorrect / topicProgress.questionsAttempted) * 100;
+  
+  // Check if topic is completed (10 questions attempted)
+  if (topicProgress.questionsAttempted >= 10) {
+    topicProgress.isCompleted = true;
+    topicProgress.completedAt = Date.now();
+  }
+  
+  // Update current topic
+  gradeProgress.currentTopicId = topicId;
+  gradeProgress.timestamp = Date.now();
+  
+  // Save progress with Firebase sync if user is authenticated
+  if (userId) {
+    try {
+      const { saveSpellboxProgressHybrid } = await import('./firebase-spellbox-cache');
+      await saveSpellboxProgressHybrid(userId, gradeProgress);
+    } catch (error) {
+      console.warn('Failed to sync to Firebase, saving locally only:', error);
+      saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+    }
+  } else {
+    // Save to localStorage only
+    saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+  }
+  
+  console.log(`📊 Spellbox Topic Progress Updated: ${topicId} - ${topicProgress.questionsAttempted}/10 questions, ${topicProgress.firstAttemptCorrect} first-attempt correct (${topicProgress.successRate.toFixed(1)}%)`);
+  
+  return topicProgress;
+};
+
+/**
+ * Check if a Spellbox topic meets the 70% success criteria
+ */
+export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress): boolean => {
+  return topicProgress.isCompleted && topicProgress.successRate >= 70;
+};
+
+/**
+ * Get the next Spellbox topic for a grade
+ */
+export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[]): string | null => {
+  const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  
+  if (!gradeProgress) {
+    // First time, return first topic
+    return allTopicIds[0] || null;
+  }
+  
+  // If current topic exists and is not completed or not passing, continue with it
+  if (gradeProgress.currentTopicId) {
+    const currentTopicProgress = gradeProgress.topicProgress[gradeProgress.currentTopicId];
+    if (!currentTopicProgress || !isSpellboxTopicPassingGrade(currentTopicProgress)) {
+      return gradeProgress.currentTopicId;
+    }
+  }
+  
+  // Find first topic that hasn't passed the 70% criteria
+  for (const topicId of allTopicIds) {
+    const topicProgress = gradeProgress.topicProgress[topicId];
+    
+    // Topic is available if:
+    // 1. Never attempted (not in topicProgress)
+    // 2. Attempted but not completed or not passing 70%
+    if (!topicProgress || !isSpellboxTopicPassingGrade(topicProgress)) {
+      return topicId;
+    }
+  }
+  
+  // All topics passed, return first topic for replay
+  return allTopicIds[0] || null;
+};
+
+/**
+ * Reset Spellbox topic progress for a grade (start over)
+ */
+export const resetSpellboxTopicProgress = (gradeDisplayName: string): void => {
+  clearSpellboxTopicProgress(gradeDisplayName);
+  console.log(`🔄 Reset Spellbox topic progress for grade ${gradeDisplayName}`);
 };
 
 /**
