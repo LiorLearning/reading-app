@@ -113,8 +113,8 @@ class ElevenLabsVoiceAgentService {
    */
   private generateTeachingResponse(thread: ConversationThread, userAnswer: string): string {
     const syllables = this.breakIntoSyllables(thread.correctAnswer);
-    return thread.correctAnswer
-    //return `The correct word is "${thread.correctAnswer}". ${syllables.join('-')}. ${thread.correctAnswer}.`;
+    // return thread.correctAnswer
+    return `correct word:${thread.correctAnswer} incorrect attempt:${userAnswer.toLowerCase}`;
   }
 
   /**
