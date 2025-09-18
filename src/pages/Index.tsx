@@ -49,6 +49,7 @@ import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQu
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
+import { useRealtimeSession } from "@/hooks/useRealtimeSession";
 
 
 // Legacy user data interface for backwards compatibility
@@ -263,6 +264,34 @@ const Index = () => {
   // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
 
+  // Realtime session state
+  const [userText, setUserText] = useState<string>("");
+  const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState<boolean>(
+    () => {
+      if (typeof window === 'undefined') return true;
+      const stored = localStorage.getItem('audioPlaybackEnabled');
+      return stored ? stored === 'true' : true;
+    },
+  );
+
+  // Use the simplified realtime session hook
+  const [realtimeEnabled, setRealtimeEnabled] = useState(true);
+  const {
+    status,
+    sendMessage,
+    onToggleConnection,
+    downloadRecording,
+  } = useRealtimeSession({
+    isAudioPlaybackEnabled,
+    enabled: realtimeEnabled,
+  });
+  console.log("REaltime status", status);
+  const handleSendTextMessage = () => {
+    if (!userText.trim() || !sendMessage) return;
+    sendMessage(userText.trim());
+    setUserText("");
+  };
+
   // Centralized function to increment message cycle count for all user interactions
   const incrementMessageCycle = useCallback(() => {
     setMessageCycleCount(prev => {
@@ -278,6 +307,30 @@ const Index = () => {
     const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
     setMessageCycleCount(aiMessageCount % 6);
   }, []); // Only run on mount
+
+  // Realtime session useEffect hooks
+  useEffect(() => {
+    const storedAudioPlaybackEnabled = localStorage.getItem(
+      "audioPlaybackEnabled"
+    );
+    if (storedAudioPlaybackEnabled) {
+      setIsAudioPlaybackEnabled(storedAudioPlaybackEnabled === "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "audioPlaybackEnabled",
+      isAudioPlaybackEnabled.toString()
+    );
+  }, [isAudioPlaybackEnabled]);
+
+  // Console log when realtime session starts
+  useEffect(() => {
+    if (status === "CONNECTED") {
+      console.log("OPENAI REALTIME STARTED:");
+    }
+  }, [status]);
   
   // Show onboarding if user is authenticated but hasn't completed setup
   const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
