@@ -136,7 +136,7 @@ class AdventureSessionService {
         lastActivityAt: serverTimestamp() as Timestamp
       };
 
-      const docRef = await addDoc(collection(db, this.COLLECTION_NAME), newSession);
+      const docRef = await addDoc(collection(db, this.COLLECTION_NAME), sanitizeForFirebase(newSession));
       console.log(`✅ Created adventure session: ${docRef.id} (${sessionType})`);
       return docRef.id;
     } catch (error) {

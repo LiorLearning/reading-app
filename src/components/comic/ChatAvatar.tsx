@@ -12,15 +12,17 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
   className = "" 
 }) => {
   return (
-    <div className={`flex flex-col items-center py-6 bg-transparent ${className}`}>
-      {/* Avatar Circle */}
-      <div className="w-28 h-28 rounded-full bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 overflow-hidden">
+
+    <div className={`flex flex-col items-center gap-4 py-6 bg-transparent ${className}`}>
+      {/* Avatar Image */}
+      <div className="w-32 h-32 flex items-center justify-center hover:scale-105 transition-all duration-200">
         <img 
           src={avatar} 
           alt={name} 
-          className="w-full h-full object-cover scale-110"
+          className="w-full h-full object-contain rounded-lg"
         />
       </div>
+
     </div>
   );
 };

@@ -23,6 +23,7 @@ interface HomePageProps {
   onStartAdventure: (topicId: string, mode: 'new' | 'continue') => void;
   onContinueSpecificAdventure?: (adventureId: string) => void;
   selectedTopicFromPreference?: string | null;
+  onPetNavigation?: () => void;
 }
 
 // Sample adventure data template
@@ -56,7 +57,7 @@ const topPicks = [
   }
 ];
 
-const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure, selectedTopicFromPreference }) => {
+const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdventure, onContinueSpecificAdventure, selectedTopicFromPreference, onPetNavigation }) => {
   // Get Firebase authenticated user
   const { user } = useAuth();
   
@@ -170,6 +171,13 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
     playClickSound();
     // Navigate to specific adventure 
     onNavigate('topics');
+  };
+
+  const handlePetClick = () => {
+    playClickSound();
+    if (onPetNavigation) {
+      onPetNavigation();
+    }
   };
 
 
@@ -459,6 +467,41 @@ const HomePage: React.FC<HomePageProps> = ({ userData, onNavigate, onStartAdvent
           </div>
         </section>
 
+        {/* My Pets Section */}
+        <section>
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-2xl">🐾</span>
+            <h2 className="text-2xl font-bold text-gray-800">My Pets</h2>
+          </div>
+          
+          <div className="flex gap-4 pb-2">
+            <div 
+              onClick={handlePetClick}
+              className="group cursor-pointer"
+              style={{ width: '280px' }}
+            >
+              <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-gray-200">
+                <div className="aspect-video relative overflow-hidden bg-gradient-to-br from-green-400 to-blue-500">
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-200"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-white text-6xl font-bold">🐶</div>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-bold text-lg text-gray-800 leading-tight">Visit My Pets</h3>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-3">Take care of your virtual pets and watch them grow!</p>
+                  <div className="flex justify-center">
+                    <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      Pet Care
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
       </div>
     </main>

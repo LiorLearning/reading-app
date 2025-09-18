@@ -744,7 +744,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 {workingSentence.split(' ').map((word, idx) => {
                   const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
                   const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');
-                  const isTargetWord = normalizedWord === normalizedTarget;
+                  
+                  // Enhanced matching: check if the target word appears at the start or end of the normalized word
+                  // This handles cases like:
+                  // - "notebook—I" where target is "notebook" (suffix case)
+                  // - "nervously—minus" where target is "minus" (prefix case)
+                  const isTargetWord = normalizedWord === normalizedTarget || 
+                                     (normalizedTarget.length >= 3 && (
+                                       normalizedWord.startsWith(normalizedTarget) || // suffix case: "notebook—I"
+                                       normalizedWord.endsWith(normalizedTarget)      // prefix case: "nervously—minus"
+                                     ));
                   
                   console.log(`🔤 Word comparison: "${word}" (normalized: "${normalizedWord}") vs target "${targetWord}" (normalized: "${normalizedTarget}") = ${isTargetWord}`);
                   

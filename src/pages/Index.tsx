@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ComicPanelComponent from "@/components/comic/ComicPanel";
 import InputBar from "@/components/comic/InputBar";
 import MessengerChat from "@/components/comic/MessengerChat";
@@ -22,6 +23,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-ai-streaming";
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
+import { useCoins } from "@/pages/coinSystem";
+import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
+import { PetProgressStorage } from "@/lib/pet-progress-storage";
+import { usePetData } from "@/lib/pet-data-service";
+import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
+import { useSessionCoins } from "@/hooks/use-session-coins";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -31,6 +38,7 @@ import MCQScreenTypeA from "./MCQScreenTypeA";
 import TopicSelection from "./TopicSelection";
   import UserOnboarding from "./UserOnboarding";
   import HomePage from "./HomePage";
+  import { PetPage } from "./PetPage";
   import { 
     cacheAdventureImage, 
     loadCachedAdventureImages, 
@@ -168,7 +176,15 @@ const PanelOneLinerFigure: React.FC<{
   );
 };
 
-const Index = () => {
+interface IndexProps {
+  initialAdventureProps?: {topicId?: string, mode?: 'new' | 'continue', adventureId?: string} | null;
+  onBackToPetPage?: () => void;
+}
+
+const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
+  // React Router navigation
+  const navigate = useNavigate();
+  
   // Firebase auth integration - must be at the top
   const { user, userData, signOut } = useAuth();
   
@@ -177,6 +193,18 @@ const Index = () => {
   
   // NEW: Unified AI streaming system status
   const { isUnifiedSystemReady, hasImageGeneration } = useUnifiedAIStatus();
+
+  // Coin system integration
+  const { coins, addCoins, addAdventureCoins } = useCoins();
+  
+  // Pet data integration
+  const { petData, isSleepAvailable } = usePetData();
+  
+  // Get current pet avatar image
+  const currentPetAvatarImage = useCurrentPetAvatarImage();
+  
+  // Session coin tracking for feeding progress
+  const { sessionCoins, resetSessionCoins } = useSessionCoins();
 
   // Auto-migrate localStorage data to Firebase when user authenticates
   React.useEffect(() => {
@@ -200,6 +228,7 @@ const Index = () => {
       (window as any).autoMigrateOnLogin = () => autoMigrateOnLogin(user?.uid || 'anonymous');
     }
   }, [user]);
+
 
   const jsonLd = useMemo(
     () => ({
@@ -260,7 +289,7 @@ const Index = () => {
   // Optional session tracking for Firebase (won't break existing functionality)
   const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
   
-  // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
+  // Track message cycle for 2-2 pattern starting at chat 3 (2 pure adventure, then 2 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
 
   // Centralized function to increment message cycle count for all user interactions
@@ -276,7 +305,7 @@ const Index = () => {
   React.useEffect(() => {
     // Count AI messages to determine current cycle position
     const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
-    setMessageCycleCount(aiMessageCount % 6);
+    setMessageCycleCount(aiMessageCount);
   }, []); // Only run on mount
   
   // Show onboarding if user is authenticated but hasn't completed setup
@@ -287,7 +316,9 @@ const Index = () => {
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-    const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3>(() => {
+    const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3 | 4>(() => {
+    // If we're coming from Pet Page with adventure props, start directly in Adventure to avoid home flash
+    if (initialAdventureProps) return 1;
     // If user exists but no userData yet, start at loading state (don't show topic selection)
     if (user && !userData) return -1;
     // If userData exists and user is already setup, go to home
@@ -307,10 +338,15 @@ const Index = () => {
   
   // Track if initial AI response has been sent for current session
   const initialResponseSentRef = React.useRef<string | null>(null);
+  // Guard to prevent duplicate initial generation on re-renders
+  const isGeneratingInitialRef = React.useRef<boolean>(false);
   
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
   const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
+  // Guard: prevent duplicate starts and duplicate session creation
+  const isStartingAdventureRef = React.useRef<boolean>(false);
+  const sessionCreatedForAdventureIdRef = React.useRef<string | null>(null);
   
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
@@ -572,18 +608,28 @@ const Index = () => {
 
   // Generate initial AI response when entering adventure screen
   React.useEffect(() => {
-    if (currentScreen === 1 && selectedTopicId && adventureMode) {
-      // Create unique session key to prevent duplicate messages
-      const sessionKey = `${selectedTopicId}-${adventureMode}`;
+    if (currentScreen === 1 && adventureMode) {
+      // Prefer adventure id for stability; fallback to topic id
+      const keyPart = currentAdventureId || selectedTopicId || 'unknown';
+      const sessionKey = `${keyPart}-${adventureMode}`;
       
       // Check if we've already sent an initial response for this session
-      if (initialResponseSentRef.current === sessionKey) {
+      if (initialResponseSentRef.current === sessionKey || isGeneratingInitialRef.current) {
         return;
       }
       
       // Generate initial AI message using real-time AI generation
       const generateInitialResponse = async () => {
         try {
+          // Mark as generating immediately to prevent duplicate triggers
+          isGeneratingInitialRef.current = true;
+          initialResponseSentRef.current = sessionKey;
+
+          // Get current pet name and type for AI context
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+          const petType = PetProgressStorage.getPetType(currentPetId);
+          
           // Generate initial message using AI service with adventure prompt
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
@@ -591,11 +637,10 @@ const Index = () => {
             currentAdventureContext, // Pass adventure context for specific adventures
             undefined, // storyEventsContext - can be added later if needed
             currentAdventureContext?.summary, // Pass adventure summary
-            userData   // user data from Firebase
+            userData,   // user data from Firebase
+            petName,    // pet name
+            petType     // pet type
           );
-
-          // Mark that we've sent the initial response for this session
-          initialResponseSentRef.current = sessionKey;
 
           // Add the initial AI message
           const aiMessage: ChatMessage = {
@@ -614,6 +659,9 @@ const Index = () => {
             );
             return [...prev, aiMessage];
           });
+          
+          // Update message cycle count for the initial AI message
+          setMessageCycleCount(prev => prev + 1);
         } catch (error) {
           console.error('Error generating initial AI message:', error);
           
@@ -621,9 +669,6 @@ const Index = () => {
           const fallbackMessage = adventureMode === 'new' 
             ? "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀"
             : "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟";
-          
-          // Mark that we've sent the initial response for this session
-          initialResponseSentRef.current = sessionKey;
 
           // Add the fallback AI message
           const aiMessage: ChatMessage = {
@@ -642,12 +687,17 @@ const Index = () => {
             );
             return [...prev, aiMessage];
           });
+          
+          // Update message cycle count for the fallback AI message
+          setMessageCycleCount(prev => prev + 1);
+        } finally {
+          isGeneratingInitialRef.current = false;
         }
       };
 
       generateInitialResponse();
     }
-  }, [currentScreen, selectedTopicId, adventureMode, currentAdventureContext, userData]);
+  }, [currentScreen, currentAdventureId, adventureMode, userData?.username]);
   
   React.useEffect(() => {
     
@@ -1019,7 +1069,12 @@ const Index = () => {
         }
       }
 
-      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData });
+      // Get current pet name and type for AI context
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+      const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+      const petType = PetProgressStorage.getPetType(currentPetId);
+      
+      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType });
       
       const result = await aiService.generateResponse(
         userText, 
@@ -1029,7 +1084,9 @@ const Index = () => {
         undefined, // adventureState
         undefined, // currentAdventure  
         undefined, // storyEventsContext
-        currentSummary // summary
+        currentSummary, // summary
+        petName, // petName
+        petType  // petType
       );
       
       console.log('✅ AI service returned:', result);
@@ -1845,19 +1902,28 @@ const Index = () => {
         const currentMessages = [...chatMessages, userMessage];
         
         // Implement 3-3 pattern: 3 pure adventure messages, then 3 with spelling questions
-        const isSpellingPhase = messageCycleCount >= 3; // Messages 3, 4, 5 have spelling
+        let isSpellingPhase = false;
+        const cyclePosition = (messageCycleCount - 2) % 3;
+        isSpellingPhase = cyclePosition >= 0 && cyclePosition < 2;
+          
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
+          
         const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+          
         console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
         // Additional debug info
         const savedGradeFromStorage = loadGradeSelection();
+          
         console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
         console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
+          
         // NEW: Use topic-based question selection for Spellbox progression
+          
         const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds) : null;
         
         // Store the original spelling question (with prefilled data) for later use
+          
         if (spellingQuestion) {
           console.log('🔤 STORING ORIGINAL SPELLING QUESTION:', {
             id: spellingQuestion.id,
@@ -1869,14 +1935,23 @@ const Index = () => {
           });
           setOriginalSpellingQuestion(spellingQuestion);
         }
+        // Implement 2-1 pattern starting at message 1: initial message has no spelling, then 2-1 pattern
+        // Message 0: Pure adventure (no spelling) - initial message
+        // Messages 1,2: With spelling questions (2 with spelling)
+        // Message 3: Pure adventure (no spelling) (1 without spelling)
+        // Messages 4,5: With spelling questions (2 with spelling)
+        // Message 6: Pure adventure (no spelling) (1 without spelling), etc.
+          
+        // First 2 of each 3-message cycle have spelling
         
-        console.log(`🔄 Message cycle: ${messageCycleCount}/6, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 3 ? 'Pure Adventure' : 'Spelling Questions'})`);
+        
+        console.log(`🔄 Message cycle: ${messageCycleCount}, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 2 ? 'Initial Pure Adventure' : isSpellingPhase ? 'Spelling Questions' : 'Pure Adventure'})`);
         
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
-        // Update cycle count and reset after 6 messages (3 adventure + 3 spelling)
-        // Note: We increment AFTER storing the original question and generating AI response
-        incrementMessageCycle();
+
+        // Update cycle count (no modulo, just increment)
+        setMessageCycleCount(prev => prev + 1);
         
         // First, add the spelling sentence message if we have one
         if (aiResponse.spelling_sentence && spellingQuestion) {
@@ -2035,9 +2110,15 @@ const Index = () => {
 
   // Handle onboarding completion
   const handleOnboardingComplete = React.useCallback(() => {
-    setCurrentScreen(-1); // Redirect to home page
     playClickSound();
-  }, []);
+    // After onboarding is complete, we should transition back to the main app
+    // The UnifiedPetAdventureApp will now route to PetPage, which will handle pet selection
+    if (onBackToPetPage) {
+      onBackToPetPage();
+    } else {
+      setCurrentScreen(-1); // Fallback to home page
+    }
+  }, [onBackToPetPage]);
 
   // Handle homepage navigation
   const handleHomeNavigation = React.useCallback((path: 'start' | 'middle' | 'topics') => {
@@ -2054,6 +2135,17 @@ const Index = () => {
       autoAssignTopicAndNavigate(path);
     }
   }, [autoAssignTopicAndNavigate]);
+
+  // Handle pet page navigation
+  const handlePetNavigation = React.useCallback(() => {
+    playClickSound();
+    
+    // Stop any ongoing TTS before navigation
+    console.log('🔧 Pet navigation cleanup: Stopping TTS');
+    ttsService.stop();
+    
+    setCurrentScreen(4); // Go to pet page
+  }, []);
 
   // Handle chat summary generation (every 2 messages)
   const handleSummaryGeneration = useCallback(async (sessionId: string, currentMessages: ChatMessage[]) => {
@@ -2410,6 +2502,11 @@ const Index = () => {
 
   // Handle start adventure from progress tracking
   const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new') => {
+    // Prevent rapid duplicate invocations
+    if (isStartingAdventureRef.current) {
+      return;
+    }
+    isStartingAdventureRef.current = true;
     playClickSound();
     setSelectedTopicId(topicId);
     setAdventureMode(mode);
@@ -2445,6 +2542,8 @@ const Index = () => {
         completeAdventureTutorial();
         console.log('🎓 Completed adventure tutorial for first-time user');
       }
+      // Reset session coins for new adventure
+      resetSessionCoins();
       
       console.log('🚀 Started new adventure with default rocket image and reset all flow states');
     } else {
@@ -2457,18 +2556,40 @@ const Index = () => {
     
     // Optional Firebase session creation (non-blocking)
     if (user) {
-      const sessionId = await adventureSessionService.createAdventureSession(
-        user.uid,
-        mode === 'new' ? 'new_adventure' : 'continue_adventure',
-        adventureId,
-        topicId,
-        mode
-      );
-      setCurrentSessionId(sessionId);
+      // Only create one session per adventureId
+      if (sessionCreatedForAdventureIdRef.current !== adventureId) {
+        const sessionId = await adventureSessionService.createAdventureSession(
+          user.uid,
+          mode === 'new' ? 'new_adventure' : 'continue_adventure',
+          adventureId,
+          topicId,
+          mode
+        );
+        setCurrentSessionId(sessionId);
+        sessionCreatedForAdventureIdRef.current = adventureId;
+      }
     }
     
     setCurrentScreen(1); // Go to adventure screen first to show AI response
+    
+    // Release the start guard slightly later to avoid double-taps
+    setTimeout(() => {
+      isStartingAdventureRef.current = false;
+    }, 250);
   }, [currentAdventureId, reset, initialPanels, user]);
+
+  // Handle initial adventure props from parent component
+  React.useEffect(() => {
+    if (initialAdventureProps) {
+      if (initialAdventureProps.adventureId) {
+        // Continue specific adventure
+        handleContinueSpecificAdventure(initialAdventureProps.adventureId);
+      } else if (initialAdventureProps.topicId && initialAdventureProps.mode) {
+        // Start new or continue adventure with topic
+        handleStartAdventure(initialAdventureProps.topicId, initialAdventureProps.mode);
+      }
+    }
+  }, [initialAdventureProps, handleStartAdventure, handleContinueSpecificAdventure]);
 
   // Handle grade selection (for HomePage dropdown display)
   const handleGradeSelection = React.useCallback((gradeDisplayName: string) => {
@@ -3216,6 +3337,12 @@ const Index = () => {
       }
       
       // Update legacy progress for backward compatibility
+
+      // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
+      addAdventureCoins(10);
+      
+      // Update progress
+
       setSpellProgress(prev => ({
         ...prev,
         currentIndex: prev.currentIndex + 1
@@ -3230,10 +3357,11 @@ const Index = () => {
         // Add adventure story
         setChatMessages(prev => {
           
-          // Create the adventure story message
+          // Create the adventure story message with coin reward notification
           const adventureStoryMessage: ChatMessage = {
             type: 'ai',
-            content: latestAIResponse.content_after_spelling,
+            // Removed reward blurb to preserve adventure flow
+            content: `${latestAIResponse.content_after_spelling}`,
             timestamp: Date.now() + 1 // Ensure it comes after success message
           };
           
@@ -3317,6 +3445,24 @@ const Index = () => {
     });
   }, [setChatMessages]);
 
+  // Special handling for pet page - render full screen without header
+  if (currentScreen === 4) {
+    return (
+      <div className="h-screen w-screen overflow-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        
+        
+        <PetPage 
+          onStartAdventure={handleStartAdventure}
+          onContinueSpecificAdventure={handleContinueSpecificAdventure}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
       <script
@@ -3347,9 +3493,12 @@ const Index = () => {
                   playClickSound();
                   await handleCloseSession(); // Save current adventure before going home
                   
-                  // Trigger a re-render by briefly updating screen state to refresh homepage data
-                  setCurrentScreen(0);
-                  setTimeout(() => setCurrentScreen(-1), 100);
+                  // Navigate back to pet page (home)
+                  if (onBackToPetPage) {
+                    onBackToPetPage();
+                  } else {
+                    navigate('/');
+                  }
                 }}
                 className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
                 style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
@@ -3690,18 +3839,40 @@ const Index = () => {
                 >
                   Adventure
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(4);
+                  }}
+                  disabled={false}
+                  className="border-2 bg-white btn-animate"
+                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                >
+                  Pets
+                </Button>
               </>
             )}
             
             <div className="text-center">
-              <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
-                {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
-                 userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
-                 currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
-                 currentScreen === 1 ? 'YOUR ADVENTURE' : 
-                 'QUIZ TIME'}
-              </h1>
-              {userData && !devToolsVisible && (
+              {currentScreen === 1 ? (
+                <div className="flex items-center justify-center">
+                  {/* Adventure Feeding Progress */}
+                  <AdventureFeedingProgress 
+                    sessionCoins={sessionCoins}
+                    targetCoins={50}
+                  />
+                </div>
+              ) : (
+                <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
+                  {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
+                   userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
+                   currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
+                   'QUIZ TIME'}
+                </h1>
+              )}
+              {userData && !devToolsVisible && currentScreen !== 1 && (
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <span className="text-sm lg:text-base font-semibold text-primary/80">
                     🎓 {selectedGradeFromDropdown || userData.gradeDisplayName}
@@ -3774,21 +3945,19 @@ const Index = () => {
               </PopoverContent>
             </Popover>
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Help" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                  <HelpCircle className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>How to use</DialogTitle>
-                  <DialogDescription>
-                    Type what happens next and press Generate to add a new panel. Click thumbnails to navigate. Tap the speaker icon in a bubble to hear the text.
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              aria-label="Pet Page" 
+              className="border-2 bg-white btn-animate" 
+              style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} 
+              onClick={() => {
+                playClickSound();
+                setCurrentScreen(4); // Navigate to pet page
+              }}
+            >
+              <span className="text-lg">🐶</span>
+            </Button>
             
             <Dialog>
               <DialogTrigger asChild>
@@ -3812,22 +3981,6 @@ const Index = () => {
               </DialogContent>
             </Dialog>
             
-            {/* End Session Button - only show when adventure is active */}
-            {currentScreen === 1 && (
-              <Button 
-                variant="destructive" 
-                size="icon"
-                aria-label="End Session" 
-                className="border-2 bg-red-500 text-white btn-animate hover:bg-red-600 rounded-full w-12 h-12" 
-                style={{ borderColor: 'hsl(from hsl(0 84% 55%) h s 25%)', boxShadow: '0 4px 0 black' }} 
-                onClick={() => {
-                  playClickSound();
-                  setShowFeedbackModal(true);
-                }}
-              >
-                <X className="h-6 w-6" />
-              </Button>
-            )}
           </div>
         </header>
 
@@ -3850,6 +4003,7 @@ const Index = () => {
             onStartAdventure={handleStartAdventure} 
             onContinueSpecificAdventure={handleContinueSpecificAdventure}
             selectedTopicFromPreference={selectedTopicFromPreference}
+            onPetNavigation={handlePetNavigation}
           />
         ) : currentScreen === 0 ? (
           <TopicSelection onTopicSelect={handleTopicSelect} />
@@ -4117,7 +4271,7 @@ const Index = () => {
                         {/* Darker theme film for avatar section */}
                         <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
                         <div className="relative z-10">
-                          <ChatAvatar />
+                          <ChatAvatar avatar={currentPetAvatarImage} />
                         </div>
                       </div>
                     
@@ -4228,6 +4382,7 @@ const Index = () => {
             <span>🎵 Loading sounds active</span>
           </div>
         )} */}
+
                         
                         <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
                       </div>
@@ -4376,6 +4531,9 @@ const Index = () => {
                     setCanAccessQuestions(false);
                     setIsRetryMode(false);
                     setRetryQuestionIndex(0);
+                    
+                    // Reset session coins for new adventure
+                    resetSessionCoins();
                     
                     // Reset initial response ref
                     initialResponseSentRef.current = null;

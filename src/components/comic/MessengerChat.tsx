@@ -8,6 +8,7 @@ import { playClickSound } from "@/lib/sounds";
 import { ttsService } from "@/lib/tts-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import { formatAIMessage } from "@/lib/utils";
+import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -68,6 +69,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
   const recognitionRef = useRef<any | null>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isCancelledRef = useRef(false);
+
+  // Use current pet avatar for the floating chat button image
+  const currentPetAvatarImage = useCurrentPetAvatarImage();
 
   // No need for message count or scroll management in hover chatbox
 
@@ -288,9 +292,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
           )}
           aria-label="Show chat"
         >
-          <img 
-            src="/avatars/krafty.png" 
-            alt="Krafty" 
+          <img
+            src={currentPetAvatarImage}
+            alt="Pet avatar"
             className="absolute inset-0 w-full h-full object-cover scale-125"
           />
         </Button>
