@@ -49,6 +49,7 @@ import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQu
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
+import { useRealtimeSession } from "@/hooks/useRealtimeSession";
 
 
 // Legacy user data interface for backwards compatibility
@@ -263,6 +264,16 @@ const Index = () => {
   // Track message cycle for 3-3 pattern (3 pure adventure, then 3 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
 
+  const {
+    status,
+    sendMessage,
+    onToggleConnection,
+    downloadRecording,
+  } = useRealtimeSession({
+    isAudioPlaybackEnabled: true,
+    enabled: false,
+  });
+
   // Centralized function to increment message cycle count for all user interactions
   const incrementMessageCycle = useCallback(() => {
     setMessageCycleCount(prev => {
@@ -278,6 +289,13 @@ const Index = () => {
     const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
     setMessageCycleCount(aiMessageCount % 6);
   }, []); // Only run on mount
+
+  // Console log when realtime session starts
+  useEffect(() => {
+    if (status === "CONNECTED") {
+      console.log("OPENAI REALTIME STARTED:");
+    }
+  }, [status]);
   
   // Show onboarding if user is authenticated but hasn't completed setup
   const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
@@ -4060,6 +4078,8 @@ const Index = () => {
                     currentQuestionIndex={spellProgress.currentIndex}
                     showHints={true}
                     showExplanation={true}
+                    // Realtime session integration
+                    sendMessage={sendMessage}
                   />
                 </div>
               </section>
