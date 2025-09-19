@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
 import Index from "./pages/Index";
@@ -19,6 +19,7 @@ const queryClient = new QueryClient();
 const UnifiedPetAdventureApp = () => {
   const [isInAdventure, setIsInAdventure] = useState(false);
   const [adventureProps, setAdventureProps] = useState<{topicId?: string, mode?: 'new' | 'continue', adventureId?: string} | null>(null);
+  const { user, userData, loading } = useAuth();
 
   // Adventure handlers that switch modes seamlessly without route changes
   const handleStartAdventure = (topicId: string, mode: 'new' | 'continue' = 'new') => {
@@ -35,6 +36,25 @@ const UnifiedPetAdventureApp = () => {
     setIsInAdventure(false);
     setAdventureProps(null);
   };
+
+  // If user is authenticated but we're still loading userData, show loading
+  if (user && !userData && !loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading your profile...</div>
+      </div>
+    );
+  }
+
+  // If user needs onboarding (first time or missing grade), route to Index for proper onboarding flow
+  if (userData && (userData.isFirstTime || !userData.grade)) {
+    return (
+      <Index 
+        initialAdventureProps={null}
+        onBackToPetPage={handleBackToPetPage}
+      />
+    );
+  }
 
   if (isInAdventure) {
     return (

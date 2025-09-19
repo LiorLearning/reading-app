@@ -21,10 +21,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     return <AuthScreen />;
   }
 
-  // If user is authenticated but hasn't completed onboarding
-  if (userData?.isFirstTime || !userData?.grade) {
-    return <>{children}</>;
-  }
-
+  // For authenticated users, always pass through to children
+  // The routing logic will handle onboarding vs main app
   return <>{children}</>;
 };

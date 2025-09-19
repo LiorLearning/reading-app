@@ -59,6 +59,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
           {name}
         </p> */}
       </div>
+
     </div>
   );
 };

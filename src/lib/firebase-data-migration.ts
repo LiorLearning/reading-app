@@ -5,6 +5,7 @@ import {
   saveCurrentAdventureIdHybrid,
   saveQuestionProgressHybrid
 } from './firebase-user-data-cache';
+import { autoMigrateSpellboxOnLogin } from './firebase-spellbox-cache';
 import { 
   saveAdventureHybrid,
   loadAdventureSummariesHybrid 
@@ -70,9 +71,18 @@ export const migrateLocalStorageToFirebase = async (userId: string): Promise<voi
       }
     }
 
+    // 6. Migrate Spellbox topic progress
+    try {
+      await autoMigrateSpellboxOnLogin(userId);
+      console.log('✅ Spellbox progress migration completed');
+    } catch (error) {
+      console.warn('Spellbox migration failed, continuing with other migrations:', error);
+    }
+
     // Verify migration by loading from Firebase
     const firebaseAdventures = await loadAdventureSummariesHybrid(userId);
 
+    console.log(`✅ Migration completed: ${migratedCount} items migrated to Firebase`);
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;
