@@ -585,32 +585,41 @@ export const useCurrentPetAvatarImage = () => {
     if (currentPetId === 'cat' && isPetOwned('cat')) {
       // Use coins from localStorage for consistent progression with PetPage
       if (coins >= 50) {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-super-happy-unscreen.gif?alt=media&token=8275c06d-139a-42c3-b5e0-abfdcbddd1e1";
       } else if (coins >= 30) {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-happy-unscreen.gif?alt=media&token=baa69ba6-06f5-4c44-ad6b-9a96c241dab0";
       } else if (coins >= 10) {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250918_002119_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-neutral-unscreen.gif?alt=media&token=fa2abbc8-8f14-4f63-bf51-355ef0d1c310";
       } else {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sad-unscreen.gif?alt=media&token=7f5ad9cb-df5d-46dc-ae54-67e35f5a5ed6";
       }
     }
     
-    // Check if Hamster is owned and being displayed
-    if (currentPetId === 'hamster' && isPetOwned('hamster')) {
-      const cumulativeCare = getCumulativeCareLevel();
-      const { feedingCount, adventureCoins } = cumulativeCare;
-      
-      // Use the same care stage logic as PetPage:
-      // Stage 3: 50+ adventure coins (ready for sleep)
-      // Stage 2: Fed once (first feeding triggers image change)
-      // Stage 1: Initial hungry/sad state (feeding count 0)
-      
-      if (adventureCoins >= 50) {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // ready_for_sleep
-      } else if (feedingCount >= 1) {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // fed
+    // Check if Dog is owned and being displayed - use coin-based progression like other pets
+    if (currentPetId === 'dog' && isPetOwned('dog')) {
+      // Use coins from localStorage for consistent progression with PetPage
+      if (coins >= 50) {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-super-happy-unscreen.gif?alt=media&token=90825746-c450-46a4-aad5-7c8a113dd33a"; // 50+ coins - placeholder for future GIF
+      } else if (coins >= 30) {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-happy-unscreen.gif?alt=media&token=63a8ea0c-4166-4be3-bfd0-4caffaaf58cc"; // 30+ coins - placeholder for future GIF
+      } else if (coins >= 10) {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-neutral-unscreen.gif?alt=media&token=fab36d1a-fec3-4510-a99d-eeeef5d9d784"; // 10+ coins - placeholder for future GIF
       } else {
-        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"; // hungry
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sad-unscreen.gif?alt=media&token=aa2818bf-d631-4394-97f5-3955b5602299"; // 0 coins - hungry - placeholder for future GIF
+      }
+    }
+    
+    // Check if Hamster is owned and being displayed - use coin-based progression like other pets
+    if (currentPetId === 'hamster' && isPetOwned('hamster')) {
+      // Use coins from localStorage for consistent progression with PetPage
+      if (coins >= 50) {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-super-happy-unscreen.gif?alt=media&token=1c6950e1-b84e-4241-8a3b-34ee4bb31e4d"; // 50+ coins
+      } else if (coins >= 30) {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6"; // 30+ coins - placeholder for future image
+      } else if (coins >= 10) {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-neutral-unscreen.gif?alt=media&token=8511abcc-9b24-4ea5-b830-9bdb7ad4bee8"; // 10+ coins
+      } else {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0"; // 0 coins - hungry
       }
     }
     

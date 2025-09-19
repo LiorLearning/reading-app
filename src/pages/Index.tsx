@@ -29,6 +29,7 @@ import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
 import { useSessionCoins } from "@/hooks/use-session-coins";
+import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -4093,6 +4094,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               </>
             )}
 
+
             {/* Right Arrow Navigation - Outside the main container */}
             {false && (
               <div 
@@ -4265,128 +4267,118 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 
                                 {/* Content only shown when not collapsed */}
                   {!sidebarCollapsed && (
-                    <>
-                      {/* Avatar Section */}
-                      <div className="flex-shrink-0 relative">
-                        {/* Darker theme film for avatar section */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
-                        <div className="relative z-10">
-                          <ChatAvatar avatar={currentPetAvatarImage} />
+                    <ResizableChatLayout
+                      defaultPetRatio={0.65}
+                      minPetRatio={0.25}
+                      maxPetRatio={0.8}
+                      petContent={
+                        <div className="relative h-full">
+                          {/* Darker theme film for avatar section */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
+                          <div className="relative z-10 h-full">
+                            <ChatAvatar avatar={currentPetAvatarImage} size="responsive" />
+                          </div>
                         </div>
-                      </div>
-                    
-                      {/* Messages */}
-                      <div className="flex-1 min-h-0 relative">
-                        {/* Messages Container */}
-                        <div 
-                          ref={messagesScrollRef}
-                          className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
-                        >
-                          {chatMessages.length === 0 ? (
-                            <div className="flex items-center justify-center h-full text-muted-foreground text-lg">
-                              <p>💬 Start chatting with Krafty!</p>
-                            </div>
-                          ) : (
-                            <>
-                              {chatMessages.filter(m => !m.hiddenInChat).map((message, index) => (
-                                <div
-                                  key={`${message.timestamp}-${index}`}
-                                  className={cn(
-                                    "flex animate-slide-up-smooth",
-                                    message.type === 'user' ? "justify-end" : "justify-start"
-                                  )}
-                                  style={{ 
-                                    animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
-                                  }}
-                                >
-                                  <div
-                                    className={cn(
-                                      "max-w-[80%] rounded-lg px-3 py-2 text-xl transition-all duration-200 relative",
-                                      message.type === 'user' 
-                                        ? "bg-primary text-primary-foreground" 
-                                        : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
-                                    )}
-                                    style={{}}
-                                  >
-                                    <div className="font-medium text-lg mb-1 opacity-70">
-                                      {message.type === 'user' ? 'You' : '🤖 Krafty'}
-                                    </div>
-                                    <div className={message.type === 'ai' ? 'pr-6' : ''}>
-                                      {message.type === 'ai' ? (
-                                        <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content, message.spelling_word) }} />
-                                      ) : (
-                                        message.content
-                                      )}
-                                    </div>
-                                    {/* Speaker button for AI messages only */}
-                                    {message.type === 'ai' && (
-                                      <SpeakerButton message={message} index={index} />
-                                    )}
-                                  </div>
+                      }
+                      chatContent={
+                        <div className="flex flex-col h-full">
+                          {/* Messages */}
+                          <div className="flex-1 min-h-0 relative">
+                            {/* Messages Container */}
+                            <div 
+                              ref={messagesScrollRef}
+                              className="h-full overflow-y-auto space-y-3 p-3 bg-white/95 backdrop-blur-sm"
+                            >
+                              {chatMessages.length === 0 ? (
+                                <div className="flex items-center justify-center h-full text-muted-foreground text-lg">
+                                  <p>💬 Start chatting with Krafty!</p>
                                 </div>
-                              ))}
-                              
-                              {/* AI Typing Indicator */}
-                              {isAIResponding && (
-                                <div className="flex justify-start animate-slide-up-smooth">
-                                  <div className="max-w-[80%] rounded-lg px-3 py-2 text-xl bg-card border-2"
-                                       style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
-                                    <div className="font-medium text-lg mb-1 opacity-70">
-                                      🤖 Krafty
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      <span>Krafty is thinking</span>
-                                      <div className="flex gap-1">
-                                        {[...Array(3)].map((_, i) => (
-                                          <div
-                                            key={i}
-                                            className="w-1 h-1 bg-primary rounded-full animate-pulse"
-                                            style={{
-                                              animationDelay: `${i * 0.2}s`,
-                                              animationDuration: '1s'
-                                            }}
-                                          />
-                                        ))}
+                              ) : (
+                                <>
+                                  {chatMessages.filter(m => !m.hiddenInChat).map((message, index) => (
+                                    <div
+                                      key={`${message.timestamp}-${index}`}
+                                      className={cn(
+                                        "flex animate-slide-up-smooth",
+                                        message.type === 'user' ? "justify-end" : "justify-start"
+                                      )}
+                                      style={{ 
+                                        animationDelay: index < lastMessageCount - 1 ? `${Math.min(index * 0.04, 0.2)}s` : "0s"
+                                      }}
+                                    >
+                                      <div
+                                        className={cn(
+                                          "max-w-[80%] rounded-lg px-3 py-2 text-xl transition-all duration-200 relative",
+                                          message.type === 'user' 
+                                            ? "bg-primary text-primary-foreground" 
+                                            : "bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5"
+                                        )}
+                                        style={{}}
+                                      >
+                                        <div className="font-medium text-lg mb-1 opacity-70">
+                                          {message.type === 'user' ? 'You' : 'Krafty'}
+                                        </div>
+                                        <div className={message.type === 'ai' ? 'pr-6' : ''}>
+                                          {message.type === 'ai' ? (
+                                            <div dangerouslySetInnerHTML={{ __html: formatAIMessage(message.content, message.spelling_word) }} />
+                                          ) : (
+                                            message.content
+                                          )}
+                                        </div>
+                                        {/* Speaker button for AI messages only */}
+                                        {message.type === 'ai' && (
+                                          <SpeakerButton message={message} index={index} />
+                                        )}
                                       </div>
                                     </div>
-                                  </div>
-                                </div>
+                                  ))}
+                                  
+                                  {/* AI Typing Indicator */}
+                                  {isAIResponding && (
+                                    <div className="flex justify-start animate-slide-up-smooth">
+                                      <div className="max-w-[80%] rounded-lg px-3 py-2 text-xl bg-card border-2"
+                                           style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+                                        <div className="font-medium text-lg mb-1 opacity-70">
+                                          
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <span>Krafty is thinking</span>
+                                          <div className="flex gap-1">
+                                            {[...Array(3)].map((_, i) => (
+                                              <div
+                                                key={i}
+                                                className="w-1 h-1 bg-primary rounded-full animate-pulse"
+                                                style={{
+                                                  animationDelay: `${i * 0.2}s`,
+                                                  animationDuration: '1s'
+                                                }}
+                                              />
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
                               )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Input Bar */}
-                      <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                        {/* NEW: Unified AI System Status Indicator */}
-                        {/* {isUnifiedSystemReady && (
-                          <div className="mb-2 flex items-center gap-2 text-xs text-green-600 bg-green-50 rounded-full px-3 py-1 animate-pulse">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span>🤖 Smart AI with Auto-Images Active</span>
+                            </div>
                           </div>
-                        )} */}
-                        
-                                {/* Loading indicator for unified system */}
-        {unifiedAIStreaming.isStreaming && (
+                          
+                          {/* Input Bar */}
+                          <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+                            {unifiedAIStreaming.isStreaming && (
           <div className="mb-2 flex items-center gap-2 text-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
             <span>{unifiedAIStreaming.isGeneratingImage ? '🎨 Creating magical visuals...' : '💭 Thinking...'}</span>
           </div>
         )}
-        
-        {/* Show legacy loading state if unified system is generating images */}
-        {/* {unifiedAIStreaming.isGeneratingImage && (
-          <div className="mb-2 flex items-center gap-2 text-xs text-orange-600 bg-orange-50 rounded-full px-3 py-1">
-            <div className="w-2 h-2 bg-orange-500 rounded-full animate-spin"></div>
-            <span>🎵 Loading sounds active</span>
-          </div>
-        )} */}
+                            <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
+                          </div>
+                        </div>
 
-                        
-                        <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
-                      </div>
-                    </>
+                      }
+                    />
+
                   )}
                 
                 {/* Resize Handle - Hidden on mobile and when collapsed */}
