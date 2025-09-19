@@ -636,8 +636,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         generateAIHint(completeWord);
         // Send target word to realtime session for pronunciation help
         if (sendMessage && targetWord) {
-          console.log('🎤 SPELLBOX: Sending target word to realtime session:', targetWord, completeWord);
-          sendMessage(`correct answer is ${targetWord} and the user answer is ${completeWord}`);
+          sendMessage(`correct answer is ${targetWord}, student response is ${completeWord}`);
         }
       }
     } else {
@@ -1070,8 +1069,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                    onClick={() => {
                      playClickSound();
                      if (sendMessage && targetWord) {
-                       console.log('🎤 SPELLBOX HINT: Sending target word to realtime session:', targetWord);
-                       sendMessage(`correct answer is ${targetWord} and the user answer is ${reconstructCompleteWord(userAnswer)}`)
+                       sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`)
                      }
                    }}
                    style={{

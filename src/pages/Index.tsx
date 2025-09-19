@@ -271,7 +271,7 @@ const Index = () => {
     downloadRecording,
   } = useRealtimeSession({
     isAudioPlaybackEnabled: true,
-    enabled: true,
+    enabled: false,
   });
 
   // Centralized function to increment message cycle count for all user interactions
