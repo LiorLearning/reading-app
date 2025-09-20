@@ -133,6 +133,7 @@ interface MCQScreenTypeAProps {
   startingQuestionIndex?: number; // Add this new prop
   onQuestionChange?: (currentQuestionIndex: number) => void; // New prop for progress tracking
   currentSessionId?: string | null; // Add session tracking prop
+  currentAdventureType?: string; // To attribute coins
 }
 
 // Remove the empty sampleMCQData object (lines 178-180)
@@ -480,7 +481,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
         // Award 10 coins for correct MCQ answer (same as spelling questions)
-        addAdventureCoins(10);
+        addAdventureCoins(10, props.currentAdventureType);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -610,7 +611,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
         // Award 10 coins for correct MCQ answer (same as spelling questions)
-        addAdventureCoins(10);
+        addAdventureCoins(10, props.currentAdventureType);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -1541,7 +1542,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
         // Award 10 coins for correct MCQ answer (same as spelling questions)
-        addAdventureCoins(10);
+        addAdventureCoins(10, props.currentAdventureType);
       }
       
       // Enhanced score tracking - save to localStorage and update state
