@@ -820,7 +820,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             );
                           } else {
                             const expectedLength = part.answer?.length || 5;
-                            console.log('📝 Creating input boxes:', { expectedLength, answer: part.answer });
                             return (
                               <div key={partIndex} className="flex items-center gap-2">
                                 {Array.from({ length: expectedLength }, (_, letterIndex) => {
