@@ -376,20 +376,23 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const petMessageId = 'pet-message';
   const isSpeaking = useTTSSpeaking(petMessageId);
   
-  // Check if user is first-time and show pet selection flow
+  // Check if user needs pet selection flow (only for users who have completed onboarding)
   useEffect(() => {
-    const checkFirstTimeUser = () => {
-      // Check if user has any owned pets
-      const allOwnedPets = PetProgressStorage.getAllOwnedPets();
-      
-      // If no pets are owned, show pet selection flow
-      if (allOwnedPets.length === 0) {
-        setShowPetSelection(true);
+    const checkPetSelection = () => {
+      // Only show pet selection if user has completed onboarding
+      if (userData && !userData.isFirstTime && userData.grade) {
+        // Check if user has any owned pets
+        const allOwnedPets = PetProgressStorage.getAllOwnedPets();
+        
+        // If no pets are owned, show pet selection flow
+        if (allOwnedPets.length === 0) {
+          setShowPetSelection(true);
+        }
       }
     };
     
-    checkFirstTimeUser();
-  }, []);
+    checkPetSelection();
+  }, [userData]);
   
   // ADDED FOR HOME PAGE FUNCTIONALITY: Grade selection logic
   useEffect(() => {

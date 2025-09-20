@@ -10,6 +10,101 @@
   overflow: hidden;
 }
 
+/* Tutorial Animations */
+@keyframes tutorial-expand {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes tutorial-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(147, 51, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.5), 0 0 25px rgba(147, 51, 234, 0.3);
+  }
+}
+
+@keyframes tutorial-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+  }
+  70% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+  }
+}
+
+/* Tutorial Classes */
+.tutorial-expand {
+  animation: tutorial-expand 2s ease-in-out infinite alternate;
+  transition: all 0.3s ease;
+}
+
+.tutorial-glow {
+  animation: tutorial-glow 1.5s ease-in-out infinite, tutorial-pulse 2s infinite;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.tutorial-highlight {
+  position: relative;
+  z-index: 50;
+}
+
+.tutorial-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, 
+    rgba(147, 51, 234, 0.2), 
+    rgba(168, 85, 247, 0.2), 
+    rgba(147, 51, 234, 0.2)
+  );
+  border-radius: 16px;
+  z-index: -1;
+  animation: tutorial-glow 2s ease-in-out infinite;
+}
+
+/* Tutorial overlay for first-time users - very subtle */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 40;
+  pointer-events: none;
+}
+
+.tutorial-spotlight {
+  position: relative;
+  z-index: 51;
+  pointer-events: auto;
+}
+
 /* Panel Animations */
 @keyframes image-factory {
   0% {

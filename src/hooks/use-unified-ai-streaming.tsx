@@ -3,10 +3,11 @@ import { ChatMessage } from '@/lib/utils';
 import { aiService } from '@/lib/ai-service';
 import { SpellingQuestion } from '@/lib/questionBankUtils';
 import { UnifiedAIResponse, StreamEvent } from '@/lib/unified-ai-streaming-service';
-import { stopImageLoadingSound } from '@/lib/sounds';
+import { stopImageLoadingSound, playImageCompleteSound } from '@/lib/sounds';
 
 export interface UseUnifiedAIStreamingOptions {
   userId: string;
+  adventureId?: string;
   onNewImage?: (imageUrl: string, prompt: string) => void;
   onResponseComplete?: (response: UnifiedAIResponse) => void;
 }
@@ -14,6 +15,7 @@ export interface UseUnifiedAIStreamingOptions {
 export interface UnifiedStreamingState {
   isStreaming: boolean;
   isGeneratingImage: boolean;
+  isUnifiedSessionActive: boolean; // NEW: Track entire unified session (including legacy fallback)
   currentText: string;
   generatedImages: string[];
   error: string | null;
@@ -25,12 +27,13 @@ export interface UnifiedStreamingState {
  * This is the new system that lets AI decide when to generate images
  */
 export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
-  const { userId, onNewImage, onResponseComplete } = options;
+  const { userId, adventureId, onNewImage, onResponseComplete } = options;
   
   // State management
   const [streamingState, setStreamingState] = useState<UnifiedStreamingState>({
     isStreaming: false,
     isGeneratingImage: false,
+    isUnifiedSessionActive: false, // NEW: Track entire unified session
     currentText: '',
     generatedImages: [],
     error: null,
@@ -40,6 +43,9 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   // Generate stable session ID that persists across re-renders
   const sessionId = useMemo(() => crypto.randomUUID(), []); // Empty dependency array ensures it never changes
   
+  // Keep track of delay timeouts to clear them if needed
+  const delayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Handle stream events - STABLE callback to prevent useEffect cleanup
   const handleStreamEventRef = useRef((event: StreamEvent) => {
     console.log('📡 Stream event received:', event.type, event.content.substring(0, 100));
@@ -53,12 +59,16 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           break;
           
         case 'image_start':
+          console.log('🎯 Image generation started');
           newState.isGeneratingImage = true;
           // Loading sound is handled in response processor
           break;
           
         case 'image_complete':
-          newState.isGeneratingImage = false;
+          console.log('🚨 CRITICAL: IMAGE_COMPLETE EVENT - keeping isGeneratingImage as TRUE');
+          // Keep loading active and set up 10-second delay
+          newState.isGeneratingImage = true;
+          
           if (event.metadata?.imageUrl) {
             newState.generatedImages.push(event.metadata.imageUrl);
             // Call callback for new image
@@ -67,20 +77,66 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             }
             // Sound handling is done in response processor
           }
+          
+          // Clear any existing timeout
+          if (delayTimeoutRef.current) {
+            clearTimeout(delayTimeoutRef.current);
+          }
+          
+          // Set up 7-second delay timeout
+          delayTimeoutRef.current = setTimeout(() => {
+            console.log('🚨 CRITICAL: 7-second delay timeout FIRED (from image_complete)');
+            // Play completion sound when loading animation finally ends
+            playImageCompleteSound();
+            setStreamingState(prevState => ({
+              ...prevState,
+              isGeneratingImage: false,
+              isUnifiedSessionActive: false // NEW: Session fully complete after image delay
+            }));
+          }, 5000);
+          
+          console.log('🚨 CRITICAL: Timeout scheduled with ID:', delayTimeoutRef.current);
           break;
           
         case 'error':
           newState.error = event.content;
           newState.isGeneratingImage = false;
+          newState.isUnifiedSessionActive = false; // NEW: Reset session state on error
+          // Clear any delay timeout on error
+          if (delayTimeoutRef.current) {
+            clearTimeout(delayTimeoutRef.current);
+            delayTimeoutRef.current = null;
+          }
           // Ensure loading sound is stopped on error
           stopImageLoadingSound();
           break;
           
         case 'complete':
+          console.log('🚨 CRITICAL: COMPLETE EVENT: Setting isGeneratingImage to TRUE for delay period');
           newState.isStreaming = false;
-          newState.isGeneratingImage = false;
-          // Ensure loading sound is stopped when stream completes
-          stopImageLoadingSound();
+          // Keep loading active and set up 10-second delay
+          newState.isGeneratingImage = true;
+          
+          // Clear any existing timeout
+          if (delayTimeoutRef.current) {
+            clearTimeout(delayTimeoutRef.current);
+          }
+          
+          // Set up 10-second delay timeout
+          delayTimeoutRef.current = setTimeout(() => {
+            console.log('🚨 CRITICAL: 10-second delay timeout FIRED (from complete)');
+            // Play completion sound when loading animation finally ends
+            playImageCompleteSound();
+            setStreamingState(prevState => ({
+              ...prevState,
+              isGeneratingImage: false,
+              isUnifiedSessionActive: false // NEW: Session fully complete after delay
+            }));
+            // Stop sound after delay
+            stopImageLoadingSound();
+          }, 5000);
+          
+          console.log('🚨 CRITICAL: Timeout scheduled with ID:', delayTimeoutRef.current);
           break;
       }
       
@@ -90,46 +146,11 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   
   // Update the ref when onNewImage changes
   useEffect(() => {
+    // Update the callback reference to access latest onNewImage closure
+    const originalHandler = handleStreamEventRef.current;
     handleStreamEventRef.current = (event: StreamEvent) => {
-      console.log('📡 Stream event received:', event.type, event.content.substring(0, 100));
-      
-      setStreamingState(prev => {
-        const newState = { ...prev };
-        
-        switch (event.type) {
-          case 'text':
-            newState.currentText += event.content;
-            break;
-            
-          case 'image_start':
-            newState.isGeneratingImage = true;
-            break;
-            
-          case 'image_complete':
-            newState.isGeneratingImage = false;
-            if (event.metadata?.imageUrl) {
-              newState.generatedImages.push(event.metadata.imageUrl);
-              if (onNewImage && event.metadata.prompt) {
-                onNewImage(event.metadata.imageUrl, event.metadata.prompt);
-              }
-            }
-            break;
-            
-          case 'error':
-            newState.error = event.content;
-            newState.isGeneratingImage = false;
-            stopImageLoadingSound();
-            break;
-            
-          case 'complete':
-            newState.isStreaming = false;
-            newState.isGeneratingImage = false;
-            stopImageLoadingSound();
-            break;
-        }
-        
-        return newState;
-      });
+      // Call original handler which has all the logic
+      originalHandler(event);
     };
   }, [onNewImage]);
   
@@ -145,6 +166,17 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       aiService.removeUnifiedStreamListener(sessionId);
     };
   }, [sessionId]); // Only depends on sessionId - stable!
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (delayTimeoutRef.current) {
+        console.log('🧹 Cleaning up delay timeout on unmount');
+        clearTimeout(delayTimeoutRef.current);
+        delayTimeoutRef.current = null;
+      }
+    };
+  }, []);
   
   // Main method to send message and get unified AI response
   const sendMessage = useCallback(async (
@@ -171,6 +203,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           ...prev,
           isStreaming: false,
           isGeneratingImage: false,
+          isUnifiedSessionActive: false, // NEW: Reset session state too
           error: null
         }));
         
@@ -193,6 +226,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       ...prev,
       isStreaming: true,
       isGeneratingImage: false,
+      isUnifiedSessionActive: true, // NEW: Mark session as active from start
       currentText: '',
       generatedImages: [],
       error: null,
@@ -203,7 +237,13 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
     let streamingTimeout: NodeJS.Timeout | null = null;
     
     try {
-      console.log('🚀 Sending message through unified AI system:', message.substring(0, 50));
+      console.log('🚀 [UnifiedAIStreaming.sendMessage()] Sending message through unified AI system:', message.substring(0, 50));
+      console.log('🔍 [UnifiedAIStreaming.sendMessage()] Current state before processing:', {
+        isStreaming: streamingState.isStreaming,
+        isGeneratingImage: streamingState.isGeneratingImage,
+        isUnifiedSessionActive: streamingState.isUnifiedSessionActive,
+        sessionId: sessionId
+      });
       
       streamingTimeout = setTimeout(() => {
         console.log('🚨 STREAMING TIMEOUT: Force-resetting stuck state after 35 seconds');
@@ -211,6 +251,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           ...prev,
           isStreaming: false,
           isGeneratingImage: false,
+          isUnifiedSessionActive: false, // NEW: Reset session state on timeout
           error: 'Request timed out - please try again'
         }));
         
@@ -228,7 +269,8 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         chatHistory,
         spellingQuestion,
         userId,
-        sessionId
+        sessionId,
+        adventureId
       );
       
       // Clear the timeout since request completed successfully
@@ -238,11 +280,12 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       
       console.log(`✅ Unified response received with ${response.imageUrls.length} images`);
       
-      // Update final state
+      // Update final state - DON'T reset isGeneratingImage here as timeout handles it
       setStreamingState(prev => ({
         ...prev,
         isStreaming: false,
-        isGeneratingImage: false, // Ensure this is also reset
+        // isGeneratingImage: false, // REMOVED - let the timeout handle this
+        // isUnifiedSessionActive: true, // KEEP: Session stays active until all processing complete
         lastResponse: response,
         currentText: response.textContent,
         generatedImages: response.imageUrls,
@@ -280,8 +323,15 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           ...prev,
           isStreaming: false,
           isGeneratingImage: false,
+          isUnifiedSessionActive: false, // NEW: Reset session state on abort
           error: null // Don't show error for intentional aborts
         }));
+        
+        // Clear any delay timeout when aborting
+        if (delayTimeoutRef.current) {
+          clearTimeout(delayTimeoutRef.current);
+          delayTimeoutRef.current = null;
+        }
         return null;
       }
       
@@ -294,8 +344,15 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         ...prev,
         isStreaming: false,
         isGeneratingImage: false,
+        isUnifiedSessionActive: false, // NEW: Reset session state on error
         error: errorMessage
       }));
+      
+      // Clear any delay timeout on error
+      if (delayTimeoutRef.current) {
+        clearTimeout(delayTimeoutRef.current);
+        delayTimeoutRef.current = null;
+      }
       
       return null;
     }
@@ -308,10 +365,17 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
     // Stop any ongoing loading sound
     stopImageLoadingSound();
     
+    // Clear any delay timeout
+    if (delayTimeoutRef.current) {
+      clearTimeout(delayTimeoutRef.current);
+      delayTimeoutRef.current = null;
+    }
+    
     setStreamingState(prev => ({
       ...prev,
       isStreaming: false,
-      isGeneratingImage: false
+      isGeneratingImage: false,
+      isUnifiedSessionActive: false // NEW: Reset session state when aborting
     }));
   }, [sessionId]);
   

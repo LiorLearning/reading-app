@@ -16,6 +16,45 @@ interface ComicHeaderProps {
   onChangeTheme?: (theme: { name: string; primary: string; background: string; accent: string; hue: string }) => void;
 }
 
+// Component for panel image figure with Firebase image resolution
+const PanelImageFigure: React.FC<{
+  panel: ComicPanel;
+  index: number;
+  oneLiner: string;
+}> = ({ panel, index, oneLiner }) => {
+  // Get current adventure ID for Firebase image resolution
+  const currentAdventureId = useCurrentAdventureId();
+  
+  // Resolve Firebase image if needed
+  const { url: resolvedImageUrl, isExpiredUrl } = useFirebaseImage(panel.image, currentAdventureId || undefined);
+  
+  React.useEffect(() => {
+    if (isExpiredUrl && resolvedImageUrl !== panel.image) {
+      console.log(`🔄 ComicHeader Panel ${index + 1}: Resolved expired image to Firebase URL: ${resolvedImageUrl.substring(0, 50)}...`);
+    }
+  }, [resolvedImageUrl, panel.image, index, isExpiredUrl]);
+
+  return (
+    <figure className="rounded-lg border-2 border-foreground bg-card">
+      <img 
+        src={resolvedImageUrl} 
+        alt={`Panel ${index + 1}`} 
+        className="h-auto w-full object-cover"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          if (!target.src.includes('placeholder')) {
+            console.warn(`⚠️ Failed to load header panel image ${index + 1}, using fallback`);
+            target.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            target.style.minHeight = '200px';
+            target.alt = `Panel ${index + 1} (image unavailable)`;
+          }
+        }}
+      />
+      <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
+    </figure>
+  );
+};
+
 // Component for handling async one-liner loading in the comic panel modal
 const PanelOneLinerFigure: React.FC<{
   panel: ComicPanel;
@@ -45,10 +84,7 @@ const PanelOneLinerFigure: React.FC<{
   }, [panel.text]);
 
   return (
-    <figure className="rounded-lg border-2 border-foreground bg-card">
-      <img src={panel.image} alt={`Panel ${index + 1}`} className="h-auto w-full object-cover" />
-      <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
-    </figure>
+    <PanelImageFigure panel={panel} index={index} oneLiner={oneLiner} />
   );
 };
 
