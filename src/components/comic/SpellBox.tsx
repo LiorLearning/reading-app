@@ -41,6 +41,9 @@ interface SpellBoxProps {
   currentQuestionIndex?: number;
   showHints?: boolean;
   showExplanation?: boolean;
+  
+  // Realtime session integration
+  sendMessage?: (text: string) => void;
 }
 
 const SpellBox: React.FC<SpellBoxProps> = ({
@@ -61,7 +64,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   totalQuestions = 1,
   currentQuestionIndex = 0,
   showHints = true,
-  showExplanation = true
+  showExplanation = true,
+  
+  // Realtime session integration
+  sendMessage
 }) => {
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [showHint, setShowHint] = useState(false);
@@ -628,13 +634,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         setAttempts(prev => prev + 1);
         // Generate AI hint for incorrect answer
         generateAIHint(completeWord);
+        // Send target word to realtime session for pronunciation help
+        if (sendMessage && targetWord) {
+          sendMessage(`correct answer is ${targetWord}, student response is ${completeWord}`);
+        }
       }
     } else {
       console.log('🔤 SPELLBOX: User input not complete yet');
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer]);
+  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, sendMessage]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
@@ -819,7 +829,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             );
                           } else {
                             const expectedLength = part.answer?.length || 5;
-                            console.log('📝 Creating input boxes:', { expectedLength, answer: part.answer });
                             return (
                               <div key={partIndex} className="flex items-center gap-2">
                                 {Array.from({ length: expectedLength }, (_, letterIndex) => {
@@ -828,6 +837,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   const isWordCompleteNow = isUserInputComplete(userAnswer);
                                   const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
                                   const isWordIncorrectNow = isWordCompleteNow && !isWordCorrectNow;
+                                  
+                                  // Check if this specific letter is correct in its position
+                                  const correctLetter = part.answer?.[letterIndex]?.toUpperCase() || '';
+                                  const isLetterCorrect = letterValue && letterValue.toUpperCase() === correctLetter;
                                   
                                   let boxStyle: React.CSSProperties = {
                                     width: '36px',
@@ -845,6 +858,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   };
 
                                   if (isWordCorrectNow) {
+                                    // Entire word is correct - green
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
@@ -854,7 +868,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       cursor: 'not-allowed',
                                       transform: 'translateY(-2px)'
                                     };
-                                  } else if (isWordIncorrectNow) {
+                                  } else if (isLetterCorrect) {
+                                    // This letter is correct in its position - green
+                                    boxStyle = {
+                                      ...boxStyle,
+                                      background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
+                                      border: '3px solid #22C55E',
+                                      color: '#15803D',
+                                      boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)'
+                                    };
+                                  } else if (isWordIncorrectNow && letterValue) {
+                                    // Word is complete but this letter is incorrect - red
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)',
@@ -863,6 +887,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
                                     };
                                   } else if (letterValue) {
+                                    // Letter has value but word not complete yet - blue
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%)',
@@ -871,6 +896,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       boxShadow: '0 4px 12px rgba(14, 165, 233, 0.2)'
                                     };
                                   } else {
+                                    // Empty letter - gray
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
@@ -948,19 +974,31 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         const isCorrectNow = isUserInputComplete(userAnswer) && isWordCorrect(completeWordNow, targetWord);
                                         const isIncorrectNow = isUserInputComplete(userAnswer) && !isCorrectNow;
                                         
+                                        // Check if this specific letter is correct in its position
+                                        const correctLetterBlur = part.answer?.[letterIndex]?.toUpperCase() || '';
+                                        const isLetterCorrectBlur = hasValue && e.target.value.toUpperCase() === correctLetterBlur;
+                                        
                                         e.target.style.transform = 'scale(1)';
                                         e.target.style.borderStyle = hasValue ? 'solid' : 'dashed';
                                         
                                         if (isCorrectNow) {
+                                          // Entire word is correct
                                           e.target.style.borderColor = '#22C55E';
                                           e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
-                                        } else if (isIncorrectNow) {
+                                        } else if (isLetterCorrectBlur) {
+                                          // This letter is correct in its position
+                                          e.target.style.borderColor = '#22C55E';
+                                          e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
+                                        } else if (isIncorrectNow && hasValue) {
+                                          // Word is complete but this letter is incorrect
                                           e.target.style.borderColor = '#EF4444';
                                           e.target.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.2)';
                                         } else if (hasValue) {
+                                          // Letter has value but word not complete yet
                                           e.target.style.borderColor = '#0EA5E9';
                                           e.target.style.boxShadow = '0 2px 4px rgba(14, 165, 233, 0.2)';
                                         } else {
+                                          // Empty letter
                                           e.target.style.borderColor = '#94A3B8';
                                           e.target.style.boxShadow = '0 1px 2px rgba(148, 163, 184, 0.1)';
                                         }
@@ -1039,107 +1077,68 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           {/* AI-powered hints for incorrect words */}
           {isComplete && !isCorrect && showHints && (
             <div style={{
-              background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
-              border: '2px solid #FB923C',
-              borderRadius: '16px',
-              padding: '16px 20px',
+              padding: '12px 0',
               marginBottom: '20px',
               position: 'relative',
-              animation: 'bounceIn 0.5s ease-out',
-              boxShadow: '0 4px 12px rgba(251, 146, 60, 0.15)'
+              animation: 'fadeSlideIn 0.3s ease-out'
             }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}>
-                <span style={{ fontSize: '24px' }}></span>
-                <div style={{ 
-                  fontSize: '16px', 
-                  fontWeight: 500, 
-                  color: '#C2410C', 
-                  lineHeight: 1.5,
-                  flex: 1,
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  gap: '8px'
-                }}>
-                  <div style={{ flex: 1 }}>
-                    {isGeneratingHint ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{
-                          width: '16px',
-                          height: '16px',
-                          border: '2px solid #FB923C',
-                          borderTop: '2px solid transparent',
-                          borderRadius: '50%',
-                          animation: 'spin 1s linear infinite'
-                        }}></div>
-                        <span>Thinking of a helpful hint...</span>
-                      </div>
-                    ) : aiHint ? (
-                      <div>
-                        <strong></strong> {aiHint}
-                      </div>
-                    ) : (
-                      <div>
-                        <strong>Friendly Hint:</strong> This word has {targetWord.length} magical letters!
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Speaker button inline with text - bottom right */}
-                  {(aiHint || (!isGeneratingHint && !aiHint)) && (
-                    <button
-                      onClick={async () => {
-                        playClickSound();
-                        const hintText = aiHint || `Friendly hint: This word has ${targetWord.length} magical letters!`;
-                        const hintMessageId = `spellbox-hint-${Date.now()}`;
-                        
-                        try {
-                          await ttsService.speak(hintText, {
-                            stability: 0.7,
-                            similarity_boost: 0.9,
-                            speed: 0.8,
-                            messageId: hintMessageId
-                          });
-                        } catch (error) {
-                          console.error('Error playing hint audio:', error);
-                        }
-                      }}
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
-                        color: 'white',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        boxShadow: '0 2px 4px rgba(251, 146, 60, 0.3)',
-                        transition: 'all 0.15s ease-out',
-                        opacity: 0.8,
-                        flexShrink: 0
-                      }}
-                      title="Listen to hint"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                        e.currentTarget.style.opacity = '1';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.opacity = '0.8';
-                      }}
-                    >
-                      🔊
-                    </button>
-                  )}
-                </div>
-              </div>
+               <div style={{
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 gap: '12px'
+               }}>
+                 <div style={{ 
+                   fontSize: '14px', 
+                   fontWeight: 400, 
+                   color: '#6B7280', 
+                   fontFamily: 'system-ui, -apple-system, sans-serif',
+                   letterSpacing: '0.5px'
+                 }}>
+                   Need help? Try listening again
+                 </div>
+                 
+                 {/* Hint button */}
+                 <button
+                   onClick={() => {
+                     playClickSound();
+                     if (sendMessage && targetWord) {
+                       sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`)
+                     }
+                   }}
+                   style={{
+                     width: '32px',
+                     height: '32px',
+                     borderRadius: '50%',
+                     border: '2px solid #4B5563',
+                     background: 'transparent',
+                     color: '#6B7280',
+                     cursor: 'pointer',
+                     display: 'flex',
+                     alignItems: 'center',
+                     justifyContent: 'center',
+                     fontSize: '14px',
+                     transition: 'all 0.2s ease-out',
+                     flexShrink: 0,
+                     filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
+                   }}
+                   title="Get pronunciation help"
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.borderColor = '#374151';
+                     e.currentTarget.style.color = '#374151';
+                     e.currentTarget.style.transform = 'scale(1.05)';
+                     e.currentTarget.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.borderColor = '#4B5563';
+                     e.currentTarget.style.color = '#6B7280';
+                     e.currentTarget.style.transform = 'scale(1)';
+                     e.currentTarget.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
+                   }}
+                 >
+                   🎤
+                 </button>
+               </div>
             </div>
           )}
 
