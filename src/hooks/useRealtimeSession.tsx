@@ -114,7 +114,6 @@ Assistant: “Almost! Is it soft guh at the end or kuh?”`} = callbacks;
     const handoffAgentName = lastMessage.name.split("transfer_to_")[1];
     onAgentHandoff?.(handoffAgentName);
   };
-  console.log("Creating SDK audio element");
   // Create SDK audio element
   const sdkAudioElement = React.useMemo(() => {
     if (typeof window === 'undefined') return undefined;
