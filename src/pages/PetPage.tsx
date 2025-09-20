@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCoins, CoinSystem } from '@/pages/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { ttsService } from '@/lib/tts-service';
@@ -10,10 +11,11 @@ import { PetSelectionFlow } from '@/components/PetSelectionFlow';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal } from 'lucide-react';
+import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal, TrendingUp } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
-import { loadUserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from '@/lib/utils';
+import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
+
 
 type Props = {
   onStartAdventure?: (topicId: string, mode: 'new' | 'continue', adventureType?: string) => void;
@@ -30,6 +32,9 @@ interface ActionButton {
 }
 
 export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props): JSX.Element {
+  // Navigation hook
+  const navigate = useNavigate();
+  
   // Use shared coin system
   const { coins, spendCoins, hasEnoughCoins, canSpendForFeeding, setCoins } = useCoins();
   
@@ -531,6 +536,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // Clear loading state when done (or on error)
       setIsAdventureLoading(false);
     }
+  };
+
+  const handleProgressTrackingClick = () => {
+    playClickSound();
+    navigate('/progress');
   };
 
   const handleActionClick = (actionId: string) => {
@@ -1136,6 +1146,8 @@ const getSleepyPetImage = (clicks: number) => {
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
+      // Save grade selection to localStorage for persistence
+      saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
     }
@@ -1612,7 +1624,7 @@ const getSleepyPetImage = (clicks: number) => {
                 >
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', 'K')}
+                    onClick={() => handlePreferenceSelection('start', 'Kindergarten')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
@@ -1623,7 +1635,7 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', 'K')}
+                    onClick={() => handlePreferenceSelection('middle', 'Kindergarten')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
@@ -1649,7 +1661,7 @@ const getSleepyPetImage = (clicks: number) => {
                 >
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '1st')}
+                    onClick={() => handlePreferenceSelection('start', '1st Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
@@ -1660,7 +1672,7 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '1st')}
+                    onClick={() => handlePreferenceSelection('middle', '1st Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
@@ -1686,7 +1698,7 @@ const getSleepyPetImage = (clicks: number) => {
                 >
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '2nd')}
+                    onClick={() => handlePreferenceSelection('start', '2nd Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
@@ -1697,7 +1709,7 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '2nd')}
+                    onClick={() => handlePreferenceSelection('middle', '2nd Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
@@ -1723,7 +1735,7 @@ const getSleepyPetImage = (clicks: number) => {
                 >
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '3rd')}
+                    onClick={() => handlePreferenceSelection('start', '3rd Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
@@ -1734,7 +1746,7 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '3rd')}
+                    onClick={() => handlePreferenceSelection('middle', '3rd Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
@@ -2361,6 +2373,19 @@ const getSleepyPetImage = (clicks: number) => {
           })}
         </div>
       )}
+
+      {/* Progress Tracking Button */}
+      <div className={`fixed ${ownedPets.length > 1 ? 'top-64' : 'top-24'} left-6 z-20`}>
+        <Button 
+          onClick={handleProgressTrackingClick}
+          variant="default"
+          className="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl px-4 py-2 font-semibold flex items-center gap-2 shadow-lg transition-all duration-300 hover:scale-105"
+          style={{ boxShadow: '0 4px 0 #15803d' }}
+        >
+          <TrendingUp className="h-4 w-4" />
+          <span className="text-sm">View Progress</span>
+        </Button>
+      </div>
 
 
       {/* Pet Shop Overlay */}

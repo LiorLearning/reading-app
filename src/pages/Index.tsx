@@ -2169,15 +2169,33 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
   }, [currentSessionId, isInQuestionMode, adventurePromptCount, user]);
 
-  // Auto-assign topic based on level and navigate
+  // Auto-assign topic based on level and navigate - FIXED to respect grade selection
   const autoAssignTopicAndNavigate = React.useCallback((level: 'start' | 'middle') => {
-    const topicId = level === 'start' ? 'K-F.2' : '1-Q.4';
-    setSelectedTopicId(topicId);
-    // Load saved question progress for this topic
-    const startingIndex = getStartingQuestionIndex(topicId);
-    setTopicQuestionIndex(startingIndex);
-    setCurrentScreen(3); // Go directly to MCQ screen
-  }, []);
+    console.log(`🎯 autoAssignTopicAndNavigate called with level: ${level}`);
+    
+    // Use proper grade-aware topic selection instead of hardcoded values
+    const allTopicIds = Object.keys(sampleMCQData.topics);
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    
+    console.log(`🎓 Current grade for auto-assignment: ${currentGrade}`);
+    
+    // Get topic based on grade and level preference
+    const topicId = getNextTopicByPreference(allTopicIds, level, currentGrade);
+    
+    console.log(`✨ Auto-assigned topic: ${topicId} for grade ${currentGrade}, level ${level}`);
+    
+    if (topicId) {
+      setSelectedTopicId(topicId);
+      // Load saved question progress for this topic
+      const startingIndex = getStartingQuestionIndex(topicId);
+      setTopicQuestionIndex(startingIndex);
+      setCurrentScreen(3); // Go directly to MCQ screen
+    } else {
+      console.error('❌ Failed to auto-assign topic - no suitable topic found');
+      // Fallback to topic selection screen
+      setCurrentScreen(0);
+    }
+  }, [selectedGradeFromDropdown, userData?.gradeDisplayName]);
 
   // Handle topic selection
   const handleTopicSelect = React.useCallback((topicId: string) => {

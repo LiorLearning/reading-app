@@ -8,6 +8,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { ProgressTracking } from "./pages/ProgressTracking";
 // Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
 import React, { useState } from "react";
@@ -95,6 +96,12 @@ const App = () => (
               <Route path="/adventure" element={
                 <AuthGuard>
                   <UnifiedPetAdventureApp />
+                </AuthGuard>
+              } />
+              {/* Progress Tracking Page */}
+              <Route path="/progress" element={
+                <AuthGuard>
+                  <ProgressTracking />
                 </AuthGuard>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
