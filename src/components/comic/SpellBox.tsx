@@ -830,6 +830,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
                                   const isWordIncorrectNow = isWordCompleteNow && !isWordCorrectNow;
                                   
+                                  // Check if this specific letter is correct in its position
+                                  const correctLetter = part.answer?.[letterIndex]?.toUpperCase() || '';
+                                  const isLetterCorrect = letterValue && letterValue.toUpperCase() === correctLetter;
+                                  
                                   let boxStyle: React.CSSProperties = {
                                     width: '36px',
                                     height: '44px',
@@ -846,6 +850,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   };
 
                                   if (isWordCorrectNow) {
+                                    // Entire word is correct - green
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
@@ -855,7 +860,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       cursor: 'not-allowed',
                                       transform: 'translateY(-2px)'
                                     };
-                                  } else if (isWordIncorrectNow) {
+                                  } else if (isLetterCorrect) {
+                                    // This letter is correct in its position - green
+                                    boxStyle = {
+                                      ...boxStyle,
+                                      background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
+                                      border: '3px solid #22C55E',
+                                      color: '#15803D',
+                                      boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)'
+                                    };
+                                  } else if (isWordIncorrectNow && letterValue) {
+                                    // Word is complete but this letter is incorrect - red
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)',
@@ -864,6 +879,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
                                     };
                                   } else if (letterValue) {
+                                    // Letter has value but word not complete yet - blue
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%)',
@@ -872,6 +888,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       boxShadow: '0 4px 12px rgba(14, 165, 233, 0.2)'
                                     };
                                   } else {
+                                    // Empty letter - gray
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
@@ -949,19 +966,31 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         const isCorrectNow = isUserInputComplete(userAnswer) && isWordCorrect(completeWordNow, targetWord);
                                         const isIncorrectNow = isUserInputComplete(userAnswer) && !isCorrectNow;
                                         
+                                        // Check if this specific letter is correct in its position
+                                        const correctLetterBlur = part.answer?.[letterIndex]?.toUpperCase() || '';
+                                        const isLetterCorrectBlur = hasValue && e.target.value.toUpperCase() === correctLetterBlur;
+                                        
                                         e.target.style.transform = 'scale(1)';
                                         e.target.style.borderStyle = hasValue ? 'solid' : 'dashed';
                                         
                                         if (isCorrectNow) {
+                                          // Entire word is correct
                                           e.target.style.borderColor = '#22C55E';
                                           e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
-                                        } else if (isIncorrectNow) {
+                                        } else if (isLetterCorrectBlur) {
+                                          // This letter is correct in its position
+                                          e.target.style.borderColor = '#22C55E';
+                                          e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
+                                        } else if (isIncorrectNow && hasValue) {
+                                          // Word is complete but this letter is incorrect
                                           e.target.style.borderColor = '#EF4444';
                                           e.target.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.2)';
                                         } else if (hasValue) {
+                                          // Letter has value but word not complete yet
                                           e.target.style.borderColor = '#0EA5E9';
                                           e.target.style.boxShadow = '0 2px 4px rgba(14, 165, 233, 0.2)';
                                         } else {
+                                          // Empty letter
                                           e.target.style.borderColor = '#94A3B8';
                                           e.target.style.boxShadow = '0 1px 2px rgba(148, 163, 184, 0.1)';
                                         }
