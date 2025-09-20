@@ -178,7 +178,7 @@ const PanelOneLinerFigure: React.FC<{
 };
 
 interface IndexProps {
-  initialAdventureProps?: {topicId?: string, mode?: 'new' | 'continue', adventureId?: string} | null;
+  initialAdventureProps?: {topicId?: string, mode?: 'new' | 'continue', adventureId?: string, adventureType?: string} | null;
   onBackToPetPage?: () => void;
 }
 
@@ -333,6 +333,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Adventure mode state to track whether it's a new or continuing adventure
   const [adventureMode, setAdventureMode] = React.useState<'new' | 'continue'>('new');
+  
+  // Track current adventure type (food, friend, etc.)
+  const [currentAdventureType, setCurrentAdventureType] = React.useState<string>('food');
   
   // Track current adventure context for contextual AI responses
   const [currentAdventureContext, setCurrentAdventureContext] = React.useState<{name: string, summary: string} | null>(null);
@@ -610,9 +613,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Generate initial AI response when entering adventure screen
   React.useEffect(() => {
     if (currentScreen === 1 && adventureMode) {
+      // If we have initial adventure props with adventureType, wait for it to be processed
+      if (initialAdventureProps?.adventureType && currentAdventureType === 'food' && initialAdventureProps.adventureType !== 'food') {
+        console.log('🎯 Waiting for adventure type to be set from initialAdventureProps:', initialAdventureProps.adventureType);
+        return;
+      }
+      
       // Prefer adventure id for stability; fallback to topic id
       const keyPart = currentAdventureId || selectedTopicId || 'unknown';
-      const sessionKey = `${keyPart}-${adventureMode}`;
+      // Include adventure type so different types don't share the same initial response gate
+      const sessionKey = `${keyPart}-${adventureMode}-${currentAdventureType}`;
       
       // Check if we've already sent an initial response for this session
       if (initialResponseSentRef.current === sessionKey || isGeneratingInitialRef.current) {
@@ -622,6 +632,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Generate initial AI message using real-time AI generation
       const generateInitialResponse = async () => {
         try {
+          console.log('🎯 generateInitialResponse called with currentAdventureType:', currentAdventureType);
           // Mark as generating immediately to prevent duplicate triggers
           isGeneratingInitialRef.current = true;
           initialResponseSentRef.current = sessionKey;
@@ -632,6 +643,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           const petType = PetProgressStorage.getPetType(currentPetId);
           
           // Generate initial message using AI service with adventure prompt
+          console.log('🔍 Calling generateInitialMessage with adventure type:', currentAdventureType);
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
             chatMessages,
@@ -640,7 +652,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             currentAdventureContext?.summary, // Pass adventure summary
             userData,   // user data from Firebase
             petName,    // pet name
-            petType     // pet type
+            petType,    // pet type
+            currentAdventureType // adventureType - back to using state
           );
 
           // Add the initial AI message
@@ -698,7 +711,84 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
       generateInitialResponse();
     }
-  }, [currentScreen, currentAdventureId, adventureMode, userData?.username]);
+  }, [currentScreen, currentAdventureId, adventureMode, userData?.username, currentAdventureType]);
+  
+  // Debug useEffect to track currentAdventureType changes
+  React.useEffect(() => {
+    console.log('🎯 currentAdventureType changed to:', currentAdventureType);
+  }, [currentAdventureType]);
+
+  // Function to trigger initial response generation with explicit adventure type
+  const triggerInitialResponseGeneration = React.useCallback(async (explicitAdventureType: string) => {
+    console.log('🎯 triggerInitialResponseGeneration called with explicitAdventureType:', explicitAdventureType);
+    
+    // Only generate if we're on the adventure screen and have the necessary data
+    if (currentScreen !== 1 || !currentAdventureId || !userData?.username) {
+      console.log('🎯 Skipping initial response generation - not ready');
+      return;
+    }
+
+    // Create session key for this specific adventure type
+    const keyPart = currentAdventureId || selectedTopicId || 'unknown';
+    const sessionKey = `${keyPart}-${adventureMode}-${explicitAdventureType}`;
+    
+    // Check if we've already sent an initial response for this session
+    if (initialResponseSentRef.current === sessionKey || isGeneratingInitialRef.current) {
+      console.log('🎯 Skipping initial response generation - already generated for this session');
+      return;
+    }
+    
+    // Generate initial AI message using real-time AI generation
+    const generateInitialResponse = async () => {
+      try {
+        console.log('🎯 generateInitialResponse called with explicitAdventureType:', explicitAdventureType);
+        // Mark as generating immediately to prevent duplicate triggers
+        isGeneratingInitialRef.current = true;
+        initialResponseSentRef.current = sessionKey;
+
+        // Get current pet name and type for AI context
+        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+        const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+        const petType = PetProgressStorage.getPetType(currentPetId);
+        
+        // Generate initial message using AI service with adventure prompt
+        console.log('🔍 Calling generateInitialMessage with explicit adventure type:', explicitAdventureType);
+        const initialMessage = await aiService.generateInitialMessage(
+          adventureMode,
+          chatMessages,
+          currentAdventureContext, // Pass adventure context for specific adventures
+          undefined, // storyEventsContext - can be added later if needed
+          currentAdventureContext?.summary, // Pass adventure summary
+          userData,   // user data from Firebase
+          petName,    // pet name
+          petType,    // pet type
+          explicitAdventureType // Use explicit adventure type instead of state
+        );
+
+        // Add the initial AI message
+        const aiMessage: ChatMessage = {
+          type: 'ai',
+          content: initialMessage,
+          timestamp: Date.now()
+        };
+
+        setChatMessages(prev => [...prev, aiMessage]);
+
+        // Speak the initial message
+        const messageId = `ai-${Date.now()}`;
+        setTimeout(async () => {
+          await ttsService.speakAIMessage(initialMessage, messageId);
+        }, 500);
+
+      } catch (error) {
+        console.error('Failed to generate initial AI message:', error);
+      } finally {
+        isGeneratingInitialRef.current = false;
+      }
+    };
+
+    generateInitialResponse();
+  }, [currentScreen, currentAdventureId, adventureMode, userData?.username, chatMessages, currentAdventureContext]);
   
   React.useEffect(() => {
     
@@ -1075,7 +1165,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const petName = PetProgressStorage.getPetDisplayName(currentPetId);
       const petType = PetProgressStorage.getPetType(currentPetId);
       
-      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType });
+      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType, adventureType: currentAdventureType });
       
       const result = await aiService.generateResponse(
         userText, 
@@ -1087,7 +1177,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         undefined, // storyEventsContext
         currentSummary, // summary
         petName, // petName
-        petType  // petType
+        petType,  // petType
+        currentAdventureType // adventureType - now dynamic!
       );
       
       console.log('✅ AI service returned:', result);
@@ -2157,6 +2248,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Handle pet page navigation
   const handlePetNavigation = React.useCallback(() => {
+    console.log('🎯 Index: handlePetNavigation called - navigating to pet page (screen 4)');
     playClickSound();
     
     // Stop any ongoing TTS before navigation
@@ -2164,6 +2256,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     ttsService.stop();
     
     setCurrentScreen(4); // Go to pet page
+    console.log('🎯 Index: Set currentScreen to 4 (PetPage)');
   }, []);
 
   // Handle chat summary generation (every 2 messages)
@@ -2515,22 +2608,42 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setCurrentScreen(1); // Go to adventure screen
     } else {
       // Fallback if adventure not found
+      console.log('🚨 Index: Fallback handleStartAdventure call (no adventureType) - this might override friend adventure!');
       handleStartAdventure(getNextTopic(Object.keys(sampleMCQData.topics)) || '', 'continue');
     }
   }, [reset, initialPanels, user]);
 
   // Handle start adventure from progress tracking
-  const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new') => {
+  const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new', adventureType: string = 'food') => {
+    const callId = `index-${Date.now()}`;
+    console.log('🎯 Index handleStartAdventure called with adventureType:', adventureType, 'callId:', callId);
+    console.log('🎯 Index Current currentAdventureType before update:', currentAdventureType, 'callId:', callId);
+    
+    // If this is a fallback call with default 'food' and we already have a non-food adventure type set, ignore it
+    if (adventureType === 'food' && currentAdventureType !== 'food') {
+      console.log('🚨 Index: Ignoring fallback food call - already have explicit adventure type:', currentAdventureType);
+      return;
+    }
+    
     // Prevent rapid duplicate invocations
     if (isStartingAdventureRef.current) {
+      console.log('🚨 Index: Adventure already starting, ignoring duplicate call');
       return;
     }
     isStartingAdventureRef.current = true;
     playClickSound();
     setSelectedTopicId(topicId);
     setAdventureMode(mode);
+    console.log('🎯 Setting currentAdventureType to:', adventureType);
+    setCurrentAdventureType(adventureType);
     // Reset the initial response ref when starting a new adventure
     initialResponseSentRef.current = null;
+    
+    // Trigger initial response generation with the correct adventure type
+    // We need to do this after state updates to ensure the adventure type is passed correctly
+    setTimeout(() => {
+      triggerInitialResponseGeneration(adventureType);
+    }, 0);
     
     let adventureId: string;
     
@@ -2589,7 +2702,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
     }
     
-    setCurrentScreen(1); // Go to adventure screen first to show AI response
+    // Use setTimeout to ensure state updates have been processed before changing screen
+    setTimeout(() => {
+      setCurrentScreen(1); // Go to adventure screen first to show AI response
+    }, 0);
     
     // Release the start guard slightly later to avoid double-taps
     setTimeout(() => {
@@ -2599,15 +2715,27 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Handle initial adventure props from parent component
   React.useEffect(() => {
-    if (initialAdventureProps) {
-      if (initialAdventureProps.adventureId) {
-        // Continue specific adventure
-        handleContinueSpecificAdventure(initialAdventureProps.adventureId);
-      } else if (initialAdventureProps.topicId && initialAdventureProps.mode) {
-        // Start new or continue adventure with topic
-        handleStartAdventure(initialAdventureProps.topicId, initialAdventureProps.mode);
+    // Add a delay to prevent this from interfering with explicit adventure starts
+    const timer = setTimeout(() => {
+      // Don't auto-start adventures if we're already starting one explicitly
+      if (isStartingAdventureRef.current) {
+        console.log('🚨 Index: Skipping initial adventure props - already starting adventure explicitly');
+        return;
       }
-    }
+      
+      if (initialAdventureProps) {
+        if (initialAdventureProps.adventureId) {
+          // Continue specific adventure
+          handleContinueSpecificAdventure(initialAdventureProps.adventureId);
+        } else if (initialAdventureProps.topicId && initialAdventureProps.mode) {
+          // Start new or continue adventure with topic
+          console.log('🚨 Index: Initial adventure props handleStartAdventure call with adventureType:', initialAdventureProps.adventureType);
+          handleStartAdventure(initialAdventureProps.topicId, initialAdventureProps.mode, initialAdventureProps.adventureType || 'food');
+        }
+      }
+    }, 100); // Small delay to let explicit calls go first
+    
+    return () => clearTimeout(timer);
   }, [initialAdventureProps, handleStartAdventure, handleContinueSpecificAdventure]);
 
   // Handle grade selection (for HomePage dropdown display)
@@ -3358,7 +3486,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Update legacy progress for backward compatibility
 
       // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
-      addAdventureCoins(10);
+      addAdventureCoins(10, currentAdventureType);
       
       // Update progress
 
@@ -3475,7 +3603,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         
         <PetPage 
-          onStartAdventure={handleStartAdventure}
+          onStartAdventure={(topicId: string, mode: 'new' | 'continue', adventureType?: string) => {
+            console.log('🎯 Index: PetPage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
+            handleStartAdventure(topicId, mode, adventureType || 'food');
+          }}
           onContinueSpecificAdventure={handleContinueSpecificAdventure}
         />
       </div>
@@ -4019,7 +4150,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     <HomePage 
             userData={userData!} 
             onNavigate={handleHomeNavigation} 
-            onStartAdventure={handleStartAdventure} 
+            onStartAdventure={(topicId: string, mode: 'new' | 'continue', adventureType?: string) => {
+              console.log('🎯 Index: HomePage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
+              handleStartAdventure(topicId, mode, adventureType || 'food');
+            }} 
             onContinueSpecificAdventure={handleContinueSpecificAdventure}
             selectedTopicFromPreference={selectedTopicFromPreference}
             onPetNavigation={handlePetNavigation}

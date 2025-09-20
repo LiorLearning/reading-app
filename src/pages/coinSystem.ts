@@ -1,4 +1,6 @@
 // Shared coin management system for the application
+import { PetProgressStorage } from '@/lib/pet-progress-storage';
+
 export class CoinSystem {
   private static readonly STORAGE_KEY = 'litkraft_coins'
   private static readonly MINIMUM_COINS = 0 // No minimum coins needed since feeding is free;
@@ -79,7 +81,7 @@ export class CoinSystem {
   }
 
   // Add adventure coins (tracks both regular coins and adventure coins for pet care)
-  static addAdventureCoins(amount: number): number {
+  static addAdventureCoins(amount: number, adventureType?: string): number {
     // Add to regular coins
     const newCoins = this.addCoins(amount);
     
@@ -119,14 +121,24 @@ export class CoinSystem {
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('petDataChanged', { detail: petData }));
       
-      // Dispatch event for session coin tracking
-      window.dispatchEvent(new CustomEvent('adventureCoinsAdded', { detail: { amount } }));
+      // Dispatch event for session coin tracking (now includes adventureType when available)
+      window.dispatchEvent(new CustomEvent('adventureCoinsAdded', { detail: { amount, adventureType } }));
       
       console.log(`🪙 Added ${amount} adventure coins. Total: ${petData.cumulativeCareLevel.adventureCoins}`);
     } catch (error) {
       console.warn('Failed to track adventure coins for pet care:', error);
     }
     
+    // Mirror to per-pet progress storage with adventure type attribution
+    try {
+      const currentPet = PetProgressStorage.getCurrentSelectedPet();
+      if (currentPet) {
+        PetProgressStorage.addAdventureCoins(currentPet, amount, adventureType || 'food');
+      }
+    } catch (error) {
+      console.warn('Failed to mirror adventure coins to PetProgressStorage:', error);
+    }
+
     return newCoins;
   }
   
@@ -208,7 +220,7 @@ export class CoinSystem {
   return {
     coins,
     addCoins: (amount: number) => CoinSystem.addCoins(amount),
-    addAdventureCoins: (amount: number) => CoinSystem.addAdventureCoins(amount),
+    addAdventureCoins: (amount: number, adventureType?: string) => CoinSystem.addAdventureCoins(amount, adventureType),
     spendCoins: (amount: number) => CoinSystem.spendCoins(amount),
     hasEnoughCoins: (amount: number) => CoinSystem.hasEnoughCoins(amount),
     canSpendForFeeding: (amount: number) => CoinSystem.canSpendForFeeding(amount),

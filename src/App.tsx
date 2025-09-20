@@ -19,12 +19,14 @@ const queryClient = new QueryClient();
 // Unified component that seamlessly switches between pet page and adventure
 const UnifiedPetAdventureApp = () => {
   const [isInAdventure, setIsInAdventure] = useState(false);
-  const [adventureProps, setAdventureProps] = useState<{topicId?: string, mode?: 'new' | 'continue', adventureId?: string} | null>(null);
+  const [adventureProps, setAdventureProps] = useState<{topicId?: string, mode?: 'new' | 'continue', adventureId?: string, adventureType?: string} | null>(null);
+
   const { user, userData, loading } = useAuth();
 
   // Adventure handlers that switch modes seamlessly without route changes
-  const handleStartAdventure = (topicId: string, mode: 'new' | 'continue' = 'new') => {
-    setAdventureProps({ topicId, mode });
+  const handleStartAdventure = (topicId: string, mode: 'new' | 'continue' = 'new', adventureType: string = 'food') => {
+    console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType });
+    setAdventureProps({ topicId, mode, adventureType });
     setIsInAdventure(true);
   };
 
