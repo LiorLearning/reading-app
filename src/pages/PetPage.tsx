@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useCoins, CoinSystem } from '@/pages/coinSystem';
+import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { ttsService } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { usePetData, PetDataService } from '@/lib/pet-data-service';
 import { loadAdventureSummariesHybrid } from '@/lib/firebase-adventure-cache';
 import { useAuth } from '@/hooks/use-auth';
 import { PetSelectionFlow } from '@/components/PetSelectionFlow';
-import { PetProgressStorage } from '@/lib/pet-progress-storage';
+//
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
 import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
-import { loadUserProgress, saveTopicPreference, loadTopicPreference } from '@/lib/utils';
+import { loadUserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference } from '@/lib/utils';
 
 type Props = {
-  onStartAdventure?: (topicId: string, mode: 'new' | 'continue') => void;
+  onStartAdventure?: (topicId: string, mode: 'new' | 'continue', adventureType?: string) => void;
   onContinueSpecificAdventure?: (adventureId: string) => void;
 };
 
@@ -93,6 +94,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [previousCoins, setPreviousCoins] = useState(coins);
   const [previousCoinsSpentForStage, setPreviousCoinsSpentForStage] = useState(0);
   const [showPetShop, setShowPetShop] = useState(false);
+  const [showMoreOverlay, setShowMoreOverlay] = useState(false);
   const [lastSpokenMessage, setLastSpokenMessage] = useState('');
   
   // Pet store state
@@ -422,9 +424,14 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       if (userProgress?.currentTopicId) {
         console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
         setSelectedTopicFromPreference(userProgress.currentTopicId);
-      } else if (savedPreference && savedPreference.topicId) {
-        console.log('Loading saved topic from preference:', savedPreference.topicId);
-        setSelectedTopicFromPreference(savedPreference.topicId);
+      } else if (savedPreference) {
+        // Preference no longer stores a specific topicId; pick next topic via preference
+        const allTopicIds = Object.keys(sampleMCQData.topics);
+        const nextByPref = getNextTopicByPreference(allTopicIds, savedPreference.level as 'start' | 'middle', userData.gradeDisplayName);
+        if (nextByPref) {
+          console.log('Loading topic from level preference:', nextByPref);
+          setSelectedTopicFromPreference(nextByPref);
+        }
       }
     }
   }, [userData]);
@@ -435,17 +442,20 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // { id: 'water', icon: '', status: 'sad' as ActionStatus, label: '' },
     ];
     
-    // Add food button - show sad when no adventures, happy when has adventure coins
-    const cumulativeCare = getCumulativeCareLevel();
-    let foodStatus: ActionStatus;
+    // Determine current item to display with 8-hour hold behavior
+    const sequence = ['house', 'friend', 'food', 'travel', 'story', 'plant-dreams'];
+    const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
     
-    if (cumulativeCare.adventureCoins === 0) {
-      foodStatus = 'sad'; // Pet is hungry for adventure
-    } else {
-      foodStatus = 'happy'; // Pet has been on adventures
-    }
+    const statusFor = (type: string): ActionStatus => {
+      const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, type, 50);
+      if (type === sadType && !done) return 'sad';
+      return done ? 'happy' : 'neutral';
+    };
     
-    baseActions.push({ id: 'food', icon: '🍪', status: foodStatus, label: 'Food' });
+    // Only show the current sad item in the bottom bar
+    baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'story' ? '📚' : '🌙', status: statusFor(sadType), label: (
+      sadType === 'plant-dreams' ? 'Plant Dreams' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
+    ) });
     
     // Add sleep button - show sad when available but not done, happy when completed
     let sleepLabel, sleepStatus: ActionStatus;
@@ -473,9 +483,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [actionStates, setActionStates] = useState<ActionButton[]>(getActionStates());
 
   // Handle adventure button click
-  const handleAdventureClick = async () => {
+  const handleAdventureClick = async (adventureType: string = 'food') => {
+    console.log('🎯 PetPage handleAdventureClick called with adventureType:', adventureType);
     // Prevent multiple clicks by checking if already loading
     if (isAdventureLoading) {
+      console.log('🎯 Adventure already loading, skipping');
       return;
     }
 
@@ -496,15 +508,21 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         alert("Adventure functionality is not available right now!");
         return;
       }
+      
+      console.log('🎯 PetPage: onStartAdventure function exists:', !!onStartAdventure, 'type:', typeof onStartAdventure);
+      console.log('🎯 PetPage: onStartAdventure function toString:', onStartAdventure.toString().substring(0, 200));
 
       // Always start a new adventure (no longer continue previous ones)
-      console.log('🚀 Starting new adventure');
-      onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new');
+      const callId = `petpage-${Date.now()}`;
+      console.log('🚀 PetPage: Starting new adventure with type:', adventureType, 'callId:', callId);
+      console.log('🚀 PetPage: Calling onStartAdventure with params:', selectedTopicFromPreference || 'K-F.2', 'new', adventureType, 'callId:', callId);
+      const result = onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new', adventureType);
+      console.log('🚀 PetPage: onStartAdventure call completed, result:', result);
     } catch (error) {
       console.error('Failed to handle adventure click:', error);
       // Fallback to starting a new adventure
       if (onStartAdventure) {
-        onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new');
+        onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new', adventureType);
       }
     } finally {
       // Clear loading state when done (or on error)
@@ -513,6 +531,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   };
 
   const handleActionClick = (actionId: string) => {
+    console.log('🎯 PetPage: handleActionClick called with actionId:', actionId);
     // Handle sleep action
     if (actionId === 'sleep') {
       // If pet is fully asleep (3 clicks), do nothing (timer is always visible)
@@ -563,7 +582,42 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle food action - always starts new adventure
     if (actionId === 'food') {
-      handleAdventureClick();
+      handleAdventureClick('food');
+      return;
+    }
+
+    // Handle friend action - starts new friend adventure
+    if (actionId === 'friend') {
+      console.log('🎯 PetPage: Friend button clicked, calling handleAdventureClick with "friend"');
+      handleAdventureClick('friend');
+      return;
+    }
+
+    // Handle house action - starts new house adventure
+    if (actionId === 'house') {
+      console.log('🎯 PetPage: House button clicked, calling handleAdventureClick with "house"');
+      handleAdventureClick('house');
+      return;
+    }
+
+    // Handle travel action - starts new travel adventure
+    if (actionId === 'travel') {
+      console.log('🎯 PetPage: Travel button clicked, calling handleAdventureClick with "travel"');
+      handleAdventureClick('travel');
+      return;
+    }
+
+    // Handle story action - starts new story adventure
+    if (actionId === 'story') {
+      console.log('🎯 PetPage: Story button clicked, calling handleAdventureClick with "story"');
+      handleAdventureClick('story');
+      return;
+    }
+
+    // Handle plant dreams action - starts new plant dreams adventure
+    if (actionId === 'plant-dreams') {
+      console.log('🎯 PetPage: Plant Dreams button clicked, calling handleAdventureClick with "plant-dreams"');
+      handleAdventureClick('plant-dreams');
       return;
     }
 
@@ -575,10 +629,9 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return;
     }
 
-    // Handle more action - placeholder for future functionality
+    // Handle more action - open overlay with ordered list
     if (actionId === 'more') {
-      // Placeholder for future functionality
-      console.log('More button clicked - functionality to be added later');
+      setShowMoreOverlay(true);
       return;
     }
 
@@ -1910,6 +1963,8 @@ const getSleepyPetImage = (clicks: number) => {
             <span>{coins}</span>
           </div>
         </div>
+
+        {/* Removed star coins: total coins already shown to the left */}
         
         {/* Daily Heart Fill Indicator - Temporarily commented out */}
         {/* <div className="w-20 h-20 rounded-full flex items-center justify-center relative">
@@ -2180,6 +2235,70 @@ const getSleepyPetImage = (clicks: number) => {
         ))}
         </div>
       </div>
+
+      {/* More Overlay */}
+      {showMoreOverlay && (() => {
+        const sequence = ['house','friend','food','travel','story','plant-dreams'];
+        const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
+        const doneSet = new Set(sequence.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
+        const sadIndex = Math.max(0, sequence.indexOf(sadType));
+        const unlocked = new Set<string>([...doneSet, sadType]);
+        // Determine the next two to-dos after the current sad, skipping 'story'
+        const nextTwo: string[] = [];
+        for (let i = sadIndex + 1; i < sequence.length && nextTwo.length < 2; i++) {
+          const t = sequence[i];
+          if (t === 'story') continue; // story handled separately
+          nextTwo.push(t);
+        }
+        nextTwo.forEach(t => unlocked.add(t));
+        // Story is always unlocked and should appear after the two to-dos visually
+        unlocked.add('story');
+
+        // Build render order: done (in sequence) → nextTwo → story → remaining
+        const doneInOrder = sequence.filter(t => doneSet.has(t));
+        const remaining = sequence.filter(t => !doneSet.has(t) && !nextTwo.includes(t) && t !== 'story');
+        const renderOrder = [...doneInOrder, ...nextTwo, 'story', ...remaining.filter(t => t !== 'story')];
+
+        const renderRow = (type: string) => {
+          const done = doneSet.has(type);
+          const isUnlocked = unlocked.has(type);
+          const icon = type === 'house' ? '🏠' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'travel' ? '✈️' : type === 'story' ? '📚' : '🌙';
+          const label = type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
+          const statusEmoji = !isUnlocked ? '🔒' : (done ? '✅' : (type === sadType ? '😞' : '😐'));
+          return (
+            <button
+              key={type}
+              className={`flex items-center justify-between p-3 rounded-xl border ${isUnlocked ? 'border-gray-200 hover:bg-gray-50' : 'border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed'}`}
+              onClick={() => { if (!isUnlocked) return; setShowMoreOverlay(false); handleActionClick(type); }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{icon}</span>
+                <span className="font-semibold">{label}</span>
+              </div>
+              <span className="text-xl">{statusEmoji}</span>
+            </button>
+          );
+        };
+
+        return (
+          <div className="fixed inset-0 bg-black/60 z-40 flex items-center justify-center" onClick={() => setShowMoreOverlay(false)}>
+            <div className="bg-white rounded-2xl p-6 w-96 shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
+              {/* Close button */}
+              <button
+                aria-label="Close"
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xl leading-none flex items-center justify-center"
+                onClick={() => setShowMoreOverlay(false)}
+              >
+                ×
+              </button>
+              <div className="text-xl font-bold mb-4">Do next</div>
+              <div className="flex flex-col gap-2">
+                {renderOrder.map(renderRow)}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Audio Toggle Button */}
       <button

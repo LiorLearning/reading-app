@@ -17,6 +17,15 @@ export interface PetProgressData {
     nextHeartResetTime: number; // When the next reset will occur
   };
   
+  // Per-adventure coin tracking (does not reset with 8-hour cycle)
+  adventureCoinsByType?: { [adventureType: string]: number };
+
+  // Sequenced "to-do" progression tracking across adventures
+  todoData?: {
+    currentType: string; // Which item is currently featured in the bottom bar
+    lastSwitchTime: number; // When it last switched (or was set on completion)
+  };
+  
   // Sleep timer system
   sleepData: {
     isAsleep: boolean;
@@ -102,6 +111,18 @@ export class PetProgressStorage {
         sleepCompleted: false,
         lastHeartResetTime: now,
         nextHeartResetTime: now + this.EIGHT_HOURS_MS,
+      },
+      adventureCoinsByType: {
+        'house': 0,
+        'friend': 0,
+        'food': 0,
+        'travel': 0,
+        'story': 0,
+        'plant-dreams': 0,
+      },
+      todoData: {
+        currentType: 'house',
+        lastSwitchTime: now
       },
       sleepData: {
         isAsleep: false,
@@ -211,6 +232,18 @@ export class PetProgressStorage {
         lastHeartResetTime: data.heartData?.lastHeartResetTime || Date.now(),
         nextHeartResetTime: data.heartData?.nextHeartResetTime || Date.now() + this.EIGHT_HOURS_MS,
       },
+      adventureCoinsByType: {
+        'house': data.adventureCoinsByType?.['house'] || 0,
+        'friend': data.adventureCoinsByType?.['friend'] || 0,
+        'food': data.adventureCoinsByType?.['food'] || 0,
+        'travel': data.adventureCoinsByType?.['travel'] || 0,
+        'story': data.adventureCoinsByType?.['story'] || 0,
+        'plant-dreams': data.adventureCoinsByType?.['plant-dreams'] || 0,
+      },
+      todoData: {
+        currentType: data.todoData?.currentType || 'house',
+        lastSwitchTime: data.todoData?.lastSwitchTime || Date.now()
+      },
       sleepData: {
         isAsleep: data.sleepData?.isAsleep || false,
         sleepStartTime: data.sleepData?.sleepStartTime || 0,
@@ -270,6 +303,7 @@ export class PetProgressStorage {
         lastHeartResetTime: now,
         nextHeartResetTime: now + this.EIGHT_HOURS_MS,
       };
+      // NOTE: Per-adventure coins do NOT reset here by design
       
       // Reset sleep data if pet was sleeping
       if (petData.sleepData.isAsleep) {
@@ -350,12 +384,28 @@ export class PetProgressStorage {
   }
 
   // Add adventure coins for a pet
-  static addAdventureCoins(petId: string, amount: number): void {
+  static addAdventureCoins(petId: string, amount: number, adventureType: string = 'food'): void {
     const petData = this.getPetProgress(petId);
     const now = Date.now();
     
     petData.heartData.adventureCoins += amount;
     petData.levelData.totalAdventureCoinsEarned += amount;
+    
+    // Track per-adventure coins (persistent cumulative)
+    if (!petData.adventureCoinsByType) {
+      petData.adventureCoinsByType = {};
+    }
+    const prev = petData.adventureCoinsByType[adventureType] || 0;
+    const updated = prev + amount;
+    petData.adventureCoinsByType[adventureType] = updated;
+
+    // If this adventure just crossed the completion threshold (50), pin the todo pointer here
+    const COMPLETION_THRESHOLD = 50;
+    if (prev < COMPLETION_THRESHOLD && updated >= COMPLETION_THRESHOLD) {
+      petData.todoData = petData.todoData || { currentType: adventureType, lastSwitchTime: now };
+      petData.todoData.currentType = adventureType;
+      petData.todoData.lastSwitchTime = now; // Start 8-hour window showing the completed item
+    }
     
     // Update achievement data
     petData.achievementData.totalAdventuresSinceOwned += 1;
@@ -380,6 +430,61 @@ export class PetProgressStorage {
     this.checkAdventureMilestones(petData);
     
     this.setPetProgress(petData);
+  }
+
+  // Get per-adventure coin totals map
+  static getAdventureCoinsByType(petId: string): { [adventureType: string]: number } {
+    const petData = this.getPetProgress(petId);
+    return petData.adventureCoinsByType || {};
+  }
+
+  // Get coins for a specific adventure type
+  static getAdventureCoinsForType(petId: string, adventureType: string): number {
+    const map = this.getAdventureCoinsByType(petId);
+    return map[adventureType] || 0;
+  }
+
+  // Check if a specific adventure type is completed (>= threshold coins)
+  static isAdventureTypeCompleted(petId: string, adventureType: string, threshold: number = 50): boolean {
+    return this.getAdventureCoinsForType(petId, adventureType) >= threshold;
+  }
+
+  // Given a fixed sequence, return the current "sad" adventure type
+  static getCurrentSadAdventureType(petId: string, sequence: string[], threshold: number = 50): string {
+    for (const type of sequence) {
+      if (!this.isAdventureTypeCompleted(petId, type, threshold)) {
+        return type;
+      }
+    }
+    // If all are complete, keep the last item sad as per spec
+    return sequence[sequence.length - 1];
+  }
+
+  // Determine which item to show in the bottom bar respecting 8-hour hold after completion
+  static getCurrentTodoDisplayType(petId: string, sequence: string[], threshold: number = 50): string {
+    const petData = this.getPetProgress(petId);
+    const now = Date.now();
+    const todo = petData.todoData || { currentType: sequence[0], lastSwitchTime: now };
+
+    // If within 8 hours of last switch, keep showing the pinned item
+    if (now - todo.lastSwitchTime < this.EIGHT_HOURS_MS) {
+      return todo.currentType || sequence[0];
+    }
+
+    // Otherwise, move pointer to the next not-completed item in sequence
+    const startIndex = Math.max(0, sequence.indexOf(todo.currentType));
+    let next: string | null = null;
+    for (let i = startIndex + 1; i < sequence.length; i++) {
+      if (!this.isAdventureTypeCompleted(petId, sequence[i], threshold)) {
+        next = sequence[i];
+        break;
+      }
+    }
+    // If none pending, keep pointing to the last item in sequence
+    const finalType = next || sequence[sequence.length - 1];
+    petData.todoData = { currentType: finalType, lastSwitchTime: now };
+    this.setPetProgress(petData);
+    return finalType;
   }
 
   // Put pet to sleep
