@@ -777,6 +777,11 @@ export const saveGradeSelection = (gradeDisplayName: string): void => {
     };
     localStorage.setItem(GRADE_SELECTION_KEY, JSON.stringify(gradeSelection));
     console.log(`💾 Saved grade selection: ${gradeDisplayName}`);
+    
+    // Dispatch custom event for same-window real-time updates (like progress tracking page)
+    window.dispatchEvent(new CustomEvent('gradeSelectionChanged', {
+      detail: { gradeDisplayName, timestamp: Date.now() }
+    }));
   } catch (error) {
     console.warn('Failed to save grade selection to local storage:', error);
   }
@@ -821,6 +826,18 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
   // Map selected grade to content grade
   const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';
   console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
+  console.log(`📚 Available topic IDs (first 10):`, allTopicIds.slice(0, 10));
+  
+  // Filter topics by grade first to see what's available
+  const gradeTopics = allTopicIds.filter(id => {
+    if (contentGrade === 'K') return id.startsWith('K-');
+    if (contentGrade === '1') return id.startsWith('1-');
+    if (contentGrade === '2') return id.startsWith('2-');
+    if (contentGrade === '3') return id.startsWith('3-');
+    return false;
+  });
+  
+  console.log(`📖 Found ${gradeTopics.length} topics for grade ${contentGrade}:`, gradeTopics.slice(0, 5));
   
   // Find starting index based on content grade and level
   let startIndex = 0;
@@ -850,6 +867,7 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // Grade 2 content - find first 2- topic
     startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
     if (startIndex === -1) {
+      console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
       // Fallback to grade 1 if grade 2 topics not found
       startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
       if (startIndex === -1) startIndex = 0;
@@ -858,14 +876,18 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // Grade 3 content - find first 3- topic
     startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
     if (startIndex === -1) {
+      console.log(`⚠️ No Grade 3 topics found, falling back to Grade 2`);
       // Fallback to grade 2 if grade 3 topics not found
       startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
       if (startIndex === -1) {
+        console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
         startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
         if (startIndex === -1) startIndex = 0;
       }
     }
   }
+  
+  console.log(`📍 Starting search from index ${startIndex}, topic: ${allTopicIds[startIndex] || 'none'}`);
   
   if (!progress) {
     // First time playing, return first topic from preferred starting point
@@ -873,6 +895,8 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     console.log(`🚀 First time playing - Starting with topic: ${selectedTopic} at index ${startIndex}`);
     return selectedTopic;
   }
+  
+  console.log(`👤 User has progress data with ${progress.completedTopics.length} completed topics`);
   
   // Find first uncompleted topic starting from the preferred level and grade
   for (let i = startIndex; i < allTopicIds.length; i++) {
@@ -885,10 +909,12 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // 1. Never attempted (not in completedTopics)
     // 2. Attempted but not completed with passing grade
     if (!topicProgress || !topicProgress.completed) {
-      console.log(`✅ Found available topic: ${topicId} at index ${i}`);
+      console.log(`✅ Found available topic: ${topicId} at index ${i} (${topicProgress ? 'attempted but not completed' : 'never attempted'})`);
       return topicId;
     }
   }
+  
+  console.log(`🔄 All topics from ${startIndex} onwards are completed, checking earlier topics`);
   
   // All topics from preferred starting point completed, check from beginning
   if (startIndex > 0) {
@@ -899,12 +925,14 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
       );
       
       if (!topicProgress || !topicProgress.completed) {
+        console.log(`✅ Found available earlier topic: ${topicId} at index ${i}`);
         return topicId;
       }
     }
   }
   
   // All topics completed, return first topic for replay
+  console.log(`🔁 All topics completed, returning first topic for replay: ${allTopicIds[0]}`);
   return allTopicIds[0] || null;
 };
 
