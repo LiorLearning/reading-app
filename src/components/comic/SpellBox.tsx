@@ -1068,28 +1068,25 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           {/* AI-powered hints for incorrect words */}
           {isComplete && !isCorrect && showHints && (
             <div style={{
-              background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
-              border: '2px solid #FB923C',
-              borderRadius: '16px',
-              padding: '16px 20px',
+              padding: '12px 0',
               marginBottom: '20px',
               position: 'relative',
-              animation: 'bounceIn 0.5s ease-out',
-              boxShadow: '0 4px 12px rgba(251, 146, 60, 0.15)'
+              animation: 'fadeSlideIn 0.3s ease-out'
             }}>
                <div style={{
                  display: 'flex',
                  alignItems: 'center',
                  justifyContent: 'center',
-                 gap: '8px'
+                 gap: '12px'
                }}>
                  <div style={{ 
-                   fontSize: '16px', 
-                   fontWeight: 500, 
-                   color: '#C2410C', 
-                   fontFamily: 'system-ui, -apple-system, sans-serif'
+                   fontSize: '14px', 
+                   fontWeight: 400, 
+                   color: '#6B7280', 
+                   fontFamily: 'system-ui, -apple-system, sans-serif',
+                   letterSpacing: '0.5px'
                  }}>
-                   <strong>HINT</strong>
+                   Need help? Try listening again
                  </div>
                  
                  {/* Hint button */}
@@ -1101,30 +1098,33 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                      }
                    }}
                    style={{
-                     width: '24px',
-                     height: '24px',
-                     borderRadius: '4px',
-                     border: 'none',
-                     background: 'linear-gradient(135deg, #FB923C 0%, #F97316 100%)',
-                     color: 'white',
+                     width: '32px',
+                     height: '32px',
+                     borderRadius: '50%',
+                     border: '2px solid #4B5563',
+                     background: 'transparent',
+                     color: '#6B7280',
                      cursor: 'pointer',
                      display: 'flex',
                      alignItems: 'center',
                      justifyContent: 'center',
-                     fontSize: '12px',
-                     boxShadow: '0 2px 4px rgba(251, 146, 60, 0.3)',
-                     transition: 'all 0.15s ease-out',
-                     opacity: 0.8,
-                     flexShrink: 0
+                     fontSize: '14px',
+                     transition: 'all 0.2s ease-out',
+                     flexShrink: 0,
+                     filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
                    }}
                    title="Get pronunciation help"
                    onMouseEnter={(e) => {
-                     e.currentTarget.style.transform = 'scale(1.1)';
-                     e.currentTarget.style.opacity = '1';
+                     e.currentTarget.style.borderColor = '#374151';
+                     e.currentTarget.style.color = '#374151';
+                     e.currentTarget.style.transform = 'scale(1.05)';
+                     e.currentTarget.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))';
                    }}
                    onMouseLeave={(e) => {
+                     e.currentTarget.style.borderColor = '#4B5563';
+                     e.currentTarget.style.color = '#6B7280';
                      e.currentTarget.style.transform = 'scale(1)';
-                     e.currentTarget.style.opacity = '0.8';
+                     e.currentTarget.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
                    }}
                  >
                    🎤
