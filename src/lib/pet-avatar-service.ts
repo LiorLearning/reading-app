@@ -265,7 +265,7 @@ export const getCurrentPetAvatarImage = (
  * Hook to get the current pet avatar image - synchronized with PetPage logic
  */
 export const useCurrentPetAvatarImage = () => {
-  const { isPetOwned, getPetCoinsSpent, getCoinsSpentForCurrentStage, getCumulativeCareLevel, petData } = usePetData();
+  const { isPetOwned, getPetCoinsSpent, getCoinsSpentForCurrentStage, getCumulativeCareLevel, petData, checkAndPerform8HourReset } = usePetData();
   
   // State for current pet - reactive to changes
   const [currentPetId, setCurrentPetId] = useState(() => {
@@ -284,11 +284,11 @@ export const useCurrentPetAvatarImage = () => {
     }
   });
   
-  // State for coins - reactive to changes (same as PetPage)
-  const [coins, setCoins] = useState(() => {
+  // Track per-pet daily coins, same as PetPage uses for image state
+  const [todayCoins, setTodayCoins] = useState<number>(() => {
     try {
-      const stored = localStorage.getItem('litkraft_coins');
-      return stored ? parseInt(stored, 10) : 0;
+      const current = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+      return PetProgressStorage.getTodayCoins(current);
     } catch {
       return 0;
     }
@@ -344,27 +344,47 @@ export const useCurrentPetAvatarImage = () => {
     };
   }, []);
   
-  // Listen for coin changes (same as PetPage)
+  // Keep today's per-pet coins in sync (calendar-day reset handled by PetProgressStorage)
   useEffect(() => {
-    const handleCoinsChange = () => {
+    const updateTodayCoins = () => {
       try {
-        const stored = localStorage.getItem('litkraft_coins');
-        setCoins(stored ? parseInt(stored, 10) : 0);
+        const current = PetProgressStorage.getCurrentSelectedPet() || currentPetId;
+        setTodayCoins(PetProgressStorage.getTodayCoins(current));
       } catch {
-        setCoins(0);
+        setTodayCoins(0);
       }
     };
-    
-    // Listen for storage events (from other tabs/windows)
-    window.addEventListener('storage', handleCoinsChange);
-    
-    // Listen for custom events (from same tab)
-    window.addEventListener('coinsChanged', handleCoinsChange);
-    
+    // Update on relevant custom events
+    const coinHandler = () => updateTodayCoins();
+    const petHandler = () => updateTodayCoins();
+    window.addEventListener('coinsChanged', coinHandler as EventListener);
+    window.addEventListener('petDataChanged', coinHandler as EventListener);
+    window.addEventListener('currentPetChanged', petHandler as EventListener);
+    window.addEventListener('storage', coinHandler);
+    // Poll as a fallback because todayCoins are stored per pet progress
+    const interval = setInterval(updateTodayCoins, 2000);
+    updateTodayCoins();
     return () => {
-      window.removeEventListener('storage', handleCoinsChange);
-      window.removeEventListener('coinsChanged', handleCoinsChange);
+      window.removeEventListener('coinsChanged', coinHandler as EventListener);
+      window.removeEventListener('petDataChanged', coinHandler as EventListener);
+      window.removeEventListener('currentPetChanged', petHandler as EventListener);
+      window.removeEventListener('storage', coinHandler as EventListener);
+      clearInterval(interval);
     };
+  }, [currentPetId]);
+
+  // Perform 8-hour reset check on mount to mirror PetPage behavior
+  useEffect(() => {
+    try {
+      const wasReset = checkAndPerform8HourReset?.();
+      if (wasReset) {
+        // Force refresh of local state after reset
+        const current = PetProgressStorage.getCurrentSelectedPet() || currentPetId;
+        setTodayCoins(PetProgressStorage.getTodayCoins(current));
+        setSleepClicksState(0);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Listen for pet data changes (adventure coins, feeding, etc.)
@@ -527,15 +547,10 @@ export const useCurrentPetAvatarImage = () => {
       return 'sleep1';
     }
 
-    // Coin-based progression system:
-    // 0 coins: initial state
-    // 10+ coins: first upgrade
-    // 30+ coins: second upgrade  
-    // 50+ coins: third upgrade
-    
-    if (coins >= 50) return 'coins_50';
-    if (coins >= 30) return 'coins_30';
-    if (coins >= 10) return 'coins_10';
+    // Per-pet daily coin thresholds used by PetPage
+    if (todayCoins >= 50) return 'coins_50';
+    if (todayCoins >= 30) return 'coins_30';
+    if (todayCoins >= 10) return 'coins_10';
     return 'coins_0';
   };
 
@@ -581,42 +596,39 @@ export const useCurrentPetAvatarImage = () => {
       }
     }
     
-    // Check if Cat is owned and being displayed - use coin-based progression like other pets
+    // Check if Cat is owned and being displayed - use the same daily coin thresholds as PetPage
     if (currentPetId === 'cat' && isPetOwned('cat')) {
-      // Use coins from localStorage for consistent progression with PetPage
-      if (coins >= 50) {
+      if (todayCoins >= 50) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-super-happy-unscreen.gif?alt=media&token=8275c06d-139a-42c3-b5e0-abfdcbddd1e1";
-      } else if (coins >= 30) {
+      } else if (todayCoins >= 30) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-happy-unscreen.gif?alt=media&token=baa69ba6-06f5-4c44-ad6b-9a96c241dab0";
-      } else if (coins >= 10) {
+      } else if (todayCoins >= 10) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-neutral-unscreen.gif?alt=media&token=fa2abbc8-8f14-4f63-bf51-355ef0d1c310";
       } else {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sad-unscreen.gif?alt=media&token=7f5ad9cb-df5d-46dc-ae54-67e35f5a5ed6";
       }
     }
     
-    // Check if Dog is owned and being displayed - use coin-based progression like other pets
+    // Check if Dog is owned and being displayed - use the same daily coin thresholds as PetPage
     if (currentPetId === 'dog' && isPetOwned('dog')) {
-      // Use coins from localStorage for consistent progression with PetPage
-      if (coins >= 50) {
+      if (todayCoins >= 50) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-super-happy-unscreen.gif?alt=media&token=90825746-c450-46a4-aad5-7c8a113dd33a"; // 50+ coins - placeholder for future GIF
-      } else if (coins >= 30) {
+      } else if (todayCoins >= 30) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-happy-unscreen.gif?alt=media&token=63a8ea0c-4166-4be3-bfd0-4caffaaf58cc"; // 30+ coins - placeholder for future GIF
-      } else if (coins >= 10) {
+      } else if (todayCoins >= 10) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-neutral-unscreen.gif?alt=media&token=fab36d1a-fec3-4510-a99d-eeeef5d9d784"; // 10+ coins - placeholder for future GIF
       } else {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sad-unscreen.gif?alt=media&token=aa2818bf-d631-4394-97f5-3955b5602299"; // 0 coins - hungry - placeholder for future GIF
       }
     }
     
-    // Check if Hamster is owned and being displayed - use coin-based progression like other pets
+    // Check if Hamster is owned and being displayed - use the same daily coin thresholds as PetPage
     if (currentPetId === 'hamster' && isPetOwned('hamster')) {
-      // Use coins from localStorage for consistent progression with PetPage
-      if (coins >= 50) {
+      if (todayCoins >= 50) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-super-happy-unscreen.gif?alt=media&token=1c6950e1-b84e-4241-8a3b-34ee4bb31e4d"; // 50+ coins
-      } else if (coins >= 30) {
+      } else if (todayCoins >= 30) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6"; // 30+ coins - placeholder for future image
-      } else if (coins >= 10) {
+      } else if (todayCoins >= 10) {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-neutral-unscreen.gif?alt=media&token=8511abcc-9b24-4ea5-b830-9bdb7ad4bee8"; // 10+ coins
       } else {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0"; // 0 coins - hungry
