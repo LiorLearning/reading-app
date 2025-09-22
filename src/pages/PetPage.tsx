@@ -7,6 +7,7 @@ import { usePetData, PetDataService } from '@/lib/pet-data-service';
 import { loadAdventureSummariesHybrid } from '@/lib/firebase-adventure-cache';
 import { useAuth } from '@/hooks/use-auth';
 import { PetSelectionFlow } from '@/components/PetSelectionFlow';
+import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
@@ -445,8 +446,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // { id: 'water', icon: '', status: 'sad' as ActionStatus, label: '' },
     ];
     
-    // Determine current item to display with 8-hour hold behavior
-    const sequence = ['house', 'friend', 'food', 'travel', 'story', 'plant-dreams'];
+    // Determine current item to display with 8-hour hold behavior (story excluded)
+    const sequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
     const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
     
     const statusFor = (type: string): ActionStatus => {
@@ -672,7 +673,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     ));
   };
 
-  // Save sleep data to localStorage
+  // Save sleep data to localStorage and best-effort sync to Firestore
   const saveSleepData = (clicks: number, sleepStartTime?: number, sleepEndTime?: number) => {
     try {
       const sleepData = {
@@ -682,6 +683,27 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         sleepEndTime: sleepEndTime || 0
       };
       localStorage.setItem('pet_sleep_data', JSON.stringify(sleepData));
+
+      // Firestore sync (non-blocking)
+      (async () => {
+        try {
+          const { auth } = await import('@/lib/firebase');
+          const { firebasePetStateService } = await import('@/lib/firebase-pet-state-service');
+          const user = auth.currentUser;
+          const petId = (window as any).currentPet || (localStorage.getItem('current_pet_id') || 'dog');
+          if (user && petId) {
+            await firebasePetStateService.initPetState(user.uid, petId);
+            if (clicks >= 3 && sleepStartTime && sleepEndTime) {
+              await firebasePetStateService.setSleepWindow(user.uid, petId, true, sleepEndTime - sleepStartTime);
+              await firebasePetStateService.updateCumulativeCare(user.uid, petId, { sleepCompleted: true });
+            }
+            if (clicks === 0) {
+              await firebasePetStateService.setSleepWindow(user.uid, petId, false);
+              await firebasePetStateService.updateCumulativeCare(user.uid, petId, { sleepCompleted: false });
+            }
+          }
+        } catch {}
+      })();
     } catch (error) {
       console.warn('Failed to save sleep data:', error);
     }
@@ -983,15 +1005,11 @@ const getSleepyPetImage = (clicks: number) => {
       return 'sleep1';
     }
 
-    // Coin-based progression system:
-    // 0 coins: initial state
-    // 10+ coins: first upgrade
-    // 30+ coins: second upgrade  
-    // 50+ coins: third upgrade
-    
-    if (coins >= 50) return 'coins_50';
-    if (coins >= 30) return 'coins_30';
-    if (coins >= 10) return 'coins_10';
+    // Daily coin-based progression (per pet): 0, 10, 30, 50
+    const todayCoins = PetProgressStorage.getTodayCoins(currentPet);
+    if (todayCoins >= 50) return 'coins_50';
+    if (todayCoins >= 30) return 'coins_30';
+    if (todayCoins >= 10) return 'coins_10';
     return 'coins_0';
   };
 
@@ -1201,9 +1219,16 @@ const getSleepyPetImage = (clicks: number) => {
     // Play purchase sound (reuse evolution sound for now)
     playEvolutionSound();
     
-    // Get pet name from store data
-    const petName = petData.name || petType;
-    alert(`🎉 Congratulations! You bought ${petName}!`);
+    // Mark ownership in per-pet storage as well
+    PetProgressStorage.setPetOwnership(petType, true);
+
+    // Generic success message, then prompt user to name the pet
+    alert('🎉 Congratulations! You bought a new pet!');
+
+    const chosenName = window.prompt('What would you like to name your new pet?', '');
+    if (chosenName && chosenName.trim()) {
+      PetProgressStorage.setPetName(petType, chosenName.trim());
+    }
   };
 
   // Pet store data structure - dynamically updated with current ownership status
@@ -1345,8 +1370,46 @@ const getSleepyPetImage = (clicks: number) => {
     
     // All pets now use the generalized cumulative care system below
 
+    // Before generic care-based thoughts, align thought with the current todo action
+    // shown in the bottom bar (e.g., travel, friend, food). This uses the same
+    // sequencing and 8-hour pin logic as the action bar so the bubble matches it.
+    const todoSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
+    const currentTodoType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, todoSequence, 50);
+    const isTodoCompleted = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentTodoType, 50);
+    if (!isTodoCompleted) {
+      const byType: Record<string, string[]> = {
+        house: [
+          `I'm feeling a bit sad in this empty space, ${userName}... 😢 Let's build our dream house together! 🏠 What kind of rooms should we create?`,
+          `This bare room makes me sad... 🥺 But I can't wait to design our perfect home with you! 🏡 Where should we put the furniture?`, 
+          `Everything feels so empty and cold right now... 😔 But we can make it cozy together! 🛋️ Which room should we work on first?`
+        ],
+        travel: [
+          `I'm tired of being stuck inside, ${userName}! ✈️ Want to go explore somewhere new?`,
+          `I'm bored and need a change of scenery! 🌍 Can we go on an adventure together?`,
+          `I really want to get out and do something fun! 🚀 Where should we go today?`
+        ],
+        friend: [
+          `I miss warm hugs and giggles! 👫 Can we visit a friend?`,
+          `My heart wants company today, ${userName} 💞 Let's go say hi!`,
+          `I want to share treats and stories! 🐾 Friend time?`
+        ],
+        food: [
+          `My tummy feels tiny and grumbly, ${userName}… 🍪 A loving snack please?`,
+          `I'm craving your yummy kindness! 🍩 Could we share a treat?`,
+          `My heart and belly need a cuddle—maybe a cookie? 🍪`
+        ],
+        'plant-dreams': [
+          `Hold my paw and plant a gentle dream with me 🌙✨`,
+          `I feel sparkly inside! 🌟 Shall we grow peaceful, cozy dreams?`,
+          `Let's whisper wishes and plant them into the night 🌙`
+        ]
+      };
+      const choices = byType[currentTodoType] || [];
+      if (choices.length > 0) {
+        return getRandomThought(choices);
+      }
+    }
 
-    
     // Default pet thoughts based on cumulative care level (for pets without specific thoughts)
     const { feedingCount, adventureCoins, sleepCompleted } = cumulativeCare;
     
@@ -1469,52 +1532,46 @@ const getSleepyPetImage = (clicks: number) => {
     return CoinSystem.getCumulativeCoinsEarned();
   };
 
-  // Level system calculation based on adventure coins earned
+  // Level system calculation based on per-pet cumulative adventure coins (does NOT reset)
   const getLevelInfo = () => {
-    // Updated level progression based on adventure coins:
-    // Level 1: 0 adventure coins (start)
-    // Level 2: 50 adventure coins (5 questions answered)
-    // Level 3: 120 adventure coins (12 questions answered)
-    // Level 4: 200 adventure coins (20 questions answered)
-    // Level 5: 300 adventure coins (30 questions answered)
-    
-    const adventureCoins = getCumulativeCareLevel().adventureCoins;
-    
-    const levelThresholds = [0, 50, 120, 200, 300]; // Level thresholds
-    
-    // Find current level based on adventure coins earned
+    // Level thresholds (same as PetProgressStorage)
+    const levelThresholds = [0, 50, 120, 200, 300];
+
+    // Read persistent cumulative coins from PetProgressStorage
+    const petProgress = PetProgressStorage.getPetProgress(currentPet);
+    const totalCoins = petProgress.levelData.totalAdventureCoinsEarned || 0;
+
+    // Determine current level and progress window
     let currentLevel = 1;
-    let coinsInCurrentLevel = adventureCoins;
-    let coinsNeededForNextLevel = 50; // Default for Level 1 to 2
-    
+    let coinsInCurrentLevel = totalCoins;
+    let coinsNeededForNextLevel = 50; // Default 1 -> 2
+
     for (let i = 1; i < levelThresholds.length; i++) {
-      if (adventureCoins >= levelThresholds[i]) {
+      if (totalCoins >= levelThresholds[i]) {
         currentLevel = i + 1;
       } else {
-        // Calculate progress within current level
         const previousThreshold = levelThresholds[i - 1];
         const nextThreshold = levelThresholds[i];
-        coinsInCurrentLevel = adventureCoins - previousThreshold;
+        coinsInCurrentLevel = totalCoins - previousThreshold;
         coinsNeededForNextLevel = nextThreshold - previousThreshold;
         break;
       }
     }
-    
-    // If we're at max level (Level 5)
+
     if (currentLevel >= levelThresholds.length) {
-      currentLevel = 5; // Cap at Level 5
-      coinsInCurrentLevel = adventureCoins - levelThresholds[levelThresholds.length - 1];
-      coinsNeededForNextLevel = 100; // Arbitrary value for max level
+      currentLevel = 5; // Cap
+      coinsInCurrentLevel = totalCoins - levelThresholds[levelThresholds.length - 1];
+      coinsNeededForNextLevel = 100; // Arbitrary for max level UI
     }
-    
+
     const progressPercentage = Math.min(100, (coinsInCurrentLevel / coinsNeededForNextLevel) * 100);
-    
+
     return {
       currentLevel,
       coinsInCurrentLevel,
       coinsNeededForNextLevel,
       progressPercentage,
-      totalCoins: adventureCoins
+      totalCoins
     };
   };
 
@@ -1552,6 +1609,61 @@ const getSleepyPetImage = (clicks: number) => {
     }
   }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking]);
 
+  // Developer tool: advance local time by 8 hours to test sleep/reset (DEV only)
+  const advanceTimeBy8Hours = React.useCallback(() => {
+    const eightHours = 8 * 60 * 60 * 1000;
+
+    try {
+      // Shift pet_sleep_data timestamps backward by 8h (simulates time passing)
+      const stored = localStorage.getItem('pet_sleep_data');
+      if (stored) {
+        const d = JSON.parse(stored);
+        const shifted = {
+          ...d,
+          timestamp: typeof d.timestamp === 'number' ? d.timestamp - eightHours : Date.now() - eightHours,
+          sleepStartTime: typeof d.sleepStartTime === 'number' ? Math.max(0, d.sleepStartTime - eightHours) : 0,
+          sleepEndTime: typeof d.sleepEndTime === 'number' ? Math.max(0, d.sleepEndTime - eightHours) : 0,
+        };
+        localStorage.setItem('pet_sleep_data', JSON.stringify(shifted));
+      }
+
+      // Force 8h reset eligibility
+      const lastReset = localStorage.getItem('pet_last_reset_time');
+      if (lastReset) {
+        const shifted = (parseInt(lastReset, 10) - eightHours).toString();
+        localStorage.setItem('pet_last_reset_time', shifted);
+      } else {
+        localStorage.setItem('pet_last_reset_time', (Date.now() - eightHours).toString());
+      }
+
+      // Push PetProgressStorage timers over thresholds for current pet
+      try {
+        const petId = PetProgressStorage.getCurrentSelectedPet();
+        if (petId) {
+          const pd = PetProgressStorage.getPetProgress(petId);
+          pd.heartData.nextHeartResetTime = Date.now() - 1;
+          if (pd.sleepData.isAsleep) {
+            pd.sleepData.sleepEndTime = Date.now() - 1;
+          }
+          PetProgressStorage.setPetProgress(pd);
+        }
+      } catch {}
+
+      // Trigger existing checks/updates in this page
+      try {
+        checkAndPerform8HourReset();
+      } catch {}
+      try {
+        // Local sleep check to update UI immediately
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        checkSleepTimeout();
+        setSleepTimeRemaining(0);
+      } catch {}
+    } catch (e) {
+      console.warn('Dev time advance failed:', e);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col" style={{
       backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250903_181706_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
@@ -1560,6 +1672,16 @@ const getSleepyPetImage = (clicks: number) => {
       backgroundRepeat: 'no-repeat',
       fontFamily: 'Quicksand, system-ui, sans-serif'
     }}>
+      {/* Invisible dev button (top-right) to advance time by 8h */}
+      {import.meta.env && (import.meta as any).env?.DEV ? (
+        <button
+          type="button"
+          aria-label="Advance time by 8 hours"
+          onClick={advanceTimeBy8Hours}
+          style={{ opacity: 0, position: 'absolute', top: 0, right: 0, width: 48, height: 48, zIndex: 50 }}
+          tabIndex={-1}
+        />
+      ) : null}
       {/* Pet Selection Flow for first-time users */}
       {showPetSelection && (
         <PetSelectionFlow 
@@ -2241,31 +2363,34 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* More Overlay */}
       {showMoreOverlay && (() => {
-        const sequence = ['house','friend','food','travel','story','plant-dreams'];
-        const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
-        const doneSet = new Set(sequence.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
-        const sadIndex = Math.max(0, sequence.indexOf(sadType));
-        const unlocked = new Set<string>([...doneSet, sadType]);
-        // Determine the next two to-dos after the current sad, skipping 'story'
-        const nextTwo: string[] = [];
-        for (let i = sadIndex + 1; i < sequence.length && nextTwo.length < 2; i++) {
-          const t = sequence[i];
-          if (t === 'story') continue; // story handled separately
-          nextTwo.push(t);
+        // New global sequence (story handled separately):
+        const coreSeq = ['house','travel','friend','food','plant-dreams'];
+        const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, coreSeq, 50);
+        const doneSet = new Set(coreSeq.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
+        const sadIndex = Math.max(0, coreSeq.indexOf(sadType));
+        const unlocked = new Set<string>([...doneSet]);
+        // Determine the two unlocked tasks: current (sad) and the next not-done item in sequence
+        const nextUnlocked: string[] = [];
+        nextUnlocked.push(sadType);
+        let nextNotDone: string | null = null;
+        for (let i = sadIndex + 1; i < coreSeq.length; i++) {
+          const t = coreSeq[i];
+          if (!doneSet.has(t)) { nextNotDone = t; break; }
         }
-        nextTwo.forEach(t => unlocked.add(t));
+        if (nextNotDone) nextUnlocked.push(nextNotDone);
+        nextUnlocked.forEach(t => unlocked.add(t));
         // Story is always unlocked and should appear after the two to-dos visually
         unlocked.add('story');
 
-        // Build render order: done (in sequence) → nextTwo → story → remaining
-        const doneInOrder = sequence.filter(t => doneSet.has(t));
-        const remaining = sequence.filter(t => !doneSet.has(t) && !nextTwo.includes(t) && t !== 'story');
-        const renderOrder = [...doneInOrder, ...nextTwo, 'story', ...remaining.filter(t => t !== 'story')];
+        // Build render order per spec: done (sequence order) → [sad, next] → Story → remaining locked
+        const doneInOrder = coreSeq.filter(t => doneSet.has(t));
+        const remaining = coreSeq.filter(t => !doneSet.has(t) && !nextUnlocked.includes(t));
+        const renderOrder = [...doneInOrder, ...nextUnlocked, 'story', ...remaining];
 
         const renderRow = (type: string) => {
           const done = doneSet.has(type);
           const isUnlocked = unlocked.has(type);
-          const icon = type === 'house' ? '🏠' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'travel' ? '✈️' : type === 'story' ? '📚' : '🌙';
+          const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
           const label = type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
           const statusEmoji = !isUnlocked ? '🔒' : (done ? '✅' : (type === sadType ? '😞' : '😐'));
           return (
@@ -2416,9 +2541,9 @@ const getSleepyPetImage = (clicks: number) => {
                       {pet.emoji}
                     </div>
                     
-                    {/* Pet Name */}
+                    {/* Pet Name (hidden before purchase) */}
                     <div className={`text-lg font-semibold mb-3 ${pet.isLocked && !pet.owned ? 'text-gray-500' : 'text-gray-800'}`}>
-                      {pet.name}
+                      {pet.owned ? pet.name : ''}
                     </div>
                     
                     {/* Purchase Button or Status */}

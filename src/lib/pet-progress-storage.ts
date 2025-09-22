@@ -26,6 +26,12 @@ export interface PetProgressData {
     lastSwitchTime: number; // When it last switched (or was set on completion)
   };
   
+  // Daily coins for image/emotion (per pet, resets by calendar day)
+  dailyCoins?: {
+    todayDate: string; // e.g., '2025-09-22' (US date if desired)
+    todayCoins: number;
+  };
+  
   // Sleep timer system
   sleepData: {
     isAsleep: boolean;
@@ -123,6 +129,10 @@ export class PetProgressStorage {
       todoData: {
         currentType: 'house',
         lastSwitchTime: now
+      },
+      dailyCoins: {
+        todayDate: new Date().toISOString().slice(0, 10),
+        todayCoins: 0,
       },
       sleepData: {
         isAsleep: false,
@@ -243,6 +253,10 @@ export class PetProgressStorage {
       todoData: {
         currentType: data.todoData?.currentType || 'house',
         lastSwitchTime: data.todoData?.lastSwitchTime || Date.now()
+      },
+      dailyCoins: {
+        todayDate: data.dailyCoins?.todayDate || new Date().toISOString().slice(0, 10),
+        todayCoins: data.dailyCoins?.todayCoins || 0,
       },
       sleepData: {
         isAsleep: data.sleepData?.isAsleep || false,
@@ -429,7 +443,30 @@ export class PetProgressStorage {
     // Check for adventure milestones
     this.checkAdventureMilestones(petData);
     
+    // Update daily coins (date-based reset)
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      if (!petData.dailyCoins) {
+        petData.dailyCoins = { todayDate: today, todayCoins: 0 };
+      }
+      if (petData.dailyCoins.todayDate !== today) {
+        petData.dailyCoins.todayDate = today;
+        petData.dailyCoins.todayCoins = 0;
+      }
+      petData.dailyCoins.todayCoins += amount;
+    } catch {}
+    
     this.setPetProgress(petData);
+  }
+
+  // Get per-pet daily coins for image/emotion selection
+  static getTodayCoins(petId: string): number {
+    const petData = this.getPetProgress(petId);
+    const today = new Date().toISOString().slice(0, 10);
+    if (!petData.dailyCoins || petData.dailyCoins.todayDate !== today) {
+      return 0;
+    }
+    return petData.dailyCoins.todayCoins || 0;
   }
 
   // Get per-adventure coin totals map

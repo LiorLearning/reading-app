@@ -26,6 +26,8 @@ export interface FirebaseSavedAdventure {
   comicPanelImage?: string;
   topicId?: string;
   comicPanels?: ComicPanel[];
+  petId?: string;
+  adventureType?: string;
 }
 
 class FirebaseAdventureService {
@@ -57,6 +59,14 @@ class FirebaseAdventureService {
       
       if (adventure.comicPanels !== undefined) {
         firebaseAdventure.comicPanels = adventure.comicPanels;
+      }
+
+      // Pass through optional identifiers if present on SavedAdventure
+      if ((adventure as any).petId !== undefined) {
+        firebaseAdventure.petId = (adventure as any).petId;
+      }
+      if ((adventure as any).adventureType !== undefined) {
+        firebaseAdventure.adventureType = (adventure as any).adventureType;
       }
 
       // Sanitize the entire object to remove any undefined values (Firebase doesn't support undefined)
