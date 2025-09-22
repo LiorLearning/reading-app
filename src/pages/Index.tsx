@@ -1088,18 +1088,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // 🎯 NEW: Reset counter to 0 when unified system generates image
       setLastAutoImageMessageCount(prev => {
         const currentUserCount = chatMessages.filter(msg => msg.type === 'user').length;
-        // Reset to 0, so auto-generation waits for full 4-message interval from now
+        // Reset to 0; compute next offset-aligned trigger strictly after current count
         const newCount = 0;
-        const nextAutoTriggerAt = currentUserCount + AUTO_IMAGE_TRIGGER_INTERVAL;
+        const nextAutoTriggerAt = currentUserCount < AUTO_IMAGE_TRIGGER_OFFSET
+          ? AUTO_IMAGE_TRIGGER_OFFSET
+          : ((Math.floor((currentUserCount - AUTO_IMAGE_TRIGGER_OFFSET) / AUTO_IMAGE_TRIGGER_INTERVAL) + 1) * AUTO_IMAGE_TRIGGER_INTERVAL) + AUTO_IMAGE_TRIGGER_OFFSET;
+        const messagesUntilNextAuto = Math.max(0, nextAutoTriggerAt - currentUserCount);
         
         console.log('📉 COMMUNICATION: Unified system generated image → resetting auto-generation counter:', {
           previousAutoCount: prev,
           currentUserMessageCount: currentUserCount,
           newAutoCount: newCount,
           nextAutoTriggerAt,
-          messagesUntilNextAuto: AUTO_IMAGE_TRIGGER_INTERVAL,
+          messagesUntilNextAuto,
           reason: 'unified_system_coordination',
-          message: `Auto-gen will now trigger after ${AUTO_IMAGE_TRIGGER_INTERVAL} more user messages`
+          message: `Auto-gen will now trigger at user message #${nextAutoTriggerAt} (in ${messagesUntilNextAuto})`
         });
         
         return newCount;
@@ -2901,6 +2904,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [isAutoImageGenerationActive, setIsAutoImageGenerationActive] = useState(true);
   const [lastAutoImageMessageCount, setLastAutoImageMessageCount] = useState(0);
   const AUTO_IMAGE_TRIGGER_INTERVAL = 4; // Generate image every 4 user messages
+  const AUTO_IMAGE_TRIGGER_OFFSET = 2; // Start at 2nd user message, then every 4 (2, 6, 10, ...)
   
   
 
@@ -2955,7 +2959,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // If we have very few messages but high counter, something went wrong - reset
     // Also reset if counter is higher than total user messages (stale state)
-    if ((userMessageCount < 3 && lastAutoImageMessageCount > 0) || 
+    if ((userMessageCount < 2 && lastAutoImageMessageCount > 0) || 
         (lastAutoImageMessageCount > userMessageCount)) {
       console.log(`🔄 SAFETY RESET - ${lastAutoImageMessageCount > userMessageCount ? 'Stale counter detected' : 'Chat cleared or new adventure started'}`);
       console.log(`🔄 userMessageCount: ${userMessageCount}, lastAutoImageMessageCount: ${lastAutoImageMessageCount}`);
@@ -3332,14 +3336,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return;
     }
     
-    if (currentMessageCount < 3) {
-      console.log(`❌ AUTO IMAGE BLOCKED: Not enough user messages (${currentMessageCount} < 3)`);
+    if (currentMessageCount < 2) {
+      console.log(`❌ AUTO IMAGE BLOCKED: Not enough user messages (${currentMessageCount} < 2)`);
       return;
     }
     
-    // 🎯 IMPROVED LOGIC: Only generate when message count is exactly divisible by interval
+    // 🎯 IMPROVED LOGIC: Only generate when (message count - offset) is divisible by interval
     // and we haven't already generated for this count (prevents duplicate triggers)
-    const isExactInterval = currentMessageCount > 0 && currentMessageCount % AUTO_IMAGE_TRIGGER_INTERVAL === 0;
+    const isExactInterval = currentMessageCount > 0 && ((currentMessageCount - AUTO_IMAGE_TRIGGER_OFFSET) % AUTO_IMAGE_TRIGGER_INTERVAL === 0);
     const notAlreadyGenerated = lastAutoImageMessageCount !== currentMessageCount;
     
     // 🚫 CLASH DETECTION: Check if unified system was called for the current message cycle
@@ -3418,8 +3422,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         console.log(`🚫 AUTO IMAGE: UNIFIED CLASH DETECTED - Skipping cycle ${currentMessageCount}, will generate at message ${nextTrigger} instead`);
         console.log(`🔍 AUTO IMAGE: Unified system already generated image for message ${currentMessageCount}, avoiding duplicate generation`);
       } else {
-        const nextTrigger = Math.ceil(currentMessageCount / AUTO_IMAGE_TRIGGER_INTERVAL) * AUTO_IMAGE_TRIGGER_INTERVAL;
-        const remaining = nextTrigger - currentMessageCount;
+        // Next trigger that satisfies (n - offset) % interval === 0, strictly after current count
+        const base = currentMessageCount < AUTO_IMAGE_TRIGGER_OFFSET
+          ? AUTO_IMAGE_TRIGGER_OFFSET
+          : ((Math.floor((currentMessageCount - AUTO_IMAGE_TRIGGER_OFFSET) / AUTO_IMAGE_TRIGGER_INTERVAL) + 1) * AUTO_IMAGE_TRIGGER_INTERVAL) + AUTO_IMAGE_TRIGGER_OFFSET;
+        const nextTrigger = base <= currentMessageCount
+          ? base + AUTO_IMAGE_TRIGGER_INTERVAL
+          : base;
+        const remaining = Math.max(0, nextTrigger - currentMessageCount);
         console.log(`⏳ AUTO IMAGE: Waiting for next interval. Current: ${currentMessageCount}, Next trigger: ${nextTrigger}, Remaining: ${remaining} messages`);
       }
     }
@@ -3467,7 +3477,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 // Topic completed with 70%+ success rate
                 const congratsMessage: ChatMessage = {
                   type: 'ai',
-                  content: `🎉 Fantastic! You've completed the topic! You're ready for the next challenge! ✨`,
+                  content: `Fantastic work! You mastered the "${currentSpellQuestion.topicName}" topic with a strong first-attempt accuracy. Keep it up! 🏆`,
                   timestamp: Date.now()
                 };
                 

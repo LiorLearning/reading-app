@@ -28,10 +28,12 @@ export interface MCQAnswer {
 export interface AdventureSession {
   id?: string;
   userId: string;
+  petId?: string;
   sessionType: 'new_adventure' | 'continue_adventure' | 'continue_specific';
   adventureId: string;
   topicId: string;
   title: string;
+  adventureType?: string;
   
   // Chat data
   chatMessages: ChatMessage[];
@@ -69,7 +71,8 @@ class AdventureSessionService {
     topicId: string,
     adventureMode: 'new' | 'continue',
     title?: string,
-    existingMessages?: ChatMessage[] // For loading old adventures with context
+    existingMessages?: ChatMessage[], // For loading old adventures with context
+    options?: { petId?: string; adventureType?: string }
   ): Promise<string | null> {
     try {
       const sessionTitle = title || this.generateSessionTitle(sessionType, adventureMode, topicId);
@@ -106,10 +109,12 @@ class AdventureSessionService {
       
       const newSession: Omit<AdventureSession, 'id'> = {
         userId,
+        petId: options?.petId,
         sessionType,
         adventureId,
         topicId,
         title: sessionTitle,
+        adventureType: options?.adventureType,
         
         // Initialize chat data with existing messages
         chatMessages: initialMessages,

@@ -1,5 +1,7 @@
 // Shared coin management system for the application
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
+import { firebasePetStateService } from '@/lib/firebase-pet-state-service';
+import { auth } from '@/lib/firebase';
 
 export class CoinSystem {
   private static readonly STORAGE_KEY = 'litkraft_coins'
@@ -134,6 +136,13 @@ export class CoinSystem {
       const currentPet = PetProgressStorage.getCurrentSelectedPet();
       if (currentPet) {
         PetProgressStorage.addAdventureCoins(currentPet, amount, adventureType || 'food');
+
+        // Also sync to Firestore when authenticated
+        const user = auth.currentUser;
+        if (user) {
+          firebasePetStateService.initPetState(user.uid, currentPet).catch(() => {});
+          firebasePetStateService.addAdventureCoins(user.uid, currentPet, amount, adventureType || 'food').catch(() => {});
+        }
       }
     } catch (error) {
       console.warn('Failed to mirror adventure coins to PetProgressStorage:', error);
