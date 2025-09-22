@@ -1609,17 +1609,18 @@ const getSleepyPetImage = (clicks: number) => {
     // 2. Audio is enabled
     // 3. Message has changed
     // 4. Not currently speaking (prevent overlapping)
-    if (!showPetShop && audioEnabled && currentPetThought !== lastSpokenMessage && !isSpeaking) {
+    // 5. NOT during pet selection flow
+    if (!showPetShop && audioEnabled && currentPetThought !== lastSpokenMessage && !isSpeaking && !showPetSelection) {
       const timer = setTimeout(() => {
         // Double-check conditions before speaking to prevent race conditions
-        if (!showPetShop && audioEnabled && currentPetThought !== lastSpokenMessage && !isSpeaking) {
+        if (!showPetShop && audioEnabled && currentPetThought !== lastSpokenMessage && !isSpeaking && !showPetSelection) {
           speakText(currentPetThought);
         }
       }, 800); // Increased delay to prevent rapid-fire thoughts when state changes quickly
       
       return () => clearTimeout(timer);
     }
-  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking]);
+  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection]);
 
   // Developer tool: advance local time by 8 hours to test sleep/reset (DEV only)
   const advanceTimeBy8Hours = React.useCallback(() => {
