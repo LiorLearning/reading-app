@@ -1955,6 +1955,18 @@ const getSleepyPetImage = (clicks: number) => {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               
+              {/* View Progress Button */}
+              <DropdownMenuItem 
+                className="flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg"
+                onClick={handleProgressTrackingClick}
+              >
+                <TrendingUp className="h-4 w-4 text-green-600" />
+                <div>
+                  <div className="font-semibold text-green-600">View Progress</div>
+                  <div className="text-sm text-gray-500">Track your spelling journey</div>
+                </div>
+              </DropdownMenuItem>
+              
               {/* Logout Button */}
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <DropdownMenuItem 
@@ -2500,18 +2512,6 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       )}
 
-      {/* Progress Tracking Button */}
-      <div className={`fixed ${ownedPets.length > 1 ? 'top-64' : 'top-24'} left-6 z-20`}>
-        <Button 
-          onClick={handleProgressTrackingClick}
-          variant="default"
-          className="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl px-4 py-2 font-semibold flex items-center gap-2 shadow-lg transition-all duration-300 hover:scale-105"
-          style={{ boxShadow: '0 4px 0 #15803d' }}
-        >
-          <TrendingUp className="h-4 w-4" />
-          <span className="text-sm">View Progress</span>
-        </Button>
-      </div>
 
 
       {/* Pet Shop Overlay */}
