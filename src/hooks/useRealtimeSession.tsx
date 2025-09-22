@@ -289,8 +289,9 @@ Assistant: “Great try! ‘oa’ makes oh, like boat. Here silent e makes long 
 
         updateStatus('CONNECTED');
         
-        // Send initial session update
-        updateSession(true);
+        // Send initial session update without triggering auto-response
+        // This prevents the realtime session from speaking over ElevenLabs initial adventure message
+        updateSession(false);
       } catch (err) {
         console.error("Error connecting via SDK:", err);
         updateStatus("DISCONNECTED");
