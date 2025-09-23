@@ -1029,6 +1029,16 @@ const getSleepyPetImage = (clicks: number) => {
       return 'sleep1';
     }
 
+    // If 8-hour heart reset has occurred (empty heart) or pet woke up sad, force sad image
+    try {
+      const petProgress = PetProgressStorage.getPetProgress(currentPet);
+      const { heartData, sleepData } = petProgress;
+      const isHeartEmpty = heartData.feedingCount === 0 && heartData.adventureCoins === 0 && !heartData.sleepCompleted;
+      if (sleepData.willBeSadOnWakeup || isHeartEmpty) {
+        return 'coins_0';
+      }
+    } catch {}
+
     // Daily coin-based progression (per pet): 0, 10, 30, 50
     const todayCoins = PetProgressStorage.getTodayCoins(currentPet);
     if (todayCoins >= 50) return 'coins_50';
