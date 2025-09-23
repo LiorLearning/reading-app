@@ -290,7 +290,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Optional session tracking for Firebase (won't break existing functionality)
   const [currentSessionId, setCurrentSessionId] = React.useState<string | null>(null);
-  
+ 
   // Track message cycle for 2-2 pattern starting at chat 3 (2 pure adventure, then 2 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
 
@@ -302,6 +302,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   } = useRealtimeSession({
     isAudioPlaybackEnabled: true,
     enabled: true,
+    sessionId: currentSessionId,
   });
 
   // Centralized function to increment message cycle count for all user interactions

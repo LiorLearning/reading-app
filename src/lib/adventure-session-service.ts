@@ -10,7 +10,8 @@ import {
   getDocs,
   Timestamp,
   serverTimestamp,
-  getDoc
+  getDoc,
+  arrayUnion
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { ChatMessage, sanitizeForFirebase } from './utils';
@@ -25,6 +26,11 @@ export interface MCQAnswer {
   questionIndex?: number; // Track the actual question index in the topic
 }
 
+export interface TranscriptEntry {
+  transcript: string;
+  timestamp: Timestamp;
+}
+
 export interface AdventureSession {
   id?: string;
   userId: string;
@@ -34,7 +40,8 @@ export interface AdventureSession {
   topicId: string;
   title: string;
   adventureType?: string;
-  
+  transcripts: TranscriptEntry[];
+
   // Chat data
   chatMessages: ChatMessage[];
   totalChatMessages: number;
@@ -114,7 +121,8 @@ class AdventureSessionService {
         adventureId,
         topicId,
         title: sessionTitle,
-        adventureType: options?.adventureType,
+        adventureType: options?.adventureType,   
+        transcripts: [],
         
         // Initialize chat data with existing messages
         chatMessages: initialMessages,
@@ -122,7 +130,7 @@ class AdventureSessionService {
         
         // Initialize chat summary with generated summary if available
         chatSummary: initialSummary,
-        lastSummaryMessageCount: initialMessageCount, // Mark all existing messages as summarized
+        lastSummaryMessageCount: initialMessageCount, // Mark all existing messages as summarized 
         
         // Initialize question data
         mcqAnswers: [],
@@ -175,6 +183,29 @@ class AdventureSessionService {
       }
     } catch (error) {
       console.warn('⚠️ Failed to save message to session (continuing normally):', error);
+      // Don't throw error - app continues working without Firebase sync
+    }
+  }
+
+  // Add transcription to session (non-blocking)
+  async addTranscription(sessionId: string, transcript: string): Promise<void> {
+    if (!sessionId) return; // Graceful exit if no session
+    try {
+      const sessionRef = doc(db, this.COLLECTION_NAME, sessionId);
+      const transcriptEntry: TranscriptEntry = {
+        transcript,
+        timestamp: Timestamp.now() // Use Timestamp.now() instead of serverTimestamp()
+      };
+      
+      const updateData = {
+        transcripts: arrayUnion(transcriptEntry),
+        updatedAt: Timestamp.now(),
+        lastActivityAt: Timestamp.now()
+      };
+      
+      await updateDoc(sessionRef, updateData);
+    } catch (error) {
+      console.warn('⚠️ Failed to save transcription to session (continuing normally):', error);
       // Don't throw error - app continues working without Firebase sync
     }
   }

@@ -8,6 +8,7 @@ import {
 
 import { audioFormatForCodec, applyCodecPreferences } from '../lib/codecUtils';
 import { convertWebMBlobToWav } from "../lib/audioUtils";
+import { useHandleSessionHistory } from './useHandleSessionHistory';
 
 // Simple session status type
 export type SessionStatus = "DISCONNECTED" | "CONNECTING" | "CONNECTED";
@@ -20,6 +21,7 @@ export interface RealtimeSessionCallbacks {
   agentName?: string;
   agentVoice?: string;
   agentInstructions?: string;
+  sessionId?: string | null;
 }
 
 export interface UseRealtimeSessionReturn {
@@ -38,6 +40,7 @@ export function useRealtimeSession(callbacks: RealtimeSessionCallbacks = {}): Us
     enabled = true,
     agentName = 'spellingTutor',
     agentVoice = 'sage',
+    sessionId,
     agentInstructions = `You are Krafty, a playful Grade-1 reading buddy.
 Your job is to help children resolve doubts in spelling and pronunciation.
 You are always given the target word and the child’s attempt.
@@ -119,7 +122,9 @@ Silent letter (nite → knight)
 “Nice try! You left out the silent k, like in know. We still write it. Can you add k?”
 
 Homophone (pearl vs purl)
-“Good effort! Pearl and purl sound the same. Pearl is the shiny stone, purl is for knitting. Which one fits here?”`} = callbacks;
+"Good effort! Pearl and purl sound the same. Pearl is the shiny stone, purl is for knitting. Which one fits here?"`} = callbacks;
+  
+  const historyHandlers = useHandleSessionHistory(sessionId).current;
   
   // Core session state
   const sessionRef = useRef<RealtimeSession | null>(null);
@@ -169,10 +174,31 @@ Homophone (pearl vs purl)
     }
   }, [sdkAudioElement]);
 
+  function handleTransportEvent(event: any) {
+    // Handle additional server events that aren't managed by the session
+    switch (event.type) {
+      case "conversation.item.input_audio_transcription.completed": {
+        historyHandlers.handleTranscriptionCompleted(event);
+        break;
+      }
+      case "response.audio_transcript.done": {
+        historyHandlers.handleTranscriptionCompleted(event);
+        break;
+      }
+      case "response.audio_transcript.delta": {
+        historyHandlers.handleTranscriptionDelta(event);
+        break;
+      }
+      // No default case - ignore all other events
+    }
+  }
+
   useEffect(() => {
     if (sessionRef.current) {
       // Handle agent handoff
       sessionRef.current.on("agent_handoff", handleAgentHandoff);
+      // Handle transport events
+      sessionRef.current.on("transport_event", handleTransportEvent);
     }
   }, [sessionRef.current]);
 
