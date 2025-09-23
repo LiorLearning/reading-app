@@ -102,7 +102,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
 
   return (
     <main 
-      className="flex-1 flex items-center justify-center min-h-0 overflow-hidden px-4 py-4 lg:px-6 bg-primary/60 relative" 
+      className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4 lg:px-6 bg-primary/60 relative" 
       style={{
         backgroundImage: `url('/backgrounds/space.png')`,
         backgroundSize: 'cover',
@@ -114,14 +114,12 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
       {/* Glass blur overlay */}
       <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
       
-      {/* Main container */}
+      {/* Main container - Now scrollable */}
       <div 
-        className="relative responsive-max-width"
+        className="relative responsive-max-width mx-auto my-auto flex-shrink-0"
         style={{ 
           width: '95%',
           maxWidth: '600px',
-          aspectRatio: '4/3',
-          maxHeight: 'calc(100vh - 100px)',
           minHeight: '500px',
           transition: 'all 0.3s ease-in-out'
         }}
@@ -132,8 +130,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
           style={{ 
             border: '4px solid hsl(var(--primary) / 0.9)',
             boxShadow: '0 0 12px 3px rgba(0, 0, 0, 0.15)',
-            backgroundColor: 'hsl(var(--primary) / 0.9)',
-            overflow: 'hidden'
+            backgroundColor: 'hsl(var(--primary) / 0.9)'
           }}
         />
         

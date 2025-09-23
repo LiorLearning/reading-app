@@ -93,7 +93,21 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   };
   
   // State for which pet is currently being displayed
-  const [currentPet, setCurrentPet] = useState('cat'); // Default to cat
+  const [currentPet, setCurrentPet] = useState(() => {
+    try {
+      const storedSelected = PetProgressStorage.getCurrentSelectedPet();
+      if (storedSelected) {
+        // Keep localStorage in sync for avatar consumers on initial render
+        localStorage.setItem('current_pet', storedSelected);
+        return storedSelected;
+      }
+      // Fallback to any legacy/local value
+      const legacy = localStorage.getItem('current_pet');
+      return legacy || 'cat';
+    } catch {
+      return 'cat';
+    }
+  });
   
   // Local state for UI interactions
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
