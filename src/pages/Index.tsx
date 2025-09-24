@@ -299,6 +299,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     sendMessage,
     onToggleConnection,
     downloadRecording,
+    interruptRealtimeSession,
   } = useRealtimeSession({
     isAudioPlaybackEnabled: true,
     enabled: true,
@@ -4399,6 +4400,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     showExplanation={true}
                     // Realtime session integration
                     sendMessage={sendMessage}
+                    interruptRealtimeSession={interruptRealtimeSession}
                   />
                 </div>
               </section>
