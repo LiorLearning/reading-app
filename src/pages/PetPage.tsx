@@ -1449,12 +1449,12 @@ const getSleepyPetImage = (clicks: number) => {
         ],
         travel: [
           `I'm tired of being stuck inside, ${userName}! ✈️ Want to go explore somewhere new?`,
-          `I'm bored and need a change of scenery! 🌍 Can we go on an adventure together?`,
+          `I'm bored and need a change of scenery! 🌍 Can we go travel together?`,
           `I really want to get out and do something fun! 🚀 Where should we go today?`
         ],
         friend: [
           `I miss warm hugs and giggles! 👫 Can we visit a friend?`,
-          `My heart wants company today, ${userName} 💞 Let's go say hi!`,
+          `My heart wants company today, ${userName} 💞 Let's go say hi to a friend!`,
           `I want to share treats and stories! 🐾 Friend time?`
         ],
         food: [
@@ -1730,11 +1730,12 @@ const getSleepyPetImage = (clicks: number) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{
+    <div className="min-h-screen flex flex-col overflow-y-auto" style={{
       backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250903_181706_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center 50%',
       backgroundRepeat: 'no-repeat',
+      backgroundAttachment: 'fixed',
       fontFamily: 'Quicksand, system-ui, sans-serif'
     }}>
       {/* Invisible dev button (top-right) to advance time by 8h */}
@@ -2265,16 +2266,16 @@ const getSleepyPetImage = (clicks: number) => {
       </div>
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-4 z-10 mt-12">
-        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-hidden" style={{ minHeight: 'clamp(420px, 48vh, 560px)' }}>
+      <div className="flex-1 flex flex-col items-center justify-center relative px-8 z-10 mt-12">
+        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-hidden" style={{ minHeight: 'clamp(380px, 45vh, 520px)' }}>
           {/* Thought bubble pinned to top */}
           {!showPetShop && (
             <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4" style={{ top: bubbleTopPx }}>
-              <div className={`relative rounded-3xl p-5 border-3 shadow-xl w-full backdrop-blur-sm ${
+              <div className={`relative rounded-3xl p-5 border-3 shadow-2xl w-full backdrop-blur-md ${
                 sleepClicks > 0 
-                  ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-400 bg-purple-50/90'
-                  : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400 bg-white/90'
-              }`}>
+                  ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-400 bg-purple-50/95'
+                  : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400 bg-white/95'
+              }`} style={{ zIndex: 30 }}>
                 {/* Speech bubble tail pointing down to pet */}
                 <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[12px] border-l-transparent border-r-transparent ${
                   sleepClicks > 0 ? 'border-t-purple-400' : 'border-t-blue-400'
@@ -2312,7 +2313,7 @@ const getSleepyPetImage = (clicks: number) => {
               src={getPetImage()}
               alt="Pet"
               className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                sleepClicks > 0 ? 'w-80 h-80 max-h-[360px]' : 'w-72 h-72 max-h-[320px]'
+                sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
               }`}
               style={{
                 animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
@@ -2389,14 +2390,37 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Below-bubble To-Dos: Travel and Sleep */}
       {!showPetShop && (
-        <div className="relative z-20 mt-12 flex justify-center">
-          <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg p-3 w-[400px] mb-16">
+        <div className="relative z-20 mt-4 flex justify-center pb-24">
+          <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg p-3 w-[400px] mb-8">
             {/* Subheader */}
             <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Daily Quests</div>
             <div className="mt-1 flex flex-col gap-2">
               {(() => {
-                const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, 'travel', 50);
+                // Use the same dynamic logic as pet thoughts to determine current quest
+                const questSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
+                const currentQuestType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, questSequence, 50);
+                const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentQuestType, 50);
                 const progress = done ? 1 : 0;
+                
+                // Get icon and label for the current quest type
+                const getQuestIcon = (type: string) => {
+                  switch(type) {
+                    case 'house': return '🏠';
+                    case 'travel': return '✈️';
+                    case 'friend': return '👫';
+                    case 'food': return '🍪';
+                    case 'plant-dreams': return '🌙';
+                    default: return '✨';
+                  }
+                };
+                
+                const getQuestLabel = (type: string) => {
+                  return type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
+                };
+                
+                const questIcon = getQuestIcon(currentQuestType);
+                const questLabel = getQuestLabel(currentQuestType);
+                
                 return (
                   <div className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${done ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'}`}>
                     {/* Celebration badge for completed */}
@@ -2405,14 +2429,14 @@ const getSleepyPetImage = (clicks: number) => {
                         ⭐
                       </div>
                     )}
-                    <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">✈️</div>
+                    <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">{questIcon}</div>
                     <div className="flex-1">
-                      <div className={`font-semibold drop-shadow-md ${done ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>Travel</div>
+                      <div className={`font-semibold drop-shadow-md ${done ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>{questLabel}</div>
                       <div className="mt-0.5 h-2 bg-white/25 rounded-full overflow-hidden w-[260px]">
                         <div className={`h-full transition-all duration-500 ${done ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
                       </div>
                     </div>
-                    <button aria-label={done ? 'Completed - Click to view' : 'Start Travel'} onClick={() => handleActionClick('travel')} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : 'bg-white/90'}`}>
+                    <button aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`} onClick={() => handleActionClick(currentQuestType)} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : 'bg-white/90'}`}>
                       {done ? '✓' : '→'}
                     </button>
                   </div>
