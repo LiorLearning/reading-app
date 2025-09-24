@@ -384,6 +384,34 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
   // Reset sleep when switching pets (skip on initial mount)
   const hasMountedRef = useRef(false);
+  // Layout refs for stage and elements to maintain minimum gap between bubble and pet
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const bubbleRef = useRef<HTMLDivElement | null>(null);
+  const petRef = useRef<HTMLDivElement | null>(null);
+  const [bubbleTopPx, setBubbleTopPx] = useState<number>(24);
+
+  useEffect(() => {
+    const MIN_GAP_PX = 16;
+    const DEFAULT_TOP_PX = 24;
+    const measure = () => {
+      const stage = stageRef.current;
+      const bubble = bubbleRef.current;
+      const pet = petRef.current;
+      if (!stage || !bubble || !pet) return;
+      const bubbleRect = bubble.getBoundingClientRect();
+      const petRect = pet.getBoundingClientRect();
+      const gap = petRect.top - bubbleRect.bottom;
+      if (isFinite(gap)) {
+        const missing = Math.max(0, MIN_GAP_PX - gap);
+        const nextTop = Math.max(8, DEFAULT_TOP_PX - missing);
+        setBubbleTopPx(nextTop);
+      }
+    };
+    // initial and on resize
+    setTimeout(measure, 0);
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [sleepClicks, currentPet]);
   useEffect(() => {
     if (hasMountedRef.current) {
       resetSleep();
@@ -1705,7 +1733,7 @@ const getSleepyPetImage = (clicks: number) => {
     <div className="min-h-screen flex flex-col" style={{
       backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250903_181706_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
       backgroundSize: 'cover',
-      backgroundPosition: 'center',
+      backgroundPosition: 'center 50%',
       backgroundRepeat: 'no-repeat',
       fontFamily: 'Quicksand, system-ui, sans-serif'
     }}>
@@ -2006,40 +2034,60 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       )}
 
-      {/* Top UI - Heart Progress Bar */}
-      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-20">
+      {/* Top UI - Heart Progress Bar (horizontal) - hidden when vertical is enabled */}
+      {false && (
+        <div className="absolute top-5 left-1/2 -translate-x-1/2 z-30">
+          {(() => {
+            const levelInfo = getLevelInfo();
+            return (
+              <div className="bg-white/20 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-white/30 shadow-lg">
+                <div className="flex flex-col items-center gap-2">
+                  {/* Level indicator above bar */}
+                  <div className="text-white font-bold text-base drop-shadow-md">
+                    Pet Level {levelInfo.currentLevel}
+                  </div>
+                  {/* Heart and progress bar container */}
+                  <div className="flex items-center gap-3">
+                    {/* Heart icon on the left */}
+                    <div className="text-white text-2xl drop-shadow-md">❤️</div>
+                    {/* Progress bar */}
+                    <div className="relative">
+                      {/* Progress bar background */}
+                      <div className="w-48 h-6 bg-white/30 rounded-full border border-white/40 overflow-hidden">
+                        {/* Progress fill */}
+                        <div
+                          className="h-full bg-gradient-to-r from-pink-400 to-red-500 transition-all duration-500 ease-out"
+                          style={{ width: `${levelInfo.progressPercentage}%` }}
+                        />
+                      </div>
+                      {/* Progress percentage in center */}
+                      <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold drop-shadow-md">
+                        {Math.round(levelInfo.progressPercentage)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* Top Right UI - Pet Level Bar */}
+      <div className="absolute top-5 right-10 z-30">
         {(() => {
           const levelInfo = getLevelInfo();
           return (
-            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/30 shadow-lg">
-              <div className="flex flex-col items-center gap-2">
-                {/* Level indicator above bar */}
-                <div className="text-white font-bold text-lg drop-shadow-md">
-                  Pet Level {levelInfo.currentLevel}
-          </div>
-                
-                {/* Heart and progress bar container */}
-                <div className="flex items-center gap-3">
-                  {/* Heart icon on the left */}
-                  <div className="text-white text-2xl drop-shadow-md">
-                    ❤️
-        </div>
-        
-                  {/* Progress bar */}
-                  <div className="relative">
-                    {/* Progress bar background */}
-                    <div className="w-48 h-8 bg-white/30 rounded-full border border-white/40 overflow-hidden">
-                      {/* Progress fill */}
-                      <div 
-                        className="h-full bg-gradient-to-r from-pink-400 to-red-500 transition-all duration-500 ease-out"
-                        style={{ width: `${levelInfo.progressPercentage}%` }}
-                      />
-          </div>
-                    
-                    {/* Progress percentage in center */}
-                    <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold drop-shadow-md">
-                      {Math.round(levelInfo.progressPercentage)}%
-        </div>
+            <div className="rounded-xl px-3 py-2 shadow-lg w-56">
+              <div className="flex items-center gap-2">
+                <div className="text-white font-bold text-lg drop-shadow-md">L{levelInfo.currentLevel}</div>
+                <div className="relative h-8 w-full bg-white/30 rounded-full border border-white/40 overflow-hidden flex items-center">
+                  <div
+                    className="h-full bg-gradient-to-r from-red-500 to-pink-400 transition-all duration-500 ease-out"
+                    style={{ width: `${levelInfo.progressPercentage}%` }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold drop-shadow-md whitespace-nowrap">
+                    {Math.round(levelInfo.progressPercentage)}%
                   </div>
                 </div>
               </div>
@@ -2099,7 +2147,7 @@ const getSleepyPetImage = (clicks: number) => {
             
             console.log('🧪 Added 10 coins (both global and adventure coins for testing)');
           }}
-          className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
+          className="bg-transparent hover:bg-white/5 px-3 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
           title="Testing: Add 10 adventure coins"
         >
           🪙
@@ -2120,10 +2168,10 @@ const getSleepyPetImage = (clicks: number) => {
         </button>
       </div>
 
-      {/* Top Right UI - Streak, Coins, and Daily Heart */}
-      <div className="absolute top-5 right-10 z-20 flex items-center gap-4">
+      {/* Top Right UI - Streak and Coins (below pet level) */}
+      <div className="absolute top-16 right-4 z-20 flex gap-4">
         {/* Streak */}
-        <div className="bg-white/20 backdrop-blur-md rounded-xl px-3 py-2 border border-white/30 shadow-lg">
+        <div className="rounded-xl px-4 py-2 shadow-lg w-20">
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
             <span className="text-xl">🔥</span>
             <span>{currentStreak}</span>
@@ -2131,9 +2179,9 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
         
         {/* Coins */}
-        <div className="bg-white/20 backdrop-blur-md rounded-xl px-3 py-2 border border-white/30 shadow-lg">
+        <div className="rounded-xl px-30 py-2 shadow-lg w-28">
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
-            <span className="text-xl">🪙</span>
+            <span className="text-xl">🪙 </span>
             <span>{coins}</span>
           </div>
         </div>
@@ -2216,71 +2264,62 @@ const getSleepyPetImage = (clicks: number) => {
         )}
       </div>
 
-      {/* Main pet area - adjusted positioning */}
-      <div className="flex-1 flex flex-col items-center justify-center relative pb-20 px-4 z-10 mt-20">
-        {/* Pet Thought Bubble - Only show when pet shop is closed */}
-        {!showPetShop && (
-          <div className={`relative rounded-3xl p-5 mb-4 mt-8 border-3 shadow-xl max-w-md w-full mx-4 backdrop-blur-sm ${
-            sleepClicks > 0 
-              ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-400 bg-purple-50/90'
-              : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400 bg-white/90'
-          }`}>
-            {/* Speech bubble tail pointing down to pet */}
-            <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[12px] border-l-transparent border-r-transparent ${
-              sleepClicks > 0 ? 'border-t-purple-400' : 'border-t-blue-400'
-            }`}></div>
-            
-            {/* Thought bubble dots */}
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-1">
-              <div className={`w-2 h-2 rounded-full animate-bounce ${
-                sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
-              }`} style={{animationDelay: '0s'}}></div>
-              <div className={`w-1.5 h-1.5 rounded-full animate-bounce ${
-                sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
-              }`} style={{animationDelay: '0.3s'}}></div>
-              <div className={`w-1 h-1 rounded-full animate-bounce ${
-                sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
-              }`} style={{animationDelay: '0.6s'}}></div>
-            </div>
-
-            <div className="text-sm text-slate-800 font-medium leading-relaxed text-center">
-              {sleepClicks >= 3 ? (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="text-lg font-bold">Pet will wake up after</div>
-                  <div className="text-2xl font-bold text-purple-600">
-                    {formatTimeRemaining(sleepTimeRemaining || getSleepTimeRemaining())}
-                  </div>
+      {/* Main pet area - fixed stage to prevent layout jump */}
+      <div className="flex-1 flex flex-col items-center justify-center relative px-4 z-10 mt-12">
+        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-hidden" style={{ minHeight: 'clamp(420px, 48vh, 560px)' }}>
+          {/* Thought bubble pinned to top */}
+          {!showPetShop && (
+            <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4" style={{ top: bubbleTopPx }}>
+              <div className={`relative rounded-3xl p-5 border-3 shadow-xl w-full backdrop-blur-sm ${
+                sleepClicks > 0 
+                  ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-400 bg-purple-50/90'
+                  : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400 bg-white/90'
+              }`}>
+                {/* Speech bubble tail pointing down to pet */}
+                <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[12px] border-l-transparent border-r-transparent ${
+                  sleepClicks > 0 ? 'border-t-purple-400' : 'border-t-blue-400'
+                }`}></div>
+                {/* Thought bubble dots */}
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-1">
+                  <div className={`w-2 h-2 rounded-full animate-bounce ${
+                    sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+                  }`} style={{animationDelay: '0s'}}></div>
+                  <div className={`w-1.5 h-1.5 rounded-full animate-bounce ${
+                    sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+                  }`} style={{animationDelay: '0.3s'}}></div>
+                  <div className={`w-1 h-1 rounded-full animate-bounce ${
+                    sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+                  }`} style={{animationDelay: '0.6s'}}></div>
                 </div>
-              ) : (
-                currentPetThought
-              )}
+                <div className="text-sm text-slate-800 font-medium leading-relaxed text-center">
+                  {sleepClicks >= 3 ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="text-lg font-bold">Pet will wake up after</div>
+                      <div className="text-2xl font-bold text-purple-600">
+                        {formatTimeRemaining(sleepTimeRemaining || getSleepTimeRemaining())}
+                      </div>
+                    </div>
+                  ) : (
+                    currentPetThought
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Pet and Timer Container */}
-        <div className="flex items-center justify-center gap-8">
-          {/* Pet (Custom Image) */}
-          <div className="relative drop-shadow-2xl">
+          )}
+          {/* Pet pinned to bottom */}
+          <div ref={petRef} className="absolute bottom-0 left-1/2 -translate-x-1/2 drop-shadow-2xl">
             <img 
               src={getPetImage()}
               alt="Pet"
               className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                sleepClicks > 0 ? 'w-80 h-80 max-h-80' : 'w-72 h-72 max-h-72'
+                sleepClicks > 0 ? 'w-80 h-80 max-h-[360px]' : 'w-72 h-72 max-h-[320px]'
               }`}
               style={{
                 animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
                           getCumulativeCarePercentage() >= 60 ? 'petEvolve 800ms ease-out' : 'none'
               }}
             />
-            
           </div>
-
-        </div>
-        
-        {/* Food bowl */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-20 text-5xl drop-shadow-lg">
-          🥣
         </div>
       </div>
 
@@ -2348,67 +2387,90 @@ const getSleepyPetImage = (clicks: number) => {
       </div>
       */}
 
-      {/* Bottom Action Buttons */}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
-        <div className="flex gap-4 px-4 py-2 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 shadow-xl">
-        {getActionStates().map((action) => (
-          <button
-            key={action.id}
-            onClick={() => handleActionClick(action.id)}
-            disabled={action.status === 'disabled'}
-            className={`flex flex-col items-center gap-1 p-3 bg-transparent border-none rounded-xl min-w-16 transition-all duration-200 ${
-              action.status === 'disabled' 
-                ? 'cursor-not-allowed opacity-50' 
-                : 'cursor-pointer hover:bg-white/20 hover:-translate-y-1 active:scale-95'
-            }`}
-          >
-            {/* Action icon with grouped status emoji */}
-            <div className="relative">
-              <div className="text-4xl drop-shadow-lg">
-                {action.id === 'food' && isAdventureLoading ? (
-                  <div className="animate-spin text-4xl">⏳</div>
-                ) : (
-                  action.icon
-                )}
-              </div>
-              
-              {/* Status emoji - always visible for non-shop buttons, grouped with main icon */}
-              {action.id !== 'shop' && (
-                <div className="absolute -top-3 -right-2 text-lg bg-white rounded-full w-6 h-6 flex items-center justify-center shadow-md">
-                  {getStatusEmoji(action.status) || '😐'}
-                </div>
-              )}
+      {/* Below-bubble To-Dos: Travel and Sleep */}
+      {!showPetShop && (
+        <div className="relative z-20 mt-12 flex justify-center">
+          <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg p-3 w-[400px] mb-16">
+            {/* Subheader */}
+            <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Daily Quests</div>
+            <div className="mt-1 flex flex-col gap-2">
+              {(() => {
+                const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, 'travel', 50);
+                const progress = done ? 1 : 0;
+                return (
+                  <div className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${done ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'}`}>
+                    {/* Celebration badge for completed */}
+                    {done && (
+                      <div className="absolute -top-2 -left-2 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
+                        ⭐
+                      </div>
+                    )}
+                    <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">✈️</div>
+                    <div className="flex-1">
+                      <div className={`font-semibold drop-shadow-md ${done ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>Travel</div>
+                      <div className="mt-0.5 h-2 bg-white/25 rounded-full overflow-hidden w-[260px]">
+                        <div className={`h-full transition-all duration-500 ${done ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
+                      </div>
+                    </div>
+                    <button aria-label={done ? 'Completed - Click to view' : 'Start Travel'} onClick={() => handleActionClick('travel')} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : 'bg-white/90'}`}>
+                      {done ? '✓' : '→'}
+                    </button>
+                  </div>
+                );
+              })()}
+              {(() => {
+                const clicks = sleepClicks;
+                const asleep = clicks >= 3;
+                const available = isSleepAvailable();
+                const progress = Math.min(clicks / 3, 1);
+                const label = asleep ? 'Sleeping' : 'Sleep';
+                const disabled = asleep || (!available && clicks < 3);
+                return (
+                  <div className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${asleep ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'}`}>
+                    {/* Celebration badge for completed */}
+                    {asleep && (
+                      <div className="absolute -top-2 -left-2 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
+                        ⭐
+                      </div>
+                    )}
+                    <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">😴</div>
+                    <div className="flex-1">
+                      <div className={`font-semibold drop-shadow-md ${asleep ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>{label}</div>
+                      <div className="mt-0.5 h-2 bg-white/25 rounded-full overflow-hidden w-[260px]">
+                        <div className={`h-full transition-all duration-500 ${asleep ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
+                      </div>
+                    </div>
+                    <button aria-label={asleep ? 'Completed - Click to view' : 'Sleep'} onClick={() => handleActionClick('sleep')} disabled={disabled} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${asleep ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : disabled ? 'bg-white/50 opacity-50' : 'bg-white/90'}`}>
+                      {asleep ? '✓' : '→'}
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
-            
-            {/* Action label - small text below */}
-            <div className="text-xs font-semibold text-white drop-shadow-md">
-              {action.label}
+            {/* Footer shortcuts: More and Shop inside the same container */}
+            <div className="mt-3 pt-3 border-t border-white/20 grid grid-cols-2 gap-2">
+              <button
+                aria-label="More"
+                onClick={() => handleActionClick('more')}
+                className="h-11 rounded-xl bg-white/80 text-slate-800 font-semibold flex items-center justify-center gap-2 hover:scale-105 active:scale-95"
+              >
+                <span className="text-xl">🐾</span>
+                <span>More</span>
+              </button>
+              <button
+                aria-label="Shop"
+                onClick={() => handleActionClick('shop')}
+                className="h-11 rounded-xl bg-white/80 text-slate-800 font-semibold flex items-center justify-center gap-2 hover:scale-105 active:scale-95"
+              >
+                <span className="text-xl">🛒</span>
+                <span>Shop</span>
+              </button>
             </div>
-            
-            {/* Coin cost for Food action */}
-            {action.id === 'water' && (
-              <div className="text-xs font-semibold text-yellow-300 drop-shadow-md">
-                
-              </div>
-            )}
-            
-            {/* Free indicator for Sleep action */}
-            {action.id === 'sleep' && (
-              <div className="text-xs font-semibold text-green-300 drop-shadow-md">
-                
-              </div>
-            )}
-            
-            {/* Free indicator for Food action */}
-            {action.id === 'food' && (
-              <div className="text-xs font-semibold text-blue-300 drop-shadow-md">
-                
-              </div>
-            )}
-          </button>
-        ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Removed bottom action bar; actions are in the to-do container */}
 
       {/* More Overlay */}
       {showMoreOverlay && (() => {

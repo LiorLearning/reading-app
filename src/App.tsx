@@ -13,8 +13,23 @@ import { ProgressTracking } from "./pages/ProgressTracking";
 import { PetPage } from "./pages/PetPage";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCoins } from "@/pages/coinSystem";
 
 const queryClient = new QueryClient();
+
+// Dev-only invisible hotspot to add coins quickly while developing
+const DevCoinHotspot: React.FC = () => {
+  if (!import.meta.env.DEV) return null;
+  const { addAdventureCoins } = useCoins();
+  return (
+    <button
+      aria-label="dev-coin-hotspot"
+      title="Add 10 coins"
+      onClick={() => addAdventureCoins(10, 'food')}
+      className="fixed bottom-2 left-2 h-10 w-10 opacity-0 z-[9999] cursor-pointer"
+    />
+  );
+};
 
 // Unified component that seamlessly switches between pet page and adventure
 const UnifiedPetAdventureApp = () => {
@@ -84,6 +99,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <CameraWidget />
+          <DevCoinHotspot />
           <BrowserRouter>
             <Routes>
               {/* Unified pet page and adventure experience */}
