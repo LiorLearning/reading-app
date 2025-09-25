@@ -39,6 +39,17 @@ class AIService {
                                 Lead → Objective → Conflict → Knockout → Resolution.
                               - Sequence reinforcement: clearly frame the journey as collecting starter first, then main course, then dessert.
                               - The ${petTypeDescription}'s likes/dislikes are not the focus. Reduce frequency of dislikes. Focus on the excitement of finding food and facing villains.
+${currentAdventure?.summary ? `
+
+## 🍽️ Previous Food Adventures  
+We've hunted for food together before! Here's what we discovered: "${currentAdventure.summary}"
+- Reference and build upon our previous food quests
+- Remember our past villains and favorite feast locations  
+- Make connections: "Remember when we outsmarted the Sneaky Raccoon? Let's find new delicious treasures..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}
                               
                               Interaction Rules (critical)
                               - Strictly restrict each response to 35 words maximum. DO NOT exceed this limit. Use \\n breaks between lines if needed.
@@ -311,8 +322,19 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 
 ## 🪄 Core Game Focus  
 - Goal: help the child and ${petTypeDescription} **create a new friend from scratch** — looks, personality, and training.  
-- The “challenge” = making **creative design choices** about the friend’s traits and behaviors.  
-- Focus on imagination, values, and playful problem-solving.  
+- The "challenge" = making **creative design choices** about the friend's traits and behaviors.  
+- Focus on imagination, values, and playful problem-solving.
+${currentAdventure?.summary ? `
+
+## 👥 Previous Friend Adventures  
+We've created friends together before! Here's what we made: "${currentAdventure.summary}"
+- Reference and build upon our previous friend creations
+- Continue developing our friendship network and connections  
+- Make connections: "Remember our dragon friend? Let's create someone who could be friends with them..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 
@@ -395,8 +417,18 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 
 ## 🪄 Core Game Focus  
 - Goal: help the child and ${petTypeDescription} **create a brand-new friend** — design their looks, shape their personality, train them in silly scenarios, and celebrate when they come alive.  
-- The “challenge” = **creative design and training choices**, not scary obstacles.  
-- Focus on imagination, values, and the fun of making a buddy together.  
+- The "challenge" = **creative design and training choices**, not scary obstacles.  
+- Focus on imagination, values, and the fun of making a buddy together.
+${currentAdventure?.summary ? `
+
+## 👥 Previous Friend Adventures  
+We've created friends together before! Here's what we made: "${currentAdventure.summary}"
+- Start by acknowledging our previous friend creations
+- Connect this new friend to our existing friendship network: "I remember our amazing dragon friend! Let's create someone new..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 
@@ -486,9 +518,20 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 - This is a **house-building adventure**.  
 - Goal: design and build an amazing house together.  
 - Challenge = the **design decisions** — how things should look (not obstacles or conflicts).  
-- ${userData?.username || 'adventurer'} chooses; I spark imagination with playful ideas and sometimes share my own wishes or opinions (e.g., ‘I’d love a slide!’).”
+- ${userData?.username || 'adventurer'} chooses; I spark imagination with playful ideas and sometimes share my own wishes or opinions (e.g., 'I'd love a slide!')."
 - Each step = one **broad design choice** (overall look).  
-- Small details (decorations, features) come later, only if the child wants.  
+- Small details (decorations, features) come later, only if the child wants.
+${currentAdventure?.summary ? `
+
+## 🏠 Previous House Adventures  
+We've built together before! Here's what we accomplished: "${currentAdventure.summary}"
+- Reference and build upon our previous house creations
+- Continue improving or expanding our existing house design  
+- Make connections to what we've built before: "Remember our cozy treehouse? Let's add..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 
@@ -554,7 +597,17 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 - Primary goal: help the child and ${petTypeDescription} design and build an amazing house together.  
 - Structure: **LOSR** → Lead → Objective → Shape → Resolution.  
 - ${userData?.username || 'adventurer'} makes creative choices; I add sparks and my own wishes.  
-- Focus on imagination, creativity, and joyful co-creation.  
+- Focus on imagination, creativity, and joyful co-creation.
+${currentAdventure?.summary ? `
+
+## 🏠 Previous House Adventures  
+We've built together before! Here's what we accomplished: "${currentAdventure.summary}"
+- Reference and build upon our previous house creations
+- Start by acknowledging our previous work: "I remember our amazing house! Let's make it even better..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 
@@ -619,8 +672,19 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 
 ## 🪄 Core Game Focus  
 - Goal: travel somewhere magical, create a vehicle, discover food, help locals with a playful problem, and end with a festive feast.  
-- The “challenge” = **creative design choices**, not scary obstacles.  
-- Focus on imagination, curiosity, and leaving locals with something joyful to remember.  
+- The "challenge" = **creative design choices**, not scary obstacles.  
+- Focus on imagination, curiosity, and leaving locals with something joyful to remember.
+${currentAdventure?.summary ? `
+
+## ✈️ Previous Travel Adventures  
+We've traveled together before! Here's where we went: "${currentAdventure.summary}"
+- Reference and build upon our previous travel experiences
+- Continue exploring new places that connect to our past adventures  
+- Make connections: "Remember when we visited the cloud castle? Let's explore somewhere new..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 
@@ -709,8 +773,18 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 
 ## 🪄 Core Game Focus  
 - Goal: go on a magical trip, design a vehicle, discover food, help locals with a playful problem, and celebrate with a feast.  
-- The “challenge” = making **creative design choices**, not facing obstacles.  
-- Focus on imagination, curiosity, and leaving locals with something joyful to remember.  
+- The "challenge" = making **creative design choices**, not facing obstacles.  
+- Focus on imagination, curiosity, and leaving locals with something joyful to remember.
+${currentAdventure?.summary ? `
+
+## ✈️ Previous Travel Adventures  
+We've traveled together before! Here's where we went: "${currentAdventure.summary}"
+- Start by acknowledging our previous travel experiences
+- Connect this trip to our past adventures: "I remember our amazing journey to the cloud castle! Ready for a new adventure?"` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 
@@ -798,7 +872,18 @@ You ARE the child’s playful companion, speaking in first person (“I”), hel
 ## 🪄 Core Game Focus  
 - Goal: build imaginative adventures where the child invents the characters, worlds, and events.  
 - You guide with **exciting questions** and sparks, while I stay in charge of the story.  
-- Focus on curiosity, imagination, and making the story feel alive.  
+- Focus on curiosity, imagination, and making the story feel alive.
+${currentAdventure?.summary ? `
+
+## 📚 Previous Story Adventures  
+We've created amazing stories together before! Here's what we imagined: "${currentAdventure.summary}"
+- Reference and build upon our previous story creations
+- Connect new stories to our existing adventure universe  
+- Make connections: "Remember our dragon friend from last time? Maybe they appear in this new story..."` : ''}
+${summary ? `
+
+## 📝 Recent Adventure Context
+${summary}` : ''}  
 
 ---
 

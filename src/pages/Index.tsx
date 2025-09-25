@@ -23,6 +23,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-ai-streaming";
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
+import { adventureHistoryService } from "@/lib/adventure-history-service";
+// Development testing utilities
+import "@/lib/adventure-history-test";
 import { useCoins } from "@/pages/coinSystem";
 import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
@@ -52,7 +55,7 @@ import { useFirebaseImage, useCurrentAdventureId } from "@/hooks/use-firebase-im
 
 import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
-import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
+import { autoMigrateOnLogin, forceMigrateUserData, forceMigratePetProgress } from "@/lib/firebase-data-migration";
 
 import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
@@ -228,6 +231,57 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       (window as any).debugFirebaseConnection = debugFirebaseConnection;
       (window as any).migrateToFirebase = () => forceMigrateUserData(user?.uid || 'anonymous');
       (window as any).autoMigrateOnLogin = () => autoMigrateOnLogin(user?.uid || 'anonymous');
+      (window as any).migratePetProgress = () => forceMigratePetProgress(user?.uid || 'anonymous');
+      (window as any).refreshPetData = () => PetProgressStorage.manualRefreshFromFirebase();
+      (window as any).debugPetSleep = (petId = 'dog') => {
+        const petData = PetProgressStorage.getPetProgress(petId);
+        console.log(`😴 Sleep Debug for ${petId}:`, {
+          isAsleep: petData.sleepData.isAsleep,
+          sleepClicks: petData.sleepData.sleepClicks,
+          sleepCompleted: petData.heartData.sleepCompleted,
+          sleepStartTime: new Date(petData.sleepData.sleepStartTime).toISOString(),
+          sleepEndTime: new Date(petData.sleepData.sleepEndTime).toISOString(),
+        });
+      };
+      (window as any).debugAllPets = () => {
+        const allPetIds = PetProgressStorage.getAllPetIds();
+        const currentPet = PetProgressStorage.getCurrentSelectedPet();
+        console.log(`🐾 All Pets Debug:`, { 
+          currentSelectedPet: currentPet,
+          allPetIds: allPetIds 
+        });
+        allPetIds.forEach(petId => {
+          const petData = PetProgressStorage.getPetProgress(petId);
+          console.log(`Pet ${petId}:`, {
+            isOwned: petData.generalData.isOwned,
+            level: petData.levelData.currentLevel,
+            totalCoins: petData.levelData.totalAdventureCoinsEarned,
+            questType: petData.todoData?.currentType,
+            questProgress: petData.adventureCoinsByType,
+            isAsleep: petData.sleepData.isAsleep,
+            sleepCompleted: petData.heartData.sleepCompleted
+          });
+        });
+      };
+
+      // Test quest and level sync for current pet
+      (window as any).testPetSync = () => {
+        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+        console.log(`🧪 Testing sync for pet: ${currentPetId}`);
+        
+        // Add adventure coins to trigger level and quest updates
+        PetProgressStorage.addAdventureCoins(currentPetId, 10, 'house');
+        
+        console.log(`✅ Added 10 adventure coins to ${currentPetId} for 'house' quest`);
+        console.log('Check other browser sessions - they should update within 15-30 seconds');
+      };
+
+      // Test switching pets to verify per-pet data
+      (window as any).switchTestPet = (petId = 'cat') => {
+        console.log(`🔄 Switching to pet: ${petId}`);
+        PetProgressStorage.setCurrentSelectedPet(petId);
+        window.location.reload(); // Reload to see pet switch
+      };
     }
   }, [user]);
 
@@ -1187,7 +1241,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const petName = PetProgressStorage.getPetDisplayName(currentPetId);
       const petType = PetProgressStorage.getPetType(currentPetId);
       
-      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType, adventureType: currentAdventureType });
+      console.log('🔍 Calling AI service with:', { 
+        userText, 
+        spellingQuestion, 
+        hasUserData: !!userData, 
+        petName, 
+        petType, 
+        adventureType: currentAdventureType,
+        hasAdventureContext: !!currentAdventureContext,
+        adventureContextSummary: currentAdventureContext?.summary?.substring(0, 100)
+      });
       
       const result = await aiService.generateResponse(
         userText, 
@@ -1195,7 +1258,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         spellingQuestion, 
         userData,
         undefined, // adventureState
-        undefined, // currentAdventure  
+        currentAdventureContext, // currentAdventure - NOW PASSING CONTEXT FROM HISTORY!
         undefined, // storyEventsContext
         currentSummary, // summary
         petName, // petName
@@ -2400,6 +2463,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         saveAdventure(adventure);
       }
       
+      // Record adventure history for contextual continuations
+      try {
+        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+        if (currentPetId && currentAdventureType) {
+          await adventureHistoryService.recordAdventureHistory(
+            currentPetId,
+            currentAdventureType,
+            currentAdventureId,
+            currentSessionId || undefined,
+            adventureSummary
+          );
+          console.log(`✅ Recorded adventure history for pet ${currentPetId} - ${currentAdventureType}`);
+        }
+      } catch (historyError) {
+        console.warn('Failed to record adventure history (continuing without):', historyError);
+      }
+      
       // // Create a new comic panel for this adventure every 10 messages
       // console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
       
@@ -2660,6 +2740,45 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setCurrentAdventureType(adventureType);
     // Reset the initial response ref when starting a new adventure
     initialResponseSentRef.current = null;
+    
+    // Load adventure context from history service when continuing
+    if (mode === 'continue') {
+      try {
+        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+        const context = await adventureHistoryService.getLastAdventureContext(currentPetId, adventureType);
+        
+        if (context && context.summary) {
+          console.log('🔄 Index: Loading adventure context from history:', context.summary.substring(0, 100) + '...');
+          
+          // Set adventure context for AI responses
+          setCurrentAdventureContext({
+            name: `${adventureType} adventure with ${PetProgressStorage.getPetDisplayName(currentPetId)}`,
+            summary: context.summary
+          });
+          
+          // Load previous messages if available
+          if (context.messages && context.messages.length > 0) {
+            console.log('🔄 Index: Restoring previous messages:', context.messages.length);
+            setChatMessages(context.messages);
+          }
+          
+          // Restore comic panels if available
+          if (context.comicPanels && context.comicPanels.length > 0) {
+            console.log(`🖼️ Index: Restoring ${context.comicPanels.length} comic panels from previous adventure`);
+            reset(context.comicPanels);
+          }
+          
+          // Use existing adventure ID if available
+          if (context.adventureId) {
+            setCurrentAdventureId(context.adventureId);
+          }
+        } else {
+          console.log('🔄 Index: No previous adventure context found, starting fresh');
+        }
+      } catch (error) {
+        console.warn('Failed to load adventure context from history (continuing without):', error);
+      }
+    }
     
     // Trigger initial response generation with the correct adventure type
     // We need to do this after state updates to ensure the adventure type is passed correctly
@@ -3475,20 +3594,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             if (topicProgress.isCompleted) {
               const passedTopic = isSpellboxTopicPassingGrade(topicProgress);
               if (passedTopic) {
-                // Topic completed with 70%+ success rate
-                const congratsMessage: ChatMessage = {
-                  type: 'ai',
-                  content: `Fantastic work! You mastered the "${currentSpellQuestion.topicName}" topic with a strong first-attempt accuracy. Keep it up! 🏆`,
-                  timestamp: Date.now()
-                };
-                
-                setChatMessages(prev => {
-                  playMessageSound();
-                  const messageId = `index-chat-${congratsMessage.timestamp}-${prev.length}`;
-                  ttsService.speakAIMessage(congratsMessage.content, messageId)
-                    .catch(error => console.error('TTS error:', error));
-                  return [...prev, congratsMessage];
-                });
+                // Topic completed with 70%+ success rate - continue with adventure flow
               } else {
                 // Topic completed but below 70%
                 const encouragementMessage: ChatMessage = {

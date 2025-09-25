@@ -1,4 +1,7 @@
-// Pet-wise local storage service for persistent progress tracking
+// Pet-wise local storage service for persistent progress tracking - now with Firebase integration
+import { firebaseUnifiedPetService } from '@/lib/firebase-unified-pet-service';
+import { auth } from '@/lib/firebase';
+
 export interface PetProgressData {
   // Pet identification
   petId: string;
@@ -97,6 +100,9 @@ export class PetProgressStorage {
   private static readonly GLOBAL_SETTINGS_KEY = 'litkraft_global_pet_settings';
   private static readonly EIGHT_HOURS_MS = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
   private static readonly DEFAULT_SLEEP_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours default sleep
+  private static isLoadingFromFirebase = false; // Flag to prevent sync loops
+  private static readonly PENDING_SYNC_KEY = 'litkraft_pending_pet_syncs'; // Key for storing pending syncs
+  private static isOnline = navigator.onLine; // Track online status
 
   // Get the storage key for a specific pet
   private static getPetStorageKey(petId: string): string {
@@ -178,9 +184,44 @@ export class PetProgressStorage {
     };
   }
 
-  // Get pet progress data
+  // Get pet progress data (with Firebase integration for important pets)
   static getPetProgress(petId: string, petType: string = petId): PetProgressData {
     try {
+      // If user is authenticated, prioritize fresh data over localStorage to prevent data leakage
+      if (auth.currentUser) {
+        // For authenticated users, only use localStorage if it exists and is recent
+        // This prevents new users from inheriting old localStorage data
+        const stored = localStorage.getItem(this.getPetStorageKey(petId));
+        if (stored) {
+          const parsed: PetProgressData = JSON.parse(stored);
+          
+          // Check if this data is from the current user session (within last hour)
+          const dataAge = Date.now() - (parsed.generalData?.lastUpdated || 0);
+          const oneHour = 60 * 60 * 1000;
+          
+          if (dataAge < oneHour) {
+            // Validate and migrate data structure if needed
+            const migrated = this.migratePetData(parsed, petId, petType);
+            
+            // Check for 8-hour heart reset
+            this.checkAndPerformHeartReset(migrated);
+            
+            // Check sleep status
+            this.updateSleepStatus(migrated);
+            
+            return migrated;
+          } else {
+            console.log(`🆕 Authenticated user: pet ${petId} localStorage data is stale, using fresh defaults`);
+          }
+        } else {
+          console.log(`🆕 Authenticated user: no localStorage data for pet ${petId}, using fresh defaults`);
+        }
+        
+        // Return fresh defaults for authenticated users without recent data
+        return this.getDefaultPetProgress(petId, petType);
+      }
+
+      // For unauthenticated users, fall back to localStorage
       const stored = localStorage.getItem(this.getPetStorageKey(petId));
       if (stored) {
         const parsed: PetProgressData = JSON.parse(stored);
@@ -208,6 +249,9 @@ export class PetProgressStorage {
     try {
       petData.generalData.lastUpdated = Date.now();
       localStorage.setItem(this.getPetStorageKey(petData.petId), JSON.stringify(petData));
+      
+      // Sync to Firebase in background if user is authenticated
+      this.syncPetProgressToFirebase(petData);
       
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('petProgressChanged', { 
@@ -737,21 +781,66 @@ export class PetProgressStorage {
     }
   }
 
-  // Get currently selected pet
+  // Get currently selected pet (with Firebase integration)
   static getCurrentSelectedPet(): string {
-    return this.getGlobalSettings().currentSelectedPet;
+    try {
+      // For now, keep using localStorage for immediate synchronous access
+      // Firebase sync happens in the background via the unified service
+      return this.getGlobalSettings().currentSelectedPet;
+    } catch (error) {
+      console.warn('Failed to get current selected pet:', error);
+      return 'dog'; // Default fallback
+    }
   }
 
-  // Set currently selected pet
+  // Async version for Firebase integration
+  static async getCurrentSelectedPetAsync(): Promise<string> {
+    try {
+      // Try Firebase first if user is authenticated
+      if (auth.currentUser) {
+        const firebaseData = await firebaseUnifiedPetService.getPetData();
+        if (firebaseData?.currentSelectedPet) {
+          // Also update localStorage cache
+          this.setCurrentSelectedPet(firebaseData.currentSelectedPet);
+          return firebaseData.currentSelectedPet;
+        }
+      }
+
+      // Fallback to localStorage
+      return this.getCurrentSelectedPet();
+    } catch (error) {
+      console.warn('Failed to get current selected pet from Firebase:', error);
+      return this.getCurrentSelectedPet(); // Fall back to sync version
+    }
+  }
+
+  // Set currently selected pet (with Firebase integration)
   static setCurrentSelectedPet(petId: string): void {
-    // Update global settings
+    console.log(`🐾 Setting current selected pet to: ${petId}`);
+    
+    // Update global settings in localStorage immediately
     this.setGlobalSettings({ currentSelectedPet: petId });
     
-    // Update all pets' selection status
+    // Sync to Firebase in background if user is authenticated
+    if (auth.currentUser) {
+      console.log(`🔄 Syncing selected pet ${petId} to Firebase...`);
+      firebaseUnifiedPetService.setPetData({
+        currentSelectedPet: petId
+      }).catch(error => {
+        console.warn('Failed to sync current selected pet to Firebase:', error);
+      });
+    }
+    
+    // Update all pets' selection status (pet-wise updates)
     const allPetIds = this.getAllPetIds();
+    console.log(`🔄 Updating selection status for all pets: ${allPetIds.join(', ')}`);
     allPetIds.forEach(id => {
       const petData = this.getPetProgress(id);
+      const wasSelected = petData.generalData.isCurrentlySelected;
       petData.generalData.isCurrentlySelected = (id === petId);
+      if (wasSelected !== petData.generalData.isCurrentlySelected) {
+        console.log(`Pet ${id} selection changed: ${wasSelected} -> ${petData.generalData.isCurrentlySelected}`);
+      }
       this.setPetProgress(petData);
     });
   }
@@ -1111,6 +1200,350 @@ export class PetProgressStorage {
       console.warn('Failed to migrate from old pet data service:', error);
     }
   }
+
+  // === FIREBASE SYNC METHODS ===
+  
+  // Sync pet progress to Firebase in background
+  private static syncPetProgressToFirebase(petData: PetProgressData): void {
+    if (!auth.currentUser || this.isLoadingFromFirebase) {
+      return; // No user authenticated or loading from Firebase, skip sync
+    }
+    
+    // Check if online
+    if (!this.isOnline) {
+      // Queue for later sync when online
+      this.addToPendingSync(petData);
+      return;
+    }
+    
+    // Convert local data format to Firebase format
+    const firebaseData = this.convertToFirebaseFormat(petData);
+    
+    // Sync in background without blocking
+    firebaseUnifiedPetService.setPetProgress(firebaseData).catch(error => {
+      console.warn(`Failed to sync pet ${petData.petId} to Firebase:`, error);
+      // Add to pending sync queue for retry
+      this.addToPendingSync(petData);
+    });
+  }
+  
+  // Load pet progress from Firebase with localStorage fallback
+  static async getPetProgressFromFirebase(petId: string, petType: string = petId): Promise<PetProgressData> {
+    try {
+      if (auth.currentUser) {
+        this.isLoadingFromFirebase = true;
+        const firebaseData = await firebaseUnifiedPetService.getPetProgress(petId);
+        if (firebaseData) {
+          // Convert Firebase format to local format
+          const localData = this.convertFromFirebaseFormat(firebaseData);
+          
+          // Update localStorage cache (without triggering Firebase sync)
+          this.setPetProgress(localData);
+          
+          return localData;
+        }
+      }
+    } catch (error) {
+      console.warn(`Failed to load pet ${petId} from Firebase:`, error);
+    } finally {
+      this.isLoadingFromFirebase = false;
+    }
+    
+    // Fallback to localStorage
+    return this.getPetProgress(petId, petType);
+  }
+  
+  // Convert local PetProgressData to Firebase format
+  static convertToFirebaseFormat(petData: PetProgressData): any {
+    return {
+      petId: petData.petId,
+      petType: petData.petType,
+      petName: petData.petName,
+      cumulativeCoinsSpent: petData.cumulativeCoinsSpent,
+      heartData: petData.heartData,
+      adventureCoinsByType: petData.adventureCoinsByType,
+      todoData: petData.todoData,
+      dailyCoins: petData.dailyCoins,
+      sleepData: petData.sleepData,
+      evolutionData: petData.evolutionData,
+      levelData: petData.levelData,
+      customizationData: {
+        unlockedFeatures: petData.customizationData.unlockedImages || [],
+        purchasedItems: petData.customizationData.unlockedAccessories || [],
+        equippedItems: {
+          accessory: petData.customizationData.currentAccessory || ''
+        }
+      },
+      generalData: {
+        isOwned: petData.generalData.isOwned,
+        purchaseDate: petData.generalData.lastUpdated,
+        lastInteractionTime: petData.generalData.lastUpdated,
+        audioEnabled: petData.generalData.audioEnabled
+      }
+    };
+  }
+  
+  // Convert Firebase format to local PetProgressData
+  static convertFromFirebaseFormat(firebaseData: any): PetProgressData {
+    const defaultData = this.getDefaultPetProgress(firebaseData.petId, firebaseData.petType);
+    
+    return {
+      ...defaultData,
+      petId: firebaseData.petId,
+      petType: firebaseData.petType,
+      petName: firebaseData.petName,
+      cumulativeCoinsSpent: firebaseData.cumulativeCoinsSpent || 0,
+      heartData: firebaseData.heartData || defaultData.heartData,
+      adventureCoinsByType: firebaseData.adventureCoinsByType || defaultData.adventureCoinsByType,
+      todoData: firebaseData.todoData || defaultData.todoData,
+      dailyCoins: firebaseData.dailyCoins || defaultData.dailyCoins,
+      sleepData: firebaseData.sleepData || defaultData.sleepData,
+      evolutionData: firebaseData.evolutionData || defaultData.evolutionData,
+      levelData: firebaseData.levelData || defaultData.levelData,
+      customizationData: {
+        unlockedImages: firebaseData.customizationData?.unlockedFeatures || [],
+        unlockedAccessories: firebaseData.customizationData?.purchasedItems || [],
+        currentAccessory: firebaseData.customizationData?.equippedItems?.accessory,
+        specialStates: defaultData.customizationData.specialStates
+      },
+      achievementData: defaultData.achievementData, // Not in Firebase yet, keep local
+      generalData: {
+        isOwned: firebaseData.generalData?.isOwned || false,
+        audioEnabled: firebaseData.generalData?.audioEnabled || true,
+        lastUpdated: firebaseData.generalData?.lastInteractionTime || Date.now(),
+        isCurrentlySelected: defaultData.generalData.isCurrentlySelected
+      }
+    };
+  }
+
+  // === OFFLINE SUPPORT METHODS ===
+  
+  // Initialize offline support
+  static initializeOfflineSupport(): void {
+    // Listen to online/offline events
+    window.addEventListener('online', () => {
+      console.log('🌐 Coming back online - syncing pending pet data...');
+      this.isOnline = true;
+      this.processPendingSync();
+      this.refreshAllPetDataFromFirebase(); // Refresh data when coming online
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('📴 Gone offline - queuing pet data syncs...');
+      this.isOnline = false;
+    });
+
+    // Listen to page visibility changes to refresh data when user switches tabs
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.isOnline && auth.currentUser) {
+        console.log('👁️ Page became visible - refreshing pet data from Firebase...');
+        this.refreshAllPetDataFromFirebase();
+      }
+    });
+
+    // Listen to window focus events for additional tab switching detection
+    window.addEventListener('focus', () => {
+      if (this.isOnline && auth.currentUser) {
+        console.log('🎯 Window gained focus - refreshing pet data from Firebase...');
+        this.refreshAllPetDataFromFirebase();
+      }
+    });
+
+    // Update initial online status
+    this.isOnline = navigator.onLine;
+
+    // Process any existing pending syncs on initialization
+    this.processPendingSync();
+  }
+  
+  // Add pet data to pending sync queue
+  private static addToPendingSync(petData: PetProgressData): void {
+    try {
+      const pendingSyncs = this.getPendingSyncs();
+      
+      // Remove any existing entry for this pet (replace with latest data)
+      const filtered = pendingSyncs.filter(p => p.petId !== petData.petId);
+      
+      // Add the new data with timestamp
+      filtered.push({
+        ...petData,
+        pendingSyncTimestamp: Date.now()
+      });
+      
+      localStorage.setItem(this.PENDING_SYNC_KEY, JSON.stringify(filtered));
+      console.log(`📋 Added pet ${petData.petId} to pending sync queue`);
+    } catch (error) {
+      console.warn('Failed to add to pending sync queue:', error);
+    }
+  }
+  
+  // Get pending syncs from localStorage
+  private static getPendingSyncs(): (PetProgressData & { pendingSyncTimestamp: number })[] {
+    try {
+      const stored = localStorage.getItem(this.PENDING_SYNC_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.warn('Failed to get pending syncs:', error);
+      return [];
+    }
+  }
+  
+  // Process all pending syncs
+  private static async processPendingSync(): Promise<void> {
+    if (!this.isOnline || !auth.currentUser) {
+      return;
+    }
+    
+    const pendingSyncs = this.getPendingSyncs();
+    if (pendingSyncs.length === 0) {
+      return;
+    }
+    
+    console.log(`🔄 Processing ${pendingSyncs.length} pending pet syncs...`);
+    
+    const successful: string[] = [];
+    
+    // Process each pending sync
+    for (const pendingData of pendingSyncs) {
+      try {
+        const firebaseData = this.convertToFirebaseFormat(pendingData);
+        await firebaseUnifiedPetService.setPetProgress(firebaseData);
+        successful.push(pendingData.petId);
+        console.log(`✅ Synced pet ${pendingData.petId} successfully`);
+      } catch (error) {
+        console.warn(`❌ Failed to sync pet ${pendingData.petId}:`, error);
+      }
+    }
+    
+    // Remove successful syncs from queue
+    if (successful.length > 0) {
+      const remaining = pendingSyncs.filter(p => !successful.includes(p.petId));
+      if (remaining.length === 0) {
+        localStorage.removeItem(this.PENDING_SYNC_KEY);
+      } else {
+        localStorage.setItem(this.PENDING_SYNC_KEY, JSON.stringify(remaining));
+      }
+      
+      console.log(`🎉 Successfully synced ${successful.length} pets, ${remaining.length} remaining`);
+    }
+  }
+  
+  // Get count of pending syncs (for debugging)
+  static getPendingSyncCount(): number {
+    return this.getPendingSyncs().length;
+  }
+  
+  // Clear all pending syncs (for debugging)
+  static clearPendingSyncs(): void {
+    localStorage.removeItem(this.PENDING_SYNC_KEY);
+    console.log('🗑️ Cleared all pending pet syncs');
+  }
+
+  // Manual refresh from Firebase (can be called by UI components)
+  static async manualRefreshFromFirebase(): Promise<void> {
+    if (!auth.currentUser) {
+      console.warn('Cannot refresh from Firebase - user not authenticated');
+      return;
+    }
+    
+    console.log('🔄 Manual refresh from Firebase requested...');
+    await this.refreshAllPetDataFromFirebase();
+  }
+
+  // Refresh all pet data from Firebase (for real-time sync between browser sessions)
+  private static async refreshAllPetDataFromFirebase(): Promise<void> {
+    if (!auth.currentUser || !this.isOnline) {
+      return;
+    }
+
+    try {
+      console.log('🔄 Starting comprehensive pet-wise Firebase refresh...');
+      
+      // First, get ALL pets from Firebase (authoritative source)
+      const firebasePets = await firebaseUnifiedPetService.getAllPetProgress();
+      const firebasePetIds = firebasePets.map(pet => pet.petId);
+      
+      // Get local pet IDs
+      const localPetIds = this.getAllPetIds();
+      
+      // Combine both sets to ensure we have all pets
+      const allPetIds = [...new Set([...firebasePetIds, ...localPetIds])];
+      
+      console.log(`🐾 Found pets - Firebase: [${firebasePetIds.join(', ')}], Local: [${localPetIds.join(', ')}], Combined: [${allPetIds.join(', ')}]`);
+
+      // Refresh data for each pet (pet-wise processing)
+      for (const petId of allPetIds) {
+        try {
+          console.log(`🔄 Processing pet: ${petId}`);
+          
+          const firebaseData = await firebaseUnifiedPetService.getPetProgress(petId);
+          if (firebaseData) {
+            const localData = this.convertFromFirebaseFormat(firebaseData);
+            
+            // Check if data has actually changed before updating
+            const currentLocalData = this.getPetProgress(petId);
+            if (this.hasDataChanged(currentLocalData, localData)) {
+              // Temporarily set loading flag to prevent sync loop
+              this.isLoadingFromFirebase = true;
+              this.setPetProgress(localData);
+              
+              // Log what specifically changed for debugging
+              const sleepChanged = currentLocalData.sleepData.isAsleep !== localData.sleepData.isAsleep || 
+                                 currentLocalData.heartData.sleepCompleted !== localData.heartData.sleepCompleted;
+              if (sleepChanged) {
+                console.log(`😴 Sleep sync update for pet ${petId}:`, {
+                  wasAsleep: currentLocalData.sleepData.isAsleep,
+                  nowAsleep: localData.sleepData.isAsleep,
+                  wasSleepCompleted: currentLocalData.heartData.sleepCompleted,
+                  nowSleepCompleted: localData.heartData.sleepCompleted,
+                  sleepClicks: localData.sleepData.sleepClicks
+                });
+              }
+              
+              console.log(`✅ Refreshed pet ${petId} from Firebase - data was updated in another session`);
+            } else {
+              console.log(`⚪ Pet ${petId} data unchanged, skipping update`);
+            }
+          } else if (localPetIds.includes(petId)) {
+            console.log(`⚠️ Pet ${petId} exists locally but not in Firebase - will sync up on next change`);
+          }
+        } catch (error) {
+          console.warn(`Failed to refresh pet ${petId} from Firebase:`, error);
+        } finally {
+          this.isLoadingFromFirebase = false;
+        }
+      }
+
+      // Refresh global pet settings
+      try {
+        const firebasePetData = await firebaseUnifiedPetService.getPetData();
+        if (firebasePetData?.currentSelectedPet) {
+          const localSelectedPet = this.getCurrentSelectedPet();
+          if (firebasePetData.currentSelectedPet !== localSelectedPet) {
+            this.setCurrentSelectedPet(firebasePetData.currentSelectedPet);
+            console.log(`🔄 Updated current selected pet from Firebase: ${firebasePetData.currentSelectedPet}`);
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to refresh current selected pet from Firebase:', error);
+      }
+
+    } catch (error) {
+      console.warn('Failed to refresh pet data from Firebase:', error);
+    }
+  }
+
+  // Check if pet data has meaningfully changed (to avoid unnecessary updates)
+  static hasDataChanged(oldData: PetProgressData, newData: PetProgressData): boolean {
+    // Check key fields that would indicate meaningful changes including sleep data
+    const oldSleepKey = `${oldData.sleepData.isAsleep}-${oldData.sleepData.sleepStartTime}-${oldData.sleepData.sleepEndTime}-${oldData.sleepData.sleepClicks}-${oldData.heartData.sleepCompleted}`;
+    const newSleepKey = `${newData.sleepData.isAsleep}-${newData.sleepData.sleepStartTime}-${newData.sleepData.sleepEndTime}-${newData.sleepData.sleepClicks}-${newData.heartData.sleepCompleted}`;
+    
+    const oldKey = `${oldData.levelData.currentLevel}-${oldData.levelData.totalAdventureCoinsEarned}-${oldData.todoData?.currentType}-${JSON.stringify(oldData.adventureCoinsByType)}-${oldData.heartData.feedingCount}-${oldData.cumulativeCoinsSpent}-${oldSleepKey}`;
+    const newKey = `${newData.levelData.currentLevel}-${newData.levelData.totalAdventureCoinsEarned}-${newData.todoData?.currentType}-${JSON.stringify(newData.adventureCoinsByType)}-${newData.heartData.feedingCount}-${newData.cumulativeCoinsSpent}-${newSleepKey}`;
+    
+    return oldKey !== newKey;
+  }
 }
 
 // React hook for using pet progress in components
@@ -1118,20 +1551,93 @@ import { useState, useEffect } from 'react';
 
 export function usePetProgress(petId: string, petType: string = 'dog') {
   const [petProgress, setPetProgress] = useState(() => PetProgressStorage.getPetProgress(petId, petType));
+  const [lastRefreshTime, setLastRefreshTime] = useState(Date.now());
 
   useEffect(() => {
-    // Update pet progress from localStorage on mount
-    setPetProgress(PetProgressStorage.getPetProgress(petId, petType));
+    // Load from Firebase first if user is authenticated, then fallback to localStorage
+    const loadPetData = async () => {
+      try {
+        console.log(`🐾 Loading pet-specific data for ${petId}...`);
+        const data = await PetProgressStorage.getPetProgressFromFirebase(petId, petType);
+        setPetProgress(data);
+        setLastRefreshTime(Date.now());
+        console.log(`✅ Loaded pet ${petId} data:`, { 
+          level: data.levelData.currentLevel, 
+          sleepStatus: data.sleepData.isAsleep,
+          questType: data.todoData?.currentType 
+        });
+      } catch (error) {
+        console.warn(`Failed to load pet ${petId} from Firebase, using localStorage:`, error);
+        setPetProgress(PetProgressStorage.getPetProgress(petId, petType));
+      }
+    };
+
+    loadPetData();
 
     // Subscribe to pet progress changes
     const unsubscribe = PetProgressStorage.onPetProgressChanged((changedPetId, newData) => {
       if (changedPetId === petId) {
         setPetProgress(newData);
+        setLastRefreshTime(Date.now());
       }
     });
 
-    return unsubscribe;
-  }, [petId, petType]);
+    // Set up periodic refresh to catch changes from other browser sessions (pet-specific)
+    const refreshInterval = setInterval(async () => {
+      // Only refresh if it's been more than 30 seconds since last refresh
+      // and user is authenticated and online
+      if (Date.now() - lastRefreshTime > 30000 && auth.currentUser && navigator.onLine) {
+        try {
+          console.log(`🔄 Periodic refresh check for specific pet: ${petId}`);
+          const data = await PetProgressStorage.getPetProgressFromFirebase(petId, petType);
+          
+          // Check if data has actually changed before updating
+          const hasChanged = PetProgressStorage.hasDataChanged(petProgress, data);
+          if (hasChanged) {
+            // Log what specifically changed for debugging
+            const sleepChanged = petProgress.sleepData.isAsleep !== data.sleepData.isAsleep || 
+                               petProgress.heartData.sleepCompleted !== data.heartData.sleepCompleted;
+            const questChanged = petProgress.todoData?.currentType !== data.todoData?.currentType;
+            const levelChanged = petProgress.levelData.currentLevel !== data.levelData.currentLevel;
+            
+            if (sleepChanged) {
+              console.log(`😴 Pet ${petId} sleep sync:`, {
+                wasAsleep: petProgress.sleepData.isAsleep,
+                nowAsleep: data.sleepData.isAsleep,
+                wasSleepCompleted: petProgress.heartData.sleepCompleted,
+                nowSleepCompleted: data.heartData.sleepCompleted
+              });
+            }
+            if (questChanged) {
+              console.log(`🎯 Pet ${petId} quest sync:`, {
+                wasQuest: petProgress.todoData?.currentType,
+                nowQuest: data.todoData?.currentType
+              });
+            }
+            if (levelChanged) {
+              console.log(`📈 Pet ${petId} level sync:`, {
+                wasLevel: petProgress.levelData.currentLevel,
+                nowLevel: data.levelData.currentLevel
+              });
+            }
+            
+            setPetProgress(data);
+            setLastRefreshTime(Date.now());
+            console.log(`✅ Periodic refresh: Updated pet ${petId} data from Firebase`);
+          } else {
+            console.log(`⚪ Periodic refresh: Pet ${petId} data unchanged`);
+          }
+        } catch (error) {
+          console.warn(`Periodic refresh failed for pet ${petId}:`, error);
+        }
+      }
+    }, 15000); // Check every 15 seconds
+
+    return () => {
+      unsubscribe();
+      clearInterval(refreshInterval);
+    };
+  }, [petId, petType, petProgress, lastRefreshTime]);
 
   return {
     petProgress,

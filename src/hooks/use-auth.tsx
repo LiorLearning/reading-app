@@ -8,7 +8,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  signInWithCredential
+  signInWithCredential,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -72,11 +75,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [hasGoogleAccount, setHasGoogleAccount] = useState(false);
 
+  // Debug logging for incognito mode issues
   useEffect(() => {
+    console.log('🔍 Auth Provider Debug Info:');
+    console.log('🔍 User Agent:', navigator.userAgent);
+    console.log('🔍 Local Storage Available:', typeof Storage !== 'undefined' && localStorage);
+    console.log('🔍 Session Storage Available:', typeof Storage !== 'undefined' && sessionStorage);
+    console.log('🔍 Firebase Auth Available:', !!auth);
+    console.log('🔍 Environment:', {
+      NODE_ENV: import.meta.env.NODE_ENV,
+      VITE_FIREBASE_API_KEY: !!import.meta.env.VITE_FIREBASE_API_KEY,
+      VITE_GOOGLE_CLIENT_ID: !!import.meta.env.VITE_GOOGLE_CLIENT_ID
+    });
+
+    // Set appropriate persistence based on browser capabilities
+    const setupPersistence = async () => {
+      try {
+        // Check if localStorage is available
+        const testKey = '__test_storage__';
+        localStorage.setItem(testKey, 'test');
+        localStorage.removeItem(testKey);
+        
+        // Use local persistence if localStorage is available
+        console.log('🔍 Setting Firebase Auth persistence to LOCAL');
+        await setPersistence(auth, browserLocalPersistence);
+      } catch (e) {
+        // Fall back to session persistence in incognito mode
+        console.log('🔍 LocalStorage not available, using SESSION persistence');
+        try {
+          await setPersistence(auth, browserSessionPersistence);
+        } catch (sessionError) {
+          console.error('🚨 Could not set any persistence:', sessionError);
+        }
+      }
+    };
+
+    setupPersistence();
+  }, []);
+
+  useEffect(() => {
+    console.log('🔍 Setting up Firebase Auth state listener...');
+    
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('🔍 Firebase Auth state changed:', user ? 'User logged in' : 'User logged out');
       setUser(user);
       
       if (user) {
+        console.log('🔍 Loading user data for:', user.uid);
         // Load user data from Firestore
         try {
           const userDocRef = doc(db, 'users', user.uid);
@@ -84,11 +129,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
+            console.log('🔍 User data loaded successfully:', data);
             setUserData(data);
             
             // Check if user signed in with Google
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
             setHasGoogleAccount(isGoogleUser);
+            console.log('🔍 Is Google user:', isGoogleUser);
             
             // Update last login
             await updateDoc(userDocRef, {
@@ -117,13 +164,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setHasGoogleAccount(isGoogleUser);
           }
         } catch (error) {
-          console.error('Error loading user data:', error);
+          console.error('🚨 Error loading user data:', error);
+          // Don't throw the error, but set loading to false so the app doesn't hang
+          setLoading(false);
+          return;
         }
       } else {
+        console.log('🔍 No user, clearing user data');
         setUserData(null);
         setHasGoogleAccount(false);
       }
       
+      console.log('🔍 Auth loading complete');
       setLoading(false);
     });
 
@@ -167,9 +219,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
+      
+      // Clear all user-specific localStorage data to prevent data leakage between users
+      clearUserSpecificLocalStorageData();
+      
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
+    }
+  };
+
+  // Helper function to clear all user-specific localStorage data on logout
+  const clearUserSpecificLocalStorageData = () => {
+    try {
+      console.log('🧹 Clearing user-specific localStorage data on logout...');
+      
+      // Clear pet-related data
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (
+          // Pet data service keys
+          key === 'litkraft_pet_data' ||
+          key === 'litkraft_coins' ||
+          key === 'litkraft_cumulative_coins_earned' ||
+          key === 'current_pet' ||
+          key === 'pet_sleep_data' ||
+          key === 'pet_last_reset_time' ||
+          key === 'pet_feeding_streak_data' ||
+          key === 'previous_care_stage' ||
+          key === 'owned_dens' ||
+          key === 'owned_accessories' ||
+          
+          // Pet progress storage keys
+          key.startsWith('litkraft_pet_progress_') ||
+          key === 'litkraft_global_pet_settings' ||
+          key === 'litkraft_pending_pet_syncs' ||
+          
+          // Adventure and quest data
+          key.startsWith('litkraft_user_adventures_') ||
+          key === 'current_adventure_id' ||
+          key === 'cached_adventure_images' ||
+          key === 'litkraft_question_progress' ||
+          
+          // Tutorial and user progress data
+          key === 'litkraft_tutorial_data' ||
+          
+          // Any other litkraft user-specific keys
+          key.startsWith('litkraft_') ||
+          key.startsWith('user_') ||
+          key.startsWith('pet_')
+        ) {
+          console.log(`🗑️ Clearing localStorage key: ${key}`);
+          localStorage.removeItem(key);
+        }
+      });
+      
+      console.log('✅ Successfully cleared user-specific localStorage data');
+    } catch (error) {
+      console.warn('⚠️ Error clearing localStorage data on logout:', error);
     }
   };
 

@@ -6,14 +6,16 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
 // Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "@/pages/coinSystem";
+import { PetProgressStorage } from "@/lib/pet-progress-storage";
 
 const queryClient = new QueryClient();
 
@@ -91,17 +93,24 @@ const UnifiedPetAdventureApp = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <div className="h-full w-full overflow-hidden">
-          <Toaster />
-          <Sonner />
-          <CameraWidget />
-          <DevCoinHotspot />
-          <BrowserRouter>
-            <Routes>
+const App = () => {
+  // Initialize offline support for pet progress sync
+  useEffect(() => {
+    PetProgressStorage.initializeOfflineSupport();
+  }, []);
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <div className="h-full w-full overflow-hidden">
+              <Toaster />
+              <Sonner />
+              <CameraWidget />
+              <DevCoinHotspot />
+              <BrowserRouter>
+              <Routes>
               {/* Unified pet page and adventure experience */}
               <Route path="/" element={
                 <AuthGuard>
@@ -123,11 +132,13 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+            </BrowserRouter>
+          </div>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;
