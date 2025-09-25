@@ -1,4 +1,7 @@
-// Pet data persistence service for local storage
+// Pet data persistence service - now using Firebase with localStorage fallback
+import { firebaseUnifiedPetService, FirebasePetData } from '@/lib/firebase-unified-pet-service';
+import { auth } from '@/lib/firebase';
+
 export interface PetData {
   careLevel: number;
   ownedPets: string[];
@@ -46,9 +49,22 @@ export class PetDataService {
     }
   };
 
-  // Get current pet data from localStorage
-  static getPetData(): PetData {
+  // Get current pet data from Firebase (with localStorage fallback)
+  static async getPetData(): Promise<PetData> {
     try {
+      // Try Firebase first if user is authenticated
+      if (auth.currentUser) {
+        const firebaseData = await firebaseUnifiedPetService.getPetData();
+        if (firebaseData) {
+          return this.convertFirebaseToPetData(firebaseData);
+        }
+        // If user is authenticated but no Firebase data exists, return fresh default data
+        // This ensures new users start with clean state instead of inheriting localStorage data
+        console.log('🆕 Authenticated user with no Firebase data - returning fresh defaults');
+        return { ...this.DEFAULT_DATA };
+      }
+
+      // Fallback to localStorage only for unauthenticated users
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
@@ -96,32 +112,75 @@ export class PetDataService {
         }
       }
     } catch (error) {
-      console.warn('Failed to get pet data from localStorage:', error);
+      console.warn('Failed to get pet data from Firebase/localStorage:', error);
     }
     return { ...this.DEFAULT_DATA };
   }
 
-  // Set pet data in localStorage
-  static setPetData(data: Partial<PetData>): void {
+  // Set pet data in Firebase (with localStorage fallback)
+  static async setPetData(data: Partial<PetData>): Promise<void> {
     try {
-      const currentData = this.getPetData();
+      const currentData = await this.getPetData();
       const updatedData: PetData = {
         ...currentData,
         ...data,
         lastUpdated: Date.now()
       };
+
+      // Try Firebase first if user is authenticated
+      if (auth.currentUser) {
+        const firebaseData = this.convertPetDataToFirebase(updatedData);
+        const success = await firebaseUnifiedPetService.setPetData(firebaseData);
+        
+        if (success) {
+          // Also update localStorage as backup
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedData));
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new CustomEvent('petDataChanged', { detail: updatedData }));
+          return;
+        }
+      }
+
+      // Fallback to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedData));
-      
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('petDataChanged', { detail: updatedData }));
     } catch (error) {
-      console.warn('Failed to save pet data to localStorage:', error);
+      console.warn('Failed to save pet data to Firebase/localStorage:', error);
     }
   }
 
+  // Convert Firebase data format to PetData format
+  private static convertFirebaseToPetData(firebaseData: FirebasePetData): PetData {
+    return {
+      careLevel: firebaseData.careLevel,
+      ownedPets: firebaseData.ownedPets,
+      audioEnabled: firebaseData.audioEnabled,
+      lastUpdated: firebaseData.lastUpdated,
+      coinsSpentPerStage: firebaseData.coinsSpentPerStage,
+      lastStreakLevel: firebaseData.lastStreakLevel,
+      petCoinsSpent: firebaseData.petCoinsSpent,
+      cumulativeCareLevel: firebaseData.cumulativeCareLevel
+    };
+  }
+
+  // Convert PetData format to Firebase data format
+  private static convertPetDataToFirebase(petData: PetData): Partial<FirebasePetData> {
+    return {
+      careLevel: petData.careLevel,
+      ownedPets: petData.ownedPets,
+      audioEnabled: petData.audioEnabled,
+      lastUpdated: petData.lastUpdated,
+      coinsSpentPerStage: petData.coinsSpentPerStage,
+      lastStreakLevel: petData.lastStreakLevel,
+      petCoinsSpent: petData.petCoinsSpent,
+      cumulativeCareLevel: petData.cumulativeCareLevel
+    };
+  }
+
   // Update care level and track coins spent per stage
-  static setCareLevel(careLevel: number, currentStreak: number): void {
-    const currentData = this.getPetData();
+  static async setCareLevel(careLevel: number, currentStreak: number): Promise<void> {
+    const currentData = await this.getPetData();
     const newCareLevel = Math.max(0, Math.min(careLevel, 6)); // Clamp between 0-6
     
     // Determine current evolution stage
@@ -130,7 +189,7 @@ export class PetDataService {
     // Check if evolution stage changed (streak increased)
     if (currentStreak > currentData.lastStreakLevel) {
       // Reset care level and coins for new stage
-      this.setPetData({ 
+      await this.setPetData({ 
         careLevel: 1, // Start with 1 feeding in new stage
         lastStreakLevel: currentStreak,
         coinsSpentPerStage: {
@@ -141,7 +200,7 @@ export class PetDataService {
     } else {
       // Normal feeding in current stage (free feeding)
       const coinsToAdd = (newCareLevel - currentData.careLevel) * 0; // Free feeding
-      this.setPetData({ 
+      await this.setPetData({ 
         careLevel: newCareLevel,
         coinsSpentPerStage: {
           ...currentData.coinsSpentPerStage,
@@ -152,18 +211,18 @@ export class PetDataService {
   }
 
   // Add a pet to owned pets
-  static addOwnedPet(petId: string): void {
-    const currentData = this.getPetData();
+  static async addOwnedPet(petId: string): Promise<void> {
+    const currentData = await this.getPetData();
     if (!currentData.ownedPets.includes(petId)) {
-      this.setPetData({ 
+      await this.setPetData({ 
         ownedPets: [...currentData.ownedPets, petId] 
       });
     }
   }
 
   // Set audio enabled state
-  static setAudioEnabled(enabled: boolean): void {
-    this.setPetData({ audioEnabled: enabled });
+  static async setAudioEnabled(enabled: boolean): Promise<void> {
+    await this.setPetData({ audioEnabled: enabled });
   }
 
   // Get evolution stage based on streak
@@ -174,41 +233,45 @@ export class PetDataService {
   }
 
   // Get coins spent for current evolution stage
-  static getCoinsSpentForCurrentStage(streak: number): number {
-    const data = this.getPetData();
+  static async getCoinsSpentForCurrentStage(streak: number): Promise<number> {
+    const data = await this.getPetData();
     const stage = this.getEvolutionStage(streak);
     return data.coinsSpentPerStage[stage] || 0;
   }
 
   // Get specific values
-  static getCareLevel(): number {
-    return this.getPetData().careLevel;
+  static async getCareLevel(): Promise<number> {
+    const data = await this.getPetData();
+    return data.careLevel;
   }
 
-  static getOwnedPets(): string[] {
-    return this.getPetData().ownedPets;
+  static async getOwnedPets(): Promise<string[]> {
+    const data = await this.getPetData();
+    return data.ownedPets;
   }
 
-  static getAudioEnabled(): boolean {
-    return this.getPetData().audioEnabled;
+  static async getAudioEnabled(): Promise<boolean> {
+    const data = await this.getPetData();
+    return data.audioEnabled;
   }
 
   // Check if a pet is owned
-  static isPetOwned(petId: string): boolean {
-    return this.getOwnedPets().includes(petId);
+  static async isPetOwned(petId: string): Promise<boolean> {
+    const ownedPets = await this.getOwnedPets();
+    return ownedPets.includes(petId);
   }
 
   // Get coins spent on a specific pet
-  static getPetCoinsSpent(petId: string): number {
-    const data = this.getPetData();
+  static async getPetCoinsSpent(petId: string): Promise<number> {
+    const data = await this.getPetData();
     return data.petCoinsSpent[petId] || 0;
   }
 
   // Add coins spent on a specific pet
-  static addPetCoinsSpent(petId: string, coins: number): void {
-    const currentData = this.getPetData();
+  static async addPetCoinsSpent(petId: string, coins: number): Promise<void> {
+    const currentData = await this.getPetData();
     const currentSpent = currentData.petCoinsSpent[petId] || 0;
-    this.setPetData({
+    await this.setPetData({
       petCoinsSpent: {
         ...currentData.petCoinsSpent,
         [petId]: currentSpent + coins
@@ -217,9 +280,9 @@ export class PetDataService {
   }
 
   // Cumulative care level methods
-  static incrementFeedingCount(): void {
-    const currentData = this.getPetData();
-    this.setPetData({
+  static async incrementFeedingCount(): Promise<void> {
+    const currentData = await this.getPetData();
+    await this.setPetData({
       cumulativeCareLevel: {
         ...currentData.cumulativeCareLevel,
         feedingCount: currentData.cumulativeCareLevel.feedingCount + 1
@@ -227,9 +290,9 @@ export class PetDataService {
     });
   }
 
-  static addAdventureCoins(coins: number): void {
-    const currentData = this.getPetData();
-    this.setPetData({
+  static async addAdventureCoins(coins: number): Promise<void> {
+    const currentData = await this.getPetData();
+    await this.setPetData({
       cumulativeCareLevel: {
         ...currentData.cumulativeCareLevel,
         adventureCoins: currentData.cumulativeCareLevel.adventureCoins + coins
@@ -237,9 +300,9 @@ export class PetDataService {
     });
   }
 
-  static setSleepCompleted(completed: boolean): void {
-    const currentData = this.getPetData();
-    this.setPetData({
+  static async setSleepCompleted(completed: boolean): Promise<void> {
+    const currentData = await this.getPetData();
+    await this.setPetData({
       cumulativeCareLevel: {
         ...currentData.cumulativeCareLevel,
         sleepCompleted: completed,
@@ -249,8 +312,8 @@ export class PetDataService {
     });
   }
 
-  static getCumulativeCarePercentage(): number {
-    const data = this.getPetData();
+  static async getCumulativeCarePercentage(): Promise<number> {
+    const data = await this.getPetData();
     const { feedingCount, adventureCoins, sleepCompleted } = data.cumulativeCareLevel;
     
     let percentage = 0;
@@ -285,20 +348,21 @@ export class PetDataService {
     return Math.min(100, percentage); // Cap at 100%
   }
 
-  static getCumulativeCareLevel(): { feedingCount: number; adventureCoins: number; sleepCompleted: boolean; adventureCoinsAtLastSleep: number } {
-    return this.getPetData().cumulativeCareLevel;
+  static async getCumulativeCareLevel(): Promise<{ feedingCount: number; adventureCoins: number; sleepCompleted: boolean; adventureCoinsAtLastSleep: number }> {
+    const data = await this.getPetData();
+    return data.cumulativeCareLevel;
   }
 
   // Check if sleep is available (50 adventure coins since last sleep or first time)
-  static isSleepAvailable(): boolean {
-    const data = this.getPetData();
+  static async isSleepAvailable(): Promise<boolean> {
+    const data = await this.getPetData();
     const { adventureCoins, adventureCoinsAtLastSleep } = data.cumulativeCareLevel;
     const coinsSinceLastSleep = adventureCoins - adventureCoinsAtLastSleep;
     return coinsSinceLastSleep >= 50;
   }
 
-  static resetCumulativeCareLevel(): void {
-    this.setPetData({
+  static async resetCumulativeCareLevel(): Promise<void> {
+    await this.setPetData({
       cumulativeCareLevel: {
         feedingCount: 0,
         adventureCoins: 0,
@@ -309,8 +373,52 @@ export class PetDataService {
   }
 
   // 8-hour time-based reset functionality for heart fill and pet state
-  static checkAndPerform8HourReset(): boolean {
+  static async checkAndPerform8HourReset(): Promise<boolean> {
     try {
+      // Try Firebase first if user is authenticated
+      if (auth.currentUser) {
+        const firebaseData = await firebaseUnifiedPetService.getPetData();
+        if (firebaseData) {
+          const lastResetTime = firebaseData.resetData?.lastResetTime || Date.now();
+          const now = Date.now();
+          const eightHours = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+          
+          const timeSinceLastReset = now - lastResetTime;
+          
+          // If 8 hours have passed, perform reset
+          if (timeSinceLastReset >= eightHours) {
+            console.log('🕐 Performing 8-hour pet reset to initial state (heart fill and pet image)');
+            
+            // Reset cumulative care level to initial state (sad and hungry)
+            await this.resetCumulativeCareLevel();
+            
+            // Reset sleep data in Firebase
+            await firebaseUnifiedPetService.setPetData({
+              sleepData: {
+                clicks: 0,
+                timestamp: 0,
+                sleepStartTime: 0,
+                sleepEndTime: 0,
+                lastUpdated: now
+              },
+              resetData: {
+                ...firebaseData.resetData,
+                lastResetTime: now
+              }
+            });
+            
+            // Also update localStorage for fallback
+            localStorage.removeItem('pet_sleep_data');
+            localStorage.setItem('pet_last_reset_time', now.toString());
+            
+            return true; // Reset was performed
+          }
+          
+          return false; // No reset needed
+        }
+      }
+
+      // Fallback to localStorage
       const lastResetTime = localStorage.getItem('pet_last_reset_time');
       const now = Date.now();
       const eightHours = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
@@ -328,7 +436,7 @@ export class PetDataService {
         console.log('🕐 Performing 8-hour pet reset to initial state (heart fill and pet image)');
         
         // Reset cumulative care level to initial state (sad and hungry)
-        this.resetCumulativeCareLevel();
+        await this.resetCumulativeCareLevel();
         
         // Reset sleep data
         localStorage.removeItem('pet_sleep_data');
@@ -347,13 +455,13 @@ export class PetDataService {
   }
 
   // Keep the 24-hour reset for backward compatibility, but now it just calls 8-hour reset
-  static checkAndPerform24HourReset(): boolean {
-    return this.checkAndPerform8HourReset();
+  static async checkAndPerform24HourReset(): Promise<boolean> {
+    return await this.checkAndPerform8HourReset();
   }
 
   // Migration logic for existing users
-  static migrateToCumulativeCareSystem(): void {
-    const currentData = this.getPetData();
+  static async migrateToCumulativeCareSystem(): Promise<void> {
+    const currentData = await this.getPetData();
     
     // Check if migration is needed (if cumulative care level is at default values)
     if (currentData.cumulativeCareLevel.feedingCount === 0 && 
@@ -390,7 +498,7 @@ export class PetDataService {
       }
       
       // Apply migration
-      this.setPetData({
+      await this.setPetData({
         cumulativeCareLevel: {
           feedingCount: estimatedFeedings,
           adventureCoins: estimatedAdventureCoins,
@@ -422,8 +530,21 @@ export class PetDataService {
   }
 
   // Reset all pet data (for testing or user reset)
-  static resetPetData(): void {
-    this.setPetData(this.DEFAULT_DATA);
+  static async resetPetData(): Promise<void> {
+    await this.setPetData(this.DEFAULT_DATA);
+  }
+
+  // Initialize Firebase migration on user auth
+  static async initializeForUser(): Promise<void> {
+    if (auth.currentUser) {
+      try {
+        // Try to migrate from localStorage to Firebase if needed
+        await firebaseUnifiedPetService.migrateFromLocalStorage();
+        console.log('✅ Pet data migration check completed');
+      } catch (error) {
+        console.warn('Migration check failed:', error);
+      }
+    }
   }
 }
 
@@ -431,22 +552,74 @@ export class PetDataService {
 import { useState, useEffect } from 'react';
 
 export function usePetData() {
-  const [petData, setPetData] = useState(PetDataService.getPetData());
+  const [petData, setPetData] = useState<PetData>(() => ({
+    careLevel: 0,
+    ownedPets: [],
+    audioEnabled: true,
+    lastUpdated: Date.now(),
+    coinsSpentPerStage: {
+      smallPup: 0,
+      mediumDog: 0,
+      largeDog: 0
+    },
+    lastStreakLevel: 0,
+    petCoinsSpent: {},
+    cumulativeCareLevel: {
+      feedingCount: 0,
+      adventureCoins: 0,
+      sleepCompleted: false,
+      adventureCoinsAtLastSleep: 0
+    }
+  }));
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Update pet data from localStorage on mount
-    setPetData(PetDataService.getPetData());
+    let mounted = true;
+
+    // Initialize pet data and migration
+    const initializePetData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Initialize Firebase migration if user is authenticated
+        await PetDataService.initializeForUser();
+        
+        // Load pet data
+        const data = await PetDataService.getPetData();
+        if (mounted) {
+          setPetData(data);
+        }
+      } catch (error) {
+        console.error('Error initializing pet data:', error);
+        // Fallback to default data
+        if (mounted) {
+          setPetData(await PetDataService.getPetData());
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initializePetData();
 
     // Subscribe to pet data changes
     const unsubscribe = PetDataService.onPetDataChanged((newData) => {
-      setPetData(newData);
+      if (mounted) {
+        setPetData(newData);
+      }
     });
 
-    return unsubscribe;
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
   }, []);
 
   return {
     petData,
+    isLoading,
     careLevel: petData.careLevel,
     ownedPets: petData.ownedPets,
     audioEnabled: petData.audioEnabled,
