@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService } from '@/lib/tts-service';
@@ -22,6 +22,12 @@ interface SpellBoxProps {
   onNext?: () => void;
   className?: string;
   isVisible?: boolean;
+  /**
+   * Render mode for the component. "overlay" keeps the existing full-screen
+   * centered experience. "inline" renders only the interactive content so it
+   * can be embedded inside other UI (e.g., pet message bubble).
+   */
+  variant?: 'overlay' | 'inline';
   
   // Enhanced props
   question?: {
@@ -55,6 +61,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   onNext,
   className,
   isVisible = true,
+  variant = 'overlay',
   
   // Enhanced props
   question,
@@ -69,6 +76,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Realtime session integration
   sendMessage
 }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [showHint, setShowHint] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -713,16 +721,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
 
   // Don't render if we don't have the basic requirements, but be more lenient about sentence
-
+  // In inline mode, respect isVisible but default is true
   if (!isVisible || !targetWord) return null;
 
   return (
     <>
-      {/* Tutorial overlay for first-time users */}
-      {showTutorial && (
+      {/* Tutorial overlay for first-time users (overlay mode only) */}
+      {variant === 'overlay' && showTutorial && (
         <div className="tutorial-overlay" />
       )}
       
+      {variant === 'overlay' ? (
       <div className={cn(
         "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
         className
@@ -734,6 +743,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
         )}>
         <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
+            { /* CONTENT START */ }
 
           {/* Question text */}
 
@@ -1212,6 +1222,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             }
 
           `}</style>
+            { /* CONTENT END */ }
         </div>
 
         {/* Tutorial message for first-time users */}
@@ -1224,100 +1235,140 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-purple-600"></div>
           </div>
         )}
-
-        {/* First-time instruction overlay - pointing finger functionality commented out */}
-        {/*
-        showFirstTimeInstruction && (
-          <div 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: speakerButtonPosition ? `
-                radial-gradient(
-                  circle at ${speakerButtonPosition.x}px ${speakerButtonPosition.y}px,
-                  transparent 30px,
-                  rgba(0, 0, 0, 0.2) 40px,
-                  rgba(0, 0, 0, 0.7) 80px
-                )
-              ` : 'rgba(0, 0, 0, 0.6)',
-              zIndex: 1000,
-              borderRadius: '24px',
-              pointerEvents: 'auto'
-            }}
-            onClick={handleFirstTimeInstructionComplete}
-          >
-            <div style={{
-              position: 'absolute',
-              left: `${Math.max(0, speakerButtonPosition.x - 25)}px`,
-              top: `${Math.max(0, speakerButtonPosition.y - 25)}px`,
-              width: '50px',
-              height: '50px',
-              borderRadius: '50%',
-              background: 'rgba(99, 102, 241, 0.3)',
-              animation: 'speakerHighlight 2s ease-in-out infinite',
-              zIndex: 999,
-              pointerEvents: 'none'
-            }} />
-            
-            <div 
-              className="pointing-finger"
-              style={{
-                position: 'absolute',
-                fontSize: 'clamp(40px, 8vw, 52px)',
-                animation: 'pointToSpeaker 1.5s ease-in-out infinite',
-                filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4))',
-                zIndex: 1001,
-                left: speakerButtonPosition ? `${Math.max(10, speakerButtonPosition.x - 60)}px` : '50%',
-                top: speakerButtonPosition ? `${speakerButtonPosition.y - 15}px` : '50%',
-                transform: speakerButtonPosition ? 'none' : 'translate(70px, -10px)',
-                transformOrigin: 'center',
-                pointerEvents: 'none'
-              }}
-            >
-              👉
             </div>
-
-            <style>{`
-              @keyframes pointToSpeaker {
-                0%, 100% {
-                  transform: rotate(0deg) scale(1);
-                  opacity: 0.9;
-                }
-                25% {
-                  transform: translate(8px, 4px) rotate(10deg) scale(1.1);
-                  opacity: 1;
-                }
-                50% {
-                  transform: translate(4px, -4px) rotate(-3deg) scale(1.05);
-                  opacity: 0.95;
-                }
-                75% {
-                  transform: translate(-4px, 2px) rotate(-8deg) scale(1.08);
-                  opacity: 1;
-                }
-              }
-
-              @keyframes speakerHighlight {
-                0%, 100% {
-                  transform: scale(1);
-                  opacity: 0.3;
-                  background: rgba(99, 102, 241, 0.3);
-                }
-                50% {
-                  transform: scale(1.2);
-                  opacity: 0.6;
-                  background: rgba(99, 102, 241, 0.5);
-                }
-              }
-            `}</style>
+            {/* Close outer container for overlay mode */}
           </div>
-        )
-        */}
+      ) : (
+        // Inline variant for embedding inside other UI (e.g., pet bubble)
+        <div ref={containerRef} className={cn("spellbox-inline-container", className)}>
+          <div className="rounded-xl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+            { /* CONTENT START */ }
+            
+            {/* Question text and interactive inputs reused as-is */}
+            {workingSentence && (
+              <div className="text-center">
+                <div className="text-base text-gray-800" style={{ lineHeight: 1.5 }}>
+                  {workingSentence.split(' ').map((word, idx) => {
+                    const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
+                    const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');
+                    const isTargetWord = normalizedWord === normalizedTarget || 
+                      (normalizedTarget.length >= 3 && (normalizedWord.startsWith(normalizedTarget) || normalizedWord.endsWith(normalizedTarget)));
+                    return (
+                      <React.Fragment key={idx}>
+                        {isTargetWord ? (
+                          <div style={{ display: 'inline-flex', gap: '6px', padding: '6px', background: 'linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)', borderRadius: '10px', border: '2px solid rgba(109,40,217,0.2)', margin: '0 2px' }}>
+                            {parts.map((part, partIndex) => {
+                              if (part.type === 'text') {
+                                return (
+                                  <React.Fragment key={partIndex}>
+                                    {part.content?.split('').map((char, charIndex) => (
+                                      <div key={`${partIndex}-${charIndex}`} style={{ width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase', color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' }}>{char}</div>
+                                    ))}
+                                  </React.Fragment>
+                                );
+                              } else {
+                                const expectedLength = part.answer?.length || 5;
+                                return (
+                                  <div key={partIndex} className="flex items-center gap-1">
+                                    {Array.from({ length: expectedLength }, (_, letterIndex) => {
+                                      const letterValue = getUserInputAtBlankIndex(letterIndex);
+                                      const completeWord = reconstructCompleteWord(userAnswer);
+                                      const isWordCompleteNow = isUserInputComplete(userAnswer);
+                                      const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
+                                      const isWordIncorrectNow = isWordCompleteNow && !isWordCorrectNow;
+                                      const correctLetter = part.answer?.[letterIndex]?.toUpperCase() || '';
+                                      const isLetterCorrect = letterValue && letterValue.toUpperCase() === correctLetter;
+                                      let boxStyle: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 600, textAlign: 'center', outline: 'none', textTransform: 'uppercase', cursor: 'pointer' };
+                                      if (isWordCorrectNow) {
+                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E', color: '#15803D', cursor: 'not-allowed' };
+                                      } else if (isLetterCorrect) {
+                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E', color: '#15803D' };
+                                      } else if (isWordIncorrectNow && letterValue) {
+                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444', color: '#B91C1C' };
+                                      } else if (letterValue) {
+                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%)', border: '2px solid #0EA5E9', color: '#0369A1' };
+                                      } else {
+                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)', border: '2px dashed #94A3B8', color: '#64748B' };
+                                      }
+                                      return (
+                                        <input
+                                          key={letterIndex}
+                                          type="text"
+                                          value={letterValue}
+                                          maxLength={1}
+                                          disabled={isWordCorrectNow}
+                                          onChange={(e) => {
+                                            if (isWordCorrectNow) return;
+                                            const newValue = e.target.value.toUpperCase();
+                                            if (newValue.match(/[A-Z]/) || newValue === '') {
+                                              const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, newValue);
+                                              handleAnswerChange(newUserAnswer);
+                                              playClickSound();
+                                              if (newValue && letterIndex < expectedLength - 1) {
+                                                const nextBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement | null;
+                                                if (nextBox) {
+                                                  setTimeout(() => nextBox.focus(), 10);
+                                                }
+                                              }
+                                            }
+                                          }}
+                                          onKeyDown={(e) => {
+                                            if (e.key === 'Backspace') {
+                                              if (letterValue) {
+                                                e.preventDefault();
+                                                const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, '');
+                                                handleAnswerChange(newUserAnswer);
+                                              } else if (letterIndex > 0) {
+                                                const prevBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement | null;
+                                                if (prevBox) prevBox.focus();
+                                              }
+                                            } else if (e.key === 'ArrowLeft' && letterIndex > 0) {
+                                              const prevBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement | null;
+                                              if (prevBox) prevBox.focus();
+                                            } else if (e.key === 'ArrowRight' && letterIndex < expectedLength - 1) {
+                                              const nextBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement | null;
+                                              if (nextBox) nextBox.focus();
+                                            }
+                                          }}
+                                          style={boxStyle}
+                                          data-letter={letterIndex}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              }
+                            })}
+                            {/* Inline mode speaker button - after the full word cluster */}
+                            <button onClick={playWordAudio} title={isSpeaking ? 'Stop audio' : 'Listen to this word'} style={{ width: '32px', height: '32px', borderRadius: '8px', border: 'none', background: isSpeaking ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)' : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)', color: 'white', marginLeft: '6px' }}>{isSpeaking ? '⏹️' : '🔊'}</button>
+                          </div>
+                        ) : (
+                          <span className="inline-block" style={{ fontWeight: 400 }}>{word}</span>
+                        )}
+                        {idx < workingSentence.split(' ').length - 1 && ' '}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Inline hints */}
+            {isComplete && !isCorrect && showHints && (
+              <div style={{ padding: '8px 0' }}>
+                <button onClick={() => { playClickSound(); if (sendMessage && targetWord) { sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`) } }} title="Get pronunciation help" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid #4B5563', background: 'transparent', color: '#6B7280' }}>🎤</button>
+          </div>
+            )}
+
+            {isCorrect && onNext && (
+              <div className="mt-2">
+                <button onClick={() => { playClickSound(); onNext(); }} className="px-3 py-2 text-sm font-medium bg-green-600 text-white rounded-md">Next Question</button>
       </div>
+            )}
+
     </div>
+        </div>
+      )}
     </>
   );
 };

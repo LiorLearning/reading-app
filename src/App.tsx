@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { CameraWidget } from "@/components/CameraWidget";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
@@ -98,7 +97,6 @@ const App = () => (
         <div className="h-full w-full overflow-hidden">
           <Toaster />
           <Sonner />
-          <CameraWidget />
           <DevCoinHotspot />
           <BrowserRouter>
             <Routes>
