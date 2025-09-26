@@ -138,6 +138,9 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return 'cat';
     }
   });
+
+  // Helper: per-pet sleep localStorage key
+  const getSleepKey = (petId: string) => `pet_sleep_data_${petId}`;
   
   // Local state for UI interactions
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
@@ -163,10 +166,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Sleep timer state
   const [sleepTimeRemaining, setSleepTimeRemaining] = useState(0); // in milliseconds
   
-  // Sleep state management with localStorage persistence
+  // Sleep state management with localStorage persistence (per-pet)
   const [sleepClicks, setSleepClicks] = useState(() => {
     try {
-      const stored = localStorage.getItem('pet_sleep_data');
+      const stored = localStorage.getItem(getSleepKey(currentPet)) || localStorage.getItem('pet_sleep_data');
       if (stored) {
         const sleepData = JSON.parse(stored);
         const now = Date.now();
@@ -444,7 +447,28 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   }, [sleepClicks, currentPet]);
   useEffect(() => {
     if (hasMountedRef.current) {
-      resetSleep();
+      // Load current pet's sleep state from per-pet storage instead of resetting
+      try {
+        const stored = localStorage.getItem(getSleepKey(currentPet)) || localStorage.getItem('pet_sleep_data');
+        if (stored) {
+          const d = JSON.parse(stored);
+          const now = Date.now();
+          if (d.sleepEndTime && now >= d.sleepEndTime) {
+            setSleepClicks(0);
+          } else if (d.sleepEndTime && now < d.sleepEndTime) {
+            setSleepClicks(d.clicks || 0);
+          } else if (d.timestamp) {
+            const eightHours = 8 * 60 * 60 * 1000;
+            setSleepClicks(now - d.timestamp < eightHours ? (d.clicks || 0) : 0);
+          } else {
+            setSleepClicks(0);
+          }
+        } else {
+          setSleepClicks(0);
+        }
+      } catch {
+        setSleepClicks(0);
+      }
     } else {
       hasMountedRef.current = true;
     }
@@ -891,7 +915,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         sleepStartTime: sleepStartTime || 0,
         sleepEndTime: sleepEndTime || 0
       };
-      localStorage.setItem('pet_sleep_data', JSON.stringify(sleepData));
+      localStorage.setItem(getSleepKey(currentPet), JSON.stringify(sleepData));
 
       // Firestore sync (non-blocking)
       (async () => {
@@ -899,7 +923,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           const { auth } = await import('@/lib/firebase');
           const { firebasePetStateService } = await import('@/lib/firebase-pet-state-service');
           const user = auth.currentUser;
-          const petId = (window as any).currentPet || (localStorage.getItem('current_pet_id') || 'dog');
+          const petId = currentPet;
           if (user && petId) {
             await firebasePetStateService.initPetState(user.uid, petId);
             if (clicks >= 3 && sleepStartTime && sleepEndTime) {
@@ -925,7 +949,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Determine if server sleep should be cleared based on prior stored window
     let shouldClearServer = false;
     try {
-      const stored = localStorage.getItem('pet_sleep_data');
+      const stored = localStorage.getItem(getSleepKey(currentPet));
       if (stored) {
         const prev = JSON.parse(stored);
         if (prev?.sleepEndTime && Date.now() >= prev.sleepEndTime) {
@@ -956,7 +980,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Check if sleep should be reset due to 8-hour timeout
   const checkSleepTimeout = () => {
     try {
-      const stored = localStorage.getItem('pet_sleep_data');
+      const stored = localStorage.getItem(getSleepKey(currentPet));
       if (stored) {
         const sleepData = JSON.parse(stored);
         const now = Date.now();
@@ -994,7 +1018,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Calculate remaining sleep time
   const getSleepTimeRemaining = () => {
     try {
-      const stored = localStorage.getItem('pet_sleep_data');
+      const stored = localStorage.getItem(getSleepKey(currentPet));
       if (stored) {
         const sleepData = JSON.parse(stored);
         const now = Date.now();

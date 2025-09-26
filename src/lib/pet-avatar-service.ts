@@ -299,7 +299,8 @@ export const useCurrentPetAvatarImage = () => {
   // Local state to track sleep clicks to keep chat avatar in sync with PetPage
   const [sleepClicksState, setSleepClicksState] = useState<number>(() => {
     try {
-      const stored = localStorage.getItem('pet_sleep_data');
+      const key = `pet_sleep_data_${PetProgressStorage.getCurrentSelectedPet?.() || 'dog'}`;
+      const stored = localStorage.getItem(key) || localStorage.getItem('pet_sleep_data');
       if (!stored) return 0;
       const data = JSON.parse(stored);
       const now = Date.now();
@@ -398,7 +399,8 @@ export const useCurrentPetAvatarImage = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       try {
-        const stored = localStorage.getItem('pet_sleep_data');
+        const key = `pet_sleep_data_${PetProgressStorage.getCurrentSelectedPet?.() || 'dog'}`;
+        const stored = localStorage.getItem(key) || localStorage.getItem('pet_sleep_data');
         const now = Date.now();
         let clicks = 0;
         if (stored) {
@@ -423,7 +425,8 @@ export const useCurrentPetAvatarImage = () => {
   // Get sleep clicks from localStorage (same logic as PetPage)
   const getSleepClicks = () => {
     try {
-      const stored = localStorage.getItem('pet_sleep_data');
+      const key = `pet_sleep_data_${PetProgressStorage.getCurrentSelectedPet?.() || 'dog'}`;
+      const stored = localStorage.getItem(key) || localStorage.getItem('pet_sleep_data');
       if (stored) {
         const sleepData = JSON.parse(stored);
         const now = Date.now();

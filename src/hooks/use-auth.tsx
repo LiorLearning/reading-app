@@ -178,7 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
             // Store locally for UI consumers; fire an event as well
             localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(questStates));
-            // Seed sleep window from server on initial sign-in
+            // Seed sleep window from server on initial sign-in (per-pet keys)
             try {
               const now = Date.now();
               // Prefer current pet, else any active sleep
@@ -190,7 +190,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               const endMs = endAny?.toMillis ? endAny.toMillis() : (endAny ? new Date(endAny).getTime() : 0);
               const startMs = startAny?.toMillis ? startAny.toMillis() : (startAny ? new Date(startAny).getTime() : 0);
               if (endMs && now < endMs) {
-                localStorage.setItem('pet_sleep_data', JSON.stringify({ clicks: 3, timestamp: startMs || now, sleepStartTime: startMs || now, sleepEndTime: endMs }));
+                const petId = (s as any)?.pet || currentPet;
+                if (petId) {
+                  localStorage.setItem(`pet_sleep_data_${petId}`, JSON.stringify({ clicks: 3, timestamp: startMs || now, sleepStartTime: startMs || now, sleepEndTime: endMs }));
+                }
               }
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: questStates }));
@@ -268,19 +271,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
             try {
               localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
-              // If server has a live sleep window for the current pet, mirror to local sleep store for timer
+              // Mirror live sleep windows per-pet for the timer
               try {
-                const currentPet = PetProgressStorage.getCurrentSelectedPet() || ownedPets[0];
-                const s = states.find(x => x.pet === currentPet);
-                if (s?.sleepStartAt && s?.sleepEndAt) {
-                  const startMs = (s.sleepStartAt as any).toMillis ? (s.sleepStartAt as any).toMillis() : new Date(s.sleepStartAt as any).getTime();
-                  const endMs = (s.sleepEndAt as any).toMillis ? (s.sleepEndAt as any).toMillis() : new Date(s.sleepEndAt as any).getTime();
-                  if (Date.now() < endMs) {
-                    localStorage.setItem('pet_sleep_data', JSON.stringify({ clicks: 3, timestamp: startMs, sleepStartTime: startMs, sleepEndTime: endMs }));
+                states.forEach((s) => {
+                  const petId = (s as any)?.pet;
+                  if (!petId) return;
+                  const startMs = (s as any)?.sleepStartAt?.toMillis ? (s as any).sleepStartAt.toMillis() : (s as any)?.sleepStartAt ? new Date((s as any).sleepStartAt).getTime() : 0;
+                  const endMs = (s as any)?.sleepEndAt?.toMillis ? (s as any).sleepEndAt.toMillis() : (s as any)?.sleepEndAt ? new Date((s as any).sleepEndAt).getTime() : 0;
+                  if (endMs && Date.now() < endMs) {
+                    localStorage.setItem(`pet_sleep_data_${petId}`, JSON.stringify({ clicks: 3, timestamp: startMs, sleepStartTime: startMs, sleepEndTime: endMs }));
                   } else {
-                    localStorage.removeItem('pet_sleep_data');
+                    localStorage.removeItem(`pet_sleep_data_${petId}`);
                   }
-                }
+                });
               } catch {}
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
