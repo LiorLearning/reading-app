@@ -3243,7 +3243,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // Get last 30 user messages for recent context
       const userMessages = chatMessages.filter(msg => msg.type === 'user');
-      const lastThirtyMessages = userMessages.slice(-30).map(msg => msg.content).join(' ');
+      const lastThirtyMessages = userMessages.slice(-10).map(msg => msg.content).join(' ');
       
       // Get recent AI messages
       const recentAIMessages = getRecentAIMessages();
@@ -3260,6 +3260,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const combinedContext = adventureSummary 
         ? `Adventure so far: ${adventureSummary}. Recent user events: ${lastThirtyMessages}. Recent AI responses: ${recentAIMessages}`
         : `Recent user events: ${lastThirtyMessages}. Recent AI responses: ${recentAIMessages}`;
+      
+      // Prefix rule to ensure no text appears in the generated image
+      const noTextRule = "There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.";
+      const imagePromptForAuto = `${noTextRule} ${combinedContext}`;
       
       console.log(`🎨 AUTO IMAGE: Final combined context:`, {
         length: combinedContext.length,
@@ -3283,13 +3287,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Re-enabled legacy auto image generation since unified system is not integrated yet
       console.log(`🎨 AUTO IMAGE: Calling aiService.generateAdventureImage()...`);
       console.log(`🎨 AUTO IMAGE: Parameters:`, {
-        prompt: combinedContext,
+        prompt: imagePromptForAuto,
         chatMessagesLength: chatMessages.length,
         fallbackPrompt: "adventure scene"
       });
       
       const generatedImageResult = await aiService.generateAdventureImage(
-        combinedContext,
+        imagePromptForAuto,
         chatMessages,
         "adventure scene",
         undefined,
