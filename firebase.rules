@@ -22,6 +22,7 @@ service cloud.firestore {
     match /userProgress/{userId} { allow read, write: if isOwner(userId); }
     match /topicPreferences/{userId} { allow read, write: if isOwner(userId); }
     match /adventureState/{userId} { allow read, write: if isOwner(userId); }
+    match /userStates/{userId} { allow read, write: if isOwner(userId); }
 
     // Pet data collections for the new unified pet service
     match /userPetData/{userId} {

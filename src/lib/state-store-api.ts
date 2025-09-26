@@ -49,6 +49,9 @@ import {
   export interface UserState {
     pets: Record<PetName, number>;
     petnames?: Record<PetName, string>;
+    // Per-pet per-adventure question counts (cumulative)
+    // Example: { hamster: { house: 8, travel: 5 }, dog: { park: 3 } }
+    petquestions?: Record<PetName, Record<string, number>>;
     coins: number;
     streak: number;
     createdAt: Timestamp;
@@ -85,6 +88,7 @@ import {
     return {
       pets: {},
       petnames: {},
+      petquestions: {},
       coins: 0,
       streak: 0,
       createdAt: nowServerTimestamp(),
@@ -153,10 +157,11 @@ import {
     userId: string;
     pet: PetName;
     questionsSolved: number; // number of correct questions in this event
+    adventureKey?: string; // optional explicit adventure/todo key (e.g., 'house', 'travel')
   }
   
   export async function updateProgressOnQuestionSolved(input: ProgressUpdateInput): Promise<void> {
-    const { userId, pet, questionsSolved } = input;
+    const { userId, pet, questionsSolved, adventureKey } = input;
     if (questionsSolved <= 0) return;
   
     // Use read + batched writes with atomic increments (no transactions)
@@ -180,6 +185,7 @@ import {
     const petObj = questsData?.[pet] ?? {};
     const index = Number(petObj?._activityIndex ?? 0) % ACTIVITY_SEQUENCE.length;
     const activeKey = ACTIVITY_SEQUENCE[index]; // always use fixed sequence, starting at 'house'
+    const perAdventureKey = (adventureKey && typeof adventureKey === 'string' && adventureKey.trim()) ? adventureKey : activeKey;
   
     // Ensure pet object exists with meta
     if (!questsData?.[pet]) {
@@ -208,6 +214,8 @@ import {
       {
         pets: { [pet]: increment(questionsSolved) },
         coins: increment(questionsSolved * COINS_PER_QUESTION),
+        // Increment per-adventure question count nested under petquestions
+        petquestions: { [pet]: { [perAdventureKey]: increment(questionsSolved) } },
         updatedAt: nowServerTimestamp(),
       } as any,
       { merge: true }
@@ -428,11 +436,12 @@ import {
     userId: string;
     pet: PetName;
     questionsSolved?: number;
+  adventureKey?: string;
   }
   
   export async function updateQuestProgress(input: UpdateQuestProgressInput): Promise<void> {
-    const { userId, pet, questionsSolved = 1 } = input;
-    await updateProgressOnQuestionSolved({ userId, pet, questionsSolved });
+  const { userId, pet, questionsSolved = 1, adventureKey } = input;
+  await updateProgressOnQuestionSolved({ userId, pet, questionsSolved, adventureKey });
   }
   
   // ==========================

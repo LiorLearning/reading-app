@@ -3694,6 +3694,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             userId: user.uid,
             pet: petType,
             questionsSolved: 1,
+            adventureKey: currentAdventureType || undefined,
           }).catch((e)=>console.warn('updateProgressOnQuestionSolved failed:', e));
         }
       } catch (e) {
