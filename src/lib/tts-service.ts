@@ -1,5 +1,6 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import { isImageLoadingSoundCurrentlyPlaying } from './sounds';
+import { PetProgressStorage } from './pet-progress-storage';
 
 interface TTSOptions {
   voice?: string;
@@ -19,36 +20,55 @@ export interface Voice {
 
 // Available voices for selection
 export const AVAILABLE_VOICES: Voice[] = [
+  // Pet-specific default voices
+  // {
+  //   id: 'CeNX9CMwmxDxUF5Q2Inm',
+  //   name: 'Dog (Default)',
+  //   description: 'Friendly, energetic tone fitting for a playful dog',
+  //   previewText: "Woof! I'm your friendly dog, ready for fun adventures and learning together!"
+  // },
+  {
+    id: 'ocZQ262SsZb9RIxcQBOj',
+    name: 'Cat (Default)',
+    description: 'Calm and curious, purrfect for gentle guidance',
+    previewText: "Meow! I'm a curious cat, here to guide you softly through new stories."
+  },
+  // {
+  //   id: 'mdzEgLpu0FjTwYs5oot0',
+  //   name: 'Hamster (Default)',
+  //   description: 'Cheery and quick, great for lively narration',
+  //   previewText: "Squeak! I'm your tiny hamster friend, excited to read and explore with you!"
+  // },
   {
     id: 'cgSgspJ2msm6clMCkdW9',
     name: 'Jessica',
     description: 'Warm and friendly tone, perfect for children',
     previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
   },
-  {
-    id: 'EXAVITQu4vr4xnSDxMaL',
-    name: 'Sarah',
-    description: 'Clear and articulate, great for educational content',
-    previewText: "Hello! I'm Sarah. I enjoy making learning fun and easy to understand. Ready to discover something new?"
-  },
-  {
-    id: 'ErXwobaYiN019PkySvjV',
-    name: 'Antoni',
-    description: 'Deep and engaging voice for storytelling',
-    previewText: "Greetings! I'm Antoni, and I love bringing stories to life. Let me take you on an amazing journey!"
-  },
-  {
-    id: 'VR6AewLTigWG4xSOukaG',
-    name: 'Arnold',
-    description: 'Strong and confident, perfect for adventure stories',
-    previewText: "Hey there, adventurer! I'm Arnold, ready to guide you through exciting quests and challenges!"
-  },
-  {
-    id: '21m00Tcm4TlvDq8ikWAM',
-    name: 'Rachel',
-    description: 'Sweet and gentle, ideal for younger learners',
-    previewText: "Hello sweetie! I'm Rachel, and I can't wait to share wonderful stories and help you learn new things!"
-  },
+  // {
+  //   id: 'EXAVITQu4vr4xnSDxMaL',
+  //   name: 'Sarah',
+  //   description: 'Clear and articulate, great for educational content',
+  //   previewText: "Hello! I'm Sarah. I enjoy making learning fun and easy to understand. Ready to discover something new?"
+  // },
+  // {
+  //   id: 'ErXwobaYiN019PkySvjV',
+  //   name: 'Antoni',
+  //   description: 'Deep and engaging voice for storytelling',
+  //   previewText: "Greetings! I'm Antoni, and I love bringing stories to life. Let me take you on an amazing journey!"
+  // },
+  // {
+  //   id: 'VR6AewLTigWG4xSOukaG',
+  //   name: 'Arnold',
+  //   description: 'Strong and confident, perfect for adventure stories',
+  //   previewText: "Hey there, adventurer! I'm Arnold, ready to guide you through exciting quests and challenges!"
+  // },
+  // {
+  //   id: '21m00Tcm4TlvDq8ikWAM',
+  //   name: 'Rachel',
+  //   description: 'Sweet and gentle, ideal for younger learners',
+  //   previewText: "Hello sweetie! I'm Rachel, and I can't wait to share wonderful stories and help you learn new things!"
+  // },
   {
     id: '7fbQ7yJuEo56rYjrYaEh',
     name: 'John Doe',
@@ -89,8 +109,23 @@ class TextToSpeechService {
     } catch (error) {
       console.warn('Failed to load selected voice from localStorage:', error);
     }
-    
-    // Default to Jessica
+
+    // If no user-selected voice, default based on current selected pet
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+      const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+        dog: 'cgSgspJ2msm6clMCkdW9',
+        cat: 'ocZQ262SsZb9RIxcQBOj',
+        hamster: 'ocZQ262SsZb9RIxcQBOj',
+      };
+      const defaultVoiceId = currentPetId ? PET_DEFAULT_VOICE_ID[currentPetId] : undefined;
+      if (defaultVoiceId) {
+        const petDefault = AVAILABLE_VOICES.find(v => v.id === defaultVoiceId);
+        if (petDefault) return petDefault;
+      }
+    } catch {}
+
+    // Fallback to first voice in the list
     return AVAILABLE_VOICES[0];
   }
 
@@ -242,13 +277,13 @@ class TextToSpeechService {
       );
 
       // Convert the stream to audio blob
-      const chunks: Uint8Array[] = [];
+      const chunks: BlobPart[] = [];
       const reader = audioStream.getReader();
       
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        chunks.push(value);
+        chunks.push(value as unknown as BlobPart);
       }
 
       // Create audio blob and play

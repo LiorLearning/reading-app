@@ -16,6 +16,10 @@ interface ComicPanelProps {
   onNextPanel?: () => void;
   hasPrevious?: boolean;
   hasNext?: boolean;
+  // Notifies parent when the current image is actually displayed (after load)
+  onImageDisplayed?: () => void;
+  // Soft focus when left chat bubble is visible
+  softFocus?: boolean;
   // Spell box props
   spellWord?: string;
   spellSentence?: string;
@@ -51,6 +55,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   onNextPanel,
   hasPrevious = false,
   hasNext = false,
+  onImageDisplayed,
+  softFocus = false,
   spellWord,
   spellSentence,
   onSpellComplete,
@@ -78,6 +84,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   const [currentImage, setCurrentImage] = React.useState(resolvedImageUrl);
   const [isImageLoading, setIsImageLoading] = React.useState(false);
   const fadeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const hasNotifiedImageDisplayedRef = React.useRef(false);
   
   // Update current image when resolved URL changes
   React.useEffect(() => {
@@ -209,6 +216,17 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
     }
   }, [image, currentImage, isGenerating, isImageLoading, preloadImage]);
 
+  // Notify parent exactly once per image display
+  React.useEffect(() => {
+    if (showImageAfterLoad && !hasNotifiedImageDisplayedRef.current) {
+      hasNotifiedImageDisplayedRef.current = true;
+      onImageDisplayed?.();
+    }
+    if (!showImageAfterLoad) {
+      hasNotifiedImageDisplayedRef.current = false;
+    }
+  }, [showImageAfterLoad, onImageDisplayed]);
+
   // Cleanup timeout on unmount
   React.useEffect(() => {
     return () => {
@@ -326,7 +344,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                 className="max-w-full max-h-full transition-opacity duration-300"
                 loading="lazy"
                 style={{
-                  filter: 'brightness(1.05) contrast(1.1) saturate(1.1)',
+                  filter: `${softFocus ? 'blur(3px) brightness(0.95) ' : ''}brightness(1.05) contrast(1.1) saturate(1.1)`,
                   opacity: showSpellBox ? 0.25 : 1
                 }}
               />

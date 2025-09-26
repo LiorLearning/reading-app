@@ -2,7 +2,8 @@ import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ComicPanelComponent from "@/components/comic/ComicPanel";
 import InputBar from "@/components/comic/InputBar";
-import MessengerChat from "@/components/comic/MessengerChat";
+// import MessengerChat from "@/components/comic/MessengerChat"; // Replaced by CollapsedInputDock in collapsed state
+import CollapsedInputDock from "@/components/adventure/CollapsedInputDock";
 import ChatAvatar from "@/components/comic/ChatAvatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -30,6 +31,8 @@ import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
 import { useSessionCoins } from "@/hooks/use-session-coins";
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
+import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
+import RightUserOverlay from "@/components/adventure/RightUserOverlay";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -282,7 +285,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Load messages from local storage on component initialization
     return loadUserAdventure();
   });
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
   const [newlyCreatedPanelId, setNewlyCreatedPanelId] = React.useState<string | null>(null);
   const [zoomingPanelId, setZoomingPanelId] = React.useState<string | null>(null);
   const [lastMessageCount, setLastMessageCount] = React.useState(0);
@@ -1031,12 +1034,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // }, [user, userData, currentScreen, loading]);
   
   
-  // Ensure chat panel is always open when adventure mode starts
+  // Ensure chat panel starts minimized when adventure mode starts
   useEffect(() => {
     if (currentScreen === 1) {
-      // Always open chat panel when entering adventure mode
-      setSidebarCollapsed(false);
-      console.log('🗨️ Adventure mode started - opening chat panel by default');
+      // Start with chat panel collapsed so the floating mini chat is visible
+      setSidebarCollapsed(true);
+      console.log('🗨️ Adventure mode started - chat panel minimized by default');
     }
   }, [currentScreen]);
   
@@ -1154,6 +1157,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Track when legacy system is running independently to avoid sync conflicts
   const [isLegacySystemRunning, setIsLegacySystemRunning] = React.useState(false);
+  // Token to trigger left overlay auto-hide when a new image is actually displayed
+  const [leftOverlayAutoHideToken, setLeftOverlayAutoHideToken] = React.useState(0);
+  const [isLeftBubbleVisible, setIsLeftBubbleVisible] = React.useState(false);
   
   // Sync legacy loading state with unified system for UI consistency
   React.useEffect(() => {
@@ -4531,11 +4537,66 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 style={{ marginRight: sidebarCollapsed ? '0px' : '5px' }}
               >
                 <div className="flex-1 min-h-0 relative">
+                  {/* Left pet overlay with AI bubble - overlays inside the stage container */}
+                  <LeftPetOverlay 
+                    petImageUrl={currentPetAvatarImage}
+                    aiMessageHtml={
+                      // If we're showing inline spelling, suppress normal HTML so the bubble only has SpellBox
+                      showSpellBox && currentSpellQuestion ? undefined :
+                      (chatMessages.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0]?.content
+                        ? formatAIMessage(
+                            chatMessages.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0]?.content as string,
+                            chatMessages.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0]?.spelling_word
+                          )
+                        : undefined)
+                    }
+                    isThinking={isAIResponding}
+                    draggable={false}
+                    autoHideToken={leftOverlayAutoHideToken}
+                    onBubbleVisibilityChange={setIsLeftBubbleVisible}
+                    spellInline={{
+                      show: showSpellBox && !!currentSpellQuestion,
+                      word: currentSpellQuestion?.word || currentSpellingWord || null,
+                      sentence:
+                        chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content_after_spelling ||
+                        chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content ||
+                        chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence || null,
+                      question: currentSpellQuestion ? {
+                        id: currentSpellQuestion.id,
+                        word: currentSpellQuestion.word,
+                        questionText: currentSpellQuestion.questionText || '',
+                        correctAnswer: currentSpellQuestion.correctAnswer,
+                        audio: currentSpellQuestion.audio,
+                        explanation: currentSpellQuestion.explanation,
+                        isPrefilled: currentSpellQuestion.isPrefilled,
+                        prefilledIndexes: currentSpellQuestion.prefilledIndexes,
+                      } : null,
+                      showHints: true,
+                      showExplanation: true,
+                      onComplete: handleSpellComplete,
+                      onSkip: handleSpellSkip,
+                      onNext: handleSpellNext,
+                      sendMessage,
+                    }}
+                  />
+                  {/* Mirror user overlay at bottom-right so the conversation feels two-sided */}
+                  <RightUserOverlay
+                    userImageUrl={user?.photoURL || null}
+                    userMessageText={chatMessages.filter(m => m.type === 'user').slice(-1)[0]?.content}
+                    autoHideToken={leftOverlayAutoHideToken}
+                    bottomOffsetPx={84} // leave room for the collapsed input dock directly below
+                    showCameraInAvatar={true}
+                  />
                   <ComicPanelComponent
                     image={current.image}
                     className="h-full w-full"
                     isNew={current.id === newlyCreatedPanelId}
                     isGenerating={isGeneratingAdventureImage}
+                    softFocus={isLeftBubbleVisible && !isGeneratingAdventureImage}
+                    onImageDisplayed={() => {
+                      console.log('🖼️ Image displayed for panel:', current.id);
+                      setLeftOverlayAutoHideToken(x => x + 1);
+                    }}
                     shouldZoom={current.id === zoomingPanelId}
                     onPreviousPanel={() => {
                       if (currentIndex > 0) {
@@ -4549,29 +4610,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     }}
                     hasPrevious={currentIndex > 0}
                     hasNext={currentIndex < panels.length - 1}
-                    spellWord={chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_word}
-                    spellSentence={
-                      // Get the full adventure story passage instead of just the spelling sentence
-                      chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content_after_spelling ||
-                      // Fallback to the main content if content_after_spelling is not available
-                      chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content ||
-                      // Last resort: use the spelling sentence
-                      chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence
-                    }
-                    // SpellBox props
-                    onSpellComplete={handleSpellComplete}
-                    onSpellSkip={handleSpellSkip}
-                    onSpellNext={handleSpellNext}
-                    showSpellBox={showSpellBox}
-                    spellQuestion={currentSpellQuestion}
-                    showProgress={true}
-                    totalQuestions={spellProgress.totalQuestions}
-                    currentQuestionIndex={spellProgress.currentIndex}
-                    showHints={true}
-                    showExplanation={true}
-                    // Realtime session integration
-                    sendMessage={sendMessage}
-                    interruptRealtimeSession={interruptRealtimeSession}
+                    // When inline spellbox is active, hide the central overlay SpellBox to avoid duplication
+                    spellWord={undefined}
+                    spellSentence={undefined}
+                    onSpellComplete={undefined}
+                    onSpellSkip={undefined}
+                    onSpellNext={undefined}
+                    showSpellBox={false}
+                    spellQuestion={undefined}
+                    showProgress={false}
+                    totalQuestions={undefined}
+                    currentQuestionIndex={undefined}
+                    showHints={false}
+                    showExplanation={false}
+                    sendMessage={undefined}
+
                   />
                 </div>
               </section>
@@ -4918,10 +4971,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           />
         )}
 
-        {/* Messenger Chat when sidebar is collapsed */}
+        {/* Compact input dock when sidebar is collapsed (next to user avatar) */}
         {sidebarCollapsed && (
-          <MessengerChat 
-            messages={chatMessages} 
+          <CollapsedInputDock
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
             onAddMessage={onAddMessage}
