@@ -62,6 +62,7 @@ import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
 import { useRealtimeSession } from "@/hooks/useRealtimeSession";
+import { stateStoreApi } from "@/lib/state-store-api";
 
 
 // Legacy user data interface for backwards compatibility
@@ -182,7 +183,16 @@ const PanelOneLinerFigure: React.FC<{
 };
 
 interface IndexProps {
-  initialAdventureProps?: {topicId?: string, mode?: 'new' | 'continue', adventureId?: string, adventureType?: string} | null;
+  initialAdventureProps?: {
+    topicId?: string, 
+    mode?: 'new' | 'continue', 
+    adventureId?: string, 
+    adventureType?: string,
+    chatHistory?: any[],
+    adventureName?: string,
+    comicPanels?: any[],
+    cachedImages?: any[]
+  } | null;
   onBackToPetPage?: () => void;
 }
 
@@ -302,6 +312,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     sendMessage,
     onToggleConnection,
     downloadRecording,
+    interruptRealtimeSession,
   } = useRealtimeSession({
     isAudioPlaybackEnabled: true,
     enabled: true,
@@ -2385,7 +2396,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       panels.forEach((panel, index) => {
         const isDefault = isDefaultOrLocalImage(panel.image);
         console.log(`💾 Panel ${index} ${isDefault ? '[SKIPPED - DEFAULT]' : '[SAVING]'}: ${panel.image.substring(0, 60)}...`);
+        console.log(`💾 Panel ${index} text: "${panel.text?.substring(0, 50)}..."`);
       });
+      
+      console.log(`💾 Generated panels being saved:`, generatedPanels.map((panel, index) => ({
+        index,
+        id: panel.id,
+        image: panel.image.substring(0, 60) + '...',
+        text: panel.text?.substring(0, 30) + '...',
+        isFirebase: panel.image.includes('firebasestorage.googleapis.com'),
+        isDalle: panel.image.includes('oaidalleapiprodscus.blob.core.windows.net')
+      })));
       
       const adventure: SavedAdventure = {
         id: currentAdventureId,
@@ -2396,7 +2417,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         lastPlayedAt: Date.now(),
         comicPanelImage: currentPanelImage,
         topicId: selectedTopicId,
-        comicPanels: generatedPanels // Only save generated panels, not default images
+        comicPanels: generatedPanels, // Only save generated panels, not default images
+        // Add adventure type for better tracking
+        ...(currentAdventureType && { adventureType: currentAdventureType })
       };
       
       // Save to Firebase (with localStorage fallback) if user is authenticated
@@ -2456,6 +2479,41 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return () => clearTimeout(timeoutId);
     }
   }, [chatMessages.length, currentAdventureId, saveCurrentAdventure]);
+
+  // Update adventure tracker when messages are sent
+  React.useEffect(() => {
+    if (chatMessages.length > 0 && currentAdventureId && currentAdventureType && user) {
+      // Get current pet from localStorage
+      let currentPet = 'bobo'; // default fallback
+      try {
+        const petData = localStorage.getItem('litkraft_pet_data');
+        if (petData) {
+          const parsed = JSON.parse(petData);
+          const ownedPets = parsed.ownedPets || [];
+          if (ownedPets.length > 0) {
+            currentPet = ownedPets[0]; // Use first owned pet
+          }
+        }
+      } catch (error) {
+        console.warn('Could not determine current pet for adventure tracking:', error);
+      }
+
+      // Update adventure activity with message count (async, non-blocking)
+      (async () => {
+        try {
+          const { PetAdventureTracker } = await import('@/lib/pet-adventure-tracker');
+          await PetAdventureTracker.updateAdventureActivity(
+            user.uid,
+            currentPet,
+            currentAdventureType,
+            chatMessages.length
+          );
+        } catch (error) {
+          console.warn('Failed to update adventure tracker:', error);
+        }
+      })();
+    }
+  }, [chatMessages.length, currentAdventureId, currentAdventureType, user]);
 
   // Handle continuing a specific saved adventure
   const handleContinueSpecificAdventure = React.useCallback(async (adventureId: string) => {
@@ -2621,6 +2679,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // Optional Firebase session creation for specific adventure with existing messages (non-blocking)
       if (user) {
+        // Get current pet from localStorage for session tracking
+        let currentPet = 'bobo'; // default fallback
+        try {
+          const petData = localStorage.getItem('litkraft_pet_data');
+          if (petData) {
+            const parsed = JSON.parse(petData);
+            const ownedPets = parsed.ownedPets || [];
+            if (ownedPets.length > 0) {
+              currentPet = ownedPets[0]; // Use first owned pet
+            }
+          }
+        } catch (error) {
+          console.warn('Could not determine current pet for session:', error);
+        }
+
+        // Try to determine adventure type from the adventure data
+        const adventureType = (targetAdventure as any).adventureType || 'food'; // fallback to food
+
         const sessionId = await adventureSessionService.createAdventureSession(
           user.uid,
           'continue_specific',
@@ -2628,7 +2704,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           topicId,
           'continue',
           targetAdventure.name,
-          targetAdventure.messages // Pass existing messages for AI context
+          targetAdventure.messages, // Pass existing messages for AI context
+          { petId: currentPet, adventureType } // options with pet and adventure type
         );
         setCurrentSessionId(sessionId);
       }
@@ -2676,15 +2753,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     let adventureId: string;
     
     if (mode === 'new') {
-      // Clear chat messages for new adventures to provide clean slate
-      setChatMessages([]);
+      // Clear chat messages for new adventures to provide clean slate (unless already set from props)
+      if (chatMessages.length === 0) {
+        setChatMessages([]);
+      }
       // Reset message cycle count for new adventure
       setMessageCycleCount(0);
-      // Generate new adventure ID
-      adventureId = crypto.randomUUID();
-      setCurrentAdventureId(adventureId);
-      // Reset comic panels to default image for new adventures
-      reset(initialPanels);
+      // Use existing adventure ID if already set, otherwise generate new one
+      adventureId = currentAdventureId || crypto.randomUUID();
+      if (!currentAdventureId) {
+        setCurrentAdventureId(adventureId);
+      }
+      // Reset comic panels to default image for new adventures (unless already restored)
+      if (panels.length <= 1 && panels[0]?.image?.includes('/src/assets/')) {
+        reset(initialPanels);
+      }
       
       // Clear adventure context for new adventures
       setCurrentAdventureContext(null);
@@ -2718,12 +2801,30 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (user) {
       // Only create one session per adventureId
       if (sessionCreatedForAdventureIdRef.current !== adventureId) {
+        // Get current pet from localStorage for session tracking
+        let currentPet = 'bobo'; // default fallback
+        try {
+          const petData = localStorage.getItem('litkraft_pet_data');
+          if (petData) {
+            const parsed = JSON.parse(petData);
+            const ownedPets = parsed.ownedPets || [];
+            if (ownedPets.length > 0) {
+              currentPet = ownedPets[0]; // Use first owned pet
+            }
+          }
+        } catch (error) {
+          console.warn('Could not determine current pet for session:', error);
+        }
+
         const sessionId = await adventureSessionService.createAdventureSession(
           user.uid,
           mode === 'new' ? 'new_adventure' : 'continue_adventure',
           adventureId,
           topicId,
-          mode
+          mode,
+          undefined, // title
+          undefined, // existingMessages
+          { petId: currentPet, adventureType } // options with pet and adventure type
         );
         setCurrentSessionId(sessionId);
         sessionCreatedForAdventureIdRef.current = adventureId;
@@ -2752,12 +2853,102 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
       
       if (initialAdventureProps) {
-        if (initialAdventureProps.adventureId) {
-          // Continue specific adventure
+        if (initialAdventureProps.adventureId && !initialAdventureProps.chatHistory) {
+          // Continue specific adventure (old way - from saved adventures)
           handleContinueSpecificAdventure(initialAdventureProps.adventureId);
         } else if (initialAdventureProps.topicId && initialAdventureProps.mode) {
           // Start new or continue adventure with topic
           console.log('🚨 Index: Initial adventure props handleStartAdventure call with adventureType:', initialAdventureProps.adventureType);
+          
+          // Set the adventure ID from the props (whether new or continuing)
+          if (initialAdventureProps.adventureId) {
+            console.log('🎯 Index: Using adventure ID from props:', initialAdventureProps.adventureId);
+            setCurrentAdventureId(initialAdventureProps.adventureId);
+          }
+          
+          // If we have chat history, this is a continuation from our new tracking system
+          if (initialAdventureProps.chatHistory && initialAdventureProps.chatHistory.length > 0) {
+            console.log('🔄 Index: Continuing adventure with', initialAdventureProps.chatHistory.length, 'previous messages');
+            
+            // Load the chat history
+            setChatMessages(initialAdventureProps.chatHistory);
+            
+            // Set adventure context for AI
+            setCurrentAdventureContext({
+              name: initialAdventureProps.adventureName || `${initialAdventureProps.adventureType} adventure`,
+              summary: `Continuing ${initialAdventureProps.adventureType} adventure with ${initialAdventureProps.chatHistory.length} previous messages`
+            });
+            
+            // Restore comic panels if available
+            if (initialAdventureProps.comicPanels && initialAdventureProps.comicPanels.length > 0) {
+              console.log('🖼️ Index: Restoring', initialAdventureProps.comicPanels.length, 'comic panels');
+              
+              // Import default images for fallback
+              const rocket1 = '/src/assets/comic-rocket-1.jpg';
+              const spaceport2 = '/src/assets/comic-spaceport-2.jpg';
+              const alien3 = '/src/assets/comic-alienland-3.jpg';
+              const defaultImages = [rocket1, spaceport2, alien3];
+              
+              // Restore panels with image resolution logic (similar to handleContinueSpecificAdventure)
+              const restoredPanels = initialAdventureProps.comicPanels.map((panel, index) => {
+                let imageToUse = panel.image;
+                let restorationMethod = 'original';
+                
+                // Check if image needs restoration (expired DALL-E URLs)
+                const isFirebaseUrl = panel.image.includes('firebasestorage.googleapis.com');
+                const isLocalUrl = panel.image.startsWith('/') || !panel.image.includes('http');
+                const isExpiredDalleUrl = panel.image.includes('oaidalleapiprodscus.blob.core.windows.net');
+                const needsRestoration = !isFirebaseUrl && !isLocalUrl && isExpiredDalleUrl;
+                
+                if (needsRestoration && initialAdventureProps.cachedImages) {
+                  // Try to find a cached Firebase image for this panel
+                  const cachedImage = initialAdventureProps.cachedImages[Math.min(index, initialAdventureProps.cachedImages.length - 1)];
+                  if (cachedImage && cachedImage.url !== panel.image) {
+                    imageToUse = cachedImage.url;
+                    restorationMethod = 'firebase_cached';
+                    console.log(`✅ Restored cached image for panel ${index}: ${cachedImage.url.substring(0, 60)}...`);
+                  } else {
+                    // Use default fallback
+                    const fallbackIndex = index % defaultImages.length;
+                    imageToUse = defaultImages[fallbackIndex];
+                    restorationMethod = 'default_fallback';
+                    console.log(`📸 Using default fallback image for panel ${index}: ${imageToUse}`);
+                  }
+                }
+                
+                return {
+                  ...panel,
+                  image: imageToUse,
+                  restorationMethod // For debugging
+                };
+              });
+              
+              // Don't override panels - restore them as they were saved
+              // The cached images are already used above for restoration if needed
+              
+              console.log('🔄 PANEL RESTORATION SUMMARY:');
+              restoredPanels.forEach((panel, index) => {
+                console.log(`📋 Panel ${index}: ${panel.restorationMethod} - Image: ${panel.image.substring(0, 60)}...`);
+              });
+              
+              // Restore the panels
+              reset(restoredPanels);
+              console.log(`✅ Restored ${restoredPanels.length} comic panels for continued adventure`);
+            } else if (initialAdventureProps.cachedImages && initialAdventureProps.cachedImages.length > 0) {
+              // No saved panels but we have cached images - create initial panel with latest image
+              const latestCachedImage = initialAdventureProps.cachedImages[0];
+              const defaultPanels = [
+                {
+                  id: crypto.randomUUID(),
+                  image: latestCachedImage.url,
+                  text: "Your adventure continues..."
+                }
+              ];
+              reset(defaultPanels);
+              console.log(`📸 Created initial panel with latest cached image for continued adventure`);
+            }
+          }
+          
           handleStartAdventure(initialAdventureProps.topicId, initialAdventureProps.mode, initialAdventureProps.adventureType || 'food');
         }
       }
@@ -3477,41 +3668,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Use async update with Firebase sync for authenticated users
         updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
           .then((topicProgress) => {
-            // Check if topic is completed and show appropriate message
-            if (topicProgress.isCompleted) {
-              const passedTopic = isSpellboxTopicPassingGrade(topicProgress);
-              if (passedTopic) {
-                // Topic completed with 70%+ success rate
-                const congratsMessage: ChatMessage = {
-                  type: 'ai',
-                  content: `Fantastic work! You mastered the "${currentSpellQuestion.topicName}" topic with a strong first-attempt accuracy. Keep it up! 🏆`,
-                  timestamp: Date.now()
-                };
-                
-                setChatMessages(prev => {
-                  playMessageSound();
-                  const messageId = `index-chat-${congratsMessage.timestamp}-${prev.length}`;
-                  ttsService.speakAIMessage(congratsMessage.content, messageId)
-                    .catch(error => console.error('TTS error:', error));
-                  return [...prev, congratsMessage];
-                });
-              } else {
-                // Topic completed but below 70%
-                const encouragementMessage: ChatMessage = {
-                  type: 'ai',
-                  content: `Good effort! You completed the "${currentSpellQuestion.topicName}" topic with ${topicProgress.successRate.toFixed(1)}% first-attempt accuracy. Let's practice more to reach 70% and unlock the next topic! 💪`,
-                  timestamp: Date.now()
-                };
-                
-                setChatMessages(prev => {
-                  playMessageSound();
-                  const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
-                  ttsService.speakAIMessage(encouragementMessage.content, messageId)
-                    .catch(error => console.error('TTS error:', error));
-                  return [...prev, encouragementMessage];
-                });
-              }
-            }
+            // Topic progress updated - continue adventure flow seamlessly
           })
           .catch(error => {
             console.error('Failed to update Spellbox topic progress:', error);
@@ -3524,6 +3681,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       addAdventureCoins(10, currentAdventureType);
       
       // Update progress
+      // NEW: Update Firestore userStates.pets count, dailyQuests progress, and coins for current pet
+      try {
+        const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+        const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+        if (user?.uid) {
+          stateStoreApi.updateProgressOnQuestionSolved({
+            userId: user.uid,
+            pet: petType,
+            questionsSolved: 1,
+          }).catch((e)=>console.warn('updateProgressOnQuestionSolved failed:', e));
+        }
+      } catch (e) {
+        console.warn('Failed to push Firestore progress update:', e);
+      }
+
 
       setSpellProgress(prev => ({
         ...prev,
@@ -4452,6 +4624,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     showHints={false}
                     showExplanation={false}
                     sendMessage={undefined}
+
                   />
                 </div>
               </section>

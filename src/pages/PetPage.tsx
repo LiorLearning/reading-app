@@ -8,6 +8,7 @@ import { usePetData, PetDataService } from '@/lib/pet-data-service';
 import { loadAdventureSummariesHybrid } from '@/lib/firebase-adventure-cache';
 import { useAuth } from '@/hooks/use-auth';
 import { PetSelectionFlow } from '@/components/PetSelectionFlow';
+import { stateStoreReader } from '@/lib/state-store-api';
 import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,18 @@ import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSe
 
 
 type Props = {
-  onStartAdventure?: (topicId: string, mode: 'new' | 'continue', adventureType?: string) => void;
+  onStartAdventure?: (
+    topicId: string, 
+    mode: 'new' | 'continue', 
+    adventureType?: string,
+      continuationContext?: {
+        adventureId: string;
+        chatHistory?: any[];
+        adventureName?: string;
+        comicPanels?: any[];
+        cachedImages?: any[];
+      }
+  ) => void;
   onContinueSpecificAdventure?: (adventureId: string) => void;
 };
 
@@ -40,7 +52,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const { coins, spendCoins, hasEnoughCoins, canSpendForFeeding, setCoins } = useCoins();
   
   // Get Firebase authenticated user for adventure loading and user data for personalized pet thoughts
-  const { user, userData, signOut } = useAuth();
+  const { user, userData, signOut, loading } = useAuth();
   
   // Use shared pet data system
   const { careLevel, ownedPets, audioEnabled, setCareLevel, addOwnedPet, setAudioEnabled, isPetOwned, getCoinsSpentForCurrentStage, getPetCoinsSpent, addPetCoinsSpent, incrementFeedingCount, addAdventureCoins, setSleepCompleted, getCumulativeCarePercentage, getCumulativeCareLevel, isSleepAvailable, resetCumulativeCareLevel, migrateToCumulativeCareSystem, checkAndPerform24HourReset, checkAndPerform8HourReset } = usePetData();
@@ -420,27 +432,82 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     }
   }, [currentPet]);
   
+  // Mirror server sleep window to local UI for the current pet
+  useEffect(() => {
+    const handler = (e: any) => {
+      try {
+        const states = (e?.detail as any[]) || [];
+        const s = states.find((x: any) => x.pet === currentPet);
+        if (s?.sleepStartAt && s?.sleepEndAt) {
+          const startMs = (s.sleepStartAt as any).toMillis ? (s.sleepStartAt as any).toMillis() : new Date(s.sleepStartAt as any).getTime();
+          const endMs = (s.sleepEndAt as any).toMillis ? (s.sleepEndAt as any).toMillis() : new Date(s.sleepEndAt as any).getTime();
+          if (endMs && Date.now() < endMs) {
+            updateSleepClicks(3, startMs || Date.now(), endMs);
+          }
+        }
+      } catch {}
+    };
+    window.addEventListener('dailyQuestsUpdated', handler as any);
+    return () => window.removeEventListener('dailyQuestsUpdated', handler as any);
+  }, [currentPet]);
+  
   // TTS message ID for tracking speaking state
   const petMessageId = 'pet-message';
   const isSpeaking = useTTSSpeaking(petMessageId);
   
   // Check if user needs pet selection flow (only for users who have completed onboarding)
   useEffect(() => {
-    const checkPetSelection = () => {
+    const checkPetSelection = async () => {
+      // Only proceed if auth loading is complete and user data is available
+      if (loading || !userData || !user) return;
+      
       // Only show pet selection if user has completed onboarding
-      if (userData && !userData.isFirstTime && userData.grade) {
-        // Check if user has any owned pets
-        const allOwnedPets = PetProgressStorage.getAllOwnedPets();
-        
-        // If no pets are owned, show pet selection flow
-        if (allOwnedPets.length === 0) {
-          setShowPetSelection(true);
+      if (!userData.isFirstTime && userData.grade) {
+        try {
+          // First check local storage for owned pets
+          const localOwnedPets = PetProgressStorage.getAllOwnedPets();
+          const localPetIds = localOwnedPets.map(pet => pet.petId);
+          
+          // Also check Firebase userState for owned pets
+          const userOverview = await stateStoreReader.fetchUserOverview(user.uid);
+          const firebasePetIds = userOverview ? Object.keys(userOverview.pets || {}) : [];
+          
+          // If user has pets in either local storage or Firebase, don't show selection
+          if (localPetIds.length > 0 || firebasePetIds.length > 0) {
+            // User has pets, ensure we have a current selected pet
+            const currentSelected = PetProgressStorage.getCurrentSelectedPet();
+            if (!currentSelected && (localPetIds.length > 0 || firebasePetIds.length > 0)) {
+              // Set the first available pet as current
+              const firstPet = localPetIds[0] || firebasePetIds[0];
+              if (firstPet) {
+                PetProgressStorage.setCurrentSelectedPet(firstPet);
+                setCurrentPet(firstPet);
+                try {
+                  localStorage.setItem('current_pet', firstPet);
+                  window.dispatchEvent(new CustomEvent('currentPetChanged'));
+                } catch (error) {
+                  console.warn('Failed to save current pet to localStorage:', error);
+                }
+              }
+            }
+            setShowPetSelection(false);
+          } else {
+            // No pets found, show pet selection flow
+            setShowPetSelection(true);
+          }
+        } catch (error) {
+          console.warn('Error checking pet ownership:', error);
+          // Fallback to local check only
+          const allOwnedPets = PetProgressStorage.getAllOwnedPets();
+          if (allOwnedPets.length === 0) {
+            setShowPetSelection(true);
+          }
         }
       }
     };
     
     checkPetSelection();
-  }, [userData]);
+  }, [userData, loading, user]);
   
   // ADDED FOR HOME PAGE FUNCTIONALITY: Grade selection logic
   useEffect(() => {
@@ -555,20 +622,79 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // Play click sound
       playFeedingSound(); // Reuse feeding sound for click
       
-      if (!onStartAdventure) {
+      if (!onStartAdventure || !onContinueSpecificAdventure) {
         alert("Adventure functionality is not available right now!");
         return;
       }
-      
-      console.log('🎯 PetPage: onStartAdventure function exists:', !!onStartAdventure, 'type:', typeof onStartAdventure);
-      console.log('🎯 PetPage: onStartAdventure function toString:', onStartAdventure.toString().substring(0, 200));
 
-      // Always start a new adventure (no longer continue previous ones)
-      const callId = `petpage-${Date.now()}`;
-      console.log('🚀 PetPage: Starting new adventure with type:', adventureType, 'callId:', callId);
-      console.log('🚀 PetPage: Calling onStartAdventure with params:', selectedTopicFromPreference || 'K-F.2', 'new', adventureType, 'callId:', callId);
-      const result = onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new', adventureType);
-      console.log('🚀 PetPage: onStartAdventure call completed, result:', result);
+      // Check if user is authenticated
+      if (!user) {
+        console.warn('User not authenticated, starting new adventure');
+        onStartAdventure(selectedTopicFromPreference || 'K-F.2', 'new', adventureType);
+        return;
+      }
+
+      // Import the adventure tracker
+      const { PetAdventureTracker } = await import('@/lib/pet-adventure-tracker');
+      
+      // Check if there's an existing adventure for this pet and adventure type
+      const existingAdventure = await PetAdventureTracker.hasExistingAdventure(
+        user.uid, 
+        currentPet, 
+        adventureType
+      );
+
+      console.log('🎯 PetPage: Existing adventure check:', existingAdventure);
+
+      if (existingAdventure.exists && existingAdventure.adventureId) {
+        // Continue existing adventure with context
+        console.log('🔄 PetPage: Continuing existing adventure:', existingAdventure.adventureId);
+        console.log('🔄 PetPage: Adventure has', existingAdventure.messageCount, 'messages');
+        
+        // Use onStartAdventure with 'continue' mode and pass the adventure context
+        // This will trigger the AI to generate a "welcome back" message with context
+        onStartAdventure(
+          existingAdventure.topicId || 'K-F.2', 
+          'continue', 
+          adventureType,
+          {
+            adventureId: existingAdventure.adventureId,
+            chatHistory: existingAdventure.chatHistory,
+            adventureName: existingAdventure.adventureName,
+            comicPanels: existingAdventure.comicPanels,
+            cachedImages: existingAdventure.cachedImages
+          }
+        );
+        
+        // Update activity timestamp
+        await PetAdventureTracker.updateAdventureActivity(
+          user.uid, 
+          currentPet, 
+          adventureType
+        );
+      } else {
+        // Start new adventure and track it
+        const newAdventureId = crypto.randomUUID();
+        const topicId = selectedTopicFromPreference || 'K-F.2';
+        
+        console.log('🚀 PetPage: Starting new adventure with type:', adventureType, 'ID:', newAdventureId);
+        
+        // Track the new adventure
+        await PetAdventureTracker.startNewAdventure(
+          user.uid,
+          currentPet,
+          adventureType,
+          newAdventureId,
+          topicId
+        );
+        
+        // Start the new adventure with the pre-generated ID
+        onStartAdventure(topicId, 'new', adventureType, {
+          adventureId: newAdventureId,
+          chatHistory: [],
+          adventureName: `New ${adventureType} adventure`
+        });
+      }
     } catch (error) {
       console.error('Failed to handle adventure click:', error);
       // Fallback to starting a new adventure
@@ -617,6 +743,19 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           updateSleepClicks(newSleepClicks, now, sleepEndTime);
           setSleepCompleted(true);
           
+          // Persist sleep window in Firestore dailyQuests for cross-device sync
+          (async () => {
+            try {
+              const { auth } = await import('@/lib/firebase');
+              const { stateStoreApi } = await import('@/lib/state-store-api');
+              const user = auth.currentUser;
+              const petId = currentPet;
+              if (user) {
+                await stateStoreApi.startPetSleep({ userId: user.uid, pet: petId, durationMs: eightHours });
+              }
+            } catch {}
+          })();
+
           // Set initial sleep time remaining
           setSleepTimeRemaining(eightHours);
         } else {
@@ -749,10 +888,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
               await firebasePetStateService.setSleepWindow(user.uid, petId, true, sleepEndTime - sleepStartTime);
               await firebasePetStateService.updateCumulativeCare(user.uid, petId, { sleepCompleted: true });
             }
-            if (clicks === 0) {
-              await firebasePetStateService.setSleepWindow(user.uid, petId, false);
-              await firebasePetStateService.updateCumulativeCare(user.uid, petId, { sleepCompleted: false });
-            }
           }
         } catch {}
       })();
@@ -769,8 +904,35 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
   // Reset sleep when needed (e.g., when switching pets or after full sleep cycle)
   const resetSleep = () => {
+    // Determine if server sleep should be cleared based on prior stored window
+    let shouldClearServer = false;
+    try {
+      const stored = localStorage.getItem('pet_sleep_data');
+      if (stored) {
+        const prev = JSON.parse(stored);
+        if (prev?.sleepEndTime && Date.now() >= prev.sleepEndTime) {
+          shouldClearServer = true;
+        }
+      }
+    } catch {}
+
     setSleepClicks(0);
     saveSleepData(0);
+
+    if (!shouldClearServer) return;
+
+    // Clear server-side sleep markers only when sleep window actually ended
+    (async () => {
+      try {
+        const { auth } = await import('@/lib/firebase');
+        const { stateStoreApi } = await import('@/lib/state-store-api');
+        const user = auth.currentUser;
+        const petId = currentPet;
+        if (user) {
+          await stateStoreApi.clearPetSleep({ userId: user.uid, pet: petId });
+        }
+      } catch {}
+    })();
   };
 
   // Check if sleep should be reset due to 8-hour timeout
@@ -1056,6 +1218,16 @@ const getSleepyPetImage = (clicks: number) => {
       if (sleepClicks >= 2) return 'sleep2';
       return 'sleep1';
     }
+
+    // If 8-hour heart reset has occurred (empty heart) or pet woke up sad, force sad image
+    try {
+      const petProgress = PetProgressStorage.getPetProgress(currentPet);
+      const { heartData, sleepData } = petProgress;
+      const isHeartEmpty = heartData.feedingCount === 0 && heartData.adventureCoins === 0 && !heartData.sleepCompleted;
+      if (sleepData.willBeSadOnWakeup || isHeartEmpty) {
+        return 'coins_0';
+      }
+    } catch {}
 
     // Daily coin-based progression (per pet): 0, 10, 30, 50
     const todayCoins = PetProgressStorage.getTodayCoins(currentPet);
@@ -2386,11 +2558,27 @@ const getSleepyPetImage = (clicks: number) => {
             <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Daily Quests</div>
             <div className="mt-1 flex flex-col gap-2">
               {(() => {
-                // Use the same dynamic logic as pet thoughts to determine current quest
+                // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
+                const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+                let activityFromFirestore: string | null = null;
+                let fracFromFirestore: number | null = null;
+                try {
+                  if (questStatesRaw) {
+                    const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target: number; }>;
+                    const item = arr?.find(x => x.pet === currentPet);
+                    if (item && item.target > 0) {
+                      activityFromFirestore = item.activity;
+                      fracFromFirestore = Math.max(0, Math.min(1, item.progress / item.target));
+                    }
+                  }
+                } catch {}
+
+                // Fallbacks when Firestore hasn't hydrated yet
                 const questSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
-                const currentQuestType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, questSequence, 50);
-                const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentQuestType, 50);
-                const progress = done ? 1 : 0;
+                const currentQuestType = activityFromFirestore || PetProgressStorage.getCurrentTodoDisplayType(currentPet, questSequence, 50);
+                const doneLocal = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentQuestType, 50);
+                const progress = fracFromFirestore !== null ? fracFromFirestore : (doneLocal ? 1 : 0);
+                const done = progress >= 1;
                 
                 // Get icon and label for the current quest type
                 const getQuestIcon = (type: string) => {
@@ -2423,7 +2611,7 @@ const getSleepyPetImage = (clicks: number) => {
                     <div className="flex-1">
                       <div className={`font-semibold drop-shadow-md ${done ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>{questLabel}</div>
                       <div className="mt-0.5 h-2 bg-white/25 rounded-full overflow-hidden w-[260px]">
-                        <div className={`h-full transition-all duration-500 ${done ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
+                        <div className={`h-full transition-all duration-500 ${done ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${Math.round(progress * 100)}%` }} />
                       </div>
                     </div>
                     <button aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`} onClick={() => handleActionClick(currentQuestType)} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : 'bg-white/90'}`}>

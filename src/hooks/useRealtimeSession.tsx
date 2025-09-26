@@ -30,6 +30,7 @@ export interface UseRealtimeSessionReturn {
   sendMessage: (text: string) => void;
   onToggleConnection: () => void;
   downloadRecording: () => Promise<void>;
+  interruptRealtimeSession: () => void;
 }
 
 export function useRealtimeSession(callbacks: RealtimeSessionCallbacks = {}): UseRealtimeSessionReturn {
@@ -533,5 +534,6 @@ Homophone (pearl vs purl)
     sendMessage,
     onToggleConnection,
     downloadRecording,
+    interruptRealtimeSession: interrupt,
   } as const;
 }

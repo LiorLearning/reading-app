@@ -33,14 +33,39 @@ const DevCoinHotspot: React.FC = () => {
 // Unified component that seamlessly switches between pet page and adventure
 const UnifiedPetAdventureApp = () => {
   const [isInAdventure, setIsInAdventure] = useState(false);
-  const [adventureProps, setAdventureProps] = useState<{topicId?: string, mode?: 'new' | 'continue', adventureId?: string, adventureType?: string} | null>(null);
+  const [adventureProps, setAdventureProps] = useState<{
+    topicId?: string, 
+    mode?: 'new' | 'continue', 
+    adventureId?: string, 
+    adventureType?: string,
+    chatHistory?: any[],
+    adventureName?: string,
+    comicPanels?: any[],
+    cachedImages?: any[]
+  } | null>(null);
 
   const { user, userData, loading } = useAuth();
 
   // Adventure handlers that switch modes seamlessly without route changes
-  const handleStartAdventure = (topicId: string, mode: 'new' | 'continue' = 'new', adventureType: string = 'food') => {
-    console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType });
-    setAdventureProps({ topicId, mode, adventureType });
+  const handleStartAdventure = (
+    topicId: string, 
+    mode: 'new' | 'continue' = 'new', 
+    adventureType: string = 'food',
+      continuationContext?: {
+        adventureId: string;
+        chatHistory?: any[];
+        adventureName?: string;
+        comicPanels?: any[];
+        cachedImages?: any[];
+      }
+  ) => {
+    console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType, continuationContext });
+    setAdventureProps({ 
+      topicId, 
+      mode, 
+      adventureType,
+      ...continuationContext // Spread the continuation context
+    });
     setIsInAdventure(true);
   };
 

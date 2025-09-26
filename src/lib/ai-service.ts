@@ -1464,13 +1464,24 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       };
 
       // For initial message, we send just the system prompt and ask for a greeting
+      let userMessageContent = "Hi! I'm ready to start a new adventure!";
+      
+      if (adventureMode === 'continue') {
+        if (isSpecificAdventure) {
+          userMessageContent = `Hi! I'm back to continue my adventure: "${currentAdventure.name}"`;
+        } else if (chatHistory && chatHistory.length > 0) {
+          // We have previous chat history - this is a continuation from our tracking system
+          const lastMessage = chatHistory[chatHistory.length - 1];
+          const messageCount = chatHistory.length;
+          userMessageContent = `Hi! I'm back to continue our ${adventureType} adventure. We had ${messageCount} messages before, and last time we were talking about: "${lastMessage.content.substring(0, 100)}${lastMessage.content.length > 100 ? '...' : ''}"`;
+        } else {
+          userMessageContent = "Hi! I'm ready to continue our adventure!";
+        }
+      }
+      
       const userMessage = {
         role: "user" as const,
-        content: isSpecificAdventure 
-          ? `Hi! I'm back to continue my adventure: "${currentAdventure.name}"`
-          : adventureMode === 'new' 
-            ? "Hi! I'm ready to start a new adventure!" 
-            : "Hi! I'm ready to continue our adventure!"
+        content: userMessageContent
       };
 
       const messages = [systemMessage, userMessage];

@@ -50,6 +50,7 @@ interface SpellBoxProps {
   
   // Realtime session integration
   sendMessage?: (text: string) => void;
+  interruptRealtimeSession?: () => void;
 }
 
 const SpellBox: React.FC<SpellBoxProps> = ({
@@ -74,7 +75,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   showExplanation = true,
   
   // Realtime session integration
-  sendMessage
+  sendMessage,
+  interruptRealtimeSession
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -624,6 +626,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       
       if (correct) {
         console.log('🎉 SPELLBOX: CORRECT ANSWER! Triggering celebration');
+        
+        // Stop any ongoing realtime session speech since it's no longer relevant
+        if (interruptRealtimeSession) {
+          interruptRealtimeSession();
+        }
+        
         // Trigger confetti celebration for correct answer
         triggerConfetti();
         
@@ -878,8 +886,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       cursor: 'not-allowed',
                                       transform: 'translateY(-2px)'
                                     };
-                                  } else if (isLetterCorrect) {
-                                    // This letter is correct in its position - green
+                                  } else if (isWordCompleteNow && isLetterCorrect) {
+                                    // Word is complete and this letter is in correct position - green
                                     boxStyle = {
                                       ...boxStyle,
                                       background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
@@ -995,8 +1003,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                           // Entire word is correct
                                           e.target.style.borderColor = '#22C55E';
                                           e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
-                                        } else if (isLetterCorrectBlur) {
-                                          // This letter is correct in its position
+                                        } else if (isWordCompleteNow && isLetterCorrectBlur) {
+                                          // Word is complete and this letter is in correct position
                                           e.target.style.borderColor = '#22C55E';
                                           e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
                                         } else if (isIncorrectNow && hasValue) {

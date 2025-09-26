@@ -503,25 +503,49 @@ export class PetProgressStorage {
     const now = Date.now();
     const todo = petData.todoData || { currentType: sequence[0], lastSwitchTime: now };
 
+    // Rollover rules:
+    // - If calendar day changed since lastSwitchTime, update today's activity:
+    //   - If currentType is completed, advance to the next in order
+    //   - If not completed, keep the same
+    // - If an 8-hour sleep just ended (wake-up event happened after lastSwitchTime), do the same rollover
+    try {
+      const lastDate = new Date(todo.lastSwitchTime).toISOString().slice(0, 10);
+      const today = new Date().toISOString().slice(0, 10);
+
+      const { sleepData } = petData;
+      const sleepEndedAfterLastSwitch =
+        !!sleepData && !sleepData.isAsleep && sleepData.sleepEndTime > 0 && sleepData.sleepEndTime <= now && todo.lastSwitchTime < sleepData.sleepEndTime;
+
+      const dayChanged = lastDate !== today;
+      const shouldRollover = dayChanged || sleepEndedAfterLastSwitch;
+
+      if (shouldRollover) {
+        const currentIsDone = this.isAdventureTypeCompleted(petId, todo.currentType, threshold);
+        let nextType = todo.currentType;
+        if (currentIsDone) {
+          const idx = Math.max(0, sequence.indexOf(todo.currentType));
+          nextType = sequence[(idx + 1) < sequence.length ? (idx + 1) : idx];
+        }
+        petData.todoData = { currentType: nextType, lastSwitchTime: now };
+        this.setPetProgress(petData);
+        return nextType;
+      }
+    } catch {}
+
     // If within 8 hours of last switch, keep showing the pinned item
     if (now - todo.lastSwitchTime < this.EIGHT_HOURS_MS) {
       return todo.currentType || sequence[0];
     }
 
-    // Otherwise, move pointer to the next not-completed item in sequence
-    const startIndex = Math.max(0, sequence.indexOf(todo.currentType));
-    let next: string | null = null;
-    for (let i = startIndex + 1; i < sequence.length; i++) {
-      if (!this.isAdventureTypeCompleted(petId, sequence[i], threshold)) {
-        next = sequence[i];
-        break;
-      }
-    }
-    // If none pending, keep pointing to the last item in sequence
-    const finalType = next || sequence[sequence.length - 1];
-    petData.todoData = { currentType: finalType, lastSwitchTime: now };
+    // After 8 hours (and no rollover), apply simple rule:
+    // - If currentType is completed, move to the next in order
+    // - If not completed, keep the same
+    const currentIsDone = this.isAdventureTypeCompleted(petId, todo.currentType, threshold);
+    const idx = Math.max(0, sequence.indexOf(todo.currentType));
+    const nextType = currentIsDone ? (sequence[(idx + 1) < sequence.length ? (idx + 1) : idx]) : todo.currentType;
+    petData.todoData = { currentType: nextType, lastSwitchTime: now };
     this.setPetProgress(petData);
-    return finalType;
+    return nextType;
   }
 
   // Put pet to sleep
