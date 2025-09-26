@@ -8,13 +8,14 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  signInWithCredential,
-  setPersistence,
-  browserLocalPersistence,
-  browserSessionPersistence
+  signInWithCredential
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { stateStoreReader } from '@/lib/state-store-api';
+import { CoinSystem } from '@/pages/coinSystem';
+import { PetProgressStorage } from '@/lib/pet-progress-storage';
+import { PetDataService } from '@/lib/pet-data-service';
 
 // Google Identity Services types
 declare global {
@@ -75,53 +76,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [hasGoogleAccount, setHasGoogleAccount] = useState(false);
 
-  // Debug logging for incognito mode issues
   useEffect(() => {
-    console.log('🔍 Auth Provider Debug Info:');
-    console.log('🔍 User Agent:', navigator.userAgent);
-    console.log('🔍 Local Storage Available:', typeof Storage !== 'undefined' && localStorage);
-    console.log('🔍 Session Storage Available:', typeof Storage !== 'undefined' && sessionStorage);
-    console.log('🔍 Firebase Auth Available:', !!auth);
-    console.log('🔍 Environment:', {
-      NODE_ENV: import.meta.env.NODE_ENV,
-      VITE_FIREBASE_API_KEY: !!import.meta.env.VITE_FIREBASE_API_KEY,
-      VITE_GOOGLE_CLIENT_ID: !!import.meta.env.VITE_GOOGLE_CLIENT_ID
-    });
-
-    // Set appropriate persistence based on browser capabilities
-    const setupPersistence = async () => {
-      try {
-        // Check if localStorage is available
-        const testKey = '__test_storage__';
-        localStorage.setItem(testKey, 'test');
-        localStorage.removeItem(testKey);
-        
-        // Use local persistence if localStorage is available
-        console.log('🔍 Setting Firebase Auth persistence to LOCAL');
-        await setPersistence(auth, browserLocalPersistence);
-      } catch (e) {
-        // Fall back to session persistence in incognito mode
-        console.log('🔍 LocalStorage not available, using SESSION persistence');
-        try {
-          await setPersistence(auth, browserSessionPersistence);
-        } catch (sessionError) {
-          console.error('🚨 Could not set any persistence:', sessionError);
-        }
-      }
-    };
-
-    setupPersistence();
-  }, []);
-
-  useEffect(() => {
-    console.log('🔍 Setting up Firebase Auth state listener...');
-    
+    let unsubscribeUserState: (() => void) | null = null;
+    let unsubscribeDailyQuests: (() => void) | null = null;
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('🔍 Firebase Auth state changed:', user ? 'User logged in' : 'User logged out');
       setUser(user);
       
       if (user) {
-        console.log('🔍 Loading user data for:', user.uid);
         // Load user data from Firestore
         try {
           const userDocRef = doc(db, 'users', user.uid);
@@ -129,13 +90,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
-            console.log('🔍 User data loaded successfully:', data);
             setUserData(data);
             
             // Check if user signed in with Google
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
             setHasGoogleAccount(isGoogleUser);
-            console.log('🔍 Is Google user:', isGoogleUser);
             
             // Update last login
             await updateDoc(userDocRef, {
@@ -163,23 +122,186 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
             setHasGoogleAccount(isGoogleUser);
           }
+
+          // Daily quest bootstrap removed per product requirement to avoid writes on refresh
         } catch (error) {
-          console.error('🚨 Error loading user data:', error);
-          // Don't throw the error, but set loading to false so the app doesn't hang
-          setLoading(false);
-          return;
+          console.error('Error loading user data:', error);
+        }
+
+        // Read-only hydration from Firestore to local UI stores (no writes to Firestore)
+        try {
+          const overview = await stateStoreReader.fetchUserOverview(user.uid);
+          if (overview) {
+            // Coins and streak
+            CoinSystem.setCoins(overview.coins);
+
+            // Pets: mark owned and hydrate progress/levels from total correct answers
+            const petIds = Object.keys(overview.pets || {});
+            const ensureLevelFromCoins = (coins: number): number => {
+              if (coins >= 300) return 5;
+              if (coins >= 200) return 4;
+              if (coins >= 120) return 3;
+              if (coins >= 50) return 2;
+              return 1;
+            };
+            for (const petId of petIds) {
+              const info = overview.pets[petId];
+              const petCoins = (info?.totalCorrect || 0) * 10; // 10 coins per question
+              const petData = PetProgressStorage.getPetProgress(petId, petId);
+              petData.generalData.isOwned = true;
+              petData.levelData.totalAdventureCoinsEarned = petCoins;
+              const newLevel = ensureLevelFromCoins(petCoins);
+              petData.levelData.currentLevel = newLevel;
+              try {
+                const today = new Date().toISOString().slice(0, 10);
+                petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
+                petData.dailyCoins.todayDate = today;
+                petData.dailyCoins.todayCoins = petCoins; // reflect Firestore-derived coins for consistent avatar
+              } catch {}
+              PetProgressStorage.setPetProgress(petData);
+            }
+
+            // Select first owned pet if none selected
+            try {
+              const currentSelected = PetProgressStorage.getCurrentSelectedPet();
+              if (!currentSelected && petIds.length > 0) {
+                PetProgressStorage.setCurrentSelectedPet(petIds[0]);
+              }
+            } catch {}
+          }
+
+          // Daily quest pet-wise states (read-only)
+          try {
+            const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
+            // Store locally for UI consumers; fire an event as well
+            localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(questStates));
+            // Seed sleep window from server on initial sign-in
+            try {
+              const now = Date.now();
+              // Prefer current pet, else any active sleep
+              const currentPet = PetProgressStorage.getCurrentSelectedPet();
+              let s = currentPet ? questStates.find(x => x.pet === currentPet) : null;
+              if (!s) s = questStates.find(x => (x as any).sleepEndAt);
+              const endAny = s?.sleepEndAt as any;
+              const startAny = s?.sleepStartAt as any;
+              const endMs = endAny?.toMillis ? endAny.toMillis() : (endAny ? new Date(endAny).getTime() : 0);
+              const startMs = startAny?.toMillis ? startAny.toMillis() : (startAny ? new Date(startAny).getTime() : 0);
+              if (endMs && now < endMs) {
+                localStorage.setItem('pet_sleep_data', JSON.stringify({ clicks: 3, timestamp: startMs || now, sleepStartTime: startMs || now, sleepEndTime: endMs }));
+              }
+            } catch {}
+            window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: questStates }));
+          } catch (e) {
+            console.warn('Failed fetching daily quest states:', e);
+          }
+        } catch (e) {
+          console.warn('Hydration from Firestore failed:', e);
+        }
+
+        // Live listeners (real-time updates)
+        try {
+          const seq = ['house','friend','travel','food','plant-dreams','story'];
+          const target = 5;
+          let ownedPets: string[] = [];
+
+          // UserState live: coins + owned pets + per-pet levels
+          unsubscribeUserState = onSnapshot(doc(db, 'userStates', user.uid), (snap) => {
+            const d = snap.data() as any;
+            if (!d) return;
+            // Coins
+            CoinSystem.setCoins(Number(d.coins ?? 0));
+            // Owned pets
+            ownedPets = Object.keys(d.pets ?? {});
+            // Hydrate levels
+            for (const petId of ownedPets) {
+              const totalCorrect = Number(d.pets?.[petId] ?? 0);
+              const petCoins = totalCorrect * 10;
+              const petData = PetProgressStorage.getPetProgress(petId, petId);
+              petData.generalData.isOwned = true;
+              petData.levelData.totalAdventureCoinsEarned = petCoins;
+              if (petCoins >= 300) petData.levelData.currentLevel = 5; else if (petCoins >= 200) petData.levelData.currentLevel = 4; else if (petCoins >= 120) petData.levelData.currentLevel = 3; else if (petCoins >= 50) petData.levelData.currentLevel = 2; else petData.levelData.currentLevel = 1;
+              try {
+                const today = new Date().toISOString().slice(0, 10);
+                petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
+                petData.dailyCoins.todayDate = today;
+                petData.dailyCoins.todayCoins = petCoins; // keep avatar emotion in sync globally
+              } catch {}
+              PetProgressStorage.setPetProgress(petData);
+            }
+          });
+
+          // DailyQuests live: quest progress bar
+          unsubscribeDailyQuests = onSnapshot(doc(db, 'dailyQuests', user.uid), (snap) => {
+            const d = (snap.data() as any) || {};
+            if (!ownedPets || ownedPets.length === 0) {
+              ownedPets = Object.keys((d || {})).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
+            }
+            const states = ownedPets.map((pet) => {
+              const petObj = (d?.[pet] ?? {}) as any;
+              const index = Number(petObj?._activityIndex ?? 0) % seq.length;
+              const key = seq[index];
+              const prog = Number(petObj?.[key] ?? 0);
+              const sleepStartAt = petObj?._sleepStartAt || null;
+              const sleepEndAt = petObj?._sleepEndAt || null;
+              return { pet, activity: key, progress: prog, target, completed: prog >= target, activityIndex: index, cooldownUntil: petObj?._cooldownUntil ?? null, sleepStartAt, sleepEndAt };
+            });
+            try {
+              localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
+              // If server has a live sleep window for the current pet, mirror to local sleep store for timer
+              try {
+                const currentPet = PetProgressStorage.getCurrentSelectedPet() || ownedPets[0];
+                const s = states.find(x => x.pet === currentPet);
+                if (s?.sleepStartAt && s?.sleepEndAt) {
+                  const startMs = (s.sleepStartAt as any).toMillis ? (s.sleepStartAt as any).toMillis() : new Date(s.sleepStartAt as any).getTime();
+                  const endMs = (s.sleepEndAt as any).toMillis ? (s.sleepEndAt as any).toMillis() : new Date(s.sleepEndAt as any).getTime();
+                  if (Date.now() < endMs) {
+                    localStorage.setItem('pet_sleep_data', JSON.stringify({ clicks: 3, timestamp: startMs, sleepStartTime: startMs, sleepEndTime: endMs }));
+                  } else {
+                    localStorage.removeItem('pet_sleep_data');
+                  }
+                }
+              } catch {}
+            } catch {}
+            window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
+
+            // Enable sleep when the CURRENT pet's daily quest progress >= 5
+            try {
+              const currentPet = PetProgressStorage.getCurrentSelectedPet() || ownedPets[0];
+              const currentState = states.find(s => s.pet === currentPet);
+              if (currentState && currentState.progress >= target) {
+                const data = PetDataService.getPetData();
+                const { adventureCoinsAtLastSleep } = data.cumulativeCareLevel;
+                // Ensure coins since last sleep >= 50 so isSleepAvailable() becomes true
+                PetDataService.setPetData({
+                  cumulativeCareLevel: {
+                    ...data.cumulativeCareLevel,
+                    adventureCoins: Math.max(data.cumulativeCareLevel.adventureCoins, adventureCoinsAtLastSleep + 50)
+                  }
+                });
+              }
+            } catch {}
+          });
+        } catch (e) {
+          console.warn('Failed to attach realtime listeners:', e);
         }
       } else {
-        console.log('🔍 No user, clearing user data');
         setUserData(null);
         setHasGoogleAccount(false);
+        // Cleanup live listeners on sign-out
+        try {
+          if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
+          if (unsubscribeDailyQuests) { unsubscribeDailyQuests(); unsubscribeDailyQuests = null; }
+        } catch {}
       }
       
-      console.log('🔍 Auth loading complete');
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      try { if (unsubscribeUserState) unsubscribeUserState(); } catch {}
+      try { if (unsubscribeDailyQuests) unsubscribeDailyQuests(); } catch {}
+      unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async () => {
@@ -219,64 +341,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
-      
-      // Clear all user-specific localStorage data to prevent data leakage between users
-      clearUserSpecificLocalStorageData();
-      
+      // Local cleanup to avoid showing previous user's state
+      try {
+        // Reset local pet progress storage and selection
+        PetProgressStorage.resetAllPetData();
+        try { localStorage.removeItem('current_pet'); } catch {}
+        try { localStorage.removeItem('pet_sleep_data'); } catch {}
+        try { localStorage.removeItem('litkraft_daily_quests_state'); } catch {}
+        try { localStorage.removeItem('litkraft_coins'); } catch {}
+        try { localStorage.removeItem('litkraft_cumulative_coins_earned'); } catch {}
+        try { localStorage.removeItem('litkraft_pet_data'); } catch {}
+        // Notify listeners
+        window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins: 0 } }));
+        window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: [] }));
+        window.dispatchEvent(new CustomEvent('currentPetChanged'));
+      } catch {}
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
-    }
-  };
-
-  // Helper function to clear all user-specific localStorage data on logout
-  const clearUserSpecificLocalStorageData = () => {
-    try {
-      console.log('🧹 Clearing user-specific localStorage data on logout...');
-      
-      // Clear pet-related data
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (
-          // Pet data service keys
-          key === 'litkraft_pet_data' ||
-          key === 'litkraft_coins' ||
-          key === 'litkraft_cumulative_coins_earned' ||
-          key === 'current_pet' ||
-          key === 'pet_sleep_data' ||
-          key === 'pet_last_reset_time' ||
-          key === 'pet_feeding_streak_data' ||
-          key === 'previous_care_stage' ||
-          key === 'owned_dens' ||
-          key === 'owned_accessories' ||
-          
-          // Pet progress storage keys
-          key.startsWith('litkraft_pet_progress_') ||
-          key === 'litkraft_global_pet_settings' ||
-          key === 'litkraft_pending_pet_syncs' ||
-          
-          // Adventure and quest data
-          key.startsWith('litkraft_user_adventures_') ||
-          key === 'current_adventure_id' ||
-          key === 'cached_adventure_images' ||
-          key === 'litkraft_question_progress' ||
-          
-          // Tutorial and user progress data
-          key === 'litkraft_tutorial_data' ||
-          
-          // Any other litkraft user-specific keys
-          key.startsWith('litkraft_') ||
-          key.startsWith('user_') ||
-          key.startsWith('pet_')
-        ) {
-          console.log(`🗑️ Clearing localStorage key: ${key}`);
-          localStorage.removeItem(key);
-        }
-      });
-      
-      console.log('✅ Successfully cleared user-specific localStorage data');
-    } catch (error) {
-      console.warn('⚠️ Error clearing localStorage data on logout:', error);
     }
   };
 

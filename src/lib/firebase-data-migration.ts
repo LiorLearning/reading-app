@@ -10,8 +10,6 @@ import {
   saveAdventureHybrid,
   loadAdventureSummariesHybrid 
 } from './firebase-adventure-cache';
-import { firebaseUnifiedPetService } from './firebase-unified-pet-service';
-import { PetProgressStorage } from './pet-progress-storage';
 
 /**
  * Migrate all localStorage data to Firebase for authenticated users
@@ -81,17 +79,6 @@ export const migrateLocalStorageToFirebase = async (userId: string): Promise<voi
       console.warn('Spellbox migration failed, continuing with other migrations:', error);
     }
 
-    // 7. Migrate pet progress data
-    try {
-      const petMigrationResult = await migratePetProgressToFirebase(userId);
-      if (petMigrationResult.migratedCount > 0) {
-        console.log(`✅ Pet progress migration completed: ${petMigrationResult.migratedCount} pets migrated`);
-        migratedCount += petMigrationResult.migratedCount;
-      }
-    } catch (error) {
-      console.warn('Pet progress migration failed, continuing with other migrations:', error);
-    }
-
     // Verify migration by loading from Firebase
     const firebaseAdventures = await loadAdventureSummariesHybrid(userId);
 
@@ -115,21 +102,11 @@ export const checkMigrationNeeded = async (userId: string): Promise<boolean> => 
       loadCurrentAdventureId
     } = await import('./utils');
 
-    // Check for pet progress data
-    const hasLocalPetData = PetProgressStorage.getAllPetIds().some(petId => {
-      const petData = PetProgressStorage.getPetProgress(petId);
-      return petData.generalData.isOwned || 
-             petData.cumulativeCoinsSpent > 0 || 
-             petData.levelData.currentLevel > 1 ||
-             petData.heartData.feedingCount > 0;
-    });
-
     const hasLocalData = !!(
       loadUserProgress() ||
       loadSavedAdventures().length > 0 ||
       loadTopicPreference() ||
-      loadCurrentAdventureId() ||
-      hasLocalPetData
+      loadCurrentAdventureId()
     );
 
     if (!hasLocalData) {
@@ -146,90 +123,6 @@ export const checkMigrationNeeded = async (userId: string): Promise<boolean> => 
   } catch (error) {
     console.error('Failed to check migration status:', error);
     return false;
-  }
-};
-
-/**
- * Migrate pet progress data from localStorage to Firebase
- */
-export const migratePetProgressToFirebase = async (userId: string): Promise<{ migratedCount: number }> => {
-  try {
-    console.log('🐾 Starting pet progress migration from localStorage to Firebase...');
-    
-    let migratedCount = 0;
-    
-    // Get all pet IDs that have data in localStorage
-    const allPetIds = PetProgressStorage.getAllPetIds();
-    
-    if (allPetIds.length === 0) {
-      console.log('No pet progress data found in localStorage to migrate');
-      return { migratedCount: 0 };
-    }
-    
-    // Check if pet data already exists in Firebase to avoid overwriting
-    const existingFirebaseData = await firebaseUnifiedPetService.getPetData(userId);
-    
-    if (existingFirebaseData) {
-      console.log('Pet data already exists in Firebase, checking for missing pets...');
-    }
-    
-    // Migrate each pet's progress data
-    for (const petId of allPetIds) {
-      try {
-        // Check if this pet already exists in Firebase
-        const existingPetData = await firebaseUnifiedPetService.getPetProgress(petId, userId);
-        
-        if (existingPetData) {
-          console.log(`Pet ${petId} already exists in Firebase, skipping migration`);
-          continue;
-        }
-        
-        // Get pet data from localStorage
-        const localPetData = PetProgressStorage.getPetProgress(petId);
-        
-        // Only migrate pets that have meaningful data (owned, or have progress)
-        const hasMeaningfulData = localPetData.generalData.isOwned || 
-                                  localPetData.cumulativeCoinsSpent > 0 || 
-                                  localPetData.levelData.currentLevel > 1 ||
-                                  localPetData.heartData.feedingCount > 0 ||
-                                  localPetData.achievementData.totalFeedingsSinceOwned > 0;
-        
-        if (!hasMeaningfulData) {
-          console.log(`Pet ${petId} has no meaningful data, skipping migration`);
-          continue;
-        }
-        
-        // Convert to Firebase format and save
-        const firebaseData = PetProgressStorage.convertToFirebaseFormat(localPetData);
-        await firebaseUnifiedPetService.setPetProgress(firebaseData, userId);
-        
-        console.log(`✅ Successfully migrated pet ${petId} to Firebase`);
-        migratedCount++;
-        
-      } catch (error) {
-        console.warn(`Failed to migrate pet ${petId}:`, error);
-      }
-    }
-    
-    // Migrate global pet settings (current selected pet)
-    try {
-      const currentSelectedPet = PetProgressStorage.getCurrentSelectedPet();
-      if (currentSelectedPet) {
-        await firebaseUnifiedPetService.setPetData({ 
-          currentSelectedPet: currentSelectedPet 
-        }, userId);
-        console.log(`✅ Migrated current selected pet: ${currentSelectedPet}`);
-      }
-    } catch (error) {
-      console.warn('Failed to migrate current selected pet:', error);
-    }
-    
-    console.log(`🎉 Pet migration completed: ${migratedCount} pets migrated to Firebase`);
-    return { migratedCount };
-    
-  } catch (error) {
-    console.error('❌ Pet progress migration failed:', error);
-    throw error;
   }
 };
 
@@ -256,14 +149,6 @@ export const autoMigrateOnLogin = async (userId: string): Promise<void> => {
  */
 export const forceMigrateUserData = async (userId: string): Promise<void> => {
   await migrateLocalStorageToFirebase(userId);
-};
-
-/**
- * Manual pet progress migration trigger (for debugging/testing)
- */
-export const forceMigratePetProgress = async (userId: string): Promise<void> => {
-  const result = await migratePetProgressToFirebase(userId);
-  console.log(`Migration completed: ${result.migratedCount} pets migrated`);
 };
 
 // Make functions available globally for debugging

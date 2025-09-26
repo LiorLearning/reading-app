@@ -6,16 +6,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CameraWidget } from "@/components/CameraWidget";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
 // Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "@/pages/coinSystem";
-import { PetProgressStorage } from "@/lib/pet-progress-storage";
 
 const queryClient = new QueryClient();
 
@@ -36,14 +34,39 @@ const DevCoinHotspot: React.FC = () => {
 // Unified component that seamlessly switches between pet page and adventure
 const UnifiedPetAdventureApp = () => {
   const [isInAdventure, setIsInAdventure] = useState(false);
-  const [adventureProps, setAdventureProps] = useState<{topicId?: string, mode?: 'new' | 'continue', adventureId?: string, adventureType?: string} | null>(null);
+  const [adventureProps, setAdventureProps] = useState<{
+    topicId?: string, 
+    mode?: 'new' | 'continue', 
+    adventureId?: string, 
+    adventureType?: string,
+    chatHistory?: any[],
+    adventureName?: string,
+    comicPanels?: any[],
+    cachedImages?: any[]
+  } | null>(null);
 
   const { user, userData, loading } = useAuth();
 
   // Adventure handlers that switch modes seamlessly without route changes
-  const handleStartAdventure = (topicId: string, mode: 'new' | 'continue' = 'new', adventureType: string = 'food') => {
-    console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType });
-    setAdventureProps({ topicId, mode, adventureType });
+  const handleStartAdventure = (
+    topicId: string, 
+    mode: 'new' | 'continue' = 'new', 
+    adventureType: string = 'food',
+      continuationContext?: {
+        adventureId: string;
+        chatHistory?: any[];
+        adventureName?: string;
+        comicPanels?: any[];
+        cachedImages?: any[];
+      }
+  ) => {
+    console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType, continuationContext });
+    setAdventureProps({ 
+      topicId, 
+      mode, 
+      adventureType,
+      ...continuationContext // Spread the continuation context
+    });
     setIsInAdventure(true);
   };
 
@@ -93,24 +116,17 @@ const UnifiedPetAdventureApp = () => {
   );
 };
 
-const App = () => {
-  // Initialize offline support for pet progress sync
-  useEffect(() => {
-    PetProgressStorage.initializeOfflineSupport();
-  }, []);
-
-  return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <div className="h-full w-full overflow-hidden">
-              <Toaster />
-              <Sonner />
-              <CameraWidget />
-              <DevCoinHotspot />
-              <BrowserRouter>
-              <Routes>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <div className="h-full w-full overflow-hidden">
+          <Toaster />
+          <Sonner />
+          <CameraWidget />
+          <DevCoinHotspot />
+          <BrowserRouter>
+            <Routes>
               {/* Unified pet page and adventure experience */}
               <Route path="/" element={
                 <AuthGuard>
@@ -132,13 +148,11 @@ const App = () => {
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-            </BrowserRouter>
-          </div>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-    </ErrorBoundary>
-  );
-};
+          </BrowserRouter>
+        </div>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;

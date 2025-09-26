@@ -20,10 +20,10 @@ export interface Voice {
 // Available voices for selection
 export const AVAILABLE_VOICES: Voice[] = [
   {
-    id: 'ocZQ262SsZb9RIxcQBOj',
-    name: 'Default Voice',
+    id: 'cgSgspJ2msm6clMCkdW9',
+    name: 'Jessica',
     description: 'Warm and friendly tone, perfect for children',
-    previewText: "Hi there! I'm here to help you learn through stories and adventures. Let's explore together!"
+    previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
   },
   {
     id: 'EXAVITQu4vr4xnSDxMaL',
