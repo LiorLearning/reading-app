@@ -21,24 +21,24 @@ export interface Voice {
 // Available voices for selection
 export const AVAILABLE_VOICES: Voice[] = [
   // Pet-specific default voices
-  {
-    id: 'CeNX9CMwmxDxUF5Q2Inm',
-    name: 'Dog (Default)',
-    description: 'Friendly, energetic tone fitting for a playful dog',
-    previewText: "Woof! I'm your friendly dog, ready for fun adventures and learning together!"
-  },
+  // {
+  //   id: 'CeNX9CMwmxDxUF5Q2Inm',
+  //   name: 'Dog (Default)',
+  //   description: 'Friendly, energetic tone fitting for a playful dog',
+  //   previewText: "Woof! I'm your friendly dog, ready for fun adventures and learning together!"
+  // },
   {
     id: 'ocZQ262SsZb9RIxcQBOj',
     name: 'Cat (Default)',
     description: 'Calm and curious, purrfect for gentle guidance',
     previewText: "Meow! I'm a curious cat, here to guide you softly through new stories."
   },
-  {
-    id: 'mdzEgLpu0FjTwYs5oot0',
-    name: 'Hamster (Default)',
-    description: 'Cheery and quick, great for lively narration',
-    previewText: "Squeak! I'm your tiny hamster friend, excited to read and explore with you!"
-  },
+  // {
+  //   id: 'mdzEgLpu0FjTwYs5oot0',
+  //   name: 'Hamster (Default)',
+  //   description: 'Cheery and quick, great for lively narration',
+  //   previewText: "Squeak! I'm your tiny hamster friend, excited to read and explore with you!"
+  // },
   {
     id: 'cgSgspJ2msm6clMCkdW9',
     name: 'Jessica',
@@ -114,9 +114,9 @@ class TextToSpeechService {
     try {
       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
       const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-        dog: 'gUjI9JTmHbl5m6WWbACH',
+        dog: 'cgSgspJ2msm6clMCkdW9',
         cat: 'ocZQ262SsZb9RIxcQBOj',
-        hamster: 'ntd8L5wHOEA2S1j4fzEx',
+        hamster: 'ocZQ262SsZb9RIxcQBOj',
       };
       const defaultVoiceId = currentPetId ? PET_DEFAULT_VOICE_ID[currentPetId] : undefined;
       if (defaultVoiceId) {
