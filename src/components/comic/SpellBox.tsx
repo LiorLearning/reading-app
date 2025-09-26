@@ -1289,7 +1289,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       let boxStyle: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 600, textAlign: 'center', outline: 'none', textTransform: 'uppercase', cursor: 'pointer' };
                                       if (isWordCorrectNow) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E', color: '#15803D', cursor: 'not-allowed' };
-                                      } else if (isLetterCorrect) {
+                                      } else if (isWordCompleteNow && isLetterCorrect) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E', color: '#15803D' };
                                       } else if (isWordIncorrectNow && letterValue) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444', color: '#B91C1C' };
