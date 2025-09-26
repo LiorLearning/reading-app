@@ -48,6 +48,7 @@ import {
   
   export interface UserState {
     pets: Record<PetName, number>;
+    petnames?: Record<PetName, string>;
     coins: number;
     streak: number;
     createdAt: Timestamp;
@@ -83,6 +84,7 @@ import {
   } {
     return {
       pets: {},
+      petnames: {},
       coins: 0,
       streak: 0,
       createdAt: nowServerTimestamp(),
@@ -446,6 +448,33 @@ import {
     const snap = await getDoc(dailyQuestsDocRef(userId));
     return snap.exists() ? (snap.data() as DailyQuests) : null;
   }
+
+  // ==========================
+  // API: Pet names (stored alongside pets counts)
+  // ==========================
+
+  export interface SetPetNameInput {
+    userId: string;
+    pet: PetName;
+    name: string;
+  }
+
+  export async function setPetName(input: SetPetNameInput): Promise<void> {
+    const { userId, pet, name } = input;
+    const userRef = userStateDocRef(userId);
+    await setDoc(
+      userRef,
+      { petnames: { [pet]: name }, updatedAt: nowServerTimestamp() } as any,
+      { merge: true }
+    );
+  }
+
+  export async function getPetNames(userId: string): Promise<Record<PetName, string>> {
+    const snap = await getDoc(userStateDocRef(userId));
+    if (!snap.exists()) return {} as Record<PetName, string>;
+    const data = snap.data() as any;
+    return (data?.petnames || {}) as Record<PetName, string>;
+  }
   
   // ==========================
   // Exported API surface
@@ -460,6 +489,7 @@ import {
     getDailyQuests,
     startPetSleep,
     clearPetSleep,
+    setPetName,
   };
   
   // ==========================
@@ -602,6 +632,7 @@ import {
   export const stateStoreReader = {
     fetchUserOverview,
     fetchDailyQuestCompletionStates,
+    getPetNames,
   };
   
   

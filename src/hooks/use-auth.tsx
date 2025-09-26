@@ -145,6 +145,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               if (coins >= 50) return 2;
               return 1;
             };
+            // Load pet names map and apply to local storage
+            let petNamesMap: Record<string, string> = {};
+            try { petNamesMap = await stateStoreReader.getPetNames(user.uid) as any; } catch {}
             for (const petId of petIds) {
               const info = overview.pets[petId];
               const petCoins = (info?.totalCorrect || 0) * 10; // 10 coins per question
@@ -153,6 +156,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               petData.levelData.totalAdventureCoinsEarned = petCoins;
               const newLevel = ensureLevelFromCoins(petCoins);
               petData.levelData.currentLevel = newLevel;
+              // Apply name from Firestore if available
+              try {
+                const nm = (petNamesMap && typeof petNamesMap[petId] === 'string') ? petNamesMap[petId] : undefined;
+                if (nm && nm.trim()) {
+                  petData.petName = nm.trim();
+                } else {
+                  // Backfill: if local has name and Firestore missing, persist once
+                  const localName = petData.petName;
+                  if (localName && localName.trim()) {
+                    try { await stateStoreApi.setPetName({ userId: user.uid, pet: petId, name: localName.trim() }); } catch {}
+                  }
+                }
+              } catch {}
               try {
                 const today = new Date().toISOString().slice(0, 10);
                 petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
@@ -234,6 +250,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             CoinSystem.setCoins(Number(d.coins ?? 0));
             // Owned pets
             ownedPets = Object.keys(d.pets ?? {});
+            // Sync pet names to local storage
+            const names = (d?.petnames || {}) as Record<string, string>;
             // Hydrate levels
             for (const petId of ownedPets) {
               const totalCorrect = Number(d.pets?.[petId] ?? 0);
@@ -242,6 +260,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               petData.generalData.isOwned = true;
               petData.levelData.totalAdventureCoinsEarned = petCoins;
               if (petCoins >= 300) petData.levelData.currentLevel = 5; else if (petCoins >= 200) petData.levelData.currentLevel = 4; else if (petCoins >= 120) petData.levelData.currentLevel = 3; else if (petCoins >= 50) petData.levelData.currentLevel = 2; else petData.levelData.currentLevel = 1;
+              try {
+                const nm = (names && typeof names[petId] === 'string') ? names[petId] : undefined;
+                if (nm && nm.trim()) {
+                  petData.petName = nm.trim();
+                }
+              } catch {}
               try {
                 const today = new Date().toISOString().slice(0, 10);
                 petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };

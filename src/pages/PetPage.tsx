@@ -10,7 +10,7 @@ import { usePetData, PetDataService } from '@/lib/pet-data-service';
 import { loadAdventureSummariesHybrid } from '@/lib/firebase-adventure-cache';
 import { useAuth } from '@/hooks/use-auth';
 import { PetSelectionFlow } from '@/components/PetSelectionFlow';
-import { stateStoreReader } from '@/lib/state-store-api';
+import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
@@ -1401,6 +1401,13 @@ const getSleepyPetImage = (clicks: number) => {
       console.warn('Failed to save current pet to localStorage:', error);
     }
     
+    // Persist pet name to Firestore userStates.petnames without touching counts
+    try {
+      if (user?.uid) {
+        stateStoreApi.setPetName({ userId: user.uid, pet: petId, name: petName });
+      }
+    } catch {}
+
     // Hide the selection flow
     setShowPetSelection(false);
     
@@ -1504,6 +1511,11 @@ const getSleepyPetImage = (clicks: number) => {
     const chosenName = window.prompt('What would you like to name your new pet?', '');
     if (chosenName && chosenName.trim()) {
       PetProgressStorage.setPetName(petType, chosenName.trim());
+      try {
+        if (user?.uid) {
+          stateStoreApi.setPetName({ userId: user.uid, pet: petType, name: chosenName.trim() });
+        }
+      } catch {}
     }
   };
 
