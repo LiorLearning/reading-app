@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { auth } from '@/lib/firebase';
+import { deductCoinsOnPurchase } from '@/lib/state-store-api';
 import { useNavigate } from 'react-router-dom';
 import { useCoins, CoinSystem } from '@/pages/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
@@ -82,9 +84,17 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     return ownedAccessories[petType]?.includes(accessoryId) || false;
   };
   
-  const purchaseDen = (petType: string, cost: number) => {
+  const purchaseDen = async (petType: string, cost: number) => {
     // Use regular coin checking since feeding is now free
     if (!hasEnoughCoins(cost)) return false;
+    if (auth.currentUser) {
+      try {
+        await deductCoinsOnPurchase({ userId: auth.currentUser.uid, amount: cost });
+      } catch (err) {
+        alert('Could not complete purchase. Please try again.');
+        return false;
+      }
+    }
     spendCoins(cost);
     const newOwnedDens = [...ownedDens, `${petType}_den`];
     setOwnedDens(newOwnedDens);
@@ -92,9 +102,17 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     return true;
   };
   
-  const purchaseAccessory = (petType: string, accessoryId: string, cost: number) => {
+  const purchaseAccessory = async (petType: string, accessoryId: string, cost: number) => {
     // Use regular coin checking since feeding is now free
     if (!hasEnoughCoins(cost)) return false;
+    if (auth.currentUser) {
+      try {
+        await deductCoinsOnPurchase({ userId: auth.currentUser.uid, amount: cost });
+      } catch (err) {
+        alert('Could not complete purchase. Please try again.');
+        return false;
+      }
+    }
     spendCoins(cost);
     const newAccessories = { ...ownedAccessories };
     if (!newAccessories[petType]) newAccessories[petType] = [];
@@ -1398,7 +1416,7 @@ const getSleepyPetImage = (clicks: number) => {
     console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, []);
 
-  const handlePetPurchase = (petType: string, cost: number) => {
+  const handlePetPurchase = async (petType: string, cost: number) => {
     // Get pet data to check level requirements
     const petStoreData = getPetStoreData();
     const petData = petStoreData[petType];
@@ -1427,6 +1445,14 @@ const getSleepyPetImage = (clicks: number) => {
     }
 
     // Deduct coins and add pet to owned pets
+    if (auth.currentUser) {
+      try {
+        await deductCoinsOnPurchase({ userId: auth.currentUser.uid, amount: cost });
+      } catch (err) {
+        alert('Could not complete purchase. Please try again.');
+        return;
+      }
+    }
     spendCoins(cost);
     addOwnedPet(petType);
     

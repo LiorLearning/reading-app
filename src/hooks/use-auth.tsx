@@ -159,6 +159,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 petData.dailyCoins.todayCoins = petCoins; // reflect Firestore-derived coins for consistent avatar
               } catch {}
               PetProgressStorage.setPetProgress(petData);
+              // Ensure local owned pets list is hydrated for UI selectors
+              try { PetDataService.addOwnedPet(petId); } catch {}
             }
 
             // Select first owned pet if none selected
@@ -227,6 +229,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 petData.dailyCoins.todayCoins = petCoins; // keep avatar emotion in sync globally
               } catch {}
               PetProgressStorage.setPetProgress(petData);
+              // Keep local pet list in sync for selector
+              try { PetDataService.addOwnedPet(petId); } catch {}
             }
           });
 
