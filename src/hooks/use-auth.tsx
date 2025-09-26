@@ -12,7 +12,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { stateStoreReader } from '@/lib/state-store-api';
+import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import { CoinSystem } from '@/pages/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let unsubscribeUserState: (() => void) | null = null;
     let unsubscribeDailyQuests: (() => void) | null = null;
+    let lastRolloverAttempt = 0; // throttle rollover writes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       
@@ -193,6 +194,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: questStates }));
+
+            // Rollover on sign-in hydration if any pet completed and cooldown passed or missing
+            try {
+              const nowMs = Date.now();
+              const needsRollover = questStates.some((s: any) => {
+                const completed = Number(s?.progress || 0) >= 5;
+                const cu: any = s?.cooldownUntil || null;
+                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
+                return completed && (!cuMs || nowMs >= cuMs);
+              });
+              if (needsRollover) {
+                lastRolloverAttempt = nowMs;
+                const owned = questStates.map((x: any) => x.pet).filter(Boolean);
+                await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: owned });
+              }
+            } catch {}
           } catch (e) {
             console.warn('Failed fetching daily quest states:', e);
           }
@@ -284,7 +301,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 });
               }
             } catch {}
+
+            // Throttled rollover in realtime when cooldown has passed
+            try {
+              const nowMs = Date.now();
+              const needsRollover = states.some((s: any) => {
+                const completed = Number(s?.progress || 0) >= 5;
+                const cu: any = s?.cooldownUntil || null;
+                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
+                return completed && (!cuMs || nowMs >= cuMs);
+              });
+              if (needsRollover && nowMs - lastRolloverAttempt > 60000) {
+                lastRolloverAttempt = nowMs;
+                stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets });
+              }
+            } catch {}
           });
+
+          // Resume handler: attempt rollover on window focus (debounced via lastRolloverAttempt)
+          const onFocus = async () => {
+            try {
+              const nowMs = Date.now();
+              if (nowMs - lastRolloverAttempt < 60000) return;
+              const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
+              const needsRollover = questStates.some((s: any) => {
+                const completed = Number(s?.progress || 0) >= 5;
+                const cu: any = (s as any)?.cooldownUntil || null;
+                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
+                return completed && (!cuMs || nowMs >= cuMs);
+              });
+              if (needsRollover) {
+                lastRolloverAttempt = nowMs;
+                const owned = questStates.map((x: any) => x.pet).filter(Boolean);
+                await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: owned });
+              }
+            } catch {}
+          };
+          try { window.addEventListener('focus', onFocus); } catch {}
         } catch (e) {
           console.warn('Failed to attach realtime listeners:', e);
         }
@@ -304,6 +357,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       try { if (unsubscribeUserState) unsubscribeUserState(); } catch {}
       try { if (unsubscribeDailyQuests) unsubscribeDailyQuests(); } catch {}
+      try { window.removeEventListener('focus', () => {}); } catch {}
       unsubscribe();
     };
   }, []);

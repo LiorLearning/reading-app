@@ -1622,12 +1622,26 @@ const getSleepyPetImage = (clicks: number) => {
     
     // All pets now use the generalized cumulative care system below
 
-    // Before generic care-based thoughts, align thought with the current todo action
-    // shown in the bottom bar (e.g., travel, friend, food). This uses the same
-    // sequencing and 8-hour pin logic as the action bar so the bubble matches it.
-    const todoSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
-    const currentTodoType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, todoSequence, 50);
-    const isTodoCompleted = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentTodoType, 50);
+    // Before generic care-based thoughts, align the thought with the current Daily Quest.
+    // Primary source: Firestore `dailyQuests` (hydrated into localStorage by auth listener).
+    // Fallback: local PetProgressStorage sequencing so the bubble never goes blank.
+    const todoSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams', 'story'];
+    let activityFromFirestore: string | null = null;
+    let doneFromFirestore = false;
+    try {
+      const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+      if (questStatesRaw) {
+        const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>;
+        const s = arr.find(x => x.pet === currentPet);
+        if (s) {
+          activityFromFirestore = s.activity;
+          const tgt = Number((s as any).target ?? 5);
+          doneFromFirestore = Number(s.progress || 0) >= tgt;
+        }
+      }
+    } catch {}
+    const currentTodoType = activityFromFirestore || PetProgressStorage.getCurrentTodoDisplayType(currentPet, todoSequence, 50);
+    const isTodoCompleted = doneFromFirestore || PetProgressStorage.isAdventureTypeCompleted(currentPet, currentTodoType, 50);
     if (!isTodoCompleted) {
       const byType: Record<string, string[]> = {
         house: [
@@ -1654,6 +1668,11 @@ const getSleepyPetImage = (clicks: number) => {
           `Hold my paw and plant a gentle dream with me 🌙✨`,
           `I feel sparkly inside! 🌟 Shall we grow peaceful, cozy dreams?`,
           `Let's whisper wishes and plant them into the night 🌙`
+        ],
+        story: [
+          `Let's curl up with a story, ${userName}! 📖 Which tale should we read?`,
+          `Story time! 🌟 I’m ready for an epic adventure in words!`,
+          `Can we read together now? 📚 I love when you narrate!`
         ]
       };
       const choices = byType[currentTodoType] || [];
