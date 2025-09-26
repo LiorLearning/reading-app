@@ -3591,28 +3591,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Use async update with Firebase sync for authenticated users
         updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
           .then((topicProgress) => {
-            // Check if topic is completed and show appropriate message
-            if (topicProgress.isCompleted) {
-              const passedTopic = isSpellboxTopicPassingGrade(topicProgress);
-              if (passedTopic) {
-                // Topic completed with 70%+ success rate - continue with adventure flow
-              } else {
-                // Topic completed but below 70%
-                const encouragementMessage: ChatMessage = {
-                  type: 'ai',
-                  content: `Good effort! You completed the "${currentSpellQuestion.topicName}" topic with ${topicProgress.successRate.toFixed(1)}% first-attempt accuracy. Let's practice more to reach 70% and unlock the next topic! 💪`,
-                  timestamp: Date.now()
-                };
-                
-                setChatMessages(prev => {
-                  playMessageSound();
-                  const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
-                  ttsService.speakAIMessage(encouragementMessage.content, messageId)
-                    .catch(error => console.error('TTS error:', error));
-                  return [...prev, encouragementMessage];
-                });
-              }
-            }
+            // Topic progress updated - continue adventure flow seamlessly
           })
           .catch(error => {
             console.error('Failed to update Spellbox topic progress:', error);
