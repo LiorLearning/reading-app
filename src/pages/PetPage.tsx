@@ -2747,34 +2747,40 @@ const getSleepyPetImage = (clicks: number) => {
       {showMoreOverlay && (() => {
         // New global sequence (story handled separately):
         const coreSeq = ['house','travel','friend','food','plant-dreams'];
-        const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, coreSeq, 50);
-        const doneSet = new Set(coreSeq.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
-        const sadIndex = Math.max(0, coreSeq.indexOf(sadType));
-        const unlocked = new Set<string>([...doneSet]);
-        // Determine the two unlocked tasks: current (sad) and the next not-done item in sequence
-        const nextUnlocked: string[] = [];
-        nextUnlocked.push(sadType);
-        let nextNotDone: string | null = null;
-        for (let i = sadIndex + 1; i < coreSeq.length; i++) {
-          const t = coreSeq[i];
-          if (!doneSet.has(t)) { nextNotDone = t; break; }
+        // Prefer Firestore daily quest assignment (hydrated into localStorage by auth listener)
+        let assignedDailyType: string | null = null;
+        try {
+          const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+          if (questStatesRaw) {
+            const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>;
+            const s = arr.find(x => x.pet === currentPet);
+            if (s && coreSeq.includes(s.activity)) {
+              assignedDailyType = s.activity;
+            }
+          }
+        } catch {}
+        // Fallback to local sequencing if Firestore hasn't hydrated
+        if (!assignedDailyType) {
+          assignedDailyType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, coreSeq, 50);
         }
-        if (nextNotDone) nextUnlocked.push(nextNotDone);
-        nextUnlocked.forEach(t => unlocked.add(t));
-        // Story is always unlocked and should appear after the two to-dos visually
-        unlocked.add('story');
 
-        // Build render order per spec: done (sequence order) → [sad, next] → Story → remaining locked
-        const doneInOrder = coreSeq.filter(t => doneSet.has(t));
-        const remaining = coreSeq.filter(t => !doneSet.has(t) && !nextUnlocked.includes(t));
-        const renderOrder = [...doneInOrder, ...nextUnlocked, 'story', ...remaining];
+        // Completion info still used for badges/emojis
+        const doneSet = new Set(coreSeq.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
+
+        // Only today's assigned daily quest and Story are unlocked
+        const unlocked = new Set<string>(['story']);
+        if (assignedDailyType) unlocked.add(assignedDailyType);
+
+        // Render order: Daily Quest → Story → remaining
+        const remaining = coreSeq.filter(t => t !== assignedDailyType);
+        const renderOrder = assignedDailyType ? [assignedDailyType, 'story', ...remaining] : ['story', ...coreSeq];
 
         const renderRow = (type: string) => {
           const done = doneSet.has(type);
           const isUnlocked = unlocked.has(type);
           const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
           const label = type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
-          const statusEmoji = !isUnlocked ? '🔒' : (done ? '✅' : (type === sadType ? '😞' : '😐'));
+          const statusEmoji = !isUnlocked ? '🔒' : (done ? '✅' : (type === assignedDailyType ? '⭐' : '😐'));
           return (
             <button
               key={type}
