@@ -194,6 +194,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
             // Store locally for UI consumers; fire an event as well
             localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(questStates));
+            // Eagerly reflect completed daily quests in todayCoins for emotion rendering
+            try {
+              const today = new Date().toISOString().slice(0, 10);
+              const targetCoins = 50; // 5 correct * 10 coins
+              questStates.forEach((s: any) => {
+                const prog = Number(s?.progress || 0);
+                const petId = (s as any)?.pet;
+                if (!petId) return;
+                if (prog >= 5) {
+                  const pd = PetProgressStorage.getPetProgress(petId, petId);
+                  pd.dailyCoins = pd.dailyCoins || { todayDate: today, todayCoins: 0 };
+                  if (pd.dailyCoins.todayDate !== today) {
+                    pd.dailyCoins.todayDate = today;
+                    pd.dailyCoins.todayCoins = 0;
+                  }
+                  if ((pd.dailyCoins.todayCoins || 0) < targetCoins) {
+                    pd.dailyCoins.todayCoins = targetCoins;
+                    PetProgressStorage.setPetProgress(pd);
+                  }
+                }
+              });
+            } catch {}
             // Seed sleep window from server on initial sign-in (per-pet keys)
             try {
               const now = Date.now();
@@ -306,6 +328,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     localStorage.setItem(`pet_sleep_data_${petId}`, JSON.stringify({ clicks: 3, timestamp: startMs, sleepStartTime: startMs, sleepEndTime: endMs }));
                   } else {
                     localStorage.removeItem(`pet_sleep_data_${petId}`);
+                  }
+                });
+              } catch {}
+              // Eagerly reflect completed daily quests in todayCoins for emotion rendering (realtime)
+              try {
+                const today = new Date().toISOString().slice(0, 10);
+                const targetCoins = 50; // 5 correct * 10 coins
+                states.forEach((s: any) => {
+                  const prog = Number(s?.progress || 0);
+                  const petId = (s as any)?.pet;
+                  if (!petId) return;
+                  if (prog >= target) {
+                    const pd = PetProgressStorage.getPetProgress(petId, petId);
+                    pd.dailyCoins = pd.dailyCoins || { todayDate: today, todayCoins: 0 };
+                    if (pd.dailyCoins.todayDate !== today) {
+                      pd.dailyCoins.todayDate = today;
+                      pd.dailyCoins.todayCoins = 0;
+                    }
+                    if ((pd.dailyCoins.todayCoins || 0) < targetCoins) {
+                      pd.dailyCoins.todayCoins = targetCoins;
+                      PetProgressStorage.setPetProgress(pd);
+                    }
                   }
                 });
               } catch {}

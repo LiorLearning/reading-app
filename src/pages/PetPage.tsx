@@ -1261,6 +1261,19 @@ const getSleepyPetImage = (clicks: number) => {
       return 'sleep1';
     }
 
+    // If daily quest is completed for this pet, force happy state regardless of heart emptiness
+    try {
+      const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+      if (questStatesRaw) {
+        const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>
+        const item = arr?.find(x => x.pet === currentPet);
+        const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
+        if (item && Number(item.progress || 0) >= target) {
+          return 'coins_50';
+        }
+      }
+    } catch {}
+
     // If 8-hour heart reset has occurred (empty heart) or pet woke up sad, force sad image
     try {
       const petProgress = PetProgressStorage.getPetProgress(currentPet);
