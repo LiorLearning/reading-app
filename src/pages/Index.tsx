@@ -4558,6 +4558,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     draggable={false}
                     autoHideToken={leftOverlayAutoHideToken}
                     onBubbleVisibilityChange={setIsLeftBubbleVisible}
+                    interruptRealtimeSession={interruptRealtimeSession}
                     spellInline={{
                       show: showSpellBox && !!currentSpellQuestion,
                       word: currentSpellQuestion?.word || currentSpellingWord || null,

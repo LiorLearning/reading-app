@@ -12,6 +12,7 @@ interface LeftPetOverlayProps {
   draggable?: boolean;
   autoHideToken?: unknown; // any changing value triggers an auto hide (e.g., after image creation)
   onBubbleVisibilityChange?: (visible: boolean) => void;
+  interruptRealtimeSession?: () => void;
   /** Optional: provide to render inline spelling UI instead of plain HTML */
   spellInline?: {
     word?: string | null;
@@ -43,6 +44,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   draggable = true,
   autoHideToken,
   onBubbleVisibilityChange,
+  interruptRealtimeSession,
   spellInline,
 }) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -199,6 +201,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                     showHints={spellInline.showHints}
                     showExplanation={spellInline.showExplanation}
                     sendMessage={spellInline.sendMessage}
+                    interruptRealtimeSession={interruptRealtimeSession}
                   />
                 ) : displayHtml ? (
                   <div dangerouslySetInnerHTML={{ __html: displayHtml }} />
