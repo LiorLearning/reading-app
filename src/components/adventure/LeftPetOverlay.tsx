@@ -56,6 +56,9 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   const lastAiHtmlRef = React.useRef<string | undefined>(undefined);
   const [hiddenReason, setHiddenReason] = React.useState<null | 'manual' | 'auto'>(null);
   const hiddenAtHtmlRef = React.useRef<string | undefined>(undefined);
+  const hasInlineQuestion = React.useMemo(() => {
+    return Boolean(spellInline?.show && !!spellInline?.question);
+  }, [spellInline?.show, spellInline?.question]);
 
   // Keep track of the last AI message so we can restore it when user taps the pet
   React.useEffect(() => {
@@ -113,7 +116,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
 
   // Auto-hide trigger (e.g., after an image is created)
   React.useEffect(() => {
-    if (autoHideToken !== undefined) {
+    if (autoHideToken !== undefined && !hasInlineQuestion) {
       // Hide once on token change
       setIsBubbleHidden(true);
       setHiddenReason('auto');
@@ -121,7 +124,15 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       hiddenAtHtmlRef.current = aiMessageHtml || lastAiHtmlRef.current;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoHideToken]);
+  }, [autoHideToken, hasInlineQuestion]);
+
+  // When a question becomes active, force-show the bubble and clear any hidden reason
+  React.useEffect(() => {
+    if (hasInlineQuestion) {
+      setIsBubbleHidden(false);
+      setHiddenReason(null);
+    }
+  }, [hasInlineQuestion]);
 
   // If we were auto-hidden, show again when a new AI message arrives
   React.useEffect(() => {
@@ -133,12 +144,12 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
 
   const displayHtml = isBubbleHidden ? undefined : (aiMessageHtml || lastAiHtmlRef.current);
 
-  // Publish visibility changes to parent (visible when bubble not hidden and there is content or thinking)
+  // Publish visibility changes to parent (visible when bubble not hidden and there is content, thinking, or inline question)
   React.useEffect(() => {
-    const visible = !isBubbleHidden && (!!displayHtml || !!isThinking);
+    const visible = !isBubbleHidden && (!!displayHtml || !!isThinking || hasInlineQuestion);
     onBubbleVisibilityChange?.(visible);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBubbleHidden, !!displayHtml, isThinking]);
+  }, [isBubbleHidden, !!displayHtml, isThinking, hasInlineQuestion]);
 
   return (
     <div ref={containerRef} className="pointer-events-none absolute inset-0 z-20">
@@ -210,21 +221,23 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                 )}
               </div>
             )}
-            {/* Close button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                ttsService.stop();
-                setIsBubbleHidden(true);
-                setHiddenReason('manual');
-              }}
-              className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
-              aria-label="Hide message"
-            >
-              <X className="h-3 w-3" />
-            </Button>
+            {/* Close button (hidden while a question is active) */}
+            {!hasInlineQuestion && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  ttsService.stop();
+                  setIsBubbleHidden(true);
+                  setHiddenReason('manual');
+                }}
+                className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
+                aria-label="Hide message"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            )}
             {/* Speaker control */}
             {displayHtml && (
               <Button
