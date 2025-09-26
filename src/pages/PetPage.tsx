@@ -2749,6 +2749,7 @@ const getSleepyPetImage = (clicks: number) => {
         const coreSeq = ['house','travel','friend','food','plant-dreams'];
         // Prefer Firestore daily quest assignment (hydrated into localStorage by auth listener)
         let assignedDailyType: string | null = null;
+        let assignedDailyDone: boolean = false;
         try {
           const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
           if (questStatesRaw) {
@@ -2756,6 +2757,9 @@ const getSleepyPetImage = (clicks: number) => {
             const s = arr.find(x => x.pet === currentPet);
             if (s && coreSeq.includes(s.activity)) {
               assignedDailyType = s.activity;
+              const target = Number(s?.target ?? 0);
+              const prog = Number(s?.progress ?? 0);
+              assignedDailyDone = target > 0 && prog >= target;
             }
           }
         } catch {}
@@ -2776,11 +2780,11 @@ const getSleepyPetImage = (clicks: number) => {
         const renderOrder = assignedDailyType ? [assignedDailyType, 'story', ...remaining] : ['story', ...coreSeq];
 
         const renderRow = (type: string) => {
-          const done = doneSet.has(type);
+          const typeDone = doneSet.has(type) || (type === assignedDailyType && assignedDailyDone);
           const isUnlocked = unlocked.has(type);
           const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
           const label = type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
-          const statusEmoji = !isUnlocked ? '🔒' : (done ? '✅' : (type === assignedDailyType ? '⭐' : '😐'));
+          const statusEmoji = !isUnlocked ? '🔒' : (typeDone ? '✅' : (type === assignedDailyType ? '⭐' : '😐'));
           return (
             <button
               key={type}
