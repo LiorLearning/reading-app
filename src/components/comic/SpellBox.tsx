@@ -313,6 +313,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [question, targetWord, parts, getExpectedUserInputLength]);
 
+  // Compute the cumulative blank offset up to a given blank part index
+  const getBlankBaseIndexForPart = useCallback((allParts: WordPart[], targetPartIndex: number): number => {
+    let offset = 0;
+    for (let i = 0; i < targetPartIndex; i++) {
+      const p = allParts[i] as any;
+      if (p && p.type === 'blank') {
+        offset += (p.answer?.length || 0);
+      }
+    }
+    return offset;
+  }, []);
+
   // Check if word is complete
   const isWordComplete = useCallback((answer: string, expectedLength: number): boolean => {
     return answer.length === expectedLength && !answer.includes(' ');
@@ -847,10 +859,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             );
                           } else {
                             const expectedLength = part.answer?.length || 5;
+                            const baseIndex = getBlankBaseIndexForPart(parts, partIndex);
                             return (
                               <div key={partIndex} className="flex items-center gap-2">
                                 {Array.from({ length: expectedLength }, (_, letterIndex) => {
-                                  const letterValue = getUserInputAtBlankIndex(letterIndex);
+                                  const globalIndex = baseIndex + letterIndex;
+                                  const letterValue = getUserInputAtBlankIndex(globalIndex);
                                   const completeWord = reconstructCompleteWord(userAnswer);
                                   const isWordCompleteNow = isUserInputComplete(userAnswer);
                                   const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
@@ -928,7 +942,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     <input
                                       key={letterIndex}
                                       type="text"
-                                      value={letterValue}
+                                        value={letterValue}
                                       maxLength={1}
                                       disabled={isWordCorrectNow}
                                       onChange={(e) => {
@@ -938,14 +952,14 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         console.log(`🔤 SPELLBOX INPUT onChange: letterIndex=${letterIndex}, newValue="${newValue}"`);
                                         
                                         if (newValue.match(/[A-Z]/) || newValue === '') {
-                                          const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, newValue);
+                                          const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, newValue);
                                           console.log(`🔤 SPELLBOX INPUT: Updated user answer from "${userAnswer}" to "${newUserAnswer}"`);
                                           
                                           handleAnswerChange(newUserAnswer);
                                           playClickSound();
                                           
-                                          if (newValue && letterIndex < expectedLength - 1) {
-                                            const nextBox = document.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement;
+                                            if (newValue && letterIndex < expectedLength - 1) {
+                                            const nextBox = document.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement;
                                             if (nextBox) {
                                               console.log(`🔤 SPELLBOX INPUT: Moving focus to next box (${letterIndex + 1})`);
                                               setTimeout(() => nextBox.focus(), 10);
@@ -957,19 +971,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         if (e.key === 'Backspace') {
                                           if (letterValue) {
                                             e.preventDefault();
-                                            const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, '');
+                                              const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, '');
                                             handleAnswerChange(newUserAnswer);
-                                          } else if (letterIndex > 0) {
-                                            const prevBox = document.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement;
+                                          } else if (globalIndex > 0) {
+                                            const prevBox = document.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement;
                                             if (prevBox) {
                                               prevBox.focus();
                                             }
                                           }
-                                        } else if (e.key === 'ArrowLeft' && letterIndex > 0) {
-                                          const prevBox = document.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement;
+                                        } else if (e.key === 'ArrowLeft' && globalIndex > 0) {
+                                          const prevBox = document.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement;
                                           if (prevBox) prevBox.focus();
-                                        } else if (e.key === 'ArrowRight' && letterIndex < expectedLength - 1) {
-                                          const nextBox = document.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement;
+                                        } else if (e.key === 'ArrowRight') {
+                                          const nextBox = document.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement;
                                           if (nextBox) nextBox.focus();
                                         }
                                       }}
@@ -1021,7 +1035,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                           e.target.style.boxShadow = '0 1px 2px rgba(148, 163, 184, 0.1)';
                                         }
                                       }}
-                                      data-letter={letterIndex}
+                                      data-letter={globalIndex}
                                     />
                                   );
                                 })}
@@ -1276,10 +1290,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 );
                               } else {
                                 const expectedLength = part.answer?.length || 5;
+                                const baseIndex = getBlankBaseIndexForPart(parts, partIndex);
                                 return (
                                   <div key={partIndex} className="flex items-center gap-1">
                                     {Array.from({ length: expectedLength }, (_, letterIndex) => {
-                                      const letterValue = getUserInputAtBlankIndex(letterIndex);
+                                      const globalIndex = baseIndex + letterIndex;
+                                      const letterValue = getUserInputAtBlankIndex(globalIndex);
                                       const completeWord = reconstructCompleteWord(userAnswer);
                                       const isWordCompleteNow = isUserInputComplete(userAnswer);
                                       const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
@@ -1309,11 +1325,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                             if (isWordCorrectNow) return;
                                             const newValue = e.target.value.toUpperCase();
                                             if (newValue.match(/[A-Z]/) || newValue === '') {
-                                              const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, newValue);
+                                              const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, newValue);
                                               handleAnswerChange(newUserAnswer);
                                               playClickSound();
                                               if (newValue && letterIndex < expectedLength - 1) {
-                                                const nextBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement | null;
+                                                const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                                 if (nextBox) {
                                                   setTimeout(() => nextBox.focus(), 10);
                                                 }
@@ -1324,22 +1340,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                             if (e.key === 'Backspace') {
                                               if (letterValue) {
                                                 e.preventDefault();
-                                                const newUserAnswer = updateUserInputAtBlankIndex(letterIndex, '');
+                                                const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, '');
                                                 handleAnswerChange(newUserAnswer);
-                                              } else if (letterIndex > 0) {
-                                                const prevBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement | null;
+                                              } else if (globalIndex > 0) {
+                                                const prevBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement | null;
                                                 if (prevBox) prevBox.focus();
                                               }
-                                            } else if (e.key === 'ArrowLeft' && letterIndex > 0) {
-                                              const prevBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex - 1}"]`) as HTMLInputElement | null;
+                                            } else if (e.key === 'ArrowLeft' && globalIndex > 0) {
+                                              const prevBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement | null;
                                               if (prevBox) prevBox.focus();
-                                            } else if (e.key === 'ArrowRight' && letterIndex < expectedLength - 1) {
-                                              const nextBox = containerRef.current?.querySelector(`input[data-letter="${letterIndex + 1}"]`) as HTMLInputElement | null;
+                                            } else if (e.key === 'ArrowRight') {
+                                              const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                               if (nextBox) nextBox.focus();
                                             }
                                           }}
                                           style={boxStyle}
-                                          data-letter={letterIndex}
+                                          data-letter={globalIndex}
                                         />
                                       );
                                     })}
