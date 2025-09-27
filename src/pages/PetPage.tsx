@@ -211,6 +211,22 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     }
   });
 
+  // Hydrate streak from Firestore-driven auth broadcast and keep it in sync
+  useEffect(() => {
+    try {
+      const s = Number(localStorage.getItem('litkraft_streak') || '0');
+      if (!Number.isNaN(s)) setCurrentStreak(s);
+    } catch {}
+    const onStreakChanged = (e: any) => {
+      try {
+        const s = Number((e?.detail && e.detail.streak) ?? 0);
+        if (!Number.isNaN(s)) setCurrentStreak(s);
+      } catch {}
+    };
+    try { window.addEventListener('streakChanged', onStreakChanged as any); } catch {}
+    return () => { try { window.removeEventListener('streakChanged', onStreakChanged as any); } catch {}; };
+  }, []);
+
   // Get current date in US timezone (Eastern Time)
   const getCurrentUSDate = () => {
     const now = new Date();

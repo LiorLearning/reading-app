@@ -54,6 +54,7 @@ import {
     petquestions?: Record<PetName, Record<string, number>>;
     coins: number;
     streak: number;
+    lastStreakIncrementAt?: Timestamp | null;
     createdAt: Timestamp;
     updatedAt: Timestamp;
   }
@@ -91,6 +92,7 @@ import {
       petquestions: {},
       coins: 0,
       streak: 0,
+      lastStreakIncrementAt: null,
       createdAt: nowServerTimestamp(),
       updatedAt: nowServerTimestamp(),
     };
