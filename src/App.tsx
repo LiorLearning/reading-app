@@ -13,6 +13,8 @@ import { PetPage } from "./pages/PetPage";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "@/pages/coinSystem";
+import { PetProgressStorage } from "@/lib/pet-progress-storage";
+import { stateStoreApi } from "@/lib/state-store-api";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,40 @@ const DevCoinHotspot: React.FC = () => {
       title="Add 10 coins"
       onClick={() => addAdventureCoins(10, 'food')}
       className="fixed bottom-2 left-2 h-10 w-10 opacity-0 z-[9999] cursor-pointer"
+    />
+  );
+};
+
+// Dev-only invisible hotspot to increment questions done by 1 for selected pet
+const DevQuestionHotspot: React.FC = () => {
+  if (!import.meta.env.DEV) return null;
+  const { user } = useAuth();
+  
+  const handleIncrementQuestion = async () => {
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+      const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+      
+      if (user?.uid) {
+        await stateStoreApi.updateProgressOnQuestionSolved({
+          userId: user.uid,
+          pet: petType,
+          questionsSolved: 1,
+          adventureKey: 'house', // Default to house adventure
+        });
+        console.log(`🔧 Dev: Incremented questions for pet ${petType} by 1`);
+      }
+    } catch (error) {
+      console.warn('Dev tool: Failed to increment questions:', error);
+    }
+  };
+
+  return (
+    <button
+      aria-label="dev-question-hotspot"
+      title="Increment questions done by 1 for selected pet"
+      onClick={handleIncrementQuestion}
+      className="fixed top-2 left-2 h-10 w-10 opacity-0 z-[9999] cursor-pointer"
     />
   );
 };
@@ -123,6 +159,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <DevCoinHotspot />
+          <DevQuestionHotspot />
           <BrowserRouter>
             <Routes>
               {/* Unified pet page and adventure experience */}

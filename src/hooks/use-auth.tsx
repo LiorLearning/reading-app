@@ -343,6 +343,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (!d) return;
             // Coins
             CoinSystem.setCoins(Number(d.coins ?? 0));
+            // Derive lifetime user coins for top-right level bar from per-pet question counts (SpellBox-only)
+            try {
+              const petsMap = (d?.pets || {}) as Record<string, number>;
+              const totalQuestions = Object.values(petsMap).reduce((acc, v) => acc + Number(v || 0), 0);
+              const derivedLifetimeCoins = totalQuestions * 10; // 10 coins per question
+
+              // Persist to localStorage where PetPage reads cumulative coins for level calc
+              localStorage.setItem('litkraft_cumulative_coins_earned', String(derivedLifetimeCoins));
+
+              // Nudge UI to refresh level bar (PetPage listens to this)
+              window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins: Number(d.coins ?? 0) } }));
+            } catch (e) {
+              console.warn('Failed to hydrate lifetime coins from pets map', e);
+            }
             // Streak broadcast for UI
             try {
               const streakVal = Number(d.streak ?? 0);
