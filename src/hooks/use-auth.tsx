@@ -349,10 +349,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               localStorage.setItem('litkraft_streak', String(streakVal));
               window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: streakVal } }));
             } catch {}
-            // Owned pets
-            ownedPets = Object.keys(d.pets ?? {});
             // Sync pet names to local storage
             const names = (d?.petnames || {}) as Record<string, string>;
+            // Owned pets (prefer petnames keys; fallback to pets counts)
+            ownedPets = Object.keys((Object.keys(names).length > 0 ? names : (d.pets ?? {})));
             // Hydrate levels
             for (const petId of ownedPets) {
               const totalCorrect = Number(d.pets?.[petId] ?? 0);
@@ -410,7 +410,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   }
                 });
               } catch {}
-              // Eagerly reflect completed daily quests in todayCoins for emotion rendering (realtime)
+              // Reflect partial daily quest progress in todayCoins for emotion rendering (realtime)
               try {
                 const today = new Date().toISOString().slice(0, 10);
                 const targetCoins = 50; // 5 correct * 10 coins
@@ -418,17 +418,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   const prog = Number(s?.progress || 0);
                   const petId = (s as any)?.pet;
                   if (!petId) return;
-                  if (prog >= target) {
-                    const pd = PetProgressStorage.getPetProgress(petId, petId);
-                    pd.dailyCoins = pd.dailyCoins || { todayDate: today, todayCoins: 0 };
-                    if (pd.dailyCoins.todayDate !== today) {
-                      pd.dailyCoins.todayDate = today;
-                      pd.dailyCoins.todayCoins = 0;
-                    }
-                    if ((pd.dailyCoins.todayCoins || 0) < targetCoins) {
-                      pd.dailyCoins.todayCoins = targetCoins;
-                      PetProgressStorage.setPetProgress(pd);
-                    }
+                  const desiredCoins = Math.min(prog * 10, targetCoins);
+                  const pd = PetProgressStorage.getPetProgress(petId, petId);
+                  pd.dailyCoins = pd.dailyCoins || { todayDate: today, todayCoins: 0 };
+                  if (pd.dailyCoins.todayDate !== today) {
+                    pd.dailyCoins.todayDate = today;
+                    pd.dailyCoins.todayCoins = 0;
+                  }
+                  // Only increase to avoid clobbering increments from adventure flow in this session
+                  if ((pd.dailyCoins.todayCoins || 0) < desiredCoins) {
+                    pd.dailyCoins.todayCoins = desiredCoins;
+                    PetProgressStorage.setPetProgress(pd);
                   }
                 });
               } catch {}

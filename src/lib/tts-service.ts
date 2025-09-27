@@ -260,7 +260,36 @@ class TextToSpeechService {
       this.notifySpeakingStateChange(this.currentSpeakingMessageId);
 
       // Use selected voice or override from options
-      const voiceId = options?.voice || this.selectedVoice.id;
+      // If no explicit user-selected voice, dynamically default by current pet
+      let resolvedVoiceId: string | undefined;
+      if (options?.voice) {
+        resolvedVoiceId = options.voice;
+      } else {
+        let hasUserSelectedVoice = false;
+        try {
+          hasUserSelectedVoice = !!localStorage.getItem(SELECTED_VOICE_KEY);
+        } catch {}
+
+        if (hasUserSelectedVoice) {
+          resolvedVoiceId = this.selectedVoice.id;
+        } else {
+          try {
+            const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+            const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+              dog: 'cgSgspJ2msm6clMCkdW9',
+              cat: 'ocZQ262SsZb9RIxcQBOj',
+              hamster: 'ocZQ262SsZb9RIxcQBOj',
+            };
+            resolvedVoiceId = currentPetId ? PET_DEFAULT_VOICE_ID[currentPetId] : undefined;
+          } catch {}
+
+          if (!resolvedVoiceId) {
+            resolvedVoiceId = this.selectedVoice.id;
+          }
+        }
+      }
+
+      const voiceId = resolvedVoiceId as string;
 
       // Generate audio using selected voice
       const audioStream = await this.client.textToSpeech.convert(

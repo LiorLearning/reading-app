@@ -527,9 +527,9 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           const localOwnedPets = PetProgressStorage.getAllOwnedPets();
           const localPetIds = localOwnedPets.map(pet => pet.petId);
           
-          // Also check Firebase userState for owned pets
-          const userOverview = await stateStoreReader.fetchUserOverview(user.uid);
-          const firebasePetIds = userOverview ? Object.keys(userOverview.pets || {}) : [];
+          // Also check Firebase userState for owned pets (prefer petnames keys)
+          const petNamesMap = await stateStoreReader.getPetNames(user.uid);
+          const firebasePetIds = Object.keys(petNamesMap || {});
           
           // If user has pets in either local storage or Firebase, don't show selection
           if (localPetIds.length > 0 || firebasePetIds.length > 0) {
@@ -1285,8 +1285,14 @@ const getSleepyPetImage = (clicks: number) => {
         const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>
         const item = arr?.find(x => x.pet === currentPet);
         const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
-        if (item && Number(item.progress || 0) >= target) {
-          return 'coins_50';
+        if (item) {
+          const prog = Number(item.progress || 0);
+          if (prog >= target) {
+            return 'coins_50';
+          }
+          // Map partial progress tiers to mood for immediate feedback outside adventure
+          if (prog >= 3) return 'coins_30';
+          if (prog >= 1) return 'coins_10';
         }
       }
     } catch {}
@@ -1652,8 +1658,7 @@ const getSleepyPetImage = (clicks: number) => {
         stability: 0.7,
         similarity_boost: 0.8,
         speed: 0.9, // Slightly slower for better comprehension
-        messageId: petMessageId,
-        voice: 'cgSgspJ2msm6clMCkdW9' // Jessica voice - warm and friendly for children
+        messageId: petMessageId
       });
     } catch (error) {
       console.error('TTS error:', error);
@@ -1939,6 +1944,30 @@ const getSleepyPetImage = (clicks: number) => {
     };
   };
 
+  // Live refresh tick for quests/progress to mirror coins auto-updates
+  const [questRefreshTick, setQuestRefreshTick] = React.useState(0);
+
+  // Listen for quest/coin/pet events and bump tick to re-render thought and quest UI
+  React.useEffect(() => {
+    const bump = () => setQuestRefreshTick((t) => t + 1);
+    window.addEventListener('dailyQuestsUpdated', bump as EventListener);
+    window.addEventListener('coinsChanged', bump as EventListener);
+    window.addEventListener('adventureCoinsAdded', bump as EventListener);
+    window.addEventListener('petDataChanged', bump as EventListener);
+    window.addEventListener('petProgressChanged', bump as EventListener);
+    window.addEventListener('currentPetChanged', bump as EventListener);
+    window.addEventListener('storage', bump as EventListener);
+    return () => {
+      window.removeEventListener('dailyQuestsUpdated', bump as EventListener);
+      window.removeEventListener('coinsChanged', bump as EventListener);
+      window.removeEventListener('adventureCoinsAdded', bump as EventListener);
+      window.removeEventListener('petDataChanged', bump as EventListener);
+      window.removeEventListener('petProgressChanged', bump as EventListener);
+      window.removeEventListener('currentPetChanged', bump as EventListener);
+      window.removeEventListener('storage', bump as EventListener);
+    };
+  }, []);
+
   // Memoize the pet thought so it only changes when the actual state changes
   // Use stable values to prevent rapid changes when user returns with coins
   const currentPetThought = useMemo(() => {
@@ -1948,7 +1977,8 @@ const getSleepyPetImage = (clicks: number) => {
     Math.floor(getCoinsSpentForCurrentStage(currentStreak) / 10) * 10, // Round to nearest 10 to reduce sensitivity
     Math.floor(getPetCoinsSpent(currentPet) / 10) * 10, // Round to nearest 10 to reduce sensitivity
     sleepClicks, 
-    JSON.stringify(getCumulativeCareLevel()) // Stringify to ensure stable comparison
+    JSON.stringify(getCumulativeCareLevel()), // Stringify to ensure stable comparison
+    questRefreshTick
   ]);
 
   // Handle audio playback when message changes with debounce to prevent multiple simultaneous thoughts
@@ -2814,8 +2844,8 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* More Overlay */}
       {showMoreOverlay && (() => {
-        // New global sequence (story handled separately):
-        const coreSeq = ['house','travel','friend','food','plant-dreams'];
+        // Canonical sequence aligned with backend ACTIVITY_SEQUENCE (story handled separately):
+        const coreSeq = ['house','friend','travel','food','plant-dreams'];
         // Prefer Firestore daily quest assignment (hydrated into localStorage by auth listener)
         let assignedDailyType: string | null = null;
         let assignedDailyDone: boolean = false;
@@ -2840,20 +2870,36 @@ const getSleepyPetImage = (clicks: number) => {
         // Completion info still used for badges/emojis
         const doneSet = new Set(coreSeq.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
 
-        // Only today's assigned daily quest and Story are unlocked
+        // Unlock rules:
+        // - Always unlock Story
+        // - Unlock today's assigned daily quest
+        // - Unlock all activities that come BEFORE today's assigned quest in the canonical order
         const unlocked = new Set<string>(['story']);
-        if (assignedDailyType) unlocked.add(assignedDailyType);
+        const assignedIndex = assignedDailyType ? coreSeq.indexOf(assignedDailyType) : -1;
+        if (assignedDailyType) {
+          unlocked.add(assignedDailyType);
+          if (assignedIndex >= 0) {
+            for (let i = 0; i < assignedIndex; i++) {
+              unlocked.add(coreSeq[i]);
+            }
+          }
+        }
 
         // Render order: Daily Quest → Story → remaining
         const remaining = coreSeq.filter(t => t !== assignedDailyType);
         const renderOrder = assignedDailyType ? [assignedDailyType, 'story', ...remaining] : ['story', ...coreSeq];
 
         const renderRow = (type: string) => {
-          const typeDone = doneSet.has(type) || (type === assignedDailyType && assignedDailyDone);
+          const typeIndex = coreSeq.indexOf(type);
+          const typeDoneVisual = (
+            (assignedIndex > 0 && typeIndex > -1 && typeIndex < assignedIndex) // all activities before today's quest
+            || (type === assignedDailyType && assignedDailyDone) // today's quest when completed
+            || doneSet.has(type) // persistent completion threshold met
+          );
           const isUnlocked = unlocked.has(type);
           const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
           const label = type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
-          const statusEmoji = !isUnlocked ? '🔒' : (typeDone ? '✅' : (type === assignedDailyType ? '⭐' : '😐'));
+          const statusEmoji = !isUnlocked ? '🔒' : (typeDoneVisual ? '✅' : (type === assignedDailyType ? '⭐' : '😐'));
           return (
             <button
               key={type}
