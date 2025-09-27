@@ -152,6 +152,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   
   // Pet store state
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
+  const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
   
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
@@ -3018,21 +3019,29 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     ) : (
                       <button
-                        onClick={() => {
-                          handlePetPurchase(pet.id, pet.cost);
-                          setStoreRefreshTrigger(prev => prev + 1);
+                        onClick={async () => {
+                          if (purchaseLoadingId) return;
+                          setPurchaseLoadingId(pet.id);
+                          try {
+                            await handlePetPurchase(pet.id, pet.cost);
+                          } finally {
+                            setPurchaseLoadingId(null);
+                            setStoreRefreshTrigger(prev => prev + 1);
+                          }
                         }}
-                        disabled={!hasEnoughCoins(pet.cost) || pet.isLocked}
+                        disabled={!hasEnoughCoins(pet.cost) || pet.isLocked || purchaseLoadingId === pet.id}
+                        aria-busy={purchaseLoadingId === pet.id}
                         className={`w-full px-4 py-3 rounded-xl font-bold text-lg transition-all duration-200 ${
                           hasEnoughCoins(pet.cost)
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:scale-105 shadow-lg'
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:scale-105 shadow-lg disabled:opacity-60 disabled:hover:scale-100'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        {hasEnoughCoins(pet.cost) 
-                          ? `🪙 ${pet.cost}`
-                          : `🔒 ${pet.cost}`
-                        }
+                        {purchaseLoadingId === pet.id
+                          ? 'Processing...'
+                          : hasEnoughCoins(pet.cost)
+                            ? `🪙 ${pet.cost}`
+                            : `🔒 ${pet.cost}`}
                       </button>
                     )}
                   </div>

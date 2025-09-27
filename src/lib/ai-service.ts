@@ -2496,7 +2496,7 @@ ${conversationContext}`;
     const prompts: string[] = [];
 
     // Fallback Option 1: Epic and dynamic cinematic adventure
-    const sanitizedEnhancedPrompt1 = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any.Eliminate sexual parts if any.Create a **hyper-realistic, photorealistic, cinematic-quality image**: ${prompt},the legs and chest area must be fully covered. .  
+    const sanitizedEnhancedPrompt1 = `No text in image. Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any.Eliminate sexual parts if any.Create a **hyper-realistic, photorealistic, cinematic-quality image**: ${prompt},the legs and chest area must be fully covered. .  
 
 Important:  
 - Reinterpret any mention of "fighting, killing, violence, blood, gore, or attack" 
@@ -2533,7 +2533,7 @@ ${conversationContext}`;
 //       const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
 // ${conversationContext}`;
-const aiSanitizedWithContext = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. 
+const aiSanitizedWithContext = `No text in image. Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. 
 
 
  make sure everything is covered from chest to feet with clothes not matter what and follow it strictly, as this is gonna be child friendly image.
@@ -2570,7 +2570,7 @@ ${conversationContext}`;
     }
 
     // Fallback Option 2: Thrilling adventure with safe content
-    const sanitizedEnhancedPrompt2 = `Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
+    const sanitizedEnhancedPrompt2 = `No text in image. Create a thrilling, high-quality adventure image: ${weightedContent}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. if their are real pop culture refrences make sure you involve some elements from that such as character appearance, famous objects etc.Keep all content completely accurately with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
 ${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt2);
@@ -2592,7 +2592,7 @@ ${conversationContext}`;
 
     // Add simple fallback if all enhanced approaches fail
     if (fallbackPrompt) {
-      const simpleFallback = ` make sure everything is covered from chest to feet with clothes not matter what and follow it strictly, as this is gonna be child friendly image.
+      const simpleFallback = `No text in image.  make sure everything is covered from chest to feet with clothes not matter what and follow it strictly, as this is gonna be child friendly image.
 Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realistic and exciting, perfect for kids, completely family-friendly content. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
 ${conversationContext}`;

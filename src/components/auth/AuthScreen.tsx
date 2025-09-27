@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { playClickSound } from '@/lib/sounds';
-import { BookOpen, Mail, Lock, User, ChevronDown, ChevronUp } from 'lucide-react';
+import { BookOpen, Mail, Lock, User, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const AuthScreen: React.FC = () => {
@@ -140,9 +140,19 @@ export const AuthScreen: React.FC = () => {
               size="lg"
               className="w-full h-14 bg-white text-gray-700 hover:bg-gray-50 border-0 text-lg font-medium shadow-md"
               disabled={loading}
+              aria-busy={loading}
             >
-              <GoogleIcon />
-              {hasGoogleAccount ? 'Welcome back! Sign in with Google' : 'Continue with Google'}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <GoogleIcon />
+                  {hasGoogleAccount ? 'Welcome back! Sign in with Google' : 'Continue with Google'}
+                </>
+              )}
             </Button>
             
             {hasGoogleAccount && (
@@ -218,8 +228,16 @@ export const AuthScreen: React.FC = () => {
                         type="submit" 
                         className="w-full bg-blue-600 hover:bg-blue-700"
                         disabled={loading}
+                        aria-busy={loading}
                       >
-                        Sign In with Email
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Signing in...
+                          </>
+                        ) : (
+                          'Sign In with Email'
+                        )}
                       </Button>
                     </form>
                   </TabsContent>
@@ -276,8 +294,16 @@ export const AuthScreen: React.FC = () => {
                         type="submit" 
                         className="w-full bg-green-600 hover:bg-green-700"
                         disabled={loading}
+                        aria-busy={loading}
                       >
-                        Create Account
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          'Create Account'
+                        )}
                       </Button>
                     </form>
                   </TabsContent>
