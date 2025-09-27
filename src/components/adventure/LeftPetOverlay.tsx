@@ -115,16 +115,21 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   };
 
   // Auto-hide trigger (e.g., after an image is created)
+  // Important: only react to TOKEN CHANGES. If a token arrives while a spelling
+  // question is active, we skip auto-hiding so the subsequent message remains visible.
   React.useEffect(() => {
-    if (autoHideToken !== undefined && !hasInlineQuestion) {
-      // Hide once on token change
-      setIsBubbleHidden(true);
-      setHiddenReason('auto');
-      // Remember what message we hid on, so we only restore on a NEW message
-      hiddenAtHtmlRef.current = aiMessageHtml || lastAiHtmlRef.current;
+    if (autoHideToken !== undefined) {
+      if (!hasInlineQuestion) {
+        setIsBubbleHidden(true);
+        setHiddenReason('auto');
+        hiddenAtHtmlRef.current = aiMessageHtml || lastAiHtmlRef.current;
+      }
+      // If a question is active, ignore this token; do not hide later when
+      // the question completes. This prevents the follow-up story message from
+      // being hidden immediately after a correct answer.
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoHideToken, hasInlineQuestion]);
+  }, [autoHideToken]);
 
   // When a question becomes active, force-show the bubble and clear any hidden reason
   React.useEffect(() => {
