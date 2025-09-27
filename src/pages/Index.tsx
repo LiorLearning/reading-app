@@ -5004,8 +5004,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           />
         )}
 
-        {/* Compact input dock when sidebar is collapsed (next to user avatar) */}
-        {sidebarCollapsed && (
+        {/* Compact input dock when sidebar is collapsed (next to user avatar)
+            Only show on Adventure screen and never during onboarding */}
+        {currentScreen === 1 && sidebarCollapsed && !showOnboarding && (
           <CollapsedInputDock
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
