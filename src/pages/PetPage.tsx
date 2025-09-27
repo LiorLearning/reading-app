@@ -54,7 +54,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const { coins, spendCoins, hasEnoughCoins, canSpendForFeeding, setCoins } = useCoins();
   
   // Get Firebase authenticated user for adventure loading and user data for personalized pet thoughts
-  const { user, userData, signOut, loading } = useAuth();
+  const { user, userData, signOut, loading, updateUserData } = useAuth();
   
   // Use shared pet data system
   const { careLevel, ownedPets, audioEnabled, setCareLevel, addOwnedPet, setAudioEnabled, isPetOwned, getCoinsSpentForCurrentStage, getPetCoinsSpent, addPetCoinsSpent, incrementFeedingCount, addAdventureCoins, setSleepCompleted, getCumulativeCarePercentage, getCumulativeCareLevel, isSleepAvailable, resetCumulativeCareLevel, migrateToCumulativeCareSystem, checkAndPerform24HourReset, checkAndPerform8HourReset } = usePetData();
@@ -1434,7 +1434,7 @@ const getSleepyPetImage = (clicks: number) => {
     setSelectedGradeFromDropdown(gradeDisplayName);
   }, []);
 
-  const handlePreferenceSelection = React.useCallback((level: 'start' | 'middle', gradeDisplayName?: string) => {
+  const handlePreferenceSelection = React.useCallback(async (level: 'start' | 'middle', gradeDisplayName?: string) => {
     playClickSound();
     
     // Update selected grade if provided
@@ -1444,6 +1444,33 @@ const getSleepyPetImage = (clicks: number) => {
       saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+    }
+    
+    // Persist selection to Firebase (minimal write)
+    try {
+      const mapDisplayToCode = (name?: string): string => {
+        if (!name) return '';
+        if (name === 'Kindergarten') return 'gradeK';
+        if (name === '1st Grade') return 'grade1';
+        if (name === '2nd Grade') return 'grade2';
+        // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
+        if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+        return '';
+      };
+      const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
+      const levelCode = level === 'middle' ? 'mid' : level;
+      const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
+      const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
+      if (gradeCode) {
+        await updateUserData({
+          grade: gradeCode,
+          gradeDisplayName: gradeName,
+          level: levelCode,
+          levelDisplayName
+        });
+      }
+    } catch (e) {
+      console.error('Failed to persist grade/level selection:', e);
     }
     
     // Get all available topic IDs from MCQ data in order
@@ -1458,7 +1485,7 @@ const getSleepyPetImage = (clicks: number) => {
     setSelectedTopicFromPreference(specificTopic);
     
     console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
-  }, []);
+  }, [updateUserData, userData]);
 
   const handlePetPurchase = async (petType: string, cost: number) => {
     // Get pet data to check level requirements

@@ -201,7 +201,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const navigate = useNavigate();
   
   // Firebase auth integration - must be at the top
-  const { user, userData, signOut } = useAuth();
+  const { user, userData, signOut, updateUserData } = useAuth();
   
   // Tutorial system integration
   const { isFirstTimeAdventurer, completeAdventureTutorial } = useTutorial();
@@ -2964,7 +2964,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, []);
 
   // Handle preference selection (for HomePage only)
-  const handlePreferenceSelection = React.useCallback((level: 'start' | 'middle', gradeDisplayName?: string) => {
+  const handlePreferenceSelection = React.useCallback(async (level: 'start' | 'middle', gradeDisplayName?: string) => {
     playClickSound();
     
     // Update selected grade if provided
@@ -2974,6 +2974,33 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+    }
+    
+    // Persist selection to Firebase (minimal write)
+    try {
+      const mapDisplayToCode = (name?: string): string => {
+        if (!name) return '';
+        if (name === 'Kindergarten') return 'gradeK';
+        if (name === '1st Grade') return 'grade1';
+        if (name === '2nd Grade') return 'grade2';
+        // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
+        if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+        return '';
+      };
+      const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
+      const levelCode = level === 'middle' ? 'mid' : level;
+      const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
+      const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
+      if (gradeCode) {
+        await updateUserData({
+          grade: gradeCode,
+          gradeDisplayName: gradeName,
+          level: levelCode,
+          levelDisplayName
+        });
+      }
+    } catch (e) {
+      console.error('Failed to persist grade/level selection:', e);
     }
     
     // Get all available topic IDs from MCQ data in order
@@ -2988,7 +3015,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setSelectedTopicFromPreference(specificTopic);
     
     console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
-  }, []);
+  }, [updateUserData, userData]);
 
   // Handle sequential back navigation from MCQ screen
   const handleBackFromMCQ = React.useCallback((currentQuestionIndex: number): string | void => {
