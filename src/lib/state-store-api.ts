@@ -247,10 +247,11 @@ import {
   export interface DeductCoinsInput {
     userId: string;
     amount: number;
+    clientCoins?: number; // optional local coins fallback when server value missing
   }
   
   export async function deductCoinsOnPurchase(input: DeductCoinsInput): Promise<void> {
-    const { userId, amount } = input;
+    const { userId, amount, clientCoins } = input;
     if (amount <= 0) return;
   
     await runTransaction(db, async (txn) => {
@@ -264,8 +265,11 @@ import {
       }
   
       const userData = userSnap.data() as UserState | any;
-      const currentCoins = userData.coins ?? 0;
-      const newCoins = Math.max(0, currentCoins - amount);
+      const serverCoins = typeof userData.coins === 'number' ? userData.coins : 0;
+      const localCoins = typeof clientCoins === 'number' ? clientCoins : 0;
+      // Use the greater of server vs client to avoid resetting to 0 when server is stale
+      const baseCoins = Math.max(serverCoins, localCoins);
+      const newCoins = Math.max(0, baseCoins - amount);
   
       txn.update(userRef, {
         coins: newCoins,

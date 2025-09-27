@@ -829,46 +829,45 @@ export class PetProgressStorage {
     window.dispatchEvent(new CustomEvent('petDataReset', { detail: { petId } }));
   }
 
-  // Level calculation based on adventure coins (updated progression system)
+  // Level calculation based on coins following coinsForLevel(n) rule
   private static calculateLevel(totalAdventureCoins: number): number {
-    // New level progression:
-    // Level 1: 0 coins (start)
-    // Level 2: 50 coins (5 questions answered)
-    // Level 3: 120 coins (12 questions answered)
-    // Level 4: 200 coins (20 questions answered)
-    // Level 5: 300 coins (30 questions answered)
-    const levelThresholds = [0, 50, 120, 200, 300]; // Level thresholds
-    
-    for (let i = levelThresholds.length - 1; i >= 0; i--) {
-      if (totalAdventureCoins >= levelThresholds[i]) {
-        return i + 1;
-      }
+    const coinsForLevel = (n: number): number => {
+      if (n === 1) return 0;
+      if (n === 2) return 50;
+      if (n === 3) return 120;
+      if (n === 4) return 200;
+      return 200 + 150 * (n - 4);
+    };
+
+    // Search up to a reasonable cap, e.g., level 50
+    let level = 1;
+    for (let n = 2; n <= 50; n++) {
+      if (totalAdventureCoins >= coinsForLevel(n)) level = n; else break;
     }
-    
-    return 1; // Default to level 1
+    return level;
   }
 
-  // Get level info for a pet
+  // Get level info for a pet using coinsForLevel progression
   static getLevelInfo(petId: string): { currentLevel: number; nextLevelThreshold: number; progress: number } {
     const petData = this.getPetProgress(petId);
     const currentLevel = petData.levelData.currentLevel;
     const totalCoins = petData.levelData.totalAdventureCoinsEarned;
-    
-    const levelThresholds = [0, 50, 120, 200, 300];
-    const nextLevelThreshold = levelThresholds[currentLevel] || 300; // Cap at level 5
-    
-    let progress = 0;
-    if (currentLevel < levelThresholds.length) {
-      const currentThreshold = levelThresholds[currentLevel - 1] || 0;
-      progress = ((totalCoins - currentThreshold) / (nextLevelThreshold - currentThreshold)) * 100;
-    } else {
-      progress = 100; // Max level reached
-    }
-    
+    const coinsForLevel = (n: number): number => {
+      if (n === 1) return 0;
+      if (n === 2) return 50;
+      if (n === 3) return 120;
+      if (n === 4) return 200;
+      return 200 + 150 * (n - 4);
+    };
+
+    const currentThreshold = coinsForLevel(currentLevel);
+    const nextLevelThreshold = coinsForLevel(currentLevel + 1);
+    const progress = Math.max(0, Math.min(100, ((totalCoins - currentThreshold) / (nextLevelThreshold - currentThreshold)) * 100));
+
     return {
       currentLevel,
       nextLevelThreshold,
-      progress: Math.max(0, Math.min(100, progress))
+      progress
     };
   }
 

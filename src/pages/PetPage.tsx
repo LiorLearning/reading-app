@@ -19,6 +19,7 @@ import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal, Trend
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
+import EvolutionStrip from '@/components/adventure/EvolutionStrip';
 
 
 type Props = {
@@ -439,6 +440,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const bubbleRef = useRef<HTMLDivElement | null>(null);
   const petRef = useRef<HTMLDivElement | null>(null);
   const [bubbleTopPx, setBubbleTopPx] = useState<number>(24);
+  const [evoOffsetPx, setEvoOffsetPx] = useState<number>(72);
 
   useEffect(() => {
     const MIN_GAP_PX = 16;
@@ -456,6 +458,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         const nextTop = Math.max(8, DEFAULT_TOP_PX - missing);
         setBubbleTopPx(nextTop);
       }
+      // Position evolution strip just to the right of the pet image
+      const halfPetWidth = Math.round(petRect.width / 2);
+      const gapRight = 16; // desired gap between pet and strip
+      setEvoOffsetPx(halfPetWidth + gapRight);
     };
     // initial and on resize
     setTimeout(measure, 0);
@@ -1541,7 +1547,7 @@ const getSleepyPetImage = (clicks: number) => {
     // Deduct coins and add pet to owned pets
     if (auth.currentUser) {
       try {
-        await deductCoinsOnPurchase({ userId: auth.currentUser.uid, amount: cost });
+        await deductCoinsOnPurchase({ userId: auth.currentUser.uid, amount: cost, clientCoins: coins });
       } catch (err) {
         alert('Could not complete purchase. Please try again.');
         return;
@@ -1588,8 +1594,8 @@ const getSleepyPetImage = (clicks: number) => {
     const currentOwnedPets = ownedPets; // This ensures we use the latest owned pets from the hook
     storeRefreshTrigger; // This ensures the function re-runs when trigger changes
     
-    // Get current user level for unlock requirements
-    const { currentLevel } = getLevelInfo();
+    // Get USER level (cumulative coins) for unlock requirements in shop
+    const { currentLevel: userLevel } = getUserLevelInfo();
     
     return {
       dog: {
@@ -1597,45 +1603,70 @@ const getSleepyPetImage = (clicks: number) => {
         emoji: '🐶',
         name: 'Buddy',
         owned: isPetOwned('dog'),
-        cost: 200,
-        requiredLevel: 3,
-        isLocked: currentLevel < 3
+        cost: 150,
+        requiredLevel: 2,
+        isLocked: userLevel < 2,
+        category: 'common'
       },
       cat: {
         id: 'cat',
         emoji: '🐱',
         name: 'Whiskers',
         owned: isPetOwned('cat'),
-        cost: 200,
-        requiredLevel: 3,
-        isLocked: currentLevel < 3
+        cost: 150,
+        requiredLevel: 2,
+        isLocked: userLevel < 2,
+        category: 'common'
       },
       hamster: {
         id: 'hamster',
         emoji: '🐹',
         name: 'Peanut',
         owned: isPetOwned('hamster'),
-        cost: 200,
-        requiredLevel: 3,
-        isLocked: currentLevel < 3
+        cost: 150,
+        requiredLevel: 2,
+        isLocked: userLevel < 2,
+        category: 'common'
+      },
+      monkey: {
+        id: 'monkey',
+        emoji: '🐵',
+        name: 'Chipper',
+        owned: isPetOwned('monkey'),
+        cost: 300,
+        requiredLevel: 5,
+        isLocked: userLevel < 5,
+        category: 'uncommon'
+      },
+      parrot: {
+        id: 'parrot',
+        emoji: '🦜',
+        name: 'Rio',
+        owned: isPetOwned('parrot'),
+        cost: 300,
+        requiredLevel: 5,
+        isLocked: userLevel < 5,
+        category: 'uncommon'
       },
       dragon: {
         id: 'dragon',
         emoji: '🐉',
         name: 'Ember',
         owned: isPetOwned('dragon'),
-        cost: 400,
-        requiredLevel: 5,
-        isLocked: currentLevel < 5
+        cost: 500,
+        requiredLevel: 10,
+        isLocked: userLevel < 10,
+        category: 'rare'
       },
       unicorn: {
         id: 'unicorn',
         emoji: '🦄',
         name: 'Stardust',
         owned: isPetOwned('unicorn'),
-        cost: 400,
-        requiredLevel: 5,
-        isLocked: currentLevel < 5
+        cost: 500,
+        requiredLevel: 10,
+        isLocked: userLevel < 10,
+        category: 'rare'
       }
     };
   };
@@ -1901,38 +1932,50 @@ const getSleepyPetImage = (clicks: number) => {
     return CoinSystem.getCumulativeCoinsEarned();
   };
 
-  // Level system calculation based on per-pet cumulative adventure coins (does NOT reset)
-  const getLevelInfo = () => {
-    // Level thresholds (same as PetProgressStorage)
-    const levelThresholds = [0, 50, 120, 200, 300];
+  // User-wise level info based on cumulative coins across all pets
+  const getUserLevelInfo = () => {
+    const totalCoins = getCumulativeCoinsEarned() || 0;
+    const coinsForLevel = (n: number): number => {
+      if (n === 1) return 0;
+      if (n === 2) return 50;
+      if (n === 3) return 120;
+      if (n === 4) return 200;
+      return 200 + 150 * (n - 4);
+    };
+    let currentLevel = 1;
+    for (let n = 2; n <= 50; n++) {
+      if (totalCoins >= coinsForLevel(n)) currentLevel = n; else break;
+    }
+    const currentThreshold = coinsForLevel(currentLevel);
+    const nextThreshold = coinsForLevel(currentLevel + 1);
+    const coinsInCurrentLevel = totalCoins - currentThreshold;
+    const coinsNeededForNextLevel = nextThreshold - currentThreshold;
+    const progressPercentage = Math.min(100, (coinsInCurrentLevel / coinsNeededForNextLevel) * 100);
+    return { currentLevel, coinsInCurrentLevel, coinsNeededForNextLevel, progressPercentage, totalCoins };
+  };
 
-    // Read persistent cumulative coins from PetProgressStorage
+  // Pet-wise level calculation using coinsForLevel progression
+  const getLevelInfo = () => {
+    const coinsForLevel = (n: number): number => {
+      if (n === 1) return 0;
+      if (n === 2) return 50;
+      if (n === 3) return 120;
+      if (n === 4) return 200;
+      return 200 + 150 * (n - 4);
+    };
+
     const petProgress = PetProgressStorage.getPetProgress(currentPet);
     const totalCoins = petProgress.levelData.totalAdventureCoinsEarned || 0;
 
-    // Determine current level and progress window
     let currentLevel = 1;
-    let coinsInCurrentLevel = totalCoins;
-    let coinsNeededForNextLevel = 50; // Default 1 -> 2
-
-    for (let i = 1; i < levelThresholds.length; i++) {
-      if (totalCoins >= levelThresholds[i]) {
-        currentLevel = i + 1;
-      } else {
-        const previousThreshold = levelThresholds[i - 1];
-        const nextThreshold = levelThresholds[i];
-        coinsInCurrentLevel = totalCoins - previousThreshold;
-        coinsNeededForNextLevel = nextThreshold - previousThreshold;
-        break;
-      }
+    for (let n = 2; n <= 50; n++) {
+      if (totalCoins >= coinsForLevel(n)) currentLevel = n; else break;
     }
 
-    if (currentLevel >= levelThresholds.length) {
-      currentLevel = 5; // Cap
-      coinsInCurrentLevel = totalCoins - levelThresholds[levelThresholds.length - 1];
-      coinsNeededForNextLevel = 100; // Arbitrary for max level UI
-    }
-
+    const currentThreshold = coinsForLevel(currentLevel);
+    const nextThreshold = coinsForLevel(currentLevel + 1);
+    const coinsInCurrentLevel = totalCoins - currentThreshold;
+    const coinsNeededForNextLevel = nextThreshold - currentThreshold;
     const progressPercentage = Math.min(100, (coinsInCurrentLevel / coinsNeededForNextLevel) * 100);
 
     return {
@@ -1940,7 +1983,7 @@ const getSleepyPetImage = (clicks: number) => {
       coinsInCurrentLevel,
       coinsNeededForNextLevel,
       progressPercentage,
-      totalCoins
+      totalCoins,
     };
   };
 
@@ -2102,11 +2145,14 @@ const getSleepyPetImage = (clicks: number) => {
                 <GraduationCap className="h-5 w-5" />
                 {(() => {
                   const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName || 'Grade';
-                  const buttonText = selectedTopicFromPreference 
-                    ? `Next: ${selectedTopicFromPreference}` 
-                    : selectedPreference 
-                      ? `${currentGrade} ${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` 
-                      : 'Grade Selection';
+                  const userName = userData?.username || 'User';
+                  const gradeLabel = (() => {
+                    if (!currentGrade) return 'Grade';
+                    if (/^K/i.test(currentGrade)) return 'K';
+                    const match = currentGrade.match(/\d+/);
+                    return match ? match[0] : currentGrade;
+                  })();
+                  const buttonText = `${userName}'s Grade: ${gradeLabel}`;
                   return buttonText;
                 })()}
                 <ChevronDown className="h-4 w-4" />
@@ -2132,6 +2178,7 @@ const getSleepyPetImage = (clicks: number) => {
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
                     onClick={() => handlePreferenceSelection('start', 'Kindergarten')}
                   >
+                    
                     <span className="text-lg">🌱</span>
                     <div>
                       <div className="font-semibold">Start</div>
@@ -2404,15 +2451,15 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       )}
 
-      {/* Top Right UI - Pet Level Bar */}
+      {/* Top Right UI - User Level Bar (cumulative coins across pets) */}
       <div className="absolute top-5 right-10 z-30">
         {(() => {
-          const levelInfo = getLevelInfo();
+          const levelInfo = getUserLevelInfo();
           return (
             <div className="rounded-xl px-3 py-2 shadow-lg w-56">
               <div className="flex items-center gap-2">
                 <div className="text-white font-bold text-lg drop-shadow-md">L{levelInfo.currentLevel}</div>
-                <div className="relative h-8 w-full bg-white/30 rounded-full border border-white/40 overflow-hidden flex items-center">
+                <div className="relative h-6 w-full bg-white/30 rounded-full border border-white/40 overflow-hidden flex items-center">
                   <div
                     className="h-full bg-gradient-to-r from-red-500 to-pink-400 transition-all duration-500 ease-out"
                     style={{ width: `${levelInfo.progressPercentage}%` }}
@@ -2654,6 +2701,41 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       </div>
 
+      {/* Evolution strip next to the pet */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="relative w-full h-full">
+          <div className="pointer-events-auto absolute left-1/2 top-1/2 z-20 hidden sm:block" style={{ transform: `translate(${evoOffsetPx}px, -80%)` }}>
+            {(() => {
+              const { currentLevel } = getLevelInfo();
+              const levelInfo = getLevelInfo();
+              const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+              return (
+                <EvolutionStrip
+                  currentLevel={currentLevel}
+                  stageLevels={[1, 5, 10]}
+                  orientation="vertical"
+                  size="sm"
+                  petType={currentPet}
+                  unlockedImage={getLevelBasedPetImage(currentPet, currentLevel, 'coins_10')}
+                  ringProgressPct={ringPct}
+                />
+              );
+            })()}
+          </div>
+          {/* Mobile placement under pet */}
+          <div className="pointer-events-auto absolute bottom-28 left-1/2 -translate-x-1/2 z-20 sm:hidden">
+            {(() => {
+              const { currentLevel } = getLevelInfo();
+              const levelInfo = getLevelInfo();
+              const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+              return (
+                <EvolutionStrip currentLevel={currentLevel} stageLevels={[1, 5, 10]} size="sm" ringProgressPct={ringPct} />
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+
       {/* Dog Evolution Display - Right Side - DISABLED */}
       {/* 
       <div className="absolute right-6 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-4">
@@ -2723,7 +2805,7 @@ const getSleepyPetImage = (clicks: number) => {
         <div className="relative z-20 mt-4 flex justify-center pb-24">
           <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg p-3 w-[400px] mb-8">
             {/* Subheader */}
-            <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Daily Quests</div>
+            <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Today</div>
             <div className="mt-1 flex flex-col gap-2">
               {(() => {
                 // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
@@ -3009,9 +3091,19 @@ const getSleepyPetImage = (clicks: number) => {
             </button>
 
             {/* Header */}
-            <div className="p-6 text-center border-b-2 border-gray-200 flex-shrink-0">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">🐾 Pet Shop 🐾</h2>
-              <div className="inline-block p-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold shadow-lg">
+            <div className="p-6 border-b-2 border-gray-200 flex items-center justify-between flex-shrink-0">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-800">Pet Book</h2>
+                {(() => {
+                  const data = getPetStoreData();
+                  const total = Object.keys(data).length;
+                  const owned = Object.values(data).filter((p: any) => p.owned).length;
+                  return (
+                    <div className="text-gray-600 mt-2 font-medium">{owned} out of {total} pets</div>
+                  );
+                })()}
+              </div>
+              <div className="inline-block px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold shadow-lg">
                 💰 {coins} coins
               </div>
             </div>
@@ -3044,14 +3136,45 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     )}
                     
-                    {/* Pet Emoji */}
-                    <div className={`text-6xl mb-4 ${pet.isLocked && !pet.owned ? 'grayscale' : ''}`}>
-                      {pet.emoji}
+                    {/* Category badge (top-right) */}
+                    {pet.category && (
+                      <div
+                        className={`mx-auto mb-3 inline-block px-3 py-1 rounded-full text-xs font-bold border shadow-sm capitalize
+                          ${pet.category === 'common' ? 'bg-green-100 text-green-700 border-green-300' : ''}
+                          ${pet.category === 'uncommon' ? 'bg-purple-100 text-purple-700 border-purple-300' : ''}
+                          ${pet.category === 'rare' ? 'bg-amber-100 text-amber-700 border-amber-300' : ''}
+                        `}
+                      >
+                        {pet.category}
+                      </div>
+                    )}
+
+                    {/* Required Level Badge - always shows required level */}
+                    <div className="absolute -top-2 -left-2 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                      L{pet.requiredLevel}
                     </div>
                     
-                    {/* Pet Name (hidden before purchase) */}
+                    {/* Pet Image or Emoji */}
+                    {pet.isLocked && !pet.owned ? (
+                      <div className="text-6xl mb-4 grayscale">{pet.emoji}</div>
+                    ) : (
+                      <div className="mb-4 flex items-center justify-center">
+                        {(['dog','cat','hamster','dragon','unicorn'] as string[]).includes(pet.id) ? (
+                          <img
+                            src={getLevelBasedPetImage(pet.id, 1, 'coins_10')}
+                            alt={pet.name}
+                            className="h-24 w-24 object-contain drop-shadow-sm"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="text-6xl">{pet.emoji}</div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Pet Name (user-given name shown after purchase) */}
                     <div className={`text-lg font-semibold mb-3 ${pet.isLocked && !pet.owned ? 'text-gray-500' : 'text-gray-800'}`}>
-                      {pet.owned ? pet.name : ''}
+                      {pet.owned ? PetProgressStorage.getPetDisplayName(pet.id) : ''}
                     </div>
                     
                     {/* Purchase Button or Status */}
