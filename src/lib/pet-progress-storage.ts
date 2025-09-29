@@ -84,6 +84,11 @@ export interface PetProgressData {
     lastUpdated: number;
     isCurrentlySelected: boolean;
   };
+
+  // Per-pet TTS settings (e.g., preferred voice)
+  ttsSettings?: {
+    voiceId?: string;
+  };
 }
 
 export interface GlobalPetSettings {
@@ -175,6 +180,7 @@ export class PetProgressStorage {
         lastUpdated: now,
         isCurrentlySelected: false,
       },
+      ttsSettings: {},
     };
   }
 
@@ -299,6 +305,7 @@ export class PetProgressStorage {
         lastUpdated: Date.now(),
         isCurrentlySelected: data.generalData?.isCurrentlySelected || false,
       },
+      ttsSettings: data.ttsSettings || {},
     };
   }
 
@@ -337,6 +344,29 @@ export class PetProgressStorage {
     }
     
     return false;
+  }
+
+  // ============================
+  // Per-pet TTS voice preference
+  // ============================
+  static getPreferredVoiceIdForPet(petId: string): string | undefined {
+    const petData = this.getPetProgress(petId);
+    return petData.ttsSettings?.voiceId;
+  }
+
+  static setPreferredVoiceIdForPet(petId: string, voiceId: string | undefined): void {
+    const petData = this.getPetProgress(petId);
+    petData.ttsSettings = petData.ttsSettings || {};
+    petData.ttsSettings.voiceId = voiceId;
+    this.setPetProgress(petData);
+  }
+
+  static clearPreferredVoiceIdForPet(petId: string): void {
+    const petData = this.getPetProgress(petId);
+    if (petData.ttsSettings) {
+      delete petData.ttsSettings.voiceId;
+      this.setPetProgress(petData);
+    }
   }
 
   // Update sleep status based on current time

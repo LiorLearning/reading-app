@@ -77,6 +77,7 @@ export const AVAILABLE_VOICES: Voice[] = [
   }
 ];
 
+// Kept for backward compatibility but no longer used for selection
 const SELECTED_VOICE_KEY = 'reading_app_selected_voice';
 const SELECTED_SPEED_KEY = 'reading_app_voice_speed';
 
@@ -91,7 +92,7 @@ class TextToSpeechService {
   private speakingStateListeners: Set<(messageId: string | null) => void> = new Set(); // Listeners for speaking state changes
 
   constructor() {
-    // Load selected voice from localStorage or default to Jessica
+    // Load initial voice using current pet preference or pet default
     this.selectedVoice = this.loadSelectedVoice();
     // Load selected speed from localStorage or default to 0.8
     this.selectedSpeed = this.loadSelectedSpeed();
@@ -99,18 +100,19 @@ class TextToSpeechService {
   }
 
   private loadSelectedVoice(): Voice {
+    // Resolve effective voice for current pet at service init
     try {
-      const stored = localStorage.getItem(SELECTED_VOICE_KEY);
-      if (stored) {
-        const voiceId = JSON.parse(stored);
-        const voice = AVAILABLE_VOICES.find(v => v.id === voiceId);
-        if (voice) return voice;
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+      if (currentPetId) {
+        const preferred = PetProgressStorage.getPreferredVoiceIdForPet(currentPetId);
+        if (preferred) {
+          const v = AVAILABLE_VOICES.find(v => v.id === preferred);
+          if (v) return v;
+        }
       }
-    } catch (error) {
-      console.warn('Failed to load selected voice from localStorage:', error);
-    }
+    } catch {}
 
-    // If no user-selected voice, default based on current selected pet
+    // Pet default mapping
     try {
       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
       const PET_DEFAULT_VOICE_ID: Record<string, string> = {
@@ -148,10 +150,11 @@ class TextToSpeechService {
   }
 
   private saveSelectedVoice(voice: Voice): void {
+    // Back-compat no-op for global key; preference is saved per pet in setSelectedVoice
     try {
       localStorage.setItem(SELECTED_VOICE_KEY, JSON.stringify(voice.id));
     } catch (error) {
-      console.warn('Failed to save selected voice to localStorage:', error);
+      // Ignore
     }
   }
 
@@ -163,15 +166,39 @@ class TextToSpeechService {
     }
   }
 
-  // Get current selected voice
+  // Get effective selected voice for the current pet
   getSelectedVoice(): Voice {
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+      if (currentPetId) {
+        const preferred = PetProgressStorage.getPreferredVoiceIdForPet(currentPetId);
+        if (preferred) {
+          const v = AVAILABLE_VOICES.find(v => v.id === preferred);
+          if (v) return v;
+        }
+        // Fall back to pet default mapping
+        const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+          dog: 'cgSgspJ2msm6clMCkdW9',
+          cat: 'ocZQ262SsZb9RIxcQBOj',
+          hamster: 'ocZQ262SsZb9RIxcQBOj',
+        };
+        const defaultVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
+        const petDefault = AVAILABLE_VOICES.find(v => v.id === defaultVoiceId);
+        if (petDefault) return petDefault;
+      }
+    } catch {}
     return this.selectedVoice;
   }
 
-  // Set selected voice
+  // Set selected voice for the current pet
   setSelectedVoice(voice: Voice): void {
     this.selectedVoice = voice;
-    this.saveSelectedVoice(voice);
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+      if (currentPetId) {
+        PetProgressStorage.setPreferredVoiceIdForPet(currentPetId, voice.id);
+      }
+    } catch {}
   }
 
   // Get all available voices
@@ -260,32 +287,30 @@ class TextToSpeechService {
       this.notifySpeakingStateChange(this.currentSpeakingMessageId);
 
       // Use selected voice or override from options
-      // If no explicit user-selected voice, dynamically default by current pet
+      // Resolve per-pet preference first, then pet default, then fallback
       let resolvedVoiceId: string | undefined;
       if (options?.voice) {
         resolvedVoiceId = options.voice;
       } else {
-        let hasUserSelectedVoice = false;
         try {
-          hasUserSelectedVoice = !!localStorage.getItem(SELECTED_VOICE_KEY);
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          if (currentPetId) {
+            const preferred = PetProgressStorage.getPreferredVoiceIdForPet(currentPetId);
+            if (preferred) {
+              resolvedVoiceId = preferred;
+            } else {
+              const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+                dog: 'cgSgspJ2msm6clMCkdW9',
+                cat: 'ocZQ262SsZb9RIxcQBOj',
+                hamster: 'ocZQ262SsZb9RIxcQBOj',
+              };
+              resolvedVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
+            }
+          }
         } catch {}
 
-        if (hasUserSelectedVoice) {
+        if (!resolvedVoiceId) {
           resolvedVoiceId = this.selectedVoice.id;
-        } else {
-          try {
-            const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-            const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-              dog: 'cgSgspJ2msm6clMCkdW9',
-              cat: 'ocZQ262SsZb9RIxcQBOj',
-              hamster: 'ocZQ262SsZb9RIxcQBOj',
-            };
-            resolvedVoiceId = currentPetId ? PET_DEFAULT_VOICE_ID[currentPetId] : undefined;
-          } catch {}
-
-          if (!resolvedVoiceId) {
-            resolvedVoiceId = this.selectedVoice.id;
-          }
         }
       }
 
