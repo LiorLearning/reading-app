@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
-import { ttsService } from '@/lib/tts-service';
+import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
@@ -434,6 +434,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   );
   const isInstructionSpeaking = useTTSSpeaking(instructionMessageId);
 
+  // Resolve Jessica's voice id once
+  const jessicaVoiceId = useMemo(() => {
+    const jessica = AVAILABLE_VOICES.find(v => v.name === 'Jessica');
+    return jessica?.id || 'cgSgspJ2msm6clMCkdW9';
+  }, []);
+
   // Calculate speaker button position dynamically
   // const calculateSpeakerButtonPosition = useCallback(() => {
   //   const speakerButton = document.getElementById('spellbox-speaker-button');
@@ -580,7 +586,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         stability: 0.7,
         similarity_boost: 0.9,
         speed: 0.8,
-        messageId: instructionMessageId
+        messageId: instructionMessageId,
+        voice: jessicaVoiceId
       });
     } catch (error) {
       console.error('🎵 INSTRUCTION AUDIO: Error playing instruction audio:', error);
@@ -607,7 +614,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         stability: 0.7,
         similarity_boost: 0.9,
         speed: 0.7,  // Set speed to 0.7x for SpellBox words
-        messageId: messageId
+        messageId: messageId,
+        voice: jessicaVoiceId
       });
     }
   }, [audioText, targetWord, messageId, isSpeaking]);
