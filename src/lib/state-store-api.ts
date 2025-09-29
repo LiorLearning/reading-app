@@ -226,13 +226,11 @@ import {
     // If we can determine completion pre-increment, annotate cooldown timestamps (best-effort)
     const currentProgress = Number(petObj?.[activeKey] ?? 0);
     const predicted = currentProgress + questionsSolved;
-    if (predicted >= QUEST_TARGET) {
-      const now = Date.now();
-      const cooldownMs = QUEST_COOLDOWN_HOURS * 60 * 60 * 1000;
-      const cooldownUntil = Timestamp.fromMillis(now + cooldownMs);
+  if (predicted >= QUEST_TARGET) {
+      // Mark completion without setting a cooldown; rollover will advance immediately
       batch.set(
         questsRef,
-        { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: cooldownUntil }, updatedAt: nowServerTimestamp() } as any,
+        { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: null }, updatedAt: nowServerTimestamp() } as any,
         { merge: true }
       );
     }
@@ -343,27 +341,17 @@ import {
       const cooldownUntilMs = cooldownUntilTs ? cooldownUntilTs.toMillis() : null;
   
       if (progress >= QUEST_TARGET) {
-        if (!cooldownUntilMs) {
-          // Set cooldown first time we detect completion
-          const cooldownMs = QUEST_COOLDOWN_HOURS * 60 * 60 * 1000;
-          updates[pet] = {
-            ...(updates[pet] || {}),
-            _completedAt: nowServerTimestamp(),
-            _cooldownUntil: Timestamp.fromMillis(nowMs + cooldownMs),
-          };
-        } else if (nowMs >= cooldownUntilMs) {
-          // Advance to next activity after cooldown
-          const nextIndex = getNextActivityIndex(index);
-          const nextKey = ACTIVITY_SEQUENCE[nextIndex];
-          updates[pet] = {
-            ...(updates[pet] || {}),
-            [activeKey]: deleteField(),
-            [nextKey]: 0,
-            _activityIndex: nextIndex,
-            _completedAt: null,
-            _cooldownUntil: null,
-          };
-        }
+        // Advance to next activity immediately upon completion
+        const nextIndex = getNextActivityIndex(index);
+        const nextKey = ACTIVITY_SEQUENCE[nextIndex];
+        updates[pet] = {
+          ...(updates[pet] || {}),
+          [activeKey]: deleteField(),
+          [nextKey]: 0,
+          _activityIndex: nextIndex,
+          _completedAt: null,
+          _cooldownUntil: null,
+        };
       }
     }
   

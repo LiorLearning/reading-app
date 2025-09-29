@@ -15,7 +15,7 @@ import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal, TrendingUp } from 'lucide-react';
+import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal, TrendingUp, Clock } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
@@ -2125,6 +2125,61 @@ const getSleepyPetImage = (clicks: number) => {
       console.warn('Dev time advance failed:', e);
     }
   }, []);
+  
+  // Developer tool: advance local time by 24 hours to test daily resets (DEV only)
+  const advanceTimeBy24Hours = React.useCallback(() => {
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    try {
+      // Shift pet_sleep_data timestamps backward by 24h (simulates time passing)
+      const stored = localStorage.getItem('pet_sleep_data');
+      if (stored) {
+        const d = JSON.parse(stored);
+        const shifted = {
+          ...d,
+          timestamp: typeof d.timestamp === 'number' ? d.timestamp - twentyFourHours : Date.now() - twentyFourHours,
+          sleepStartTime: typeof d.sleepStartTime === 'number' ? Math.max(0, d.sleepStartTime - twentyFourHours) : 0,
+          sleepEndTime: typeof d.sleepEndTime === 'number' ? Math.max(0, d.sleepEndTime - twentyFourHours) : 0,
+        };
+        localStorage.setItem('pet_sleep_data', JSON.stringify(shifted));
+      }
+
+      // Force 24h reset eligibility
+      const lastReset = localStorage.getItem('pet_last_reset_time');
+      if (lastReset) {
+        const shifted = (parseInt(lastReset, 10) - twentyFourHours).toString();
+        localStorage.setItem('pet_last_reset_time', shifted);
+      } else {
+        localStorage.setItem('pet_last_reset_time', (Date.now() - twentyFourHours).toString());
+      }
+
+      // Push PetProgressStorage timers over thresholds for current pet
+      try {
+        const petId = PetProgressStorage.getCurrentSelectedPet();
+        if (petId) {
+          const pd = PetProgressStorage.getPetProgress(petId);
+          pd.heartData.nextHeartResetTime = Date.now() - 1;
+          if (pd.sleepData.isAsleep) {
+            pd.sleepData.sleepEndTime = Date.now() - 1;
+          }
+          PetProgressStorage.setPetProgress(pd);
+        }
+      } catch {}
+
+      // Trigger existing checks/updates in this page
+      try {
+        checkAndPerform24HourReset();
+      } catch {}
+      try {
+        // Local sleep check to update UI immediately
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        checkSleepTimeout();
+        setSleepTimeRemaining(0);
+      } catch {}
+    } catch (e) {
+      console.warn('Dev time advance failed:', e);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col overflow-y-auto" style={{
@@ -2135,15 +2190,24 @@ const getSleepyPetImage = (clicks: number) => {
       backgroundAttachment: 'fixed',
       fontFamily: 'Quicksand, system-ui, sans-serif'
     }}>
-      {/* Invisible dev button (top-right) to advance time by 8h */}
+      {/* Invisible dev buttons (top-right) to advance time */}
       {import.meta.env && (import.meta as any).env?.DEV ? (
-        <button
-          type="button"
-          aria-label="Advance time by 8 hours"
-          onClick={advanceTimeBy8Hours}
-          style={{ opacity: 0, position: 'absolute', top: 0, right: 0, width: 48, height: 48, zIndex: 50 }}
-          tabIndex={-1}
-        />
+        <>
+          <button
+            type="button"
+            aria-label="Advance time by 8 hours"
+            onClick={advanceTimeBy8Hours}
+            style={{ opacity: 0, position: 'absolute', top: 0, right: 0, width: 48, height: 48, zIndex: 50 }}
+            tabIndex={-1}
+          />
+          <button
+            type="button"
+            aria-label="Advance time by 24 hours"
+            onClick={advanceTimeBy24Hours}
+            style={{ opacity: 0, position: 'absolute', top: 0, right: 48, width: 48, height: 48, zIndex: 50 }}
+            tabIndex={-1}
+          />
+        </>
       ) : null}
       {/* Pet Selection Flow for first-time users */}
       {showPetSelection && (
@@ -2568,6 +2632,15 @@ const getSleepyPetImage = (clicks: number) => {
         >
           🕐
         </button>
+        
+        {/* Testing Button - Advance Time by 24 Hours (Development Only) */}
+        <button
+          onClick={advanceTimeBy24Hours}
+          className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
+          title="Testing: Advance time by 24 hours"
+        >
+          <Clock size={16} />
+        </button>
       </div>
 
       {/* Top Right UI - Streak and Coins (below pet level) */}
@@ -2980,6 +3053,7 @@ const getSleepyPetImage = (clicks: number) => {
         // - Always unlock Story
         // - Unlock today's assigned daily quest
         // - Unlock all activities that come BEFORE today's assigned quest in the canonical order
+        // - If today's assigned quest is completed, also unlock the NEXT quest immediately
         const unlocked = new Set<string>(['story']);
         const assignedIndex = assignedDailyType ? coreSeq.indexOf(assignedDailyType) : -1;
         if (assignedDailyType) {
@@ -2987,6 +3061,10 @@ const getSleepyPetImage = (clicks: number) => {
           if (assignedIndex >= 0) {
             for (let i = 0; i < assignedIndex; i++) {
               unlocked.add(coreSeq[i]);
+            }
+            if (assignedDailyDone) {
+              const nextIndex = Math.min(coreSeq.length - 1, assignedIndex + 1);
+              unlocked.add(coreSeq[nextIndex]);
             }
           }
         }
