@@ -532,19 +532,19 @@ export class PetProgressStorage {
       }
     } catch {}
 
-    // If within 8 hours of last switch, keep showing the pinned item
-    if (now - todo.lastSwitchTime < this.EIGHT_HOURS_MS) {
-      return todo.currentType || sequence[0];
-    }
+    // Removed 8-hour pin: allow immediate advance when current is completed
 
-    // After 8 hours (and no rollover), apply simple rule:
+    // Immediate advance rule (no 8h pin):
     // - If currentType is completed, move to the next in order
     // - If not completed, keep the same
     const currentIsDone = this.isAdventureTypeCompleted(petId, todo.currentType, threshold);
     const idx = Math.max(0, sequence.indexOf(todo.currentType));
     const nextType = currentIsDone ? (sequence[(idx + 1) < sequence.length ? (idx + 1) : idx]) : todo.currentType;
-    petData.todoData = { currentType: nextType, lastSwitchTime: now };
-    this.setPetProgress(petData);
+    // Only persist if the currentType actually changes to avoid writes during render
+    if (!petData.todoData || petData.todoData.currentType !== nextType) {
+      petData.todoData = { currentType: nextType, lastSwitchTime: now };
+      this.setPetProgress(petData);
+    }
     return nextType;
   }
 
