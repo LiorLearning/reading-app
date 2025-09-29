@@ -10,6 +10,7 @@ type EvolutionStripProps = {
   stageEmojis?: string[]; // optional explicit emojis per stage
   unlockedImage?: string; // neutral pet image for the currently unlocked stage
   ringProgressPct?: number; // 0-100 progress for current level -> next level
+  showArrows?: boolean; // show chevrons indicating progression
 };
 
 /**
@@ -26,10 +27,12 @@ export const EvolutionStrip: React.FC<EvolutionStripProps> = ({
   stageEmojis,
   unlockedImage,
   ringProgressPct = 0,
+  showArrows = true,
 }) => {
   const itemSize = size === 'sm' ? 40 : 56;
   const ringSize = itemSize + 6;
   const ringThickness = size === 'sm' ? 4 : 5;
+  const arrowSize = size === 'sm' ? 12 : 16;
 
   const getDefaultEmojis = (type?: string): string[] => {
     const t = (type || '').toLowerCase();
@@ -120,6 +123,48 @@ export const EvolutionStrip: React.FC<EvolutionStripProps> = ({
     );
   });
 
+  const renderArrow = (i: number) => {
+    if (!showArrows) return null;
+    if (i >= 2) return null;
+    const nextReq = stageLevels[i + 1] ?? (i === 0 ? 5 : 10);
+    const isNextUnlocked = currentLevel >= nextReq;
+    const arrowColor = isNextUnlocked ? '#0a6e4a' : '#0a6e4a';
+    const arrowOpacity = isNextUnlocked ? 1 : 0.8;
+    
+    return (
+      <div 
+        key={`arrow-${i}`} 
+        className="flex items-center justify-center"
+        style={{ marginTop: orientation === 'vertical' ? -4 : 0, marginBottom: orientation === 'vertical' ? -4 : 0 }}
+      >
+        <div 
+          className="rounded-full bg-white/70 shadow-sm flex items-center justify-center"
+          style={{ 
+            width: arrowSize + 4, 
+            height: arrowSize + 4,
+            border: '1px solid rgba(0,0,0,0.2)'
+          }}
+        >
+          {orientation === 'vertical' ? (
+            <svg width={arrowSize} height={arrowSize} viewBox="0 0 24 24" fill="none" stroke={arrowColor} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: arrowOpacity }}>
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          ) : (
+            <svg width={arrowSize} height={arrowSize} viewBox="0 0 24 24" fill="none" stroke={arrowColor} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: arrowOpacity }}>
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const stagesWithArrows = stages.flatMap((el, i) => {
+    if (i === stages.length - 1) return [el];
+    const arrowEl = renderArrow(i);
+    return arrowEl ? [el, arrowEl] : [el];
+  });
+
   // Determine progress toward next unlock
   const nextLevel = currentLevel < 5 ? 5 : currentLevel < 10 ? 10 : 10;
   const prevLevel = currentLevel < 5 ? 1 : currentLevel < 10 ? 5 : 10;
@@ -130,14 +175,14 @@ export const EvolutionStrip: React.FC<EvolutionStripProps> = ({
   if (orientation === 'vertical') {
     return (
       <div className="flex items-center gap-2 select-none">
-        <div className="flex flex-col items-center gap-2">{stages}</div>
+        <div className="flex flex-col items-center gap-2">{showArrows ? stagesWithArrows : stages}</div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center gap-2 select-none">
-      <div className="flex items-center gap-2">{stages}</div>
+      <div className="flex items-center gap-0">{showArrows ? stagesWithArrows : stages}</div>
       <div className="w-full h-1.5 bg-black/20 rounded-full overflow-hidden" style={{ maxWidth: ringSize * 3 + 24 }}>
         <div className="h-full bg-emerald-500" style={{ width: `${pct}%` }} />
       </div>
