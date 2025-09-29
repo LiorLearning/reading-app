@@ -123,9 +123,16 @@ export const getCurrentPetAvatarImage = (
     if (currentPet === 'unicorn') {
       return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Funicorn-sleeping-unscreen.gif?alt=media&token=4e329a08-ba34-4e56-bd7a-d6eed5d7d09d";
     }
-    if (currentPet === 'dog' || currentPet === 'hamster') {
-      return getSleepyPetImage(sleepClicks, currentPet);
+    if (currentPet === 'dog') {
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sleeping.gif?alt=media&token=ffc0469d-0cd0-488e-9672-ac41282b3c26";
     }
+    if (currentPet === 'cat') {
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sleeping.gif?alt=media&token=dd59e26d-3694-433f-a36a-e852ecf4f519";
+    }
+    if (currentPet === 'hamster') {
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-sleeping.gif?alt=media&token=a3b5cea4-24c2-4336-8c4b-c165c3e0535d";
+    }
+    
   }
   
   // Check if Bobo is owned and being displayed
