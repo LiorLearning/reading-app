@@ -2093,13 +2093,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             wordInSentence: aiResponse.spelling_sentence.toLowerCase().includes(spellingQuestion.audio.toLowerCase())
           });
           
+          // Ensure we always have a continuation for after spelling.
+          // If the AI didn't provide an adventure story, synthesize a gentle prompt
+          // by appending a follow-up question to the spelling sentence.
+          const contentAfterSpelling: string = (aiResponse.adventure_story && aiResponse.adventure_story.trim())
+            ? aiResponse.adventure_story
+            : `${(aiResponse.spelling_sentence || '').trim()} ${'What should we do next?'}`.trim();
+
           const spellingSentenceMessage: ChatMessage = {
             type: 'ai',
             content: aiResponse.spelling_sentence,
             timestamp: Date.now(),
             spelling_word: spellingQuestion.audio,
             spelling_sentence: aiResponse.spelling_sentence,
-            content_after_spelling: aiResponse.adventure_story, // Store the adventure story for later
+            content_after_spelling: contentAfterSpelling, // Always present: AI story or synthesized fallback
             hiddenInChat: true
           };
           
