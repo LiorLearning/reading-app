@@ -626,7 +626,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     ];
     
     // Determine current item to display with 8-hour hold behavior (story excluded)
-    const sequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
+    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams'];
     const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
     
     const statusFor = (type: string): ActionStatus => {
@@ -1748,6 +1748,7 @@ const getSleepyPetImage = (clicks: number) => {
     
     // Get cumulative care level data
     const cumulativeCare = getCumulativeCareLevel();
+    const { feedingCount, adventureCoins, sleepCompleted } = cumulativeCare;
     
     // If pet is sleeping, show sleep-related thoughts
     if (sleepClicks > 0) {
@@ -1789,7 +1790,20 @@ const getSleepyPetImage = (clicks: number) => {
     
     // All pets now use the generalized cumulative care system below
 
-    // Before generic care-based thoughts, align the thought with the current Daily Quest.
+    // Priority: If adventure coins >= 50, show sleepy thoughts regardless of to-do
+    if (adventureCoins >= 50 && !sleepCompleted) {
+      const readyForSleepThoughts = [
+        `Wow! We've had magical adventures, ${userName}! 🌟 Now I'm getting sleepy... 😴`,
+        `What an incredible journey we've had! 🚀 I'm wonderfully tired now... 💤`,
+        `I feel accomplished after our quests! 🏆 My soul yawns with contentment... 😴`,
+        `Amazing! Look at all my coins! 🪙 Ready for a cozy nap... 💤`,
+        `Perfect! Our adventures filled my soul! ✨ I'm deliciously drowsy now... 😴`,
+        `Incredible adventures, beloved ${userName}! 🎯 My eyelids grow heavy... 💤`
+      ];
+      return getRandomThought(readyForSleepThoughts);
+    }
+
+    // Before other generic care-based thoughts, align the thought with the current Daily Quest.
     // Primary source: Firestore `dailyQuests` (hydrated into localStorage by auth listener).
     // Fallback: local PetProgressStorage sequencing so the bubble never goes blank.
     const todoSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'story'];
@@ -1859,21 +1873,9 @@ const getSleepyPetImage = (clicks: number) => {
     }
 
     // Default pet thoughts based on cumulative care level (for pets without specific thoughts)
-    const { feedingCount, adventureCoins, sleepCompleted } = cumulativeCare;
     
     // Pet thoughts based on cumulative care progress
-    // Priority: If adventure coins >= 50, show sleepy thoughts regardless of feeding status
-    if (adventureCoins >= 50 && !sleepCompleted) {
-      const readyForSleepThoughts = [
-        `Wow! We've had magical adventures, ${userName}! 🌟 Now I'm getting sleepy... 😴`,
-        `What an incredible journey we've had! 🚀 I'm wonderfully tired now... 💤`,
-        `I feel accomplished after our quests! 🏆 My soul yawns with contentment... 😴`,
-        `Amazing! Look at all my coins! 🪙 Ready for a cozy nap... 💤`,
-        `Perfect! Our adventures filled my soul! ✨ I'm deliciously drowsy now... 😴`,
-        `Incredible adventures, beloved ${userName}! 🎯 My eyelids grow heavy... 💤`
-      ];
-      return getRandomThought(readyForSleepThoughts);
-    } else if (feedingCount === 0) {
+    if (feedingCount === 0) {
       // No feeding yet - initial state (sad and hungry)
       const hungryThoughts = [
         `Hi ${userName}... my tummy's rumbling! Could you share some treats with me? 🍪`,
@@ -3121,7 +3123,7 @@ const getSleepyPetImage = (clicks: number) => {
             || doneSet.has(type) // persistent completion threshold met
           );
           const isUnlocked = unlocked.has(type);
-          const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'dressing-competition' ? '🦚' : type === 'who-made-the-pets-sick' ? '🕵️' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
+          const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'dressing-competition' ? '👗' : type === 'who-made-the-pets-sick' ? '🕵️' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
           const label = type === 'plant-dreams' ? 'Plant Dreams' : type === 'dressing-competition' ? 'Dressing Competition' : type === 'who-made-the-pets-sick' ? 'Who Made The Pets Sick' : type.charAt(0).toUpperCase() + type.slice(1);
           const statusEmoji = !isUnlocked ? '🔒' : (typeDoneVisual ? '✅' : (type === assignedDailyTypeForDisplay ? '⭐' : '😐'));
           return (

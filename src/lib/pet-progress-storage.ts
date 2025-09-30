@@ -126,10 +126,12 @@ export class PetProgressStorage {
       adventureCoinsByType: {
         'house': 0,
         'friend': 0,
-        'food': 0,
+        'dressing-competition': 0,
+        'who-made-the-pets-sick': 0,
         'travel': 0,
-        'story': 0,
+        'food': 0,
         'plant-dreams': 0,
+        'story': 0,
       },
       todoData: {
         currentType: 'house',
@@ -251,10 +253,12 @@ export class PetProgressStorage {
       adventureCoinsByType: {
         'house': data.adventureCoinsByType?.['house'] || 0,
         'friend': data.adventureCoinsByType?.['friend'] || 0,
-        'food': data.adventureCoinsByType?.['food'] || 0,
+        'dressing-competition': data.adventureCoinsByType?.['dressing-competition'] || 0,
+        'who-made-the-pets-sick': data.adventureCoinsByType?.['who-made-the-pets-sick'] || 0,
         'travel': data.adventureCoinsByType?.['travel'] || 0,
-        'story': data.adventureCoinsByType?.['story'] || 0,
+        'food': data.adventureCoinsByType?.['food'] || 0,
         'plant-dreams': data.adventureCoinsByType?.['plant-dreams'] || 0,
+        'story': data.adventureCoinsByType?.['story'] || 0,
       },
       todoData: {
         currentType: data.todoData?.currentType || 'house',
