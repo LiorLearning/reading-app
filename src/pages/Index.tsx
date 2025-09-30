@@ -128,7 +128,7 @@ const IndexPanelImageFigure: React.FC<{
   }, [resolvedImageUrl, panel.image, index, isExpiredUrl]);
 
   return (
-    <figure className="rounded-lg border-2 bg-card" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
+    <figure className="rounded-lg border-2 bg-card relative" style={{ borderColor: 'hsla(var(--primary), 0.9)' }}>
       <img 
         src={resolvedImageUrl} 
         alt={`Panel ${index + 1}`} 
@@ -144,6 +144,13 @@ const IndexPanelImageFigure: React.FC<{
           }
         }}
       />
+      <button 
+        onClick={() => window.open(resolvedImageUrl, '_blank')}
+        className="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white border-none rounded-md px-2 py-1 text-xs flex items-center gap-1 transition-colors"
+        title="Open image in new tab"
+      >
+        📥 Download
+      </button>
       <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
     </figure>
   );

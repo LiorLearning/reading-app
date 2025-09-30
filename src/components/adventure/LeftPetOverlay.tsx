@@ -56,6 +56,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   const lastAiHtmlRef = React.useRef<string | undefined>(undefined);
   const [hiddenReason, setHiddenReason] = React.useState<null | 'manual' | 'auto'>(null);
   const hiddenAtHtmlRef = React.useRef<string | undefined>(undefined);
+  const [isManuallyClosed, setIsManuallyClosed] = React.useState(false);
   const hasInlineQuestion = React.useMemo(() => {
     return Boolean(spellInline?.show && !!spellInline?.question);
   }, [spellInline?.show, spellInline?.question]);
@@ -190,21 +191,32 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoHideToken]);
 
-  // When a question becomes active, force-show the bubble and clear any hidden reason
+  // When a question becomes active, force-show the bubble
+  // Questions should always show, even if manually closed
   React.useEffect(() => {
     if (hasInlineQuestion) {
       setIsBubbleHidden(false);
       setHiddenReason(null);
+      // Don't reset manual close state - keep it for after question
     }
   }, [hasInlineQuestion]);
 
-  // If we were auto-hidden, show again when a new AI message arrives
+  // When question ends, hide the dialog again if it was manually closed
   React.useEffect(() => {
-    if (hiddenReason === 'auto' && aiMessageHtml && aiMessageHtml !== hiddenAtHtmlRef.current) {
+    if (!hasInlineQuestion && isManuallyClosed) {
+      setIsBubbleHidden(true);
+      setHiddenReason('manual');
+    }
+  }, [hasInlineQuestion, isManuallyClosed]);
+
+  // If we were auto-hidden, show again when a new AI message arrives
+  // But don't show if it was manually closed by the user
+  React.useEffect(() => {
+    if (hiddenReason === 'auto' && !isManuallyClosed && aiMessageHtml && aiMessageHtml !== hiddenAtHtmlRef.current) {
       setIsBubbleHidden(false);
       setHiddenReason(null);
     }
-  }, [aiMessageHtml, hiddenReason]);
+  }, [aiMessageHtml, hiddenReason, isManuallyClosed]);
 
   const displayHtml = isBubbleHidden ? undefined : (aiMessageHtml || lastAiHtmlRef.current);
 
@@ -237,6 +249,16 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           className="pointer-events-auto w-[240px] h-[240px] rounded-xl overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm"
           onClick={(e) => {
             e.stopPropagation();
+            // Only show bubble if it wasn't manually closed by the user
+            if (!isManuallyClosed) {
+              setIsBubbleHidden(false);
+              setHiddenReason(null);
+            }
+          }}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            // Double-click to reset manual close state and show bubble
+            setIsManuallyClosed(false);
             setIsBubbleHidden(false);
             setHiddenReason(null);
           }}
@@ -295,6 +317,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                   ttsService.stop();
                   setIsBubbleHidden(true);
                   setHiddenReason('manual');
+                  setIsManuallyClosed(true);
                 }}
                 className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
                 aria-label="Hide message"
