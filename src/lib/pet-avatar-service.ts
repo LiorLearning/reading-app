@@ -614,8 +614,17 @@ export const useCurrentPetAvatarImage = () => {
     return levelInfo.currentLevel;
   };
 
-  // Handle special pets (bobo, feather, etc.) - same logic as PetPage
-  const getSpecialPetImage = () => {
+  // Handle pets that have GIF sets; decide by unified careState
+  const getSpecialPetImage = (careState: string) => {
+    // Helper: collapse careState to GIF mood buckets, and treat any sleep as super-happy
+    const stateToGifKey = (state: string): 'coins_50' | 'coins_30' | 'coins_10' | 'coins_0' => {
+      if (state.startsWith('sleep')) return 'coins_50';
+      if (state === 'coins_50') return 'coins_50';
+      if (state === 'coins_30') return 'coins_30';
+      if (state === 'coins_10') return 'coins_10';
+      return 'coins_0';
+    };
+    const gifKey = stateToGifKey(careState);
     // Check if Bobo is owned and being displayed
     if (currentPetId === 'bobo' && isPetOwned('bobo')) {
       const cumulativeCare = getCumulativeCareLevel();
@@ -650,94 +659,94 @@ export const useCurrentPetAvatarImage = () => {
       }
     }
     
-    // Check if Cat is owned and being displayed - use the same daily coin thresholds as PetPage
+    // Check if Cat is owned and being displayed - map from careState buckets
     if (currentPetId === 'cat' && isPetOwned('cat')) {
-      if (todayCoins >= 50) {
+      if (gifKey === 'coins_50') {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-super-happy-unscreen.gif?alt=media&token=8275c06d-139a-42c3-b5e0-abfdcbddd1e1";
-      } else if (todayCoins >= 30) {
+      } else if (gifKey === 'coins_30') {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-happy-unscreen.gif?alt=media&token=baa69ba6-06f5-4c44-ad6b-9a96c241dab0";
-      } else if (todayCoins >= 10) {
+      } else if (gifKey === 'coins_10') {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-neutral-unscreen.gif?alt=media&token=fa2abbc8-8f14-4f63-bf51-355ef0d1c310";
       } else {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sad-unscreen.gif?alt=media&token=7f5ad9cb-df5d-46dc-ae54-67e35f5a5ed6";
       }
     }
     
-    // Check if Dog is owned and being displayed - use the same daily coin thresholds as PetPage
+    // Check if Dog is owned and being displayed - map from careState buckets
     if (currentPetId === 'dog' && isPetOwned('dog')) {
-      if (todayCoins >= 50) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-super-happy-unscreen.gif?alt=media&token=90825746-c450-46a4-aad5-7c8a113dd33a"; // 50+ coins - placeholder for future GIF
-      } else if (todayCoins >= 30) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-happy-unscreen.gif?alt=media&token=63a8ea0c-4166-4be3-bfd0-4caffaaf58cc"; // 30+ coins - placeholder for future GIF
-      } else if (todayCoins >= 10) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-neutral-unscreen.gif?alt=media&token=fab36d1a-fec3-4510-a99d-eeeef5d9d784"; // 10+ coins - placeholder for future GIF
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-super-happy-unscreen.gif?alt=media&token=90825746-c450-46a4-aad5-7c8a113dd33a";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-happy-unscreen.gif?alt=media&token=63a8ea0c-4166-4be3-bfd0-4caffaaf58cc";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-neutral-unscreen.gif?alt=media&token=fab36d1a-fec3-4510-a99d-eeeef5d9d784";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sad-unscreen.gif?alt=media&token=aa2818bf-d631-4394-97f5-3955b5602299"; // 0 coins - hungry - placeholder for future GIF
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sad-unscreen.gif?alt=media&token=aa2818bf-d631-4394-97f5-3955b5602299";
       }
     }
     
-    // Check if Hamster is owned and being displayed - use the same daily coin thresholds as PetPage
+    // Check if Hamster is owned and being displayed - map from careState buckets
     if (currentPetId === 'hamster' && isPetOwned('hamster')) {
-      if (todayCoins >= 50) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-super-happy-unscreen.gif?alt=media&token=1c6950e1-b84e-4241-8a3b-34ee4bb31e4d"; // 50+ coins
-      } else if (todayCoins >= 30) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6"; // 30+ coins - placeholder for future image
-      } else if (todayCoins >= 10) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-neutral-unscreen.gif?alt=media&token=8511abcc-9b24-4ea5-b830-9bdb7ad4bee8"; // 10+ coins
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-super-happy-unscreen.gif?alt=media&token=1c6950e1-b84e-4241-8a3b-34ee4bb31e4d";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-neutral-unscreen.gif?alt=media&token=8511abcc-9b24-4ea5-b830-9bdb7ad4bee8";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0"; // 0 coins - hungry
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0";
       }
     }
     
-    // Check if Dragon is owned and being displayed - use the same daily coin thresholds as PetPage (TBD GIFs)
+    // Check if Dragon is owned and being displayed - map from careState buckets (TBD GIFs)
     if (currentPetId === 'dragon' && isPetOwned('dragon')) {
-      if (todayCoins >= 50) {
-        return "TBD"; // 50+ coins - super happy
-      } else if (todayCoins >= 30) {
-        return "TBD"; // 30+ coins - happy
-      } else if (todayCoins >= 10) {
-        return "TBD"; // 10+ coins - neutral
+      if (gifKey === 'coins_50') {
+        return "TBD";
+      } else if (gifKey === 'coins_30') {
+        return "TBD";
+      } else if (gifKey === 'coins_10') {
+        return "TBD";
       } else {
-        return "TBD"; // 0 coins - sad/hungry
+        return "TBD";
       }
     }
     
-    // Check if Unicorn is owned and being displayed - use the same daily coin thresholds as PetPage (TBD GIFs)
+    // Check if Unicorn is owned and being displayed - map from careState buckets (TBD GIFs)
     if (currentPetId === 'unicorn' && isPetOwned('unicorn')) {
-      if (todayCoins >= 50) {
-        return "TBD"; // 50+ coins - super happy
-      } else if (todayCoins >= 30) {
-        return "TBD"; // 30+ coins - happy
-      } else if (todayCoins >= 10) {
-        return "TBD"; // 10+ coins - neutral
+      if (gifKey === 'coins_50') {
+        return "TBD";
+      } else if (gifKey === 'coins_30') {
+        return "TBD";
+      } else if (gifKey === 'coins_10') {
+        return "TBD";
       } else {
-        return "TBD"; // 0 coins - sad/hungry
+        return "TBD";
       }
     }
     
-    // Check if Parrot is owned and being displayed - use the same daily coin thresholds as PetPage (TBD GIFs)
+    // Check if Parrot is owned and being displayed - map from careState buckets
     if (currentPetId === 'parrot' && isPetOwned('parrot')) {
-      if (todayCoins >= 50) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-superhappy-unscreen.gif?alt=media&token=af057d1e-47b1-4a6c-8fa7-fbc44da8b18a"; // 50+ coins - super happy
-      } else if (todayCoins >= 30) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-happy-unscreen.gif?alt=media&token=4f4df3cf-486f-4471-8fae-480775d1574d"; // 30+ coins - happy
-      } else if (todayCoins >= 10) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-neutral-unscreen.gif?alt=media&token=9da3fa6e-9f8b-4c65-8427-94378971a739"; // 10+ coins - neutral
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-superhappy-unscreen.gif?alt=media&token=af057d1e-47b1-4a6c-8fa7-fbc44da8b18a";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-happy-unscreen.gif?alt=media&token=4f4df3cf-486f-4471-8fae-480775d1574d";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-neutral-unscreen.gif?alt=media&token=9da3fa6e-9f8b-4c65-8427-94378971a739";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sad-unscreen.gif?alt=media&token=05efa46e-ec9a-4aac-86ed-43dec953cb49"; // 0 coins - sad/hungry
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sad-unscreen.gif?alt=media&token=05efa46e-ec9a-4aac-86ed-43dec953cb49";
       }
     }
     
-    // Check if Monkey is owned and being displayed - use the same daily coin thresholds as PetPage (TBD GIFs)
+    // Check if Monkey is owned and being displayed - map from careState buckets
     if (currentPetId === 'monkey' && isPetOwned('monkey')) {
-      if (todayCoins >= 50) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-superhappy-unscreen.gif?alt=media&token=2e4a741f-cf3f-471c-9d84-94b63c066687"; // 50+ coins - super happy
-      } else if (todayCoins >= 30) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-happy-unscreen.gif?alt=media&token=042e3938-b885-447b-a63e-e1b883fa4e5f"; // 30+ coins - happy
-      } else if (todayCoins >= 10) {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-neutral-unscreen.gif?alt=media&token=7380ade3-dd24-4bc7-a8e0-cf0894a83bc0"; // 10+ coins - neutral
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-superhappy-unscreen.gif?alt=media&token=2e4a741f-cf3f-471c-9d84-94b63c066687";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-happy-unscreen.gif?alt=media&token=042e3938-b885-447b-a63e-e1b883fa4e5f";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-neutral-unscreen.gif?alt=media&token=7380ade3-dd24-4bc7-a8e0-cf0894a83bc0";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-sad-unscreen.gif?alt=media&token=3fbbd435-b1de-4932-a693-137c626e20e4"; // 0 coins - sad/hungry
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-sad-unscreen.gif?alt=media&token=3fbbd435-b1de-4932-a693-137c626e20e4";
       }
     }
     
@@ -746,15 +755,17 @@ export const useCurrentPetAvatarImage = () => {
 
   // Main function to get pet image (same as PetPage)
   const getPetImage = () => {
-    // First check for special pets
-    const specialPetImage = getSpecialPetImage();
+    // Compute unified care state first
+    const careState = getCurrentCareState();
+    
+    // Prefer GIFs for pets that have them, driven by careState
+    const specialPetImage = getSpecialPetImage(careState);
     if (specialPetImage) {
       return specialPetImage;
     }
     
-    // Fall back to level-based system for standard pets
+    // Fall back to level-based system for standard pets (static images)
     const currentLevel = getCurrentPetLevel();
-    const careState = getCurrentCareState();
     return getLevelBasedPetImage(currentPetId, currentLevel, careState);
   };
 
