@@ -571,6 +571,36 @@ export const useCurrentPetAvatarImage = () => {
       return 'sleep1';
     }
 
+    // Daily quest override (same mapping as PetPage)
+    try {
+      const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+      if (questStatesRaw) {
+        const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>;
+        const item = arr?.find(x => x.pet === currentPetId);
+        const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
+        if (item) {
+          const prog = Number(item.progress || 0);
+          if (prog >= target) return 'coins_50';
+          if (prog >= 3) return 'coins_30';
+          if (prog >= 1) return 'coins_10';
+        }
+      }
+    } catch {
+      // ignore and fall through
+    }
+
+    // Force sad when pet will be sad on wakeup or heart is empty (align with PetPage)
+    try {
+      const petProgress = PetProgressStorage.getPetProgress(currentPetId);
+      const { heartData, sleepData } = petProgress;
+      const isHeartEmpty = heartData.feedingCount === 0 && heartData.adventureCoins === 0 && !heartData.sleepCompleted;
+      if (sleepData.willBeSadOnWakeup || isHeartEmpty) {
+        return 'coins_0';
+      }
+    } catch {
+      // ignore; fall through to coin thresholds
+    }
+
     // Per-pet daily coin thresholds used by PetPage
     if (todayCoins >= 50) return 'coins_50';
     if (todayCoins >= 30) return 'coins_30';
