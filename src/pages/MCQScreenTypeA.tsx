@@ -2201,6 +2201,14 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                               }}
                             />
                           </div>
+                          {/* Download button */}
+                          <button 
+                            onClick={() => window.open(generatedImages[currentQuestionIndex], '_blank')}
+                            className="absolute top-4 right-4 bg-black/70 hover:bg-black/90 text-white border-none rounded-md px-3 py-2 text-sm flex items-center gap-2 transition-colors z-20"
+                            title="Open image in new tab"
+                          >
+                            📥 Download
+                          </button>
                         </div>
                       ) : null}
                       

@@ -1515,12 +1515,19 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
     
     if (isValidImageUrl) {
       const placeholder = `XIMGPLACEHOLDERX${allImages.length}XENDX`;
-      // Create styled image HTML
-      const imageHTML = `<div class="adventure-image-container" style="margin: 8px 0; text-align: center;">
+      // Create styled image HTML with download button
+      const imageHTML = `<div class="adventure-image-container" style="margin: 8px 0; text-align: center; position: relative;">
         <img src="${url}" alt="${altText || 'Generated adventure image'}" 
              class="adventure-image" 
              style="max-width: 100%; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid #000;" 
              loading="lazy" />
+        <button onclick="window.open('${url}', '_blank')" 
+                style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px; transition: background 0.2s;"
+                onmouseover="this.style.background='rgba(0,0,0,0.9)'" 
+                onmouseout="this.style.background='rgba(0,0,0,0.7)'"
+                title="Open image in new tab">
+          📥 Download
+        </button>
       </div>`;
       
       allImages.push(imageHTML);
