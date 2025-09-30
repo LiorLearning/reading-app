@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, Square, X } from "lucide-react";
-import { ttsService } from "@/lib/tts-service";
+import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
 import SpellBox from "@/components/comic/SpellBox";
 import { cn } from "@/lib/utils";
 
@@ -60,6 +60,16 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     return Boolean(spellInline?.show && !!spellInline?.question);
   }, [spellInline?.show, spellInline?.question]);
 
+  // Resolve Jessica voice once (fallback to currently selected voice)
+  const jessicaVoiceId = React.useMemo(() => {
+    const v = AVAILABLE_VOICES.find(v => v.name === 'Jessica');
+    try {
+      return v?.id || ttsService.getSelectedVoice().id;
+    } catch {
+      return v?.id || undefined;
+    }
+  }, []);
+
   // Keep track of the last AI message so we can restore it when user taps the pet
   React.useEffect(() => {
     if (aiMessageHtml) {
@@ -95,14 +105,63 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   };
 
   const handleSpeak = async () => {
-    const toSpeak = aiMessageHtml || lastAiHtmlRef.current;
-    if (!toSpeak) return;
     if (isSpeakingRef.current) {
       ttsService.stop();
       isSpeakingRef.current = false;
       return;
     }
-    // Strip HTML for TTS
+
+    // If inline SpellBox is active, prefer speaking the full sentence; fallback to the spelling word
+    if (hasInlineQuestion) {
+      const sentenceHtml = spellInline?.sentence || '';
+      const sentenceText = (() => {
+        if (!sentenceHtml) return '';
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = sentenceHtml;
+        return (tempDiv.textContent || tempDiv.innerText || '').trim();
+      })();
+
+      const wordToSpeak = spellInline?.word || '';
+
+      // Derive exactly what SpellBox shows by extracting only the sentence that contains the target word
+      const extractVisibleSentence = (fullText: string, targetWord: string): string => {
+        const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const normalizedWord = targetWord?.trim();
+        if (!fullText || !normalizedWord) return fullText;
+        const parts = fullText
+          .split(/(?<=[.!?])\s+/) // split but keep punctuation with previous chunk
+          .map(p => p.trim())
+          .filter(p => p.length > 0);
+        const wordRegex = new RegExp(`\\b${escapeRegExp(normalizedWord)}\\b`, 'i');
+        const match = parts.find(p => wordRegex.test(p));
+        return match || fullText;
+      };
+
+      const visibleSentence = extractVisibleSentence(sentenceText, wordToSpeak);
+      const textToSpeak = (visibleSentence || '').trim() || wordToSpeak;
+      if (textToSpeak) {
+        isSpeakingRef.current = true;
+        try {
+          await ttsService.speak(textToSpeak, {
+            stability: 0.7,
+            similarity_boost: 0.9,
+            // Use a slightly slower speed only when we fall back to the isolated word
+            speed: visibleSentence ? undefined : 0.7,
+            messageId: visibleSentence
+              ? `left-pet-inline-spellbox-sentence-${Date.now()}`
+              : `left-pet-inline-spellbox-${wordToSpeak}`,
+            voice: jessicaVoiceId,
+          });
+        } finally {
+          isSpeakingRef.current = false;
+        }
+        return;
+      }
+    }
+
+    // Otherwise, speak the AI bubble HTML (text-only)
+    const toSpeak = aiMessageHtml || lastAiHtmlRef.current;
+    if (!toSpeak) return;
     const temp = document.createElement("div");
     temp.innerHTML = toSpeak;
     const text = temp.textContent || temp.innerText || "";
@@ -243,8 +302,8 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                 <X className="h-3 w-3" />
               </Button>
             )}
-            {/* Speaker control */}
-            {displayHtml && (
+            {/* Speaker control (available for AI HTML or inline SpellBox) */}
+            {(displayHtml || hasInlineQuestion) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -253,7 +312,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                   handleSpeak();
                 }}
                 className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
-                aria-label="Play message"
+                aria-label="Play audio"
               >
                 {isSpeakingRef.current ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
               </Button>
