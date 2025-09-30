@@ -853,6 +853,20 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return;
     }
 
+    // Handle dressing competition action - starts new dressing-competition adventure
+    if (actionId === 'dressing-competition') {
+      console.log('🎯 PetPage: Dressing Competition clicked, calling handleAdventureClick with "dressing-competition"');
+      handleAdventureClick('dressing-competition');
+      return;
+    }
+
+    // Handle investigation action - starts new sick investigation adventure
+    if (actionId === 'who-made-the-pets-sick') {
+      console.log('🎯 PetPage: Who Made The Pets Sick clicked, calling handleAdventureClick with "who-made-the-pets-sick"');
+      handleAdventureClick('who-made-the-pets-sick');
+      return;
+    }
+
     // Handle house action - starts new house adventure
     if (actionId === 'house') {
       console.log('🎯 PetPage: House button clicked, calling handleAdventureClick with "house"');
@@ -1778,7 +1792,7 @@ const getSleepyPetImage = (clicks: number) => {
     // Before generic care-based thoughts, align the thought with the current Daily Quest.
     // Primary source: Firestore `dailyQuests` (hydrated into localStorage by auth listener).
     // Fallback: local PetProgressStorage sequencing so the bubble never goes blank.
-    const todoSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams', 'story'];
+    const todoSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'story'];
     let activityFromFirestore: string | null = null;
     let doneFromFirestore = false;
     try {
@@ -1811,6 +1825,16 @@ const getSleepyPetImage = (clicks: number) => {
           `I miss warm hugs and giggles! 👫 Can we visit a friend?`,
           `My heart wants company today, ${userName} 💞 Let's go say hi to a friend!`,
           `I want to share treats and stories! 🐾 Friend time?`
+        ],
+        'dressing-competition': [
+          `It’s dress-up time, ${userName}! 👗 I’m excited! What should I wear—maybe a crown… or something else?`,
+          `I want to look amazing today! ✨ What should I wear—maybe a bow… or something else?`,
+          `Help me pick my look! 😻 What should I wear—maybe a cape… or something else?`
+        ],
+        'who-made-the-pets-sick': [
+          `I’m worried, ${userName}… so many pets feel sick. What should we check first—maybe the fountain… or something else?`,
+          `My best friend is weak today. 😢 How should we investigate?`,
+          `Something’s wrong in the pet kingdom! 🐾 What should we investigate—maybe the food… or something else?`
         ],
         food: [
           `My tummy feels tiny and grumbly, ${userName}… 🍪 A loving snack please?`,
@@ -2182,7 +2206,7 @@ const getSleepyPetImage = (clicks: number) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-y-auto" style={{
+    <div className="h-screen flex flex-col overflow-y-auto overflow-x-hidden" style={{
       backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250903_181706_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center 50%',
@@ -2921,7 +2945,7 @@ const getSleepyPetImage = (clicks: number) => {
                 } catch {}
 
                 // Fallbacks when Firestore hasn't hydrated yet
-                const questSequence = ['house', 'travel', 'friend', 'food', 'plant-dreams'];
+                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams'];
                 const currentQuestType = activityFromFirestore || PetProgressStorage.getCurrentTodoDisplayType(currentPet, questSequence, 50);
                 const doneLocal = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentQuestType, 50);
                 const progress = fracFromFirestore !== null ? fracFromFirestore : (doneLocal ? 1 : 0);
@@ -2933,6 +2957,8 @@ const getSleepyPetImage = (clicks: number) => {
                     case 'house': return '🏠';
                     case 'travel': return '✈️';
                     case 'friend': return '👫';
+                    case 'who-made-the-pets-sick': return '🕵️';
+                    case 'dressing-competition': return '👗';
                     case 'food': return '🍪';
                     case 'plant-dreams': return '🌙';
                     default: return '✨';
@@ -2940,7 +2966,10 @@ const getSleepyPetImage = (clicks: number) => {
                 };
                 
                 const getQuestLabel = (type: string) => {
-                  return type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
+                  if (type === 'plant-dreams') return 'Plant Dreams';
+                  if (type === 'who-made-the-pets-sick') return 'Who Made The Pets Sick';
+                  if (type === 'dressing-competition') return 'Dressing Competition';
+                  return type.charAt(0).toUpperCase() + type.slice(1);
                 };
                 
                 const questIcon = getQuestIcon(currentQuestType);
@@ -3024,7 +3053,7 @@ const getSleepyPetImage = (clicks: number) => {
       {/* More Overlay */}
       {showMoreOverlay && (() => {
         // Canonical sequence aligned with backend ACTIVITY_SEQUENCE (story handled separately):
-        const coreSeq = ['house','friend','travel','food','plant-dreams'];
+        const coreSeq = ['house','friend','dressing-competition','who-made-the-pets-sick','travel','food','plant-dreams'];
         // Prefer Firestore daily quest assignment (hydrated into localStorage by auth listener)
         let assignedDailyType: string | null = null;
         let assignedDailyDone: boolean = false;
@@ -3055,23 +3084,34 @@ const getSleepyPetImage = (clicks: number) => {
         // - Unlock all activities that come BEFORE today's assigned quest in the canonical order
         // - If today's assigned quest is completed, also unlock the NEXT quest immediately
         const unlocked = new Set<string>(['story']);
-        const assignedIndex = assignedDailyType ? coreSeq.indexOf(assignedDailyType) : -1;
+        const assignedIndexOriginal = assignedDailyType ? coreSeq.indexOf(assignedDailyType) : -1;
         if (assignedDailyType) {
           unlocked.add(assignedDailyType);
-          if (assignedIndex >= 0) {
-            for (let i = 0; i < assignedIndex; i++) {
+          if (assignedIndexOriginal >= 0) {
+            for (let i = 0; i < assignedIndexOriginal; i++) {
               unlocked.add(coreSeq[i]);
             }
             if (assignedDailyDone) {
-              const nextIndex = Math.min(coreSeq.length - 1, assignedIndex + 1);
+              const nextIndex = Math.min(coreSeq.length - 1, assignedIndexOriginal + 1);
               unlocked.add(coreSeq[nextIndex]);
             }
           }
         }
 
+        // If today's quest is completed, advance the overlay highlight to the next quest for display
+        const assignedDailyTypeForDisplay = (() => {
+          if (!assignedDailyType) return assignedDailyType;
+          if (!assignedDailyDone) return assignedDailyType;
+          const idx = coreSeq.indexOf(assignedDailyType);
+          if (idx < 0) return assignedDailyType;
+          const nextIndex = Math.min(coreSeq.length - 1, idx + 1);
+          return coreSeq[nextIndex];
+        })();
+        const assignedIndex = assignedDailyTypeForDisplay ? coreSeq.indexOf(assignedDailyTypeForDisplay) : -1;
+
         // Render order: Daily Quest → Story → remaining
-        const remaining = coreSeq.filter(t => t !== assignedDailyType);
-        const renderOrder = assignedDailyType ? [assignedDailyType, 'story', ...remaining] : ['story', ...coreSeq];
+        const remaining = coreSeq.filter(t => t !== assignedDailyTypeForDisplay);
+        const renderOrder = assignedDailyTypeForDisplay ? [assignedDailyTypeForDisplay, 'story', ...remaining] : ['story', ...coreSeq];
 
         const renderRow = (type: string) => {
           const typeIndex = coreSeq.indexOf(type);
@@ -3081,9 +3121,9 @@ const getSleepyPetImage = (clicks: number) => {
             || doneSet.has(type) // persistent completion threshold met
           );
           const isUnlocked = unlocked.has(type);
-          const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
-          const label = type === 'plant-dreams' ? 'Plant Dreams' : type.charAt(0).toUpperCase() + type.slice(1);
-          const statusEmoji = !isUnlocked ? '🔒' : (typeDoneVisual ? '✅' : (type === assignedDailyType ? '⭐' : '😐'));
+          const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'dressing-competition' ? '🦚' : type === 'who-made-the-pets-sick' ? '🕵️' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
+          const label = type === 'plant-dreams' ? 'Plant Dreams' : type === 'dressing-competition' ? 'Dressing Competition' : type === 'who-made-the-pets-sick' ? 'Who Made The Pets Sick' : type.charAt(0).toUpperCase() + type.slice(1);
+          const statusEmoji = !isUnlocked ? '🔒' : (typeDoneVisual ? '✅' : (type === assignedDailyTypeForDisplay ? '⭐' : '😐'));
           return (
             <button
               key={type}
