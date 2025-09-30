@@ -364,8 +364,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         result += upperWord[i];
         console.log(`🔤 SPELLBOX: Position ${i}: Using prefilled "${upperWord[i]}"`);
       } else {
-        // Use user input character (or empty if not provided)
-        const userChar = userInput[userInputIndex] || '';
+        // Use user input character (or empty if not provided). Treat space as empty.
+        const rawChar = userInput[userInputIndex] || '';
+        const userChar = rawChar === ' ' ? '' : rawChar;
         result += userChar;
         console.log(`🔤 SPELLBOX: Position ${i}: Using user input "${userChar}" (userInputIndex: ${userInputIndex})`);
         userInputIndex++;
@@ -394,16 +395,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
   // Helper function to get user input character at a specific blank position
   const getUserInputAtBlankIndex = useCallback((blankIndex: number): string => {
-    return userAnswer[blankIndex] || '';
+    const ch = userAnswer[blankIndex];
+    return ch === ' ' ? '' : (ch || '');
   }, [userAnswer]);
 
   // Helper function to update user input at a specific blank position
   const updateUserInputAtBlankIndex = useCallback((blankIndex: number, newValue: string): string => {
     const expectedLength = getExpectedUserInputLength();
-    const newUserAnswer = Array.from({ length: expectedLength }, (_, i) => 
-      i === blankIndex ? newValue : (userAnswer[i] || '')
-    );
-    return newUserAnswer.join('');
+    const baseArray = Array.from({ length: expectedLength }, (_, i) => {
+      const existing = userAnswer[i];
+      return existing === undefined || existing === '' ? ' ' : existing;
+    });
+    baseArray[blankIndex] = newValue === '' ? ' ' : newValue;
+    return baseArray.join('');
   }, [userAnswer, getExpectedUserInputLength]);
 
   // Check for first-time instruction display
