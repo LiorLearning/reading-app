@@ -642,17 +642,31 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       sadType === 'plant-dreams' ? 'Plant Dreams' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
     ) });
     
-    // Add sleep button - show sad when available but not done, happy when completed
+    // Add sleep button - per-pet gating using hydrated daily quest progress
+    // Determine if the CURRENT pet has completed today's daily quest (>= target, default 5)
+    let canSleepForCurrentPet = false;
+    try {
+      const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+      if (questStatesRaw) {
+        const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; progress: number; target?: number }>;
+        const item = arr?.find((x) => x.pet === currentPet);
+        const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
+        const prog = Number(item?.progress || 0);
+        canSleepForCurrentPet = prog >= target;
+      }
+    } catch {}
+
+    // Show sad when available but not done, happy when completed; disabled when not available
     let sleepLabel, sleepStatus: ActionStatus;
     if (sleepClicks >= 3) {
       sleepLabel = 'Sleeping';
       sleepStatus = 'happy'; // Pet is fully asleep and happy
-    } else if (isSleepAvailable()) {
+    } else if (canSleepForCurrentPet) {
       sleepLabel = sleepClicks === 0 ? 'Sleep' : `Sleep ${sleepClicks}/3`;
-      sleepStatus = 'sad'; // Sleep is available but pet needs to sleep
+      sleepStatus = 'sad'; // Sleep is available for this pet but needs to sleep
     } else {
       sleepLabel = sleepClicks === 0 ? 'Sleep' : `Sleep ${sleepClicks}/3`;
-      sleepStatus = 'disabled'; // Sleep not available yet
+      sleepStatus = 'disabled'; // Sleep not available yet for this pet
     }
     baseActions.push({ id: 'sleep', icon: '😴', status: sleepStatus, label: sleepLabel });
     
@@ -2104,6 +2118,11 @@ const getSleepyPetImage = (clicks: number) => {
     };
   }, []);
 
+  // Recompute action buttons (including per-pet sleep gating) live when quests update
+  useEffect(() => {
+    setActionStates(getActionStates());
+  }, [questRefreshTick]);
+
   // Memoize the pet thought so it only changes when the actual state changes
   // Use stable values to prevent rapid changes when user returns with coins
   const currentPetThought = useMemo(() => {
@@ -3044,10 +3063,21 @@ const getSleepyPetImage = (clicks: number) => {
               {(() => {
                 const clicks = sleepClicks;
                 const asleep = clicks >= 3;
-                const available = isSleepAvailable();
+                // Per-pet gating: sleep only available when CURRENT pet's daily quest is done
+                let canSleepForCurrentPet = false;
+                try {
+                  const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+                  if (questStatesRaw) {
+                    const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; progress: number; target?: number }>;
+                    const item = arr?.find((x) => x.pet === currentPet);
+                    const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
+                    const prog = Number(item?.progress || 0);
+                    canSleepForCurrentPet = prog >= target;
+                  }
+                } catch {}
                 const progress = Math.min(clicks / 3, 1);
                 const label = asleep ? 'Sleeping' : 'Sleep';
-                const disabled = asleep || (!available && clicks < 3);
+                const disabled = asleep || (!canSleepForCurrentPet && clicks < 3);
                 return (
                   <div className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${asleep ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'}`}>
                     {/* Celebration badge for completed */}
