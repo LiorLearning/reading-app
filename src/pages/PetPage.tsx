@@ -169,6 +169,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   
   // Sleep timer state
   const [sleepTimeRemaining, setSleepTimeRemaining] = useState(0); // in milliseconds
+  // Loader for sleeping GIF when switching to a sleeping pet
+  const [isSleepingGifLoading, setIsSleepingGifLoading] = useState(false);
+  const sleepingGifLoadTokenRef = useRef(0);
+  const previousPetForLoaderRef = useRef(currentPet);
   
   // Sleep state management with localStorage persistence (per-pet)
   const [sleepClicks, setSleepClicks] = useState(() => {
@@ -429,6 +433,91 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return () => clearInterval(interval);
     }
   }, [sleepClicks]);
+
+  // Show loading overlay when switching to a sleeping pet until sleeping GIF loads
+  useEffect(() => {
+    // Only consider when current pet changes OR sleep state indicates sleeping
+    const petChanged = previousPetForLoaderRef.current !== currentPet;
+    previousPetForLoaderRef.current = currentPet;
+    const isSleeping = sleepClicks > 0;
+    if (!petChanged && !isSleeping) {
+      return;
+    }
+
+    // Determine if the displayed image is a sleeping GIF for current pet
+    const url = getPetImage?.();
+    const looksLikeGif = typeof url === 'string' && /sleeping|unscreen\.gif|\.gif/i.test(url);
+    if (!isSleeping || !looksLikeGif) {
+      setIsSleepingGifLoading(false);
+      return;
+    }
+
+    // Start loader and preload
+    const token = Date.now();
+    sleepingGifLoadTokenRef.current = token;
+
+    // Optional small delay before showing overlay to prevent flicker on cached loads
+    let showOverlayTimer: any = null;
+    let didShowOverlay = false;
+    showOverlayTimer = setTimeout(() => {
+      // Only show if still the latest token
+      if (sleepingGifLoadTokenRef.current === token) {
+        setIsSleepingGifLoading(true);
+        didShowOverlay = true;
+      }
+    }, 120);
+
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = url as string;
+
+    const cleanup = () => {
+      if (showOverlayTimer) clearTimeout(showOverlayTimer);
+      img.onload = null;
+      img.onerror = null;
+    };
+
+    if ((img as any).complete && (img as any).naturalWidth > 0) {
+      cleanup();
+      // If it finished immediately, don't show overlay; but if already visible, keep minimal time
+      if (sleepingGifLoadTokenRef.current === token) {
+        if (didShowOverlay) {
+          setTimeout(() => {
+            if (sleepingGifLoadTokenRef.current === token) {
+              setIsSleepingGifLoading(false);
+            }
+          }, 200);
+        } else {
+          setIsSleepingGifLoading(false);
+        }
+      }
+      return;
+    }
+
+    img.onload = () => {
+      cleanup();
+      if (sleepingGifLoadTokenRef.current !== token) return; // stale
+      if (didShowOverlay) {
+        setTimeout(() => {
+          if (sleepingGifLoadTokenRef.current === token) {
+            setIsSleepingGifLoading(false);
+          }
+        }, 200);
+      } else {
+        setIsSleepingGifLoading(false);
+      }
+    };
+    img.onerror = () => {
+      cleanup();
+      if (sleepingGifLoadTokenRef.current !== token) return; // stale
+      setIsSleepingGifLoading(false);
+    };
+
+    return () => {
+      cleanup();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPet, sleepClicks]);
 
   // Update action states when pet, sleep state, or adventure coins change
   useEffect(() => {
@@ -2942,6 +3031,14 @@ const getSleepyPetImage = (clicks: number) => {
           )}
           {/* Pet pinned to bottom */}
           <div ref={petRef} className="absolute bottom-0 left-1/2 -translate-x-1/2 drop-shadow-2xl">
+            {isSleepingGifLoading && (
+              <div className="absolute inset-0 z-40 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+                <div className="relative z-50 rounded-xl px-4 py-3 bg-white/90 border shadow-lg text-slate-700 text-sm font-medium">
+                  Loading...
+                </div>
+              </div>
+            )}
             <img 
               src={getPetImage()}
               alt="Pet"
