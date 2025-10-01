@@ -1594,13 +1594,14 @@ const getSleepyPetImage = (clicks: number) => {
     spendCoins(cost);
     addOwnedPet(petType);
     
-    // Switch to the newly purchased pet
+    // Switch to the newly purchased pet and persist selection globally
+    PetProgressStorage.setCurrentSelectedPet(petType);
     setCurrentPet(petType);
     
     // Sync to localStorage for pet-avatar-service
     try {
       localStorage.setItem('current_pet', petType);
-      // Dispatch custom event to notify other components
+      // Dispatch custom event to notify other components and sync avatar hooks
       window.dispatchEvent(new CustomEvent('currentPetChanged'));
     } catch (error) {
       console.warn('Failed to save current pet to localStorage:', error);
