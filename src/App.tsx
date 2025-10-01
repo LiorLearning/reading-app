@@ -157,7 +157,7 @@ const App = () => (
       <TooltipProvider>
         <div className="h-full w-full overflow-hidden">
           <Toaster />
-          <Sonner />
+          <Sonner position="top-left" />
           <DevCoinHotspot />
           <DevQuestionHotspot />
           <BrowserRouter>

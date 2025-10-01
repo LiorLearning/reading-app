@@ -20,6 +20,8 @@ import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
 import EvolutionStrip from '@/components/adventure/EvolutionStrip';
+import { ensureMicPermission } from '@/lib/mic-permission';
+import { toast } from 'sonner';
 
 
 type Props = {
@@ -777,7 +779,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     navigate('/progress');
   };
 
-  const handleActionClick = (actionId: string) => {
+  const handleActionClick = async (actionId: string) => {
     console.log('🎯 PetPage: handleActionClick called with actionId:', actionId);
     // Handle sleep action
     if (actionId === 'sleep') {
@@ -840,8 +842,13 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return;
     }
 
-    // Handle food action - always starts new adventure
+    // Handle food action - starts new adventure (requires mic permission)
     if (actionId === 'food') {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('food');
       return;
     }
@@ -849,6 +856,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle friend action - starts new friend adventure
     if (actionId === 'friend') {
       console.log('🎯 PetPage: Friend button clicked, calling handleAdventureClick with "friend"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('friend');
       return;
     }
@@ -856,6 +868,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle dressing competition action - starts new dressing-competition adventure
     if (actionId === 'dressing-competition') {
       console.log('🎯 PetPage: Dressing Competition clicked, calling handleAdventureClick with "dressing-competition"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('dressing-competition');
       return;
     }
@@ -863,6 +880,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle investigation action - starts new sick investigation adventure
     if (actionId === 'who-made-the-pets-sick') {
       console.log('🎯 PetPage: Who Made The Pets Sick clicked, calling handleAdventureClick with "who-made-the-pets-sick"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('who-made-the-pets-sick');
       return;
     }
@@ -870,6 +892,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle house action - starts new house adventure
     if (actionId === 'house') {
       console.log('🎯 PetPage: House button clicked, calling handleAdventureClick with "house"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('house');
       return;
     }
@@ -877,6 +904,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle travel action - starts new travel adventure
     if (actionId === 'travel') {
       console.log('🎯 PetPage: Travel button clicked, calling handleAdventureClick with "travel"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('travel');
       return;
     }
@@ -884,6 +916,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle story action - starts new story adventure
     if (actionId === 'story') {
       console.log('🎯 PetPage: Story button clicked, calling handleAdventureClick with "story"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('story');
       return;
     }
@@ -891,6 +928,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Handle plant dreams action - starts new plant dreams adventure
     if (actionId === 'plant-dreams') {
       console.log('🎯 PetPage: Plant Dreams button clicked, calling handleAdventureClick with "plant-dreams"');
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
       handleAdventureClick('plant-dreams');
       return;
     }

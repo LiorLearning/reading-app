@@ -18,6 +18,8 @@ import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadi
 import { useComic, ComicPanel } from "@/hooks/use-comic";
 import { AdventureResponse, aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
+import { ensureMicPermission } from "@/lib/mic-permission";
+import { toast } from "sonner";
 import VoiceSelector from "@/components/ui/voice-selector";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import { useAuth } from "@/hooks/use-auth";
@@ -927,8 +929,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   const [selectedTheme, setSelectedTheme] = useState(colorThemes[0]);
   
-  const changeTheme = useCallback((theme: typeof colorThemes[0]) => {
+  const changeTheme = useCallback(async (theme: typeof colorThemes[0]) => {
     playClickSound();
+    const granted = await ensureMicPermission();
+    if (!granted) {
+      toast.error('Enable Mic Access');
+      return;
+    }
     setSelectedTheme(theme);
     
     // Update CSS variables on the document root
@@ -2533,6 +2540,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Handle continuing a specific saved adventure
   const handleContinueSpecificAdventure = React.useCallback(async (adventureId: string) => {
+    // Ensure mic permission so browser shows prompt immediately on click
+    try {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+    } catch {}
     playClickSound();
     
     // Load the specific adventure from Firebase (with localStorage fallback)
@@ -2739,6 +2754,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const callId = `index-${Date.now()}`;
     console.log('🎯 Index handleStartAdventure called with adventureType:', adventureType, 'callId:', callId);
     console.log('🎯 Index Current currentAdventureType before update:', currentAdventureType, 'callId:', callId);
+    
+    // Ensure mic permission so browser shows prompt immediately on click
+    try {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+    } catch {}
     
     // If this is a fallback call with default 'food' and we already have a non-food adventure type set, ignore it
     if (adventureType === 'food' && currentAdventureType !== 'food') {
