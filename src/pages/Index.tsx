@@ -437,6 +437,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [currentSpellQuestion, setCurrentSpellQuestion] = React.useState<SpellingQuestion | null>(null);
   // Store the original spelling question from question bank (with prefilled data)
   const [originalSpellingQuestion, setOriginalSpellingQuestion] = React.useState<SpellingQuestion | null>(null);
+  // Track last successfully resolved spelling word to prevent immediate re-open
+  const lastResolvedWordRef = React.useRef<string | null>(null);
   
   // Sequential spelling progress tracking
   const [spellingProgressIndex, setSpellingProgressIndex] = React.useState<number>(() => {
@@ -512,7 +514,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
-    if (currentSpellingWord && currentScreen === 1) {
+    if (currentSpellingWord && currentScreen === 1 && currentSpellingWord !== lastResolvedWordRef.current) {
       console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
         currentSpellingWord,
         hasOriginalQuestion: !!originalSpellingQuestion,
@@ -3748,39 +3750,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         currentIndex: prev.currentIndex + 1
       }));
       
-      // Get the latest AI response that has the stored adventure story
-      const latestAIResponse = chatMessages
-        .filter(msg => msg.type === 'ai' && msg.content_after_spelling)
-        .slice(-1)[0];
+      // Add adventure story using functional state (avoids stale closure)
+      setChatMessages(prev => {
+        const latestWithContinuation = prev
+          .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
+          .slice(-1)[0] as any;
 
-      if (latestAIResponse?.content_after_spelling) {
-        // Add adventure story
-        setChatMessages(prev => {
-          
-          // Create the adventure story message with coin reward notification
-          const adventureStoryMessage: ChatMessage = {
-            type: 'ai',
-            // Removed reward blurb to preserve adventure flow
-            content: `${latestAIResponse.content_after_spelling}`,
-            timestamp: Date.now() + 1 // Ensure it comes after success message
-          };
-          
-          playMessageSound();
-          
-          // Auto-speak both messages in sequence
-          const adventureMessageId = `index-chat-${adventureStoryMessage.timestamp}-${prev.length + 1}`;
-          
-          ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId)
-            .catch(error => console.error('TTS error:', error));
-          
-          // Save message to Firebase if available
-          if (currentSessionId) {
-            adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
-          }
-          
-          return [...prev, adventureStoryMessage];
-        });
-      }
+        const continuation = latestWithContinuation?.content_after_spelling || currentSpellingSentence || "Great job! Let's continue our adventure! ✨";
+
+        const adventureStoryMessage: ChatMessage = {
+          type: 'ai',
+          content: `${continuation}`,
+          timestamp: Date.now() + 1
+        };
+
+        playMessageSound();
+        const adventureMessageId = `index-chat-${adventureStoryMessage.timestamp}-${prev.length + 1}`;
+        ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId)
+          .catch(error => console.error('TTS error:', error));
+        if (currentSessionId) {
+          adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
+        }
+        return [...prev, adventureStoryMessage];
+      });
+
+      // Remember this word as resolved to prevent immediate re-open
+      lastResolvedWordRef.current = currentSpellQuestion?.audio || currentSpellQuestion?.word || null;
       
       // Hide spell box after success
       setShowSpellBox(false);
@@ -3824,26 +3819,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setCurrentSpellQuestion(null);
   }, [currentSpellQuestion, setChatMessages]);
 
-  const handleSpellNext = useCallback(() => {
-    playClickSound();
-    
-    // For automatic system, just hide the current spell box
-    // The next one will appear automatically when the AI generates a new spelling word
-    setShowSpellBox(false);
-    setCurrentSpellQuestion(null);
-    
-    // Add transition message
-    const nextMessage: ChatMessage = {
-      type: 'ai',
-      content: `Great job! Let's continue our adventure! ✨`,
-      timestamp: Date.now()
-    };
-    
-    setChatMessages(prev => {
-      playMessageSound();
-      return [...prev, nextMessage];
-    });
-  }, [setChatMessages]);
+  // Removed manual Next handler; flow advances automatically on completion
 
   // Special handling for pet page - render full screen without header
   if (currentScreen === 4) {
@@ -4605,9 +4581,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       show: showSpellBox && !!currentSpellQuestion,
                       word: currentSpellQuestion?.word || currentSpellingWord || null,
                       sentence:
-                        chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content_after_spelling ||
-                        chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content ||
-                        chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence || null,
+                        // While SpellBox is active, show only the fragment containing the target word
+                        (showSpellBox && currentSpellQuestion)
+                          ? (chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence || null)
+                          : (
+                            chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content_after_spelling ||
+                            chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content ||
+                            chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence || null
+                          ),
                       question: currentSpellQuestion ? {
                         id: currentSpellQuestion.id,
                         word: currentSpellQuestion.word,
@@ -4622,7 +4603,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       showExplanation: true,
                       onComplete: handleSpellComplete,
                       onSkip: handleSpellSkip,
-                      onNext: handleSpellNext,
                       sendMessage,
                     }}
                   />
