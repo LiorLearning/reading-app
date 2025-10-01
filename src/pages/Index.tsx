@@ -31,6 +31,7 @@ import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
+import { useAdventurePersistentProgress } from "@/hooks/use-adventure-progress";
 import { useSessionCoins } from "@/hooks/use-session-coins";
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
@@ -110,6 +111,14 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
     </Button>
   );
 };
+// Persistent progress bar wrapper to keep JSX clean
+const PersistentAdventureProgressBar: React.FC = () => {
+  const { progressFraction } = useAdventurePersistentProgress();
+  return (
+    <AdventureFeedingProgress progressFraction={progressFraction} />
+  );
+};
+
 
 // Component for panel image figure with Firebase image resolution (Index.tsx version)
 const IndexPanelImageFigure: React.FC<{
@@ -227,7 +236,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Get current pet avatar image
   const currentPetAvatarImage = useCurrentPetAvatarImage();
   
-  // Session coin tracking for feeding progress
+  // Session coin tracking for feeding progress (still used for other parts),
+  // but the top bar will use persistent progress via PersistentAdventureProgressBar
   const { sessionCoins, resetSessionCoins } = useSessionCoins();
 
   // Auto-migrate localStorage data to Firebase when user authenticates
@@ -4261,11 +4271,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             <div className="text-center">
               {currentScreen === 1 ? (
                 <div className="flex items-center justify-center">
-                  {/* Adventure Feeding Progress */}
-                  <AdventureFeedingProgress 
-                    sessionCoins={sessionCoins}
-                    targetCoins={50}
-                  />
+                  {/* Adventure Feeding Progress (persistent) */}
+                  <PersistentAdventureProgressBar />
                 </div>
               ) : (
                 <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">

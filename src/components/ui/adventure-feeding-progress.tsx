@@ -2,18 +2,34 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface AdventureFeedingProgressProps {
-  sessionCoins: number;
+  // Deprecated: session-based coins (kept for backward compatibility)
+  sessionCoins?: number;
+  // Optional: when using coins-based calculation
   targetCoins?: number;
+  // Preferred: pass persistent fraction 0..1 directly
+  progressFraction?: number;
+  // Or pass percentage directly 0..100
+  progressPercent?: number;
   className?: string;
 }
 
 const AdventureFeedingProgress: React.FC<AdventureFeedingProgressProps> = ({
   sessionCoins,
   targetCoins = 50,
+  progressFraction,
+  progressPercent,
   className
 }) => {
   // Calculate progress percentage (0-100)
-  const progressPercentage = Math.min(100, (sessionCoins / targetCoins) * 100);
+  const computedFromCoins = typeof sessionCoins === 'number' && targetCoins > 0
+    ? (sessionCoins / targetCoins) * 100
+    : 0;
+  const computedFromFraction = typeof progressFraction === 'number'
+    ? (progressFraction * 100)
+    : undefined;
+  const basePercent = typeof progressPercent === 'number' ? progressPercent
+    : (typeof computedFromFraction === 'number' ? computedFromFraction : computedFromCoins);
+  const progressPercentage = Math.max(0, Math.min(100, basePercent));
   
   // Determine pet state based on progress
   const getPetState = () => {
