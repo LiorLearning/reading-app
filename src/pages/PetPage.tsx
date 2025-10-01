@@ -1847,7 +1847,78 @@ const getSleepyPetImage = (clicks: number) => {
     
     // All pets now use the generalized cumulative care system below
 
-    // Priority: If adventure coins >= 50, show sleepy thoughts regardless of to-do
+    // Strict Daily Quest gating (Firestore-hydrated via localStorage):
+    // - If today's quest for current pet has progress < target: show ONLY the quest message
+    // - If progress >= target: show ONLY sleep-ready messages
+    try {
+      const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+      if (questStatesRaw) {
+        const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>;
+        const s = arr.find(x => x.pet === currentPet);
+        if (s) {
+          const target = Number((s as any).target ?? 5);
+          const prog = Number(s.progress || 0);
+          if (prog < target) {
+            const activity = s.activity;
+            const byTypeStrict: Record<string, string[]> = {
+              house: [
+                `I'm feeling a bit sad in this empty space, ${userName}... 😢 Let's build our dream house together! 🏠 What kind of rooms should we create?`,
+                `This bare room makes me sad... 🥺 But I can't wait to design our perfect home with you! 🏡 Where should we put the furniture?`, 
+                `Everything feels so empty and cold right now... 😔 But we can make it cozy together! 🛋️ Which room should we work on first?`
+              ],
+              travel: [
+                `I'm tired of being stuck inside, ${userName}! ✈️ Want to go explore somewhere new?`,
+                `I'm bored and need a change of scenery! 🌍 Can we go travel together?`,
+                `I really want to get out and do something fun! 🚀 Where should we go today?`
+              ],
+              friend: [
+                `I miss warm hugs and giggles! 👫 Can we visit a friend?`,
+                `My heart wants company today, ${userName} 💞 Let's go say hi to a friend!`,
+                `I want to share treats and stories! 🐾 Friend time?`
+              ],
+              'dressing-competition': [
+                `It’s dress-up time, ${userName}! 👗 I’m excited! What should I wear—maybe a crown… or something else?`,
+                `I want to look amazing today! ✨ What should I wear—maybe a bow… or something else?`,
+                `Help me pick my look! 😻 What should I wear—maybe a cape… or something else?`
+              ],
+              'who-made-the-pets-sick': [
+                `I’m worried, ${userName}… so many pets feel sick. What should we check first—maybe the fountain… or something else?`,
+                `My best friend is weak today. 😢 How should we investigate?`,
+                `Something’s wrong in the pet kingdom! 🐾 What should we investigate—maybe the food… or something else?`
+              ],
+              food: [
+                `My tummy feels tiny and grumbly, ${userName}… 🍪 A loving snack please?`,
+                `I'm craving your yummy kindness! 🍩 Could we share a treat?`,
+                `My heart and belly need a cuddle—maybe a cookie? 🍪`
+              ],
+              'plant-dreams': [
+                `Hold my paw and plant a gentle dream with me 🌙✨`,
+                `I feel sparkly inside! 🌟 Shall we grow peaceful, cozy dreams?`,
+                `Let's whisper wishes and plant them into the night 🌙`
+              ],
+              story: [
+                `Let's curl up with a story, ${userName}! 📖 Which tale should we read?`,
+                `Story time! 🌟 I’m ready for an epic adventure in words!`,
+                `Can we read together now? 📚 I love when you narrate!`
+              ]
+            };
+            const choices = byTypeStrict[activity] || [];
+            if (choices.length > 0) return getRandomThought(choices);
+          } else {
+            const sleepReadyThoughts = [
+              `Wow! We've had magical adventures, ${userName}! 🌟 Now I'm getting sleepy... 😴`,
+              `What an incredible journey we've had! 🚀 I'm wonderfully tired now... 💤`,
+              `I feel accomplished after our quests! 🏆 My soul yawns with contentment... 😴`,
+              `Perfect day together, ${userName}! I'm ready for a cozy nap... 💤`,
+              `We did it! ✨ My heart is happy and sleepy now... 😴`
+            ];
+            return getRandomThought(sleepReadyThoughts);
+          }
+        }
+      }
+    } catch {}
+
+    // Priority (fallback only when Firestore state not available): If adventure coins >= 50, show sleepy thoughts
     if (adventureCoins >= 50 && !sleepCompleted) {
       const readyForSleepThoughts = [
         `Wow! We've had magical adventures, ${userName}! 🌟 Now I'm getting sleepy... 😴`,
