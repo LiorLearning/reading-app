@@ -28,6 +28,12 @@ export const AVAILABLE_VOICES: Voice[] = [
   //   previewText: "Woof! I'm your friendly dog, ready for fun adventures and learning together!"
   // },
   {
+    id: 'cgSgspJ2msm6clMCkdW9',
+    name: 'Jessica',
+    description: 'Warm and friendly tone, perfect for children',
+    previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
+  },
+  {
     id: 'ocZQ262SsZb9RIxcQBOj',
     name: 'Cat (Default)',
     description: 'Calm and curious, purrfect for gentle guidance',
@@ -39,12 +45,7 @@ export const AVAILABLE_VOICES: Voice[] = [
   //   description: 'Cheery and quick, great for lively narration',
   //   previewText: "Squeak! I'm your tiny hamster friend, excited to read and explore with you!"
   // },
-  {
-    id: 'cgSgspJ2msm6clMCkdW9',
-    name: 'Jessica',
-    description: 'Warm and friendly tone, perfect for children',
-    previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
-  },
+  
   // {
   //   id: 'EXAVITQu4vr4xnSDxMaL',
   //   name: 'Sarah',

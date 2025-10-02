@@ -1486,6 +1486,21 @@ const getSleepyPetImage = (clicks: number) => {
       }
     } catch {}
 
+    // Enforce daily sadness cap: only assigned pets can be sad today
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_sadness') : null;
+      if (raw) {
+        const sad = JSON.parse(raw) as { date: string; assignedPets: string[] };
+        const today = new Date().toISOString().slice(0, 10);
+        const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
+        const isAssignedToday = sad?.date === today && assigned.includes(currentPet);
+        if (!isAssignedToday) {
+          // Unassigned pets cannot be sad today; force a happy baseline
+          return 'coins_10';
+        }
+      }
+    } catch {}
+
     // If 8-hour heart reset has occurred (empty heart) or pet woke up sad, force sad image
     try {
       const petProgress = PetProgressStorage.getPetProgress(currentPet);
