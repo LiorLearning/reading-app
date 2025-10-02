@@ -771,3 +771,61 @@ export const useCurrentPetAvatarImage = () => {
 
   return getPetImage();
 };
+
+// ----- Emotion action media placeholders -----
+// Replace these per-pet URLs with real Firestore/GCS links when available.
+export type PetEmotionAction = 'feed' | 'water' | 'pat' | 'needy';
+
+const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>> = {
+  dog: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-food-unscreen.gif?alt=media&token=fd024488-b0d1-499b-9d48-4552ffd99271',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-water-unscreen.gif?alt=media&token=86ef6744-5fa5-4381-b0b9-19cef93a91a8',
+    // Pet = coins_30 (happy); Wrong = sad
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-happy-unscreen.gif?alt=media&token=63a8ea0c-4166-4be3-bfd0-4caffaaf58cc',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sad-unscreen.gif?alt=media&token=aa2818bf-d631-4394-97f5-3955b5602299',
+  },
+  cat: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-food-unscreen.gif?alt=media&token=c82c8075-f34e-4ee2-b986-ea674a42a559',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-water-unscreen.gif?alt=media&token=3ce09ca8-74c3-48ca-a153-60e5a5dd6c63',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-happy-unscreen.gif?alt=media&token=baa69ba6-06f5-4c44-ad6b-9a96c241dab0',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sad-unscreen.gif?alt=media&token=7f5ad9cb-df5d-46dc-ae54-67e35f5a5ed6',
+  },
+  hamster: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-food-unscreen.gif?alt=media&token=799c1d3a-0076-43e8-ac8b-b9ecf9481dd0',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-water-unscreen.gif?alt=media&token=917777a5-10a7-4aa3-a7d5-6b0db1cc149b',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0',
+  },
+  parrot: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-food-unscreen.gif?alt=media&token=4201c661-7acc-46d0-8c22-24abd39ef948',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-water-unscreen.gif?alt=media&token=b9a5e15d-ce03-44b2-af99-2ead4f6a29ba',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-happy-unscreen.gif?alt=media&token=4f4df3cf-486f-4471-8fae-480775d1574d',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sad-unscreen.gif?alt=media&token=05efa46e-ec9a-4aac-86ed-43dec953cb49',
+  },
+  monkey: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-food-unscreen.gif?alt=media&token=9a12ed08-5ea3-4ecb-aa7a-bd876d4aee18',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-water-unscreen.gif?alt=media&token=a1cd303c-a298-4c46-8716-8ba812189865',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-happy-unscreen.gif?alt=media&token=042e3938-b885-447b-a63e-e1b883fa4e5f',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-sad-unscreen.gif?alt=media&token=3fbbd435-b1de-4932-a693-137c626e20e4',
+  },
+  dragon: {
+    feed: '/placeholder.svg',
+    water: '/placeholder.svg',
+    pat: 'TBD', // coins_30 equivalent
+    needy: 'TBD', // sad equivalent
+  },
+  unicorn: {
+    feed: '/placeholder.svg',
+    water: '/placeholder.svg',
+    pat: 'TBD',
+    needy: 'TBD',
+  },
+};
+
+export const getPetEmotionActionMedia = (
+  petType: string,
+  action: PetEmotionAction
+): string => {
+  const set = ACTION_MEDIA_PLACEHOLDERS[petType] || ACTION_MEDIA_PLACEHOLDERS['dog'];
+  return set[action] || '/placeholder.svg';
+};

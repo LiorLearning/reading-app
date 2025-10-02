@@ -27,8 +27,9 @@ import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-a
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
 import { useCoins } from "@/pages/coinSystem";
-import { useCurrentPetAvatarImage } from "@/lib/pet-avatar-service";
+import { useCurrentPetAvatarImage, getPetEmotionActionMedia } from "@/lib/pet-avatar-service";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
+import { trackEvent } from "@/lib/feedback-service";
 import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
 import { useAdventurePersistentProgress } from "@/hooks/use-adventure-progress";
@@ -396,6 +397,74 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const initialResponseSentRef = React.useRef<string | null>(null);
   // Guard to prevent duplicate initial generation on re-renders
   const isGeneratingInitialRef = React.useRef<boolean>(false);
+
+  // Emotion/heart state (persisted in Firebase per pet)
+  const [emotionActive, setEmotionActive] = React.useState<boolean>(false);
+  const [emotionRequiredAction, setEmotionRequiredAction] = React.useState<'water' | 'pat' | 'feed' | null>(null);
+  const [overridePetMediaUrl, setOverridePetMediaUrl] = React.useState<string | null>(null);
+  const overrideMediaClearRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const syncEmotionState = React.useCallback(() => {
+    const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+    if (!currentPetId) return;
+    const key = `pet_emotion_${currentPetId}`;
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      setEmotionActive(Boolean(parsed.emotionActive));
+      setEmotionRequiredAction(parsed.emotionRequiredAction || null);
+    } else {
+      setEmotionActive(false);
+      setEmotionRequiredAction(null);
+    }
+  }, []);
+
+  // Load on mount and when user/pet changes
+  React.useEffect(() => {
+    syncEmotionState();
+    // also when pet selection changes via storage event
+    const handler = () => syncEmotionState();
+    window.addEventListener('currentPetChanged', handler as any);
+    return () => window.removeEventListener('currentPetChanged', handler as any);
+  }, [syncEmotionState]);
+
+  const handleEmotionAction = React.useCallback((action: 'water' | 'pat' | 'feed') => {
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+      if (!currentPetId) return;
+      const required = emotionRequiredAction;
+      const isCorrect = required === action;
+      const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+      const successMedia = getPetEmotionActionMedia(petType, action === 'water' ? 'water' : action === 'pat' ? 'pat' : 'feed');
+      const wrongMedia = getPetEmotionActionMedia(petType, 'needy');
+      trackEvent('action_clicked', { petId: currentPetId, action });
+      const chosenMedia = isCorrect ? successMedia : wrongMedia;
+      console.log('[Emotion Debug] chosenMedia:', { petType, action, isCorrect, chosenMedia });
+      setOverridePetMediaUrl(chosenMedia);
+      // Cancel any prior revert timer
+      if (overrideMediaClearRef.current) {
+        clearTimeout(overrideMediaClearRef.current);
+        overrideMediaClearRef.current = null;
+      }
+      if (isCorrect) {
+        const key = `pet_emotion_${currentPetId}`;
+        const nextPointer = required === 'water' ? 'pat' : required === 'pat' ? 'feed' : 'water';
+        localStorage.setItem(key, JSON.stringify({ emotionActive: false, emotionRequiredAction: null, emotionNextAction: nextPointer }));
+        setEmotionActive(false);
+        setEmotionRequiredAction(null);
+        // advance rotation already handled in fulfillEmotionNeed
+        trackEvent('heart_filled', { petId: currentPetId, action });
+        // Success media should auto-revert after 8 seconds
+        overrideMediaClearRef.current = setTimeout(() => {
+          setOverridePetMediaUrl(null);
+          overrideMediaClearRef.current = null;
+        }, 12000);
+      }
+      trackEvent('action_result', { petId: currentPetId, action, result: isCorrect ? 'success' : 'wrong' });
+    } catch (e) {
+      console.warn('Emotion action failed:', e);
+    }
+  }, [emotionRequiredAction]);
   
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
@@ -3727,6 +3796,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     playClickSound();
     
     if (isCorrect) {
+
       // Update sequential spelling progress (keep existing system intact)
       const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
       const nextIndex = spellingProgressIndex + 1;
@@ -3814,6 +3884,35 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Hide spell box after success
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
+
+      // Emotion trigger: after Q1, Q4, Q7... (1 + 3k) and only if none active
+      (async () => {
+        try {
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+          if (!currentPetId) return;
+          const solvedCount = spellProgress.currentIndex + 1;
+          const isTrigger = (solvedCount - 1) % 3 === 0; // 1,4,7...
+          const key = `pet_emotion_${currentPetId}`;
+          const raw = localStorage.getItem(key);
+          const parsed = raw ? JSON.parse(raw) : null;
+          const emotionActive = parsed ? Boolean(parsed.emotionActive) : false;
+          if (!emotionActive && isTrigger) {
+            const nextRequired = parsed?.emotionNextAction || 'water';
+            localStorage.setItem(key, JSON.stringify({ emotionActive: true, emotionRequiredAction: nextRequired, emotionNextAction: nextRequired, emotionActivatedAtMs: Date.now() }));
+            setEmotionRequiredAction(nextRequired);
+            setEmotionActive(true);
+            trackEvent('heart_shown', { petId: currentPetId, required: nextRequired });
+            // Immediately show needy GIF while need is active, but do not override if an action GIF is playing (let it finish)
+            if (!overrideMediaClearRef.current) {
+              const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+              const needyMedia = getPetEmotionActionMedia(petType, 'needy');
+              setOverridePetMediaUrl(needyMedia);
+            }
+          }
+        } catch (e) {
+          console.warn('Emotion trigger failed:', e);
+        }
+      })();
     } else {
       // Provide encouragement for incorrect answers
       const encouragementMessage: ChatMessage = {
@@ -4593,6 +4692,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {/* Left pet overlay with AI bubble - overlays inside the stage container */}
                   <LeftPetOverlay 
                     petImageUrl={currentPetAvatarImage}
+                    overridePetMediaUrl={overridePetMediaUrl}
+                    emotionActive={emotionActive}
+                    emotionRequiredAction={emotionRequiredAction}
+                    onEmotionAction={handleEmotionAction}
                     aiMessageHtml={
                       // If we're showing inline spelling, suppress normal HTML so the bubble only has SpellBox
                       showSpellBox && currentSpellQuestion ? undefined :
@@ -4743,7 +4846,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                           {/* Darker theme film for avatar section */}
                           <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/20 to-primary/25 backdrop-blur-sm"></div>
                           <div className="relative z-10 h-full">
-                            <ChatAvatar avatar={currentPetAvatarImage} size="responsive" />
+                            <ChatAvatar key={overridePetMediaUrl || currentPetAvatarImage} avatar={overridePetMediaUrl || currentPetAvatarImage} size="responsive" />
                           </div>
                         </div>
                       }

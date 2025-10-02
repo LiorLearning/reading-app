@@ -23,6 +23,11 @@ export interface FirebasePetState {
   feedingCount?: number;
   sleepCompleted?: boolean;
   adventureCoinsAtLastSleep?: number;
+  // Emotion/heart system
+  emotionActive?: boolean; // whether the heart is half (a need is active)
+  emotionRequiredAction?: 'water' | 'pat' | 'feed'; // action needed to fill heart
+  emotionNextAction?: 'water' | 'pat' | 'feed'; // rotation pointer for next trigger
+  emotionActivatedAtMs?: number; // client timestamp when need activated (for UX/timers)
   // bookkeeping
   updatedAt: Timestamp;
   createdAt: Timestamp;
@@ -94,6 +99,62 @@ class FirebasePetStateService {
     'feedingCount' | 'sleepCompleted' | 'adventureCoinsAtLastSleep'>>): Promise<void> {
     const ref = this.getPetDocRef(userId, petId);
     await setDoc(ref, { ...updates, updatedAt: serverTimestamp() }, { merge: true });
+  }
+
+  // ----- Emotion helpers -----
+  private rotateAction(current: 'water' | 'pat' | 'feed'): 'water' | 'pat' | 'feed' {
+    if (current === 'water') return 'pat';
+    if (current === 'pat') return 'feed';
+    return 'water';
+  }
+
+  async getEmotionState(userId: string, petId: string): Promise<{
+    emotionActive: boolean;
+    emotionRequiredAction: 'water' | 'pat' | 'feed' | null;
+    emotionNextAction: 'water' | 'pat' | 'feed';
+    emotionActivatedAtMs: number | null;
+  }> {
+    const ref = this.getPetDocRef(userId, petId);
+    const snap = await getDoc(ref);
+    const data = (snap.exists() ? (snap.data() as FirebasePetState) : undefined);
+    return {
+      emotionActive: Boolean(data?.emotionActive),
+      emotionRequiredAction: (data?.emotionRequiredAction as any) || null,
+      emotionNextAction: (data?.emotionNextAction as any) || 'water',
+      emotionActivatedAtMs: (data?.emotionActivatedAtMs as any) || null
+    };
+  }
+
+  async activateEmotionNeed(userId: string, petId: string, requiredAction?: 'water' | 'pat' | 'feed'): Promise<'water' | 'pat' | 'feed'> {
+    const ref = this.getPetDocRef(userId, petId);
+    const snap = await getDoc(ref);
+    const data = (snap.exists() ? (snap.data() as FirebasePetState) : undefined);
+    const nextPointer = (data?.emotionNextAction as any) || 'water';
+    const action = requiredAction || nextPointer;
+    await setDoc(ref, {
+      emotionActive: true,
+      emotionRequiredAction: action,
+      // Keep the nextAction as-is; it will be advanced on fulfillment
+      emotionNextAction: nextPointer,
+      emotionActivatedAtMs: Date.now(),
+      updatedAt: serverTimestamp()
+    } as Partial<FirebasePetState>, { merge: true });
+    return action;
+  }
+
+  async fulfillEmotionNeed(userId: string, petId: string): Promise<'water' | 'pat' | 'feed'> {
+    const ref = this.getPetDocRef(userId, petId);
+    const snap = await getDoc(ref);
+    const data = (snap.exists() ? (snap.data() as FirebasePetState) : undefined);
+    const prevRequired = (data?.emotionRequiredAction as any) || 'water';
+    const nextPointer = this.rotateAction(prevRequired);
+    await setDoc(ref, {
+      emotionActive: false,
+      emotionRequiredAction: null,
+      emotionNextAction: nextPointer,
+      updatedAt: serverTimestamp()
+    } as any, { merge: true });
+    return nextPointer;
   }
 }
 
