@@ -1647,6 +1647,8 @@ const getSleepyPetImage = (clicks: number) => {
     try {
       if (user?.uid) {
         stateStoreApi.setPetName({ userId: user.uid, pet: petId, name: petName });
+        // Force new pet to be sad today; rotation will resume tomorrow
+        stateStoreApi.ensurePetSadToday({ userId: user.uid, pet: petId });
       }
     } catch {}
 
@@ -1784,6 +1786,8 @@ const getSleepyPetImage = (clicks: number) => {
       try {
         if (user?.uid) {
           stateStoreApi.setPetName({ userId: user.uid, pet: petType, name: chosenName.trim() });
+          // Force purchased pet to be sad on purchase day
+          stateStoreApi.ensurePetSadToday({ userId: user.uid, pet: petType });
         }
       } catch {}
     }

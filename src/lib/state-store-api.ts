@@ -488,6 +488,60 @@ import {
 
     return { date: today, assignedPets: selected, max: cap };
   }
+
+  // Force a specific pet to be sad today (used on first selection/purchase day)
+  export interface EnsurePetSadTodayInput {
+    userId: string;
+    pet: PetName;
+  }
+
+  export async function ensurePetSadToday(input: EnsurePetSadTodayInput): Promise<void> {
+    const { userId, pet } = input;
+    const today = getTodayDateString();
+    const userRef = userStateDocRef(userId);
+    const questsRef = dailyQuestsDocRef(userId);
+    const [userSnap, questsSnap] = await Promise.all([getDoc(userRef), getDoc(questsRef)]);
+
+    const cap = SADNESS_CAP_PER_DAY;
+
+    const batch = writeBatch(db);
+    if (!questsSnap.exists()) {
+      // Initialize with this pet present to avoid missing structure
+      batch.set(questsRef, createInitialDailyQuests([pet] as any));
+    }
+
+    const existing = (questsSnap.exists() ? (questsSnap.data() as any)?._sadness : null) as any;
+    let assigned: string[] = [];
+    if (existing && existing.date === today && Array.isArray(existing.assignedPets)) {
+      assigned = [...existing.assignedPets];
+    }
+    if (!assigned.includes(pet)) {
+      if (assigned.length < cap) {
+        assigned.push(pet);
+      } else {
+        // Ensure the new pet is included today; drop the last to keep size within cap
+        assigned = [pet, ...assigned.slice(0, cap - 1)];
+      }
+    }
+
+    // Publish sadness today and mirror in userState without advancing pointer (no fairness penalty)
+    batch.set(questsRef, { _sadness: { date: today, assignedPets: assigned, max: cap }, updatedAt: nowServerTimestamp() } as any, { merge: true });
+
+    // Update sadnessRotation snapshot without changing pointer
+    const usr = (userSnap.exists() ? (userSnap.data() as any) : null) as any;
+    const rot = usr?.sadnessRotation || {};
+    batch.set(userRef, {
+      sadnessRotation: {
+        date: today,
+        pointer: Number(rot?.pointer || 0),
+        lastAssignedPets: assigned,
+        max: cap,
+      },
+      updatedAt: nowServerTimestamp(),
+    } as any, { merge: true });
+
+    await batch.commit();
+  }
   
   export interface GetDailyQuestResultPet {
     pet: string;
@@ -615,6 +669,7 @@ import {
     deductCoinsOnPurchase,
     handleDailyQuestRollover,
     ensureDailySadnessAssigned,
+    ensurePetSadToday,
     getUserState,
     getDailyQuests,
     startPetSleep,
