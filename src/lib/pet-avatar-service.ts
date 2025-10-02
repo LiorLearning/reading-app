@@ -589,6 +589,24 @@ export const useCurrentPetAvatarImage = () => {
       // ignore and fall through
     }
 
+    // Enforce daily sadness assignment cap: only assigned pets can be sad today
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_sadness') : null;
+      if (raw) {
+        const sad = JSON.parse(raw) as { date: string; assignedPets: string[] };
+        const today = new Date().toISOString().slice(0, 10);
+        const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
+        const isAssignedToday = sad?.date === today && assigned.includes(currentPetId);
+        if (!isAssignedToday) {
+          // Clamp to neutral-or-better buckets; never render coins_0 for unassigned pets
+          if (todayCoins >= 50) return 'coins_50';
+          if (todayCoins >= 30) return 'coins_30';
+          if (todayCoins >= 10) return 'coins_10';
+          return 'coins_10';
+        }
+      }
+    } catch {}
+
     // Force sad when pet will be sad on wakeup or heart is empty (align with PetPage)
     try {
       const petProgress = PetProgressStorage.getPetProgress(currentPetId);
