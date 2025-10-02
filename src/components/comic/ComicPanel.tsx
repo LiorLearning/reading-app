@@ -354,7 +354,9 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                 className="absolute top-4 right-4 bg-black/70 hover:bg-black/90 text-white border-none rounded-md px-3 py-2 text-sm flex items-center gap-2 transition-colors z-20"
                 title="Open image in new tab"
               >
-                📥 Download
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
               </button>
             </div>
           </div>

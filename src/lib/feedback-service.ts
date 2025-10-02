@@ -40,3 +40,15 @@ export const feedbackService = {
     }
   }
 };
+
+// Lightweight telemetry helper (console for now; hook to analytics later)
+export function trackEvent(eventName: string, payload?: Record<string, any>) {
+  try {
+    const data = {
+      event: eventName,
+      ts: Date.now(),
+      ...(payload || {})
+    };
+    console.log('[telemetry]', data);
+  } catch {}
+}
