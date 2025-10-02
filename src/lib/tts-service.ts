@@ -35,7 +35,7 @@ export const AVAILABLE_VOICES: Voice[] = [
   },
   {
     id: 'ocZQ262SsZb9RIxcQBOj',
-    name: 'Cat (Default)',
+    name: 'Cat',
     description: 'Calm and curious, purrfect for gentle guidance',
     previewText: "Meow! I'm a curious cat, here to guide you softly through new stories."
   },
@@ -45,7 +45,7 @@ export const AVAILABLE_VOICES: Voice[] = [
   //   description: 'Cheery and quick, great for lively narration',
   //   previewText: "Squeak! I'm your tiny hamster friend, excited to read and explore with you!"
   // },
-  
+ 
   // {
   //   id: 'EXAVITQu4vr4xnSDxMaL',
   //   name: 'Sarah',

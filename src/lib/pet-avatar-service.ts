@@ -847,3 +847,20 @@ export const getPetEmotionActionMedia = (
   const set = ACTION_MEDIA_PLACEHOLDERS[petType] || ACTION_MEDIA_PLACEHOLDERS['dog'];
   return set[action] || '/placeholder.svg';
 };
+
+// ----- Yawn media placeholders (sticky default override) -----
+// Placeholder links for a pet "yawn" or bored state. Replace with real GIFs when available.
+const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
+  dog: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-yawn-unscreen.gif?alt=media&token=e84b84be-8222-4632-941c-3386e67c879a',
+  cat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-yawn-unscreen.gif?alt=media&token=ef95740c-81e3-4928-949b-e329b1db25b3',
+  hamster: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-yawn-unscreen.gif?alt=media&token=10c574d7-3bb4-43a1-b137-7fa6f00c5d21',
+  parrot: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-yawn-unscreen.gif?alt=media&token=59ec008d-1f70-4bc6-9034-3b30912139d9',
+  monkey: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-yawn-unscreen.gif?alt=media&token=4f1f7d6f-4dc6-46f3-b871-952b62de55d3',
+  dragon: '/placeholder.svg',
+  unicorn: '/placeholder.svg',
+};
+
+export const getPetYawnMedia = (petType: string): string => {
+  const key = petType || 'dog';
+  return YAWN_MEDIA_PLACEHOLDERS[key] || YAWN_MEDIA_PLACEHOLDERS['dog'] || '/placeholder.svg';
+};
