@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, PersonGeneration } from '@google/genai';
 import { ChatMessage } from './utils';
 
 export interface ImageGenerationResult {
@@ -262,7 +262,7 @@ class GoogleImagenProvider implements ImageProvider {
       prompt,
       config: {
         numberOfImages: 1,
-        personGeneration: 'allow_all',
+        personGeneration: PersonGeneration.ALLOW_ALL,
         includeRaiReason: true,
         outputMimeType: 'image/png',
       },
@@ -274,28 +274,10 @@ class GoogleImagenProvider implements ImageProvider {
       throw new Error('No image bytes returned from Google Imagen');
     }
 
-    // Return a stable blob URL for the base64 to avoid flicker and re-decodes
-    const cached = GoogleImagenProvider.blobUrlCache.get(imageBytes);
-    if (cached) {
-      console.log(`✅ [GoogleImagenProvider.generate()] Reusing cached blob URL (length: ${imageBytes.length})`);
-      return cached;
-    }
-
-    const blob = this.base64ToBlob(imageBytes, 'image/png');
-    const blobUrl = URL.createObjectURL(blob);
-
-    // Simple cache with soft cap to prevent unbounded growth
-    if (GoogleImagenProvider.blobUrlCache.size > 40) {
-      const firstKey = GoogleImagenProvider.blobUrlCache.keys().next().value;
-      if (firstKey) {
-        try { URL.revokeObjectURL(GoogleImagenProvider.blobUrlCache.get(firstKey)!); } catch {}
-        GoogleImagenProvider.blobUrlCache.delete(firstKey);
-      }
-    }
-    GoogleImagenProvider.blobUrlCache.set(imageBytes, blobUrl);
-
-    console.log(`✅ [GoogleImagenProvider.generate()] Created blob URL from base64 (length: ${imageBytes.length})`);
-    return blobUrl;
+    // Return data URL string so UI can render immediately without waiting and we can upload base64
+    const dataUrl = `data:image/png;base64,${imageBytes}`;
+    console.log(`✅ [GoogleImagenProvider.generate()] Created data URL from base64 (length: ${imageBytes.length})`);
+    return dataUrl;
   }
 
   private base64ToBlob(base64: string, mimeType: string): Blob {

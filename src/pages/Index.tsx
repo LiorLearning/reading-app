@@ -24,6 +24,7 @@ import VoiceSelector from "@/components/ui/voice-selector";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import { useAuth } from "@/hooks/use-auth";
 import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-ai-streaming";
+import { firebaseImageService } from "@/lib/firebase-image-service";
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
 import { useCoins } from "@/pages/coinSystem";
@@ -299,7 +300,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     []
   );
 
-  const { panels, currentIndex, setCurrent, addPanel, redo, reset } = useComic(initialPanels);
+  const { panels, currentIndex, setCurrent, addPanel, updatePanelImage, redo, reset } = useComic(initialPanels);
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>(() => {
     // Load messages from local storage on component initialization
@@ -1265,30 +1266,58 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         return newCount;
       });
       
-      // Cache the unified AI image to Firebase/localStorage
+      // Optimistic render: if this is a data URL from Imagen, upload in background and then swap to Storage URL
       try {
-        await cacheAdventureImageHybrid(
-          user?.uid || null,
-          imageUrl,
-          prompt,
-          prompt, // Use prompt as context
-          currentAdventureId || undefined
-        );
-        console.log('🔄 NEW: Unified AI image cached successfully');
+        const isDataUrl = typeof imageUrl === 'string' && imageUrl.startsWith('data:');
+        if (isDataUrl && user?.uid && currentAdventureId) {
+          // Add panel first with data URL (optimistic)
+          const newPanelId = crypto.randomUUID();
+          addPanel({ id: newPanelId, image: imageUrl, text: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : ''), timestamp: Date.now() } as any);
+          setNewlyCreatedPanelId(newPanelId);
+
+          // Begin background upload to Firebase
+          (async () => {
+            try {
+              const stored = await firebaseImageService.uploadGeneratedImageData(
+                user.uid,
+                currentAdventureId,
+                imageUrl,
+                prompt,
+                prompt,
+                undefined
+              );
+              if (stored?.imageUrl) {
+                updatePanelImage(newPanelId, stored.imageUrl);
+                // Also persist URL metadata
+                await cacheAdventureImageHybrid(user.uid, stored.imageUrl, prompt, prompt, currentAdventureId);
+              }
+            } catch (bgErr) {
+              console.warn('⚠️ Background uploadImagen failed:', bgErr);
+            }
+          })();
+        } else {
+          // Not a data URL; cache to Firebase/localStorage as before
+          await cacheAdventureImageHybrid(
+            user?.uid || null,
+            imageUrl,
+            prompt,
+            prompt,
+            currentAdventureId || undefined
+          );
+          console.log('🔄 NEW: Unified AI image cached successfully');
+          const newPanel = {
+            id: crypto.randomUUID(),
+            image: imageUrl,
+            text: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : ''),
+            timestamp: Date.now()
+          } as any;
+          addPanel(newPanel);
+        }
       } catch (error) {
         console.warn('⚠️ NEW: Failed to cache unified AI image:', error);
       }
       
-      // Add new comic panel with the generated image  
-      const newPanel = {
-        id: crypto.randomUUID(),
-        image: imageUrl,
-        text: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : ''),
-        timestamp: Date.now()
-      };
-      
-      console.log(`🎨 PANEL DEBUG: Adding new panel with image: ${imageUrl.substring(0, 60)}...`);
-      addPanel(newPanel);
+      console.log(`🎨 PANEL DEBUG: Image handled (optimistic for data URLs): ${imageUrl.substring(0, 60)}...`);
       
       // Completion sound is now handled by the unified streaming hook timeout
     },
