@@ -1376,6 +1376,17 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sleeping.gif?alt=media&token=ffc0469d-0cd0-488e-9672-ac41282b3c26"
         }
+        ,
+        5: {
+          // Level 5 Dog images (placeholders) - copy of Level 1 key system
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045604_dog-teen-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045452_dog-teen-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045454_dog-teen-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045338_dog--teen-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        }
       },
       cat: {
         1: {
@@ -1387,10 +1398,30 @@ const getSleepyPetImage = (clicks: number) => {
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_155438_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sleeping.gif?alt=media&token=dd59e26d-3694-433f-a36a-e852ecf4f519"
+        },
+        5: {
+          // Level 5 Cat images (placeholders)
+          coins_0: "/placeholder.svg",
+          coins_10: "/placeholder.svg",
+          coins_30: "/placeholder.svg",
+          coins_50: "/placeholder.svg",
+          sleep1: "/placeholder.svg",
+          sleep2: "/placeholder.svg",
+          sleep3: "/placeholder.svg"
         }
       },
       hamster: {
         1: {
+          // Level 5 Hamster images (placeholders)
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5:{
           // Level 1 Hamster images - coin-based progression
           coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
@@ -1448,6 +1479,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
         }
+      },
+      pikachu: {
+        1: {
+          // Level 1 Parrot images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_063222_ChatGPT_Image_Oct_3__2025__12_01_53_PM-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
+        }
       }
     };
 
@@ -1457,7 +1500,9 @@ const getSleepyPetImage = (clicks: number) => {
       return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
     }
 
-    const levelImages = petLevelImages[level as keyof typeof petLevelImages] || petLevelImages[1];
+    // Clamp display level: for any level >= 5, use Level 5 visuals (dog, cat, hamster)
+    const levelKey = ((petType === 'dog' || petType === 'cat' || petType === 'hamster') && level >= 5) ? 5 : level;
+    const levelImages = petLevelImages[levelKey as keyof typeof petLevelImages] || petLevelImages[1];
     return levelImages[careState as keyof typeof levelImages] || levelImages.coins_0;
   };
 
@@ -1872,6 +1917,16 @@ const getSleepyPetImage = (clicks: number) => {
         requiredLevel: 10,
         isLocked: userLevel < 10,
         category: 'rare'
+      },
+      pikachu: {
+        id: 'pikachu',
+        emoji: '🦅',
+        name: 'Pikachu',
+        owned: isPetOwned('Pikachu'),
+        cost: 1000,
+        requiredLevel: 10,
+        isLocked: userLevel < 10,
+        category: 'legendary'
       }
     };
   };
@@ -3466,9 +3521,9 @@ const getSleepyPetImage = (clicks: number) => {
             const levelForPet = (() => {
               try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
             })();
-            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot'].includes(petType);
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'].includes(petType);
             const petImageUrl = petHasImages ? getLevelBasedPetImage(petType, levelForPet, 'coins_30') : '';
-            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : '🐾';
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : '🐾';
 
             return (
               <button
@@ -3591,6 +3646,7 @@ const getSleepyPetImage = (clicks: number) => {
                           ${pet.category === 'common' ? 'bg-green-100 text-green-700 border-green-300' : ''}
                           ${pet.category === 'uncommon' ? 'bg-purple-100 text-purple-700 border-purple-300' : ''}
                           ${pet.category === 'rare' ? 'bg-amber-100 text-amber-700 border-amber-300' : ''}
+                      ${pet.category === 'legendary' ? 'bg-red-100 text-red-700 border-red-300' : ''}
                         `}
                       >
                         {pet.category}
@@ -3605,7 +3661,7 @@ const getSleepyPetImage = (clicks: number) => {
                     {/* Pet Image or Emoji */}
                     {pet.isLocked && !pet.owned ? (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={`${pet.name} (locked)`}
@@ -3618,7 +3674,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     ) : (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={pet.name}
