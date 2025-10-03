@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ComicPanelComponent from "@/components/comic/ComicPanel";
 import InputBar from "@/components/comic/InputBar";
@@ -301,6 +301,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   );
 
   const { panels, currentIndex, setCurrent, addPanel, updatePanelImage, redo, reset } = useComic(initialPanels);
+  const panelCountRef = useRef<number>(0);
+  const latestPanelIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const panelCount = panels.length;
+    const latestPanelId = panelCount > 0 ? panels[panelCount - 1]?.id ?? null : null;
+    const countIncreased = panelCount > panelCountRef.current;
+    const latestChanged = latestPanelId && latestPanelId !== latestPanelIdRef.current;
+
+    if (panelCount > 0 && (countIncreased || latestChanged) && currentIndex !== panelCount - 1) {
+      setCurrent(panelCount - 1);
+    }
+
+    panelCountRef.current = panelCount;
+    latestPanelIdRef.current = latestPanelId;
+  }, [panels, currentIndex, setCurrent]);
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>(() => {
     // Load messages from local storage on component initialization

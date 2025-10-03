@@ -59,7 +59,15 @@ function reducer(state: State, action: Action): State {
       return { panels: next.panels, currentIndex: next.currentIndex, past: [...state.past, pastSnap], future: rest };
     }
     case "RESET": {
-      return { panels: action.initialPanels, currentIndex: 0, past: [], future: [] };
+      const nextIndex = action.initialPanels.length > 0
+        ? action.initialPanels.length - 1
+        : 0;
+      return {
+        panels: action.initialPanels,
+        currentIndex: nextIndex,
+        past: [],
+        future: [],
+      };
     }
     default:
       return state;
@@ -67,10 +75,10 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useComic(initialPanels: ComicPanel[]) {
-  const initialState: State = useMemo(
-    () => ({ panels: initialPanels, currentIndex: 0, past: [], future: [] }),
-    [initialPanels]
-  );
+  const initialState: State = useMemo(() => {
+    const startIndex = initialPanels.length > 0 ? initialPanels.length - 1 : 0;
+    return { panels: initialPanels, currentIndex: startIndex, past: [], future: [] };
+  }, [initialPanels]);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
