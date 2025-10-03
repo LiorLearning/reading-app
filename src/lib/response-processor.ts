@@ -359,7 +359,6 @@ ${sanitizedConversationContext}`;
         
         if (result.success && result.imageUrl) {
           console.log(`✅ [ResponseProcessor.processResponseWithImages()] Image ${index + 1} generated successfully in ${duration}ms`);
-          console.log(`🖼️ [ResponseProcessor.processResponseWithImages()] Generated image URL: ${result.imageUrl}`);
           console.log(`🏢 [ResponseProcessor.processResponseWithImages()] Provider used: ${result.provider}`);
           hasGeneratedSuccessfulImage = true; // Mark as successful, stop generating more
           
@@ -384,7 +383,7 @@ ${sanitizedConversationContext}`;
           // Update adventure context with the generated image
           adventureContext.push({
             type: 'ai',
-            content: `![Generated Image](${result.imageUrl})`,
+            content: '[Generated Image] Image created successfully (content not stored in chat).',
             timestamp: Date.now()
           });
           

@@ -1473,7 +1473,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         const aiMessage: ChatMessage = {
           type: 'ai',
-          content: `![Legacy Image](${generatedImageResult.imageUrl})\n\n${contextualResponse}`,
+          content: `![Legacy Image]\n\n${contextualResponse}`,
           timestamp: Date.now()
         };
         
@@ -3705,7 +3705,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       msg.type === 'ai' && 
       msg.timestamp && latestUserMessage.timestamp &&
       msg.timestamp > latestUserMessage.timestamp && // AI message came after user message
-      (msg.content?.includes('![Generated Image]') || // Unified system success
+      (msg.content?.includes('[Generated Image]') || // Unified system success
        msg.content?.includes('![Legacy Image]')) // Legacy fallback success
     );
     

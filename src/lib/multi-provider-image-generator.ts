@@ -1,13 +1,13 @@
 import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from './utils';
-import { FirebaseImageService } from './firebase-image-service';
 
 export interface ImageGenerationResult {
   success: boolean;
   imageUrl?: string;
   error?: string;
   attempts: number;
-  provider: 'openai' | 'azure' | 'stable-diffusion' | 'none';
+  provider: 'google-imagen' | 'openai' | 'azure' | 'stable-diffusion' | 'none';
   duration: number;
 }
 
@@ -16,6 +16,7 @@ export interface GenerationOptions {
   quality?: 'standard' | 'hd';
   style?: 'vivid' | 'natural';
   adventureContext?: ChatMessage[];
+  sanitizedConversationContext?: string;
 }
 
 /**
@@ -24,15 +25,14 @@ export interface GenerationOptions {
  */
 export class MultiProviderImageGenerator {
   private readonly providers: ImageProvider[];
-  private readonly firebaseImageService: FirebaseImageService;
   
   constructor() {
     this.providers = [
+      new GoogleImagenProvider(),
       new OpenAIProvider(),
-      new AzureOpenAIProvider(), 
+      new AzureOpenAIProvider(),
       new StableDiffusionProvider()
     ];
-    this.firebaseImageService = new FirebaseImageService();
   }
   
   /**
@@ -72,42 +72,21 @@ export class MultiProviderImageGenerator {
         console.log(`🎯 [MultiProviderImageGenerator.generateWithFallback()] Refined prompt for ${provider.name}: "${refinedPrompt}"`);
         
         // Generate image with current provider
-        const imageUrl = await provider.generate(refinedPrompt, userId, options);
+        const imageUrl = await provider.generate(refinedPrompt, userId, {
+          ...options,
+          adventureContext: options.adventureContext || [],
+          sanitizedConversationContext: options.sanitizedConversationContext
+        });
         const providerDuration = Date.now() - providerStartTime;
         
-        console.log(`✅ [MultiProviderImageGenerator.generateWithFallback()] ${provider.name} generated image successfully in ${providerDuration}ms`);
-        console.log(`🖼️ [MultiProviderImageGenerator.generateWithFallback()] Generated image URL: ${imageUrl}`);
-        
-        // Upload to Firebase for persistence (non-blocking)
-        let persistentUrl = imageUrl;
-        try {
-          const adventureId = options.adventureContext 
-            ? this.extractAdventureId(options.adventureContext)
-            : crypto.randomUUID();
-            
-          const uploadResult = await this.firebaseImageService.uploadGeneratedImage(
-            userId,
-            adventureId,
-            imageUrl,
-            prompt,
-            this.buildAdventureContextString(options.adventureContext || [])
-          );
-          
-          if (uploadResult?.imageUrl) {
-            persistentUrl = uploadResult.imageUrl;
-            console.log(`☁️ [MultiProviderImageGenerator.generateWithFallback()] Image uploaded to Firebase successfully`);
-            console.log(`🔗 [MultiProviderImageGenerator.generateWithFallback()] Firebase URL: ${persistentUrl}`);
-          }
-        } catch (uploadError) {
-          console.warn('⚠️ [MultiProviderImageGenerator.generateWithFallback()] Firebase upload failed, using original URL:', uploadError);
-          // Continue with original URL - don't fail the entire generation
-        }
+        const lengthInfo = typeof imageUrl === 'string' ? imageUrl.length : 'unknown-length';
+        console.log(`✅ [MultiProviderImageGenerator.generateWithFallback()] ${provider.name} generated image successfully in ${providerDuration}ms (length=${lengthInfo})`);
         
         const totalDuration = Date.now() - startTime;
         
         return {
           success: true,
-          imageUrl: persistentUrl,
+          imageUrl,
           attempts: attempt + 1,
           provider: provider.name,
           duration: totalDuration
@@ -153,8 +132,8 @@ export class MultiProviderImageGenerator {
    * Refine prompt for specific provider to improve success rate
    */
   private async refinePromptForProvider(
-    originalPrompt: string, 
-    providerName: string, 
+    originalPrompt: string,
+    providerName: ImageProvider['name'],
     options: GenerationOptions
   ): Promise<string> {
     
@@ -176,6 +155,10 @@ export class MultiProviderImageGenerator {
         refinedPrompt = `${refinedPrompt}, cinematic style, vivid colors`;
         break;
         
+      case 'google-imagen':
+        refinedPrompt = `${refinedPrompt}, high quality art, richly detailed, photorealistic lighting`;
+        break;
+
       case 'stable-diffusion':
         refinedPrompt = `${refinedPrompt}, realistic art style, detailed`;
         break;
@@ -241,9 +224,89 @@ export class MultiProviderImageGenerator {
 
 // Provider interface
 interface ImageProvider {
-  name: 'openai' | 'azure' | 'stable-diffusion';
+  name: 'google-imagen' | 'openai' | 'azure' | 'stable-diffusion';
   isConfigured(): boolean;
   generate(prompt: string, userId: string, options?: GenerationOptions): Promise<string>;
+}
+
+class GoogleImagenProvider implements ImageProvider {
+  name = 'google-imagen' as const;
+  private client: GoogleGenAI | null = null;
+  private static blobUrlCache: Map<string, string> = new Map();
+
+  constructor() {
+    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    if (apiKey) {
+      this.client = new GoogleGenAI({ apiKey });
+    } else {
+      console.warn('⚠️ [GoogleImagenProvider] VITE_GOOGLE_API_KEY not configured. Provider disabled.');
+    }
+  }
+
+  isConfigured(): boolean {
+    return this.client !== null;
+  }
+
+  async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
+    if (!this.client) {
+      throw new Error('Google Imagen client not configured');
+    }
+
+    console.log(`🎯 [GoogleImagenProvider.generate()] Starting Google Imagen image generation`);
+    console.log(`📝 [GoogleImagenProvider.generate()] Full prompt: "${prompt}"`);
+    console.log(`👤 [GoogleImagenProvider.generate()] User ID: ${userId}`);
+    console.log(`⚙️ [GoogleImagenProvider.generate()] Options:`, options);
+
+    const response = await this.client.models.generateImages({
+      model: 'imagen-4.0-fast-generate-001',
+      prompt,
+      config: {
+        numberOfImages: 1,
+        personGeneration: 'allow_all',
+        includeRaiReason: true,
+        outputMimeType: 'image/png',
+      },
+    });
+
+    const imageBytes = response.generatedImages?.[0]?.image?.imageBytes;
+
+    if (!imageBytes) {
+      throw new Error('No image bytes returned from Google Imagen');
+    }
+
+    // Return a stable blob URL for the base64 to avoid flicker and re-decodes
+    const cached = GoogleImagenProvider.blobUrlCache.get(imageBytes);
+    if (cached) {
+      console.log(`✅ [GoogleImagenProvider.generate()] Reusing cached blob URL (length: ${imageBytes.length})`);
+      return cached;
+    }
+
+    const blob = this.base64ToBlob(imageBytes, 'image/png');
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Simple cache with soft cap to prevent unbounded growth
+    if (GoogleImagenProvider.blobUrlCache.size > 40) {
+      const firstKey = GoogleImagenProvider.blobUrlCache.keys().next().value;
+      if (firstKey) {
+        try { URL.revokeObjectURL(GoogleImagenProvider.blobUrlCache.get(firstKey)!); } catch {}
+        GoogleImagenProvider.blobUrlCache.delete(firstKey);
+      }
+    }
+    GoogleImagenProvider.blobUrlCache.set(imageBytes, blobUrl);
+
+    console.log(`✅ [GoogleImagenProvider.generate()] Created blob URL from base64 (length: ${imageBytes.length})`);
+    return blobUrl;
+  }
+
+  private base64ToBlob(base64: string, mimeType: string): Blob {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  }
 }
 
 /**
@@ -293,9 +356,7 @@ class OpenAIProvider implements ImageProvider {
       throw new Error('No image URL returned from OpenAI DALL-E 3');
     }
     
-    console.log(`✅ [OpenAIProvider.generate()] Successfully generated image with DALL-E 3`);
-    console.log(`🖼️ [OpenAIProvider.generate()] Image URL: ${imageUrl}`);
-    
+    console.log(`✅ [OpenAIProvider.generate()] Successfully generated image with DALL-E 3`); 
     return imageUrl;
   }
 }
@@ -353,9 +414,7 @@ class AzureOpenAIProvider implements ImageProvider {
       throw new Error('No image URL returned from Azure OpenAI DALL-E 3');
     }
     
-    console.log(`✅ [AzureOpenAIProvider.generate()] Successfully generated image with Azure DALL-E 3`);
-    console.log(`🖼️ [AzureOpenAIProvider.generate()] Image URL: ${imageUrl}`);
-    
+    console.log(`✅ [AzureOpenAIProvider.generate()] Successfully generated image with Azure DALL-E 3`); 
     return imageUrl;
   }
 }

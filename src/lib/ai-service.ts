@@ -2611,7 +2611,6 @@ Return ONLY the new reading passage, nothing else.`;
         
         if (imageUrl) {
           console.log(`✅ [AIService.generateAdventureImage()] PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
-          console.log(`🖼️ [AIService.generateAdventureImage()] Generated image URL: ${imageUrl}`);
           clearTimeout(safetyTimeout); // Clear safety timeout
           this.isGeneratingImage = false; // Clear generation flag
           return { imageUrl, usedPrompt: finalPrompt, adventureId };
