@@ -15,7 +15,7 @@ import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, LogOut, ShoppingCart, MoreHorizontal, TrendingUp, Clock } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart, MoreHorizontal, TrendingUp, Clock } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
@@ -150,6 +150,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [previousCoins, setPreviousCoins] = useState(coins);
   const [previousCoinsSpentForStage, setPreviousCoinsSpentForStage] = useState(0);
   const [showPetShop, setShowPetShop] = useState(false);
+  // UI: vertical slider for pet list (show max 5 at once)
+  const [petStartIndex, setPetStartIndex] = useState(0);
   const [showMoreOverlay, setShowMoreOverlay] = useState(false);
   const [lastSpokenMessage, setLastSpokenMessage] = useState('');
   
@@ -1374,6 +1376,17 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sleeping.gif?alt=media&token=ffc0469d-0cd0-488e-9672-ac41282b3c26"
         }
+        ,
+        5: {
+          // Level 5 Dog images (placeholders) - copy of Level 1 key system
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045604_dog-teen-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045452_dog-teen-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045454_dog-teen-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045338_dog--teen-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        }
       },
       cat: {
         1: {
@@ -1385,10 +1398,30 @@ const getSleepyPetImage = (clicks: number) => {
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_155438_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sleeping.gif?alt=media&token=dd59e26d-3694-433f-a36a-e852ecf4f519"
+        },
+        5: {
+          // Level 5 Cat images (placeholders)
+          coins_0: "/placeholder.svg",
+          coins_10: "/placeholder.svg",
+          coins_30: "/placeholder.svg",
+          coins_50: "/placeholder.svg",
+          sleep1: "/placeholder.svg",
+          sleep2: "/placeholder.svg",
+          sleep3: "/placeholder.svg"
         }
       },
       hamster: {
         1: {
+          // Level 5 Hamster images (placeholders)
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5:{
           // Level 1 Hamster images - coin-based progression
           coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
@@ -1446,6 +1479,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
         }
+      },
+      pikachu: {
+        1: {
+          // Level 1 Parrot images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_063222_ChatGPT_Image_Oct_3__2025__12_01_53_PM-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
+        }
       }
     };
 
@@ -1455,7 +1500,9 @@ const getSleepyPetImage = (clicks: number) => {
       return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
     }
 
-    const levelImages = petLevelImages[level as keyof typeof petLevelImages] || petLevelImages[1];
+    // Clamp display level: for any level >= 5, use Level 5 visuals (dog, cat, hamster)
+    const levelKey = ((petType === 'dog' || petType === 'cat' || petType === 'hamster') && level >= 5) ? 5 : level;
+    const levelImages = petLevelImages[levelKey as keyof typeof petLevelImages] || petLevelImages[1];
     return levelImages[careState as keyof typeof levelImages] || levelImages.coins_0;
   };
 
@@ -1482,6 +1529,21 @@ const getSleepyPetImage = (clicks: number) => {
           // Map partial progress tiers to mood for immediate feedback outside adventure
           if (prog >= 3) return 'coins_30';
           if (prog >= 1) return 'coins_10';
+        }
+      }
+    } catch {}
+
+    // Enforce daily sadness cap: only assigned pets can be sad today
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_sadness') : null;
+      if (raw) {
+        const sad = JSON.parse(raw) as { date: string; assignedPets: string[] };
+        const today = new Date().toISOString().slice(0, 10);
+        const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
+        const isAssignedToday = sad?.date === today && assigned.includes(currentPet);
+        if (!isAssignedToday) {
+          // Unassigned pets cannot be sad today; force a happy baseline
+          return 'coins_10';
         }
       }
     } catch {}
@@ -1630,6 +1692,8 @@ const getSleepyPetImage = (clicks: number) => {
     try {
       if (user?.uid) {
         stateStoreApi.setPetName({ userId: user.uid, pet: petId, name: petName });
+        // Force new pet to be sad today; rotation will resume tomorrow
+        stateStoreApi.ensurePetSadToday({ userId: user.uid, pet: petId });
       }
     } catch {}
 
@@ -1767,6 +1831,8 @@ const getSleepyPetImage = (clicks: number) => {
       try {
         if (user?.uid) {
           stateStoreApi.setPetName({ userId: user.uid, pet: petType, name: chosenName.trim() });
+          // Force purchased pet to be sad on purchase day
+          stateStoreApi.ensurePetSadToday({ userId: user.uid, pet: petType });
         }
       } catch {}
     }
@@ -1851,6 +1917,16 @@ const getSleepyPetImage = (clicks: number) => {
         requiredLevel: 10,
         isLocked: userLevel < 10,
         category: 'rare'
+      },
+      pikachu: {
+        id: 'pikachu',
+        emoji: '🦅',
+        name: 'Pikachu',
+        owned: isPetOwned('Pikachu'),
+        cost: 1000,
+        requiredLevel: 10,
+        isLocked: userLevel < 10,
+        category: 'legendary'
       }
     };
   };
@@ -3421,23 +3497,43 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Pet Switcher - Only show if user owns multiple pets */}
       {ownedPets.length > 1 && (
-        <div className="fixed top-24 left-6 z-20 flex flex-col gap-2">
-          <div className="text-xs font-semibold text-white drop-shadow-md mb-1">
+        <div className="fixed top-24 left-6 z-20 flex flex-col gap-2 items-center">
+          <div className="text-md font-semibold text-white drop-shadow-md mb-1">
             Your Pets:
           </div>
-          {ownedPets.map((petId) => {
-            const petEmoji = petId === 'cat' ? '🐱' : petId === 'hamster' ? '🐹' : petId === 'dragon' ? '🐉' : petId === 'unicorn' ? '🦄' : petId === 'monkey' ? '🐵' : petId === 'parrot' ? '🦜' : '🐾';
+          {/* Up arrow for sliding up */}
+          {ownedPets.length > 5 && (
+            <button
+              onClick={() => setPetStartIndex((idx) => Math.max(0, idx - 1))}
+              className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shadow-md transition-colors ${
+                petStartIndex > 0 ? 'bg-white/30 border-white/50 hover:bg-white/40' : 'bg-white/10 border-white/20 opacity-50 cursor-not-allowed'
+              }`}
+              aria-label="Scroll up"
+              disabled={petStartIndex === 0}
+            >
+              <ChevronUp className="text-white" />
+            </button>
+          )}
+
+          {ownedPets.slice(petStartIndex, petStartIndex + 5).map((petId) => {
             const isActive = currentPet === petId;
-            
+            const petType = PetProgressStorage.getPetType(petId) || petId;
+            const levelForPet = (() => {
+              try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
+            })();
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'].includes(petType);
+            const petImageUrl = petHasImages ? getLevelBasedPetImage(petType, levelForPet, 'coins_30') : '';
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : '🐾';
+
             return (
               <button
                 key={petId}
                 onClick={() => {
                   setCurrentPet(petId);
-                  
+
                   // SYNC: Update PetProgressStorage current selected pet
                   PetProgressStorage.setCurrentSelectedPet(petId);
-                  
+
                   // Sync to localStorage for pet-avatar-service
                   try {
                     localStorage.setItem('current_pet', petId);
@@ -3447,17 +3543,39 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`w-12 h-12 rounded-xl border-2 text-2xl flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 ${
-                  isActive 
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white text-white' 
-                    : 'bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30'
+                className={`w-16 h-16 rounded-2xl border-2 flex items-center justify-center shadow-lg overflow-hidden transition-all duration-200 hover:scale-110 ${
+                  isActive
+                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
+                    : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
               >
-                {petEmoji}
+                {petHasImages ? (
+                  <img
+                    src={petImageUrl}
+                    alt={PetProgressStorage.getPetDisplayName(petId)}
+                    className="w-full h-full object-contain p-1 drop-shadow-sm"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="text-3xl text-white">{petEmoji}</span>
+                )}
               </button>
             );
           })}
+          {/* Down arrow for sliding down */}
+          {ownedPets.length > 5 && (
+            <button
+              onClick={() => setPetStartIndex((idx) => Math.min(Math.max(0, ownedPets.length - 5), idx + 1))}
+              className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shadow-md transition-colors ${
+                petStartIndex < Math.max(0, ownedPets.length - 5) ? 'bg-white/30 border-white/50 hover:bg-white/40' : 'bg-white/10 border-white/20 opacity-50 cursor-not-allowed'
+              }`}
+              aria-label="Scroll down"
+              disabled={petStartIndex >= Math.max(0, ownedPets.length - 5)}
+            >
+              <ChevronDown className="text-white" />
+            </button>
+          )}
         </div>
       )}
 
@@ -3528,6 +3646,7 @@ const getSleepyPetImage = (clicks: number) => {
                           ${pet.category === 'common' ? 'bg-green-100 text-green-700 border-green-300' : ''}
                           ${pet.category === 'uncommon' ? 'bg-purple-100 text-purple-700 border-purple-300' : ''}
                           ${pet.category === 'rare' ? 'bg-amber-100 text-amber-700 border-amber-300' : ''}
+                      ${pet.category === 'legendary' ? 'bg-red-100 text-red-700 border-red-300' : ''}
                         `}
                       >
                         {pet.category}
@@ -3542,7 +3661,7 @@ const getSleepyPetImage = (clicks: number) => {
                     {/* Pet Image or Emoji */}
                     {pet.isLocked && !pet.owned ? (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={`${pet.name} (locked)`}
@@ -3555,7 +3674,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     ) : (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={pet.name}

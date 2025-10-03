@@ -55,6 +55,13 @@ import {
     coins: number;
     streak: number;
     lastStreakIncrementAt?: Timestamp | null;
+    // Daily sadness rotation controller for fair assignment across pets
+    sadnessRotation?: {
+      date: string; // YYYY-MM-DD (client-local)
+      pointer: number; // round-robin offset into owned pets list
+      lastAssignedPets: PetName[]; // the pets assigned on that date
+      max: number; // cap used on that date (e.g., 2)
+    } | null;
     createdAt: Timestamp;
     updatedAt: Timestamp;
   }
@@ -80,6 +87,7 @@ import {
   const QUEST_TARGET = 5;
   const QUEST_COOLDOWN_HOURS = 8; // wait 8 hours before advancing after completion
   const ACTIVITY_SEQUENCE: QuestTask[] = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'story'];
+  const SADNESS_CAP_PER_DAY = 2;
   
   // Default generators
   function createDefaultUserState(): Omit<UserState, 'createdAt' | 'updatedAt'> & {
@@ -370,11 +378,170 @@ import {
   
     batch.set(questsRef, updates, { merge: true });
     await batch.commit();
+
+    // Ensure sadness assignment exists for the day (idempotent)
+    try { await ensureDailySadnessAssigned(userId); } catch {}
   }
   
   // ==========================
   // NEW API: Daily quest helpers (batch-based)
   // ==========================
+
+  // ==========================
+  // Daily sadness rotation assignment
+  // ==========================
+
+  export interface SadnessAssignment {
+    date: string;
+    assignedPets: PetName[];
+    max: number;
+  }
+
+  function getTodayDateString(): string {
+    try {
+      return new Date().toISOString().slice(0, 10);
+    } catch {
+      // Fallback if environment lacks toISOString
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    }
+  }
+
+  function isSleepingNow(petObj: any): boolean {
+    const endAny = petObj?._sleepEndAt as any;
+    if (!endAny) return false;
+    try {
+      const now = Date.now();
+      const endMs = endAny?.toMillis ? endAny.toMillis() : (endAny ? new Date(endAny).getTime() : 0);
+      return Boolean(endMs && now < endMs);
+    } catch {
+      return false;
+    }
+  }
+
+  export async function ensureDailySadnessAssigned(userId: string): Promise<SadnessAssignment> {
+    const today = getTodayDateString();
+    const userRef = userStateDocRef(userId);
+    const questsRef = dailyQuestsDocRef(userId);
+    const [userSnap, questsSnap] = await Promise.all([getDoc(userRef), getDoc(questsRef)]);
+
+    const userData = (userSnap.exists() ? (userSnap.data() as any) : null);
+    const questsData = (questsSnap.exists() ? (questsSnap.data() as any) : {});
+
+    const cap = SADNESS_CAP_PER_DAY;
+
+    // If already assigned for today in dailyQuests, return it (idempotent)
+    const existing = questsData?._sadness as any;
+    if (existing && existing.date === today && Array.isArray(existing.assignedPets)) {
+      return { date: existing.date, assignedPets: existing.assignedPets as PetName[], max: Number(existing.max || cap) };
+    }
+
+    // Determine owned pets (prefer petnames keys when available for stability)
+    const petsMap = (userData?.pets || {}) as Record<string, number>;
+    const namesMap = (userData?.petnames || {}) as Record<string, string>;
+    const ownedPets = (Object.keys(namesMap).length > 0 ? Object.keys(namesMap) : Object.keys(petsMap)).sort();
+
+    const totalOwned = ownedPets.length;
+    const k = Math.min(cap, totalOwned);
+
+    const rot = (userData?.sadnessRotation || null) as any;
+    const pointer = Number(rot?.pointer || 0) % (totalOwned || 1);
+
+    // Compute eligibility: exclude pets actively sleeping
+    const eligiblePets = ownedPets.filter((pet) => {
+      const petObj = questsData?.[pet] || {};
+      return !isSleepingNow(petObj);
+    });
+
+    // If fewer eligible than cap, assign as many as possible (may be 0..k)
+    const pool = eligiblePets.length > 0 ? eligiblePets : ownedPets;
+    const assignCount = Math.min(k, pool.length);
+
+    const selected: PetName[] = [];
+    if (assignCount > 0 && pool.length > 0) {
+      for (let i = 0; i < pool.length && selected.length < assignCount; i++) {
+        const idx = (pointer + i) % pool.length;
+        const pet = pool[idx];
+        if (!selected.includes(pet as PetName)) selected.push(pet as PetName);
+      }
+    }
+
+    // Prepare updates (batch)
+    const batch = writeBatch(db);
+    // Quests _sadness publication for realtime UI consumption
+    batch.set(questsRef, { _sadness: { date: today, assignedPets: selected, max: cap }, updatedAt: nowServerTimestamp() } as any, { merge: true });
+    // UserState rotation bookkeeping
+    batch.set(userRef, {
+      sadnessRotation: {
+        date: today,
+        pointer: (totalOwned > 0 ? (pointer + assignCount) % totalOwned : 0),
+        lastAssignedPets: selected,
+        max: cap,
+      },
+      updatedAt: nowServerTimestamp(),
+    } as any, { merge: true });
+
+    await batch.commit();
+
+    return { date: today, assignedPets: selected, max: cap };
+  }
+
+  // Force a specific pet to be sad today (used on first selection/purchase day)
+  export interface EnsurePetSadTodayInput {
+    userId: string;
+    pet: PetName;
+  }
+
+  export async function ensurePetSadToday(input: EnsurePetSadTodayInput): Promise<void> {
+    const { userId, pet } = input;
+    const today = getTodayDateString();
+    const userRef = userStateDocRef(userId);
+    const questsRef = dailyQuestsDocRef(userId);
+    const [userSnap, questsSnap] = await Promise.all([getDoc(userRef), getDoc(questsRef)]);
+
+    const cap = SADNESS_CAP_PER_DAY;
+
+    const batch = writeBatch(db);
+    if (!questsSnap.exists()) {
+      // Initialize with this pet present to avoid missing structure
+      batch.set(questsRef, createInitialDailyQuests([pet] as any));
+    }
+
+    const existing = (questsSnap.exists() ? (questsSnap.data() as any)?._sadness : null) as any;
+    let assigned: string[] = [];
+    if (existing && existing.date === today && Array.isArray(existing.assignedPets)) {
+      assigned = [...existing.assignedPets];
+    }
+    if (!assigned.includes(pet)) {
+      if (assigned.length < cap) {
+        assigned.push(pet);
+      } else {
+        // Ensure the new pet is included today; drop the last to keep size within cap
+        assigned = [pet, ...assigned.slice(0, cap - 1)];
+      }
+    }
+
+    // Publish sadness today and mirror in userState without advancing pointer (no fairness penalty)
+    batch.set(questsRef, { _sadness: { date: today, assignedPets: assigned, max: cap }, updatedAt: nowServerTimestamp() } as any, { merge: true });
+
+    // Update sadnessRotation snapshot without changing pointer
+    const usr = (userSnap.exists() ? (userSnap.data() as any) : null) as any;
+    const rot = usr?.sadnessRotation || {};
+    batch.set(userRef, {
+      sadnessRotation: {
+        date: today,
+        pointer: Number(rot?.pointer || 0),
+        lastAssignedPets: assigned,
+        max: cap,
+      },
+      updatedAt: nowServerTimestamp(),
+    } as any, { merge: true });
+
+    await batch.commit();
+  }
   
   export interface GetDailyQuestResultPet {
     pet: string;
@@ -501,6 +668,8 @@ import {
     updateProgressOnQuestionSolved,
     deductCoinsOnPurchase,
     handleDailyQuestRollover,
+    ensureDailySadnessAssigned,
+    ensurePetSadToday,
     getUserState,
     getDailyQuests,
     startPetSleep,

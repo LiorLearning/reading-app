@@ -10,11 +10,14 @@ import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
 // Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "@/pages/coinSystem";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { stateStoreApi } from "@/lib/state-store-api";
+import { useDeviceGate } from "@/hooks/use-device-gate";
+import DeviceGateModal from "@/components/DeviceGateModal";
+import MicPermissionModal from "@/components/MicPermissionModal";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +84,34 @@ const UnifiedPetAdventureApp = () => {
   } | null>(null);
 
   const { user, userData, loading } = useAuth();
+  const { shouldShowGate, suppressForDays } = useDeviceGate();
+  const [gateOpen, setGateOpen] = useState<boolean>(false);
+  const [showMicPrompt, setShowMicPrompt] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    setGateOpen(shouldShowGate);
+  }, [shouldShowGate]);
+
+  // One-time microphone prompt for new users
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const seen = localStorage.getItem('mic_prompt_seen');
+      if (!seen) {
+        setShowMicPrompt(true);
+      }
+    } catch {}
+  }, []);
+
+  const handleMicPromptClose = React.useCallback(() => {
+    setShowMicPrompt(false);
+    try { localStorage.setItem('mic_prompt_seen', '1'); } catch {}
+  }, []);
+
+  const handleContinueAnyway = React.useCallback(() => {
+    suppressForDays(3);
+    setGateOpen(false);
+  }, [suppressForDays]);
 
   // Adventure handlers that switch modes seamlessly without route changes
   const handleStartAdventure = (
@@ -144,10 +175,21 @@ const UnifiedPetAdventureApp = () => {
   }
 
   return (
-    <PetPage 
-      onStartAdventure={handleStartAdventure}
-      onContinueSpecificAdventure={handleContinueSpecificAdventure}
-    />
+    <>
+      <DeviceGateModal
+        open={gateOpen}
+        onClose={() => setGateOpen(false)}
+        onContinueAnyway={handleContinueAnyway}
+      />
+      <MicPermissionModal
+        open={showMicPrompt}
+        onClose={handleMicPromptClose}
+      />
+      <PetPage 
+        onStartAdventure={handleStartAdventure}
+        onContinueSpecificAdventure={handleContinueSpecificAdventure}
+      />
+    </>
   );
 };
 

@@ -309,6 +309,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: questStates }));
 
+            // Ensure daily sadness assignment exists for today (progress-agnostic)
+            try {
+              const sad = await stateStoreApi.ensureDailySadnessAssigned(user.uid);
+              // Mirror a compact local flag for UI gating without extra reads
+              try { localStorage.setItem('litkraft_daily_sadness', JSON.stringify(sad)); } catch {}
+              window.dispatchEvent(new CustomEvent('dailySadnessUpdated', { detail: sad }));
+            } catch {}
+
             // Rollover on sign-in hydration if any pet completed and cooldown passed or missing
             try {
               const nowMs = Date.now();
@@ -410,6 +418,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
             try {
               localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
+              // Also expose sadness assignment if present
+              try {
+                const sad = (d?._sadness || null);
+                if (sad && sad.date) {
+                  localStorage.setItem('litkraft_daily_sadness', JSON.stringify(sad));
+                  window.dispatchEvent(new CustomEvent('dailySadnessUpdated', { detail: sad }));
+                }
+              } catch {}
               // Mirror live sleep windows per-pet for the timer
               try {
                 states.forEach((s) => {
@@ -626,6 +642,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleOneTapSignIn,
+        use_fedcm_for_prompt: true,
         auto_select: hasGoogleAccount, // Auto-select if user has Google account
         context: 'signin',
         ux_mode: 'popup',
@@ -634,11 +651,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Only show the prompt if user is not already signed in
       if (!user) {
-        window.google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('One Tap prompt was not displayed or skipped');
-          }
-        });
+        window.google.accounts.id.prompt();
       }
     } catch (error) {
       console.error('Error initializing One Tap Sign-in:', error);

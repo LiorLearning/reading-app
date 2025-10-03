@@ -6,6 +6,8 @@ import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
+import { Button } from '@/components/ui/button';
+import { Volume2, Square } from 'lucide-react';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -1057,46 +1059,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         })}
                         
                         {/* Audio button with ElevenLabs TTS - positioned after the complete word */}
-                        <button
-                          onClick={playWordAudio}
+                        <Button
                           id="spellbox-speaker-button"
-                          style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            background: isSpeaking 
-                              ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)'
-                              : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-                            color: 'white',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '24px',
-                            boxShadow: isSpeaking 
-                              ? '0 4px 12px rgba(220, 38, 38, 0.3)'
-                              : '0 4px 12px rgba(99, 102, 241, 0.3)',
-                            transition: 'all 0.15s ease-out',
-                            opacity: 1,
-                            transform: 'scale(1)',
-                            position: 'relative',
-                            marginLeft: '8px'
-                          }}
-                          title={isSpeaking ? "Stop audio" : "Listen to this word"}
-                          onMouseEnter={(e) => {
-                            if (!isSpeaking) {
-                              e.currentTarget.style.transform = 'scale(1.05)';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isSpeaking) {
-                              e.currentTarget.style.transform = 'scale(1)';
-                            }
-                          }}
+                          variant="comic"
+                          size="icon"
+                          onClick={playWordAudio}
+                          className={cn(
+                            'ml-2 h-11 w-11 rounded-lg border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
+                            isSpeaking && 'bg-red-500 text-white hover:bg-red-600'
+                          )}
+                          title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
+                          aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
                         >
-                          {isSpeaking ? '⏹️' : '🔊'}
-                        </button>
+                          {isSpeaking ? (
+                            <Square className="h-5 w-5" />
+                          ) : (
+                            <Volume2 className="h-5 w-5" />
+                          )}
+                        </Button>
                       </div>
                     ) : (
                       <span className="inline-block" 
@@ -1376,7 +1356,23 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               }
                             })}
                             {/* Inline mode speaker button - after the full word cluster */}
-                            <button onClick={playWordAudio} title={isSpeaking ? 'Stop audio' : 'Listen to this word'} style={{ width: '32px', height: '32px', borderRadius: '8px', border: 'none', background: isSpeaking ? 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)' : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)', color: 'white', marginLeft: '6px' }}>{isSpeaking ? '⏹️' : '🔊'}</button>
+                            <Button
+                              variant="comic"
+                              size="icon"
+                              onClick={playWordAudio}
+                              className={cn(
+                                'ml-1 h-8 w-8 rounded-md border-2 border-black bg-white text-foreground shadow-[0_3px_0_rgba(0,0,0,0.6)]',
+                                isSpeaking ? 'bg-red-500 text-white hover:bg-red-600' : 'hover:bg-primary hover:text-primary-foreground'
+                              )}
+                              title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
+                              aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
+                            >
+                              {isSpeaking ? (
+                                <Square className="h-4 w-4" />
+                              ) : (
+                                <Volume2 className="h-4 w-4" />
+                              )}
+                            </Button>
                           </div>
                         ) : (
                           <span className="inline-block" style={{ fontWeight: 400 }}>{word}</span>

@@ -27,7 +27,7 @@ import { useUnifiedAIStreaming, useUnifiedAIStatus } from "@/hooks/use-unified-a
 import { adventureSessionService } from "@/lib/adventure-session-service";
 import { chatSummaryService } from "@/lib/chat-summary-service";
 import { useCoins } from "@/pages/coinSystem";
-import { useCurrentPetAvatarImage, getPetEmotionActionMedia } from "@/lib/pet-avatar-service";
+import { useCurrentPetAvatarImage, getPetEmotionActionMedia, getPetYawnMedia } from "@/lib/pet-avatar-service";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { trackEvent } from "@/lib/feedback-service";
 import { usePetData } from "@/lib/pet-data-service";
@@ -404,6 +404,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [overridePetMediaUrl, setOverridePetMediaUrl] = React.useState<string | null>(null);
   const overrideMediaClearRef = React.useRef<NodeJS.Timeout | null>(null);
 
+  // Sticky yawn state (boring replies): no time-based cooldown; hysteresis to avoid flicker
+  const [inYawnMode, setInYawnMode] = React.useState<boolean>(false);
+  const [consecutiveShortCount, setConsecutiveShortCount] = React.useState<number>(0);
+  const [consecutiveNonShortCount, setConsecutiveNonShortCount] = React.useState<number>(0);
+
   const syncEmotionState = React.useCallback(() => {
     const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
     if (!currentPetId) return;
@@ -452,6 +457,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         localStorage.setItem(key, JSON.stringify({ emotionActive: false, emotionRequiredAction: null, emotionNextAction: nextPointer }));
         setEmotionActive(false);
         setEmotionRequiredAction(null);
+        // If a need was just satisfied, also exit any yawn badge state immediately
+        setInYawnMode(false);
         // advance rotation already handled in fulfillEmotionNeed
         trackEvent('heart_filled', { petId: currentPetId, action });
         // Success media should auto-revert after 8 seconds
@@ -459,12 +466,52 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setOverridePetMediaUrl(null);
           overrideMediaClearRef.current = null;
         }, 12000);
+        try {
+          // Replay the most recent AI message in chat after successful care
+          const lastAI = chatMessages.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0]?.content;
+          if (lastAI) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = lastAI;
+            const plain = (tempDiv.textContent || tempDiv.innerText || '').trim();
+            // Non-blocking replay
+            setTimeout(() => {
+              try { 
+                // Ensure the left bubble is visible for the replay
+                window.dispatchEvent(new Event('showLeftBubble'));
+                ttsService.stop(); 
+                ttsService.speakAIMessage(plain, `replay-after-care-${Date.now()}`); 
+              } catch {}
+            }, 0);
+          }
+        } catch {}
       }
       trackEvent('action_result', { petId: currentPetId, action, result: isCorrect ? 'success' : 'wrong' });
     } catch (e) {
       console.warn('Emotion action failed:', e);
     }
   }, [emotionRequiredAction]);
+  
+  // Ensure needy-state media shows while emotion is active (even after refresh)
+  React.useEffect(() => {
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+      const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+      if (emotionActive) {
+        // Don't override if a success/other override is currently scheduled
+        if (!overrideMediaClearRef.current && !overridePetMediaUrl) {
+          const needyMedia = getPetEmotionActionMedia(petType, 'needy');
+          setOverridePetMediaUrl(needyMedia);
+        }
+      } else {
+        // If emotion cleared and the override is the needy media, remove it
+        const needyMedia = getPetEmotionActionMedia(petType, 'needy');
+        if (overridePetMediaUrl === needyMedia && !overrideMediaClearRef.current) {
+          setOverridePetMediaUrl(null);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emotionActive]);
   
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
@@ -1918,6 +1965,49 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
       });
 
+      // Sticky yawn detection (skip during MCQ screen)
+      try {
+        const isMCQScreen = currentScreen === 3;
+        if (!isMCQScreen) {
+          const trimmed = (text || '').trim();
+          const fillerSet = new Set(['ok', 'k', 'kk', 'okay', 'yes', 'no', 'idk', 'hmm', 'hmmm', 'lol', 'nice', 'cool', '…', '...', ':)', '👍']);
+          const isEmojiOnly = /^([\p{Emoji_Presentation}\p{Emoji}\p{Extended_Pictographic}\u200d\ufe0f\s])+$/u.test(trimmed);
+          const isShort = trimmed.length <= 10 || fillerSet.has(trimmed.toLowerCase()) || isEmojiOnly;
+
+          // Pre-compute next-state decisions based on current input
+          const willEnterYawn = !inYawnMode && isShort && (consecutiveShortCount + 1 >= 2);
+          const willExitYawn = inYawnMode && !isShort;
+
+          // Update counters
+          if (isShort) {
+            setConsecutiveShortCount((c) => c + 1);
+            setConsecutiveNonShortCount(0);
+          } else {
+            setConsecutiveNonShortCount((c) => c + 1);
+            setConsecutiveShortCount(0);
+          }
+
+          // Update yawn mode state (exit after 1 non-short)
+          setInYawnMode((prev) => {
+            if (!prev && willEnterYawn) return true;
+            if (prev && !isShort) return false;
+            return prev;
+          });
+
+          // Apply/clear override immediately using computed intent
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+          const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+          if (willExitYawn) {
+            if (!overrideMediaClearRef.current) setOverridePetMediaUrl(null);
+          } else if ((willEnterYawn || (inYawnMode && isShort)) && !overrideMediaClearRef.current) {
+            const yawnUrl = getPetYawnMedia(petType);
+            setOverridePetMediaUrl(yawnUrl);
+          }
+        }
+      } catch (e) {
+        console.warn('Yawn detection error:', e);
+      }
+
       // Optional: Save user message to Firebase session (non-blocking)
       if (currentSessionId) {
         adventureSessionService.addChatMessage(currentSessionId, userMessage);
@@ -2279,7 +2369,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         setIsAIResponding(false);
       }
     },
-    [incrementMessageCycle, generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount]
+    [incrementMessageCycle, generateAIResponse, chatMessages, currentScreen, adventurePromptCount, topicQuestionIndex, isInQuestionMode, currentSessionId, messageCycleCount, inYawnMode, consecutiveShortCount, consecutiveNonShortCount]
   );
 
   // Auto-scroll to bottom when new messages arrive
@@ -4695,6 +4785,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     overridePetMediaUrl={overridePetMediaUrl}
                     emotionActive={emotionActive}
                     emotionRequiredAction={emotionRequiredAction}
+                    showAttentionBadge={inYawnMode}
                     onEmotionAction={handleEmotionAction}
                     aiMessageHtml={
                       // If we're showing inline spelling, suppress normal HTML so the bubble only has SpellBox

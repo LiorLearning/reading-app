@@ -38,6 +38,16 @@ class FirebasePetStateService {
     return doc(collection(db, 'users'), userId, 'pets', petId);
   }
 
+  private getTodayDateString(): string {
+    try { return new Date().toISOString().slice(0, 10); } catch {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    }
+  }
+
   async initPetState(userId: string, petId: string): Promise<void> {
     const ref = this.getPetDocRef(userId, petId);
     const snap = await getDoc(ref);
@@ -126,6 +136,23 @@ class FirebasePetStateService {
   }
 
   async activateEmotionNeed(userId: string, petId: string, requiredAction?: 'water' | 'pat' | 'feed'): Promise<'water' | 'pat' | 'feed'> {
+    // Respect daily sadness assignment cap using dailyQuests/_sadness
+    try {
+      const dqRef = doc(db, 'dailyQuests', userId);
+      const dqSnap = await getDoc(dqRef);
+      const today = this.getTodayDateString();
+      const s = (dqSnap.exists() ? (dqSnap.data() as any)?._sadness : null) as any;
+      const assigned: string[] = (s && s.date === today && Array.isArray(s.assignedPets)) ? s.assignedPets : [];
+      if (!assigned.includes(petId)) {
+        // Not assigned to be sad today; do not activate emotion need
+        const refNoop = this.getPetDocRef(userId, petId);
+        const snapNoop = await getDoc(refNoop);
+        const dataNoop = (snapNoop.exists() ? (snapNoop.data() as FirebasePetState) : undefined);
+        const nextPtr = (dataNoop?.emotionNextAction as any) || 'water';
+        return requiredAction || nextPtr;
+      }
+    } catch {}
+
     const ref = this.getPetDocRef(userId, petId);
     const snap = await getDoc(ref);
     const data = (snap.exists() ? (snap.data() as FirebasePetState) : undefined);

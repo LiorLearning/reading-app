@@ -39,6 +39,8 @@ interface LeftPetOverlayProps {
   emotionActive?: boolean;
   emotionRequiredAction?: 'water' | 'pat' | 'feed' | null;
   onEmotionAction?: (action: 'water' | 'pat' | 'feed') => void;
+  /** Controls visibility of the attention badge independent of emotion state (e.g., yawn) */
+  showAttentionBadge?: boolean;
   // Optional temporary media to overlay inside avatar (e.g., GIF/video)
   overridePetMediaUrl?: string | null;
 }
@@ -55,10 +57,12 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   emotionActive = false,
   emotionRequiredAction = null,
   onEmotionAction,
+  showAttentionBadge = false,
   overridePetMediaUrl = null,
 }) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
+  const avatarRef = React.useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = React.useState<{ left: number; top: number } | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
   const isSpeakingRef = React.useRef(false);
@@ -105,6 +109,13 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     }, wait);
   }, [overrideMediaLoading]);
 
+  // Slightly desynchronize pulses for action buttons
+  const actionPulseDelays = React.useMemo(() => {
+    const rand = () => `${(Math.random() * 0.35).toFixed(2)}s`;
+    return { water: rand(), pat: rand(), feed: rand() } as const;
+  }, []);
+  const pulseClasses = 'ring-2 ring-amber-400/70 shadow-[0_0_10px_rgba(251,191,36,0.35)] motion-safe:animate-pulse hover:animate-none active:animate-none focus:animate-none hover:ring-amber-500 hover:shadow-[0_0_12px_rgba(245,158,11,0.5)]';
+
   // Ambient floating hearts (background) while petting is active
   const [floatHearts, setFloatHearts] = React.useState<Array<{ id: number; x: number; y: number; driftX: number; scale: number; animate: boolean }>>([]);
   const floatIntervalRef = React.useRef<number | null>(null);
@@ -149,6 +160,14 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     };
   }, [pettingActive, spawnFloatHeart]);
 
+  // Wrong-action feedback highlights: track all wrong actions pressed during the current emotion step
+  const [wrongActions, setWrongActions] = React.useState<Set<'water' | 'pat' | 'feed'>>(new Set());
+
+  // Clear wrong highlights whenever emotion step resets/hides
+  React.useEffect(() => {
+    if (!emotionActive) setWrongActions(new Set());
+  }, [emotionActive]);
+
   // Start/stop helpers
   const startPetting = React.useCallback((startX?: number, startY?: number) => {
     setPettingActive(true);
@@ -157,10 +176,14 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       try { (navigator as any).vibrate?.(10); } catch {}
     }
     // Initial hand position roughly center if not provided
-    if (overlayRef.current) {
-      const rect = overlayRef.current.getBoundingClientRect();
-      setHandPosition({ x: startX ?? rect.width / 2, y: startY ?? rect.height / 2 });
-      lastStrokePointRef.current = { x: startX ?? rect.width / 2, y: startY ?? rect.height / 2 };
+    if (avatarRef.current) {
+      const rect = avatarRef.current.getBoundingClientRect();
+      const defaultX = rect.width * 0.65;
+      const defaultY = rect.height * 0.45;
+      const x = startX ? startX - rect.left : defaultX;
+      const y = startY ? startY - rect.top : defaultY;
+      setHandPosition({ x, y });
+      lastStrokePointRef.current = { x, y };
     }
     // Auto end after a short time so UI doesn't get stuck
     if (pettingTimeoutRef.current) window.clearTimeout(pettingTimeoutRef.current);
@@ -181,6 +204,17 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     };
   }, []);
 
+  // External trigger to force-show the bubble (e.g., after care success replay)
+  React.useEffect(() => {
+    const handler = () => {
+      setIsManuallyClosed(false);
+      setIsBubbleHidden(false);
+      setHiddenReason(null);
+    };
+    window.addEventListener('showLeftBubble', handler as EventListener);
+    return () => window.removeEventListener('showLeftBubble', handler as EventListener);
+  }, []);
+
   const spawnHeart = React.useCallback((x: number, y: number) => {
     const id = Date.now() + Math.random();
     setHearts(prev => [...prev, { id, x, y, animate: false }]);
@@ -195,8 +229,8 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   }, []);
 
   const onPetPointerMove = React.useCallback((clientX: number, clientY: number) => {
-    if (!overlayRef.current) return;
-    const rect = overlayRef.current.getBoundingClientRect();
+    if (!avatarRef.current) return;
+    const rect = avatarRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const y = Math.max(0, Math.min(clientY - rect.top, rect.height));
     setHandPosition({ x, y });
@@ -218,6 +252,59 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       return v?.id || undefined;
     }
   }, []);
+
+  // Yawn-state speaker lines (rotated)
+  const YAWN_NUDGE_LINES = React.useMemo(() => [
+    "One-word answers make me sleepy, but I want some fun! Please add more detail?",
+    "I’m snoozing on short replies… spice it up?",
+    "I yawn at tiny replies. Add more ideas?",
+    "Short replies make me a bit bored. Add more detail?",
+  ], []);
+  // Neutral motivation lines for emotion/need state (no hinting which action)
+  const EMOTION_HINT_LINES = React.useMemo(() => [
+    "I’m getting a bit cranky… could you try doing something for me?",
+    "Hmm, I need a little care—can you do something nice for me?",
+    "I’m feeling a bit fussy—try doing something nice for me?",
+    "I could use a little help—maybe try doing something for me?",
+  ], []);
+  const lastYawnNudgeAtRef = React.useRef<number>(0);
+  const [yawnNudgeAcknowledged, setYawnNudgeAcknowledged] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    // Reset acknowledgement whenever yawn or emotion attention appears again
+    if (showAttentionBadge || emotionActive) {
+      setYawnNudgeAcknowledged(false);
+    }
+  }, [showAttentionBadge, emotionActive]);
+  const handleYawnNudgeSpeak = React.useCallback(async () => {
+    const now = Date.now();
+    if (now - lastYawnNudgeAtRef.current < 2500) return; // debounce ~2.5s
+    lastYawnNudgeAtRef.current = now;
+    try {
+      ttsService.stop();
+      const line = YAWN_NUDGE_LINES[Math.floor(Math.random() * YAWN_NUDGE_LINES.length)];
+      await ttsService.speakAnswer(line);
+    } catch {}
+  }, [YAWN_NUDGE_LINES]);
+
+  // Unified top-right speaker behavior
+  const handleGlobalSpeaker = React.useCallback(async () => {
+    // Always allow speaking on press; do not block due to GIFs or loaders.
+    ttsService.stop();
+    // Prioritize emotion/need state over yawn if both are active
+    if (emotionActive) {
+      try {
+        const line = EMOTION_HINT_LINES[Math.floor(Math.random() * EMOTION_HINT_LINES.length)];
+        await ttsService.speakAnswer(line);
+      } catch {}
+      return;
+    }
+    if (showAttentionBadge) {
+      await handleYawnNudgeSpeak();
+      return;
+    }
+    // Fallback to speaking the current bubble content
+    await handleSpeak();
+  }, [showAttentionBadge, emotionActive, overridePetMediaUrl, overrideMediaLoading, handleYawnNudgeSpeak, EMOTION_HINT_LINES]);
 
   // Keep track of the last AI message so we can restore it when user taps the pet
   React.useEffect(() => {
@@ -254,10 +341,11 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   };
 
   const handleSpeak = async () => {
-    if (isSpeakingRef.current) {
+    // Ensure exclusivity: stop any ongoing TTS first
+    if (isSpeakingRef.current || ttsService.getIsSpeaking()) {
       ttsService.stop();
       isSpeakingRef.current = false;
-      return;
+      // If user tapped while something else is speaking, we intend to play current content next fallthrough
     }
 
     // If inline SpellBox is active, prefer speaking the full sentence; fallback to the spelling word
@@ -277,10 +365,17 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
         const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const normalizedWord = targetWord?.trim();
         if (!fullText || !normalizedWord) return fullText;
-        const parts = fullText
-          .split(/(?<=[.!?])\s+/) // split but keep punctuation with previous chunk
-          .map(p => p.trim())
-          .filter(p => p.length > 0);
+        const parts = (() => {
+          const segments = fullText.split(/([.!?])/);
+          const out: string[] = [];
+          for (let i = 0; i < segments.length; i += 2) {
+            const body = (segments[i] || '').trim();
+            const punct = segments[i + 1] || '';
+            const combined = (body + punct).trim();
+            if (combined) out.push(combined);
+          }
+          return out;
+        })();
         const wordRegex = new RegExp(`\\b${escapeRegExp(normalizedWord)}\\b`, 'i');
         const match = parts.find(p => wordRegex.test(p));
         return match || fullText;
@@ -395,6 +490,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
         {/* Pet avatar and actions */}
         <div className="pointer-events-auto flex flex-col items-center">
           <div
+          ref={avatarRef}
           className="relative w-[240px] h-[240px] rounded-xl overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm"
           onClick={(e) => {
             e.stopPropagation();
@@ -412,24 +508,21 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
             setHiddenReason(null);
           }}
         >
-          {/* Heart badge - top-right inside avatar */}
-          <div className="absolute top-2 right-2 z-10">
-            <div className="relative w-8 h-8">
-              <svg viewBox="0 0 24 24" className="absolute inset-0 w-full h-full text-red-600">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <svg viewBox="0 0 24 24" className="absolute inset-0 w-full h-full">
-                <defs>
-                  <clipPath id="half-heart-clip">
-                    <rect x="12" y="0" width="12" height="24" />
-                  </clipPath>
-                </defs>
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" 
-                  className="text-red-600" fill="currentColor" 
-                  clipPath={emotionActive ? "url(#half-heart-clip)" : undefined} opacity={0.9} />
-              </svg>
-            </div>
-          </div>
+          {/* Top-right unified speaker visible only for yawn or emotion attention. */}
+          {(emotionActive || showAttentionBadge) && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleGlobalSpeaker();
+              }}
+              aria-label={showAttentionBadge ? 'Play tip' : (emotionActive ? 'Play hint' : 'Play message')}
+              className={`absolute top-2 right-2 z-10 w-9 h-9 rounded-full border-2 border-black grid place-items-center shadow-[0_2px_0_rgba(0,0,0,0.4)] ${
+                (showAttentionBadge || emotionActive) ? 'bg-amber-400' : 'bg-amber-300'
+              }`}
+            >
+              <Volume2 className="w-5 h-5 text-black" />
+            </button>
+          )}
 
           {/* Avatar image or temporary override media (force remount on URL change) */}
           {overridePetMediaUrl ? (
@@ -531,14 +624,27 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           )}
         </div>
 
-        {/* Actions row below avatar - visible only when emotion active */}
+        {/* Actions row below avatar - emotion actions OR yawn nudge (mutually exclusive) */}
         {emotionActive && (
           <div className="mt-3 flex items-center gap-2">
             <Button
               variant="secondary"
               size="icon"
-              className={`h-9 w-9 rounded-full border-2 border-black bg-white/80`}
-              onClick={(e) => { e.stopPropagation(); onEmotionAction?.('water'); }}
+              className={`h-9 w-9 rounded-full border-2 border-black ${wrongActions.has('water') ? 'bg-red-500 text-black hover:bg-red-500 active:bg-red-500 focus:bg-red-500 focus-visible:bg-red-500' : `bg-white/80 ${pulseClasses}`}`}
+              style={{ animationDelay: actionPulseDelays.water }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                if (emotionActive && emotionRequiredAction && emotionRequiredAction !== 'water') {
+                  setWrongActions(prev => new Set(prev).add('water'));
+                }
+              }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                if (emotionActive && emotionRequiredAction && emotionRequiredAction !== 'water') {
+                  setWrongActions(prev => new Set(prev).add('water'));
+                }
+                onEmotionAction?.('water');
+              }}
               aria-label="Give water"
             >
               <Droplet className="h-4 w-4" />
@@ -546,10 +652,20 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
             <Button
               variant="secondary"
               size="icon"
-              className={`h-9 w-9 rounded-full border-2 border-black bg-white/80`}
+              className={`h-9 w-9 rounded-full border-2 border-black ${wrongActions.has('pat') ? 'bg-red-500 hover:bg-red-500 active:bg-red-500 focus:bg-red-500 focus-visible:bg-red-500' : `bg-white/80 ${pulseClasses}`}`}
+              style={{ animationDelay: actionPulseDelays.pat }}
               onClick={(e) => { 
                 e.stopPropagation(); 
                 startPetting();
+                if (emotionActive && emotionRequiredAction && emotionRequiredAction !== 'pat') {
+                  setWrongActions(prev => new Set(prev).add('pat'));
+                }
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                if (emotionActive && emotionRequiredAction && emotionRequiredAction !== 'pat') {
+                  setWrongActions(prev => new Set(prev).add('pat'));
+                }
               }}
               aria-label="Pat pet"
             >
@@ -558,14 +674,29 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
             <Button
               variant="secondary"
               size="icon"
-              className={`h-9 w-9 rounded-full border-2 border-black bg-white/80`}
-              onClick={(e) => { e.stopPropagation(); onEmotionAction?.('feed'); }}
+              className={`h-9 w-9 rounded-full border-2 border-black ${wrongActions.has('feed') ? 'bg-red-500 text-white hover:bg-red-500 active:bg-red-500 focus:bg-red-500 focus-visible:bg-red-500' : `bg-white/80 ${pulseClasses}`}`}
+              style={{ animationDelay: actionPulseDelays.feed }}
+              onPointerDown={(e) => { 
+                e.stopPropagation(); 
+                if (emotionActive && emotionRequiredAction && emotionRequiredAction !== 'feed') {
+                  setWrongActions(prev => new Set(prev).add('feed'));
+                }
+              }}
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                if (emotionActive && emotionRequiredAction && emotionRequiredAction !== 'feed') {
+                  setWrongActions(prev => new Set(prev).add('feed'));
+                }
+                onEmotionAction?.('feed');
+              }}
               aria-label="Feed pet"
             >
               <Utensils className="h-4 w-4" />
             </Button>
           </div>
         )}
+
+        {/* Yawn mode: no separate row; the top-right speaker handles voice */}
 
         {/* Close the avatar+actions wrapper */}
         </div>

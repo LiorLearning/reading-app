@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { playClickSound } from '@/lib/sounds';
 import { BookOpen, Mail, Lock, User, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getFriendlyAuthError } from '@/lib/firebase-auth-errors';
 
 export const AuthScreen: React.FC = () => {
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, initializeOneTapSignIn, hasGoogleAccount } = useAuth();
@@ -54,7 +55,7 @@ export const AuthScreen: React.FC = () => {
     try {
       await signInWithGoogle();
     } catch (error: any) {
-      setError(error.message || 'Failed to sign in with Google');
+      setError(getFriendlyAuthError(error, 'google'));
     } finally {
       setLoading(false);
     }
@@ -69,7 +70,7 @@ export const AuthScreen: React.FC = () => {
     try {
       await signInWithEmail(signInData.email, signInData.password);
     } catch (error: any) {
-      setError(error.message || 'Failed to sign in');
+      setError(getFriendlyAuthError(error, 'signin'));
     } finally {
       setLoading(false);
     }
@@ -90,7 +91,7 @@ export const AuthScreen: React.FC = () => {
     try {
       await signUpWithEmail(signUpData.email, signUpData.password, signUpData.username);
     } catch (error: any) {
-      setError(error.message || 'Failed to create account');
+      setError(getFriendlyAuthError(error, 'signup'));
     } finally {
       setLoading(false);
     }
@@ -192,7 +193,7 @@ export const AuthScreen: React.FC = () => {
             {/* Collapsible Email/Password Form */}
             {showEmailAuth && (
               <div className="space-y-4 animate-in slide-in-from-top-2">
-                <Tabs defaultValue="signin" className="w-full">
+                <Tabs defaultValue="signup" className="w-full">
                   <TabsList className="grid w-full grid-cols-2 mb-4">
                     <TabsTrigger value="signin">Sign In</TabsTrigger>
                     <TabsTrigger value="signup">Sign Up</TabsTrigger>
