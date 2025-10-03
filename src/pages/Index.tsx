@@ -466,12 +466,52 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setOverridePetMediaUrl(null);
           overrideMediaClearRef.current = null;
         }, 12000);
+        try {
+          // Replay the most recent AI message in chat after successful care
+          const lastAI = chatMessages.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0]?.content;
+          if (lastAI) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = lastAI;
+            const plain = (tempDiv.textContent || tempDiv.innerText || '').trim();
+            // Non-blocking replay
+            setTimeout(() => {
+              try { 
+                // Ensure the left bubble is visible for the replay
+                window.dispatchEvent(new Event('showLeftBubble'));
+                ttsService.stop(); 
+                ttsService.speakAIMessage(plain, `replay-after-care-${Date.now()}`); 
+              } catch {}
+            }, 0);
+          }
+        } catch {}
       }
       trackEvent('action_result', { petId: currentPetId, action, result: isCorrect ? 'success' : 'wrong' });
     } catch (e) {
       console.warn('Emotion action failed:', e);
     }
   }, [emotionRequiredAction]);
+  
+  // Ensure needy-state media shows while emotion is active (even after refresh)
+  React.useEffect(() => {
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+      const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+      if (emotionActive) {
+        // Don't override if a success/other override is currently scheduled
+        if (!overrideMediaClearRef.current && !overridePetMediaUrl) {
+          const needyMedia = getPetEmotionActionMedia(petType, 'needy');
+          setOverridePetMediaUrl(needyMedia);
+        }
+      } else {
+        // If emotion cleared and the override is the needy media, remove it
+        const needyMedia = getPetEmotionActionMedia(petType, 'needy');
+        if (overridePetMediaUrl === needyMedia && !overrideMediaClearRef.current) {
+          setOverridePetMediaUrl(null);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emotionActive]);
   
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());

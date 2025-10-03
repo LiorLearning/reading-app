@@ -1,5 +1,5 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
-import { isImageLoadingSoundCurrentlyPlaying } from './sounds';
+import { isImageLoadingSoundCurrentlyPlaying, stopImageLoadingSound } from './sounds';
 import { PetProgressStorage } from './pet-progress-storage';
 
 interface TTSOptions {
@@ -270,10 +270,9 @@ class TextToSpeechService {
       return;
     }
 
-    // Check if image loading sound is playing - if so, don't speak
+    // Ensure exclusivity with image-loading loop: stop it if playing
     if (isImageLoadingSoundCurrentlyPlaying()) {
-      console.debug('Image loading sound is playing, skipping TTS');
-      return;
+      try { stopImageLoadingSound(); } catch {}
     }
 
     try {
