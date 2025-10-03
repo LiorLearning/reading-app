@@ -1689,17 +1689,25 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
             };
           }
           
-          // Split into sentences more robustly, preserving punctuation
-          const sentences = adventureText.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+          // Split into sentences in a Safari-safe way (no lookbehind). Preserve punctuation with the previous chunk.
+          const sentences = (() => {
+            const parts = adventureText.split(/([.!?])/);
+            const result: string[] = [];
+            for (let i = 0; i < parts.length; i += 2) {
+              const sentenceBody = (parts[i] || '').trim();
+              const punctuation = parts[i + 1] || '';
+              const combined = (sentenceBody + punctuation).trim();
+              if (combined) result.push(combined);
+            }
+            return result;
+          })();
           
-          // Find the sentence containing the target word (case-insensitive, word boundary aware)
+          // Find the sentence containing the target word (case-insensitive, token-based)
           const spellingSentence = sentences.find(sentence => {
             const normalizedSentence = sentence.toLowerCase().replace(/[^\w\s]/g, ' ');
             const normalizedWord = spellingWord.toLowerCase();
-            
-            // Check for word boundaries to avoid partial matches
-            const wordRegex = new RegExp(`\\b${normalizedWord}\\b`, 'i');
-            return wordRegex.test(normalizedSentence);
+            const tokens = normalizedSentence.split(/\s+/).filter(Boolean);
+            return tokens.includes(normalizedWord);
           });
           
           if (spellingSentence) {
