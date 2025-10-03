@@ -10,11 +10,13 @@ import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
 // Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCoins } from "@/pages/coinSystem";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { stateStoreApi } from "@/lib/state-store-api";
+import { useDeviceGate } from "@/hooks/use-device-gate";
+import DeviceGateModal from "@/components/DeviceGateModal";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +83,17 @@ const UnifiedPetAdventureApp = () => {
   } | null>(null);
 
   const { user, userData, loading } = useAuth();
+  const { shouldShowGate, suppressForDays } = useDeviceGate();
+  const [gateOpen, setGateOpen] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    setGateOpen(shouldShowGate);
+  }, [shouldShowGate]);
+
+  const handleContinueAnyway = React.useCallback(() => {
+    suppressForDays(3);
+    setGateOpen(false);
+  }, [suppressForDays]);
 
   // Adventure handlers that switch modes seamlessly without route changes
   const handleStartAdventure = (
@@ -144,10 +157,17 @@ const UnifiedPetAdventureApp = () => {
   }
 
   return (
-    <PetPage 
-      onStartAdventure={handleStartAdventure}
-      onContinueSpecificAdventure={handleContinueSpecificAdventure}
-    />
+    <>
+      <DeviceGateModal
+        open={gateOpen}
+        onClose={() => setGateOpen(false)}
+        onContinueAnyway={handleContinueAnyway}
+      />
+      <PetPage 
+        onStartAdventure={handleStartAdventure}
+        onContinueSpecificAdventure={handleContinueSpecificAdventure}
+      />
+    </>
   );
 };
 
