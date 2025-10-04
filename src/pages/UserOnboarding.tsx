@@ -114,6 +114,19 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
       {/* Glass blur overlay */}
       <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
       
+      {/* Invisible dev-only previous-step hotspot (center-left) */}
+      {process.env.NODE_ENV === 'development' && step > 1 && (
+        <button
+          aria-label="Dev: Previous onboarding step"
+          onClick={() => {
+            playClickSound();
+            setStep(prev => Math.max(1, prev - 1));
+          }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-24 opacity-0 z-50"
+          title="Dev prev step"
+        />
+      )}
+      
       {/* Main container - Now scrollable */}
       <div 
         className="relative responsive-max-width mx-auto my-auto flex-shrink-0"

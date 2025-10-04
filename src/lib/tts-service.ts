@@ -28,6 +28,12 @@ export const AVAILABLE_VOICES: Voice[] = [
   //   previewText: "Woof! I'm your friendly dog, ready for fun adventures and learning together!"
   // },
   {
+    id: 'lnieQLGTodpbhjpZtg1k',
+    name: 'Professor',
+    description: 'Warm, wise mentor tone for Krafty (tutorial voice)',
+    previewText: "Hello! I'm your trainer, here to guide you step by step."
+  },
+  {
     id: 'cgSgspJ2msm6clMCkdW9',
     name: 'Jessica',
     description: 'Warm and friendly tone, perfect for children',

@@ -114,7 +114,7 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
 };
 // Persistent progress bar wrapper to keep JSX clean
 const PersistentAdventureProgressBar: React.FC = () => {
-  const { progressFraction } = useAdventurePersistentProgress();
+  const { progressFraction, activity } = useAdventurePersistentProgress();
   return (
     <AdventureFeedingProgress progressFraction={progressFraction} />
   );
@@ -223,7 +223,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const { user, userData, signOut, updateUserData } = useAuth();
   
   // Tutorial system integration
-  const { isFirstTimeAdventurer, completeAdventureTutorial } = useTutorial();
+  const { isFirstTimeAdventurer, completeAdventureTutorial, needsAdventureStep5Intro, completeAdventureStep5Intro, needsAdventureStep6Intro, completeAdventureStep6Intro, needsAdventureStep7HomeMoreIntro } = useTutorial();
   
   // NEW: Unified AI streaming system status
   const { isUnifiedSystemReady, hasImageGeneration } = useUnifiedAIStatus();
@@ -263,6 +263,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       (window as any).autoMigrateOnLogin = () => autoMigrateOnLogin(user?.uid || 'anonymous');
     }
   }, [user]);
+
 
 
   const jsonLd = useMemo(
@@ -370,7 +371,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Dev tools state
   const [devToolsVisible, setDevToolsVisible] = React.useState(false);
-    const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3 | 4>(() => {
+  // Screen state first (used by step 5 effect)
+  const [currentScreen, setCurrentScreen] = React.useState<-1 | 0 | 1 | 2 | 3 | 4>(() => {
     // If we're coming from Pet Page with adventure props, start directly in Adventure to avoid home flash
     if (initialAdventureProps) return 1;
     // If user exists but no userData yet, start at loading state (don't show topic selection)
@@ -381,6 +383,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Start at home screen to avoid topic selection flash
     return -1;
   });
+  // Step 5 adventure intro overlay
+  const [showStep5Intro, setShowStep5Intro] = React.useState(false);
+  // Step 6 adventure completion hint overlay
+  const [showStep6Intro, setShowStep6Intro] = React.useState(false);
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
@@ -782,6 +788,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Generate initial AI response when entering adventure screen
   React.useEffect(() => {
+    // If Step 5 intro overlay is visible, defer initial response until it's dismissed
+    const pendingIntro = (() => { try { return localStorage.getItem('pending_step5_intro') === 'true'; } catch { return false; } })();
+    if (showStep5Intro || pendingIntro) return;
+
     if (currentScreen === 1 && adventureMode) {
       // If we have initial adventure props with adventureType, wait for it to be processed
       if (initialAdventureProps?.adventureType && currentAdventureType === 'food' && initialAdventureProps.adventureType !== 'food') {
@@ -881,12 +891,60 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
       generateInitialResponse();
     }
-  }, [currentScreen, currentAdventureId, adventureMode, userData?.username, currentAdventureType]);
+  }, [currentScreen, currentAdventureId, adventureMode, userData?.username, currentAdventureType, showStep5Intro]);
+
+  // Show Step 5 overlay when landing in adventure after pet page click
+  React.useEffect(() => {
+    try {
+      const pending = localStorage.getItem('pending_step5_intro') === 'true';
+      if (currentScreen === 1 && pending && needsAdventureStep5Intro) {
+        setShowStep5Intro(true);
+        localStorage.removeItem('pending_step5_intro');
+        try {
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+          const intro = `Brighten your ${petType}’s day. Spend time talking and create a house it will truly love. The more creative, the better!`;
+          ttsService.speakAIMessage(intro, 'krafty-step5-intro').catch(() => {});
+        } catch {}
+      }
+    } catch {}
+  }, [currentScreen, needsAdventureStep5Intro]);
   
   // Debug useEffect to track currentAdventureType changes
   React.useEffect(() => {
     console.log('🎯 currentAdventureType changed to:', currentAdventureType);
   }, [currentAdventureType]);
+
+  // Track persistent adventure progress to trigger Step 6 when full
+  const { progressFraction: persistentProgressFraction, activity: persistentActivity } = useAdventurePersistentProgress();
+
+  // Show Step 6 overlay when progress is full (first-time only)
+  React.useEffect(() => {
+    try {
+      if (
+        currentScreen === 1 &&
+        !showStep5Intro &&
+        needsAdventureStep6Intro &&
+        (persistentProgressFraction >= 1)
+      ) {
+        setShowStep6Intro(true);
+        try {
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+          const msg = `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
+          ttsService.speakAIMessage(msg, 'krafty-step6-intro').catch(() => {});
+        } catch {}
+      }
+    } catch {}
+  }, [currentScreen, persistentProgressFraction, needsAdventureStep6Intro, showStep5Intro]);
+
+  // When Step 6 is dismissed (Next), mark a pending Step 7 trigger so it only shows after returning home
+  React.useEffect(() => {
+    // Intercept when Step 6 just transitioned from visible to hidden
+    if (!showStep6Intro && currentScreen !== 1) {
+      return;
+    }
+  }, [showStep6Intro, currentScreen]);
 
   // Function to trigger initial response generation with explicit adventure type
   const triggerInitialResponseGeneration = React.useCallback(async (explicitAdventureType: string) => {
@@ -4787,6 +4845,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     emotionRequiredAction={emotionRequiredAction}
                     showAttentionBadge={inYawnMode}
                     onEmotionAction={handleEmotionAction}
+                    forceTopLayer={showStep5Intro}
                     aiMessageHtml={
                       // If we're showing inline spelling, suppress normal HTML so the bubble only has SpellBox
                       showSpellBox && currentSpellQuestion ? undefined :
@@ -5225,7 +5284,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
         {/* Compact input dock when sidebar is collapsed (next to user avatar)
             Only show on Adventure screen and never during onboarding */}
-        {currentScreen === 1 && sidebarCollapsed && !showOnboarding && (
+        {currentScreen === 1 && sidebarCollapsed && !showOnboarding && !showStep5Intro && !showStep6Intro && (
           <CollapsedInputDock
             onGenerate={onGenerate}
             onGenerateImage={onGenerateImage}
@@ -5235,6 +5294,112 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               setSidebarCollapsed(false);
             }}
           />
+        )}
+
+        {/* Step 5 Intro Overlay - one-time, shown after tapping adventure on pet page */}
+        {showStep5Intro && currentScreen === 1 && (
+          <div className="fixed inset-0 z-[60]">
+            {/* Dim background with stronger top opacity, lighter near bottom */}
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/5" />
+
+            {/* Bottom-left Krafty assistant with speech bubble */}
+            <div className="absolute left-4 bottom-4 z-[61] flex items-start gap-5">
+              <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5 shadow-xl">
+                <div className="h-24 w-24 rounded-full overflow-hidden">
+                  <ChatAvatar size="responsive" />
+                </div>
+              </div>
+              <div className="max-w-2xl">
+                <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
+                  <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
+                    {(() => {
+                      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                      const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      return `Brighten your ${petType}’s day. Spend time talking and create a house it will truly love. The more creative, the better!`;
+                    })()}
+                  </p>
+                  <Button
+                    className="px-5"
+                    onClick={() => {
+                      try { ttsService.stop(); } catch {}
+                      setShowStep5Intro(false);
+                      completeAdventureStep5Intro();
+                      // Auto-start: add Krafty's first house prompt so the child can respond
+                      try {
+                        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                        const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                        const message: ChatMessage = {
+                          type: 'ai',
+                          content: `Yippee! Let’s build our dream house for your ${petType}! What should it be—maybe floating in the sky... or something else?`,
+                          timestamp: Date.now(),
+                        };
+                        setChatMessages(prev => {
+                          playMessageSound();
+                          const id = `index-chat-${message.timestamp}-${prev.length}`;
+                          ttsService.speakAIMessage(message.content, id).catch(() => {});
+                          return [...prev, message];
+                        });
+                        setMessageCycleCount(prev => prev + 1);
+                      } catch {}
+                    }}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 6 Intro Overlay - one-time, shown when adventure progress bar fills */}
+        {showStep6Intro && currentScreen === 1 && (
+          <div className="fixed inset-0 z-[70]">
+            {/* Dim background */}
+            <div className="absolute inset-0 bg-black/40" />
+
+            {/* No additional emphasis on Home per design feedback */}
+
+            {/* Bottom-left Krafty assistant with speech bubble */}
+            <div className="absolute left-4 bottom-4 z-[71] flex items-start gap-5">
+              <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5 shadow-xl">
+                <div className="h-24 w-24 rounded-full overflow-hidden">
+                  <ChatAvatar size="responsive" />
+                </div>
+              </div>
+              <div className="max-w-2xl">
+                <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
+                  <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
+                    {(() => {
+                      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                      const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      return `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
+                    })()}
+                  </p>
+                  <Button
+                    className="px-5"
+                    onClick={() => {
+                      try { ttsService.stop(); } catch {}
+                      setShowStep6Intro(false);
+                      completeAdventureStep6Intro();
+                      // Set pending Step 7 trigger only when today's quest was House
+                      try {
+                        const pendingActivity = persistentActivity;
+                        if (pendingActivity === 'house') {
+                          localStorage.setItem('pending_step7_home_more', 'true');
+                        }
+                      } catch {}
+                      // Continue normal adventure flow
+                    }}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Removed extra emoji indicator per design feedback */}
+          </div>
         )}
 
 

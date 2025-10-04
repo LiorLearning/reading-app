@@ -10,6 +10,8 @@ interface LeftPetOverlayProps {
   aiMessageHtml?: string;
   isThinking?: boolean;
   draggable?: boolean;
+  /** When true, render above most overlays (e.g., tutorial dimmers) */
+  forceTopLayer?: boolean;
   autoHideToken?: unknown; // any changing value triggers an auto hide (e.g., after image creation)
   onBubbleVisibilityChange?: (visible: boolean) => void;
   interruptRealtimeSession?: () => void;
@@ -50,6 +52,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   aiMessageHtml,
   isThinking = false,
   draggable = true,
+  forceTopLayer = false,
   autoHideToken,
   onBubbleVisibilityChange,
   interruptRealtimeSession,
@@ -464,7 +467,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   }, [isBubbleHidden, !!displayHtml, isThinking, hasInlineQuestion]);
 
   return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-20">
+    <div ref={containerRef} className={`pointer-events-none absolute inset-0 ${forceTopLayer ? 'z-[70]' : 'z-20'}`}>
       <div
         ref={overlayRef}
         className={cn(

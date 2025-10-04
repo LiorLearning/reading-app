@@ -8,6 +8,20 @@ export interface TutorialState {
   fillInBlanksTutorialCompleted: boolean;
   mcqTutorialCompleted: boolean;
   chatTutorialCompleted: boolean;
+  // New: one-time intro before first pet speech on home page
+  petDailyCheckIntroCompleted?: boolean;
+  // New: one-time Step 5 intro shown on Adventure screen after pet-page button
+  adventureStep5IntroCompleted?: boolean;
+  // New: one-time Step 6 congrats overlay after progress bar fills on Adventure
+  adventureStep6IntroCompleted?: boolean;
+  // Step 7: Home page after first quest - show hand to More and Krafty line
+  adventureStep7HomeMoreIntroCompleted?: boolean;
+  // Step 8: Next step after closing More
+  adventureStep8Started?: boolean;
+  // Step 9: Sleep intro started
+  adventureStep9SleepIntroStarted?: boolean;
+  // Step 9: Sleep intro completed so it doesn't reappear
+  adventureStep9SleepIntroCompleted?: boolean;
 }
 
 class TutorialService {
@@ -26,6 +40,13 @@ class TutorialService {
           fillInBlanksTutorialCompleted: parsed.fillInBlanksTutorialCompleted || false,
           mcqTutorialCompleted: parsed.mcqTutorialCompleted || false,
           chatTutorialCompleted: parsed.chatTutorialCompleted || false,
+          petDailyCheckIntroCompleted: parsed.petDailyCheckIntroCompleted || false,
+          adventureStep5IntroCompleted: parsed.adventureStep5IntroCompleted || false,
+          adventureStep6IntroCompleted: parsed.adventureStep6IntroCompleted || false,
+          adventureStep7HomeMoreIntroCompleted: parsed.adventureStep7HomeMoreIntroCompleted || false,
+          adventureStep8Started: parsed.adventureStep8Started || false,
+          adventureStep9SleepIntroStarted: parsed.adventureStep9SleepIntroStarted || false,
+          adventureStep9SleepIntroCompleted: parsed.adventureStep9SleepIntroCompleted || false,
         };
       }
     } catch (error) {
@@ -38,6 +59,13 @@ class TutorialService {
       fillInBlanksTutorialCompleted: false,
       mcqTutorialCompleted: false,
       chatTutorialCompleted: false,
+      petDailyCheckIntroCompleted: false,
+        adventureStep5IntroCompleted: false,
+        adventureStep6IntroCompleted: false,
+        adventureStep7HomeMoreIntroCompleted: false,
+        adventureStep8Started: false,
+        adventureStep9SleepIntroStarted: false,
+        adventureStep9SleepIntroCompleted: false,
     };
   }
   
@@ -88,6 +116,51 @@ class TutorialService {
   }
   
   /**
+   * Whether to show the one-time "daily check" intro on the pet home page
+   */
+  needsPetDailyCheckIntro(): boolean {
+    const state = this.getTutorialState();
+    return !state.petDailyCheckIntroCompleted;
+  }
+
+  /**
+   * Whether to show the one-time Step 5 Adventure intro
+   */
+  needsAdventureStep5Intro(): boolean {
+    const state = this.getTutorialState();
+    return !state.adventureStep5IntroCompleted;
+  }
+  
+  /**
+   * Whether to show the one-time Step 6 Adventure congrats/next-hint
+   */
+  needsAdventureStep6Intro(): boolean {
+    const state = this.getTutorialState();
+    return !state.adventureStep6IntroCompleted;
+  }
+  
+  /** Whether to show Step 7 on Home after first quest */
+  needsAdventureStep7HomeMoreIntro(): boolean {
+    const state = this.getTutorialState();
+    return !state.adventureStep7HomeMoreIntroCompleted;
+  }
+  
+  /** Whether Step 8 has started */
+  hasAdventureStep8Started(): boolean {
+    const state = this.getTutorialState();
+    return !!state.adventureStep8Started;
+  }
+  
+  hasAdventureStep9SleepIntroStarted(): boolean {
+    const state = this.getTutorialState();
+    return !!state.adventureStep9SleepIntroStarted;
+  }
+  hasAdventureStep9SleepIntroCompleted(): boolean {
+    const state = this.getTutorialState();
+    return !!state.adventureStep9SleepIntroCompleted;
+  }
+  
+  /**
    * Mark adventure tutorial as completed
    */
   completeAdventureTutorial(): void {
@@ -113,6 +186,41 @@ class TutorialService {
    */
   completeChatTutorial(): void {
     this.updateTutorialState({ chatTutorialCompleted: true });
+  }
+  
+  /**
+   * Mark the pet daily check intro as completed so it won't show again
+   */
+  completePetDailyCheckIntro(): void {
+    this.updateTutorialState({ petDailyCheckIntroCompleted: true });
+  }
+  
+  /**
+   * Mark the Step 5 Adventure intro as completed
+   */
+  completeAdventureStep5Intro(): void {
+    this.updateTutorialState({ adventureStep5IntroCompleted: true });
+  }
+  
+  /**
+   * Mark the Step 6 Adventure intro as completed
+   */
+  completeAdventureStep6Intro(): void {
+    this.updateTutorialState({ adventureStep6IntroCompleted: true });
+  }
+  /** Mark Step 7 as completed */
+  completeAdventureStep7HomeMoreIntro(): void {
+    this.updateTutorialState({ adventureStep7HomeMoreIntroCompleted: true });
+  }
+  /** Start Step 8 */
+  startAdventureStep8(): void {
+    this.updateTutorialState({ adventureStep8Started: true });
+  }
+  startAdventureStep9(): void {
+    this.updateTutorialState({ adventureStep9SleepIntroStarted: true });
+  }
+  completeAdventureStep9(): void {
+    this.updateTutorialState({ adventureStep9SleepIntroCompleted: true });
   }
   
   /**
