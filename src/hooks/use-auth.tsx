@@ -642,6 +642,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleOneTapSignIn,
+        use_fedcm_for_prompt: true,
         auto_select: hasGoogleAccount, // Auto-select if user has Google account
         context: 'signin',
         ux_mode: 'popup',
@@ -650,11 +651,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Only show the prompt if user is not already signed in
       if (!user) {
-        window.google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('One Tap prompt was not displayed or skipped');
-          }
-        });
+        window.google.accounts.id.prompt();
       }
     } catch (error) {
       console.error('Error initializing One Tap Sign-in:', error);

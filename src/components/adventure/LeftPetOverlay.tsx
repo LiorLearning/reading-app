@@ -370,10 +370,17 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
         const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const normalizedWord = targetWord?.trim();
         if (!fullText || !normalizedWord) return fullText;
-        const parts = fullText
-          .split(/(?<=[.!?])\s+/) // split but keep punctuation with previous chunk
-          .map(p => p.trim())
-          .filter(p => p.length > 0);
+        const parts = (() => {
+          const segments = fullText.split(/([.!?])/);
+          const out: string[] = [];
+          for (let i = 0; i < segments.length; i += 2) {
+            const body = (segments[i] || '').trim();
+            const punct = segments[i + 1] || '';
+            const combined = (body + punct).trim();
+            if (combined) out.push(combined);
+          }
+          return out;
+        })();
         const wordRegex = new RegExp(`\\b${escapeRegExp(normalizedWord)}\\b`, 'i');
         const match = parts.find(p => wordRegex.test(p));
         return match || fullText;

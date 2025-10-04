@@ -503,28 +503,59 @@ export const useCurrentPetAvatarImage = () => {
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_162600_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5: {
+          // Level 5 Dog images (placeholders) - copy of Level 1 key system
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045604_dog-teen-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045452_dog-teen-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045454_dog-teen-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045338_dog--teen-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
         }
       },
       cat: {
         1: {
-          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234455_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_155438_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_160705_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023120_cat-baby-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023119_cat-baby-normal-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023115_cat-baby-superhappy-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-superhappy-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5: {
+          // Level 5 Cat images (placeholders)
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023359_cat-teen-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023359_cat-teen-normal-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023359_cat-teen-happy-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023400_cat-teen-superhappy-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
         }
       },
       hamster: {
         1: {
+          // Level 5 Hamster images (placeholders)
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5: {
+          // Level 1 Hamster images - coin-based progression
           coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163423_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_163334_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_164339_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_165002_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-sleeping.gif?alt=media&token=a3b5cea4-24c2-4336-8c4b-c165c3e0535d"
         }
       },
       dragon: {
@@ -632,6 +663,28 @@ export const useCurrentPetAvatarImage = () => {
     return levelInfo.currentLevel;
   };
 
+  // Level 5 dog idle GIF placeholders for adventure avatar (coins buckets)
+  const LEVEL5_DOG_IDLE_GIFS: Record<'coins_50' | 'coins_30' | 'coins_10' | 'coins_0', string> = {
+    coins_50: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-teen-super-happy.gif?alt=media&token=e87d672d-3fa0-4068-bda9-aeac7109eb76',
+    coins_30: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-normal-teen.gif?alt=media&token=48b604a4-d3af-40f8-badf-0161cc6007db',
+    coins_10: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-normal-teen.gif?alt=media&token=48b604a4-d3af-40f8-badf-0161cc6007db',
+    coins_0: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-teen-sad.gif?alt=media&token=79890860-cad1-45ea-8576-ca0e47f56ff2',
+  };
+
+  // Level 5 cat and hamster idle GIF placeholders
+  const LEVEL5_CAT_IDLE_GIFS: Record<'coins_50' | 'coins_30' | 'coins_10' | 'coins_0', string> = {
+    coins_50: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023404_cat-teen-superhappy-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    coins_30: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-normal-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    coins_10: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-normal-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    coins_0: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_024217_cat-teen-sad-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+  };
+  const LEVEL5_HAMSTER_IDLE_GIFS: Record<'coins_50' | 'coins_30' | 'coins_10' | 'coins_0', string> = {
+    coins_50: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-super-happy-unscreen.gif?alt=media&token=1c6950e1-b84e-4241-8a3b-34ee4bb31e4d',
+    coins_30: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6',
+    coins_10: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-neutral-unscreen.gif?alt=media&token=8511abcc-9b24-4ea5-b830-9bdb7ad4bee8',
+    coins_0: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0',
+  };
+
   // Handle pets that have GIF sets; decide by unified careState
   const getSpecialPetImage = (careState: string) => {
     // Helper: collapse careState to GIF mood buckets, and treat any sleep as super-happy
@@ -677,21 +730,37 @@ export const useCurrentPetAvatarImage = () => {
       }
     }
     
-    // Check if Cat is owned and being displayed - map from careState buckets
+    // Check if Cat is owned and being displayed - prefer level 5 idle GIFs
     if (currentPetId === 'cat' && isPetOwned('cat')) {
+      try {
+        const lvl = getCurrentPetLevelFromProgress(currentPetId);
+        if (lvl >= 5) {
+          const override = LEVEL5_CAT_IDLE_GIFS[gifKey];
+          if (override) return override;
+        }
+      } catch {}
       if (gifKey === 'coins_50') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-super-happy-unscreen.gif?alt=media&token=8275c06d-139a-42c3-b5e0-abfdcbddd1e1";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-superhappy-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       } else if (gifKey === 'coins_30') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-happy-unscreen.gif?alt=media&token=baa69ba6-06f5-4c44-ad6b-9a96c241dab0";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023120_cat-baby-happy-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       } else if (gifKey === 'coins_10') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-neutral-unscreen.gif?alt=media&token=fa2abbc8-8f14-4f63-bf51-355ef0d1c310";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023121_cat-baby-normal-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sad-unscreen.gif?alt=media&token=7f5ad9cb-df5d-46dc-ae54-67e35f5a5ed6";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023121_cat-baby-sad-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       }
     }
     
-    // Check if Dog is owned and being displayed - map from careState buckets
+    
+    // Check if Dog is owned and being displayed - use Level 5 idle GIFs when available
     if (currentPetId === 'dog' && isPetOwned('dog')) {
+      try {
+        // Use global per-pet level (totalAdventureCoinsEarned), same as PetPage
+        const lvl = getCurrentPetLevelFromProgress(currentPetId);
+        if (lvl >= 5) {
+          const override = LEVEL5_DOG_IDLE_GIFS[gifKey];
+          if (override) return override;
+        }
+      } catch {}
       if (gifKey === 'coins_50') {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-super-happy-unscreen.gif?alt=media&token=90825746-c450-46a4-aad5-7c8a113dd33a";
       } else if (gifKey === 'coins_30') {
@@ -703,16 +772,23 @@ export const useCurrentPetAvatarImage = () => {
       }
     }
     
-    // Check if Hamster is owned and being displayed - map from careState buckets
+    // Check if Hamster is owned and being displayed - prefer level 5 idle GIFs
     if (currentPetId === 'hamster' && isPetOwned('hamster')) {
+      try {
+        const lvl = getCurrentPetLevelFromProgress(currentPetId);
+        if (lvl >= 5) {
+          const override = LEVEL5_HAMSTER_IDLE_GIFS[gifKey];
+          if (override) return override;
+        }
+      } catch {}
       if (gifKey === 'coins_50') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-super-happy-unscreen.gif?alt=media&token=1c6950e1-b84e-4241-8a3b-34ee4bb31e4d";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-baby-superhappy.gif?alt=media&token=99e18bb5-df61-4ed1-a0d2-0acad400c4d3";
       } else if (gifKey === 'coins_30') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-happy-baby.gif?alt=media&token=7e2ee59b-ea92-4565-8572-dc574fcc3e86";
       } else if (gifKey === 'coins_10') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-neutral-unscreen.gif?alt=media&token=8511abcc-9b24-4ea5-b830-9bdb7ad4bee8";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-normal-baby.gif?alt=media&token=ec604ab4-7e15-4980-ba87-224a4cf7c5bf";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-baby-sad.gif?alt=media&token=4573fc4e-6141-45bb-acf4-f1214a32198e";
       }
     }
     
@@ -794,6 +870,35 @@ export const useCurrentPetAvatarImage = () => {
 // Replace these per-pet URLs with real Firestore/GCS links when available.
 export type PetEmotionAction = 'feed' | 'water' | 'pat' | 'needy';
 
+// Level-based overrides for action media (use when a pet reaches a certain level)
+// Only dog level 5 is populated now; others fall back to ACTION_MEDIA_PLACEHOLDERS
+const LEVEL_ACTION_OVERRIDES: Record<string, Record<number, Record<PetEmotionAction, string>>> = {
+  dog: {
+    5: {
+      feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-teen-food.gif?alt=media&token=42d81baf-3a00-46bc-ac9e-6254c0a71e81',
+      water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-teen-water.gif?alt=media&token=8b1e9907-ea6a-4d9b-8e6c-56139a6f46c1',
+      pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-pet-teen.gif?alt=media&token=625cd157-aad0-441d-bbf7-9ead26cd1bc7',
+      needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-teen-sad.gif?alt=media&token=79890860-cad1-45ea-8576-ca0e47f56ff2',
+    }
+  },
+  cat: {
+    5: {
+      feed: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-eating-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+      water: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023404_cat-teen-drinking-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+      pat: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023403_cat-teen-pat-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+      needy: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-normal-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    }
+  },
+  hamster: {
+    5: {
+      feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-food-unscreen.gif?alt=media&token=799c1d3a-0076-43e8-ac8b-b9ecf9481dd0',
+      water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-water-unscreen.gif?alt=media&token=917777a5-10a7-4aa3-a7d5-6b0db1cc149b',
+      pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6',
+      needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0',
+    }
+  }
+};
+
 const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>> = {
   dog: {
     feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-food-unscreen.gif?alt=media&token=fd024488-b0d1-499b-9d48-4552ffd99271',
@@ -803,16 +908,16 @@ const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>
     needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sad-unscreen.gif?alt=media&token=aa2818bf-d631-4394-97f5-3955b5602299',
   },
   cat: {
-    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-food-unscreen.gif?alt=media&token=c82c8075-f34e-4ee2-b986-ea674a42a559',
-    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-water-unscreen.gif?alt=media&token=3ce09ca8-74c3-48ca-a153-60e5a5dd6c63',
-    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-happy-unscreen.gif?alt=media&token=baa69ba6-06f5-4c44-ad6b-9a96c241dab0',
-    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sad-unscreen.gif?alt=media&token=7f5ad9cb-df5d-46dc-ae54-67e35f5a5ed6',
+    feed: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023119_cat-baby-eat-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    water: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023121_cat-baby-drink-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    pat: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023129_cat-baby-pat-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    needy: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023121_cat-baby-sad-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
   },
   hamster: {
-    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-food-unscreen.gif?alt=media&token=799c1d3a-0076-43e8-ac8b-b9ecf9481dd0',
-    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-water-unscreen.gif?alt=media&token=917777a5-10a7-4aa3-a7d5-6b0db1cc149b',
-    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-waving-unscreen.gif?alt=media&token=d57ef528-9abd-4728-9b92-dee06e4763c6',
-    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0',
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-baby-food.gif?alt=media&token=7fdd0807-1d03-4fe6-a046-8c9d340efd27',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-babay-water.gif?alt=media&token=8f824134-1783-4251-92fa-6e16478f98d6',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-baby-superhappy.gif?alt=media&token=99e18bb5-df61-4ed1-a0d2-0acad400c4d3',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-baby-sad.gif?alt=media&token=4573fc4e-6141-45bb-acf4-f1214a32198e',
   },
   parrot: {
     feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-food-unscreen.gif?alt=media&token=4201c661-7acc-46d0-8c22-24abd39ef948',
@@ -840,16 +945,67 @@ const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>
   },
 };
 
+// Helper: compute current level for a given pet using PetProgressStorage and same thresholds as PetPage
+function getCurrentPetLevelFromProgress(petType: string): number {
+  try {
+    const petId = PetProgressStorage.getCurrentSelectedPet?.() || petType || 'dog';
+    const resolvedType = PetProgressStorage.getPetType?.(petId) || petId;
+    const progress = PetProgressStorage.getPetProgress(petId, resolvedType);
+    const totalCoins = progress?.levelData?.totalAdventureCoinsEarned || 0;
+    const coinsForLevel = (n: number): number => {
+      if (n === 1) return 0;
+      if (n === 2) return 50;
+      if (n === 3) return 120;
+      if (n === 4) return 200;
+      return 200 + 150 * (n - 4);
+    };
+    let currentLevel = 1;
+    for (let n = 2; n <= 50; n++) {
+      if (totalCoins >= coinsForLevel(n)) currentLevel = n; else break;
+    }
+    return currentLevel;
+  } catch {
+    return 1;
+  }
+}
+
 export const getPetEmotionActionMedia = (
   petType: string,
   action: PetEmotionAction
 ): string => {
+  // Try level-specific override first
+  const level = getCurrentPetLevelFromProgress(petType);
+  // Exact level match
+  const levelOverride = LEVEL_ACTION_OVERRIDES[petType]?.[level]?.[action];
+  if (levelOverride) return levelOverride;
+  // Fallback: use the highest defined override <= current level (so L5 applies to L6+)
+  const definedLevels = Object.keys(LEVEL_ACTION_OVERRIDES[petType] || {})
+    .map((k) => Number(k))
+    .filter((n) => !Number.isNaN(n) && n <= level)
+    .sort((a, b) => b - a);
+  if (definedLevels.length > 0) {
+    const best = definedLevels[0];
+    const bestOverride = LEVEL_ACTION_OVERRIDES[petType]?.[best]?.[action];
+    if (bestOverride) return bestOverride;
+  }
   const set = ACTION_MEDIA_PLACEHOLDERS[petType] || ACTION_MEDIA_PLACEHOLDERS['dog'];
   return set[action] || '/placeholder.svg';
 };
 
 // ----- Yawn media placeholders (sticky default override) -----
 // Placeholder links for a pet "yawn" or bored state. Replace with real GIFs when available.
+const LEVEL_YAWN_OVERRIDES: Record<string, Record<number, string>> = {
+  dog: {
+    5: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-teen-yawn.gif?alt=media&token=64390936-c858-4345-9851-034c2de1115b',
+  },
+  cat: {
+    5: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023406_cat-teen-yawn-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+  },
+  hamster: {
+    5: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-baby-yawn.gif?alt=media&token=a35cd1cd-b9ed-457e-babe-033a3739bbb9',
+  }
+};
+
 const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
   dog: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-yawn-unscreen.gif?alt=media&token=e84b84be-8222-4632-941c-3386e67c879a',
   cat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-yawn-unscreen.gif?alt=media&token=ef95740c-81e3-4928-949b-e329b1db25b3',
@@ -862,5 +1018,19 @@ const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
 
 export const getPetYawnMedia = (petType: string): string => {
   const key = petType || 'dog';
+  const level = getCurrentPetLevelFromProgress(key);
+  // Exact level match
+  const levelOverride = LEVEL_YAWN_OVERRIDES[key]?.[level];
+  if (levelOverride) return levelOverride;
+  // Fallback: use the highest defined override <= current level
+  const definedLevels = Object.keys(LEVEL_YAWN_OVERRIDES[key] || {})
+    .map((k) => Number(k))
+    .filter((n) => !Number.isNaN(n) && n <= level)
+    .sort((a, b) => b - a);
+  if (definedLevels.length > 0) {
+    const best = definedLevels[0];
+    const bestOverride = LEVEL_YAWN_OVERRIDES[key]?.[best];
+    if (bestOverride) return bestOverride;
+  }
   return YAWN_MEDIA_PLACEHOLDERS[key] || YAWN_MEDIA_PLACEHOLDERS['dog'] || '/placeholder.svg';
 };

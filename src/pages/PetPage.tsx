@@ -17,7 +17,7 @@ import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart, Rocket, TrendingUp, Clock } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
@@ -82,6 +82,79 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return {};
     }
   });
+  
+  // Camera selfie modal state
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
+  const [polaroidUrl, setPolaroidUrl] = useState<string | null>(null);
+  const [isProcessingCapture, setIsProcessingCapture] = useState(false);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+  const [selectedFilter, setSelectedFilter] = useState<'none' | 'bw' | 'sepia' | 'warm' | 'cool' | 'vivid'>('none');
+
+  const playShutterSound = () => {
+    try {
+      const audio = new Audio('/sounds/camera-click.mp3');
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    } catch {}
+  };
+
+  const getCssFilter = (f: typeof selectedFilter): string => {
+    switch (f) {
+      case 'bw':
+        return 'grayscale(1) contrast(1.05)';
+      case 'sepia':
+        return 'sepia(0.75) contrast(1.05)';
+      case 'warm':
+        return 'saturate(1.2) contrast(1.05) hue-rotate(-10deg)';
+      case 'cool':
+        return 'saturate(1.1) contrast(1.05) hue-rotate(12deg)';
+      case 'vivid':
+        return 'saturate(1.35) contrast(1.15)';
+      default:
+        return 'none';
+    }
+  };
+  
+  // Camera selfie modal state (defined above)
+
+  
+
+  // Start/stop camera stream when modal opens/closes or when facing mode changes
+  useEffect(() => {
+    const start = async () => {
+      if (!showCamera) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode },
+          audio: false,
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(() => {});
+        }
+      } catch (e) {
+        console.error('Camera error', e);
+        toast.error('Camera not available');
+        setShowCamera(false);
+      }
+    };
+    const stop = () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    };
+
+    start();
+    return () => stop();
+  }, [showCamera, facingMode]);
   
   // Helper functions for dens and accessories
   const isDenOwned = (petType: string) => ownedDens.includes(`${petType}_den`);
@@ -157,6 +230,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [showMoreOverlay, setShowMoreOverlay] = useState(false);
   const [lastSpokenMessage, setLastSpokenMessage] = useState('');
   
+  // Camera selfie modal state (defined earlier)
+
   // Pet store state
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
   const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
@@ -663,7 +738,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const bubbleRef = useRef<HTMLDivElement | null>(null);
   const petRef = useRef<HTMLDivElement | null>(null);
   const [bubbleTopPx, setBubbleTopPx] = useState<number>(24);
-  const [evoOffsetPx, setEvoOffsetPx] = useState<number>(72);
 
   useEffect(() => {
     const MIN_GAP_PX = 16;
@@ -681,10 +755,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         const nextTop = Math.max(8, DEFAULT_TOP_PX - missing);
         setBubbleTopPx(nextTop);
       }
-      // Position evolution strip just to the right of the pet image
-      const halfPetWidth = Math.round(petRect.width / 2);
-      const gapRight = 16; // desired gap between pet and strip
-      setEvoOffsetPx(halfPetWidth + gapRight);
     };
     // initial and on resize
     setTimeout(measure, 0);
@@ -1545,21 +1615,51 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdog-sleeping.gif?alt=media&token=ffc0469d-0cd0-488e-9672-ac41282b3c26"
         }
+        ,
+        5: {
+          // Level 5 Dog images (placeholders) - copy of Level 1 key system
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045604_dog-teen-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045452_dog-teen-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045454_dog-teen-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045338_dog--teen-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_045654_dog-teen-slleping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        }
       },
       cat: {
         1: {
-          // Level 1 Cat images - coin-based progression
-          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234430_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250918_002119_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_234441_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250910_000550_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_153821_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250911_155438_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-sleeping.gif?alt=media&token=dd59e26d-3694-433f-a36a-e852ecf4f519"
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023120_cat-baby-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023119_cat-baby-normal-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023115_cat-baby-superhappy-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-superhappy-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023118_cat-baby-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5: {
+          // Level 5 Cat images (placeholders)
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023359_cat-teen-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023359_cat-teen-normal-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023359_cat-teen-happy-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023400_cat-teen-superhappy-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251004_023402_cat-teen-sleep-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
         }
       },
       hamster: {
         1: {
+          // Level 5 Hamster images (placeholders)
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-sad-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins10-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054243_hamster-baby-coins30-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054244_hamster-baby-coins50-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_054710_hamster-baby-sleeping-gif-unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+        },
+        5:{
           // Level 1 Hamster images - coin-based progression
           coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162526_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250915_162541_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
@@ -1617,6 +1717,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
         }
+      },
+      pikachu: {
+        1: {
+          // Level 1 Parrot images - coin-based progression
+          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_063222_ChatGPT_Image_Oct_3__2025__12_01_53_PM-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
+        }
       }
     };
 
@@ -1626,7 +1738,9 @@ const getSleepyPetImage = (clicks: number) => {
       return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250905_160158_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
     }
 
-    const levelImages = petLevelImages[level as keyof typeof petLevelImages] || petLevelImages[1];
+    // Clamp display level: for any level >= 5, use Level 5 visuals (dog, cat, hamster)
+    const levelKey = ((petType === 'dog' || petType === 'cat' || petType === 'hamster') && level >= 5) ? 5 : level;
+    const levelImages = petLevelImages[levelKey as keyof typeof petLevelImages] || petLevelImages[1];
     return levelImages[careState as keyof typeof levelImages] || levelImages.coins_0;
   };
 
@@ -2074,6 +2188,16 @@ const getSleepyPetImage = (clicks: number) => {
         requiredLevel: 10,
         isLocked: userLevel < 10,
         category: 'rare'
+      },
+      pikachu: {
+        id: 'pikachu',
+        emoji: '🦅',
+        name: 'Pikachu',
+        owned: isPetOwned('Pikachu'),
+        cost: 1000,
+        requiredLevel: 10,
+        isLocked: userLevel < 10,
+        category: 'legendary'
       }
     };
   };
@@ -3375,55 +3499,54 @@ const getSleepyPetImage = (clicks: number) => {
                 </div>
               </div>
             )}
-            <img 
-              src={getPetImage()}
-              alt="Pet"
-              className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                sleepClicks > 0 ? 'w-72 h-72 max-h-[320px]' : 'w-64 h-64 max-h-[280px]'
-              }`}
-              style={{
-                animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
-                          getCumulativeCarePercentage() >= 60 ? 'petEvolve 800ms ease-out' : 'none'
-              }}
-            />
+
+            <div className="relative">
+              <img 
+                src={getPetImage()}
+                alt="Pet"
+                className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
+                  sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
+                }`}
+                style={{
+                  animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
+                            getCumulativeCarePercentage() >= 60 ? 'petEvolve 800ms ease-out' : 'none'
+                }}
+              />
+              {/* Evolution strip anchored to pet (desktop) */}
+              <div className="absolute top-1/2 left-full -translate-y-1/2 ml-4 z-20 hidden sm:block">
+                {(() => {
+                  const { currentLevel } = getLevelInfo();
+                  const levelInfo = getLevelInfo();
+                  const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+                  return (
+                    <EvolutionStrip
+                      currentLevel={currentLevel}
+                      stageLevels={[1, 5, 10]}
+                      orientation="vertical"
+                      size="sm"
+                      petType={currentPet}
+                      unlockedImage={getLevelBasedPetImage(currentPet, currentLevel, 'coins_10')}
+                      ringProgressPct={ringPct}
+                    />
+                  );
+                })()}
+              </div>
+              {/* Evolution strip anchored to pet (mobile) */}
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-20 sm:hidden">
+                {(() => {
+                  const { currentLevel } = getLevelInfo();
+                  const levelInfo = getLevelInfo();
+                  const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+                  return (
+                    <EvolutionStrip currentLevel={currentLevel} stageLevels={[1, 5, 10]} size="sm" ringProgressPct={ringPct} />
+                  );
+                })()}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Evolution strip next to the pet */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="relative w-full h-full">
-          <div className="pointer-events-auto absolute left-1/2 top-1/2 z-20 hidden sm:block" style={{ transform: `translate(${evoOffsetPx}px, -80%)` }}>
-            {(() => {
-              const { currentLevel } = getLevelInfo();
-              const levelInfo = getLevelInfo();
-              const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
-              return (
-                <EvolutionStrip
-                  currentLevel={currentLevel}
-                  stageLevels={[1, 5, 10]}
-                  orientation="vertical"
-                  size="sm"
-                  petType={currentPet}
-                  unlockedImage={getLevelBasedPetImage(currentPet, currentLevel, 'coins_10')}
-                  ringProgressPct={ringPct}
-                />
-              );
-            })()}
-          </div>
-          {/* Mobile placement under pet */}
-          <div className="pointer-events-auto absolute bottom-28 left-1/2 -translate-x-1/2 z-20 sm:hidden">
-            {(() => {
-              const { currentLevel } = getLevelInfo();
-              const levelInfo = getLevelInfo();
-              const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
-              return (
-                <EvolutionStrip currentLevel={currentLevel} stageLevels={[1, 5, 10]} size="sm" ringProgressPct={ringPct} />
-              );
-            })()}
-          </div>
-        </div>
-      </div>
 
       {/* Dog Evolution Display - Right Side - DISABLED */}
       {/* 
@@ -3752,22 +3875,234 @@ const getSleepyPetImage = (clicks: number) => {
         );
       })()}
 
-      {/* Audio Toggle Button */}
-      <button
+      {/* Camera FAB (replaces audio toggle) */}
+      <Button
         onClick={() => {
-          setAudioEnabled(!audioEnabled);
           if (isSpeaking) {
             ttsService.stop();
           }
+          setShowCamera(true);
         }}
-        className={`fixed bottom-6 right-6 w-14 h-14 rounded-full border-2 border-white/30 text-2xl flex items-center justify-center shadow-xl z-40 transition-all duration-200 hover:scale-110 active:scale-95 ${
-          audioEnabled 
-            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white' 
-            : 'bg-gradient-to-br from-red-500 to-red-600 text-white'
-        }`}
+        variant="outline"
+        size="icon"
+        aria-label="Open camera"
+        className="fixed bottom-6 right-6 h-16 w-16 rounded-xl border-2 border-foreground bg-white text-foreground btn-animate shadow-solid z-40 [&_svg]:!size-9"
       >
-        {audioEnabled ? '🔊' : '🔇'}
-      </button>
+        <Camera />
+      </Button>
+
+      {/* Camera Modal */}
+      {showCamera && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center" role="dialog" aria-modal="true" onClick={() => {
+          // close on backdrop click
+          setShowCamera(false);
+        }}>
+          <div className="relative w-[92vw] max-w-md aspect-[3/4] bg-black rounded-2xl overflow-hidden border border-white/20 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Video preview */}
+            {!capturedUrl ? (
+              <>
+                <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]" style={{ filter: getCssFilter(selectedFilter) }} />
+                {/* Live pet overlay */}
+                <img
+                  src={getPetImage()}
+                  alt="Pet overlay"
+                  className="absolute left-[6%] bottom-[20%] w-auto drop-shadow-xl pointer-events-none select-none"
+                  style={{ height: '50%' }}
+                />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-black flex items-center justify-center p-4">
+                <img
+                  src={polaroidUrl || capturedUrl}
+                  alt="Polaroid"
+                  className="max-w-full max-h-full drop-shadow-2xl"
+                  style={{ transform: 'rotate(-2deg)' }}
+                />
+              </div>
+            )}
+
+            {/* Controls */}
+            <div className="absolute inset-x-0 bottom-0 p-4 flex items-center justify-between gap-3 bg-gradient-to-t from-black/70 to-transparent">
+              {!capturedUrl ? (
+                <>
+                  <button
+                    className="px-4 py-2 rounded-full bg-white/20 text-white border border-white/30 text-sm"
+                    onClick={async () => {
+                      setFacingMode((m) => (m === 'user' ? 'environment' : 'user'));
+                    }}
+                  >
+                    Flip
+                  </button>
+                  <button
+                    className={`w-16 h-16 rounded-full bg-white ${isProcessingCapture ? 'opacity-60' : ''}`}
+                  onClick={async () => {
+                    if (!videoRef.current || isProcessingCapture) return;
+                    try {
+                      setIsProcessingCapture(true);
+                      playShutterSound();
+                      const frameVideo = videoRef.current;
+                      const canvas = document.createElement('canvas');
+                      // Set a reasonable output resolution based on video
+                      const vw = frameVideo.videoWidth || 720;
+                      const vh = frameVideo.videoHeight || 960;
+                      canvas.width = vw;
+                      canvas.height = vh;
+                      const ctx = canvas.getContext('2d');
+                      if (!ctx) throw new Error('Canvas not supported');
+                      // Draw camera frame first (background)
+                      ctx.save();
+                      // Unmirror the saved result so text isn't reversed
+                      ctx.translate(vw, 0);
+                      ctx.scale(-1, 1);
+                      // Draw with filter
+                      if ('filter' in ctx) {
+                        (ctx as any).filter = getCssFilter(selectedFilter);
+                      }
+                      ctx.drawImage(frameVideo, 0, 0, vw, vh);
+                      if ('filter' in ctx) {
+                        (ctx as any).filter = 'none';
+                      }
+                      ctx.restore();
+
+                      // Draw pet image as overlay in front for Phase 1
+                      const petUrl = getPetImage();
+                      await new Promise<void>((resolve, reject) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                          // Place pet at bottom-left with 50% height
+                          const desiredHeight = Math.round(vh * 0.5);
+                          const scale = desiredHeight / img.height;
+                          const w = Math.round(img.width * scale);
+                          const h = desiredHeight;
+                          const x = Math.round(vw * 0.06);
+                          const y = vh - h - Math.round(vh * 0.20);
+                          ctx.drawImage(img, x, y, w, h);
+                          resolve();
+                        };
+                        img.onerror = () => reject(new Error('Failed to load pet image'));
+                        img.src = petUrl;
+                      });
+
+                      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve as BlobCallback, 'image/jpeg', 0.9));
+                      if (!blob) throw new Error('Failed to create image');
+                      const url = URL.createObjectURL(blob);
+                      setCapturedUrl(url);
+
+                      // Build a polaroid-framed image for display and saving
+                      await new Promise<void>((resolve) => {
+                        const img = new Image();
+                        img.onload = async () => {
+                          const maxSide = Math.max(img.width, img.height);
+                          const pad = Math.round(maxSide * 0.06);
+                          const bottomExtra = Math.round(maxSide * 0.18);
+                          const fw = img.width + pad * 2;
+                          const fh = img.height + pad + bottomExtra;
+                          const fCanvas = document.createElement('canvas');
+                          fCanvas.width = fw;
+                          fCanvas.height = fh;
+                          const fctx = fCanvas.getContext('2d');
+                          if (!fctx) { resolve(); return; }
+                          // White frame
+                          fctx.fillStyle = '#ffffff';
+                          fctx.fillRect(0, 0, fw, fh);
+                          // Soft border
+                          fctx.strokeStyle = 'rgba(0,0,0,0.08)';
+                          fctx.lineWidth = Math.max(2, Math.round(maxSide * 0.005));
+                          fctx.strokeRect(fctx.lineWidth/2, fctx.lineWidth/2, fw - fctx.lineWidth, fh - fctx.lineWidth);
+                          // Photo
+                          fctx.drawImage(img, pad, pad, img.width, img.height);
+                          const pBlob: Blob | null = await new Promise((r) => fCanvas.toBlob(r as BlobCallback, 'image/jpeg', 0.95));
+                          if (pBlob) {
+                            const pUrl = URL.createObjectURL(pBlob);
+                            setPolaroidUrl(pUrl);
+                          }
+                          resolve();
+                        };
+                        img.crossOrigin = 'anonymous';
+                        img.src = url;
+                      });
+                    } catch (err) {
+                      console.error(err);
+                      toast.error('Failed to capture photo');
+                    } finally {
+                      setIsProcessingCapture(false);
+                    }
+                  }}
+                  aria-label="Capture selfie"
+                    />
+                  <span className="px-4 py-2 rounded-full opacity-0 select-none">Close</span>
+                </>
+              ) : (
+                <div className="flex items-center gap-3 mx-auto">
+                  <button
+                    className="px-4 py-2 rounded-full bg-white text-black text-sm"
+                    onClick={() => {
+                      // download
+                      const toSave = polaroidUrl || capturedUrl;
+                      if (!toSave) return;
+                      const a = document.createElement('a');
+                      a.href = toSave;
+                      a.download = 'pet-selfie.jpg';
+                      a.click();
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="px-4 py-2 rounded-full bg-white/20 text-white border border-white/30 text-sm"
+                    onClick={() => {
+                      // retake
+                      if (capturedUrl) URL.revokeObjectURL(capturedUrl);
+                      if (polaroidUrl) URL.revokeObjectURL(polaroidUrl);
+                      setCapturedUrl(null);
+                      setPolaroidUrl(null);
+                    }}
+                  >
+                    Retake
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Top controls */}
+            <div className="absolute top-0 right-0 p-3">
+              <button
+                className="px-4 py-2 rounded-full bg-white/20 text-white border border-white/30 text-sm"
+                onClick={() => setShowCamera(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Filter selector */}
+            {!capturedUrl && (
+              <div className="absolute left-0 right-0 bottom-24 px-4 flex gap-2 justify-center">
+                {[
+                  { id: 'none', label: 'None' },
+                  { id: 'bw', label: 'B&W' },
+                  { id: 'sepia', label: 'Sepia' },
+                  { id: 'warm', label: 'Warm' },
+                  { id: 'cool', label: 'Cool' },
+                  { id: 'vivid', label: 'Vivid' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    className={`px-3 py-1 rounded-full text-xs border ${selectedFilter === (f.id as any) ? 'bg-white text-black border-white' : 'bg-white/15 text-white border-white/30'}`}
+                    onClick={() => setSelectedFilter(f.id as any)}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Top controls */}
+            <div className="absolute top-0 right-0 p-3 flex items-center gap-2">
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pet Switcher - Only show if user owns multiple pets */}
       {ownedPets.length > 1 && (
@@ -3795,9 +4130,9 @@ const getSleepyPetImage = (clicks: number) => {
             const levelForPet = (() => {
               try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
             })();
-            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot'].includes(petType);
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'].includes(petType);
             const petImageUrl = petHasImages ? getLevelBasedPetImage(petType, levelForPet, 'coins_30') : '';
-            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : '🐾';
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : '🐾';
 
             return (
               <button
@@ -3938,6 +4273,7 @@ const getSleepyPetImage = (clicks: number) => {
                           ${pet.category === 'common' ? 'bg-green-100 text-green-700 border-green-300' : ''}
                           ${pet.category === 'uncommon' ? 'bg-purple-100 text-purple-700 border-purple-300' : ''}
                           ${pet.category === 'rare' ? 'bg-amber-100 text-amber-700 border-amber-300' : ''}
+                      ${pet.category === 'legendary' ? 'bg-red-100 text-red-700 border-red-300' : ''}
                         `}
                       >
                         {pet.category}
@@ -3952,7 +4288,7 @@ const getSleepyPetImage = (clicks: number) => {
                     {/* Pet Image or Emoji */}
                     {pet.isLocked && !pet.owned ? (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={`${pet.name} (locked)`}
@@ -3965,7 +4301,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     ) : (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={pet.name}
