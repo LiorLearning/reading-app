@@ -85,14 +85,24 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   const [isImageLoading, setIsImageLoading] = React.useState(false);
   const fadeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const hasNotifiedImageDisplayedRef = React.useRef(false);
+  const hasInitializedNewPanelRef = React.useRef(false);
+  const isCurrentImageDataUrl = React.useMemo(() => typeof currentImage === 'string' && currentImage.startsWith('data:image'), [currentImage]);
+  const incomingImageIsDataUrl = React.useMemo(() => typeof image === 'string' && image.startsWith('data:image'), [image]);
   
   // Update current image when resolved URL changes
   React.useEffect(() => {
+    if (incomingImageIsDataUrl) {
+      setCurrentImage(image);
+      setShowImageAfterLoad(true);
+      setIsImageLoading(false);
+      return;
+    }
+
     if (resolvedImageUrl !== currentImage) {
       console.log(`🔄 ComicPanel: Image resolved from ${isExpiredUrl ? 'expired DALL-E URL' : 'original'} to: ${resolvedImageUrl.substring(0, 50)}...`);
       setCurrentImage(resolvedImageUrl);
     }
-  }, [resolvedImageUrl, currentImage, isExpiredUrl]);
+  }, [resolvedImageUrl, currentImage, isExpiredUrl, incomingImageIsDataUrl, image]);
 
   // Preload image and wait for it to fully load before showing
   const preloadImage = React.useCallback((imageUrl: string): Promise<void> => {
@@ -114,31 +124,29 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
 
     // When isGenerating changes from true to false, preload the new image first
     if (previousLoadingState && !isGenerating) {
+      if (incomingImageIsDataUrl || isCurrentImageDataUrl) {
+        setShowImageAfterLoad(true);
+        setIsImageLoading(false);
+        setPreviousLoadingState(isGenerating);
+        return;
+      }
+
       setIsImageLoading(true);
-      
-      // Update the current image when loading completes
       setCurrentImage(image);
-      
-      // Preload the new image and show it only when ready
       preloadImage(image)
         .then(() => {
-          // Extra safety check: only show image if we're still not generating
-          // This prevents showing the image if loading started again during preload
           if (!isGenerating) {
             setShowImageAfterLoad(true);
             setIsImageLoading(false);
-            // Play completion sound when image is ready and displayed
             playImageCompleteSound();
           }
         })
         .catch((error) => {
           console.warn('Failed to preload image, showing anyway:', error);
-          // Show the image even if preloading failed, but add a small delay
           fadeTimeoutRef.current = setTimeout(() => {
             if (!isGenerating) {
               setShowImageAfterLoad(true);
               setIsImageLoading(false);
-              // Play completion sound even if preloading failed
               playImageCompleteSound();
             }
           }, 300);
@@ -146,20 +154,25 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
     }
     
     // When loading starts again, immediately hide the image
-    if (isGenerating && !previousLoadingState) {
+    if (isGenerating && !previousLoadingState && !isCurrentImageDataUrl) {
       setShowImageAfterLoad(false);
       setIsImageLoading(false);
     }
     
     setPreviousLoadingState(isGenerating);
-  }, [isGenerating, previousLoadingState, image, preloadImage]);
+  }, [isGenerating, previousLoadingState, image, preloadImage, incomingImageIsDataUrl, isCurrentImageDataUrl]);
 
   // Reset state when it's a new panel or image changes
   React.useEffect(() => {
     if (isNew) {
-      setShowImageAfterLoad(false);
-      setCurrentImage(image);
-      setIsImageLoading(false);
+      if (!hasInitializedNewPanelRef.current) {
+        setShowImageAfterLoad(false);
+        setCurrentImage(image);
+        setIsImageLoading(false);
+        hasInitializedNewPanelRef.current = true;
+      }
+    } else if (hasInitializedNewPanelRef.current) {
+      hasInitializedNewPanelRef.current = false;
     }
   }, [isNew, image]);
 
@@ -235,6 +248,19 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
       }
     };
   }, []);
+
+  React.useEffect(() => {
+    if (
+      !incomingImageIsDataUrl &&
+      !isCurrentImageDataUrl &&
+      !isGenerating &&
+      !isImageLoading &&
+      image === currentImage &&
+      !showImageAfterLoad
+    ) {
+      setShowImageAfterLoad(true);
+    }
+  }, [incomingImageIsDataUrl, isCurrentImageDataUrl, isGenerating, isImageLoading, image, currentImage, showImageAfterLoad]);
   return (
     <div className={cn(
       "relative w-full h-full flex flex-col overflow-hidden",
@@ -242,7 +268,11 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
       className
     )}>
       <div className="flex-1 min-h-0 relative">
-        {(isNew || isGenerating || isImageLoading) ? (
+        {(() => {
+          const isInlineData = incomingImageIsDataUrl || isCurrentImageDataUrl;
+          const shouldShowLoader = !isInlineData && !showImageAfterLoad && (isNew || isGenerating || isImageLoading);
+          return shouldShowLoader;
+        })() ? (
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
             {/* Loading Animation Container */}
             <div 
