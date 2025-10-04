@@ -608,7 +608,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const bubbleRef = useRef<HTMLDivElement | null>(null);
   const petRef = useRef<HTMLDivElement | null>(null);
   const [bubbleTopPx, setBubbleTopPx] = useState<number>(24);
-  const [evoOffsetPx, setEvoOffsetPx] = useState<number>(72);
 
   useEffect(() => {
     const MIN_GAP_PX = 16;
@@ -626,10 +625,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         const nextTop = Math.max(8, DEFAULT_TOP_PX - missing);
         setBubbleTopPx(nextTop);
       }
-      // Position evolution strip just to the right of the pet image
-      const halfPetWidth = Math.round(petRect.width / 2);
-      const gapRight = 16; // desired gap between pet and strip
-      setEvoOffsetPx(halfPetWidth + gapRight);
     };
     // initial and on resize
     setTimeout(measure, 0);
@@ -3189,55 +3184,53 @@ const getSleepyPetImage = (clicks: number) => {
                 </div>
               </div>
             )}
-            <img 
-              src={getPetImage()}
-              alt="Pet"
-              className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
-              }`}
-              style={{
-                animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
-                          getCumulativeCarePercentage() >= 60 ? 'petEvolve 800ms ease-out' : 'none'
-              }}
-            />
+            <div className="relative">
+              <img 
+                src={getPetImage()}
+                alt="Pet"
+                className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
+                  sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
+                }`}
+                style={{
+                  animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
+                            getCumulativeCarePercentage() >= 60 ? 'petEvolve 800ms ease-out' : 'none'
+                }}
+              />
+              {/* Evolution strip anchored to pet (desktop) */}
+              <div className="absolute top-1/2 left-full -translate-y-1/2 ml-4 z-20 hidden sm:block">
+                {(() => {
+                  const { currentLevel } = getLevelInfo();
+                  const levelInfo = getLevelInfo();
+                  const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+                  return (
+                    <EvolutionStrip
+                      currentLevel={currentLevel}
+                      stageLevels={[1, 5, 10]}
+                      orientation="vertical"
+                      size="sm"
+                      petType={currentPet}
+                      unlockedImage={getLevelBasedPetImage(currentPet, currentLevel, 'coins_10')}
+                      ringProgressPct={ringPct}
+                    />
+                  );
+                })()}
+              </div>
+              {/* Evolution strip anchored to pet (mobile) */}
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-20 sm:hidden">
+                {(() => {
+                  const { currentLevel } = getLevelInfo();
+                  const levelInfo = getLevelInfo();
+                  const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+                  return (
+                    <EvolutionStrip currentLevel={currentLevel} stageLevels={[1, 5, 10]} size="sm" ringProgressPct={ringPct} />
+                  );
+                })()}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Evolution strip next to the pet */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="relative w-full h-full">
-          <div className="pointer-events-auto absolute left-1/2 top-1/2 z-20 hidden sm:block" style={{ transform: `translate(${evoOffsetPx}px, -80%)` }}>
-            {(() => {
-              const { currentLevel } = getLevelInfo();
-              const levelInfo = getLevelInfo();
-              const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
-              return (
-                <EvolutionStrip
-                  currentLevel={currentLevel}
-                  stageLevels={[1, 5, 10]}
-                  orientation="vertical"
-                  size="sm"
-                  petType={currentPet}
-                  unlockedImage={getLevelBasedPetImage(currentPet, currentLevel, 'coins_10')}
-                  ringProgressPct={ringPct}
-                />
-              );
-            })()}
-          </div>
-          {/* Mobile placement under pet */}
-          <div className="pointer-events-auto absolute bottom-28 left-1/2 -translate-x-1/2 z-20 sm:hidden">
-            {(() => {
-              const { currentLevel } = getLevelInfo();
-              const levelInfo = getLevelInfo();
-              const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
-              return (
-                <EvolutionStrip currentLevel={currentLevel} stageLevels={[1, 5, 10]} size="sm" ringProgressPct={ringPct} />
-              );
-            })()}
-          </div>
-        </div>
-      </div>
 
       {/* Dog Evolution Display - Right Side - DISABLED */}
       {/* 
