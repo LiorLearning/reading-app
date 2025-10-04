@@ -81,6 +81,79 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     }
   });
   
+  // Camera selfie modal state
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [capturedUrl, setCapturedUrl] = useState<string | null>(null);
+  const [polaroidUrl, setPolaroidUrl] = useState<string | null>(null);
+  const [isProcessingCapture, setIsProcessingCapture] = useState(false);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+  const [selectedFilter, setSelectedFilter] = useState<'none' | 'bw' | 'sepia' | 'warm' | 'cool' | 'vivid'>('none');
+
+  const playShutterSound = () => {
+    try {
+      const audio = new Audio('/sounds/camera-click.mp3');
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    } catch {}
+  };
+
+  const getCssFilter = (f: typeof selectedFilter): string => {
+    switch (f) {
+      case 'bw':
+        return 'grayscale(1) contrast(1.05)';
+      case 'sepia':
+        return 'sepia(0.75) contrast(1.05)';
+      case 'warm':
+        return 'saturate(1.2) contrast(1.05) hue-rotate(-10deg)';
+      case 'cool':
+        return 'saturate(1.1) contrast(1.05) hue-rotate(12deg)';
+      case 'vivid':
+        return 'saturate(1.35) contrast(1.15)';
+      default:
+        return 'none';
+    }
+  };
+  
+  // Camera selfie modal state (defined above)
+
+  
+
+  // Start/stop camera stream when modal opens/closes or when facing mode changes
+  useEffect(() => {
+    const start = async () => {
+      if (!showCamera) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode },
+          audio: false,
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(() => {});
+        }
+      } catch (e) {
+        console.error('Camera error', e);
+        toast.error('Camera not available');
+        setShowCamera(false);
+      }
+    };
+    const stop = () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    };
+
+    start();
+    return () => stop();
+  }, [showCamera, facingMode]);
+  
   // Helper functions for dens and accessories
   const isDenOwned = (petType: string) => ownedDens.includes(`${petType}_den`);
   const isAccessoryOwned = (petType: string, accessoryId: string) => {
@@ -155,6 +228,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [showMoreOverlay, setShowMoreOverlay] = useState(false);
   const [lastSpokenMessage, setLastSpokenMessage] = useState('');
   
+  // Camera selfie modal state (defined earlier)
+
   // Pet store state
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
   const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
@@ -3478,22 +3553,240 @@ const getSleepyPetImage = (clicks: number) => {
         );
       })()}
 
-      {/* Audio Toggle Button */}
+      {/* Camera FAB (replaces audio toggle) */}
       <button
         onClick={() => {
-          setAudioEnabled(!audioEnabled);
+          // Stop any speaking and open camera
           if (isSpeaking) {
             ttsService.stop();
           }
+          setShowCamera(true);
         }}
-        className={`fixed bottom-6 right-6 w-14 h-14 rounded-full border-2 border-white/30 text-2xl flex items-center justify-center shadow-xl z-40 transition-all duration-200 hover:scale-110 active:scale-95 ${
-          audioEnabled 
-            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white' 
-            : 'bg-gradient-to-br from-red-500 to-red-600 text-white'
-        }`}
+        className={`fixed bottom-6 right-6 w-20 h-20 rounded-2xl border-2 border-white/30 flex items-center justify-center shadow-xl z-40 transition-all duration-200 hover:scale-110 active:scale-95 bg-gradient-to-br from-blue-500 to-indigo-600`}
+        aria-label="Open camera"
       >
-        {audioEnabled ? '🔊' : '🔇'}
+        <span className="relative inline-block">
+          {/* soft glow */}
+          <span aria-hidden="true" className="absolute -inset-4 rounded-2xl bg-white/15 blur-lg" />
+          {/* icon */}
+          <span className="relative inline-flex items-center justify-center w-14 h-14">
+            <img src="/icons/pet-camera.svg" alt="Camera" className="w-14 h-14 opacity-95" />
+          </span>
+        </span>
       </button>
+
+      {/* Camera Modal */}
+      {showCamera && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center" role="dialog" aria-modal="true" onClick={() => {
+          // close on backdrop click
+          setShowCamera(false);
+        }}>
+          <div className="relative w-[92vw] max-w-md aspect-[3/4] bg-black rounded-2xl overflow-hidden border border-white/20 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            {/* Video preview */}
+            {!capturedUrl ? (
+              <>
+                <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]" style={{ filter: getCssFilter(selectedFilter) }} />
+                {/* Live pet overlay */}
+                <img
+                  src={getPetImage()}
+                  alt="Pet overlay"
+                  className="absolute left-[6%] bottom-[20%] w-auto drop-shadow-xl pointer-events-none select-none"
+                  style={{ height: '50%' }}
+                />
+              </>
+            ) : (
+              <div className="absolute inset-0 bg-black flex items-center justify-center p-4">
+                <img
+                  src={polaroidUrl || capturedUrl}
+                  alt="Polaroid"
+                  className="max-w-full max-h-full drop-shadow-2xl"
+                  style={{ transform: 'rotate(-2deg)' }}
+                />
+              </div>
+            )}
+
+            {/* Controls */}
+            <div className="absolute inset-x-0 bottom-0 p-4 flex items-center justify-between gap-3 bg-gradient-to-t from-black/70 to-transparent">
+              {!capturedUrl ? (
+                <>
+                  <button
+                    className="px-4 py-2 rounded-full bg-white/20 text-white border border-white/30 text-sm"
+                    onClick={async () => {
+                      setFacingMode((m) => (m === 'user' ? 'environment' : 'user'));
+                    }}
+                  >
+                    Flip
+                  </button>
+                  <button
+                    className={`w-16 h-16 rounded-full bg-white ${isProcessingCapture ? 'opacity-60' : ''}`}
+                  onClick={async () => {
+                    if (!videoRef.current || isProcessingCapture) return;
+                    try {
+                      setIsProcessingCapture(true);
+                      playShutterSound();
+                      const frameVideo = videoRef.current;
+                      const canvas = document.createElement('canvas');
+                      // Set a reasonable output resolution based on video
+                      const vw = frameVideo.videoWidth || 720;
+                      const vh = frameVideo.videoHeight || 960;
+                      canvas.width = vw;
+                      canvas.height = vh;
+                      const ctx = canvas.getContext('2d');
+                      if (!ctx) throw new Error('Canvas not supported');
+                      // Draw camera frame first (background)
+                      ctx.save();
+                      // Unmirror the saved result so text isn't reversed
+                      ctx.translate(vw, 0);
+                      ctx.scale(-1, 1);
+                      // Draw with filter
+                      if ('filter' in ctx) {
+                        (ctx as any).filter = getCssFilter(selectedFilter);
+                      }
+                      ctx.drawImage(frameVideo, 0, 0, vw, vh);
+                      if ('filter' in ctx) {
+                        (ctx as any).filter = 'none';
+                      }
+                      ctx.restore();
+
+                      // Draw pet image as overlay in front for Phase 1
+                      const petUrl = getPetImage();
+                      await new Promise<void>((resolve, reject) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                          // Place pet at bottom-left with 50% height
+                          const desiredHeight = Math.round(vh * 0.5);
+                          const scale = desiredHeight / img.height;
+                          const w = Math.round(img.width * scale);
+                          const h = desiredHeight;
+                          const x = Math.round(vw * 0.06);
+                          const y = vh - h - Math.round(vh * 0.20);
+                          ctx.drawImage(img, x, y, w, h);
+                          resolve();
+                        };
+                        img.onerror = () => reject(new Error('Failed to load pet image'));
+                        img.src = petUrl;
+                      });
+
+                      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve as BlobCallback, 'image/jpeg', 0.9));
+                      if (!blob) throw new Error('Failed to create image');
+                      const url = URL.createObjectURL(blob);
+                      setCapturedUrl(url);
+
+                      // Build a polaroid-framed image for display and saving
+                      await new Promise<void>((resolve) => {
+                        const img = new Image();
+                        img.onload = async () => {
+                          const maxSide = Math.max(img.width, img.height);
+                          const pad = Math.round(maxSide * 0.06);
+                          const bottomExtra = Math.round(maxSide * 0.18);
+                          const fw = img.width + pad * 2;
+                          const fh = img.height + pad + bottomExtra;
+                          const fCanvas = document.createElement('canvas');
+                          fCanvas.width = fw;
+                          fCanvas.height = fh;
+                          const fctx = fCanvas.getContext('2d');
+                          if (!fctx) { resolve(); return; }
+                          // White frame
+                          fctx.fillStyle = '#ffffff';
+                          fctx.fillRect(0, 0, fw, fh);
+                          // Soft border
+                          fctx.strokeStyle = 'rgba(0,0,0,0.08)';
+                          fctx.lineWidth = Math.max(2, Math.round(maxSide * 0.005));
+                          fctx.strokeRect(fctx.lineWidth/2, fctx.lineWidth/2, fw - fctx.lineWidth, fh - fctx.lineWidth);
+                          // Photo
+                          fctx.drawImage(img, pad, pad, img.width, img.height);
+                          const pBlob: Blob | null = await new Promise((r) => fCanvas.toBlob(r as BlobCallback, 'image/jpeg', 0.95));
+                          if (pBlob) {
+                            const pUrl = URL.createObjectURL(pBlob);
+                            setPolaroidUrl(pUrl);
+                          }
+                          resolve();
+                        };
+                        img.crossOrigin = 'anonymous';
+                        img.src = url;
+                      });
+                    } catch (err) {
+                      console.error(err);
+                      toast.error('Failed to capture photo');
+                    } finally {
+                      setIsProcessingCapture(false);
+                    }
+                  }}
+                  aria-label="Capture selfie"
+                    />
+                  <span className="px-4 py-2 rounded-full opacity-0 select-none">Close</span>
+                </>
+              ) : (
+                <div className="flex items-center gap-3 mx-auto">
+                  <button
+                    className="px-4 py-2 rounded-full bg-white text-black text-sm"
+                    onClick={() => {
+                      // download
+                      const toSave = polaroidUrl || capturedUrl;
+                      if (!toSave) return;
+                      const a = document.createElement('a');
+                      a.href = toSave;
+                      a.download = 'pet-selfie.jpg';
+                      a.click();
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className="px-4 py-2 rounded-full bg-white/20 text-white border border-white/30 text-sm"
+                    onClick={() => {
+                      // retake
+                      if (capturedUrl) URL.revokeObjectURL(capturedUrl);
+                      if (polaroidUrl) URL.revokeObjectURL(polaroidUrl);
+                      setCapturedUrl(null);
+                      setPolaroidUrl(null);
+                    }}
+                  >
+                    Retake
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Top controls */}
+            <div className="absolute top-0 right-0 p-3">
+              <button
+                className="px-4 py-2 rounded-full bg-white/20 text-white border border-white/30 text-sm"
+                onClick={() => setShowCamera(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Filter selector */}
+            {!capturedUrl && (
+              <div className="absolute left-0 right-0 bottom-24 px-4 flex gap-2 justify-center">
+                {[
+                  { id: 'none', label: 'None' },
+                  { id: 'bw', label: 'B&W' },
+                  { id: 'sepia', label: 'Sepia' },
+                  { id: 'warm', label: 'Warm' },
+                  { id: 'cool', label: 'Cool' },
+                  { id: 'vivid', label: 'Vivid' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    className={`px-3 py-1 rounded-full text-xs border ${selectedFilter === (f.id as any) ? 'bg-white text-black border-white' : 'bg-white/15 text-white border-white/30'}`}
+                    onClick={() => setSelectedFilter(f.id as any)}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Top controls */}
+            <div className="absolute top-0 right-0 p-3 flex items-center gap-2">
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pet Switcher - Only show if user owns multiple pets */}
       {ownedPets.length > 1 && (
