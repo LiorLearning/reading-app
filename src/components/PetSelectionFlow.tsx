@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import ChatAvatar from '@/components/comic/ChatAvatar';
+// import ChatAvatar from '@/components/comic/ChatAvatar';
 import { ttsService } from '@/lib/tts-service';
 import { Volume2 } from 'lucide-react';
 
@@ -60,12 +60,19 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const welcomeText = `Welcome to Pet Academy! I’m Krafty, and I’ll help you become the best Pet Master ever. First, let's choose a pet!`;
   const namingText = selectedPet ? `Awesome, what would you like to call your ${selectedPet.name.toLowerCase()}?` : '';
-  const dailyIntroText = `It’s important to check up on your pets daily! Let’s check how your pet is feeling right now!`;
+  const dailyIntroText = `${petName} is a great name. How about we check how ${petName} is feeling right now?`;
 
   // Auto-play TTS once when entering the selection step
   useEffect(() => {
     if (step === 'selection' && !hasSpokenRef.current) {
-      try { ttsService.speakAIMessage(welcomeText, 'krafty-pet-select'); } catch {}
+      try {
+        ttsService.speak(welcomeText, {
+          voice: 'UgBBYS2sOqTuMpoF3BR0',
+          stability: 0.7,
+          similarity_boost: 0.9,
+          messageId: 'krafty-pet-select'
+        });
+      } catch {}
       hasSpokenRef.current = true;
     }
     return () => {
@@ -84,7 +91,14 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
   useEffect(() => {
     if (step === 'naming' && selectedPet && !hasNamingSpokenRef.current) {
       const timer = setTimeout(() => {
-        try { ttsService.speakAIMessage(namingText, 'krafty-pet-naming'); } catch {}
+        try {
+          ttsService.speak(namingText, {
+            voice: 'UgBBYS2sOqTuMpoF3BR0',
+            stability: 0.7,
+            similarity_boost: 0.9,
+            messageId: 'krafty-pet-naming'
+          });
+        } catch {}
       }, 200);
       // focus input and move caret to end so the blinking caret is visible
       requestAnimationFrame(() => {
@@ -131,7 +145,16 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
       // Move to step 3 (daily intro) instead of finishing immediately
       setStep('dailyIntro');
       try { ttsService.stop(); } catch {}
-      setTimeout(() => { try { ttsService.speakAIMessage(dailyIntroText, 'krafty-daily-intro'); } catch {} }, 150);
+      setTimeout(() => {
+        try {
+          ttsService.speak(dailyIntroText, {
+            voice: 'UgBBYS2sOqTuMpoF3BR0',
+            stability: 0.7,
+            similarity_boost: 0.9,
+            messageId: 'krafty-daily-intro'
+          });
+        } catch {}
+      }, 150);
     }
   };
 
@@ -144,18 +167,23 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-kids">
         {/* Krafty assistant outside the modal, bottom-left */}
         <div className="absolute left-4 bottom-4 z-10 flex items-start gap-5">
-          <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5">
-            <div className="h-24 w-24 rounded-full overflow-hidden">
-              <ChatAvatar size="responsive" />
-            </div>
+          <div className="shrink-0">
+            <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
           </div>
-          <div className="max-w-2xl">
-            <div className="bg-card border rounded-2xl px-7 py-6 flex items-start gap-4 shadow-md">
+          <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+            <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-start gap-4 shadow-xl ring-1 ring-primary/40">
               <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                 {welcomeText}
               </p>
               <Button aria-label="Play message" variant="ghost" size="icon" className="h-10 w-10 text-primary" onClick={() => {
-                try { ttsService.speakAIMessage(welcomeText, 'krafty-pet-select'); } catch {}
+                try {
+                  ttsService.speak(welcomeText, {
+                    voice: 'UgBBYS2sOqTuMpoF3BR0',
+                    stability: 0.7,
+                    similarity_boost: 0.9,
+                    messageId: 'krafty-pet-select'
+                  });
+                } catch {}
               }}>
                 <Volume2 className="h-6 w-6" />
               </Button>
@@ -164,22 +192,22 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
         </div>
 
         {/* Center modal with header and pet cards */}
-        <Card className="relative w-full max-w-3xl bg-card/90 backdrop-blur text-card-foreground overflow-hidden border border-border shadow-2xl ring-1 ring-primary/10 font-kids">
+        <Card className="relative z-20 w-full max-w-3xl bg-white/95 backdrop-blur text-card-foreground overflow-hidden border border-primary/20 shadow-2xl ring-1 ring-primary/40 font-kids">
           {/* Modal-only decorative background */}
           <div className="pointer-events-none absolute inset-0 -z-10">
             <img src="/backgrounds/space.png" alt="decorative background" className="w-full h-full object-cover opacity-20" />
-            <div className="absolute inset-0 bg-primary/5" />
+            <div className="absolute inset-0 bg-primary/10" />
           </div>
           <div className="px-8 pt-8 pb-4 text-center">
-            <h2 className="text-3xl font-extrabold tracking-wide drop-shadow-sm">Choose your pet</h2>
-            <p className="mt-2 text-muted-foreground"></p>
+            {/* <h2 className="text-3xl font-extrabold tracking-wide drop-shadow-sm"></h2> */}
+            {/* <p className="mt-2 text-muted-foreground"></p> */}
           </div>
           <CardContent className="pt-2 pb-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" role="radiogroup" aria-label="Choose your pet">
               {PET_OPTIONS.map((pet) => (
                 <Card
                   key={pet.id}
-                  className="group cursor-pointer border border-border bg-card rounded-2xl shadow-2xl hover:shadow-[0_20px_60px_rgba(0,0,0,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:ring-offset-2 h-72 font-kids"
+                  className="group cursor-pointer border border-primary/20 bg-white rounded-2xl shadow-2xl hover:shadow-[0_20px_60px_rgba(0,0,0,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:ring-offset-2 h-72 font-kids"
                   onClick={() => handlePetChoice(pet)}
                 >
                   <CardContent className="p-6 text-center h-full flex flex-col justify-center" role="radio" aria-checked={false} aria-label={pet.name}>
@@ -207,13 +235,11 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-kids">
         {/* Krafty assistant bottom-left with auto-spoken prompt */}
         <div className="absolute left-4 bottom-4 z-10 flex items-start gap-5">
-          <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5">
-            <div className="h-24 w-24 rounded-full overflow-hidden">
-              <ChatAvatar size="responsive" />
-            </div>
+          <div className="shrink-0">
+            <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
           </div>
-          <div className="max-w-2xl">
-            <div className="bg-card border rounded-2xl px-7 py-6 flex items-start gap-4 shadow-md">
+          <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+            <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-start gap-4 shadow-xl ring-1 ring-primary/40">
               <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                 {namingText}
               </p>
@@ -227,7 +253,12 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
                     if (speakingMessageId === 'krafty-pet-naming') {
                       ttsService.stop();
                     } else {
-                      ttsService.speakAIMessage(namingText, 'krafty-pet-naming');
+                      ttsService.speak(namingText, {
+                        voice: 'UgBBYS2sOqTuMpoF3BR0',
+                        stability: 0.7,
+                        similarity_boost: 0.9,
+                        messageId: 'krafty-pet-naming'
+                      });
                     }
                   } catch {}
                 }}
@@ -239,7 +270,7 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
         </div>
 
         {/* Minimal naming modal: image + input + suggestion chips */}
-        <Card className="relative w-full max-w-md bg-card/90 backdrop-blur text-card-foreground overflow-hidden border border-border shadow-2xl ring-1 ring-primary/10 font-kids">
+        <Card className="relative z-20 w-full max-w-md bg-white/95 backdrop-blur text-card-foreground overflow-hidden border border-primary/20 shadow-2xl ring-1 ring-primary/40 font-kids">
           <CardContent className="pt-8 space-y-6">
             <div className="mx-auto aspect-square w-24 sm:w-28 md:w-32 rounded-xl overflow-hidden">
               {selectedPet.imageUrl ? (
@@ -268,7 +299,7 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
                   variant="outline"
                   size="sm"
                   onClick={() => handleSampleNameClick(name)}
-                  className={`${petName === name ? 'bg-destructive text-destructive-foreground border-destructive shadow-sm' : 'border-primary/30 text-primary hover:bg-primary/5'}`}
+                  className={`${petName === name ? 'bg-primary text-primary-foreground border-primary shadow-sm' : 'border-primary/30 text-primary hover:bg-primary/5'}`}
                 >
                   {name}
                 </Button>
@@ -287,7 +318,7 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
                 onClick={handleNameSubmit}
                 disabled={!petName.trim()}
                 variant="default"
-                className="flex-1"
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Choose {petName || 'Pet'}!
               </Button>
@@ -303,18 +334,16 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
     return (
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 p-4 font-kids">
         <div className="absolute left-4 bottom-4 z-10 flex items-start gap-5">
-          <div className="shrink-0 rounded-full border-4 border-destructive/60 bg-gradient-to-b from-muted/60 to-background p-1.5">
-            <div className="h-24 w-24 rounded-full overflow-hidden">
-              <ChatAvatar size="responsive" />
-            </div>
+          <div className="shrink-0">
+            <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
           </div>
-          <div className="max-w-2xl">
-            <div className="bg-card border-2 border-destructive/60 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-sm">
+          <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+            <div className="bg-white/95 border-2 border-primary/30 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-xl ring-1 ring-primary/40">
               <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                 {dailyIntroText}
               </p>
               <Button
-                className="px-5"
+                className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
                 onClick={() => {
                   try { ttsService.stop(); } catch {}
                   onPetSelected(selectedPet.id, petName.trim());

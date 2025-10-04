@@ -217,10 +217,20 @@ class TutorialService {
     this.updateTutorialState({ adventureStep8Started: true });
   }
   startAdventureStep9(): void {
-    this.updateTutorialState({ adventureStep9SleepIntroStarted: true });
+    // When Step 9 begins, Step 8 should be considered ended so its UI/voice won't reappear
+    this.updateTutorialState({ 
+      adventureStep8Started: false,
+      adventureStep9SleepIntroStarted: true 
+    });
   }
   completeAdventureStep9(): void {
-    this.updateTutorialState({ adventureStep9SleepIntroCompleted: true });
+    // Completing Step 9 should end the first-time tutorial flow.
+    // Hide Step 8 overlays and mark Step 9 as done so it won't reappear.
+    this.updateTutorialState({
+      adventureStep8Started: false,
+      adventureStep9SleepIntroStarted: false,
+      adventureStep9SleepIntroCompleted: true,
+    });
   }
   
   /**

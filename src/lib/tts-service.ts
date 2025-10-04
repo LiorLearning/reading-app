@@ -28,7 +28,7 @@ export const AVAILABLE_VOICES: Voice[] = [
   //   previewText: "Woof! I'm your friendly dog, ready for fun adventures and learning together!"
   // },
   {
-    id: 'lnieQLGTodpbhjpZtg1k',
+    id: 'UgBBYS2sOqTuMpoF3BR0',
     name: 'Professor',
     description: 'Warm, wise mentor tone for Krafty (tutorial voice)',
     previewText: "Hello! I'm your trainer, here to guide you step by step."
@@ -97,6 +97,12 @@ class TextToSpeechService {
   private selectedSpeed: number; // Voice speed (0.25-4.0, default 0.8)
   private currentSpeakingMessageId: string | null = null; // Track which message is speaking
   private speakingStateListeners: Set<(messageId: string | null) => void> = new Set(); // Listeners for speaking state changes
+  private suppressNonKrafty: boolean = false; // Gate to mute non-Krafty speech during overlays
+  // Track overlapping speak requests so the newest wins and earlier ones never play
+  private speakRequestSeq: number = 0;
+  private activeSpeakRequestSeq: number = 0;
+  // Store the most recent non-Krafty message suppressed while overlays are active
+  private lastSuppressedMessage: { text: string; options?: TTSOptions } | null = null;
 
   constructor() {
     // Load initial voice using current pet preference or pet default
@@ -104,6 +110,16 @@ class TextToSpeechService {
     // Load selected speed from localStorage or default to 0.8
     this.selectedSpeed = this.loadSelectedSpeed();
     this.initialize();
+  }
+
+  // Allow callers to suppress non-Krafty speech (used during tutorial overlays)
+  setSuppressNonKrafty(suppress: boolean): void {
+    this.suppressNonKrafty = suppress;
+  }
+
+  // Expose current suppression state for UI/overlays to check
+  isNonKraftySuppressed(): boolean {
+    return this.suppressNonKrafty;
   }
 
   private loadSelectedVoice(): Voice {
@@ -269,7 +285,18 @@ class TextToSpeechService {
   async speak(text: string, options?: TTSOptions): Promise<void> {
     // Clean the text for better speech
     const cleanText = this.cleanTextForSpeech(text);
-    
+
+    // Determine if this is a Krafty message (only consider explicit messageId)
+    const messageId = options?.messageId || '';
+    const isKrafty = typeof messageId === 'string' && /\bkrafty\b|^krafty-|krafty-/.test(messageId);
+
+    // If non-Krafty speech is suppressed (e.g., during overlays), skip speaking
+    if (this.suppressNonKrafty && !isKrafty) {
+      // Save the last suppressed message so it can be replayed immediately after suppression lifts
+      this.lastSuppressedMessage = { text: cleanText, options };
+      return;
+    }
+
     // If not initialized or no API key, skip TTS
     if (!this.isInitialized || !this.client) {
       console.warn('TTS not configured. Cannot speak text.');
@@ -282,7 +309,11 @@ class TextToSpeechService {
     }
 
     try {
-      // Stop any current audio and clean up resources
+      // Increment speak request sequence so this call becomes the active one
+      const requestSeq = ++this.speakRequestSeq;
+      this.activeSpeakRequestSeq = requestSeq;
+
+      // Stop any current audio and clean up resources to prevent overlap
       this.stop();
       
       // Add a small delay to ensure previous audio is fully stopped
@@ -298,25 +329,36 @@ class TextToSpeechService {
       if (options?.voice) {
         resolvedVoiceId = options.voice;
       } else {
-        try {
-          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-          if (currentPetId) {
-            const preferred = PetProgressStorage.getPreferredVoiceIdForPet(currentPetId);
-            if (preferred) {
-              resolvedVoiceId = preferred;
-            } else {
-              const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-                dog: 'cgSgspJ2msm6clMCkdW9',
-                cat: 'ocZQ262SsZb9RIxcQBOj',
-                hamster: 'ocZQ262SsZb9RIxcQBOj',
-              };
-              resolvedVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
-            }
+        // If the message is from Krafty, force Professor voice
+        const isKraftyMsg = isKrafty;
+        if (isKraftyMsg) {
+          const professor = AVAILABLE_VOICES.find(v => v.name === 'Professor');
+          if (professor) {
+            resolvedVoiceId = professor.id;
           }
-        } catch {}
+        }
 
         if (!resolvedVoiceId) {
-          resolvedVoiceId = this.selectedVoice.id;
+          try {
+            const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+            if (currentPetId) {
+              const preferred = PetProgressStorage.getPreferredVoiceIdForPet(currentPetId);
+              if (preferred) {
+                resolvedVoiceId = preferred;
+              } else {
+                const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+                  dog: 'cgSgspJ2msm6clMCkdW9',
+                  cat: 'ocZQ262SsZb9RIxcQBOj',
+                  hamster: 'ocZQ262SsZb9RIxcQBOj',
+                };
+                resolvedVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
+              }
+            }
+          } catch {}
+
+          if (!resolvedVoiceId) {
+            resolvedVoiceId = this.selectedVoice.id;
+          }
         }
       }
 
@@ -349,7 +391,13 @@ class TextToSpeechService {
       // Create audio blob and play
       const audioBlob = new Blob(chunks, { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
-      
+
+      // If a newer speak request started while we were generating audio, abort this playback
+      if (this.activeSpeakRequestSeq !== requestSeq) {
+        URL.revokeObjectURL(audioUrl);
+        return;
+      }
+
       this.currentAudio = new Audio(audioUrl);
       this.isSpeaking = true;
 
@@ -393,6 +441,14 @@ class TextToSpeechService {
       this.notifySpeakingStateChange(null);
       throw error;
     }
+  }
+
+  // Replay the most recently suppressed non-Krafty message, if any
+  async replayLastSuppressed(): Promise<void> {
+    if (!this.lastSuppressedMessage) return;
+    const payload = this.lastSuppressedMessage;
+    this.lastSuppressedMessage = null;
+    await this.speak(payload.text, payload.options);
   }
 
   // Clean text for better speech synthesis

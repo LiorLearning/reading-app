@@ -894,12 +894,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [currentScreen, currentAdventureId, adventureMode, userData?.username, currentAdventureType, showStep5Intro]);
 
   // Show Step 5 overlay when landing in adventure after pet page click
+  // Fallback: if pending flag was not set (edge cases), still show once for first-time users
   React.useEffect(() => {
     try {
       const pending = localStorage.getItem('pending_step5_intro') === 'true';
-      if (currentScreen === 1 && pending && needsAdventureStep5Intro) {
+      const alreadyShownThisSession = (() => { try { return sessionStorage.getItem('step5_shown_this_session') === 'true'; } catch { return false; } })();
+      if (
+        currentScreen === 1 &&
+        needsAdventureStep5Intro &&
+        (pending || !alreadyShownThisSession)
+      ) {
         setShowStep5Intro(true);
-        localStorage.removeItem('pending_step5_intro');
+        try { localStorage.removeItem('pending_step5_intro'); } catch {}
+        try { sessionStorage.setItem('step5_shown_this_session', 'true'); } catch {}
         try {
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
@@ -929,6 +936,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       ) {
         setShowStep6Intro(true);
         try {
+          // Immediately stop any ongoing TTS (likely pet) and suppress non-Krafty speech
+          ttsService.stop();
+          ttsService.setSuppressNonKrafty(true);
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
           const msg = `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
@@ -937,6 +947,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
     } catch {}
   }, [currentScreen, persistentProgressFraction, needsAdventureStep6Intro, showStep5Intro]);
+
+  // Enforce suppression while Step 6 overlay is visible
+  React.useEffect(() => {
+    if (showStep6Intro) {
+      try {
+        ttsService.setSuppressNonKrafty(true);
+        ttsService.stop();
+      } catch {}
+    }
+  }, [showStep6Intro]);
 
   // When Step 6 is dismissed (Next), mark a pending Step 7 trigger so it only shows after returning home
   React.useEffect(() => {
@@ -5305,33 +5325,46 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
             {/* Bottom-left Krafty assistant with speech bubble */}
             <div className="absolute left-4 bottom-4 z-[61] flex items-start gap-5">
-              <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5 shadow-xl">
-                <div className="h-24 w-24 rounded-full overflow-hidden">
-                  <ChatAvatar size="responsive" />
-                </div>
+              {/* Freestanding Krafty image (outside circular avatar) */}
+              <div className="shrink-0">
+                <img
+                  src="/avatars/krafty.png"
+                  alt="Krafty"
+                  className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain"
+                />
               </div>
-              <div className="max-w-2xl">
-                <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
+              <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+                <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl ring-1 ring-primary/40">
                   <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                     {(() => {
                       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
                       const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      // Suppress non-Krafty speech while Step 5 overlay is visible
+                      try { ttsService.setSuppressNonKrafty(true); } catch {}
                       return `Brighten your ${petType}’s day. Spend time talking and create a house it will truly love. The more creative, the better!`;
                     })()}
                   </p>
                   <Button
-                    className="px-5"
+                    className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
                     onClick={() => {
                       try { ttsService.stop(); } catch {}
+                      // Allow pet speech again after overlay
+                      try { ttsService.setSuppressNonKrafty(false); } catch {}
                       setShowStep5Intro(false);
                       completeAdventureStep5Intro();
+                      // Prevent duplicate initial pet message in this session
+                      try {
+                        const keyPart = currentAdventureId || selectedTopicId || 'unknown';
+                        const sessionKey = `${keyPart}-${adventureMode}-${currentAdventureType}`;
+                        initialResponseSentRef.current = sessionKey;
+                      } catch {}
                       // Auto-start: add Krafty's first house prompt so the child can respond
                       try {
                         const currentPetId = PetProgressStorage.getCurrentSelectedPet();
                         const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
                         const message: ChatMessage = {
                           type: 'ai',
-                          content: `Yippee! Let’s build our dream house for your ${petType}! What should it be—maybe floating in the sky... or something else?`,
+                          content: `Yippee! Let's build our dream house for your ${petType}! What should it be—maybe floating in the sky... or something else?`,
                           timestamp: Date.now(),
                         };
                         setChatMessages(prev => {
@@ -5358,38 +5391,56 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             {/* Dim background */}
             <div className="absolute inset-0 bg-black/40" />
 
-            {/* No additional emphasis on Home per design feedback */}
-
-            {/* Bottom-left Krafty assistant with speech bubble */}
+            {/* Bottom-left Krafty assistant with speech bubble (match Step 5) */}
             <div className="absolute left-4 bottom-4 z-[71] flex items-start gap-5">
-              <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5 shadow-xl">
-                <div className="h-24 w-24 rounded-full overflow-hidden">
-                  <ChatAvatar size="responsive" />
-                </div>
+              <div className="shrink-0">
+                <img
+                  src="/avatars/krafty.png"
+                  alt="Krafty"
+                  className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain"
+                />
               </div>
-              <div className="max-w-2xl">
-                <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
+              <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+                <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl ring-1 ring-primary/40">
                   <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                     {(() => {
                       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
                       const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      // Suppress non-Krafty speech while Step 6 overlay is visible
+                      try { ttsService.setSuppressNonKrafty(true); } catch {}
                       return `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
                     })()}
                   </p>
                   <Button
-                    className="px-5"
+                    className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
                     onClick={() => {
                       try { ttsService.stop(); } catch {}
+                      // Allow pet speech again after overlay
+                      try { ttsService.setSuppressNonKrafty(false); } catch {}
                       setShowStep6Intro(false);
                       completeAdventureStep6Intro();
                       // Set pending Step 7 trigger only when today's quest was House
+                      // and only if Step 7 is actually needed
                       try {
                         const pendingActivity = persistentActivity;
                         if (pendingActivity === 'house') {
-                          localStorage.setItem('pending_step7_home_more', 'true');
+                          // Avoid re-arming Step 7 if already completed
+                          const stateStr = localStorage.getItem('reading-app-tutorial-state');
+                          let alreadyCompleted = false;
+                          if (stateStr) {
+                            try {
+                              const s = JSON.parse(stateStr);
+                              alreadyCompleted = !!s.adventureStep7HomeMoreIntroCompleted;
+                            } catch {}
+                          }
+                          if (!alreadyCompleted) {
+                            localStorage.setItem('pending_step7_home_more', 'true');
+                          }
                         }
                       } catch {}
                       // Continue normal adventure flow
+                      // If any pet line was suppressed while the overlay was visible, replay it now
+                      try { ttsService.replayLastSuppressed(); } catch {}
                     }}
                   >
                     Next

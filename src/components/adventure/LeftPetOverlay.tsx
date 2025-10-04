@@ -344,6 +344,8 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   };
 
   const handleSpeak = async () => {
+    // If overlays have requested suppression (e.g., Step 6), do not speak
+    try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
     // Ensure exclusivity: stop any ongoing TTS first
     if (isSpeakingRef.current || ttsService.getIsSpeaking()) {
       ttsService.stop();
@@ -380,6 +382,8 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       const visibleSentence = extractVisibleSentence(sentenceText, wordToSpeak);
       const textToSpeak = (visibleSentence || '').trim() || wordToSpeak;
       if (textToSpeak) {
+        // Check suppression again just before speaking
+        try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
         isSpeakingRef.current = true;
         try {
           await ttsService.speak(textToSpeak, {
@@ -405,6 +409,8 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     const temp = document.createElement("div");
     temp.innerHTML = toSpeak;
     const text = temp.textContent || temp.innerText || "";
+    // Guard suppression before speaking bubble HTML
+    try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
     isSpeakingRef.current = true;
     try {
       await ttsService.speakAIMessage(text, `left-pet-overlay-${Date.now()}`);

@@ -10,14 +10,14 @@ import { usePetData, PetDataService } from '@/lib/pet-data-service';
 import { loadAdventureSummariesHybrid } from '@/lib/firebase-adventure-cache';
 import { useAuth } from '@/hooks/use-auth';
 import { PetSelectionFlow } from '@/components/PetSelectionFlow';
-import ChatAvatar from '@/components/comic/ChatAvatar';
 import { useTutorial } from '@/hooks/use-tutorial';
+import tutorialService from '@/lib/tutorial-service';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import PetNamingModal from '@/components/PetNamingModal';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart, MoreHorizontal, TrendingUp, Clock } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart, Rocket, TrendingUp, Clock } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
@@ -183,30 +183,100 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const { completePetDailyCheckIntro, needsAdventureStep5Intro, needsAdventureStep7HomeMoreIntro, completeAdventureStep7HomeMoreIntro, startAdventureStep8, hasAdventureStep8Started, startAdventureStep9, hasAdventureStep9SleepIntroStarted, hasAdventureStep9SleepIntroCompleted, completeAdventureStep9 } = useTutorial();
   const [showStep7, setShowStep7] = useState(false);
   const [showStep9, setShowStep9] = useState(false);
+  const [showStep10, setShowStep10] = useState(false);
   const prevShowPetShopRef = useRef(false);
+  const hasSpokenStep7Ref = useRef(false);
+  const hasSpokenStep8Ref = useRef(false);
 
   useEffect(() => {
     try {
       const pending = localStorage.getItem('pending_step7_home_more') === 'true';
       if (needsAdventureStep7HomeMoreIntro && pending) {
+        // Prepare Step 7 overlay and suppress non-Krafty speech early.
+        try { ttsService.setSuppressNonKrafty(true); } catch {}
         setShowStep7(true);
         localStorage.removeItem('pending_step7_home_more');
-        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-        const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
-        const msg = `Great, your ${petType} will grow as you do more activities with it. Let's see what's in store!`;
-        ttsService.speakAIMessage(msg, 'krafty-step7-home').catch(() => {});
       }
     } catch {}
   }, [needsAdventureStep7HomeMoreIntro]);
   
+  // Auto-speak when Step 7 overlay becomes visible (covers cases without pending flag)
   useEffect(() => {
-    if (hasAdventureStep9SleepIntroStarted) {
-      setShowStep9(true);
+    if (showStep7 && !hasSpokenStep7Ref.current) {
       try {
+        // Ensure pet (or any) speech is stopped so only Krafty talks during Step 7
+        try { ttsService.stop(); } catch {}
+        try { ttsService.setSuppressNonKrafty(true); } catch {}
         const currentPetId = PetProgressStorage.getCurrentSelectedPet();
         const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
-        const msg = `For now, let’s put your ${petType} to sleep to complete our daily check-in!`;
-        ttsService.speakAIMessage(msg, 'krafty-step9-sleep').catch(() => {});
+        const msg = `Great, your ${petType} will grow as you do more activities with it.`;
+        ttsService.speakAIMessage(msg, 'krafty-step7-home').catch(() => {});
+      } finally {
+        hasSpokenStep7Ref.current = true;
+      }
+    }
+    if (!showStep7) {
+      try { ttsService.setSuppressNonKrafty(false); } catch {}
+      hasSpokenStep7Ref.current = false;
+    }
+  }, [showStep7]);
+  
+  // Auto-speak Step 8 guidance when Step 8 starts and overlay is visible
+  useEffect(() => {
+    // Speak as soon as Step 8 starts and Step 7/9 are not visible
+    const overlayVisible = hasAdventureStep8Started && !showStep7 && !showStep9; 
+    if (overlayVisible && !hasSpokenStep8Ref.current) {
+      try {
+        // Ensure only Krafty speaks during Step 8
+        try { ttsService.stop(); } catch {}
+        try { ttsService.setSuppressNonKrafty(true); } catch {}
+        const msg = 'And once you have enough coins, you can buy other pets too!';
+        ttsService.speakAIMessage(msg, 'krafty-step8').catch(() => {});
+      } finally {
+        hasSpokenStep8Ref.current = true;
+      }
+    }
+    // Maintain suppression for the entire Step 8 flow (overlay and shop),
+    // and only release it when Step 8 fully ends (Step 9 begins or Step 8 resets)
+    if (hasAdventureStep8Started) {
+      try { ttsService.setSuppressNonKrafty(true); } catch {}
+    } else {
+      try { ttsService.setSuppressNonKrafty(false); } catch {}
+      hasSpokenStep8Ref.current = false;
+    }
+  }, [hasAdventureStep8Started, showStep7, showStep9, showPetShop]);
+  
+  useEffect(() => {
+    if (hasAdventureStep9SleepIntroStarted) {
+      // Step 9 starts: allow pet to speak again
+      try { ttsService.setSuppressNonKrafty(false); } catch {}
+      setShowStep9(true);
+      // Step 9: Allow pet thought; speak only if idle
+      try {
+        const speakNow = () => {
+          if (!audioEnabled) return;
+          const msg = frozenThought ?? currentPetThought;
+          setTimeout(() => { speakText(msg); }, 150);
+        };
+
+        const idle = !ttsService.getIsSpeaking();
+        if (idle) {
+          // If anything was suppressed during Step 8, let it replay; otherwise speak the thought
+          try { ttsService.replayLastSuppressed(); } catch {}
+          // Fallback to explicit thought after a brief moment
+          setTimeout(() => {
+            if (!ttsService.getIsSpeaking()) speakNow();
+          }, 400);
+        } else {
+          // Wait for Krafty to finish, then speak the pet thought
+          const listener = (messageId: string | null) => {
+            if (messageId === null) {
+              try { ttsService.removeSpeakingStateListener(listener); } catch {}
+              speakNow();
+            }
+          };
+          try { ttsService.addSpeakingStateListener(listener); } catch {}
+        }
       } catch {}
     }
   }, [hasAdventureStep9SleepIntroStarted]);
@@ -215,6 +285,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   useEffect(() => {
     if (prevShowPetShopRef.current && !showPetShop && hasAdventureStep8Started && !hasAdventureStep9SleepIntroStarted) {
       try { ttsService.stop(); } catch {}
+      // Release suppression before triggering Step 9 so pet can speak
+      try { ttsService.setSuppressNonKrafty(false); } catch {}
       startAdventureStep9();
     }
     prevShowPetShopRef.current = showPetShop;
@@ -226,6 +298,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [isSleepingGifLoading, setIsSleepingGifLoading] = useState(false);
   const sleepingGifLoadTokenRef = useRef(0);
   const previousPetForLoaderRef = useRef(currentPet);
+  // Ref to the Sleep row arrow button to auto-scroll into view for Step 9
+  const sleepArrowRef = useRef<HTMLButtonElement | null>(null);
+
+  // When Step 9 is visible, ensure the Sleep arrow is on-screen
+  // (moved below sleepClicks declaration to avoid temporal dead zone)
   
   // Sleep state management with localStorage persistence (per-pet)
   const [sleepClicks, setSleepClicks] = useState(() => {
@@ -257,6 +334,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return 0;
     }
   });
+
+  // Step 9: no auto-scroll (hand points where the Sleep arrow would be)
   
   // Streak system for dog evolution unlocks - based on consecutive calendar days (US timezone)
   const [currentStreak, setCurrentStreak] = useState(() => {
@@ -663,6 +742,17 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // TTS message ID for tracking speaking state
   const petMessageId = 'pet-message';
   const isSpeaking = useTTSSpeaking(petMessageId);
+  // Freeze the pet thought briefly to avoid mid-speech swaps (e.g., after onboarding step 3)
+  const [frozenThought, setFrozenThought] = useState<string | null>(null);
+  const frozenClearTimerRef = React.useRef<number | null>(null);
+  useEffect(() => {
+    return () => {
+      if (frozenClearTimerRef.current) {
+        window.clearTimeout(frozenClearTimerRef.current);
+        frozenClearTimerRef.current = null;
+      }
+    };
+  }, []);
   
   // Check if user needs pet selection flow (only for users who have completed onboarding)
   useEffect(() => {
@@ -942,6 +1032,12 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     console.log('🎯 PetPage: handleActionClick called with actionId:', actionId);
     // Handle sleep action
     if (actionId === 'sleep') {
+      // If Step 8 is still active, immediately transition into Step 9 before handling sleep
+      try {
+        if (hasAdventureStep8Started && !hasAdventureStep9SleepIntroStarted) {
+          startAdventureStep9();
+        }
+      } catch {}
       // If pet is fully asleep (3 clicks), do nothing (timer is always visible)
       if (sleepClicks >= 3) {
         return;
@@ -968,6 +1064,19 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           
           updateSleepClicks(newSleepClicks, now, sleepEndTime);
           setSleepCompleted(true);
+
+          // Step 10: Krafty-only line after sleep starts
+          try {
+            const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+            const petName = PetProgressStorage.getPetName(currentPetId) || 'your pet';
+            const msg = `Awesome! Let ${petName} get a good 8-hour sleep. The more you care, the faster ${petName} will grow. See you tomorrow!`;
+            try { ttsService.setSuppressNonKrafty(true); } catch {}
+          ttsService.speakAIMessage(msg, 'krafty-step10-after-sleep').finally(() => {
+              try { ttsService.setSuppressNonKrafty(false); } catch {}
+            }).catch(() => {});
+          // Show Step 10 visual (Krafty bottom-left) and wait for user to press Done
+          setShowStep10(true);
+          } catch {}
           
           // Persist sleep window in Firestore dailyQuests for cross-device sync
           (async () => {
@@ -995,12 +1104,13 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         setShowHeartAnimation(true);
         setTimeout(() => setShowHeartAnimation(false), 1000);
         
-        // Stop any current audio when pet gets sleepier
-        ttsService.stop();
-        // If step 9 is active, close its UI now
+        // Stop any current audio only when not starting full sleep (avoid interrupting Step 10)
+        if (newSleepClicks < 3) {
+          ttsService.stop();
+        }
+        // If step 9 is active, close its UI now (completion happens on Step 10 Done)
         if (hasAdventureStep9SleepIntroStarted && !hasAdventureStep9SleepIntroCompleted) {
           setShowStep9(false);
-          try { completeAdventureStep9(); } catch {}
         }
       }
       return;
@@ -1716,7 +1826,14 @@ const getSleepyPetImage = (clicks: number) => {
     // Daily intro handled inside PetSelectionFlow as Step 3 now
     // After closing the flow, speak the pet's current thought and schedule the Step 4 hint
     try {
-      const thought = currentPetThought;
+      // Generate a fresh thought immediately after Step 3 completes
+      const thought = getPetThought();
+      // Freeze the bubble text to the selected thought while it is spoken
+      setFrozenThought(thought);
+      if (frozenClearTimerRef.current) window.clearTimeout(frozenClearTimerRef.current);
+      frozenClearTimerRef.current = window.setTimeout(() => {
+        setFrozenThought(null);
+      }, 8000);
       setTimeout(() => { speakText(thought); }, 150);
       // Start a fallback timer to show the hand hint after 5s
       setAwaitingStep4Hint(true);
@@ -1731,6 +1848,18 @@ const getSleepyPetImage = (clicks: number) => {
     // Trigger store refresh to update UI
     setStoreRefreshTrigger(prev => prev + 1);
   };
+
+  // Auto-clear frozen thought as soon as TTS for pet message ends
+  useEffect(() => {
+    if (!frozenThought) return;
+    if (!isSpeaking) {
+      setFrozenThought(null);
+      if (frozenClearTimerRef.current) {
+        window.clearTimeout(frozenClearTimerRef.current);
+        frozenClearTimerRef.current = null;
+      }
+    }
+  }, [isSpeaking, frozenThought]);
   
   // ADDED FOR HOME PAGE FUNCTIONALITY: Grade selection handlers
   const handleGradeSelection = React.useCallback((gradeDisplayName: string) => {
@@ -2062,14 +2191,14 @@ const getSleepyPetImage = (clicks: number) => {
                 `I want to share treats and stories! 🐾 Friend time?`
               ],
               'dressing-competition': [
-                `It’s dress-up time, ${userName}! 👗 I’m excited! What should I wear—maybe a crown… or something else?`,
+                `It's dress-up time, ${userName}! 👗 I'm excited! What should I wear—maybe a crown… or something else?`,
                 `I want to look amazing today! ✨ What should I wear—maybe a bow… or something else?`,
                 `Help me pick my look! 😻 What should I wear—maybe a cape… or something else?`
               ],
               'who-made-the-pets-sick': [
-                `I’m worried, ${userName}… so many pets feel sick. What should we check first—maybe the fountain… or something else?`,
+                `I'm worried, ${userName}… so many pets feel sick. What should we check first—maybe the fountain… or something else?`,
                 `My best friend is weak today. 😢 How should we investigate?`,
-                `Something’s wrong in the pet kingdom! 🐾 What should we investigate—maybe the food… or something else?`
+                `Something's wrong in the pet kingdom! 🐾 What should we investigate—maybe the food… or something else?`
               ],
               food: [
                 `My tummy feels tiny and grumbly, ${userName}… 🍪 A loving snack please?`,
@@ -2083,7 +2212,7 @@ const getSleepyPetImage = (clicks: number) => {
               ],
               story: [
                 `Let's curl up with a story, ${userName}! 📖 Which tale should we read?`,
-                `Story time! 🌟 I’m ready for an epic adventure in words!`,
+                `Story time! 🌟 I'm ready for an epic adventure in words!`,
                 `Can we read together now? 📚 I love when you narrate!`
               ]
             };
@@ -2154,14 +2283,14 @@ const getSleepyPetImage = (clicks: number) => {
           `I want to share treats and stories! 🐾 Friend time?`
         ],
         'dressing-competition': [
-          `It’s dress-up time, ${userName}! 👗 I’m excited! What should I wear—maybe a crown… or something else?`,
+          `It's dress-up time, ${userName}! 👗 I'm excited! What should I wear—maybe a crown… or something else?`,
           `I want to look amazing today! ✨ What should I wear—maybe a bow… or something else?`,
           `Help me pick my look! 😻 What should I wear—maybe a cape… or something else?`
         ],
         'who-made-the-pets-sick': [
-          `I’m worried, ${userName}… so many pets feel sick. What should we check first—maybe the fountain… or something else?`,
+          `I'm worried, ${userName}… so many pets feel sick. What should we check first—maybe the fountain… or something else?`,
           `My best friend is weak today. 😢 How should we investigate?`,
-          `Something’s wrong in the pet kingdom! 🐾 What should we investigate—maybe the food… or something else?`
+          `Something's wrong in the pet kingdom! 🐾 What should we investigate—maybe the food… or something else?`
         ],
         food: [
           `My tummy feels tiny and grumbly, ${userName}… 🍪 A loving snack please?`,
@@ -2175,7 +2304,7 @@ const getSleepyPetImage = (clicks: number) => {
         ],
         story: [
           `Let's curl up with a story, ${userName}! 📖 Which tale should we read?`,
-          `Story time! 🌟 I’m ready for an epic adventure in words!`,
+          `Story time! 🌟 I'm ready for an epic adventure in words!`,
           `Can we read together now? 📚 I love when you narrate!`
         ]
       };
@@ -2394,6 +2523,26 @@ const getSleepyPetImage = (clicks: number) => {
 
   // Handle audio playback when message changes with debounce to prevent multiple simultaneous thoughts
   useEffect(() => {
+    // While a frozen thought is active, do not interrupt or auto-speak new thoughts
+    if (frozenThought) return;
+
+    // During tutorial Step 10 overlay, let Krafty speak uninterrupted
+    if (showStep10) {
+      return;
+    }
+
+    // During tutorial Step 8 flow, do not stop audio or auto-speak pet
+    // so Krafty's Step 8 guidance can play fully without interruption
+    if (hasAdventureStep8Started) {
+      return;
+    }
+
+    // During tutorial Step 7, suppress pet speech so only Krafty talks
+    if (showStep7) {
+      try { ttsService.stop(); } catch {}
+      return;
+    }
+
     // Stop any currently playing audio when pet state changes
     ttsService.stop();
     
@@ -2411,10 +2560,10 @@ const getSleepyPetImage = (clicks: number) => {
           speakText(currentPetThought);
         }
       }, 800); // Increased delay to prevent rapid-fire thoughts when state changes quickly
-      
+
       return () => clearTimeout(timer);
     }
-  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection]);
+  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection, frozenThought, showStep7, showStep10, hasAdventureStep8Started]);
 
   // Step 4 hint controller: when pet speech starts or after 5s, show hint once
   useEffect(() => {
@@ -2895,64 +3044,45 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Step 9 overlay visuals */}
       {showStep9 && (
-        <>
-          {/* Hand pointing to Sleep arrow (right above the Sleep button) */}
-          <img
-            aria-hidden
-            src="https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_224508_image-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
-            alt=""
-            className="pointer-events-none fixed left-[calc(50%+180px)] bottom-[150px] -translate-x-1/2 max-w-none w-[clamp(28px,8vw,80px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce z-40"
-          />
+        <></>
+      )}
 
-          {/* Krafty speech for Step 9 - bubble above avatar and constrained width */}
+      {/* Step 10 overlay visuals (Krafty returns after full sleep start) */}
+      {showStep10 && (
+        <>
           <div className="fixed left-4 bottom-2 md:bottom-4 z-40">
             <div className="relative flex flex-col items-start">
               <div className="bg-card border rounded-2xl px-6 py-5 shadow-2xl mb-3 w-[min(60vw,360px)]">
-                <p className="text-base sm:text-lg md:text-l leading-relaxed font-kids">
-                  {(() => {
-                    const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-                    const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
-                    return `For now, let’s put your ${petType} to sleep to complete our daily check-in!`;
-                  })()}
-                </p>
-              </div>
-              <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5">
-                <div className="h-24 w-24 rounded-full overflow-hidden">
-                  <ChatAvatar size="responsive" />
+                <div className="flex items-end gap-4">
+                  <p className="flex-1 text-base sm:text-lg md:text-l leading-relaxed font-kids">
+                    {(() => {
+                      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                      const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      const petName = PetProgressStorage.getPetName(currentPetId) || 'your pet';
+                      return `Awesome! Let ${petName} get a good 8-hour sleep. The more you care, the faster ${petName} will grow. See you tomorrow!`;
+                    })()}
+                  </p>
+                  <Button
+                    variant="comic"
+                    className="shrink-0"
+                    onClick={() => {
+                      try { playClickSound(); } catch {}
+                      setShowStep10(false);
+                      try { completeAdventureStep9(); } catch {}
+                    }}
+                  >
+                    Done
+                  </Button>
                 </div>
               </div>
-            </div>
-          </div>
-        </>
-      )}
-      {/* Step 8 overlay visuals */}
-      {hasAdventureStep8Started && !showStep7 && !showStep9 && (
-        <>
-          {/* Hand pointing to Shop (top-right, below More) */}
-          <img
-            aria-hidden
-            src="https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_224508_image-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
-            alt=""
-            className="pointer-events-none fixed right-0 top-[13rem] max-w-none w-[clamp(28px,8vw,80px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce z-40"
-          />
-
-          {/* Bottom-left Krafty speech for Step 8 */}
-          <div className="fixed left-4 bottom-4 z-40 flex items-start gap-5">
-            <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5">
-              <div className="h-24 w-24 rounded-full overflow-hidden">
-                <ChatAvatar size="responsive" />
-              </div>
-            </div>
-            <div className="max-w-2xl">
-              <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
-                <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
-                  And once you have enough coins, you can buy other pets too!
-                </p>
+              <div className="shrink-0">
+                <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
               </div>
             </div>
           </div>
         </>
       )}
+      {/* Step 8 overlay visuals (deduplicated; see later block with !showPetShop) */}
 
       {/* Top UI - Heart Progress Bar (horizontal) - hidden when vertical is enabled */}
       {false && (
@@ -3229,7 +3359,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     </div>
                   ) : (
-                    currentPetThought
+                    (frozenThought ?? currentPetThought)
                   )}
                 </div>
               </div>
@@ -3249,7 +3379,7 @@ const getSleepyPetImage = (clicks: number) => {
               src={getPetImage()}
               alt="Pet"
               className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
+                sleepClicks > 0 ? 'w-72 h-72 max-h-[320px]' : 'w-64 h-64 max-h-[280px]'
               }`}
               style={{
                 animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
@@ -3361,7 +3491,7 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Below-bubble To-Dos: Travel and Sleep */}
       {!showPetShop && (
-        <div className="relative z-20 mt-4 flex justify-center pb-24">
+        <div className="relative z-20 mt-16 flex justify-center pb-24">
           <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg p-3 w-[400px] mb-8">
             {/* Subheader */}
             <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Today</div>
@@ -3438,7 +3568,7 @@ const getSleepyPetImage = (clicks: number) => {
                           aria-hidden
                           src="https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_224508_image-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
                           alt=""
-                          className="pointer-events-none absolute left-[70%] -translate-x-1/2 bottom-full mb-[clamp(6px,1vw,12px)] max-w-none w-[clamp(36px,8vw,80px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce"
+                          className="pointer-events-none absolute left-[70%] -translate-x-1/2 bottom-full mb-[clamp(6px,1vw,12px)] max-w-none w-[clamp(24px,8vw,60px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce"
                         />
                       )}
                     </div>
@@ -3478,9 +3608,19 @@ const getSleepyPetImage = (clicks: number) => {
                         <div className={`h-full transition-all duration-500 ${asleep ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
                       </div>
                     </div>
-                    <button aria-label={asleep ? 'Completed - Click to view' : 'Sleep'} onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }} disabled={disabled} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${asleep ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : disabled ? 'bg-white/50 opacity-50' : 'bg-white/90'}`}>
-                      {asleep ? '✓' : '→'}
-                    </button>
+                    <div className="relative inline-block overflow-visible z-30">
+                      <button ref={sleepArrowRef} aria-label={asleep ? 'Completed - Click to view' : 'Sleep'} onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }} disabled={disabled} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${asleep ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : disabled ? 'bg-white/50 opacity-50' : 'bg-white/90'}`}>
+                        {asleep ? '✓' : '→'}
+                      </button>
+                      {showStep9 && !asleep && (
+                        <img
+                          aria-hidden
+                          src="https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_224508_image-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
+                          alt=""
+                          className="pointer-events-none absolute left-[70%] -translate-x-1/2 bottom-full mb-[clamp(6px,1vw,12px)] max-w-none w-[clamp(24px,8vw,60px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce"
+                        />
+                      )}
+                    </div>
                   </div>
                 );
               })()}
@@ -3570,7 +3710,18 @@ const getSleepyPetImage = (clicks: number) => {
             <button
               key={type}
               className={`flex items-center justify-between p-3 rounded-xl border ${isUnlocked ? 'border-gray-200 hover:bg-gray-50' : 'border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed'}`}
-              onClick={() => { if (!isUnlocked) return; setShowMoreOverlay(false); handleActionClick(type); }}
+              onClick={() => {
+                if (!isUnlocked) return;
+                setShowMoreOverlay(false);
+                try {
+                  if (showStep7) {
+                    setShowStep7(false);
+                    completeAdventureStep7HomeMoreIntro();
+                    startAdventureStep8();
+                  }
+                } catch {}
+                handleActionClick(type);
+              }}
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{icon}</span>
@@ -3703,22 +3854,20 @@ const getSleepyPetImage = (clicks: number) => {
       )}
 
   {/* Global top-right shortcuts: More and Shop */}
-  <div className="fixed top-48 right-6 z-30 flex flex-col gap-2 items-end">
+  <div className="fixed top-48 right-6 z-30 flex flex-col gap-3 items-end">
     <button
       aria-label="More"
       onClick={() => { handleActionClick('more'); }}
-      className="h-11 px-4 rounded-xl bg-white/90 text-slate-800 font-semibold flex items-center justify-center gap-2 shadow-lg hover:scale-105 active:scale-95 border border-white/60 shadow-2xl"
+      className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xl hover:bg-emerald-600 active:scale-95 border border-white/20"
     >
-      <span className="text-xl">🐾</span>
-      <span></span>
+      <Rocket className="w-6 h-6" />
     </button>
     <button
       aria-label="Shop"
       onClick={() => handleActionClick('shop')}
-      className="h-11 px-4 rounded-xl bg-white/90 text-slate-800 font-semibold flex items-center justify-center gap-2 shadow-lg hover:scale-105 active:scale-95 border border-white/60 shadow-2xl"
+      className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xl hover:bg-emerald-600 active:scale-95 border border-white/20"
     >
-      <span className="text-xl">🛒</span>
-      <span></span>
+      <ShoppingCart className="w-6 h-6" />
     </button>
   </div>
 
@@ -3886,18 +4035,16 @@ const getSleepyPetImage = (clicks: number) => {
             aria-hidden
             src="https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_224508_image-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
             alt=""
-            className="pointer-events-none fixed right-0 top-36 max-w-none w-[clamp(28px,8vw,80px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce z-40"
+            className="pointer-events-none fixed right-0 top-36 max-w-none w-[clamp(24px,8vw,60px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce z-40"
           />
 
           {/* Bottom-left Krafty speech */}
           <div className="fixed left-4 bottom-4 z-40 flex items-start gap-5">
-            <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5">
-              <div className="h-24 w-24 rounded-full overflow-hidden">
-                <ChatAvatar size="responsive" />
-              </div>
+            <div className="shrink-0">
+              <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
             </div>
-            <div className="max-w-2xl">
-              <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
+            <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+              <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl ring-1 ring-primary/40">
                 <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                   {(() => {
                     const currentPetId = PetProgressStorage.getCurrentSelectedPet();
@@ -3919,18 +4066,16 @@ const getSleepyPetImage = (clicks: number) => {
             aria-hidden
             src="https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_224508_image-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
             alt=""
-            className="pointer-events-none fixed right-0 top-[13rem] max-w-none w-[clamp(28px,8vw,80px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce z-40"
+            className="pointer-events-none fixed right-0 top-[13rem] max-w-none w-[clamp(24px,8vw,60px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce z-40"
           />
 
           {/* Bottom-left Krafty speech for Step 8 */}
           <div className="fixed left-4 bottom-4 z-40 flex items-start gap-5">
-            <div className="shrink-0 rounded-full border-4 border-primary/30 bg-gradient-to-b from-muted/60 to-background p-1.5">
-              <div className="h-24 w-24 rounded-full overflow-hidden">
-                <ChatAvatar size="responsive" />
-              </div>
+            <div className="shrink-0">
+              <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
             </div>
-            <div className="max-w-2xl">
-              <div className="bg-card border rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl">
+            <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+              <div className="bg-white/95 border rounded-2xl border-primary/20 px-7 py-6 flex items-center gap-4 shadow-2xl ring-1 ring-primary/40">
                 <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
                   And once you have enough coins, you can buy other pets too!
                 </p>
@@ -3938,6 +4083,27 @@ const getSleepyPetImage = (clicks: number) => {
             </div>
           </div>
         </>
+      )}
+
+      {import.meta.env.DEV && (
+        <button
+          aria-label="Dev: Jump to Step 7"
+          title="Dev: Jump to Step 7"
+          onClick={() => {
+            try { ttsService.stop(); } catch {}
+            try {
+              tutorialService.updateTutorialState({
+                adventureStep7HomeMoreIntroCompleted: false,
+                adventureStep8Started: false,
+                adventureStep9SleepIntroStarted: false,
+                adventureStep9SleepIntroCompleted: false,
+              });
+              localStorage.setItem('pending_step7_home_more', 'true');
+            } catch {}
+            setShowStep7(true);
+          }}
+          className="fixed right-2 top-1/2 -translate-y-1/2 z-50 w-10 h-24 opacity-0"
+        />
       )}
 
       <style>
