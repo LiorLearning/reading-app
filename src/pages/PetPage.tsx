@@ -1003,7 +1003,12 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       ttsService.stop();
       
       // Set a one-time trigger so the Adventure screen can show Step 5 overlay
-      try { if (needsAdventureStep5Intro) localStorage.setItem('pending_step5_intro', 'true'); } catch {}
+      // Only arm Step 5 for House adventure to avoid misguiding other adventures
+      try {
+        if (adventureType === 'house' && needsAdventureStep5Intro) {
+          localStorage.setItem('pending_step5_intro', 'true');
+        }
+      } catch {}
 
       // Play click sound
       playFeedingSound(); // Reuse feeding sound for click

@@ -899,14 +899,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     try {
       const pending = localStorage.getItem('pending_step5_intro') === 'true';
       const alreadyShownThisSession = (() => { try { return sessionStorage.getItem('step5_shown_this_session') === 'true'; } catch { return false; } })();
-      if (
-        currentScreen === 1 &&
-        needsAdventureStep5Intro &&
-        (pending || !alreadyShownThisSession)
-      ) {
+    if (
+      currentScreen === 1 &&
+      needsAdventureStep5Intro &&
+      pending
+    ) {
         setShowStep5Intro(true);
         try { localStorage.removeItem('pending_step5_intro'); } catch {}
-        try { sessionStorage.setItem('step5_shown_this_session', 'true'); } catch {}
+      try { sessionStorage.setItem('step5_shown_this_session', 'true'); } catch {}
         try {
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
@@ -5352,29 +5352,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       try { ttsService.setSuppressNonKrafty(false); } catch {}
                       setShowStep5Intro(false);
                       completeAdventureStep5Intro();
-                      // Prevent duplicate initial pet message in this session
-                      try {
-                        const keyPart = currentAdventureId || selectedTopicId || 'unknown';
-                        const sessionKey = `${keyPart}-${adventureMode}-${currentAdventureType}`;
-                        initialResponseSentRef.current = sessionKey;
-                      } catch {}
-                      // Auto-start: add Krafty's first house prompt so the child can respond
-                      try {
-                        const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-                        const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
-                        const message: ChatMessage = {
-                          type: 'ai',
-                          content: `Yippee! Let's build our dream house for your ${petType}! What should it be—maybe floating in the sky... or something else?`,
-                          timestamp: Date.now(),
-                        };
-                        setChatMessages(prev => {
-                          playMessageSound();
-                          const id = `index-chat-${message.timestamp}-${prev.length}`;
-                          ttsService.speakAIMessage(message.content, id).catch(() => {});
-                          return [...prev, message];
-                        });
-                        setMessageCycleCount(prev => prev + 1);
-                      } catch {}
                     }}
                   >
                     Next

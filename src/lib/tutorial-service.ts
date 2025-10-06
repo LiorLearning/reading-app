@@ -275,6 +275,39 @@ class TutorialService {
       });
       console.log('📚 Migrated legacy SpellBox tutorial state');
     }
+
+    // Heuristic migration for returning users: if pet progress shows prior activity,
+    // consider steps 5–6 completed so the trainer does not run.
+    try {
+      const anyPetKeys = [] as string[];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i) || '';
+        if (k.startsWith('litkraft_pet_progress_')) anyPetKeys.push(k);
+      }
+      // If any pet has coins/adventures, treat as returning user
+      let isReturning = false;
+      for (const key of anyPetKeys) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          const parsed = JSON.parse(raw);
+          const coins = parsed?.heartData?.adventureCoins || 0;
+          const totalAdventures = parsed?.achievementData?.totalAdventuresSinceOwned || 0;
+          const owned = parsed?.generalData?.isOwned;
+          if (coins > 0 || totalAdventures > 0 || owned) {
+            isReturning = true;
+            break;
+          }
+        } catch {}
+      }
+      if (isReturning) {
+        this.updateTutorialState({
+          adventureStep5IntroCompleted: true,
+          adventureStep6IntroCompleted: true,
+        });
+        console.log('📚 Returning user detected — marked steps 5–6 as completed');
+      }
+    } catch {}
   }
 }
 
