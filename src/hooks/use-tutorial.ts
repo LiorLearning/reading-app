@@ -43,6 +43,40 @@ export const useTutorial = () => {
     refreshTutorialState();
   }, [refreshTutorialState]);
 
+  const completePetDailyCheckIntro = useCallback(() => {
+    tutorialService.completePetDailyCheckIntro();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+
+  const completeAdventureStep5Intro = useCallback(() => {
+    tutorialService.completeAdventureStep5Intro();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+
+  const completeAdventureStep6Intro = useCallback(() => {
+    tutorialService.completeAdventureStep6Intro();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+
+  const completeAdventureStep7HomeMoreIntro = useCallback(() => {
+    tutorialService.completeAdventureStep7HomeMoreIntro();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+
+  const startAdventureStep8 = useCallback(() => {
+    tutorialService.startAdventureStep8();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+
+  const startAdventureStep9 = useCallback(() => {
+    tutorialService.startAdventureStep9();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+  const completeAdventureStep9 = useCallback(() => {
+    tutorialService.completeAdventureStep9();
+    refreshTutorialState();
+  }, [refreshTutorialState]);
+
   const resetAllTutorials = useCallback(() => {
     tutorialService.resetAllTutorials();
     refreshTutorialState();
@@ -53,6 +87,13 @@ export const useTutorial = () => {
   const needsFillInBlanksTutorial = tutorialService.needsFillInBlanksTutorial();
   const needsMCQTutorial = tutorialService.needsMCQTutorial();
   const needsChatTutorial = tutorialService.needsChatTutorial();
+  const needsPetDailyCheckIntro = tutorialService.needsPetDailyCheckIntro();
+  const needsAdventureStep5Intro = tutorialService.needsAdventureStep5Intro();
+  const needsAdventureStep6Intro = tutorialService.needsAdventureStep6Intro();
+  const needsAdventureStep7HomeMoreIntro = tutorialService.needsAdventureStep7HomeMoreIntro();
+  const hasAdventureStep8Started = tutorialService.hasAdventureStep8Started();
+  const hasAdventureStep9SleepIntroStarted = tutorialService.hasAdventureStep9SleepIntroStarted();
+  const hasAdventureStep9SleepIntroCompleted = tutorialService.hasAdventureStep9SleepIntroCompleted();
 
   return {
     // State
@@ -60,6 +101,7 @@ export const useTutorial = () => {
     
     // Convenience flags
     isFirstTimeAdventurer,
+    needsPetDailyCheckIntro,
     needsFillInBlanksTutorial,
     needsMCQTutorial,
     needsChatTutorial,
@@ -69,8 +111,21 @@ export const useTutorial = () => {
     completeFillInBlanksTutorial,
     completeMCQTutorial,
     completeChatTutorial,
+    completePetDailyCheckIntro,
+    completeAdventureStep5Intro,
+    completeAdventureStep6Intro,
+    completeAdventureStep7HomeMoreIntro,
+    startAdventureStep8,
+    startAdventureStep9,
+    completeAdventureStep9,
     resetAllTutorials,
     refreshTutorialState,
+    needsAdventureStep5Intro,
+    needsAdventureStep6Intro,
+    needsAdventureStep7HomeMoreIntro,
+    hasAdventureStep8Started,
+    hasAdventureStep9SleepIntroStarted,
+    hasAdventureStep9SleepIntroCompleted,
   };
 };
 

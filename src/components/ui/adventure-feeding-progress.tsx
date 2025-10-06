@@ -59,12 +59,7 @@ const AdventureFeedingProgress: React.FC<AdventureFeedingProgressProps> = ({
 
   return (
     <div className={cn("flex items-center justify-center gap-3", className)}>
-      {/* Emoji indicator on the left */}
-      <div className="text-2xl transition-all duration-700 ease-out flex items-center justify-center min-w-[2rem]">
-        {petState.emoji}
-      </div>
-      
-      {/* Progress bar - wider and cleaner */}
+      {/* Progress bar with emoji that moves to the right when full */}
       <div className="relative w-80 h-8 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-full border border-slate-400/30 overflow-hidden">
         {/* Progress fill with dynamic gradient */}
         <div 
@@ -83,6 +78,19 @@ const AdventureFeedingProgress: React.FC<AdventureFeedingProgressProps> = ({
             transition: 'transform 0.7s ease-out'
           }}
         />
+        
+        {/* Emoji indicator - default left, slides to right when full */}
+        <div
+          className={cn(
+            "absolute inset-y-0 flex items-center transition-all duration-700 ease-out",
+            progressPercentage >= 100 ? "justify-end right-2 left-2" : "justify-start left-2 right-2"
+          )}
+          aria-hidden
+        >
+          <div className="text-2xl select-none">
+            {petState.emoji}
+          </div>
+        </div>
       </div>
     </div>
   );

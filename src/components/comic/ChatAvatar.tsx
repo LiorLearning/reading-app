@@ -34,7 +34,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
   return (
     <div className={`flex flex-col items-center justify-center gap-2 p-4 bg-transparent h-full ${className}`}>
       {/* Avatar Image or Video */}
-      <div className={`flex items-center justify-center hover:scale-105 transition-all duration-200 ${getSizeClasses()}`}>
+      <div className={`flex items-center justify-center hover:scale-105 transition-all duration-200 overflow-hidden rounded-lg ${getSizeClasses()}`}>
         {isVideo ? (
           <video 
             src={avatar} 
@@ -42,13 +42,13 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
             loop 
             muted 
             playsInline
-            className="w-full h-full object-contain rounded-lg"
+            className="w-full h-full object-contain rounded-lg scale-[1.08]"
           />
         ) : (
           <img 
             src={avatar} 
             alt={name} 
-            className="w-full h-full object-contain rounded-lg"
+            className="w-full h-full object-contain rounded-lg scale-[1.08]"
           />
         )}
       </div>

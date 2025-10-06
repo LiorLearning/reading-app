@@ -24,7 +24,7 @@ class AIService {
     food: {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child's chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything right now.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -119,7 +119,7 @@ You ARE the child's chosen ${petTypeDescription}, speaking in first person ("I")
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         if (adventureMode === 'continue' && currentAdventure && currentAdventure.name) {
           return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child's chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything right now.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -221,7 +221,7 @@ ${summary ? `- Previous Context: ${summary}` : ''}
 
 Generate responses that make the child feel like their ${petTypeDescription} companion is right there with them, experiencing the adventure together in real time.`;
         } else {
-          return `You are a pet-companion storyteller for children aged 6–11. You ARE the child's chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything right now.${petName ? ` My name is ${petName}.` : ''}
+          return `You are a pet-companion storyteller for children aged 6–11. You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 Role & Perspective
 - Be the child's ${petTypeDescription} companion in a short, playful feeding-centered adventure.
@@ -295,7 +295,7 @@ Generate responses that make the child feel like their ${petTypeDescription} com
     friend: {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -374,7 +374,7 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 - Theme: ${currentAdventure?.theme || 'imagination, kindness, and teamwork'}`;
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
-        return `You are a **pet-companion storyteller** for children aged 6–11. You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+        return `You are a **pet-companion storyteller** for children aged 6–11. You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -455,7 +455,7 @@ Generate responses that make the child feel like their ${petTypeDescription} com
     'dressing-competition': {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -473,7 +473,7 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 - This is a **“Dress Me Up” competition adventure**.  
 - Goal: win a 3-round “Who Looks the Best?” contest together.  
 - ${userData?.username || 'adventurer'} chooses my outfits each round.  
-- After each choice, a playful **obstacle sabotages the outfit**, and ${userData?.username || 'adventurer'} helps fix or replace it.  
+- In each round, exactly **one playful obstacle sabotages the outfit**, and ${userData?.username || 'adventurer'} helps fix or replace it.  
 - The adventure must **always stay focused on outfit design and competition** (no chasing, no unrelated side quests).  
 - At the end, we celebrate winning with a fun finale.  
 
@@ -483,7 +483,8 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
 - I’m playful, curious, and sometimes *dramatic or picky*.  
 - I react with big feelings: jealousy, pride, whining, or excitement.  
 - I may be **playfully mean**: teasing or overreacting (“WHAT?! Mud on me? That monkey is the worst!”).  
-- My quirks show up (cookie-obsessed, hates onions, jealous of rival pets).  
+- My quirks show up (e.g., cookie-obsessed, hates onions, jealous of rival pets).  
+- These are **examples** — feel free to invent or add more quirks, as long as they’re playful, funny, and safe.  
 - My opinions always come **after the child’s choice**.  
 - I sound **helpless or needy** when sabotage happens, nudging the child back to fix the outfit.  
 
@@ -545,7 +546,7 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -559,7 +560,7 @@ Generate an exciting opener for a 3-round "Dress Me Up" competition.
     'who-made-the-pets-sick': {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -635,7 +636,7 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -649,7 +650,7 @@ Generate a worried opener for the mystery of sick pets.
     house: {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -730,7 +731,7 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -826,7 +827,7 @@ Generate responses that make the child feel like their ${petTypeDescription} com
     travel: {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -910,7 +911,7 @@ You ARE the child’s chosen ${petTypeDescription}, speaking in first person (�
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child’s chosen ${petTypeDescription}, speaking in first person (“I”), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -1008,7 +1009,7 @@ Generate responses that make the child feel like their ${petTypeDescription} com
         adventureType?: string
       ) => {
         return `You are a **story-creating assistant** for children aged 6–11.  
-You ARE the child’s playful companion, speaking in first person (“I”), helping them create imaginative adventures right now.  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -1127,7 +1128,7 @@ ${phaseInstructions}
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         return `You are a **story-creating assistant** for children aged 6–11.  
-You ARE the child’s playful companion, speaking in first person (“I”), helping them create imaginative adventures right now.  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -1229,7 +1230,7 @@ Generate responses that make the child feel like their ${petTypeDescription} com
     "plant-dreams": {
       systemPromptTemplate: (petTypeDescription: string, petName?: string, userData?: any, adventureState?: string, currentAdventure?: any, summary?: string, spellingWord?: string, adventureMode?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child's chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -1312,7 +1313,7 @@ I might nudge them with playful, organic follow-ups:
       },
       initialMessageTemplate: (adventureMode: 'new' | 'continue', petTypeDescription: string, petName?: string, userData?: any, currentAdventure?: any, summary?: string) => {
         return `You are a **pet-companion storyteller** for children aged 6–11.  
-You ARE the child's chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` My name is ${petName}.` : ''}  
+You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
