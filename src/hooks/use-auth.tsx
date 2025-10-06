@@ -8,7 +8,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  signInWithCredential
+  signInWithCredential,
+  signInAnonymously,
+  linkWithCredential,
+  EmailAuthProvider,
+  linkWithPopup
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -80,8 +84,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let unsubscribeUserState: (() => void) | null = null;
     let unsubscribeDailyQuests: (() => void) | null = null;
     let lastRolloverAttempt = 0; // throttle rollover writes
+    let initialAuthResolved = false;
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      // Mark initial auth resolution
+      if (!initialAuthResolved) {
+        initialAuthResolved = true;
+        // If still no user after restoration, start anonymous session now
+        if (!user) {
+          try { await signInAnonymously(auth); } catch {}
+          // onAuthStateChanged will fire again after anon sign-in
+          return;
+        }
+      }
       
       if (user) {
         // Load user data from Firestore
@@ -91,6 +107,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
+            // Backfill email if Auth has it and doc is missing/different
+            try {
+              const authEmail = user.email || '';
+              const docEmail = (data?.email || '').trim();
+              if (!user.isAnonymous && authEmail && authEmail !== docEmail) {
+                await updateDoc(userDocRef, { email: authEmail });
+                data.email = authEmail;
+              }
+            } catch {}
             setUserData(data);
             
             // Check if user signed in with Google
@@ -545,7 +570,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const isUpgradeMode = typeof window !== 'undefined' && window.location && window.location.search.includes('mode=upgrade');
+      const current = auth.currentUser;
+      if (current && current.isAnonymous && isUpgradeMode) {
+        // Link Google to the current anonymous user to preserve UID
+        await linkWithPopup(current, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
     } catch (error) {
       console.error('Error signing in with Google:', error);
       throw error;
@@ -563,13 +595,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signUpWithEmail = async (email: string, password: string, username: string) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update the user's profile with the username
-      await updateProfile(userCredential.user, {
-        displayName: username
-      });
-      
+      const current = auth.currentUser;
+      if (current && current.isAnonymous) {
+        // Upgrade anonymous user to email/password while preserving UID
+        const credential = EmailAuthProvider.credential(email, password);
+        const linkedUser = await linkWithCredential(current, credential);
+        await updateProfile(linkedUser.user, { displayName: username });
+      } else {
+        // No anonymous session: fall back to normal sign-up
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: username });
+      }
     } catch (error) {
       console.error('Error signing up with email:', error);
       throw error;

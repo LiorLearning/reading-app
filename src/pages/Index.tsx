@@ -314,6 +314,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [isGeneratingAdventureImage, setIsGeneratingAdventureImage] = React.useState(false);
   const [isExplicitImageRequest, setIsExplicitImageRequest] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
+  // Guest signup gate state
+  const [signupGateOpen, setSignupGateOpen] = React.useState<boolean>(() => {
+    try { return localStorage.getItem('guest_signup_gate_open') === '1'; } catch { return false; }
+  });
+  const [guestPromptCount, setGuestPromptCount] = React.useState<number>(() => {
+    try {
+      const raw = localStorage.getItem('guest_prompt_count');
+      return raw ? (parseInt(raw, 10) || 0) : 0;
+    } catch { return 0; }
+  });
   
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
@@ -1805,6 +1815,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
+      // If anonymous and limit reached, block and open signup gate
+      try {
+        const isAnon = !!user && (user as any).isAnonymous === true;
+        if (isAnon && guestPromptCount >= 5) {
+          setSignupGateOpen(true);
+          try { localStorage.setItem('guest_signup_gate_open', '1'); } catch {}
+          return;
+        }
+      } catch {}
       
       // Check if the last message is "transcribing..." and replace it with actual transcription
       const lastMessage = chatMessages[chatMessages.length - 1];
@@ -2042,6 +2061,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           return [...prev, userMessage];
         }
       });
+
+      // Increment guest prompt counter and open gate after the 5th prompt
+      try {
+        const isAnon = !!user && (user as any).isAnonymous === true;
+        if (isAnon) {
+          const next = guestPromptCount + 1;
+          setGuestPromptCount(next);
+          try { localStorage.setItem('guest_prompt_count', String(next)); } catch {}
+          if (next === 5) {
+            setTimeout(() => {
+              setSignupGateOpen(true);
+              try { localStorage.setItem('guest_signup_gate_open', '1'); } catch {}
+            }, 0);
+          }
+        }
+      } catch {}
 
       // Sticky yawn detection (skip during MCQ screen)
       try {
@@ -4145,6 +4180,41 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
+      {/* Signup Gate Modal */}
+      <Dialog open={signupGateOpen} onOpenChange={(o) => {
+        setSignupGateOpen(o);
+        try { localStorage.setItem('guest_signup_gate_open', o ? '1' : ''); } catch {}
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create your account to continue</DialogTitle>
+            <DialogDescription>
+              You’ve reached the free trial limit. Create an account to save progress and continue your adventure.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-2">
+            <Button
+              className="w-full"
+              onClick={() => {
+                playClickSound();
+                navigate('/auth?mode=upgrade&redirect=/');
+              }}
+            >
+              Create account
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                playClickSound();
+                navigate('/auth?redirect=/');
+              }}
+            >
+              I already have an account
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
