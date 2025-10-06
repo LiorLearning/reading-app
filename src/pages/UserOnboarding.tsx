@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -39,6 +40,7 @@ const levels: LevelOption[] = [
 ];
 
 const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
+  const navigate = useNavigate();
   const { updateUserData, userData, user } = useAuth();
   const [username, setUsername] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("");
@@ -201,6 +203,17 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
             </CardHeader>
 
             <CardContent className="space-y-6">
+              {/* Existing user login entry point */}
+              <Button
+                variant="outline"
+                className="w-full h-10 border-2 border-black"
+                onClick={() => {
+                  playClickSound();
+                  navigate(`/auth?redirect=/`);
+                }}
+              >
+                Log in to existing account
+              </Button>
               {step === 1 ? (
                 // Username Step
                 <div className="space-y-4">

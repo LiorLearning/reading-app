@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +12,8 @@ import { getFriendlyAuthError } from '@/lib/firebase-auth-errors';
 
 export const AuthScreen: React.FC = () => {
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, initializeOneTapSignIn, hasGoogleAccount } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showEmailAuth, setShowEmailAuth] = useState(false);
@@ -54,6 +57,9 @@ export const AuthScreen: React.FC = () => {
     
     try {
       await signInWithGoogle();
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/';
+      navigate(redirect);
     } catch (error: any) {
       setError(getFriendlyAuthError(error, 'google'));
     } finally {
@@ -69,6 +75,9 @@ export const AuthScreen: React.FC = () => {
 
     try {
       await signInWithEmail(signInData.email, signInData.password);
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/';
+      navigate(redirect);
     } catch (error: any) {
       setError(getFriendlyAuthError(error, 'signin'));
     } finally {
@@ -90,6 +99,9 @@ export const AuthScreen: React.FC = () => {
 
     try {
       await signUpWithEmail(signUpData.email, signUpData.password, signUpData.username);
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/';
+      navigate(redirect);
     } catch (error: any) {
       setError(getFriendlyAuthError(error, 'signup'));
     } finally {
