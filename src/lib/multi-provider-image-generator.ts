@@ -7,7 +7,7 @@ export interface ImageGenerationResult {
   imageUrl?: string;
   error?: string;
   attempts: number;
-  provider: 'google-imagen' | 'openai' | 'azure' | 'stable-diffusion' | 'none';
+  provider: 'flux-schnell' | 'google-imagen' | 'openai' | 'azure' | 'stable-diffusion' | 'none';
   duration: number;
 }
 
@@ -28,6 +28,7 @@ export class MultiProviderImageGenerator {
   
   constructor() {
     this.providers = [
+      new FluxSchnellProvider(),
       new GoogleImagenProvider(),
       new OpenAIProvider(),
       new AzureOpenAIProvider(),
@@ -155,6 +156,10 @@ export class MultiProviderImageGenerator {
         refinedPrompt = `${refinedPrompt}, cinematic style, vivid colors`;
         break;
         
+      case 'flux-schnell':
+        refinedPrompt = `${refinedPrompt}, cinematic, richly detailed, ultra vivid lighting`;
+        break;
+
       case 'google-imagen':
         refinedPrompt = `${refinedPrompt}, high quality art, richly detailed, photorealistic lighting`;
         break;
@@ -224,9 +229,65 @@ export class MultiProviderImageGenerator {
 
 // Provider interface
 interface ImageProvider {
-  name: 'google-imagen' | 'openai' | 'azure' | 'stable-diffusion';
+  name: 'flux-schnell' | 'google-imagen' | 'openai' | 'azure' | 'stable-diffusion';
   isConfigured(): boolean;
   generate(prompt: string, userId: string, options?: GenerationOptions): Promise<string>;
+}
+
+class FluxSchnellProvider implements ImageProvider {
+  name = 'flux-schnell' as const;
+
+  isConfigured(): boolean {
+    return true;
+  }
+
+  async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
+    console.log(`🎯 [FluxSchnellProvider.generate()] Starting Flux Schnell image generation via Cloud Function proxy`);
+    console.log(`📝 [FluxSchnellProvider.generate()] Prompt: "${prompt}"`);
+    console.log(`👤 [FluxSchnellProvider.generate()] User ID: ${userId}`);
+    console.log(`⚙️ [FluxSchnellProvider.generate()] Options:`, options);
+
+    let authToken: string | null = null;
+    try {
+      const { auth } = await import('./firebase');
+      const currentUser = auth.currentUser;
+      authToken = currentUser ? await currentUser.getIdToken() : null;
+    } catch (error) {
+      console.warn('⚠️ [FluxSchnellProvider.generate()] Failed to obtain Firebase auth token:', error);
+    }
+
+    const functionUrl = `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net/generateFluxSchnell`;
+
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
+      body: JSON.stringify({
+        prompt,
+        options: {
+          go_fast: true,
+          output_quality: 80,
+          num_inference_steps: 4,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Flux Schnell cloud function failed (${response.status}): ${errorText}`);
+    }
+
+    const result = await response.json();
+
+    if (!result?.success || !result?.imageUrl) {
+      throw new Error(result?.error || 'Flux Schnell cloud function did not return image URL');
+    }
+
+    console.log(`✅ [FluxSchnellProvider.generate()] Successfully generated Flux Schnell image via proxy: ${result.imageUrl}`);
+    return result.imageUrl;
+  }
 }
 
 class GoogleImagenProvider implements ImageProvider {

@@ -1312,22 +1312,42 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             }
           })();
         } else {
-          // Not a data URL; cache to Firebase/localStorage as before
-          await cacheAdventureImageHybrid(
-            user?.uid || null,
-            imageUrl,
-            prompt,
-            prompt,
-            currentAdventureId || undefined
-          );
-          console.log('🔄 NEW: Unified AI image cached successfully');
-          const newPanel = {
-            id: crypto.randomUUID(),
-            image: imageUrl,
-            text: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : ''),
-            timestamp: Date.now()
-          } as any;
-          addPanel(newPanel);
+          // Remote URL (e.g., Flux Schnell) → optimistic render immediately, then upload in background and swap URL
+          const newPanelId = crypto.randomUUID();
+          addPanel({ id: newPanelId, image: imageUrl, text: prompt.substring(0, 100) + (prompt.length > 100 ? '...' : ''), timestamp: Date.now() } as any);
+          setNewlyCreatedPanelId(newPanelId);
+
+          (async () => {
+            try {
+              if (user?.uid && currentAdventureId) {
+                // Upload original remote image URL to Firebase Storage via Cloud Function
+                const stored = await firebaseImageService.uploadGeneratedImage(
+                  user.uid,
+                  currentAdventureId,
+                  imageUrl,
+                  prompt,
+                  prompt
+                );
+                if (stored?.imageUrl) {
+                  // Swap panel image to permanent Firebase URL
+                  updatePanelImage(newPanelId, stored.imageUrl);
+                  // Persist URL metadata for retrieval
+                  await cacheAdventureImageHybrid(user.uid, stored.imageUrl, prompt, prompt, currentAdventureId);
+                }
+              } else {
+                // No auth/adventure → just persist locally without blocking UI
+                await cacheAdventureImageHybrid(
+                  user?.uid || null,
+                  imageUrl,
+                  prompt,
+                  prompt,
+                  currentAdventureId || undefined
+                );
+              }
+            } catch (bgErr) {
+              console.warn('⚠️ Background uploadImage failed (remote URL):', bgErr);
+            }
+          })();
         }
       } catch (error) {
         console.warn('⚠️ NEW: Failed to cache unified AI image:', error);

@@ -11,6 +11,39 @@ const storage = getStorage();
 const firestore = getFirestore();
 const auth = getAuth();
 
+const FLUX_SCHNELL_PREDICTION_URL = 'https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions';
+
+async function pollFluxSchnellPrediction(statusUrl: string, replicateToken: string, timeoutMs = 120000, intervalMs = 2000) {
+  const start = Date.now();
+
+  while (Date.now() - start < timeoutMs) {
+    const statusResponse = await fetch(statusUrl, {
+      headers: {
+        Authorization: `Bearer ${replicateToken}`,
+      },
+    });
+
+    if (!statusResponse.ok) {
+      const errorText = await statusResponse.text();
+      throw new Error(`Flux Schnell status polling failed (${statusResponse.status}): ${errorText}`);
+    }
+
+    const statusData = await statusResponse.json();
+
+    if (statusData?.status === 'succeeded') {
+      return statusData;
+    }
+
+    if (statusData?.status === 'failed' || statusData?.status === 'canceled') {
+      throw new Error(`Flux Schnell prediction ${statusData?.status || 'failed'}`);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error('Flux Schnell prediction timed out');
+}
+
 export const uploadImage = onRequest(
   {
     cors: true,
@@ -203,6 +236,114 @@ export const uploadImagen = onRequest(
       });
     } catch (error) {
       console.error('❌ Error in uploadImagen function:', error);
+      response.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+);
+
+export const generateFluxSchnell = onRequest(
+  {
+    cors: true,
+    region: 'us-central1',
+    secrets: ['VITE_REPLICATE_TOKEN'],
+  },
+  async (request, response) => {
+    response.set('Access-Control-Allow-Origin', '*');
+    response.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+
+    if (request.method === 'OPTIONS') {
+      response.status(204).send('');
+      return;
+    }
+
+    if (request.method !== 'POST') {
+      response.status(405).json({ success: false, error: 'Method not allowed' });
+      return;
+    }
+
+    try {
+      const authToken = request.headers.authorization?.replace('Bearer ', '');
+
+      if (!authToken) {
+        response.status(401).json({ success: false, error: 'No auth token provided' });
+        return;
+      }
+
+      await auth.verifyIdToken(authToken);
+
+      const { prompt, options } = request.body || {};
+
+      if (!prompt || typeof prompt !== 'string') {
+        response.status(400).json({ success: false, error: 'Missing or invalid prompt' });
+        return;
+      }
+
+      const replicateToken = process.env.VITE_REPLICATE_TOKEN;
+      if (!replicateToken) {
+        response.status(500).json({ success: false, error: 'Replicate API token not configured' });
+        return;
+      }
+
+      const payload = {
+        input: {
+          prompt,
+          go_fast: options?.go_fast !== undefined ? options.go_fast : true,
+          output_quality: options?.output_quality ?? 80,
+          num_inference_steps: options?.num_inference_steps ?? 4,
+        },
+      };
+
+      const initialResponse = await fetch(FLUX_SCHNELL_PREDICTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${replicateToken}`,
+          Prefer: 'wait',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!initialResponse.ok) {
+        const errorText = await initialResponse.text();
+        response.status(initialResponse.status).json({
+          success: false,
+          error: `Flux Schnell API request failed (${initialResponse.status}): ${errorText}`,
+        });
+        return;
+      }
+
+      let prediction = await initialResponse.json();
+
+      if (!prediction?.output?.[0] || prediction?.status !== 'succeeded') {
+        const statusUrl = prediction?.urls?.get;
+
+        if (!statusUrl) {
+          response.status(500).json({ success: false, error: 'Flux Schnell prediction missing status URL' });
+          return;
+        }
+
+        prediction = await pollFluxSchnellPrediction(statusUrl, replicateToken);
+      }
+
+      const outputUrl = prediction?.output?.[0];
+
+      if (!outputUrl || typeof outputUrl !== 'string') {
+        response.status(500).json({ success: false, error: 'Flux Schnell prediction returned invalid output' });
+        return;
+      }
+
+      response.json({
+        success: true,
+        imageUrl: outputUrl,
+        predictionId: prediction?.id,
+        status: prediction?.status,
+      });
+    } catch (error) {
+      console.error('❌ Error in generateFluxSchnell function:', error);
       response.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
