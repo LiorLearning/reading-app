@@ -4614,7 +4614,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               ) : (
                 <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
                   {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
-                   userData && currentScreen === -1 ? `Welcome back, ${userData.username}!` :
+                   userData && currentScreen === -1 ? `Welcome back ${userData.username}!` :
                    currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
                    'QUIZ TIME'}
                 </h1>

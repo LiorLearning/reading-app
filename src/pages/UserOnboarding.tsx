@@ -203,17 +203,6 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              {/* Existing user login entry point */}
-              <Button
-                variant="outline"
-                className="w-full h-10 border-2 border-black"
-                onClick={() => {
-                  playClickSound();
-                  navigate(`/auth?redirect=/`);
-                }}
-              >
-                Log in to existing account
-              </Button>
               {step === 1 ? (
                 // Username Step
                 <div className="space-y-4">
@@ -249,6 +238,24 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                     }}
                   >
                     Continue
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                  {/* Existing user login entry point (moved below Continue) */}
+                  <Button
+                    onClick={() => {
+                      playClickSound();
+                      navigate(`/auth?redirect=/`);
+                    }}
+                    className={cn(
+                      "w-full h-14 text-lg font-normal rounded-xl border-3 btn-animate flex items-center justify-center gap-3",
+                      "bg-green-600 hover:bg-green-700 text-white"
+                    )}
+                    style={{ 
+                      borderColor: '#16a34a',
+                      boxShadow: '0 6px 0 #16a34a'
+                    }}
+                  >
+                    Returning User?
                     <ChevronRight className="h-5 w-5" />
                   </Button>
                 </div>
