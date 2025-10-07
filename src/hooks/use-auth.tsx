@@ -85,6 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let unsubscribeDailyQuests: (() => void) | null = null;
     let lastRolloverAttempt = 0; // throttle rollover writes
     let initialAuthResolved = false;
+    let focusListener: ((this: Window, ev: Event) => any) | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -549,7 +550,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             } catch {}
           };
-          try { window.addEventListener('focus', onFocus); } catch {}
+          try { window.addEventListener('focus', onFocus); focusListener = onFocus; } catch {}
         } catch (e) {
           console.warn('Failed to attach realtime listeners:', e);
         }
@@ -561,6 +562,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
           if (unsubscribeDailyQuests) { unsubscribeDailyQuests(); unsubscribeDailyQuests = null; }
         } catch {}
+        // Detach window focus listener on sign-out
+        try {
+          if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; }
+        } catch {}
       }
       
       setLoading(false);
@@ -569,7 +574,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       try { if (unsubscribeUserState) unsubscribeUserState(); } catch {}
       try { if (unsubscribeDailyQuests) unsubscribeDailyQuests(); } catch {}
-      try { window.removeEventListener('focus', () => {}); } catch {}
+      try { if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; } } catch {}
       unsubscribe();
     };
   }, []);
@@ -632,9 +637,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try { localStorage.removeItem('litkraft_coins'); } catch {}
         try { localStorage.removeItem('litkraft_cumulative_coins_earned'); } catch {}
         try { localStorage.removeItem('litkraft_pet_data'); } catch {}
+        try { localStorage.removeItem('litkraft_streak'); } catch {}
         // Notify listeners
         window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins: 0 } }));
         window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: [] }));
+        window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: 0 } }));
         window.dispatchEvent(new CustomEvent('currentPetChanged'));
       } catch {}
     } catch (error) {
