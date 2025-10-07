@@ -685,6 +685,8 @@ export const useCurrentPetAvatarImage = () => {
     coins_0: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-crying-unscreen.gif?alt=media&token=7762a589-6fa3-474e-87e4-3ea2110bd0a0',
   };
 
+  // (helper removed to avoid export-in-scope issues)
+
   // Handle pets that have GIF sets; decide by unified careState
   const getSpecialPetImage = (careState: string) => {
     // Helper: collapse careState to GIF mood buckets, and treat any sleep as super-happy
