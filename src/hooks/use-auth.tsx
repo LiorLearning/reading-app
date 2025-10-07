@@ -396,6 +396,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               localStorage.setItem('litkraft_streak', String(streakVal));
               window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: streakVal } }));
             } catch {}
+            // Weekly hearts broadcast for UI (modal and others)
+            try {
+              const map = (d?.weeklyHearts || {}) as Record<string, Record<string, boolean>>;
+              localStorage.setItem('litkraft_weekly_hearts', JSON.stringify(map));
+              window.dispatchEvent(new CustomEvent('weeklyHeartsUpdated', { detail: map }));
+            } catch {}
+
             // Sync pet names to local storage
             const names = (d?.petnames || {}) as Record<string, string>;
             // Owned pets (prefer petnames keys; fallback to pets counts)

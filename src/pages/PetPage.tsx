@@ -24,6 +24,8 @@ import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSe
 import EvolutionStrip from '@/components/adventure/EvolutionStrip';
 import { ensureMicPermission } from '@/lib/mic-permission';
 import { toast } from 'sonner';
+import KraftyReinforcedStreakModal, { markTodayHeartFilled } from '@/components/KraftyReinforcedStreakModal';
+import { getPetEmotionActionMedia } from '@/lib/pet-avatar-service';
 
 
 type Props = {
@@ -92,8 +94,56 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [isProcessingCapture, setIsProcessingCapture] = useState(false);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [selectedFilter, setSelectedFilter] = useState<'none' | 'bw' | 'sepia' | 'warm' | 'cool' | 'vivid'>('none');
+  // Reinforced streak modal state
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [streakForModal, setStreakForModal] = useState(0);
+
+  // Weekly hearts count for current week (from Firestore-broadcasted userStates.weeklyHearts, fallback to local)
+  const getMondayOfCurrentWeek = () => {
+    const now = new Date();
+    const day = now.getDay(); // 0..6
+    const diff = (day === 0 ? -6 : 1 - day);
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diff);
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  };
+  const ymd = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  };
+  const getWeeklyHeartsCount = () => {
+    try {
+      const key = `week_${ymd(getMondayOfCurrentWeek())}`;
+      const raw = localStorage.getItem('litkraft_weekly_hearts');
+      const map = raw ? (JSON.parse(raw) as Record<string, Record<string, boolean>>) : {};
+      const week = (map && map[key]) || {};
+      const serverCount = Object.values(week).filter(Boolean).length;
+      if (serverCount > 0) return serverCount;
+      // Fallback to local per-week storage
+      const localRaw = localStorage.getItem(`litkraft_weekly_streak_hearts_${key}`);
+      const localWeek = localRaw ? (JSON.parse(localRaw) as Record<string, boolean>) : {};
+      return Object.values(localWeek).filter(Boolean).length;
+    } catch {
+      return 0;
+    }
+  };
+  const [weeklyHeartsCount, setWeeklyHeartsCount] = useState<number>(() => getWeeklyHeartsCount());
+
+  useEffect(() => {
+    const onWeeklyHearts = () => {
+      try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
+    };
+    try { window.addEventListener('weeklyHeartsUpdated', onWeeklyHearts as any); } catch {}
+    // Prime once on mount
+    onWeeklyHearts();
+    return () => { try { window.removeEventListener('weeklyHeartsUpdated', onWeeklyHearts as any); } catch {} };
+  }, []);
 
   const playShutterSound = () => {
+    
     try {
       const audio = new Audio('/sounds/camera-click.mp3');
       audio.currentTime = 0;
@@ -258,7 +308,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const { completePetDailyCheckIntro, needsAdventureStep5Intro, needsAdventureStep7HomeMoreIntro, completeAdventureStep7HomeMoreIntro, startAdventureStep8, hasAdventureStep8Started, startAdventureStep9, hasAdventureStep9SleepIntroStarted, hasAdventureStep9SleepIntroCompleted, completeAdventureStep9 } = useTutorial();
   const [showStep7, setShowStep7] = useState(false);
   const [showStep9, setShowStep9] = useState(false);
-  const [showStep10, setShowStep10] = useState(false);
+  // const [showStep10, setShowStep10] = useState(false); // Step 10 disabled (conflicts with streak modal)
   const prevShowPetShopRef = useRef(false);
   const hasSpokenStep7Ref = useRef(false);
   const hasSpokenStep8Ref = useRef(false);
@@ -1139,19 +1189,68 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           
           updateSleepClicks(newSleepClicks, now, sleepEndTime);
           setSleepCompleted(true);
-
-          // Step 10: Krafty-only line after sleep starts
           try {
-            const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-            const petName = PetProgressStorage.getPetName(currentPetId) || 'your pet';
-            const msg = `Awesome! Let ${petName} get a good 8-hour sleep. The more you care, the faster ${petName} will grow. See you tomorrow!`;
-            try { ttsService.setSuppressNonKrafty(true); } catch {}
-          ttsService.speakAIMessage(msg, 'krafty-step10-after-sleep').finally(() => {
-              try { ttsService.setSuppressNonKrafty(false); } catch {}
-            }).catch(() => {});
-          // Show Step 10 visual (Krafty bottom-left) and wait for user to press Done
-          setShowStep10(true);
+            // If today's assigned quest is done for ANY pet, and we haven't shown modal today, show it now.
+            const hasShownKey = 'litkraft_reinforced_streak_last_shown_date';
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+            const lastShown = localStorage.getItem(hasShownKey) || '';
+
+            // Determine if this is the first pet completing both to-dos today
+            let anyPetDone = false;
+            try {
+              const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+              if (questStatesRaw) {
+                const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; progress: number; target?: number }>;
+                anyPetDone = Array.isArray(arr) && arr.some((x) => Number(x?.progress || 0) >= Number(x?.target || 0));
+              }
+            } catch {}
+
+            if (anyPetDone && lastShown !== todayStr) {
+              // Fill today's weekly heart, set streak, and open modal
+              markTodayHeartFilled();
+              // Refresh local weekly hearts count immediately (works even before Firestore roundtrip)
+              try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
+              // Also persist to Firestore weeklyHearts when signed in
+              try {
+                const userObj = auth.currentUser;
+                if (userObj) {
+                  const getMondayOfCurrentWeek = () => {
+                    const now = new Date();
+                    const day = now.getDay();
+                    const diff = (day === 0 ? -6 : 1 - day);
+                    const monday = new Date(now);
+                    monday.setDate(now.getDate() + diff);
+                    monday.setHours(0, 0, 0, 0);
+                    return monday;
+                  };
+                  const ymd = (d: Date) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${dd}`;
+                  };
+                  const monday = getMondayOfCurrentWeek();
+                  const weekKey = `week_${ymd(monday)}`;
+                  (async () => {
+                    try { await stateStoreApi.setWeeklyHeart({ userId: userObj.uid, weekKey, dateStr: todayStr, filled: true }); } catch {}
+                  })();
+                }
+              } catch {}
+              try {
+                const s = Number(localStorage.getItem('litkraft_streak') || '0');
+                setStreakForModal(Number.isNaN(s) ? 0 : s);
+              } catch { setStreakForModal(0); }
+              setShowStreakModal(true);
+              localStorage.setItem(hasShownKey, todayStr);
+            }
           } catch {}
+
+          // Step 10 disabled: complete Step 9 immediately and skip Step 10 TTS/overlay
+          try { completeAdventureStep9(); } catch {}
           
           // Persist sleep window in Firestore dailyQuests for cross-device sync
           (async () => {
@@ -2655,10 +2754,7 @@ const getSleepyPetImage = (clicks: number) => {
     // While a frozen thought is active, do not interrupt or auto-speak new thoughts
     if (frozenThought) return;
 
-    // During tutorial Step 10 overlay, let Krafty speak uninterrupted
-    if (showStep10) {
-      return;
-    }
+    // Step 10 disabled: do not gate audio on Step 10
 
     // During tutorial Step 8 flow, do not stop audio or auto-speak pet
     // so Krafty's Step 8 guidance can play fully without interruption
@@ -2692,7 +2788,7 @@ const getSleepyPetImage = (clicks: number) => {
 
       return () => clearTimeout(timer);
     }
-  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection, frozenThought, showStep7, showStep10, hasAdventureStep8Started]);
+  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection, frozenThought, showStep7, hasAdventureStep8Started]);
 
   // Step 4 hint controller: when pet speech starts or after 5s, show hint once
   useEffect(() => {
@@ -3176,41 +3272,7 @@ const getSleepyPetImage = (clicks: number) => {
         <></>
       )}
 
-      {/* Step 10 overlay visuals (Krafty returns after full sleep start) */}
-      {showStep10 && (
-        <>
-          <div className="fixed left-4 bottom-2 md:bottom-4 z-40">
-            <div className="relative flex flex-col items-start">
-              <div className="bg-card border rounded-2xl px-6 py-5 shadow-2xl mb-3 w-[min(60vw,360px)]">
-                <div className="flex items-end gap-4">
-                  <p className="flex-1 text-base sm:text-lg md:text-l leading-relaxed font-kids">
-                    {(() => {
-                      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-                      const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
-                      const petName = PetProgressStorage.getPetName(currentPetId) || 'your pet';
-                      return `Awesome! Let ${petName} get a good 8-hour sleep. The more you care, the faster ${petName} will grow. See you tomorrow!`;
-                    })()}
-                  </p>
-                  <Button
-                    variant="comic"
-                    className="shrink-0"
-                    onClick={() => {
-                      try { playClickSound(); } catch {}
-                      setShowStep10(false);
-                      try { completeAdventureStep9(); } catch {}
-                    }}
-                  >
-                    Done
-                  </Button>
-                </div>
-              </div>
-              <div className="shrink-0">
-                <img src="/avatars/krafty.png" alt="Krafty" className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain" />
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      {/* Step 10 overlay visuals disabled */}
       {/* Step 8 overlay visuals (deduplicated; see later block with !showPetShop) */}
 
       {/* Top UI - Heart Progress Bar (horizontal) - hidden when vertical is enabled */}
@@ -3311,7 +3373,7 @@ const getSleepyPetImage = (clicks: number) => {
           className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
           title="Testing: Increase streak by 1"
         >
-          🔥
+          ❤️
         </button>
         
         {/* Testing Button - Add Adventure Coins (Development Only) */}
@@ -3359,10 +3421,20 @@ const getSleepyPetImage = (clicks: number) => {
       {/* Top Right UI - Streak and Coins (below pet level) */}
       <div className="absolute top-16 right-4 z-20 flex gap-4">
         {/* Streak */}
-        <div className="rounded-xl px-4 py-2 shadow-lg w-20">
+        <div
+          className="rounded-xl px-4 py-2 shadow-lg w-20 cursor-pointer hover:bg-white/5"
+          role="button"
+          aria-label="Open weekly hearts"
+          onClick={() => {
+            try {
+              setStreakForModal(Number.isNaN(Number(currentStreak)) ? 0 : Number(currentStreak));
+            } catch { setStreakForModal(0); }
+            setShowStreakModal(true);
+          }}
+        >
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
-            <span className="text-xl">🔥</span>
-            <span>{currentStreak}</span>
+            <span className="text-xl">❤️</span>
+            <span>{weeklyHeartsCount}</span>
           </div>
         </div>
         
@@ -3879,6 +3951,61 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         );
       })()}
+
+      {/* Reinforced Streak Modal */}
+      {showStreakModal && (() => {
+        // Use pet avatar service GIF for the pet that just went to sleep (coins_50 vibe)
+        let celebrationUrl: string | undefined;
+        try {
+          // Map to pat/happy action media which in our placeholders corresponds to coins_50-tier GIFs
+          const media = getPetEmotionActionMedia(currentPet, 'pat');
+          if (typeof media === 'string' && media) celebrationUrl = media;
+        } catch {}
+        return (
+          <KraftyReinforcedStreakModal
+            open={showStreakModal}
+            currentStreak={streakForModal}
+            celebrationUrl={celebrationUrl}
+            onClose={() => setShowStreakModal(false)}
+          />
+        );
+      })()}
+
+      {/* Invisible dev-only buttons */}
+      {/* Top-center: increment streak */}
+      <button
+        aria-label="dev-increment-streak"
+        onClick={() => {
+          // Increment stored streak and show modal to preview
+          try {
+            const s = Number(localStorage.getItem('litkraft_streak') || '0');
+            const next = Number.isNaN(s) ? 1 : s + 1;
+            localStorage.setItem('litkraft_streak', String(next));
+            window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: next } }));
+            setStreakForModal(next);
+          } catch {
+            setStreakForModal((prev) => prev + 1);
+          }
+          setShowStreakModal(true);
+        }}
+        className="fixed top-2 left-1/2 -translate-x-1/2 h-6 w-16 opacity-0 pointer-events-auto z-[2001]"
+      >
+        dev
+      </button>
+      {/* Bottom-center: open modal */}
+      <button
+        aria-label="dev-streak-modal-trigger"
+        onClick={() => {
+          try {
+            const s = Number(localStorage.getItem('litkraft_streak') || '0');
+            setStreakForModal(Number.isNaN(s) ? 0 : s);
+          } catch { setStreakForModal(0); }
+          setShowStreakModal(true);
+        }}
+        className="fixed bottom-2 left-1/2 -translate-x-1/2 h-6 w-16 opacity-0 pointer-events-auto z-[2001]"
+      >
+        dev
+      </button>
 
       {/* Camera FAB (replaces audio toggle) */}
       <Button
