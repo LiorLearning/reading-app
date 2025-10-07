@@ -4738,7 +4738,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     }
                     isThinking={isAIResponding}
                     draggable={false}
-                    autoHideToken={leftOverlayAutoHideToken}
                     onBubbleVisibilityChange={setIsLeftBubbleVisible}
                     interruptRealtimeSession={interruptRealtimeSession}
                     spellInline={{
@@ -4774,7 +4773,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   <RightUserOverlay
                     userImageUrl={user?.photoURL || null}
                     userMessageText={chatMessages.filter(m => m.type === 'user').slice(-1)[0]?.content}
-                    autoHideToken={leftOverlayAutoHideToken}
                     bottomOffsetPx={84} // leave room for the collapsed input dock directly below
                     showCameraInAvatar={true}
                   />
@@ -4786,7 +4784,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     softFocus={isLeftBubbleVisible && !isGeneratingAdventureImage}
                     onImageDisplayed={() => {
                       console.log('🖼️ Image displayed for panel:', current.id);
-                      setLeftOverlayAutoHideToken(x => x + 1);
                     }}
                     shouldZoom={current.id === zoomingPanelId}
                     onPreviousPanel={() => {

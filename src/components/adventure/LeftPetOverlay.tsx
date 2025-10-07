@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Volume2, Square, X, Droplet, Hand, Utensils } from "lucide-react";
+import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight } from "lucide-react";
 import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
 import SpellBox from "@/components/comic/SpellBox";
 import { cn } from "@/lib/utils";
@@ -503,15 +503,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           className="relative w-[240px] h-[240px] rounded-xl overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm"
           onClick={(e) => {
             e.stopPropagation();
-            // Only show bubble if it wasn't manually closed by the user
-            if (!isManuallyClosed) {
-              setIsBubbleHidden(false);
-              setHiddenReason(null);
-            }
-          }}
-          onDoubleClick={(e) => {
-            e.stopPropagation();
-            // Double-click to reset manual close state and show bubble
+            // Single click always (re)opens and resets manual-close state
             setIsManuallyClosed(false);
             setIsBubbleHidden(false);
             setHiddenReason(null);
@@ -629,6 +621,12 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                   <span className="text-3xl">🤚</span>
                 </div>
               )}
+            </div>
+          )}
+          {/* Chevron indicator to hint message is hidden - positioned inside the avatar box */}
+          {isBubbleHidden && (
+            <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
+              <ChevronRight className="w-4 h-4 text-black/70" />
             </div>
           )}
         </div>
