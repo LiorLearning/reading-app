@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { playClickSound, playImageCompleteSound } from "@/lib/sounds";
+import { playClickSound } from "@/lib/sounds";
 import SpellBox from "./SpellBox";
 import { useFirebaseImage, useCurrentAdventureId } from "@/hooks/use-firebase-image";
 
@@ -138,7 +138,6 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           if (!isGenerating) {
             setShowImageAfterLoad(true);
             setIsImageLoading(false);
-            playImageCompleteSound();
           }
         })
         .catch((error) => {
@@ -147,7 +146,6 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             if (!isGenerating) {
               setShowImageAfterLoad(true);
               setIsImageLoading(false);
-              playImageCompleteSound();
             }
           }, 300);
         });
@@ -187,16 +185,12 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           setCurrentImage(image);
           setShowImageAfterLoad(true);
           setIsImageLoading(false);
-          // Play completion sound when image update is ready
-          playImageCompleteSound();
         })
         .catch((error) => {
           console.warn('Failed to preload image during update, showing anyway:', error);
           setCurrentImage(image);
           setShowImageAfterLoad(true);
           setIsImageLoading(false);
-          // Play completion sound even if preloading failed during update
-          playImageCompleteSound();
         });
     }
   }, [image, currentImage, isGenerating, isNew, isImageLoading, preloadImage]);
@@ -215,16 +209,12 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           setCurrentImage(image);
           setShowImageAfterLoad(true);
           setIsImageLoading(false);
-          // Play completion sound when timeout handling completes
-          playImageCompleteSound();
         })
         .catch((error) => {
           console.warn('Failed to preload image during timeout handling, showing anyway:', error);
           setCurrentImage(image);
           setShowImageAfterLoad(true);
           setIsImageLoading(false);
-          // Play completion sound even if preloading failed during timeout handling
-          playImageCompleteSound();
         });
     }
   }, [image, currentImage, isGenerating, isImageLoading, preloadImage]);

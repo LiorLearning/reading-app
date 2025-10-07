@@ -160,16 +160,42 @@ export class UnifiedAIStreamingService {
       });
       
       if (!hasImages) {
-        // Fallback to legacy system instead of text-only response
-        console.log('📝 Unified system detected no image requests - falling back to legacy system...');
-        return await this.callLegacySystemAsFallback(
-          userMessage, 
-          chatHistory, 
-          spellingQuestion, 
-          userId, 
+        // Force image generation using Flux-first pipeline on every prompt
+        console.log('🖼️ Forcing image generation (Flux priority) even without explicit tags...');
+        const streamEvents: StreamEvent[] = [];
+        const imageUrls: string[] = [];
+        let textContent = '';
+        
+        for await (const chunk of ResponseProcessor.processResponseWithImages(
           aiResponse,
-          adventureId
-        );
+          userId,
+          chatHistory,
+          this.imageGenerator,
+          userMessage
+        )) {
+          const streamEvent = this.convertChunkToStreamEvent(chunk);
+          streamEvents.push(streamEvent);
+          const callback = this.eventCallbacks.get(sessionId);
+          if (callback) callback(streamEvent);
+          if (chunk.type === 'text') {
+            textContent += chunk.content;
+          } else if (chunk.type === 'image' && chunk.metadata?.imageUrl) {
+            imageUrls.push(chunk.metadata.imageUrl);
+          }
+        }
+        
+        const completionEvent: StreamEvent = { type: 'complete', content: 'Response completed', timestamp: Date.now() };
+        streamEvents.push(completionEvent);
+        const cb = this.eventCallbacks.get(sessionId);
+        if (cb) cb(completionEvent);
+        
+        return {
+          hasImages: imageUrls.length > 0,
+          textContent,
+          imageUrls,
+          streamEvents,
+          timestamp: Date.now()
+        };
       }
       
       // Process response with image generation

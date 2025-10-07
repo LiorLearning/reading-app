@@ -10,11 +10,11 @@ import { ttsService } from "@/lib/tts-service";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
-  onGenerateImage: () => void;
+  // onGenerateImage removed (image button disabled)
   onAddMessage: (message: { type: 'user' | 'ai'; content: string; timestamp: number }) => void;
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage, onAddMessage }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -333,29 +333,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage, onAddM
   }, [useWhisper, onAddMessage]);
 
   // Function to handle create image button during recording
+  // Image button disabled – no-op handler retained for safety
   const handleImageDuringRecording = useCallback(() => {
-    playClickSound();
-    console.log('Create image button clicked during recording - stopping and sending as image...');
-    
-    // Immediately add "transcribing..." message for instant feedback
-    onAddMessage({
-      type: 'user',
-      content: 'Transcribing...',
-      timestamp: Date.now()
-    });
-    
-    // Set pending action to image
-    pendingActionRef.current = 'image';
-    
-    // Stop recording and let transcription handler do the sending
-    if (useWhisper && mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current = null;
-    } else if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-    }
-  }, [useWhisper, onAddMessage]);
+    // intentionally disabled
+  }, []);
 
   const submit = useCallback(
     (e?: React.FormEvent) => {
@@ -425,36 +406,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onGenerateImage, onAddM
             className="rounded-xl flex-1 bg-white/90 border-0 shadow-sm focus:shadow-md transition-shadow backdrop-blur-sm"
           />
         )}
-        <Button 
-          type="button"
-          variant="outline"
-          size="icon"
-          disabled={!text.trim() && !isMicActive}
-          onClick={() => {
-            if (isMicActive) {
-              // During recording: stop and send as image
-              handleImageDuringRecording();
-            } else {
-              // Normal mode: check text and send as image
-              if (!text.trim()) {
-                toast.error("Please write something first before generating an image.");
-                return;
-              }
-              playClickSound();
-              ttsService.stop();
-              onGenerate(`create image: ${text.trim()}`);
-              setText("");
-            }
-          }}
-          aria-label={isMicActive ? "Stop recording and generate image" : "Generate new image"}
-          className={cn(
-            "h-10 w-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 backdrop-blur-sm transition-all duration-300 relative overflow-hidden group",
-            (!text.trim() && !isMicActive) && "opacity-50 cursor-not-allowed hover:scale-100"
-          )}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          <ImageIcon className="h-4 w-4 relative z-10 drop-shadow-sm" />
-        </Button>
+        {/* Image button removed */}
         <Button 
           type="button"
           variant="outline" 

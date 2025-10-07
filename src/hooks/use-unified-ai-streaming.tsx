@@ -3,7 +3,7 @@ import { ChatMessage } from '@/lib/utils';
 import { aiService } from '@/lib/ai-service';
 import { SpellingQuestion } from '@/lib/questionBankUtils';
 import { UnifiedAIResponse, StreamEvent } from '@/lib/unified-ai-streaming-service';
-import { stopImageLoadingSound, playImageCompleteSound } from '@/lib/sounds';
+// Remove image-related sounds for creation/change/render events
 
 export interface UseUnifiedAIStreamingOptions {
   userId: string;
@@ -90,14 +90,12 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
                 console.warn('⚠️ onNewImage callback threw an error:', callbackError);
               }
             }
-            // Sound handling is done in response processor
             // clear any pending timeouts
             if (delayTimeoutRef.current) {
               clearTimeout(delayTimeoutRef.current);
               delayTimeoutRef.current = null;
             }
-            stopImageLoadingSound();
-            playImageCompleteSound();
+            // No sounds
           }
           break;
           
@@ -110,8 +108,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             clearTimeout(delayTimeoutRef.current);
             delayTimeoutRef.current = null;
           }
-          // Ensure loading sound is stopped on error
-          stopImageLoadingSound();
+          // No sounds on error
           break;
           
         case 'complete':
@@ -123,8 +120,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             clearTimeout(delayTimeoutRef.current);
             delayTimeoutRef.current = null;
           }
-          stopImageLoadingSound();
-          playImageCompleteSound();
+          // No sounds on complete
           break;
       }
       
@@ -303,8 +299,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           currentStreamingState: streamingState.isStreaming
         });
         
-        // Stop any loading sound when request is aborted
-        stopImageLoadingSound();
+        // No sounds on abort
         
         // 🛠️ CRITICAL: Always reset streaming state on abort
         setStreamingState(prev => ({
@@ -350,8 +345,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   const abortStream = useCallback(() => {
     aiService.abortUnifiedStream(sessionId);
     
-    // Stop any ongoing loading sound
-    stopImageLoadingSound();
+    // No sounds on abort
     
     // Clear any delay timeout
     if (delayTimeoutRef.current) {

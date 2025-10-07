@@ -19,7 +19,6 @@ interface ChatMessage {
 interface MessengerChatProps {
   messages: ChatMessage[];
   onGenerate: (text: string) => void;
-  onGenerateImage: () => void;
   onExpandChat: () => void; // Function to expand chat to full panel
   onAddMessage: (message: { type: 'user' | 'ai'; content: string; timestamp: number }) => void;
 }
@@ -58,7 +57,7 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
   );
 };
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onGenerateImage, onExpandChat, onAddMessage }) => {
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onExpandChat, onAddMessage }) => {
   const [isHidden, setIsHidden] = useState(true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [text, setText] = useState("");
@@ -465,28 +464,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onG
                 <Send className="h-4 w-4" />
               </Button>
               
-              {/* Image Generation Button */}
-              <Button 
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  if (!text.trim()) {
-                    toast.error("Please write something first before generating an image.");
-                    return;
-                  }
-                  playClickSound();
-                  // Pause any currently playing TTS when user generates an image
-                  ttsService.stop();
-                  onGenerate(`create image: ${text.trim()}`);
-                  setText("");
-                }}
-                aria-label="Generate new image"
-                className="h-9 w-9 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 hover:from-purple-600 hover:via-pink-600 hover:to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105 flex-shrink-0 btn-animate border-0 transition-all duration-300 relative overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <ImageIcon className="h-4 w-4 relative z-10 drop-shadow-sm" />
-              </Button>
+              {/* Image Generation Button removed */}
             </form>
           </div>
         </div>

@@ -32,7 +32,6 @@ interface QuestionScreenTypeAProps {
   chatMessages: any[];
   setChatMessages: React.Dispatch<React.SetStateAction<any[]>>;
   onGenerate: (text: string) => void;
-  onGenerateImage: () => void;
   chatPanelWidthPercent: number;
   setChatPanelWidthPercent: (width: number) => void;
   isResizing: boolean;
@@ -68,7 +67,6 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
   chatMessages,
   setChatMessages,
   onGenerate,
-  onGenerateImage,
   chatPanelWidthPercent,
   setChatPanelWidthPercent,
   isResizing,
@@ -542,7 +540,7 @@ const QuestionScreenTypeA: React.FC<QuestionScreenTypeAProps> = ({
                       
                       {/* Input Bar */}
                       <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                        <InputBar onGenerate={onGenerate} onGenerateImage={onGenerateImage} />
+                        <InputBar onGenerate={onGenerate} />
                       </div>
                     </div>
                   }

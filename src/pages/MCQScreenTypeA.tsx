@@ -117,7 +117,6 @@ interface MCQScreenTypeAProps {
   chatMessages: any[];
   setChatMessages: React.Dispatch<React.SetStateAction<any[]>>;
   onGenerate: (text: string) => void;
-  onGenerateImage: () => void;
   chatPanelWidthPercent: number;
   setChatPanelWidthPercent: (width: number) => void;
   isResizing: boolean;
@@ -179,7 +178,6 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   chatMessages,
   setChatMessages,
   onGenerate,
-  onGenerateImage,
   chatPanelWidthPercent,
   setChatPanelWidthPercent,
   isResizing,
@@ -194,7 +192,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   onBack,
   startingQuestionIndex,
   onQuestionChange,
-  currentSessionId
+  currentSessionId,
+  currentAdventureType
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   
@@ -481,7 +480,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
         // Award 10 coins for correct MCQ answer (same as spelling questions)
-        addAdventureCoins(10, props.currentAdventureType);
+        addAdventureCoins(10, currentAdventureType);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -562,7 +561,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     // Auto-expand chat to show feedback
     // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages]); // Removed setSidebarCollapsed from dependencies
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages, currentAdventureType]); // Removed setSidebarCollapsed from dependencies
 
   // Handle fill blank answer submission
   const handleFillBlankSubmit = useCallback(async () => {
@@ -611,7 +610,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
         // Award 10 coins for correct MCQ answer (same as spelling questions)
-        addAdventureCoins(10, props.currentAdventureType);
+        addAdventureCoins(10, currentAdventureType);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -692,7 +691,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     // Auto-expand chat to show feedback
     // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages]); // Removed setSidebarCollapsed from dependencies
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages, currentAdventureType]); // Removed setSidebarCollapsed from dependencies
 
   // Handle student reflection response
   const handleReflectionResponse = useCallback(async (studentReflection: string) => {
@@ -724,7 +723,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     // Auto-speak the encouragement message and wait for completion
     const messageId = `mcq-chat-${encouragementMessage.timestamp}-${chatMessages.length}`;
     await ttsService.speakAIMessage(encouragementMessage.content, messageId);
-  }, [isInReflectionMode, currentQuestion, setChatMessages]);
+  }, [isInReflectionMode, currentQuestion, setChatMessages, currentAdventureType]);
 
   // Function to handle help requests with progressive hinting
   const handleHelpRequest = useCallback(async (userMessage: string) => {
@@ -825,7 +824,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       setChatMessages((prev: any) => [...prev, fallbackHint]);
       playMessageSound();
     }
-  }, [currentQuestion, hintCount, setChatMessages, loadUserAdventure]);
+  }, [currentQuestion, hintCount, setChatMessages, loadUserAdventure, currentAdventureType]);
 
   // Wrapper for onGenerate to handle reflection mode and help requests
   const handleGenerate = useCallback(async (text: string) => {
@@ -847,7 +846,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     // Normal chat generation
     onGenerate(text);
-  }, [isInReflectionMode, handleReflectionResponse, onGenerate, hasAnswered, selectedAnswer, handleHelpRequest]);
+  }, [isInReflectionMode, handleReflectionResponse, onGenerate, hasAnswered, selectedAnswer, handleHelpRequest, currentAdventureType]);
 
   // Handle back button - sequential navigation logic
   const handleBackButton = useCallback(() => {
@@ -1542,7 +1541,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       if (!wasAlreadyCorrect) {
         setScore(prev => prev + 1);
         // Award 10 coins for correct MCQ answer (same as spelling questions)
-        addAdventureCoins(10, props.currentAdventureType);
+        addAdventureCoins(10, currentAdventureType);
       }
       
       // Enhanced score tracking - save to localStorage and update state
@@ -1613,7 +1612,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
 
     // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
-  }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages]);
+  }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages, currentAdventureType]);
 
   // Reset quiz UI state only (preserves saved scores)
   const resetQuizState = useCallback(() => {
@@ -2473,7 +2472,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
                       
                       {/* Input Bar */}
                       <div className="flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-                        <InputBar onGenerate={handleGenerate} onGenerateImage={onGenerateImage} onAddMessage={onAddMessage} />
+                        <InputBar onGenerate={handleGenerate} onAddMessage={onAddMessage} />
                       </div>
                     </div>
                   }
