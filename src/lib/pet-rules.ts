@@ -15,7 +15,7 @@ export const PET_RULES: Record<string, PetRule> = {
 		instruction: 'Replace any second-person references ("you") with the pet persona: "a friendly dog pet who is loyal, playful, and brave" when forming visual descriptions. Maintain first-person dialogue in chat as the pet, but image prompts should describe the pet in third-person.'
 	},
 	cat: {
-		description: 'a curious cat pet who is clever, agile, and gentle',
+		description: 'a curious black cat pet who is clever, agile, and gentle',
 		instruction: 'Replace any second-person references ("you") with the pet persona: "a curious cat pet who is clever, agile, and gentle" in image prompts.'
 	},
 	hamster: {

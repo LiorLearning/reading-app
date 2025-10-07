@@ -1882,6 +1882,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       });
       
       // 🛠️ IMPROVED: Better handling of stuck streaming state
+      let skipUnifiedBackground = false;
       if (unifiedAIStreaming.isStreaming) {
         console.log('⚠️ Unified system appears to be streaming');
         
@@ -1905,27 +1906,30 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
           console.log('✅ Stuck state cleared, proceeding with new request');
         } else {
-          // Normal case - actually streaming, ignore duplicate request
-          console.log('⚠️ Valid streaming in progress - ignoring duplicate request');
-          return;
+          // Normal case - actually streaming. Do NOT block user text submission;
+          // just skip triggering another unified background task this turn.
+          console.log('⚠️ Valid streaming in progress - skipping unified background call but continuing text flow');
+          skipUnifiedBackground = true;
         }
       }
       
-      // 🎨 Always trigger unified image generation (Flux-first) on every send, in background
-      try {
-        const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
-        const bgSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds);
-        if (bgSpellingQuestion) {
-          setOriginalSpellingQuestion(bgSpellingQuestion);
+      // 🎨 Trigger unified background task only when not already streaming
+      if (!skipUnifiedBackground) {
+        try {
+          const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+          const bgSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds);
+          if (bgSpellingQuestion) {
+            setOriginalSpellingQuestion(bgSpellingQuestion);
+          }
+          // Fire-and-forget: generate image via unified system; ignore any caption text
+          void unifiedAIStreaming.sendMessage(
+            text,
+            chatMessages,
+            bgSpellingQuestion
+          );
+        } catch (bgErr) {
+          console.warn('⚠️ Unified background image generation failed:', bgErr);
         }
-        // Fire-and-forget: generate image via unified system; ignore any caption text
-        void unifiedAIStreaming.sendMessage(
-          text,
-          chatMessages,
-          bgSpellingQuestion
-        );
-      } catch (bgErr) {
-        console.warn('⚠️ Unified background image generation failed:', bgErr);
       }
 
       // Check if user is asking for image generation using intent-based detection
