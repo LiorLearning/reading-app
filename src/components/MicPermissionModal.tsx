@@ -36,18 +36,15 @@ export const MicPermissionModal: React.FC<MicPermissionModalProps> = ({ open, on
         <DialogHeader>
           <DialogTitle className="text-2xl">Enable your microphone</DialogTitle>
           <DialogDescription>
-            Turn on your microphone for the best, hands‑free experience. You can speak answers and interact faster.
+            Turn on your microphone for a fun Adventure!
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 text-sm text-muted-foreground">
-          <p>
-            We will ask your browser for microphone access. You can change this anytime in your browser settings.
-          </p>
+        {/* <div className="space-y-3 text-sm text-muted-foreground">
           {error && (
             <p className="text-destructive">{error}</p>
           )}
-        </div>
+        </div> */}
 
         <div className="mt-6 flex items-center justify-end gap-3">
           <Button variant="secondary" onClick={onClose} disabled={isRequesting}>

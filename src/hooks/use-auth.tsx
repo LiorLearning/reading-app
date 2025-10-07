@@ -631,13 +631,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         // Reset local pet progress storage and selection
         PetProgressStorage.resetAllPetData();
-        try { localStorage.removeItem('current_pet'); } catch {}
-        try { localStorage.removeItem('pet_sleep_data'); } catch {}
-        try { localStorage.removeItem('litkraft_daily_quests_state'); } catch {}
-        try { localStorage.removeItem('litkraft_coins'); } catch {}
-        try { localStorage.removeItem('litkraft_cumulative_coins_earned'); } catch {}
-        try { localStorage.removeItem('litkraft_pet_data'); } catch {}
-        try { localStorage.removeItem('litkraft_streak'); } catch {}
+        // Clear all local and session storage to prevent leaking prior user state
+        try { localStorage.clear(); } catch {}
+        try { sessionStorage.clear(); } catch {}
+        // Clear Cache Storage and unregister any service workers
+        try {
+          if (typeof caches !== 'undefined' && typeof caches.keys === 'function') {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map((name) => caches.delete(name)));
+          }
+        } catch {}
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((r) => r.unregister()));
+          }
+        } catch {}
         // Notify listeners
         window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins: 0 } }));
         window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: [] }));

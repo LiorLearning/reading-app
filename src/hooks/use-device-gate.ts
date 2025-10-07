@@ -14,7 +14,7 @@ export interface DeviceGateState {
 }
 
 const SUPPRESS_KEY = "device-gate-suppress-until"
-const DEFAULT_MIN_DIMENSION_THRESHOLD = 700 // px
+const DEFAULT_MIN_DIMENSION_THRESHOLD = 500 // px
 
 function isPhoneLike(threshold = DEFAULT_MIN_DIMENSION_THRESHOLD): boolean {
   if (typeof window === "undefined") return false

@@ -3744,14 +3744,19 @@ const getSleepyPetImage = (clicks: number) => {
                 const questLabel = getQuestLabel(currentQuestType);
                 
                 return (
-                  <div className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${done ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'}`}>
+                  <button
+                    type="button"
+                    aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`}
+                    onClick={() => { setShowFirstDoHint(false); handleActionClick(currentQuestType); }}
+                    className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${done ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'} w-full text-left`}
+                  >
                     {/* Celebration badge for completed */}
                     {done && (
                       <div className="absolute -top-2 -left-2 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
                         ⭐
                       </div>
                     )}
-                    {/* Hand hint will be anchored directly to the start button wrapper below */}
+                    {/* Hand hint remains anchored to the decorative arrow wrapper on the right */}
                     <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">{questIcon}</div>
                     <div className="flex-1">
                       <div className={`font-semibold drop-shadow-md ${done ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>{questLabel}</div>
@@ -3759,10 +3764,10 @@ const getSleepyPetImage = (clicks: number) => {
                         <div className={`h-full transition-all duration-500 ${done ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${Math.round(progress * 100)}%` }} />
                       </div>
                     </div>
-                    <div className="relative inline-block overflow-visible z-30">
-                      <button aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`} onClick={() => { setShowFirstDoHint(false); handleActionClick(currentQuestType); }} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : 'bg-white/90'}`}>
+                    <span className="relative inline-block overflow-visible z-30 pointer-events-none">
+                      <span className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg' : 'bg-white/90'}`}>
                         {done ? '✓' : '→'}
-                      </button>
+                      </span>
                       {!done && showFirstDoHint && currentQuestType === 'house' && (
                         <img
                           aria-hidden
@@ -3771,8 +3776,8 @@ const getSleepyPetImage = (clicks: number) => {
                           className="pointer-events-none absolute left-[70%] -translate-x-1/2 bottom-full mb-[clamp(6px,1vw,12px)] max-w-none w-[clamp(24px,8vw,60px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce"
                         />
                       )}
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 );
               })()}
               {(() => {
@@ -3794,7 +3799,13 @@ const getSleepyPetImage = (clicks: number) => {
                 const label = asleep ? 'Sleeping' : 'Sleep';
                 const disabled = asleep || (!canSleepForCurrentPet && clicks < 3);
                 return (
-                  <div className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${asleep ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'}`}>
+                  <button
+                    type="button"
+                    aria-label={asleep ? 'Completed - Click to view' : 'Sleep'}
+                    onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }}
+                    disabled={disabled}
+                    className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${asleep ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'} w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
                     {/* Celebration badge for completed */}
                     {asleep && (
                       <div className="absolute -top-2 -left-2 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
@@ -3808,10 +3819,10 @@ const getSleepyPetImage = (clicks: number) => {
                         <div className={`h-full transition-all duration-500 ${asleep ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
                       </div>
                     </div>
-                    <div className="relative inline-block overflow-visible z-30">
-                      <button ref={sleepArrowRef} aria-label={asleep ? 'Completed - Click to view' : 'Sleep'} onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }} disabled={disabled} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${asleep ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 hover:scale-105' : disabled ? 'bg-white/50 opacity-50' : 'bg-white/90'}`}>
+                    <span className="relative inline-block overflow-visible z-30 pointer-events-none">
+                      <span ref={sleepArrowRef as any} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${asleep ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg' : disabled ? 'bg-white/50 opacity-50' : 'bg-white/90'}`}>
                         {asleep ? '✓' : '→'}
-                      </button>
+                      </span>
                       {showStep9 && !asleep && (
                         <img
                           aria-hidden
@@ -3820,8 +3831,8 @@ const getSleepyPetImage = (clicks: number) => {
                           className="pointer-events-none absolute left-[70%] -translate-x-1/2 bottom-full mb-[clamp(6px,1vw,12px)] max-w-none w-[clamp(24px,8vw,60px)] h-auto select-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.35)] animate-bounce"
                         />
                       )}
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 );
               })()}
             </div>
@@ -4322,20 +4333,24 @@ const getSleepyPetImage = (clicks: number) => {
 
   {/* Global top-right shortcuts: More and Shop */}
   <div className="fixed top-48 right-6 z-30 flex flex-col gap-3 items-end">
-    <button
+    <Button
       aria-label="More"
       onClick={() => { handleActionClick('more'); }}
-      className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xl hover:bg-emerald-600 active:scale-95 border border-white/20"
+      variant="outline"
+      size="icon"
+      className="w-12 h-12 rounded-lg border-2 border-foreground bg-white text-foreground btn-animate shadow-solid [&_svg]:!size-6"
     >
-      <Rocket className="w-6 h-6" />
-    </button>
-    <button
+      <Rocket />
+    </Button>
+    <Button
       aria-label="Shop"
       onClick={() => handleActionClick('shop')}
-      className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-2xl hover:bg-emerald-600 active:scale-95 border border-white/20"
+      variant="outline"
+      size="icon"
+      className="w-12 h-12 rounded-lg border-2 border-foreground bg-white text-foreground btn-animate shadow-solid [&_svg]:!size-6"
     >
-      <ShoppingCart className="w-6 h-6" />
-    </button>
+      <ShoppingCart />
+    </Button>
   </div>
 
 

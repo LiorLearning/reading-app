@@ -64,9 +64,9 @@ export const DeviceGateModal: React.FC<DeviceGateModalProps> = ({ open, onClose,
             <Button className="flex-1" onClick={onContinueAnyway}>
               Continue anyway
             </Button>
-            <Button className="flex-1" variant="outline" onClick={onClose}>
+            {/* <Button className="flex-1" variant="outline" onClick={() => {}}>
               Close
-            </Button>
+            </Button> */}
           </div>
         </div>
       </DialogContent>
