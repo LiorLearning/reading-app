@@ -90,10 +90,43 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
     setWeekly(loadWeeklyHearts(monday));
   }, [open, monday]);
 
+  // Listen for Firestore-driven weeklyHearts updates and merge into current week
+  useEffect(() => {
+    const handler = (e: any) => {
+      try {
+        const map = (e?.detail || JSON.parse(localStorage.getItem('litkraft_weekly_hearts') || '{}')) as Record<string, Record<string, boolean>>;
+        const key = `week_${ymd(monday)}`;
+        const week = (map && map[key]) || {};
+        if (week && typeof week === 'object') {
+          setWeekly((prev) => ({ ...prev, ...week }));
+          // Also mirror to localStorage-backed per-week key for dev toggles/UI
+          try {
+            const merged = { ...loadWeeklyHearts(monday), ...week };
+            saveWeeklyHearts(monday, merged);
+          } catch {}
+        }
+      } catch {}
+    };
+    try { window.addEventListener('weeklyHeartsUpdated', handler as any); } catch {}
+    // Also prime from localStorage cache on mount/open
+    handler(null);
+    return () => { try { window.removeEventListener('weeklyHeartsUpdated', handler as any); } catch {} };
+  }, [monday]);
+
   if (!open) return null;
 
   const todayStr = getLocalTodayDateString();
   const userName = (userData?.username && userData.username.trim()) ? userData.username.trim() : 'friend';
+  // Ensure we display at least 1 day if today's heart is filled but server streak is 0 (new users same-day)
+  const displayStreak = useMemo(() => {
+    try {
+      const base = Math.max(0, Number(currentStreak || 0));
+      const todayFilled = !!weekly[todayStr];
+      return Math.max(base, todayFilled ? 1 : 0);
+    } catch {
+      return Math.max(0, Number(currentStreak || 0));
+    }
+  }, [currentStreak, weekly, todayStr]);
 
   // Thoughts buckets
   const oneDayThoughts = useMemo(() => [
@@ -104,21 +137,27 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
     `You made my tail wag all day long, ${userName}! 🐶 Day 1 done—shall we continue our adventure tomorrow?`
   ], [userName]);
 
-  const underSevenThoughts = useMemo(() => [
-    `You're on a ${Math.max(2, currentStreak)}-day love streak, ${userName}! 💖 Let's keep the adventures going tomorrow?`,
-    `${Math.max(2, currentStreak)} days in a row with me? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
-    `Our adventures are adding up—${Math.max(2, currentStreak)} days strong! ✨ See you tomorrow, ${userName}?`,
-    `I'm purring with pride, ${userName}! 😺 ${Math.max(2, currentStreak)}-day streak and growing—ready for tomorrow?`,
-    `High paws! 🐾 ${Math.max(2, currentStreak)} days of care and cuddles—shall we make it ${Math.max(2, currentStreak) + 1} tomorrow?`
-  ], [currentStreak, userName]);
+  const underSevenThoughts = useMemo(() => {
+    const s = Math.max(2, displayStreak);
+    return [
+      `You're on a ${s}-day love streak, ${userName}! 💖 Let's keep the adventures going tomorrow?`,
+      `${s} days in a row with me? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
+      `Our adventures are adding up—${s} days strong! ✨ See you tomorrow, ${userName}?`,
+      `I'm purring with pride, ${userName}! 😺 ${s}-day streak and growing—ready for tomorrow?`,
+      `High paws! 🐾 ${s} days of care and cuddles—shall we make it ${s + 1} tomorrow?`
+    ];
+  }, [displayStreak, userName]);
 
-  const sevenPlusThoughts = useMemo(() => [
-    `A whole ${Math.max(7, currentStreak)} days with you, ${userName}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
-    `${Math.max(7, currentStreak)} days strong, ${userName}! 💫 I feel so loved—shall we make it even bigger tomorrow?`,
-    `We did it—${Math.max(7, currentStreak)}-day streak! ❤️ Thanks for taking such good care of me, ${userName}! See you tomorrow?`,
-    `Woof-wow! 🐶 ${Math.max(7, currentStreak)} days of cuddles and adventures—my heart is full, ${userName}! Ready for day ${currentStreak + 1}?`,
-    `One week and beyond! 🌟 ${Math.max(7, currentStreak)} happy days together—same time tomorrow, ${userName}?`
-  ], [currentStreak, userName]);
+  const sevenPlusThoughts = useMemo(() => {
+    const s = Math.max(7, displayStreak);
+    return [
+      `A whole ${s} days with you, ${userName}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
+      `${s} days strong, ${userName}! 💫 I feel so loved—shall we make it even bigger tomorrow?`,
+      `We did it—${s}-day streak! ❤️ Thanks for taking such good care of me, ${userName}! See you tomorrow?`,
+      `Woof-wow! 🐶 ${s} days of cuddles and adventures—my heart is full, ${userName}! Ready for day ${displayStreak + 1}?`,
+      `One week and beyond! 🌟 ${s} happy days together—same time tomorrow, ${userName}?`
+    ];
+  }, [displayStreak, userName]);
 
   // Daily random selection with persistence (once per calendar day)
   const thoughtText = useMemo(() => {
@@ -127,8 +166,8 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
       const saved = localStorage.getItem(key);
       if (saved) return saved;
       let pool: string[] = [];
-      if (currentStreak === 1) pool = oneDayThoughts;
-      else if (currentStreak > 1 && currentStreak < 7) pool = underSevenThoughts;
+      if (displayStreak === 1) pool = oneDayThoughts;
+      else if (displayStreak > 1 && displayStreak < 7) pool = underSevenThoughts;
       else pool = sevenPlusThoughts;
       const idx = Math.floor(Math.random() * pool.length);
       const chosen = pool[idx];
@@ -136,11 +175,11 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
       return chosen;
     } catch {
       // Fallback without persistence
-      if (currentStreak === 1) return oneDayThoughts[0];
-      if (currentStreak > 1 && currentStreak < 7) return underSevenThoughts[0];
+      if (displayStreak === 1) return oneDayThoughts[0];
+      if (displayStreak > 1 && displayStreak < 7) return underSevenThoughts[0];
       return sevenPlusThoughts[0];
     }
-  }, [todayStr, currentStreak, oneDayThoughts, underSevenThoughts, sevenPlusThoughts]);
+  }, [todayStr, displayStreak, oneDayThoughts, underSevenThoughts, sevenPlusThoughts]);
 
   // Infer pet from celebrationUrl for voice override
   function inferPetIdFromGifUrl(url?: string): string | undefined {
@@ -222,9 +261,9 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
             <div className="flex items-center justify-center gap-4">
               <div className="text-6xl sm:text-6xl">❤️</div>
               <div className="flex items-baseline gap-2">
-                <div className="text-5xl sm:text-5xl font-extrabold text-white drop-shadow">{Math.max(0, Number(currentStreak || 0))}</div>
+                <div className="text-5xl sm:text-5xl font-extrabold text-white drop-shadow">{Math.max(0, Number(displayStreak || 0))}</div>
                 <div className="text-xl sm:text-2xl font-semibold text-white/90 drop-shadow">
-                  {Number(currentStreak || 0) === 1 ? 'day' : 'days'}
+                  {Number(displayStreak || 0) === 1 ? 'day' : 'days'}
                 </div>
               </div>
             </div>

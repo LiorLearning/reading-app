@@ -98,6 +98,50 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [streakForModal, setStreakForModal] = useState(0);
 
+  // Weekly hearts count for current week (from Firestore-broadcasted userStates.weeklyHearts, fallback to local)
+  const getMondayOfCurrentWeek = () => {
+    const now = new Date();
+    const day = now.getDay(); // 0..6
+    const diff = (day === 0 ? -6 : 1 - day);
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diff);
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  };
+  const ymd = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  };
+  const getWeeklyHeartsCount = () => {
+    try {
+      const key = `week_${ymd(getMondayOfCurrentWeek())}`;
+      const raw = localStorage.getItem('litkraft_weekly_hearts');
+      const map = raw ? (JSON.parse(raw) as Record<string, Record<string, boolean>>) : {};
+      const week = (map && map[key]) || {};
+      const serverCount = Object.values(week).filter(Boolean).length;
+      if (serverCount > 0) return serverCount;
+      // Fallback to local per-week storage
+      const localRaw = localStorage.getItem(`litkraft_weekly_streak_hearts_${key}`);
+      const localWeek = localRaw ? (JSON.parse(localRaw) as Record<string, boolean>) : {};
+      return Object.values(localWeek).filter(Boolean).length;
+    } catch {
+      return 0;
+    }
+  };
+  const [weeklyHeartsCount, setWeeklyHeartsCount] = useState<number>(() => getWeeklyHeartsCount());
+
+  useEffect(() => {
+    const onWeeklyHearts = () => {
+      try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
+    };
+    try { window.addEventListener('weeklyHeartsUpdated', onWeeklyHearts as any); } catch {}
+    // Prime once on mount
+    onWeeklyHearts();
+    return () => { try { window.removeEventListener('weeklyHeartsUpdated', onWeeklyHearts as any); } catch {} };
+  }, []);
+
   const playShutterSound = () => {
     
     try {
@@ -1168,6 +1212,34 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
             if (anyPetDone && lastShown !== todayStr) {
               // Fill today's weekly heart, set streak, and open modal
               markTodayHeartFilled();
+              // Refresh local weekly hearts count immediately (works even before Firestore roundtrip)
+              try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
+              // Also persist to Firestore weeklyHearts when signed in
+              try {
+                const userObj = auth.currentUser;
+                if (userObj) {
+                  const getMondayOfCurrentWeek = () => {
+                    const now = new Date();
+                    const day = now.getDay();
+                    const diff = (day === 0 ? -6 : 1 - day);
+                    const monday = new Date(now);
+                    monday.setDate(now.getDate() + diff);
+                    monday.setHours(0, 0, 0, 0);
+                    return monday;
+                  };
+                  const ymd = (d: Date) => {
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    return `${y}-${m}-${dd}`;
+                  };
+                  const monday = getMondayOfCurrentWeek();
+                  const weekKey = `week_${ymd(monday)}`;
+                  (async () => {
+                    try { await stateStoreApi.setWeeklyHeart({ userId: userObj.uid, weekKey, dateStr: todayStr, filled: true }); } catch {}
+                  })();
+                }
+              } catch {}
               try {
                 const s = Number(localStorage.getItem('litkraft_streak') || '0');
                 setStreakForModal(Number.isNaN(s) ? 0 : s);
@@ -3349,10 +3421,20 @@ const getSleepyPetImage = (clicks: number) => {
       {/* Top Right UI - Streak and Coins (below pet level) */}
       <div className="absolute top-16 right-4 z-20 flex gap-4">
         {/* Streak */}
-        <div className="rounded-xl px-4 py-2 shadow-lg w-20">
+        <div
+          className="rounded-xl px-4 py-2 shadow-lg w-20 cursor-pointer hover:bg-white/5"
+          role="button"
+          aria-label="Open weekly hearts"
+          onClick={() => {
+            try {
+              setStreakForModal(Number.isNaN(Number(currentStreak)) ? 0 : Number(currentStreak));
+            } catch { setStreakForModal(0); }
+            setShowStreakModal(true);
+          }}
+        >
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
             <span className="text-xl">❤️</span>
-            <span>{currentStreak}</span>
+            <span>{weeklyHeartsCount}</span>
           </div>
         </div>
         

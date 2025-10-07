@@ -55,6 +55,9 @@ import {
     coins: number;
     streak: number;
     lastStreakIncrementAt?: Timestamp | null;
+    // Weekly hearts map keyed by week key (e.g., "week_2025-10-06") and then by date (YYYY-MM-DD)
+    // Example: weeklyHearts: { "week_2025-10-06": { "2025-10-07": true } }
+    weeklyHearts?: Record<string, Record<string, boolean>>;
     // Daily sadness rotation controller for fair assignment across pets
     sadnessRotation?: {
       date: string; // YYYY-MM-DD (client-local)
@@ -101,6 +104,7 @@ import {
       coins: 0,
       streak: 0,
       lastStreakIncrementAt: null,
+      weeklyHearts: {},
       createdAt: nowServerTimestamp(),
       updatedAt: nowServerTimestamp(),
     };
@@ -675,6 +679,7 @@ import {
     startPetSleep,
     clearPetSleep,
     setPetName,
+    setWeeklyHeart,
   };
   
   // ==========================
@@ -819,6 +824,28 @@ import {
     fetchDailyQuestCompletionStates,
     getPetNames,
   };
+
+  // ==========================
+  // Weekly hearts helpers
+  // ==========================
+
+  export interface SetWeeklyHeartInput {
+    userId: string;
+    weekKey: string; // e.g., "week_2025-10-06" (Monday date)
+    dateStr: string; // YYYY-MM-DD within that week
+    filled?: boolean; // default true
+  }
+
+  export async function setWeeklyHeart(input: SetWeeklyHeartInput): Promise<void> {
+    const { userId, weekKey, dateStr, filled = true } = input;
+    if (!userId || !weekKey || !dateStr) return;
+    const userRef = userStateDocRef(userId);
+    await setDoc(
+      userRef,
+      { weeklyHearts: { [weekKey]: { [dateStr]: filled } }, updatedAt: nowServerTimestamp() } as any,
+      { merge: true }
+    );
+  }
   
   
   
