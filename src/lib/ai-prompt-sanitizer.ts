@@ -1,4 +1,6 @@
 import OpenAI from 'openai';
+import { PetProgressStorage } from '@/lib/pet-progress-storage';
+import { getPetRule } from '@/lib/pet-rules';
 
 interface SanitizedPromptResult {
   sanitizedPrompt: string;
@@ -64,6 +66,17 @@ class AIPromptSanitizer {
     }
 
     try {
+      // Determine current pet persona mapping
+      const currentPetId = ((): string => {
+        try {
+          return PetProgressStorage.getCurrentSelectedPet() || localStorage.getItem('current_pet') || 'dog';
+        } catch {
+          return 'dog';
+        }
+      })();
+      const petRule = getPetRule(currentPetId);
+      const personaInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
+
       const systemPrompt = `You are a strict image prompt sanitizer for children's adventure. 
 Your job is to take any user request (raw prompt) and rewrite it into a safe, 
 child-friendly, realistic description for image generation.
@@ -92,6 +105,8 @@ Rules you must always follow:
 5. CLEANLINESS
 - Do not include any text, signs, or labels in the rewritten prompt.
 - Do not add explanations — only output the cleaned prompt.
+6. PET PERSONA MAPPING
+- ${personaInstruction}
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  
    - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, robes, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
@@ -191,6 +206,17 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
         throw new Error('Empty response from AI sanitizer');
       }
 
+      // Post-process persona replacement as extra safety
+      try {
+        if (petRule?.description) {
+          const youRegex = /\byou\b/gi;
+          sanitizedPrompt = sanitizedPrompt.replace(youRegex, petRule.description);
+          if (sanitizedContext) {
+            sanitizedContext = sanitizedContext.replace(youRegex, petRule.description);
+          }
+        }
+      } catch {}
+
       const result: SanitizedPromptResult = {
         sanitizedPrompt,
         sanitizedContext,
@@ -240,6 +266,17 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
     }
 
     try {
+      // Determine current pet persona mapping
+      const currentPetId = ((): string => {
+        try {
+          return PetProgressStorage.getCurrentSelectedPet() || localStorage.getItem('current_pet') || 'dog';
+        } catch {
+          return 'dog';
+        }
+      })();
+      const petRule = getPetRule(currentPetId);
+      const personaInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
+
       const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
 
 CRITICAL RULES:
@@ -249,6 +286,7 @@ CRITICAL RULES:
 4. Preserve character names and main visual elements
 5. Use heroic, adventurous, and magical language instead
 6. Return ONLY the cleaned prompt, no explanations
+7. PET PERSONA MAPPING: ${personaInstruction}
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
@@ -271,11 +309,18 @@ Transform this image request:`;
         temperature: 0.7,
       });
 
-      const sanitizedPrompt = completion.choices[0]?.message?.content?.trim() || '';
+      let sanitizedPrompt = completion.choices[0]?.message?.content?.trim() || '';
       
       if (!sanitizedPrompt) {
         throw new Error('Empty response from AI sanitizer');
       }
+
+      // Post-process persona replacement as extra safety
+      try {
+        if (petRule?.description) {
+          sanitizedPrompt = sanitizedPrompt.replace(/\byou\b/gi, petRule.description);
+        }
+      } catch {}
 
       const result: SanitizedPromptResult = {
         sanitizedPrompt,
@@ -306,6 +351,14 @@ Transform this image request:`;
     console.log('📥 AI Sanitizer FALLBACK INPUT - Adventure Context:', adventureContext || 'No context');
     
     // Rule-based sanitization as fallback
+    const currentPetId = ((): string => {
+      try {
+        return PetProgressStorage.getCurrentSelectedPet() || localStorage.getItem('current_pet') || 'dog';
+      } catch {
+        return 'dog';
+      }
+    })();
+    const petRule = getPetRule(currentPetId);
     const replacements: Record<string, string> = {
       'violently fighting': 'in an epic heroic stance',
       'violent fight': 'intense magical contest',
@@ -328,15 +381,21 @@ Transform this image request:`;
     };
 
     // Sanitize prompt
-    let sanitizedPrompt = originalPrompt.toLowerCase();
+    let sanitizedPrompt = originalPrompt;
     for (const [problematic, safe] of Object.entries(replacements)) {
       sanitizedPrompt = sanitizedPrompt.replace(new RegExp(problematic, 'gi'), safe);
+    }
+    if (petRule?.description) {
+      sanitizedPrompt = sanitizedPrompt.replace(/\byou\b/gi, petRule.description);
     }
 
     // Sanitize context
     let sanitizedContext = adventureContext || '';
     for (const [problematic, safe] of Object.entries(replacements)) {
       sanitizedContext = sanitizedContext.replace(new RegExp(problematic, 'gi'), safe);
+    }
+    if (petRule?.description) {
+      sanitizedContext = sanitizedContext.replace(/\byou\b/gi, petRule.description);
     }
 
     // Add family-friendly wrapper
@@ -362,7 +421,15 @@ Transform this image request:`;
     console.log('🔧 AI Sanitizer: Using rule-based fallback sanitization');
     
     // Rule-based sanitization as fallback
-    let sanitized = originalPrompt.toLowerCase();
+    const currentPetId = ((): string => {
+      try {
+        return PetProgressStorage.getCurrentSelectedPet() || localStorage.getItem('current_pet') || 'dog';
+      } catch {
+        return 'dog';
+      }
+    })();
+    const petRule = getPetRule(currentPetId);
+    let sanitized = originalPrompt;
     
     // Common problematic terms and their replacements
     const replacements: Record<string, string> = {
@@ -386,6 +453,9 @@ Transform this image request:`;
 
     for (const [problematic, safe] of Object.entries(replacements)) {
       sanitized = sanitized.replace(new RegExp(problematic, 'gi'), safe);
+    }
+    if (petRule?.description) {
+      sanitized = sanitized.replace(/\byou\b/gi, petRule.description);
     }
 
     // Add family-friendly context

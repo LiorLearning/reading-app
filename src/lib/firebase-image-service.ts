@@ -100,6 +100,55 @@ class FirebaseImageService {
   }
 
   /**
+   * Upload generated image (base64/data URL) to Firebase via Cloud Function
+   */
+  async uploadGeneratedImageData(
+    userId: string,
+    adventureId: string,
+    imageData: string, // base64 string or full data URL
+    prompt: string,
+    adventureContext: string = '',
+    mimeType?: string
+  ): Promise<StoredImage | null> {
+    try {
+      const functionUrl = `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net/uploadImagen`;
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await this.getAuthToken()}`
+        },
+        body: JSON.stringify({
+          userId,
+          adventureId,
+          imageData,
+          prompt,
+          adventureContext,
+          mimeType
+        })
+      });
+
+      if (!response.ok) {
+        console.log('❌ Cloud function uploadImagen failed, storing metadata only...');
+        return await this.storeImageMetadata(userId, adventureId, imageData, prompt, adventureContext, 0);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        console.log(`✅ Image uploaded successfully via uploadImagen: ${result.filename}`);
+        await this.cleanupOldImages(userId, adventureId);
+        return result.storedImage as StoredImage;
+      } else {
+        throw new Error(result.error || 'uploadImagen returned failure');
+      }
+    } catch (error) {
+      console.error('❌ Failed to upload via uploadImagen:', error);
+      return await this.storeImageMetadata(userId, adventureId, imageData, prompt, adventureContext, 0);
+    }
+  }
+
+  /**
    * Get authentication token for Cloud Function
    */
   private async getAuthToken(): Promise<string> {

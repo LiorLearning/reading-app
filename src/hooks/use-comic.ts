@@ -16,6 +16,7 @@ type State = {
 type Action =
   | { type: "SET_CURRENT"; index: number }
   | { type: "ADD_PANEL"; panel: ComicPanel }
+  | { type: "UPDATE_PANEL_IMAGE"; id: string; image: string }
   | { type: "UNDO" }
   | { type: "REDO" }
   | { type: "RESET"; initialPanels: ComicPanel[] };
@@ -38,6 +39,11 @@ function reducer(state: State, action: Action): State {
         future: [],
       };
     }
+    case "UPDATE_PANEL_IMAGE": {
+      const snapshot = { panels: clonePanels(state.panels), currentIndex: state.currentIndex };
+      const newPanels = state.panels.map(p => p.id === action.id ? { ...p, image: action.image } : p);
+      return { panels: newPanels, currentIndex: state.currentIndex, past: [...state.past, snapshot], future: [] };
+    }
     case "UNDO": {
       const prev = state.past[state.past.length - 1];
       if (!prev) return state;
@@ -53,7 +59,15 @@ function reducer(state: State, action: Action): State {
       return { panels: next.panels, currentIndex: next.currentIndex, past: [...state.past, pastSnap], future: rest };
     }
     case "RESET": {
-      return { panels: action.initialPanels, currentIndex: 0, past: [], future: [] };
+      const nextIndex = action.initialPanels.length > 0
+        ? action.initialPanels.length - 1
+        : 0;
+      return {
+        panels: action.initialPanels,
+        currentIndex: nextIndex,
+        past: [],
+        future: [],
+      };
     }
     default:
       return state;
@@ -61,18 +75,19 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useComic(initialPanels: ComicPanel[]) {
-  const initialState: State = useMemo(
-    () => ({ panels: initialPanels, currentIndex: 0, past: [], future: [] }),
-    [initialPanels]
-  );
+  const initialState: State = useMemo(() => {
+    const startIndex = initialPanels.length > 0 ? initialPanels.length - 1 : 0;
+    return { panels: initialPanels, currentIndex: startIndex, past: [], future: [] };
+  }, [initialPanels]);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const setCurrent = useCallback((index: number) => dispatch({ type: "SET_CURRENT", index }), []);
   const addPanel = useCallback((panel: ComicPanel) => dispatch({ type: "ADD_PANEL", panel }), []);
+  const updatePanelImage = useCallback((id: string, image: string) => dispatch({ type: "UPDATE_PANEL_IMAGE", id, image }), []);
   const undo = useCallback(() => dispatch({ type: "UNDO" }), []);
   const redo = useCallback(() => dispatch({ type: "REDO" }), []);
   const reset = useCallback((newInitialPanels: ComicPanel[]) => dispatch({ type: "RESET", initialPanels: newInitialPanels }), []);
 
-  return { ...state, setCurrent, addPanel, undo, redo, reset };
+  return { ...state, setCurrent, addPanel, updatePanelImage, undo, redo, reset };
 }

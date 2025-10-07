@@ -1,5 +1,5 @@
 import { ChatMessage } from './utils';
-import { playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from './sounds';
+// Loading/complete sounds disabled for image generation loading state
 
 export interface StreamChunk {
   type: 'text' | 'image_start' | 'image' | 'error';
@@ -123,115 +123,115 @@ export class ResponseProcessor {
     
     const imagePrompts = this.extractImagePrompts(response);
     
-    // If no explicit image prompts found, check for fallback content-based generation
+    // If no explicit image prompts found, still generate a fallback image (start immediately on message)
     if (!imagePrompts.length) {
-      if (this.shouldGenerateImageFromContent(response)) {
-        console.log('🔍 No explicit image tags found, but content suggests visual scene - generating fallback image');
-        
-        // Use original user message for fallback generation if available
-        const rawFallbackPrompt = originalUserMessage || this.generateFallbackImagePrompt(response, '');
-        
-        // 🧹 NEW: Sanitize fallback prompt too
-        console.log('🧹 ResponseProcessor: Sanitizing fallback prompt...');
-        const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
-        
-        let sanitizedFallbackPrompt = rawFallbackPrompt;
-        try {
-          const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(rawFallbackPrompt);
-          if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
-            sanitizedFallbackPrompt = sanitizationResult.sanitizedPrompt;
-            console.log('✅ ResponseProcessor: Fallback prompt sanitized successfully');
-            console.log('🔄 Original fallback:', rawFallbackPrompt.substring(0, 100) + '...');
-            console.log('✨ Sanitized fallback:', sanitizedFallbackPrompt.substring(0, 100) + '...');
-          } else {
-            console.log('⚠️ ResponseProcessor: Fallback sanitization failed, using original prompt');
-          }
-        } catch (sanitizationError) {
-          console.warn('⚠️ ResponseProcessor: Fallback prompt sanitization error, using original prompt:', sanitizationError);
+      // Use original user message for fallback generation if available
+      const rawFallbackPrompt = originalUserMessage || this.generateFallbackImagePrompt(response, '');
+      
+      // 🧹 Sanitize fallback prompt
+      console.log('🧹 ResponseProcessor: Sanitizing fallback prompt...');
+      const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
+      
+      let sanitizedFallbackPrompt = rawFallbackPrompt;
+      try {
+        const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(rawFallbackPrompt);
+        if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
+          sanitizedFallbackPrompt = sanitizationResult.sanitizedPrompt;
+          console.log('✅ ResponseProcessor: Fallback prompt sanitized successfully');
+        } else {
+          console.log('⚠️ ResponseProcessor: Fallback sanitization failed, using original prompt');
         }
+      } catch (sanitizationError) {
+        console.warn('⚠️ ResponseProcessor: Fallback prompt sanitization error, using original prompt:', sanitizationError);
+      }
+      
+      // Apply enhanced safety prompt to fallback as well
+      const enhancedFallbackPrompt = `No text in image. Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${sanitizedFallbackPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
+      
+      console.log(`🎨 [ResponseProcessor.processResponseWithImages()] Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
+      
+      // Yield text first
+      yield { 
+        type: 'text', 
+        content: response 
+      };
+      
+      // Then generate image
+      yield { 
+        type: 'image_start', 
+        content: 'GENERATING_IMAGE',
+        metadata: { prompt: enhancedFallbackPrompt }
+      };
+      
+      try {
+        const startTime = Date.now();
+        const result = await imageGenerator.generateWithFallback(enhancedFallbackPrompt, userId, {
+          adventureContext,
+          size: '1024x1024',
+          quality: 'hd'
+        });
         
-        // Apply enhanced safety prompt to fallback as well
-        const enhancedFallbackPrompt = `No text in image. Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${sanitizedFallbackPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.
-
-Current user request (70% context weight): ${sanitizedFallbackPrompt}`;
+        const duration = Date.now() - startTime;
         
-        console.log(`🎨 [ResponseProcessor.processResponseWithImages()] Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
-        console.log(`📝 Raw fallback: ${rawFallbackPrompt}`);
-        console.log(`🧹 Sanitized fallback: ${sanitizedFallbackPrompt}`);
-        console.log(`🛡️ Enhanced fallback: ${enhancedFallbackPrompt}`);
-        console.log(`🎯 dall-e prompt primary final: ${enhancedFallbackPrompt}`);
-        
-        // Yield text first
-        yield { 
-          type: 'text', 
-          content: response 
-        };
-        
-        // Then generate image
-        yield { 
-          type: 'image_start', 
-          content: 'GENERATING_IMAGE',
-          metadata: { prompt: enhancedFallbackPrompt }
-        };
-        
-        try {
-          const startTime = Date.now();
-          const result = await imageGenerator.generateWithFallback(enhancedFallbackPrompt, userId, {
-            adventureContext,
-            size: '1024x1024',
-            quality: 'hd'
-          });
+        if (result.success && result.imageUrl) {
+          console.log(`✅ Fallback image generated successfully in ${duration}ms`);
           
-          const duration = Date.now() - startTime;
-          
-          if (result.success && result.imageUrl) {
-            console.log(`✅ Fallback image generated successfully in ${duration}ms`);
-            
-            yield { 
-              type: 'image', 
-              content: result.imageUrl,
-              metadata: { 
-                prompt: enhancedFallbackPrompt, 
-                duration, 
-                attempts: result.attempts,
-                provider: result.provider,
-                imageUrl: result.imageUrl
-              }
-            };
-          } else {
-            console.error(`❌ Fallback image generation failed:`, result.error);
-            
-            yield { 
-              type: 'error', 
-              content: result.error || 'Failed to generate image',
-              metadata: { prompt: enhancedFallbackPrompt, duration }
-            };
-          }
-        } catch (error) {
-          console.error(`❌ Fallback image generation error:`, error);
+          yield { 
+            type: 'image', 
+            content: result.imageUrl,
+            metadata: { 
+              prompt: enhancedFallbackPrompt, 
+              duration, 
+              attempts: result.attempts,
+              provider: result.provider,
+              imageUrl: result.imageUrl
+            }
+          };
+        } else {
+          console.error(`❌ Fallback image generation failed:`, result.error);
           
           yield { 
             type: 'error', 
-            content: error instanceof Error ? error.message : 'Image generation failed',
-            metadata: { prompt: enhancedFallbackPrompt }
+            content: result.error || 'Failed to generate image',
+            metadata: { prompt: enhancedFallbackPrompt, duration }
           };
         }
+      } catch (error) {
+        console.error(`❌ Fallback image generation error:`, error);
         
-        return; // Exit after handling fallback
-      } else {
-        // No image generation needed, just yield text
         yield { 
-          type: 'text', 
-          content: response 
+          type: 'error', 
+          content: error instanceof Error ? error.message : 'Image generation failed',
+          metadata: { prompt: enhancedFallbackPrompt }
         };
-        return;
       }
+      
+      return; // Exit after handling fallback
     }
     
     console.log(`🎨 Found ${imagePrompts.length} image generation request(s) in AI response`);
     
     let lastEnd = 0;
     let hasGeneratedSuccessfulImage = false;
+    
+    // Helper to skip a short caption line immediately after an image tag
+    const skipCaptionAfter = (text: string, fromIndex: number): number => {
+      let i = fromIndex;
+      // Skip immediate whitespace/newlines
+      while (i < text.length && /\s/.test(text[i])) i++;
+      const start = i;
+      let count = 0;
+      while (i < text.length && text[i] !== '\n' && count < 150) {
+        i++;
+        count++;
+      }
+      // If a short line exists, treat it as caption and skip it (plus trailing newline)
+      if (i > start && count <= 150) {
+        while (i < text.length && (text[i] === '\n' || text[i] === '\r')) i++;
+        return i;
+      }
+      return fromIndex;
+    };
     
     // Process each image prompt in order, but stop after first success
     for (const [index, { prompt, start, end }] of imagePrompts.entries()) {
@@ -247,14 +247,12 @@ Current user request (70% context weight): ${sanitizedFallbackPrompt}`;
       // If we already generated a successful image, skip this image prompt but continue with text
       if (hasGeneratedSuccessfulImage) {
         console.log(`🛑 [ResponseProcessor.processResponseWithImages()] Skipping image ${index + 1} - already generated a successful image`);
-        // Skip the image tag content but continue with the loop to process remaining text
-        lastEnd = end;
+        // Skip the image tag content and its immediate caption line
+        lastEnd = skipCaptionAfter(response, end);
         continue;
       }
       
-      // Signal that image generation is starting
-      console.log('🎵 Starting image loading sound...');
-      playImageLoadingSound();
+      // Signal that image generation is starting (no loading sound)
       
       yield { 
         type: 'image_start', 
@@ -294,10 +292,6 @@ Current user request (70% context weight): ${sanitizedFallbackPrompt}`;
           console.warn('⚠️ ResponseProcessor: Prompt sanitization error, using original prompt and context:', sanitizationError);
         }
         
-        // Apply enhanced safety prompt as PRIMARY attempt with conversation context
-//         const enhancedPrompt = `Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${rawPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
-
-// ${conversationContext}`;
 
 const enhancedPrompt = `Create a **ultra-realistic with vivid, lifelike details, natural lighting, accurate textures, and depth of field and vivid background.**: ${sanitizedRawPrompt}. Chest area and leg are should be fully covered with clothes not matter what and follow it strictly.
 
@@ -359,13 +353,10 @@ ${sanitizedConversationContext}`;
         
         if (result.success && result.imageUrl) {
           console.log(`✅ [ResponseProcessor.processResponseWithImages()] Image ${index + 1} generated successfully in ${duration}ms`);
-          console.log(`🖼️ [ResponseProcessor.processResponseWithImages()] Generated image URL: ${result.imageUrl}`);
           console.log(`🏢 [ResponseProcessor.processResponseWithImages()] Provider used: ${result.provider}`);
           hasGeneratedSuccessfulImage = true; // Mark as successful, stop generating more
           
-          // Stop loading sound - completion sound now handled by unified streaming hook
-          console.log('🎵 Stopping loading sound...');
-          stopImageLoadingSound();
+          // No loading sound to stop
           // playImageCompleteSound(); // Removed - now handled by unified streaming hook timeout
           
           // Stream the completed image
@@ -384,16 +375,14 @@ ${sanitizedConversationContext}`;
           // Update adventure context with the generated image
           adventureContext.push({
             type: 'ai',
-            content: `![Generated Image](${result.imageUrl})`,
+            content: '[Generated Image] Image created successfully (content not stored in chat).',
             timestamp: Date.now()
           });
           
         } else {
           console.error(`❌ Image ${index + 1} generation failed:`, result.error);
           
-          // Stop loading sound on error
-          console.log('🎵 Stopping loading sound due to error...');
-          stopImageLoadingSound();
+          // No loading sound to stop
           
           // Stream error and continue to next prompt (don't mark as successful)
           yield { 
@@ -406,9 +395,7 @@ ${sanitizedConversationContext}`;
       } catch (error) {
         console.error(`❌ Image ${index + 1} generation error:`, error);
         
-        // Stop loading sound on error
-        console.log('🎵 Stopping loading sound due to generation error...');
-        stopImageLoadingSound();
+        // No loading sound to stop
         
         yield { 
           type: 'error', 
@@ -417,7 +404,8 @@ ${sanitizedConversationContext}`;
         };
       }
       
-      lastEnd = end;
+      // After handling this image tag, skip any immediate caption line before resuming
+      lastEnd = skipCaptionAfter(response, end);
     }
     
     // Stream any remaining text after the last image

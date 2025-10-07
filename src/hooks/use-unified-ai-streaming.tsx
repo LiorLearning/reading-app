@@ -3,7 +3,7 @@ import { ChatMessage } from '@/lib/utils';
 import { aiService } from '@/lib/ai-service';
 import { SpellingQuestion } from '@/lib/questionBankUtils';
 import { UnifiedAIResponse, StreamEvent } from '@/lib/unified-ai-streaming-service';
-import { stopImageLoadingSound, playImageCompleteSound } from '@/lib/sounds';
+// Remove image-related sounds for creation/change/render events
 
 export interface UseUnifiedAIStreamingOptions {
   userId: string;
@@ -65,37 +65,38 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           break;
           
         case 'image_complete':
-          console.log('🚨 CRITICAL: IMAGE_COMPLETE EVENT - keeping isGeneratingImage as TRUE');
-          // Keep loading active and set up 10-second delay
-          newState.isGeneratingImage = true;
+          console.log('🎨 Image complete event received');
+          newState.isGeneratingImage = false;
+          // leave streaming flags alone; let callers decide when to stop loading
+          newState.isUnifiedSessionActive = false;
           
           if (event.metadata?.imageUrl) {
-            newState.generatedImages.push(event.metadata.imageUrl);
+            const existingFirst = newState.generatedImages[0];
+            const nextImageUrl = event.metadata.imageUrl;
+            const isNewImage = existingFirst !== nextImageUrl;
+
+            if (isNewImage) {
+              console.log('🖼️ New inline image received, updating state');
+              newState.generatedImages = [nextImageUrl];
+            } else {
+              console.log('ℹ️ Inline image unchanged, skipping state update to prevent flicker');
+            }
             // Call callback for new image
             if (onNewImage && event.metadata.prompt) {
-              onNewImage(event.metadata.imageUrl, event.metadata.prompt);
+              const prompt = event.metadata.prompt;
+              try {
+                onNewImage(nextImageUrl, prompt);
+              } catch (callbackError) {
+                console.warn('⚠️ onNewImage callback threw an error:', callbackError);
+              }
             }
-            // Sound handling is done in response processor
+            // clear any pending timeouts
+            if (delayTimeoutRef.current) {
+              clearTimeout(delayTimeoutRef.current);
+              delayTimeoutRef.current = null;
+            }
+            // No sounds
           }
-          
-          // Clear any existing timeout
-          if (delayTimeoutRef.current) {
-            clearTimeout(delayTimeoutRef.current);
-          }
-          
-          // Set up 7-second delay timeout
-          delayTimeoutRef.current = setTimeout(() => {
-            console.log('🚨 CRITICAL: 7-second delay timeout FIRED (from image_complete)');
-            // Play completion sound when loading animation finally ends
-            playImageCompleteSound();
-            setStreamingState(prevState => ({
-              ...prevState,
-              isGeneratingImage: false,
-              isUnifiedSessionActive: false // NEW: Session fully complete after image delay
-            }));
-          }, 5000);
-          
-          console.log('🚨 CRITICAL: Timeout scheduled with ID:', delayTimeoutRef.current);
           break;
           
         case 'error':
@@ -107,36 +108,19 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             clearTimeout(delayTimeoutRef.current);
             delayTimeoutRef.current = null;
           }
-          // Ensure loading sound is stopped on error
-          stopImageLoadingSound();
+          // No sounds on error
           break;
           
         case 'complete':
-          console.log('🚨 CRITICAL: COMPLETE EVENT: Setting isGeneratingImage to TRUE for delay period');
+          console.log('✅ Stream complete');
           newState.isStreaming = false;
-          // Keep loading active and set up 10-second delay
-          newState.isGeneratingImage = true;
-          
-          // Clear any existing timeout
+          newState.isGeneratingImage = false;
+          newState.isUnifiedSessionActive = false;
           if (delayTimeoutRef.current) {
             clearTimeout(delayTimeoutRef.current);
+            delayTimeoutRef.current = null;
           }
-          
-          // Set up 10-second delay timeout
-          delayTimeoutRef.current = setTimeout(() => {
-            console.log('🚨 CRITICAL: 10-second delay timeout FIRED (from complete)');
-            // Play completion sound when loading animation finally ends
-            playImageCompleteSound();
-            setStreamingState(prevState => ({
-              ...prevState,
-              isGeneratingImage: false,
-              isUnifiedSessionActive: false // NEW: Session fully complete after delay
-            }));
-            // Stop sound after delay
-            stopImageLoadingSound();
-          }, 5000);
-          
-          console.log('🚨 CRITICAL: Timeout scheduled with ID:', delayTimeoutRef.current);
+          // No sounds on complete
           break;
       }
       
@@ -315,8 +299,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           currentStreamingState: streamingState.isStreaming
         });
         
-        // Stop any loading sound when request is aborted
-        stopImageLoadingSound();
+        // No sounds on abort
         
         // 🛠️ CRITICAL: Always reset streaming state on abort
         setStreamingState(prev => ({
@@ -362,8 +345,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   const abortStream = useCallback(() => {
     aiService.abortUnifiedStream(sessionId);
     
-    // Stop any ongoing loading sound
-    stopImageLoadingSound();
+    // No sounds on abort
     
     // Clear any delay timeout
     if (delayTimeoutRef.current) {
