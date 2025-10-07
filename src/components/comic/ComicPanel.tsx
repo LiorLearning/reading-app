@@ -1,6 +1,5 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
 import SpellBox from "./SpellBox";
@@ -266,8 +265,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
             {/* Loading Animation Container */}
             <div 
-              className={cn(
-                "bg-white/90 backdrop-blur-sm rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full mx-4 transition-opacity duration-500",
+                className={cn(
+                  "bg-white/90 rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full mx-4 transition-opacity duration-500",
                 showImageAfterLoad && "opacity-0 pointer-events-none"
               )}
             >
@@ -318,15 +317,15 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                 showImageAfterLoad ? "opacity-100" : "opacity-0 pointer-events-none"
               )}
             >
-              {/* Blurred background image */}
+              {/* Background image with soft blur */}
               <img 
                 src={currentImage} 
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover object-center"
                 loading="lazy"
                 style={{
-                  filter: 'blur(20px) brightness(0.7) contrast(1.1) saturate(1.1)',
-                  transform: 'scale(1.1)' // Slightly scale to avoid blur edges
+                  filter: 'blur(20px) brightness(0.75) contrast(1.1) saturate(1.1)',
+                  transform: 'scale(1.08)'
                 }}
               />
               {/* Main image - original size, centered */}
@@ -345,15 +344,15 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           </div>
         ) : (
           <div className="relative w-full h-full overflow-hidden">
-            {/* Blurred background image */}
+            {/* Background image with soft blur */}
             <img 
               src={currentImage} 
               alt=""
               className="absolute inset-0 w-full h-full object-cover object-center"
               loading="lazy"
               style={{
-                filter: 'blur(20px) brightness(0.7) contrast(1.1) saturate(1.1)',
-                transform: 'scale(1.1)' // Slightly scale to avoid blur edges
+                filter: 'blur(20px) brightness(0.75) contrast(1.1) saturate(1.1)',
+                transform: 'scale(1.08)'
               }}
             />
             {/* Main image - original size, centered */}
@@ -364,20 +363,10 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                 className="max-w-full max-h-full transition-opacity duration-300"
                 loading="lazy"
                 style={{
-                  filter: `${softFocus ? 'blur(3px) brightness(0.95) ' : ''}brightness(1.05) contrast(1.1) saturate(1.1)`,
+                  filter: `brightness(1.05) contrast(1.1) saturate(1.1)`,
                   opacity: showSpellBox ? 0.25 : 1
                 }}
               />
-              {/* Download button */}
-              <button 
-                onClick={() => window.open(currentImage, '_blank')}
-                className="absolute top-4 right-4 bg-black/70 hover:bg-black/90 text-white border-none rounded-md px-3 py-2 text-sm flex items-center gap-2 transition-colors z-20"
-                title="Open image in new tab"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </button>
             </div>
           </div>
         )}
@@ -412,8 +401,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
               }}
               className="bg-black/70 hover:bg-black/90 text-white rounded-full p-3 
                          transition-all duration-200 hover:scale-110 shadow-lg
-                         border-2 border-white/20 hover:border-white/40
-                         backdrop-blur-sm"
+                         border-2 border-white/20 hover:border-white/40"
               aria-label="Previous panel"
             >
               <ChevronLeft className="h-6 w-6" />
@@ -433,8 +421,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
               }}
               className="bg-black/70 hover:bg-black/90 text-white rounded-full p-3 
                          transition-all duration-200 hover:scale-110 shadow-lg
-                         border-2 border-white/20 hover:border-white/40
-                         backdrop-blur-sm"
+                         border-2 border-white/20 hover:border-white/40"
               aria-label="Next panel"
             >
               <ChevronRight className="h-6 w-6" />

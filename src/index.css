@@ -786,6 +786,19 @@ All colors MUST be HSL.
       #fbbf24 16px
     );
   }
+
+  .header-panel-gradient {
+    background-image:
+      radial-gradient(circle at 12% -10%, hsl(var(--primary) / 0.45) 0%, transparent 55%),
+      radial-gradient(circle at 80% 0%, hsl(var(--primary) / 0.4) 0%, transparent 60%),
+      linear-gradient(120deg,
+        hsl(var(--primary) / 0.92) 0%,
+        hsl(var(--primary) / 0.78) 45%,
+        hsl(var(--primary) / 0.68) 70%,
+        hsl(var(--primary) / 0.6) 100%
+      );
+    background-blend-mode: screen, screen, normal;
+  }
   
   /* Background with themed color film overlay */
   .bg-pattern {

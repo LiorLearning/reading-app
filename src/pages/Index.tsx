@@ -157,13 +157,6 @@ const IndexPanelImageFigure: React.FC<{
           }
         }}
       />
-      <button 
-        onClick={() => window.open(resolvedImageUrl, '_blank')}
-        className="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white border-none rounded-md px-2 py-1 text-xs flex items-center gap-1 transition-colors"
-        title="Open image in new tab"
-      >
-        📥 Download
-      </button>
       <figcaption className="px-2 py-1 text-sm font-semibold">{index + 1}. {oneLiner}</figcaption>
     </figure>
   );
@@ -3977,7 +3970,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           <DialogHeader>
             <DialogTitle>Create your account to continue</DialogTitle>
             <DialogDescription>
-              You’ve reached the free trial limit. Create an account to save progress and continue your adventure.
+              You've reached the free trial limit. Create an account to save progress and continue your adventure.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-2">
@@ -4010,18 +4003,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       <div className="w-full flex-1 flex flex-col min-h-0">
         {/* Header Panel */}
         <header 
-          className="flex items-center justify-center py-3 lg:py-4 border-b-2 border-foreground/10 bg-white/30 backdrop-blur-md relative"
+          className="relative flex items-center justify-center py-3 lg:py-4 border-b border-white/20 text-white overflow-hidden header-panel-gradient"
           style={{
-            boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.1)'
+            borderBottomColor: 'hsl(var(--primary) / 0.35)',
+            boxShadow: '0 10px 24px -10px rgba(20, 20, 60, 0.45)'
           }}
         >
+          <div className="pointer-events-none absolute inset-0 opacity-[0.55] mix-blend-soft-light bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.45),transparent_50%),radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.25),transparent_65%)]"></div>
           {/* Top Left Home Button - Show on all screens except home (-1) when user is logged in */}
           <div 
-            className="absolute left-0 flex items-center gap-1 lg:gap-2"
+            className="absolute left-0 flex items-center gap-2 lg:gap-3"
             style={{
-              marginLeft: `calc((100% - 92%) / 2)`, // Align with left edge of purple container
+              marginLeft: `clamp(16px, 5vw, 48px)`,
               top: '50%',
-              transform: 'translateY(-50%)' // Center vertically to match right buttons
+              transform: 'translateY(-50%)'
             }}
           >
             {userData && currentScreen !== -1 && (
@@ -4038,10 +4033,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     navigate('/');
                   }
                 }}
-                className="border-2 bg-primary hover:bg-primary/90 text-white btn-animate px-4"
-                style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                className="flex items-center gap-2 rounded-full px-4 py-2 bg-white text-black font-semibold border-2 border-foreground shadow-solid btn-animate"
               >
-                🏠 Home
+                <span className="text-lg leading-none">🏠</span>
+                <span>Home</span>
               </Button>
             )}
             
@@ -4051,11 +4046,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="default"
-                    className={`border-2 ${selectedPreference ? 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'} text-white rounded-xl px-4 py-3 font-semibold btn-animate flex items-center gap-2 shadow-lg transition-all duration-300`}
-                    style={{ boxShadow: selectedPreference ? '0 4px 0 #15803d' : '0 4px 0 #1d4ed8' }}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 btn-animate border border-white/50 backdrop-blur ${selectedPreference ? 'bg-white/20 hover:bg-white/25' : 'bg-white/10 hover:bg-white/20'} text-white shadow-[0_4px_0_rgba(0,0,0,0.3)]`}
                     onClick={() => playClickSound()}
                   >
-                    <GraduationCap className="h-5 w-5" />
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-white/80 to-white/60 text-primary shadow-sm">
+                      <GraduationCap className="h-3.5 w-3.5" />
+                    </div>
                     {(() => {
                       const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName || 'Grade';
                       const buttonText = selectedTopicFromPreference 
@@ -4066,11 +4062,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       console.log('Button render - selectedGradeFromDropdown:', selectedGradeFromDropdown, 'selectedTopicFromPreference:', selectedTopicFromPreference, 'selectedPreference:', selectedPreference, 'buttonText:', buttonText);
                       return buttonText;
                     })()}
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-4 w-4 opacity-80" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
-                  className="w-64 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                  className="w-64 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                   align="start"
                 >
                   {/* Kindergarten */}
@@ -4083,7 +4079,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       )}
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent 
-                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                      className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
                         className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
@@ -4120,7 +4116,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       )}
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent 
-                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                      className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
                         className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
@@ -4157,7 +4153,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       )}
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent 
-                      className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
+                      className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
                         className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
@@ -4346,10 +4342,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     setCurrentScreen(-1);
                   }}
                   disabled={currentScreen === -1}
-                  className="border-2 bg-white btn-animate"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                className="rounded-full px-3 py-2 text-xs font-semibold bg-white text-black border-2 border-foreground shadow-solid btn-animate"
                 >
-                  Home
+                  🏠 Home
                 </Button>
                 <Button
                   variant="outline"
@@ -4359,8 +4354,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     setCurrentScreen(0);
                   }}
                   disabled={currentScreen === 0}
-                  className="border-2 bg-white btn-animate"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                className="rounded-full px-3 py-2 text-xs font-semibold bg-white text-black border-2 border-foreground shadow-solid btn-animate"
                 >
                   Topics
                 </Button>
@@ -4372,8 +4366,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     setCurrentScreen(1);
                   }}
                   disabled={currentScreen === 1}
-                  className="border-2 bg-white btn-animate"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                  className="rounded-full px-3 py-2 text-xs font-semibold bg-white text-black border-2 border-foreground shadow-solid btn-animate"
                 >
                   Adventure
                 </Button>
@@ -4385,8 +4378,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     setCurrentScreen(4);
                   }}
                   disabled={false}
-                  className="border-2 bg-white btn-animate"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                  className="rounded-full px-3 py-2 text-xs font-semibold bg-white text-black border-2 border-foreground shadow-solid btn-animate"
                 >
                   Pets
                 </Button>
@@ -4400,7 +4392,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   <PersistentAdventureProgressBar />
                 </div>
               ) : (
-                <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent drop-shadow-lg font-kids tracking-wide">
+                <h1 className="text-xl lg:text-2xl font-bold text-white drop-shadow-lg font-kids tracking-wide">
                   {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
                    userData && currentScreen === -1 ? `Welcome back ${userData.username}!` :
                    currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
@@ -4409,7 +4401,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               )}
               {userData && !devToolsVisible && currentScreen !== 1 && (
                 <div className="flex items-center justify-center gap-2 mt-1">
-                  <span className="text-sm lg:text-base font-semibold text-primary/80">
+                  <span className="text-sm lg:text-base font-semibold text-white/85">
                     🎓 {selectedGradeFromDropdown || userData.gradeDisplayName}
                   </span>
                 </div>
@@ -4427,8 +4419,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     setCurrentScreen(3);
                   }}
                   disabled={currentScreen === 3}
-                  className="border-2 bg-white btn-animate"
-                  style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }}
+                className="rounded-full px-3 py-2 text-xs font-semibold bg-white hover:bg-white text-black border border-white shadow-[0_4px_0_rgba(0,0,0,0.35)] btn-animate"
                 >
                   MCQ Screen
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -4439,9 +4430,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
           {/* Right Buttons Group - Positioned to align with purple container */}
           <div 
-            className="absolute right-0 flex items-center gap-2"
+            className="absolute right-0 flex items-center gap-3"
             style={{
-              marginRight: `calc((100% - 92%) / 2)` // Align with right edge of purple container
+              marginRight: `clamp(16px, 5vw, 48px)`
             }}
           >
 
@@ -4454,8 +4445,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             {/* Theme Changer and How To buttons - Show on all screens */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Change theme color" className="border-2 bg-white btn-animate" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                  <Palette className="h-4 w-4" />
+        <Button 
+          variant="outline" 
+          size="icon" 
+          aria-label="Change theme color" 
+          className="border-2 border-foreground shadow-solid bg-white text-black btn-animate w-10 h-10 rounded-full flex items-center justify-center text-lg leading-none"
+          onClick={() => playClickSound()}
+        >
+          <span role="img" aria-hidden="true">🎨</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-2" align="start">
@@ -4484,20 +4481,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               variant="outline" 
               size="icon" 
               aria-label="Pet Page" 
-              className="border-2 bg-white btn-animate" 
-              style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} 
+              className="border-2 border-foreground shadow-solid bg-white text-black btn-animate w-10 h-10 rounded-full flex items-center justify-center text-lg leading-none" 
               onClick={() => {
                 playClickSound();
                 setCurrentScreen(4); // Navigate to pet page
               }}
             >
-              <span className="text-lg">🐶</span>
+              <span role="img" aria-hidden="true">🐶</span>
             </Button>
             
             <Dialog>
               <DialogTrigger asChild>
-                                <Button variant="default" aria-label="View whole comic" className="border-2 bg-primary text-primary-foreground btn-animate px-4 hover:bg-primary/90" style={{ borderColor: 'hsl(from hsl(var(--primary)) h s 25%)', boxShadow: '0 4px 0 black' }} onClick={() => playClickSound()}>
-                  View Whole Comic
+                <Button 
+                  variant="default" 
+                  aria-label="View whole comic" 
+                  className="border-2 border-foreground bg-white text-black font-semibold btn-animate px-5 py-2 shadow-solid hover:bg-white flex items-center gap-2 rounded-full"
+                  onClick={() => playClickSound()}
+                >
+                  <span role="img" aria-hidden="true" className="text-lg leading-none">📕</span>
+                  <span className="tracking-wide">View Whole Comic</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
