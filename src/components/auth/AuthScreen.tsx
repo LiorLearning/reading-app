@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { playClickSound } from '@/lib/sounds';
-import { BookOpen, Mail, Lock, User, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { BookOpen, Mail, Lock, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getFriendlyAuthError } from '@/lib/firebase-auth-errors';
 
@@ -24,12 +24,10 @@ export const AuthScreen: React.FC = () => {
     password: ''
   });
 
-  // Sign up form state
+  // Sign up form state (email + password only)
   const [signUpData, setSignUpData] = useState({
-    username: '',
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
 
   // Initialize One Tap Sign-in when component mounts
@@ -91,14 +89,8 @@ export const AuthScreen: React.FC = () => {
     setError('');
     playClickSound();
 
-    if (signUpData.password !== signUpData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
     try {
-      await signUpWithEmail(signUpData.email, signUpData.password, signUpData.username);
+      await signUpWithEmail(signUpData.email, signUpData.password);
       const params = new URLSearchParams(location.search);
       const redirect = params.get('redirect') || '/';
       navigate(redirect);
@@ -206,9 +198,19 @@ export const AuthScreen: React.FC = () => {
             {showEmailAuth && (
               <div className="space-y-4 animate-in slide-in-from-top-2">
                 <Tabs defaultValue="signup" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="signin">Sign In</TabsTrigger>
-                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 mb-4 bg-white/10 border border-white/20 rounded-md p-1">
+                    <TabsTrigger 
+                      value="signin"
+                      className="text-sm font-semibold text-blue-100 rounded md:rounded px-3 py-2 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-2 data-[state=active]:ring-blue-300"
+                    >
+                      Sign In
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="signup"
+                      className="text-sm font-semibold text-blue-100 rounded md:rounded px-3 py-2 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-2 data-[state=active]:ring-blue-300"
+                    >
+                      Sign Up
+                    </TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="signin" className="space-y-4">
@@ -259,17 +261,6 @@ export const AuthScreen: React.FC = () => {
                     <form onSubmit={handleEmailSignUp} className="space-y-4">
                       <div className="space-y-3">
                         <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            type="text"
-                            placeholder="Username"
-                            value={signUpData.username}
-                            onChange={(e) => setSignUpData({ ...signUpData, username: e.target.value })}
-                            className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-300"
-                            required
-                          />
-                        </div>
-                        <div className="relative">
                           <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                           <Input
                             type="email"
@@ -287,17 +278,6 @@ export const AuthScreen: React.FC = () => {
                             placeholder="Password"
                             value={signUpData.password}
                             onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
-                            className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-300"
-                            required
-                          />
-                        </div>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            type="password"
-                            placeholder="Confirm Password"
-                            value={signUpData.confirmPassword}
-                            onChange={(e) => setSignUpData({ ...signUpData, confirmPassword: e.target.value })}
                             className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-300"
                             required
                           />

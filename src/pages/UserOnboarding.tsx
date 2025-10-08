@@ -240,41 +240,45 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                     Continue
                     <ChevronRight className="h-5 w-5" />
                   </Button>
-                  {/* Existing user login entry point (moved below Continue) */}
-                  <Button
-                    onClick={() => {
-                      playClickSound();
-                      navigate(`/auth?redirect=/`);
-                    }}
-                    className={cn(
-                      "w-full h-14 text-lg font-normal rounded-xl border-3 btn-animate flex items-center justify-center gap-3",
-                      "bg-green-600 hover:bg-green-700 text-white"
-                    )}
-                    style={{ 
-                      borderColor: '#16a34a',
-                      boxShadow: '0 6px 0 #16a34a'
-                    }}
-                  >
-                    Log In
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      playClickSound();
-                      navigate(`/auth?redirect=/`);
-                    }}
-                    className={cn(
-                      "w-full h-14 text-lg font-normal rounded-xl border-3 btn-animate flex items-center justify-center gap-3",
-                      "bg-blue-600 hover:bg-blue-700 text-white"
-                    )}
-                    style={{ 
-                      borderColor: 'rgb(64, 64, 205)',
-                      boxShadow: '0 6px 0rgb(64, 64, 205)'
-                    }}
-                  >
-                    Sign Up
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
+                  {/* Show auth buttons only for anonymous/guest users */}
+                  {(!user || user.isAnonymous) && (
+                    <>
+                      <Button
+                        onClick={() => {
+                          playClickSound();
+                          navigate(`/auth?redirect=/`);
+                        }}
+                        className={cn(
+                          "w-full h-14 text-lg font-normal rounded-xl border-3 btn-animate flex items-center justify-center gap-3",
+                          "bg-green-600 hover:bg-green-700 text-white"
+                        )}
+                        style={{ 
+                          borderColor: '#16a34a',
+                          boxShadow: '0 6px 0 #16a34a'
+                        }}
+                      >
+                        Log In
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          playClickSound();
+                          navigate(`/auth?redirect=/`);
+                        }}
+                        className={cn(
+                          "w-full h-14 text-lg font-normal rounded-xl border-3 btn-animate flex items-center justify-center gap-3",
+                          "bg-blue-600 hover:bg-blue-700 text-white"
+                        )}
+                        style={{ 
+                          borderColor: 'rgb(64, 64, 205)',
+                          boxShadow: '0 6px 0rgb(64, 64, 205)'
+                        }}
+                      >
+                        Sign Up
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    </>
+                  )}
                 </div>
               ) : (
                 // Grade Selection Step

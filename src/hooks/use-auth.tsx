@@ -57,7 +57,7 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string, username: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserData: (data: Partial<UserData>) => Promise<void>;
   initializeOneTapSignIn: () => void;
@@ -101,6 +101,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       
       if (user) {
+        // Mark that this device has previously signed in with a real account
+        try {
+          if (!user.isAnonymous) {
+            localStorage.setItem('previouslysignedin', '1');
+          }
+        } catch {}
         // Load user data from Firestore
         try {
           const userDocRef = doc(db, 'users', user.uid);
@@ -605,18 +611,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signUpWithEmail = async (email: string, password: string, username: string) => {
+  const signUpWithEmail = async (email: string, password: string) => {
     try {
       const current = auth.currentUser;
       if (current && current.isAnonymous) {
         // Upgrade anonymous user to email/password while preserving UID
         const credential = EmailAuthProvider.credential(email, password);
         const linkedUser = await linkWithCredential(current, credential);
-        await updateProfile(linkedUser.user, { displayName: username });
       } else {
         // No anonymous session: fall back to normal sign-up
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName: username });
       }
     } catch (error) {
       console.error('Error signing up with email:', error);
@@ -629,10 +633,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await firebaseSignOut(auth);
       // Local cleanup to avoid showing previous user's state
       try {
+        // Preserve previouslysignedin flag across clears
+        let preservePrevSignedIn = '0';
+        try {
+          const current = auth.currentUser;
+          const existing = (typeof localStorage !== 'undefined') ? (localStorage.getItem('previouslysignedin') || '0') : '0';
+          // If there is an existing real account marker or current user wasn't anonymous, keep it
+          preservePrevSignedIn = (!current || current.isAnonymous) ? existing : '1';
+        } catch {}
         // Reset local pet progress storage and selection
         PetProgressStorage.resetAllPetData();
         // Clear all local and session storage to prevent leaking prior user state
         try { localStorage.clear(); } catch {}
+        // Restore the preserved flag
+        try { localStorage.setItem('previouslysignedin', preservePrevSignedIn); } catch {}
         try { sessionStorage.clear(); } catch {}
         // Clear Cache Storage and unregister any service workers
         try {

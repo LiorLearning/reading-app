@@ -4475,46 +4475,50 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               </PopoverContent>
             </Popover>
             
-            <Button 
-              variant="outline" 
-              size="icon" 
-              aria-label="Pet Page" 
-              className="border-2 border-foreground shadow-solid bg-white text-black btn-animate w-10 h-10 rounded-full flex items-center justify-center text-lg leading-none" 
-              onClick={() => {
-                playClickSound();
-                setCurrentScreen(4); // Navigate to pet page
-              }}
-            >
-              <span role="img" aria-hidden="true">🐶</span>
-            </Button>
-            
-            <Dialog>
-              <DialogTrigger asChild>
+            {!showOnboarding && (
+              <>
                 <Button 
-                  variant="default" 
-                  aria-label="View whole comic" 
-                  className="border-2 border-foreground bg-white text-black font-semibold btn-animate px-5 py-2 shadow-solid hover:bg-white flex items-center gap-2 rounded-full"
-                  onClick={() => playClickSound()}
+                  variant="outline" 
+                  size="icon" 
+                  aria-label="Pet Page" 
+                  className="border-2 border-foreground shadow-solid bg-white text-black btn-animate w-10 h-10 rounded-full flex items-center justify-center text-lg leading-none" 
+                  onClick={() => {
+                    playClickSound();
+                    setCurrentScreen(4); // Navigate to pet page
+                  }}
                 >
-                  <span role="img" aria-hidden="true" className="text-lg leading-none">📕</span>
-                  <span className="tracking-wide">View Whole Comic</span>
+                  <span role="img" aria-hidden="true">🐶</span>
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
-                <DialogHeader>
-                  <DialogTitle>Your Adventure (All Panels)</DialogTitle>
-                </DialogHeader>
-                <div className="flex-1 overflow-auto pr-2">
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 pb-4">
-                    {panels
-                      .filter(p => p.text !== "The brave astronaut climbs into ROCKET!") // Exclude the default starting panel
-                      .map((p, i) => (
-                        <PanelOneLinerFigure key={p.id} panel={p} index={i} />
-                      ))}
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+                
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="default" 
+                      aria-label="View whole comic" 
+                      className="border-2 border-foreground bg-white text-black font-semibold btn-animate px-5 py-2 shadow-solid hover:bg-white flex items-center gap-2 rounded-full"
+                      onClick={() => playClickSound()}
+                    >
+                      <span role="img" aria-hidden="true" className="text-lg leading-none">📕</span>
+                      <span className="tracking-wide">View Whole Comic</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+                    <DialogHeader>
+                      <DialogTitle>Your Adventure (All Panels)</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-auto pr-2">
+                      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 pb-4">
+                        {panels
+                          .filter(p => p.text !== "The brave astronaut climbs into ROCKET!") // Exclude the default starting panel
+                          .map((p, i) => (
+                            <PanelOneLinerFigure key={p.id} panel={p} index={i} />
+                          ))}
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
             
           </div>
         </header>
