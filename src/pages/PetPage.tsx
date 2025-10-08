@@ -2911,7 +2911,7 @@ const getSleepyPetImage = (clicks: number) => {
 
   return (
     <div className="h-screen flex flex-col overflow-y-auto overflow-x-hidden" style={{
-      backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250903_181706_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
+      backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center 50%',
       backgroundRepeat: 'no-repeat',
@@ -2992,9 +2992,8 @@ const getSleepyPetImage = (clicks: number) => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="default"
-                className={`border-2 ${selectedPreference ? 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'} text-white rounded-xl px-4 py-3 font-semibold btn-animate flex items-center gap-2 shadow-lg transition-all duration-300`}
-                style={{ boxShadow: selectedPreference ? '0 4px 0 #15803d' : '0 4px 0 #1d4ed8' }}
+                variant="outline"
+                className={`border-[3px] border-[#111827] bg-white text-[#111827] rounded-[22px] px-5 py-3 font-semibold btn-animate flex items-center gap-2 transition-all duration-200 shadow-[0_6px_0_#0B0B0B] [&_svg]:!text-[#111827]`}
                 onClick={() => playClickSound()}
               >
                 <GraduationCap className="h-5 w-5" />
@@ -3281,7 +3280,7 @@ const getSleepyPetImage = (clicks: number) => {
           {(() => {
             const levelInfo = getLevelInfo();
             return (
-              <div className="bg-white/20 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-white/30 shadow-lg">
+              <div className="bg-white/20 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-white/30">
                 <div className="flex flex-col items-center gap-2">
                   {/* Level indicator above bar */}
                   <div className="text-white font-bold text-base drop-shadow-md">
@@ -3319,7 +3318,7 @@ const getSleepyPetImage = (clicks: number) => {
         {(() => {
           const levelInfo = getUserLevelInfo();
           return (
-            <div className="rounded-xl px-3 py-2 shadow-lg w-56">
+            <div className="rounded-xl px-3 py-2 w-56">
               <div className="flex items-center gap-2">
                 <div className="text-white font-bold text-lg drop-shadow-md">L{levelInfo.currentLevel}</div>
                 <div className="relative h-6 w-full bg-white/30 rounded-full border border-white/40 overflow-hidden flex items-center">
@@ -3422,7 +3421,7 @@ const getSleepyPetImage = (clicks: number) => {
       <div className="absolute top-16 right-4 z-20 flex gap-4">
         {/* Streak */}
         <div
-          className="rounded-xl px-4 py-2 shadow-lg w-20 cursor-pointer hover:bg-white/5"
+          className="rounded-xl px-4 py-2 w-20 cursor-pointer hover:bg-white/5"
           role="button"
           aria-label="Open weekly hearts"
           onClick={() => {
@@ -3439,7 +3438,7 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
         
         {/* Coins */}
-        <div className="rounded-xl px-30 py-2 shadow-lg w-28">
+        <div className="rounded-xl px-30 py-2 w-28">
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
             <span className="text-xl">🪙 </span>
             <span>{coins}</span>
@@ -3530,32 +3529,32 @@ const getSleepyPetImage = (clicks: number) => {
           {/* Thought bubble pinned to top */}
           {!showPetShop && (
             <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4" style={{ top: bubbleTopPx }}>
-              <div className={`relative rounded-3xl p-5 border-3 shadow-2xl w-full backdrop-blur-md ${
+              <div className={`relative rounded-3xl p-5 border-3 shadow-2xl w-full ${
                 sleepClicks > 0 
-                  ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-400 bg-purple-50/95'
-                  : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-400 bg-white/95'
+                  ? 'bg-[#EFE7FF] border-[#D4C8FF]'
+                  : 'bg-[#F1F5FF] border-[#BBD7FF]'
               }`} style={{ zIndex: 30 }}>
                 {/* Speech bubble tail pointing down to pet */}
                 <div className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[12px] border-l-transparent border-r-transparent ${
-                  sleepClicks > 0 ? 'border-t-purple-400' : 'border-t-blue-400'
+                  sleepClicks > 0 ? 'border-t-[#D4C8FF]' : 'border-t-[#BBD7FF]'
                 }`}></div>
                 {/* Thought bubble dots */}
                 <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-1">
                   <div className={`w-2 h-2 rounded-full animate-bounce ${
-                    sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+                    sleepClicks > 0 ? 'bg-[#C9B8FF]' : 'bg-[#BBD7FF]'
                   }`} style={{animationDelay: '0s'}}></div>
                   <div className={`w-1.5 h-1.5 rounded-full animate-bounce ${
-                    sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+                    sleepClicks > 0 ? 'bg-[#C9B8FF]' : 'bg-[#BBD7FF]'
                   }`} style={{animationDelay: '0.3s'}}></div>
                   <div className={`w-1 h-1 rounded-full animate-bounce ${
-                    sleepClicks > 0 ? 'bg-purple-400' : 'bg-blue-400'
+                    sleepClicks > 0 ? 'bg-[#C9B8FF]' : 'bg-[#BBD7FF]'
                   }`} style={{animationDelay: '0.6s'}}></div>
                 </div>
                 <div className="text-sm text-slate-800 font-medium leading-relaxed text-center">
                   {sleepClicks >= 3 ? (
                     <div className="flex flex-col items-center gap-2">
                       <div className="text-lg font-bold">Pet will wake up after</div>
-                      <div className="text-2xl font-bold text-purple-600">
+                      <div className="text-2xl font-bold" style={{ color: '#6C5CE7' }}>
                         {formatTimeRemaining(sleepTimeRemaining || getSleepTimeRemaining())}
                       </div>
                     </div>
@@ -3692,9 +3691,9 @@ const getSleepyPetImage = (clicks: number) => {
       {/* Below-bubble To-Dos: Travel and Sleep */}
       {!showPetShop && (
         <div className="relative z-20 mt-16 flex justify-center pb-24">
-          <div className="rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 shadow-lg p-3 w-[400px] mb-8">
+          <div className="rounded-[24px] shadow-xl p-4 w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
-            <div className="mb-2 px-1 text-white/90 font-semibold tracking-wide text-sm">Today</div>
+            <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
             <div className="mt-1 flex flex-col gap-2">
               {(() => {
                 // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
@@ -3748,24 +3747,23 @@ const getSleepyPetImage = (clicks: number) => {
                     type="button"
                     aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`}
                     onClick={() => { setShowFirstDoHint(false); handleActionClick(currentQuestType); }}
-                    className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${done ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'} w-full text-left`}
+                    className={`relative flex items-center gap-3 p-4 rounded-2xl border shadow-sm w-full text-left transition-shadow ${done ? '' : 'hover:shadow-md'}`}
+                    style={{ background: '#FFFFFF', borderColor: '#EDE9D5' }}
                   >
-                    {/* Celebration badge for completed */}
-                    {done && (
-                      <div className="absolute -top-2 -left-2 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
-                        ⭐
-                      </div>
-                    )}
-                    {/* Hand hint remains anchored to the decorative arrow wrapper on the right */}
-                    <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">{questIcon}</div>
+                    {/* Left icon */}
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl" style={{ background: '#ECFDF5' }}>{questIcon}</div>
                     <div className="flex-1">
-                      <div className={`font-semibold drop-shadow-md ${done ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>{questLabel}</div>
-                      <div className="mt-0.5 h-2 bg-white/25 rounded-full overflow-hidden w-[260px]">
-                        <div className={`h-full transition-all duration-500 ${done ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${Math.round(progress * 100)}%` }} />
+                      <div className="font-semibold" style={{ color: '#0F766E' }}>{questLabel}</div>
+                      <div className="mt-2 h-2 rounded-full overflow-hidden w-[260px]" style={{ background: '#ECFDF5' }}>
+                        <div
+                          className="h-full transition-all duration-500"
+                          style={{ width: `${Math.round(progress * 100)}%`, background: done ? '#34D399' : '#86EFAC' }}
+                        />
                       </div>
                     </div>
                     <span className="relative inline-block overflow-visible z-30 pointer-events-none">
-                      <span className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg' : 'bg-white/90'}`}>
+                      <span className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? '' : ''}`}
+                        style={{ background: done ? '#34D399' : '#E0F2FE', color: done ? '#FFFFFF' : '#0EA5A4' }}>
                         {done ? '✓' : '→'}
                       </span>
                       {!done && showFirstDoHint && currentQuestType === 'house' && (
@@ -3804,23 +3802,22 @@ const getSleepyPetImage = (clicks: number) => {
                     aria-label={asleep ? 'Completed - Click to view' : 'Sleep'}
                     onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }}
                     disabled={disabled}
-                    className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-300 ${asleep ? 'bg-gradient-to-r from-green-400/30 to-emerald-400/30 border-green-300/60 shadow-lg shadow-green-400/20' : 'bg-white/10 border-white/20'} w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`relative flex items-center gap-3 p-4 rounded-2xl border shadow-sm w-full text-left transition-shadow ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}`}
+                    style={{ background: '#FFFFFF', borderColor: '#EDE9D5' }}
                   >
-                    {/* Celebration badge for completed */}
-                    {asleep && (
-                      <div className="absolute -top-2 -left-2 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
-                        ⭐
-                      </div>
-                    )}
-                    <div className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center text-2xl">😴</div>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl" style={{ background: '#ECFDF5' }}>😴</div>
                     <div className="flex-1">
-                      <div className={`font-semibold drop-shadow-md ${asleep ? 'text-green-100 line-through decoration-2 decoration-green-300' : 'text-white'}`}>{label}</div>
-                      <div className="mt-0.5 h-2 bg-white/25 rounded-full overflow-hidden w-[260px]">
-                        <div className={`h-full transition-all duration-500 ${asleep ? 'bg-gradient-to-r from-green-400 to-emerald-400 shadow-sm' : 'bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400'}`} style={{ width: `${progress * 100}%` }} />
+                      <div className="font-semibold" style={{ color: '#0F766E' }}>{label}</div>
+                      <div className="mt-2 h-2 rounded-full overflow-hidden w-[260px]" style={{ background: '#ECFDF5' }}>
+                        <div
+                          className="h-full transition-all duration-500"
+                          style={{ width: `${progress * 100}%`, background: asleep ? '#34D399' : '#86EFAC' }}
+                        />
                       </div>
                     </div>
                     <span className="relative inline-block overflow-visible z-30 pointer-events-none">
-                      <span ref={sleepArrowRef as any} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${asleep ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg' : disabled ? 'bg-white/50 opacity-50' : 'bg-white/90'}`}>
+                      <span ref={sleepArrowRef as any} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300`}
+                        style={{ background: asleep ? '#34D399' : '#E0F2FE', color: asleep ? '#FFFFFF' : '#0EA5A4' }}>
                         {asleep ? '✓' : '→'}
                       </span>
                       {showStep9 && !asleep && (
@@ -4029,7 +4026,7 @@ const getSleepyPetImage = (clicks: number) => {
         variant="outline"
         size="icon"
         aria-label="Open camera"
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-xl border-2 border-foreground bg-white text-foreground btn-animate shadow-solid z-40 [&_svg]:!size-9"
+        className="fixed bottom-6 right-6 h-16 w-16 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] z-40 [&_svg]:!size-9"
       >
         <Camera />
       </Button>
@@ -4338,7 +4335,7 @@ const getSleepyPetImage = (clicks: number) => {
       onClick={() => { handleActionClick('more'); }}
       variant="outline"
       size="icon"
-      className="w-12 h-12 rounded-lg border-2 border-foreground bg-white text-foreground btn-animate shadow-solid [&_svg]:!size-6"
+      className="w-12 h-12 rounded-[12px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] [&_svg]:!size-6"
     >
       <Rocket />
     </Button>
@@ -4347,7 +4344,7 @@ const getSleepyPetImage = (clicks: number) => {
       onClick={() => handleActionClick('shop')}
       variant="outline"
       size="icon"
-      className="w-12 h-12 rounded-lg border-2 border-foreground bg-white text-foreground btn-animate shadow-solid [&_svg]:!size-6"
+      className="w-12 h-12 rounded-[12px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] [&_svg]:!size-6"
     >
       <ShoppingCart />
     </Button>

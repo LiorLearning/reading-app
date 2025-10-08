@@ -7,7 +7,7 @@ import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
-import { Volume2, Square } from 'lucide-react';
+import { Volume2, Square, ChevronRight } from 'lucide-react';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -771,7 +771,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         className
       )}>
         <div className={cn(
-          "spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4",
+          "spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4 relative",
           showTutorial && "tutorial-spotlight",
           showTutorial && tutorialStep === 'expand' && "tutorial-expand",
           showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
@@ -1166,32 +1166,20 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
-          {/* Action buttons with enhanced styling */}
-          <div className="flex justify-center items-center gap-4 mt-8">
-            {/* Skip button commented out - might use later
-            <button
-              onClick={onSkip}
-              className="px-6 py-3 font-semibold text-gray-600 hover:text-gray-800 transition-colors rounded-xl hover:bg-gray-100"
-              style={{ fontFamily: 'Quicksand, sans-serif' }}
-            >
-              Skip this one
-            </button>
-            */}
-            
-
-            {isCorrect && onNext && (
-              <button
-                onClick={() => {
-                  playClickSound();
-                  onNext();
-                }}
-                className="px-8 py-4 text-lg font-medium bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-102 hover:shadow-md"
-                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          {/* Next chevron - circular, positioned on the right of the spellbox */}
+          {isCorrect && onNext && (
+            <div className="absolute inset-y-0 -right-9 sm:-right-10 flex items-center z-20">
+              <Button
+                variant="comic"
+                size="icon"
+                aria-label="Next question"
+                onClick={() => { playClickSound(); onNext(); }}
+                className={cn('h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105')}
               >
-                Next Question ✨
-              </button>
-            )}
-          </div>
+                <ChevronRight className="h-6 w-6" />
+              </Button>
+            </div>
+          )}
 
           {/* CSS animations */}
           <style>{`
@@ -1254,7 +1242,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           </div>
       ) : (
         // Inline variant for embedding inside other UI (e.g., pet bubble)
-        <div ref={containerRef} className={cn("spellbox-inline-container", className)}>
+        <div ref={containerRef} className={cn("spellbox-inline-container relative", className)}>
           <div className="rounded-xl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
             { /* CONTENT START */ }
             
@@ -1393,9 +1381,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             )}
 
             {isCorrect && onNext && (
-              <div className="mt-2">
-                <button onClick={() => { playClickSound(); onNext(); }} className="px-3 py-2 text-sm font-medium bg-green-600 text-white rounded-md">Next Question</button>
-      </div>
+              <div className="absolute inset-y-0 -right-7 sm:-right-8 flex items-center z-20">
+                <Button
+                  variant="comic"
+                  size="icon"
+                  aria-label="Next question"
+                  onClick={() => { playClickSound(); onNext(); }}
+                  className={cn('h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105')}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             )}
 
     </div>

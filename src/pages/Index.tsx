@@ -3775,128 +3775,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     unifiedAIStreaming.isUnifiedSessionActive // NEW: Re-check when unified session state changes
   ]);
 
+  // Store attempt count for the most recent correct SpellBox answer and guard against double-advance
+  const lastSpellAttemptCountRef = useRef<number | null>(null);
+  const isAdvancingSpellRef = useRef<boolean>(false);
+
   // SpellBox event handlers
   const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
     playClickSound();
     
     if (isCorrect) {
-
-      // Update sequential spelling progress (keep existing system intact)
-      const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
-      const nextIndex = spellingProgressIndex + 1;
-      const updatedCompletedIds = currentSpellQuestion ? [...completedSpellingIds, currentSpellQuestion.id] : completedSpellingIds;
-      
-      // Update local state
-      setSpellingProgressIndex(nextIndex);
-      setCompletedSpellingIds(updatedCompletedIds);
-      
-      // Save progress to localStorage
-      if (currentGrade) {
-        saveSpellingProgress(currentGrade, nextIndex, updatedCompletedIds);
-        console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
-      }
-      
-      // NEW: Update Spellbox topic progress with Firebase sync
-      if (currentGrade && currentSpellQuestion) {
-        const isFirstAttempt = attemptCount === 1;
-        
-        // Use async update with Firebase sync for authenticated users
-        updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
-          .then((topicProgress) => {
-            // Topic progress updated - continue adventure flow seamlessly
-          })
-          .catch(error => {
-            console.error('Failed to update Spellbox topic progress:', error);
-          });
-      }
-      
-      // Update legacy progress for backward compatibility
-
-      // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
-      addAdventureCoins(10, currentAdventureType);
-      
-      // Update progress
-      // NEW: Update Firestore userStates.pets count, dailyQuests progress, and coins for current pet
-      try {
-        const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
-        const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
-        if (user?.uid) {
-          stateStoreApi.updateProgressOnQuestionSolved({
-            userId: user.uid,
-            pet: petType,
-            questionsSolved: 1,
-            adventureKey: currentAdventureType || undefined,
-          }).catch((e)=>console.warn('updateProgressOnQuestionSolved failed:', e));
-        }
-      } catch (e) {
-        console.warn('Failed to push Firestore progress update:', e);
-      }
-
-
-      setSpellProgress(prev => ({
-        ...prev,
-        currentIndex: prev.currentIndex + 1
-      }));
-      
-      // Add adventure story using functional state (avoids stale closure)
-      setChatMessages(prev => {
-        const latestWithContinuation = prev
-          .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
-          .slice(-1)[0] as any;
-
-        const continuation = latestWithContinuation?.content_after_spelling || currentSpellingSentence || "Great job! Let's continue our adventure! ✨";
-
-        const adventureStoryMessage: ChatMessage = {
-          type: 'ai',
-          content: `${continuation}`,
-          timestamp: Date.now() + 1
-        };
-
-        playMessageSound();
-        const adventureMessageId = `index-chat-${adventureStoryMessage.timestamp}-${prev.length + 1}`;
-        ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId)
-          .catch(error => console.error('TTS error:', error));
-        if (currentSessionId) {
-          adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
-        }
-        return [...prev, adventureStoryMessage];
-      });
-
-      // Remember this word as resolved to prevent immediate re-open
-      lastResolvedWordRef.current = currentSpellQuestion?.audio || currentSpellQuestion?.word || null;
-      
-      // Hide spell box after success
-      setShowSpellBox(false);
-      setCurrentSpellQuestion(null);
-
-      // Emotion trigger: after Q1, Q4, Q7... (1 + 3k) and only if none active
-      (async () => {
-        try {
-          const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
-          if (!currentPetId) return;
-          const solvedCount = spellProgress.currentIndex + 1;
-          const isTrigger = (solvedCount - 1) % 3 === 0; // 1,4,7...
-          const key = `pet_emotion_${currentPetId}`;
-          const raw = localStorage.getItem(key);
-          const parsed = raw ? JSON.parse(raw) : null;
-          const emotionActive = parsed ? Boolean(parsed.emotionActive) : false;
-          if (!emotionActive && isTrigger) {
-            const nextRequired = parsed?.emotionNextAction || 'water';
-            localStorage.setItem(key, JSON.stringify({ emotionActive: true, emotionRequiredAction: nextRequired, emotionNextAction: nextRequired, emotionActivatedAtMs: Date.now() }));
-            setEmotionRequiredAction(nextRequired);
-            setEmotionActive(true);
-            trackEvent('heart_shown', { petId: currentPetId, required: nextRequired });
-            // Immediately show needy GIF while need is active, but do not override if an action GIF is playing (let it finish)
-            if (!overrideMediaClearRef.current) {
-              const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
-              const needyMedia = getPetEmotionActionMedia(petType, 'needy');
-              setOverridePetMediaUrl(needyMedia);
-            }
-          }
-        } catch (e) {
-          console.warn('Emotion trigger failed:', e);
-        }
-      })();
+      // Defer progression and messaging until user clicks Next
+      lastSpellAttemptCountRef.current = attemptCount;
     } else {
       // Provide encouragement for incorrect answers
       const encouragementMessage: ChatMessage = {
@@ -3915,6 +3804,124 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       });
     }
   }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
+
+  // Proceed to next after user clicks Next in SpellBox
+  const handleSpellNext = useCallback(() => {
+    if (isAdvancingSpellRef.current) return;
+    isAdvancingSpellRef.current = true;
+
+    const effectiveAttemptCount = lastSpellAttemptCountRef.current ?? 1;
+
+    // Update sequential spelling progress (keep existing system intact)
+    const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+    const nextIndex = spellingProgressIndex + 1;
+    const updatedCompletedIds = currentSpellQuestion ? [...completedSpellingIds, currentSpellQuestion.id] : completedSpellingIds;
+    
+    // Update local state
+    setSpellingProgressIndex(nextIndex);
+    setCompletedSpellingIds(updatedCompletedIds);
+    
+    // Save progress to localStorage
+    if (currentGrade) {
+      saveSpellingProgress(currentGrade, nextIndex, updatedCompletedIds);
+      console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
+    }
+    
+    // Update Spellbox topic progress with Firebase sync
+    if (currentGrade && currentSpellQuestion) {
+      const isFirstAttempt = effectiveAttemptCount === 1;
+      updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
+        .catch(error => {
+          console.error('Failed to update Spellbox topic progress:', error);
+        });
+    }
+    
+    // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
+    addAdventureCoins(10, currentAdventureType);
+    
+    // Update progress in Firestore user state
+    try {
+      const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+      const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+      if (user?.uid) {
+        stateStoreApi.updateProgressOnQuestionSolved({
+          userId: user.uid,
+          pet: petType,
+          questionsSolved: 1,
+          adventureKey: currentAdventureType || undefined,
+        }).catch((e)=>console.warn('updateProgressOnQuestionSolved failed:', e));
+      }
+    } catch (e) {
+      console.warn('Failed to push Firestore progress update:', e);
+    }
+
+    setSpellProgress(prev => ({
+      ...prev,
+      currentIndex: prev.currentIndex + 1
+    }));
+    
+    // Add adventure story using functional state (avoids stale closure)
+    setChatMessages(prev => {
+      const latestWithContinuation = prev
+        .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
+        .slice(-1)[0] as any;
+
+      const continuation = latestWithContinuation?.content_after_spelling || currentSpellingSentence || "Great job! Let's continue our adventure! ✨";
+
+      const adventureStoryMessage: ChatMessage = {
+        type: 'ai',
+        content: `${continuation}`,
+        timestamp: Date.now() + 1
+      };
+
+      playMessageSound();
+      const adventureMessageId = `index-chat-${adventureStoryMessage.timestamp}-${prev.length + 1}`;
+      ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId)
+        .catch(error => console.error('TTS error:', error));
+      if (currentSessionId) {
+        adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
+      }
+      return [...prev, adventureStoryMessage];
+    });
+
+    // Remember this word as resolved to prevent immediate re-open
+    lastResolvedWordRef.current = currentSpellQuestion?.audio || currentSpellQuestion?.word || null;
+    
+    // Hide spell box after success
+    setShowSpellBox(false);
+    setCurrentSpellQuestion(null);
+
+    // Emotion trigger: after Q1, Q4, Q7... (1 + 3k) and only if none active
+    (async () => {
+      try {
+        const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+        if (!currentPetId) return;
+        const solvedCount = spellProgress.currentIndex + 1;
+        const isTrigger = (solvedCount - 1) % 3 === 0; // 1,4,7...
+        const key = `pet_emotion_${currentPetId}`;
+        const raw = localStorage.getItem(key);
+        const parsed = raw ? JSON.parse(raw) : null;
+        const emotionActive = parsed ? Boolean(parsed.emotionActive) : false;
+        if (!emotionActive && isTrigger) {
+          const nextRequired = parsed?.emotionNextAction || 'water';
+          localStorage.setItem(key, JSON.stringify({ emotionActive: true, emotionRequiredAction: nextRequired, emotionNextAction: nextRequired, emotionActivatedAtMs: Date.now() }));
+          setEmotionRequiredAction(nextRequired);
+          setEmotionActive(true);
+          trackEvent('heart_shown', { petId: currentPetId, required: nextRequired });
+          // Immediately show needy GIF while need is active, but do not override if an action GIF is playing (let it finish)
+          if (!overrideMediaClearRef.current) {
+            const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+            const needyMedia = getPetEmotionActionMedia(petType, 'needy');
+            setOverridePetMediaUrl(needyMedia);
+          }
+        }
+      } catch (e) {
+        console.warn('Emotion trigger failed:', e);
+      } finally {
+        isAdvancingSpellRef.current = false;
+      }
+    })();
+  }, [currentSpellQuestion, currentSpellingSentence, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
 
   const handleSpellSkip = useCallback(() => {
     playClickSound();
@@ -4766,6 +4773,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       showExplanation: true,
                       onComplete: handleSpellComplete,
                       onSkip: handleSpellSkip,
+                      onNext: handleSpellNext,
                       sendMessage,
                     }}
                   />

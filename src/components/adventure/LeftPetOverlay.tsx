@@ -626,7 +626,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           {/* Chevron indicator to hint message is hidden - positioned inside the avatar box */}
           {isBubbleHidden && (
             <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2">
-              <ChevronRight className="w-4 h-4 text-black/70" />
+              <ChevronRight className="w-6 h-6 text-black/70" />
             </div>
           )}
         </div>
