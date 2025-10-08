@@ -1271,8 +1271,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           updateSleepClicks(newSleepClicks);
         }
         
-        // Play a gentle sleep sound
-        playFeedingSound(); // Reuse feeding sound for now
+        // Do not play sleep SFX on full sleep start to keep streak TTS clear
+        // (We intentionally skip feeding sound on the third tap)
         
         // Trigger heart animation for sleep progress
         setShowHeartAnimation(true);

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { ttsService } from '@/lib/tts-service';
+import { muteAllUISounds, unmuteAllUISounds, pauseAllUISounds } from '@/lib/sounds';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 
 interface Props {
@@ -83,6 +84,7 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
   const monday = useMemo(() => getMondayOfCurrentWeek(), []);
   const labels = useMemo(() => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], []);
   const [weekly, setWeekly] = useState<WeeklyHearts>(() => loadWeeklyHearts(monday));
+  const hasSpokenRef = React.useRef<boolean>(false);
 
   useEffect(() => {
     if (!open) return;
@@ -192,9 +194,16 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
     return undefined;
   }
 
-  // Autoplay pet voice for the selected thought
+  // Autoplay pet voice for the selected thought (run once per open)
   useEffect(() => {
     if (!open) return;
+    hasSpokenRef.current = false;
+    // Ensure UI SFX do not overlap with streak TTS
+    try { pauseAllUISounds(); } catch {}
+    try { muteAllUISounds(); } catch {}
+    try { ttsService.setExclusiveStopGuard(true); } catch {}
+    try { ttsService.stop(true); } catch {}
+    try { ttsService.setSuppressNonKrafty(true); } catch {}
     const petId = inferPetIdFromGifUrl(celebrationUrl) || (() => {
       try { return PetProgressStorage.getCurrentSelectedPet(); } catch { return undefined; }
     })();
@@ -216,18 +225,34 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
       }
     } catch {}
 
-    // Speak using resolved voice (if any)
-    try {
-      ttsService.speak(thoughtText, {
-        voice: overrideVoice,
-        stability: 0.6,
-        similarity_boost: 0.85,
-        speed: ttsService.getSelectedSpeed?.() || 0.7,
-        messageId: 'pet-thought-streak',
-      }).catch(() => {});
-    } catch {}
-    // No cleanup needed; modal close button will stop if global playback is managed elsewhere
-  }, [open, celebrationUrl, thoughtText]);
+    // Capture the line to speak now to avoid effect re-runs cutting it off
+    const lineToSpeak = thoughtText;
+    // Speak using resolved voice (if any), with a tiny delay to ensure SFX are fully paused
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      if (cancelled || hasSpokenRef.current) return;
+      hasSpokenRef.current = true;
+      try {
+        ttsService.speak(lineToSpeak, {
+          voice: overrideVoice,
+          stability: 0.6,
+          similarity_boost: 0.85,
+          speed: ttsService.getSelectedSpeed?.() || 0.7,
+          messageId: 'krafty-streak',
+        }).catch(() => {});
+      } catch {}
+    }, 250);
+
+    // Cleanup on close/unmount: stop TTS and restore SFX state
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      try { ttsService.stop(true); } catch {}
+      try { ttsService.setSuppressNonKrafty(false); } catch {}
+      try { ttsService.setExclusiveStopGuard(false); } catch {}
+      try { unmuteAllUISounds(); } catch {}
+    };
+  }, [open]);
   const days: { date: string; label: string; isFilled: boolean; isToday: boolean }[] = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);

@@ -103,6 +103,8 @@ class TextToSpeechService {
   private activeSpeakRequestSeq: number = 0;
   // Store the most recent non-Krafty message suppressed while overlays are active
   private lastSuppressedMessage: { text: string; options?: TTSOptions } | null = null;
+  // Guard to ignore external stop() calls during exclusive playback (e.g., streak modal)
+  private exclusiveStopGuard: boolean = false;
 
   constructor() {
     // Load initial voice using current pet preference or pet default
@@ -110,6 +112,11 @@ class TextToSpeechService {
     // Load selected speed from localStorage or default to 0.8
     this.selectedSpeed = this.loadSelectedSpeed();
     this.initialize();
+  }
+
+  // Prevent external stop() calls from interrupting critical playback
+  setExclusiveStopGuard(enabled: boolean): void {
+    this.exclusiveStopGuard = enabled;
   }
 
   // Allow callers to suppress non-Krafty speech (used during tutorial overlays)
@@ -471,7 +478,11 @@ class TextToSpeechService {
   }
 
   // Stop current speech
-  stop(): void {
+  stop(force: boolean = false): void {
+    if (this.exclusiveStopGuard && !force) {
+      // Ignore non-forced stops while in exclusive mode
+      return;
+    }
     const wasPlaying = this.isSpeaking || this.currentAudio;
     
     if (this.currentAudio) {

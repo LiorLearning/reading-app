@@ -9,6 +9,8 @@ let messageAudio: HTMLAudioElement | null = null;
 
 // Add state tracking for image loading sound
 let isImageLoadingSoundPlaying = false;
+// Global mute flag for UI SFX to ensure nothing plays over critical TTS
+let isUISoundsMuted = false;
 
 /**
  * Initialize all audio files immediately to prevent delays
@@ -73,6 +75,7 @@ const initClickSound = (): HTMLAudioElement => {
  */
 export const playClickSound = (): void => {
   try {
+    if (isUISoundsMuted) return;
     if (clickAudio) {
       // Reset audio to beginning in case it was already playing
       clickAudio.currentTime = 0;
@@ -124,6 +127,7 @@ const initImageCompleteSound = (): HTMLAudioElement => {
  */
 export const playImageLoadingSound = (): void => {
   try {
+    if (isUISoundsMuted) return;
     if (imageLoadingAudio) {
       // Reset audio to beginning in case it was already playing
       imageLoadingAudio.currentTime = 0;
@@ -179,6 +183,7 @@ export const stopImageLoadingSound = (): void => {
  */
 export const playImageCompleteSound = (): void => {
   try {
+    if (isUISoundsMuted) return;
     if (imageCompleteAudio) {
       // Reset audio to beginning in case it was already playing
       imageCompleteAudio.currentTime = 0;
@@ -233,6 +238,7 @@ const initMessageSound = (): HTMLAudioElement => {
  */
 export const playMessageSound = (): void => {
   try {
+    if (isUISoundsMuted) return;
     if (messageAudio) {
       // Reset audio to beginning in case it was already playing
       messageAudio.currentTime = 0;
@@ -253,4 +259,47 @@ export const playMessageSound = (): void => {
 export const setMessageSoundVolume = (volume: number): void => {
   const audio = initMessageSound();
   audio.volume = Math.max(0, Math.min(1, volume));
+};
+
+/**
+ * Pause and reset all known UI SFX immediately.
+ */
+export const pauseAllUISounds = (): void => {
+  try {
+    if (clickAudio) {
+      clickAudio.pause();
+      clickAudio.currentTime = 0;
+    }
+  } catch {}
+  try {
+    if (imageLoadingAudio) {
+      imageLoadingAudio.pause();
+      imageLoadingAudio.currentTime = 0;
+      isImageLoadingSoundPlaying = false;
+    }
+  } catch {}
+  try {
+    if (imageCompleteAudio) {
+      imageCompleteAudio.pause();
+      imageCompleteAudio.currentTime = 0;
+    }
+  } catch {}
+  try {
+    if (messageAudio) {
+      messageAudio.pause();
+      messageAudio.currentTime = 0;
+    }
+  } catch {}
+};
+
+/**
+ * Mute/unmute UI SFX globally, and pause/reset any currently playing SFX when muting.
+ */
+export const muteAllUISounds = (): void => {
+  isUISoundsMuted = true;
+  pauseAllUISounds();
+};
+
+export const unmuteAllUISounds = (): void => {
+  isUISoundsMuted = false;
 };
