@@ -18,6 +18,7 @@ import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadi
 import { useComic, ComicPanel } from "@/hooks/use-comic";
 import { AdventureResponse, aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
+import { bubbleMessageIdFromHtml, inlineSpellboxMessageId } from "@/lib/tts-message-id";
 import { ensureMicPermission } from "@/lib/mic-permission";
 import { toast } from "sonner";
 import VoiceSelector from "@/components/ui/voice-selector";
@@ -492,24 +493,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setOverridePetMediaUrl(null);
           overrideMediaClearRef.current = null;
         }, 12000);
-        try {
-          // Replay the most recent AI message in chat after successful care
-          const lastAI = chatMessages.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0]?.content;
-          if (lastAI) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = lastAI;
-            const plain = (tempDiv.textContent || tempDiv.innerText || '').trim();
-            // Non-blocking replay
-            setTimeout(() => {
-              try { 
-                // Ensure the left bubble is visible for the replay
-                window.dispatchEvent(new Event('showLeftBubble'));
-                ttsService.stop(); 
-                ttsService.speakAIMessage(plain, `replay-after-care-${Date.now()}`); 
-              } catch {}
-            }, 0);
-          }
-        } catch {}
+        // Previously: auto-replayed last AI message via TTS after correct action.
+        // Product change: do not auto-speak here. Keep the bubble visible only.
+        try { window.dispatchEvent(new Event('showLeftBubble')); } catch {}
       }
       trackEvent('action_result', { petId: currentPetId, action, result: isCorrect ? 'success' : 'wrong' });
     } catch (e) {
@@ -1041,8 +1027,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
         setChatMessages(prev => [...prev, aiMessage]);
 
-        // Speak the initial message
-        const messageId = `ai-${Date.now()}`;
+        // Speak the initial message using the same messageId the overlay derives
+        // from the bubble HTML so the stop icon shows immediately.
+        const messageId = bubbleMessageIdFromHtml(formatAIMessage(initialMessage));
         setTimeout(async () => {
           await ttsService.speakAIMessage(initialMessage, messageId);
         }, 500);
@@ -2241,8 +2228,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setChatMessages(prev => {
             setLastMessageCount(prev.length + 1);
             playMessageSound();
-            // Auto-speak the spelling sentence
-            const messageId = `index-chat-${spellingSentenceMessage.timestamp}-${prev.length}`;
+            // Auto-speak the spelling sentence using the same inline ID that
+            // the overlay derives while SpellBox is visible. This ensures the
+            // bottom-right speaker button shows the stop icon immediately.
+            const messageId = inlineSpellboxMessageId(
+              (spellingQuestion as any)?.word || (spellingQuestion as any)?.audio,
+              (spellingQuestion as any)?.id ?? null
+            );
             ttsService.speakAIMessage(spellingSentenceMessage.content, messageId).catch(error => 
               console.error('TTS error for spelling sentence:', error)
             );
@@ -2274,7 +2266,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setLastMessageCount(prev.length + 1);
           playMessageSound();
           // Auto-speak the AI message and wait for completion
-          const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
+          // Use the same derived bubble ID that the LeftPetOverlay uses so the
+          // bottom-right speaker button shows the stop state immediately.
+          const messageId = bubbleMessageIdFromHtml(formatAIMessage(aiMessage.content));
           ttsService.speakAIMessage(aiMessage.content, messageId).catch(error => 
             console.error('TTS error for AI message:', error)
           );
@@ -3871,7 +3865,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       };
 
       playMessageSound();
-      const adventureMessageId = `index-chat-${adventureStoryMessage.timestamp}-${prev.length + 1}`;
+      // Use the same derived bubble ID so the bottom-right speaker shows stop
+      const adventureMessageId = bubbleMessageIdFromHtml(formatAIMessage(adventureStoryMessage.content));
       ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId)
         .catch(error => console.error('TTS error:', error));
       if (currentSessionId) {

@@ -2,8 +2,10 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight } from "lucide-react";
 import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
+import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import SpellBox from "@/components/comic/SpellBox";
 import { cn } from "@/lib/utils";
+import { bubbleMessageIdFromHtml, inlineSpellboxMessageId } from "@/lib/tts-message-id";
 
 interface LeftPetOverlayProps {
   petImageUrl: string | null | undefined;
@@ -350,7 +352,8 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     if (isSpeakingRef.current || ttsService.getIsSpeaking()) {
       ttsService.stop();
       isSpeakingRef.current = false;
-      // If user tapped while something else is speaking, we intend to play current content next fallthrough
+      // If user tapped while something else is speaking, stop and return for a true toggle
+      return;
     }
 
     // If inline SpellBox is active, prefer speaking the full sentence; fallback to the spelling word
@@ -398,9 +401,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
             similarity_boost: 0.9,
             // Use a slightly slower speed only when we fall back to the isolated word
             speed: visibleSentence ? undefined : 0.7,
-            messageId: visibleSentence
-              ? `left-pet-inline-spellbox-sentence-${Date.now()}`
-              : `left-pet-inline-spellbox-${wordToSpeak}`,
+            messageId: currentMessageIdRef.current,
             voice: jessicaVoiceId,
           });
         } finally {
@@ -420,7 +421,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
     isSpeakingRef.current = true;
     try {
-      await ttsService.speakAIMessage(text, `left-pet-overlay-${Date.now()}`);
+      await ttsService.speakAIMessage(text, currentMessageIdRef.current);
     } finally {
       isSpeakingRef.current = false;
     }
@@ -471,6 +472,18 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   }, [aiMessageHtml, hiddenReason, isManuallyClosed]);
 
   const displayHtml = isBubbleHidden ? undefined : (aiMessageHtml || lastAiHtmlRef.current);
+
+  // Derive a stable messageId for the current visible content so the speaker button
+  // can reflect play/stop state consistently across renders.
+  const currentMessageId = React.useMemo(() => {
+    if (hasInlineQuestion) {
+      return inlineSpellboxMessageId(spellInline?.word, spellInline?.question?.id ?? null);
+    }
+    return bubbleMessageIdFromHtml(displayHtml);
+  }, [hasInlineQuestion, spellInline?.question?.id, spellInline?.word, displayHtml]);
+  const currentMessageIdRef = React.useRef<string>(currentMessageId);
+  React.useEffect(() => { currentMessageIdRef.current = currentMessageId; }, [currentMessageId]);
+  const isSpeakingThisMessage = useTTSSpeaking(currentMessageId);
 
   // Publish visibility changes to parent (visible when bubble not hidden and there is content, thinking, or inline question)
   React.useEffect(() => {
@@ -722,7 +735,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="text-base leading-relaxed">
+              <div className="text-base leading-relaxed pr-7">
                 {spellInline?.show && spellInline?.word ? (
                   <SpellBox
                     variant="inline"
@@ -773,9 +786,9 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                   handleSpeak();
                 }}
                 className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
-                aria-label="Play audio"
+                aria-label={isSpeakingThisMessage ? 'Stop message' : 'Play message'}
               >
-                {isSpeakingRef.current ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                {isSpeakingThisMessage ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
               </Button>
             )}
           </div>
