@@ -131,6 +131,10 @@ Homophone (pearl vs purl)
   const sessionRef = useRef<RealtimeSession | null>(null);
   const [status, setStatus] = useState<SessionStatus>('DISCONNECTED');
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  // Queues to buffer outbound traffic until the transport is connected
+  const pendingTextQueueRef = useRef<string[]>([]);
+  const pendingEventQueueRef = useRef<any[]>([]);
+  const isFlushingRef = useRef<boolean>(false);
   
   // Audio recording state
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -299,6 +303,24 @@ Homophone (pearl vs purl)
         // Send initial session update without triggering auto-response
         // This prevents the realtime session from speaking over ElevenLabs initial adventure message
         updateSession(false);
+
+        // Flush any queued outbound messages/events
+        try {
+          if (!isFlushingRef.current) {
+            isFlushingRef.current = true;
+            // Drain event queue first to configure session before user texts
+            while (pendingEventQueueRef.current.length > 0) {
+              const ev = pendingEventQueueRef.current.shift();
+              try { sessionRef.current?.transport.sendEvent(ev); } catch (err) { console.warn('Failed sending queued event, re-queuing', err); pendingEventQueueRef.current.unshift(ev); break; }
+            }
+            while (pendingTextQueueRef.current.length > 0) {
+              const text = pendingTextQueueRef.current.shift();
+              try { sessionRef.current?.sendMessage(text); } catch (err) { console.warn('Failed sending queued text, re-queuing', err); pendingTextQueueRef.current.unshift(text); break; }
+            }
+          }
+        } finally {
+          isFlushingRef.current = false;
+        }
       } catch (err) {
         console.error("Error connecting via SDK:", err);
         updateStatus("DISCONNECTED");
@@ -324,6 +346,36 @@ Homophone (pearl vs purl)
     // }
   }, [enabled]);
 
+  // Waiter to ensure connection established before sending; resolves once CONNECTED or times out
+  const waitForConnected = useCallback(async (timeoutMs: number = 5000) => {
+    if (status === 'CONNECTED' && sessionRef.current) return;
+    const start = Date.now();
+    await new Promise<void>((resolve, reject) => {
+      const interval = setInterval(() => {
+        if (status === 'CONNECTED' && sessionRef.current) {
+          clearInterval(interval);
+          resolve();
+        } else if (Date.now() - start > timeoutMs) {
+          clearInterval(interval);
+          reject(new Error('Realtime connection timeout'));
+        }
+      }, 50);
+    });
+  }, [status]);
+
+  // Ensure connected (kick off connection if needed) before attempting to send
+  const ensureConnectedBeforeSend = useCallback(async () => {
+    if (status === 'CONNECTED' && sessionRef.current) return;
+    try {
+      await connect();
+    } catch {}
+    try {
+      await waitForConnected(5000);
+    } catch (err) {
+      // Swallow; callers will queue on failure
+    }
+  }, [status, connect, waitForConnected]);
+
   const assertconnected = () => {
     if (!sessionRef.current) throw new Error('RealtimeSession not connected');
   };
@@ -335,13 +387,37 @@ Homophone (pearl vs purl)
   }, []);
   
   const sendUserText = useCallback((text: string) => {
-    assertconnected();
-    sessionRef.current!.sendMessage(text);
-  }, []);
+    // Non-throwing: if not connected yet, queue
+    if (!sessionRef.current) {
+      pendingTextQueueRef.current.push(text);
+      // Kick connection if needed
+      ensureConnectedBeforeSend();
+      return;
+    }
+    try {
+      sessionRef.current.sendMessage(text);
+    } catch (err) {
+      console.warn('sendMessage failed, queuing text', err);
+      pendingTextQueueRef.current.push(text);
+      ensureConnectedBeforeSend();
+    }
+  }, [ensureConnectedBeforeSend]);
 
   const sendEvent = useCallback((ev: any) => {
-    sessionRef.current?.transport.sendEvent(ev);
-  }, []);
+    // Non-throwing: if not connected or data-channel not ready, queue
+    if (!sessionRef.current) {
+      pendingEventQueueRef.current.push(ev);
+      ensureConnectedBeforeSend();
+      return;
+    }
+    try {
+      sessionRef.current.transport.sendEvent(ev);
+    } catch (err) {
+      console.warn('sendEvent failed, queuing event', err);
+      pendingEventQueueRef.current.push(ev);
+      ensureConnectedBeforeSend();
+    }
+  }, [ensureConnectedBeforeSend]);
 
   const mute = useCallback((m: boolean) => {
     sessionRef.current?.mute(m);
@@ -388,11 +464,8 @@ Homophone (pearl vs purl)
   };
 
   const sendClientEvent = (eventObj: any) => {
-    try {
-      sendEvent(eventObj);
-    } catch (err) {
-      console.error('Failed to send via SDK', err);
-    }
+    // Delegate to safe sendEvent (queues if needed)
+    sendEvent(eventObj);
   };
 
   const sendSimulatedUserMessage = (text: string) => {
@@ -430,11 +503,8 @@ Homophone (pearl vs purl)
     if (!text.trim()) return;
     interrupt();
     console.log("realtime => user text:", text);
-    try {
-      sendUserText(text.trim());
-    } catch (err) {
-      console.error('Failed to send via SDK', err);
-    }
+    // Non-throwing safe send; queues if not yet connected
+    sendUserText(text.trim());
   }, [interrupt, sendUserText]);
 
   const onToggleConnection = () => {

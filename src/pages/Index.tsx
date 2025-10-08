@@ -2166,10 +2166,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 3-3 pattern: 3 pure adventure messages, then 3 with spelling questions
+        // Implement 3-1 pattern: 3 spelling prompts followed by 1 pure adventure beat
         let isSpellingPhase = false;
-        const cyclePosition = (messageCycleCount - 2) % 3;
-        isSpellingPhase = cyclePosition >= 0 && cyclePosition < 2;
+        const SPELLING_CYCLE_OFFSET = 1; // only the very first adventure message stays pure
+        const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
+        if (messageCycleCount >= SPELLING_CYCLE_OFFSET) {
+          const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
+          isSpellingPhase = cyclePosition < 3;
+        }
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           
@@ -2200,17 +2204,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           });
           setOriginalSpellingQuestion(spellingQuestion);
         }
-        // Implement 2-1 pattern starting at message 1: initial message has no spelling, then 2-1 pattern
-        // Message 0: Pure adventure (no spelling) - initial message
-        // Messages 1,2: With spelling questions (2 with spelling)
-        // Message 3: Pure adventure (no spelling) (1 without spelling)
-        // Messages 4,5: With spelling questions (2 with spelling)
-        // Message 6: Pure adventure (no spelling) (1 without spelling), etc.
-          
-        // First 2 of each 3-message cycle have spelling
-        
-        
-        console.log(`🔄 Message cycle: ${messageCycleCount}, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < 2 ? 'Initial Pure Adventure' : isSpellingPhase ? 'Spelling Questions' : 'Pure Adventure'})`);
+        console.log(`🔄 Message cycle: ${messageCycleCount}, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < SPELLING_CYCLE_OFFSET ? 'Initial Pure Adventure' : isSpellingPhase ? 'Spelling Trio' : 'Adventure Break'})`);
         
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
@@ -5071,11 +5065,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   console.log(`🔍 DEBUG: Setting topicQuestionIndex to: ${newQuestionIndex}`);
                 }
                 
-                // Check if we should return to adventure mode based on the flow pattern
-                // After completing Q3 (index 2), newQuestionIndex becomes 3
-                // After completing Q6 (index 5), newQuestionIndex becomes 6
-                // After completing Q9 (index 8), newQuestionIndex becomes 9
-                if (newQuestionIndex === 3 || newQuestionIndex === 6 || newQuestionIndex === 9) {
+                // Check if we should return to adventure mode based on the flow pattern (3-1 cadence)
+                // After completing each batch of 3 questions (Q3, Q6, Q9), newQuestionIndex will be a multiple of 3 (< 10)
+                if (newQuestionIndex % 3 === 0 && newQuestionIndex < 10) {
                   console.log(`🔍 DEBUG: Adventure break after question ${newQuestionIndex}. Going to adventure mode.`);
                   // After q3, q6, or q9, return to adventure mode
                   setIsInQuestionMode(false);
