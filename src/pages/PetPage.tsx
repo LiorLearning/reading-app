@@ -3296,7 +3296,7 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="w-48 h-6 bg-white/30 rounded-full border border-white/40 overflow-hidden">
                         {/* Progress fill */}
                         <div
-                          className="h-full bg-gradient-to-r from-pink-400 to-red-500 transition-all duration-500 ease-out"
+                          className="h-full bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--accent))] transition-all duration-500 ease-out"
                           style={{ width: `${levelInfo.progressPercentage}%` }}
                         />
                       </div>
@@ -3323,7 +3323,7 @@ const getSleepyPetImage = (clicks: number) => {
                 <div className="text-white font-bold text-lg drop-shadow-md">L{levelInfo.currentLevel}</div>
                 <div className="relative h-6 w-full bg-white/30 rounded-full border border-white/40 overflow-hidden flex items-center">
                   <div
-                    className="h-full bg-gradient-to-r from-red-500 to-pink-400 transition-all duration-500 ease-out"
+                    className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-500 ease-out"
                     style={{ width: `${levelInfo.progressPercentage}%` }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold drop-shadow-md whitespace-nowrap">
@@ -3694,7 +3694,7 @@ const getSleepyPetImage = (clicks: number) => {
           <div className="rounded-[24px] shadow-xl p-4 w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
             <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
-            <div className="mt-1 flex flex-col gap-2">
+            <div className="mt-1 flex flex-col gap-4">
               {(() => {
                 // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
                 const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
@@ -3747,8 +3747,7 @@ const getSleepyPetImage = (clicks: number) => {
                     type="button"
                     aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`}
                     onClick={() => { setShowFirstDoHint(false); handleActionClick(currentQuestType); }}
-                    className={`relative flex items-center gap-3 p-4 rounded-2xl border shadow-sm w-full text-left transition-shadow ${done ? '' : 'hover:shadow-md'}`}
-                    style={{ background: '#FFFFFF', borderColor: '#EDE9D5' }}
+                    className={`relative flex items-center gap-3 p-4 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] w-full text-left`}
                   >
                     {/* Left icon */}
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl" style={{ background: '#ECFDF5' }}>{questIcon}</div>
@@ -3802,8 +3801,7 @@ const getSleepyPetImage = (clicks: number) => {
                     aria-label={asleep ? 'Completed - Click to view' : 'Sleep'}
                     onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }}
                     disabled={disabled}
-                    className={`relative flex items-center gap-3 p-4 rounded-2xl border shadow-sm w-full text-left transition-shadow ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}`}
-                    style={{ background: '#FFFFFF', borderColor: '#EDE9D5' }}
+                    className={`relative flex items-center gap-3 p-4 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl" style={{ background: '#ECFDF5' }}>😴</div>
                     <div className="flex-1">

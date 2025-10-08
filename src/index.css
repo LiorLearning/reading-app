@@ -515,8 +515,8 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Lavender base with violet accents (default theme) */
-    --background: 260 40% 96%; /* Soft lavender background */
+    /* Teal base with aqua accents (default theme) */
+    --background: 180 30% 97%; /* Soft teal-tinted background */
     --foreground: 0 0% 15%; /* Dark gray text */
 
     --card: 0 0% 100%; /* Pure white cards */
@@ -528,7 +528,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 15%;
 
-    --primary: 262 83% 58%; /* violet primary */
+    --primary: 180 83% 35%; /* teal primary */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96%; /* Light gray secondary */
@@ -537,7 +537,7 @@ All colors MUST be HSL.
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 262 83% 58%; /* violet accent */
+    --accent: 180 83% 35%; /* teal accent */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 56%;
@@ -545,14 +545,14 @@ All colors MUST be HSL.
 
     --border: 0 0% 85%;
     --input: 0 0% 95%;
-    --ring: 262 83% 58%;
+    --ring: 180 83% 35%;
 
     --radius: 0.75rem;
     
-    /* Book styling colors - violet theme */
-    --book-border: 262 83% 58%; /* main border */
-    --book-border-deep: 262 83% 48%; /* deeper for dimension */
-    --book-border-shadow: 262 83% 38%; /* dark shadow */
+    /* Book styling colors - teal theme */
+    --book-border: 180 83% 35%; /* main border */
+    --book-border-deep: 180 83% 30%; /* deeper for dimension */
+    --book-border-shadow: 180 83% 25%; /* dark shadow */
     --book-page-light: 0 0% 99%; /* Very light cream page */
     --book-page-main: 0 0% 97%; /* Soft white page */
     --book-page-shadow: 0 0% 94%; /* Light gray shadow tone */
@@ -560,12 +560,12 @@ All colors MUST be HSL.
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary: 180 83% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 96%;
     --sidebar-accent-foreground: 0 0% 15%;
     --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-ring: 180 83% 35%;
     
     /* Chat Backgrounds - Clean whites! */
     --chat-container-bg: 0 0% 100%; /* Pure white background for sidebar container and avatar */
@@ -575,7 +575,7 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Clean dark mode with violet accents */
+    /* Clean dark mode with teal accents */
     --background: 0 0% 10%; /* Dark gray background */
     --foreground: 0 0% 90%; /* Light gray text */
 
@@ -585,7 +585,7 @@ All colors MUST be HSL.
     --popover: 0 0% 15%;
     --popover-foreground: 0 0% 90%;
 
-    --primary: 262 83% 58%; /* violet primary */
+    --primary: 180 83% 35%; /* teal primary */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 20%; /* Dark gray secondary */
@@ -594,7 +594,7 @@ All colors MUST be HSL.
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 262 83% 58%; /* violet accent */
+    --accent: 180 83% 35%; /* teal accent */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 40%;
@@ -602,12 +602,12 @@ All colors MUST be HSL.
 
     --border: 0 0% 25%;
     --input: 0 0% 20%;
-    --ring: 262 83% 58%;
+    --ring: 180 83% 35%;
     
-    /* Dark book styling colors - violet theme */
-    --book-border: 262 83% 55%; /* Slightly darker violet border */
-    --book-border-deep: 262 83% 45%; /* Deeper violet for dimension */
-    --book-border-shadow: 262 83% 35%; /* Dark violet shadow */
+    /* Dark book styling colors - teal theme */
+    --book-border: 180 83% 35%; /* Teal border */
+    --book-border-deep: 180 83% 30%; /* Deeper teal for dimension */
+    --book-border-shadow: 180 83% 25%; /* Dark teal shadow */
     --book-page-light: 0 0% 25%; /* Dark gray page */
     --book-page-main: 0 0% 20%; /* Darker gray page */
     --book-page-shadow: 0 0% 15%; /* Very dark gray shadow */
@@ -615,12 +615,12 @@ All colors MUST be HSL.
     
     --sidebar-background: 0 0% 15%;
     --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary: 180 83% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 20%;
     --sidebar-accent-foreground: 0 0% 90%;
     --sidebar-border: 0 0% 25%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-ring: 180 83% 35%;
     
     /* Chat Backgrounds - Clean dark grays! */
     --chat-container-bg: 0 0% 15%; /* Dark gray background for sidebar container and avatar */

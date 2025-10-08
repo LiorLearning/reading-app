@@ -1150,7 +1150,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     { name: "Emerald", primary: "160 84% 39%", background: "160 30% 97%", accent: "160 84% 39%", hue: "160" },
   ];
   
-  const [selectedTheme, setSelectedTheme] = useState(colorThemes[0]);
+  const [selectedTheme, setSelectedTheme] = useState(
+    colorThemes.find(t => t.name === "Teal") || colorThemes[0]
+  );
   
   const changeTheme = useCallback(async (theme: typeof colorThemes[0]) => {
     playClickSound();
