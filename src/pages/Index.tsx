@@ -3768,6 +3768,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Store attempt count for the most recent correct SpellBox answer and guard against double-advance
   const lastSpellAttemptCountRef = useRef<number | null>(null);
   const isAdvancingSpellRef = useRef<boolean>(false);
+  // When a SpellBox answer is correct and waiting for Next, disable input bar
+  const [disableInputForSpell, setDisableInputForSpell] = useState<boolean>(false);
+  // When user clicks disabled input, highlight the Next chevron
+  const [highlightSpellNext, setHighlightSpellNext] = useState<boolean>(false);
 
   // SpellBox event handlers
   const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
@@ -3776,6 +3780,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (isCorrect) {
       // Defer progression and messaging until user clicks Next
       lastSpellAttemptCountRef.current = attemptCount;
+      // Disable input until Next is clicked
+      setDisableInputForSpell(true);
+      // Do not highlight yet; wait for user to tap the disabled input
     } else {
       // Provide encouragement for incorrect answers
       const encouragementMessage: ChatMessage = {
@@ -3799,6 +3806,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const handleSpellNext = useCallback(() => {
     if (isAdvancingSpellRef.current) return;
     isAdvancingSpellRef.current = true;
+
+    // Re-enable input and remove highlight immediately when Next is clicked
+    setDisableInputForSpell(false);
+    setHighlightSpellNext(false);
 
     const effectiveAttemptCount = lastSpellAttemptCountRef.current ?? 1;
 
@@ -4769,6 +4780,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       onComplete: handleSpellComplete,
                       onSkip: handleSpellSkip,
                       onNext: handleSpellNext,
+                      highlightNext: highlightSpellNext,
                       sendMessage,
                     }}
                   />
@@ -5165,10 +5177,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           <CollapsedInputDock
             onGenerate={onGenerate}
             onAddMessage={onAddMessage}
-            onExpandChat={() => {
-              playClickSound();
-              setSidebarCollapsed(false);
-            }}
+            disabled={disableInputForSpell}
+            onDisabledClick={() => setHighlightSpellNext(true)}
           />
         )}
 

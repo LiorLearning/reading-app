@@ -12,9 +12,13 @@ interface InputBarProps {
   onGenerate: (text: string) => void;
   // onGenerateImage removed (image button disabled)
   onAddMessage: (message: { type: 'user' | 'ai'; content: string; timestamp: number }) => void;
+  /** When true, disables all interactions and shows a transparent blocker overlay */
+  disabled?: boolean;
+  /** Called when user taps/clicks while disabled (to nudge elsewhere) */
+  onDisabledClick?: () => void;
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled = false, onDisabledClick }) => {
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -368,7 +372,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
   );
 
   return (
-    <section aria-label="Create next panel" className="bg-transparent">
+    <section aria-label="Create next panel" className="bg-transparent relative">
       <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
         {isMicActive ? (
           // Recording state: Show only Cancel button
@@ -376,9 +380,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
             type="button"
             variant="comic"
             size="icon"
-            onClick={handleCancelRecording}
+            onClick={disabled ? undefined : handleCancelRecording}
             aria-label="Cancel recording"
             className="flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
+            disabled={disabled}
           >
             <X className="h-5 w-5" />
           </Button>
@@ -388,9 +393,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
             type="button"
             variant="comic"
             size="icon"
-            onClick={startVoice}
+            onClick={disabled ? undefined : startVoice}
             aria-label="Voice input"
             className="flex-shrink-0 btn-animate"
+            disabled={disabled}
           >
             <Mic className="h-5 w-5" />
           </Button>
@@ -404,6 +410,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="rounded-xl flex-1 bg-white/90 border-0 shadow-sm focus:shadow-md transition-shadow backdrop-blur-sm"
+            disabled={disabled}
           />
         )}
         {/* Image button removed */}
@@ -411,8 +418,13 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
           type="button"
           variant="outline" 
           size="icon" 
-          disabled={!text.trim() && !isMicActive}
+          disabled={disabled || (!text.trim() && !isMicActive)}
           onClick={(e) => {
+            if (disabled) {
+              e.preventDefault();
+              onDisabledClick?.();
+              return;
+            }
             if (isMicActive) {
               // During recording: stop and send directly
               e.preventDefault();
@@ -425,12 +437,23 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage }) => {
           aria-label={isMicActive ? "Stop recording and send" : "Send message"}
           className={cn(
             "h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm",
-            (!text.trim() && !isMicActive) && "opacity-50 cursor-not-allowed"
+            (disabled || (!text.trim() && !isMicActive)) && "opacity-50 cursor-not-allowed"
           )}
         >
           <Send className="h-4 w-4" />
         </Button>
       </form>
+      {disabled && (
+        <div
+          className="absolute inset-0 z-20 rounded-xl cursor-not-allowed"
+          onClick={(e) => {
+            e.preventDefault();
+            onDisabledClick?.();
+          }}
+          role="button"
+          aria-label="Please tap Next to continue"
+        />
+      )}
     </section>
   );
 };
