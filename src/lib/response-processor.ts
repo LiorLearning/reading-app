@@ -169,7 +169,7 @@ export class ResponseProcessor {
           adventureContext,
           size: '1024x1024',
           quality: 'hd'
-        });
+        }, sanitizedFallbackPrompt);
         
         const duration = Date.now() - startTime;
         

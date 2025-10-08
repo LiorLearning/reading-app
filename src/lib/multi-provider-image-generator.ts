@@ -42,7 +42,8 @@ export class MultiProviderImageGenerator {
   async generateWithFallback(
     prompt: string, 
     userId: string,
-    options: GenerationOptions = {}
+    options: GenerationOptions = {},
+    sanitizedFallbackPrompt?: string
   ): Promise<ImageGenerationResult> {
     
     let lastError: Error | null = null;
@@ -69,7 +70,10 @@ export class MultiProviderImageGenerator {
         console.log(`🔄 [MultiProviderImageGenerator.generateWithFallback()] Attempting image generation with ${provider.name}... (attempt ${attempt + 1}/${this.providers.length})`);
         
         // Refine prompt for this specific provider
-        const refinedPrompt = await this.refinePromptForProvider(prompt, provider.name, options);
+        const promptForProvider = provider.name === 'flux-schnell' && sanitizedFallbackPrompt
+          ? sanitizedFallbackPrompt
+          : prompt;
+        const refinedPrompt = await this.refinePromptForProvider(promptForProvider, provider.name, options);
         console.log(`🎯 [MultiProviderImageGenerator.generateWithFallback()] Refined prompt for ${provider.name}: "${refinedPrompt}"`);
         
         // Generate image with current provider
