@@ -37,6 +37,8 @@ interface LeftPetOverlayProps {
     onComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
     onSkip?: () => void;
     onNext?: () => void;
+    /** When true, visually highlight the Next chevron to guide the user */
+    highlightNext?: boolean;
     sendMessage?: (text: string) => void;
   };
   // Emotion/heart UI
@@ -544,7 +546,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           {/* AI bubble above the pet */}
           {!isBubbleHidden && (
             <div className="pointer-events-auto relative">
-              <div className="bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-w-[360px]">
+              <div className="relative bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-w-[360px]">
                 {isThinking && !displayHtml ? (
                   <div className="flex items-center gap-1 text-sm">
                     <span>Krafty is thinking</span>
@@ -566,6 +568,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                         onComplete={spellInline.onComplete}
                         onSkip={spellInline.onSkip}
                         onNext={spellInline.onNext}
+                        highlightNext={spellInline.highlightNext}
                         showHints={spellInline.showHints}
                         showExplanation={spellInline.showExplanation}
                         sendMessage={spellInline.sendMessage}

@@ -22,6 +22,8 @@ interface SpellBoxProps {
   onComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSkip?: () => void;
   onNext?: () => void;
+  /** Visually highlight the Next chevron with a little finger pointer cue */
+  highlightNext?: boolean;
   className?: string;
   isVisible?: boolean;
   /**
@@ -62,6 +64,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   onComplete,
   onSkip,
   onNext,
+  highlightNext = false,
   className,
   isVisible = true,
   variant = 'overlay',
@@ -1168,16 +1171,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
           {/* Next chevron - circular, positioned on the right of the spellbox */}
           {isCorrect && onNext && (
-            <div className="absolute inset-y-0 -right-9 sm:-right-10 flex items-center z-20">
+            <div className="absolute top-1/2 -translate-y-1/2 -right-[24px] z-20">
               <Button
                 variant="comic"
                 size="icon"
                 aria-label="Next question"
                 onClick={() => { playClickSound(); onNext(); }}
-                className={cn('h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105')}
+                className={cn('h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105', highlightNext && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300')}
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>
+              {highlightNext && (
+                <div className="ml-2 text-2xl select-none" aria-hidden="true">👉</div>
+              )}
             </div>
           )}
 
@@ -1194,34 +1200,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               }
             }
 
-            @keyframes bounceIn {
-              0% {
-                opacity: 0;
-                transform: scale(0.3);
-              }
-              50% {
-                opacity: 0.9;
-                transform: scale(1.1);
-              }
-              80% {
-                opacity: 1;
-                transform: scale(0.89);
-              }
-              100% {
-                opacity: 1;
-                transform: scale(1);
-              }
-            }
+            @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3);} 50% { opacity: 0.9; transform: scale(1.1);} 80% { opacity: 1; transform: scale(0.89);} 100% { opacity: 1; transform: scale(1);} }
 
 
-            @keyframes spin {
-              0% {
-                transform: rotate(0deg);
-              }
-              100% {
-                transform: rotate(360deg);
-              }
-            }
+            @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+
+            @keyframes wiggle { 0%,100% { transform: rotate(0deg);} 25% { transform: rotate(6deg);} 75% { transform: rotate(-6deg);} }
 
           `}</style>
             { /* CONTENT END */ }
@@ -1242,7 +1226,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           </div>
       ) : (
         // Inline variant for embedding inside other UI (e.g., pet bubble)
-        <div ref={containerRef} className={cn("spellbox-inline-container relative", className)}>
+        <div ref={containerRef} className={cn("spellbox-inline-container", className)}>
           <div className="rounded-xl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
             { /* CONTENT START */ }
             
@@ -1380,8 +1364,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           </div>
             )}
 
-            {isCorrect && onNext && (
-              <div className="absolute inset-y-0 -right-7 sm:-right-8 flex items-center z-20">
+             {isCorrect && onNext && (
+               <div className="absolute top-1/2 -translate-y-1/2 -right-[18px] z-20">
                 <Button
                   variant="comic"
                   size="icon"
