@@ -331,14 +331,14 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     const parentRect = overlayRef.current.parentElement.getBoundingClientRect();
     const overlayRect = overlayRef.current.getBoundingClientRect();
 
-    const targetCenterX = parentRect.width * 0.30;
+    const targetCenterX = parentRect.width * 0.22;
     const preferredLeft = targetCenterX - overlayRect.width / 2;
     const maxLeft = Math.max(0, parentRect.width - overlayRect.width);
     const left = Math.min(Math.max(16, preferredLeft), maxLeft);
 
     const maxTopAllowed = Math.max(0, parentRect.height - overlayRect.height);
     const preferredTop = bubbleVisible
-      ? Math.min(maxTopAllowed, 30)
+      ? Math.min(maxTopAllowed, 50)
       : Math.max(0, (parentRect.height - overlayRect.height) / 2);
     const top = Math.min(Math.max(16, preferredTop), maxTopAllowed);
 
@@ -546,7 +546,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           {/* AI bubble above the pet */}
           {!isBubbleHidden && (
             <div className="pointer-events-auto relative">
-              <div className="relative bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-w-[360px]">
+              <div className="relative bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-w-[400px]">
                 {isThinking && !displayHtml ? (
                   <div className="flex items-center gap-1 text-sm">
                     <span>Krafty is thinking</span>
