@@ -262,11 +262,11 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           const shouldShowLoader = !isInlineData && !showImageAfterLoad && (isNew || isGenerating || isImageLoading);
           return shouldShowLoader;
         })() ? (
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center">
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-end px-6 sm:px-10 lg:px-16">
             {/* Loading Animation Container */}
-            <div 
-                className={cn(
-                  "bg-white/90 rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full mx-4 transition-opacity duration-500",
+            <div
+              className={cn(
+                "bg-white/90 rounded-3xl p-8 border-4 border-white shadow-2xl relative overflow-hidden max-w-md w-full transition-opacity duration-500",
                 showImageAfterLoad && "opacity-0 pointer-events-none"
               )}
             >
@@ -355,8 +355,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                 transform: 'scale(1.08)'
               }}
             />
-            {/* Main image - original size, centered */}
-            <div className="relative w-full h-full flex items-center justify-center z-10">
+            {/* Main image - original size, aligned to the right edge */}
+            <div className="relative w-full h-full flex items-center justify-end z-10">
               <img 
                 src={currentImage} 
                 alt="Current comic scene" 
@@ -370,8 +370,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             </div>
           </div>
         )}
-        
-          <SpellBox
+
+        <SpellBox
             word={spellWord}
             sentence={spellSentence}
             question={spellQuestion}

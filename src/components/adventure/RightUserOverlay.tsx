@@ -14,6 +14,8 @@ interface RightUserOverlayProps {
   bottomOffsetPx?: number;
   /** Show the live camera feed inside the avatar instead of a static image */
   showCameraInAvatar?: boolean;
+  /** Choose which side of the stage to anchor the user overlay */
+  side?: "left" | "right";
 }
 
 /**
@@ -27,16 +29,20 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
   onBubbleVisibilityChange,
   bottomOffsetPx = 0,
   showCameraInAvatar = false,
+  side = "right",
 }) => {
   const [isBubbleHidden, setIsBubbleHidden] = React.useState(false);
   const lastUserTextRef = React.useRef<string | undefined>(undefined);
   const hiddenAtTextRef = React.useRef<string | undefined>(undefined);
-  const [hiddenReason, setHiddenReason] = React.useState<null | "manual" | "auto">(null);
+  const hideTimeoutRef = React.useRef<number | null>(null);
+  const [hiddenReason, setHiddenReason] = React.useState<null | "manual" | "auto" | "timeout">(null);
   const [cameraStream, setCameraStream] = React.useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const [isCameraEnabled, setIsCameraEnabled] = React.useState<boolean>(showCameraInAvatar);
+  const [isCameraEnabled, setIsCameraEnabled] = React.useState<boolean>(false);
   const [isRequesting, setIsRequesting] = React.useState<boolean>(false);
   const { toast } = useToast();
+
+  const isLeftSide = side === "left";
 
   const startCamera = React.useCallback(async () => {
     try {
@@ -60,11 +66,12 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
         await videoRef.current.play().catch(() => {});
       }
       setIsRequesting(false);
-    } catch (e: any) {
+    } catch (e) {
+      const error = e as DOMException | Error;
       setCameraStream(null);
       setIsCameraEnabled(false);
       setIsRequesting(false);
-      const name = e?.name || 'Error';
+      const name = (error as DOMException)?.name || (error as Error)?.name || 'Error';
       const message =
         name === 'NotAllowedError'
           ? 'Permission denied. Click the camera icon in the address bar to enable.'
@@ -79,8 +86,14 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
 
   // Track last user text so we can restore it if user taps avatar
   React.useEffect(() => {
-    if (userMessageText) {
-      lastUserTextRef.current = userMessageText;
+    if (!userMessageText) return;
+
+    const previous = lastUserTextRef.current;
+    lastUserTextRef.current = userMessageText;
+
+    if (userMessageText !== previous) {
+      setIsBubbleHidden(false);
+      setHiddenReason(null);
     }
   }, [userMessageText]);
 
@@ -97,7 +110,7 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
   // If auto-hidden, show again when a NEW user message arrives
   React.useEffect(() => {
     if (
-      hiddenReason === "auto" &&
+      (hiddenReason === "auto" || hiddenReason === "timeout") &&
       userMessageText &&
       userMessageText !== hiddenAtTextRef.current
     ) {
@@ -110,6 +123,38 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
     ? undefined
     : userMessageText || lastUserTextRef.current;
 
+  React.useEffect(() => {
+    if (hideTimeoutRef.current) {
+      window.clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+
+    if (!displayText || isBubbleHidden) {
+      return;
+    }
+
+    hideTimeoutRef.current = window.setTimeout(() => {
+      setIsBubbleHidden(true);
+      setHiddenReason("timeout");
+      hiddenAtTextRef.current = displayText;
+    }, 5000);
+
+    return () => {
+      if (hideTimeoutRef.current) {
+        window.clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+    };
+  }, [displayText, isBubbleHidden]);
+
+  React.useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) {
+        window.clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Publish visibility changes
   React.useEffect(() => {
     const visible = !isBubbleHidden && !!displayText;
@@ -119,9 +164,9 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
 
   // Auto-start if requested by prop on mount; cleanup on unmount
   React.useEffect(() => {
-    if (showCameraInAvatar && isCameraEnabled && !cameraStream) {
-      startCamera();
-    }
+    // if (showCameraInAvatar && isCameraEnabled && !cameraStream) {
+    //   startCamera();
+    // }
     return () => {
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
@@ -145,13 +190,13 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
           "absolute flex items-center gap-3 select-none",
         )}
         style={{
-          right: 16,
+          [isLeftSide ? "left" : "right"]: 16,
           bottom: bottomOffsetPx,
         }}
       >
-        {/* Bubble to the left of the user avatar */}
+        {/* Bubble adjacent to the user avatar */}
         {!isBubbleHidden && (
-          <div className="pointer-events-auto relative order-1">
+          <div className={cn("pointer-events-auto relative", isLeftSide ? "order-2" : "order-1")}>
             <div
               className="bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-h-40 overflow-y-auto overflow-x-hidden max-w-none"
               style={{ maxWidth: 'min(65vw, 360px)' }}
@@ -172,36 +217,58 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
                   setIsBubbleHidden(true);
                   setHiddenReason("manual");
                 }}
-                className="absolute top-1 left-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
+                className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
                 aria-label="Hide message"
               >
                 <X className="h-3 w-3" />
               </Button>
             </div>
-            {/* Tail pointing to avatar (on the right side) */}
-            <div className="absolute right-[-10px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-b-[10px] border-l-[10px] border-t-transparent border-b-transparent border-l-black" />
-            <div className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[9px] border-b-[9px] border-l-[9px] border-t-transparent border-b-transparent border-l-white" />
+            {/* Tail pointing toward the avatar */}
+            <div
+              className={cn(
+                "absolute top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-b-[10px] border-t-transparent border-b-transparent",
+                isLeftSide
+                  ? "left-[-10px] border-r-[10px] border-r-black"
+                  : "right-[-10px] border-l-[10px] border-l-black",
+              )}
+            />
+            <div
+              className={cn(
+                "absolute top-1/2 -translate-y-1/2 w-0 h-0 border-t-[9px] border-b-[9px] border-t-transparent border-b-transparent",
+                isLeftSide
+                  ? "left-[-8px] border-r-[9px] border-r-white"
+                  : "right-[-8px] border-l-[9px] border-l-white",
+              )}
+            />
           </div>
         )}
 
         {/* User avatar */}
         <div
-          className="pointer-events-auto w-[160px] h-[160px] rounded-xl overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm order-2"
+          className={cn(
+            "pointer-events-auto w-[50px] h-[50px] rounded-full overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm",
+            isLeftSide ? "order-1" : "order-2",
+          )}
           onClick={(e) => {
             e.stopPropagation();
             setIsBubbleHidden(false);
             setHiddenReason(null);
           }}
         >
-          {isCameraEnabled && cameraStream ? (
-            <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover transform scale-x-[-1]" />
-          ) : userImageUrl ? (
-            <img src={userImageUrl} alt="You" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full grid place-items-center bg-gradient-to-br from-slate-200 to-slate-100 text-slate-600 font-semibold">
-              You
-            </div>
-          )}
+            <img
+              src="/avatars/krafty-old.png"
+              alt="Default avatar"
+              className="w-full h-full object-cover rounded-full"
+            />
+          {/* {isCameraEnabled && cameraStream ? (
+            <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover transform scale-x-[-1] rounded-full" />
+          ) 
+          // : userImageUrl ? (
+          //   <img src={userImageUrl} alt="You" className="w-full h-full object-cover rounded-full" />
+          // ) 
+          : (
+          
+          )} */}
 
           {isRequesting && (
             <div className="absolute inset-0 grid place-items-center bg-black/40">
@@ -210,7 +277,7 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
           )}
 
           {/* Camera toggle button */}
-          <button
+          {/* <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
@@ -222,12 +289,12 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
                 setIsCameraEnabled(false);
               } else {
                 // Call getUserMedia directly in the click handler to satisfy mobile/Safari gesture requirements
-                startCamera();
+             //   startCamera();
               }
             }}
             aria-label={isCameraEnabled ? "Turn camera off" : "Turn camera on"}
             title={isCameraEnabled ? "Turn camera off" : "Turn camera on"}
-            className="absolute top-1 right-1 h-7 w-7 grid place-items-center rounded-full border-2 border-black bg-white/80 hover:bg-white text-black shadow-[0_2px_0_rgba(0,0,0,0.6)] disabled:opacity-60"
+            className="absolute top-1 right-1 h-4 w-4 grid place-items-center rounded-full border-2 border-black bg-white/80 hover:bg-white text-black shadow-[0_2px_0_rgba(0,0,0,0.6)] disabled:opacity-60"
             disabled={isRequesting}
           >
             {isCameraEnabled ? (
@@ -235,7 +302,7 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
             ) : (
               <CameraOff className="h-4 w-4" />
             )}
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
