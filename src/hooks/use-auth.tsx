@@ -618,9 +618,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Upgrade anonymous user to email/password while preserving UID
         const credential = EmailAuthProvider.credential(email, password);
         const linkedUser = await linkWithCredential(current, credential);
+        // Clear guest gating flags after successful upgrade
+        try {
+          localStorage.removeItem('guest_signup_gate_open');
+          localStorage.removeItem('guest_prompt_count');
+        } catch {}
       } else {
         // No anonymous session: fall back to normal sign-up
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Clear guest gating flags after successful sign-up
+        try {
+          localStorage.removeItem('guest_signup_gate_open');
+          localStorage.removeItem('guest_prompt_count');
+        } catch {}
       }
     } catch (error) {
       console.error('Error signing up with email:', error);

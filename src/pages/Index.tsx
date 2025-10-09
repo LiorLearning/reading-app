@@ -336,6 +336,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     } catch { return 0; }
   });
   
+  // Close and clear signup gate once user upgrades from anonymous to real account
+  React.useEffect(() => {
+    try {
+      const isAnon = !!user && (user as any).isAnonymous === true;
+      if (!isAnon) {
+        setSignupGateOpen(false);
+        try {
+          localStorage.removeItem('guest_signup_gate_open');
+          localStorage.removeItem('guest_prompt_count');
+        } catch {}
+      }
+    } catch {}
+  }, [user]);
+  
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
   
@@ -3971,7 +3985,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
       {/* Signup Gate Modal */}
-      <Dialog open={signupGateOpen} onOpenChange={(o) => {
+      <Dialog open={signupGateOpen && (!!user && (user as any).isAnonymous === true)} onOpenChange={(o) => {
         setSignupGateOpen(o);
         try { localStorage.setItem('guest_signup_gate_open', o ? '1' : ''); } catch {}
       }}>
