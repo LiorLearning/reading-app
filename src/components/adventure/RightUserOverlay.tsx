@@ -34,7 +34,8 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
   const [isBubbleHidden, setIsBubbleHidden] = React.useState(false);
   const lastUserTextRef = React.useRef<string | undefined>(undefined);
   const hiddenAtTextRef = React.useRef<string | undefined>(undefined);
-  const [hiddenReason, setHiddenReason] = React.useState<null | "manual" | "auto">(null);
+  const hideTimeoutRef = React.useRef<number | null>(null);
+  const [hiddenReason, setHiddenReason] = React.useState<null | "manual" | "auto" | "timeout">(null);
   const [cameraStream, setCameraStream] = React.useState<MediaStream | null>(null);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [isCameraEnabled, setIsCameraEnabled] = React.useState<boolean>(false);
@@ -85,8 +86,14 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
 
   // Track last user text so we can restore it if user taps avatar
   React.useEffect(() => {
-    if (userMessageText) {
-      lastUserTextRef.current = userMessageText;
+    if (!userMessageText) return;
+
+    const previous = lastUserTextRef.current;
+    lastUserTextRef.current = userMessageText;
+
+    if (userMessageText !== previous) {
+      setIsBubbleHidden(false);
+      setHiddenReason(null);
     }
   }, [userMessageText]);
 
@@ -103,7 +110,7 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
   // If auto-hidden, show again when a NEW user message arrives
   React.useEffect(() => {
     if (
-      hiddenReason === "auto" &&
+      (hiddenReason === "auto" || hiddenReason === "timeout") &&
       userMessageText &&
       userMessageText !== hiddenAtTextRef.current
     ) {
@@ -115,6 +122,38 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
   const displayText = isBubbleHidden
     ? undefined
     : userMessageText || lastUserTextRef.current;
+
+  React.useEffect(() => {
+    if (hideTimeoutRef.current) {
+      window.clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+
+    if (!displayText || isBubbleHidden) {
+      return;
+    }
+
+    hideTimeoutRef.current = window.setTimeout(() => {
+      setIsBubbleHidden(true);
+      setHiddenReason("timeout");
+      hiddenAtTextRef.current = displayText;
+    }, 5000);
+
+    return () => {
+      if (hideTimeoutRef.current) {
+        window.clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+    };
+  }, [displayText, isBubbleHidden]);
+
+  React.useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) {
+        window.clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Publish visibility changes
   React.useEffect(() => {
@@ -178,7 +217,7 @@ const RightUserOverlay: React.FC<RightUserOverlayProps> = ({
                   setIsBubbleHidden(true);
                   setHiddenReason("manual");
                 }}
-                className="absolute top-1 left-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
+                className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
                 aria-label="Hide message"
               >
                 <X className="h-3 w-3" />
