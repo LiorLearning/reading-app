@@ -4778,6 +4778,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     userMessageText={chatMessages.filter(m => m.type === 'user').slice(-1)[0]?.content}
                     bottomOffsetPx={84} // leave room for the collapsed input dock directly below
                     showCameraInAvatar={true}
+                    side="left"
                   />
                   <ComicPanelComponent
                     image={current.image}

@@ -355,8 +355,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
                 transform: 'scale(1.08)'
               }}
             />
-            {/* Main image - original size, centered */}
-            <div className="relative w-full h-full flex items-center justify-center z-10">
+            {/* Main image - original size, aligned to the right edge */}
+            <div className="relative w-full h-full flex items-center justify-end z-10">
               <img 
                 src={currentImage} 
                 alt="Current comic scene" 
@@ -370,8 +370,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             </div>
           </div>
         )}
-        
-          <SpellBox
+
+        <SpellBox
             word={spellWord}
             sentence={spellSentence}
             question={spellQuestion}
