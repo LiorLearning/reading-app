@@ -2768,6 +2768,11 @@ const getSleepyPetImage = (clicks: number) => {
       return;
     }
 
+    // During sleep progression (any clicks > 0), keep showing thought bubbles but suppress TTS playback
+    if (sleepClicks > 0) {
+      return;
+    }
+
     // Stop any currently playing audio when pet state changes
     ttsService.stop();
     
@@ -2788,7 +2793,7 @@ const getSleepyPetImage = (clicks: number) => {
 
       return () => clearTimeout(timer);
     }
-  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection, frozenThought, showStep7, hasAdventureStep8Started]);
+  }, [currentPetThought, showPetShop, audioEnabled, lastSpokenMessage, isSpeaking, showPetSelection, frozenThought, showStep7, hasAdventureStep8Started, sleepClicks]);
 
   // Step 4 hint controller: when pet speech starts or after 5s, show hint once
   useEffect(() => {
