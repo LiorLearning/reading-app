@@ -241,6 +241,7 @@ exports.generateFluxSchnell = (0, https_1.onRequest)({
                 go_fast: (options === null || options === void 0 ? void 0 : options.go_fast) !== undefined ? options.go_fast : true,
                 output_quality: (_b = options === null || options === void 0 ? void 0 : options.output_quality) !== null && _b !== void 0 ? _b : 80,
                 num_inference_steps: (_c = options === null || options === void 0 ? void 0 : options.num_inference_steps) !== null && _c !== void 0 ? _c : 4,
+                aspect_ratio: "5:4"
             },
         };
         const initialResponse = await fetch(FLUX_SCHNELL_PREDICTION_URL, {

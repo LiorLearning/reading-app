@@ -294,6 +294,7 @@ export const generateFluxSchnell = onRequest(
           go_fast: options?.go_fast !== undefined ? options.go_fast : true,
           output_quality: options?.output_quality ?? 80,
           num_inference_steps: options?.num_inference_steps ?? 4,
+          aspect_ratio: "5:4"
         },
       };
 

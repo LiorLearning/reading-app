@@ -70,6 +70,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   const avatarRef = React.useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = React.useState<{ left: number; top: number } | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
+  const hasUserDraggedRef = React.useRef(false);
   const isSpeakingRef = React.useRef(false);
   const [isBubbleHidden, setIsBubbleHidden] = React.useState(false);
   const lastAiHtmlRef = React.useRef<string | undefined>(undefined);
@@ -318,12 +319,36 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     }
   }, [aiMessageHtml]);
 
+  const displayHtml = isBubbleHidden ? undefined : (aiMessageHtml || lastAiHtmlRef.current);
+  const bubbleVisible = !isBubbleHidden && (!!displayHtml || !!isThinking || hasInlineQuestion);
+
   React.useEffect(() => {
-    // On mount, place near top-left with small inset
-    if (!position && overlayRef.current && overlayRef.current.parentElement) {
-      setPosition({ left: 16, top: 16 });
-    }
-  }, [position]);
+    if (isDragging || hasUserDraggedRef.current) return;
+    if (!overlayRef.current || !overlayRef.current.parentElement) return;
+
+    const parentRect = overlayRef.current.parentElement.getBoundingClientRect();
+    const overlayRect = overlayRef.current.getBoundingClientRect();
+
+    const targetCenterX = parentRect.width * 0.30;
+    const preferredLeft = targetCenterX - overlayRect.width / 2;
+    const maxLeft = Math.max(0, parentRect.width - overlayRect.width);
+    const left = Math.min(Math.max(16, preferredLeft), maxLeft);
+
+    const maxTopAllowed = Math.max(0, parentRect.height - overlayRect.height);
+    const preferredTop = bubbleVisible
+      ? Math.min(maxTopAllowed, 30)
+      : Math.max(0, (parentRect.height - overlayRect.height) / 2);
+    const top = Math.min(Math.max(16, preferredTop), maxTopAllowed);
+
+    if (!Number.isFinite(left) || !Number.isFinite(top)) return;
+
+    setPosition(prev => {
+      if (prev && Math.abs(prev.left - left) < 0.5 && Math.abs(prev.top - top) < 0.5) {
+        return prev;
+      }
+      return { left, top };
+    });
+  }, [bubbleVisible, displayHtml, isBubbleHidden, isThinking, hasInlineQuestion, isDragging]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (!draggable) return;
@@ -340,8 +365,16 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     const parent = overlayRef.current.parentElement;
     if (!parent) return;
     const rect = parent.getBoundingClientRect();
-    const newLeft = Math.min(Math.max(0, e.clientX - rect.left - 40), rect.width - 120);
-    const newTop = Math.min(Math.max(0, e.clientY - rect.top - 40), rect.height - 120);
+    const overlayRect = overlayRef.current.getBoundingClientRect();
+    hasUserDraggedRef.current = true;
+    const newLeft = Math.min(
+      Math.max(0, e.clientX - rect.left - overlayRect.width / 2),
+      Math.max(0, rect.width - overlayRect.width)
+    );
+    const newTop = Math.min(
+      Math.max(0, e.clientY - rect.top - overlayRect.height / 2),
+      Math.max(0, rect.height - overlayRect.height)
+    );
     setPosition({ left: newLeft, top: newTop });
   };
 
@@ -471,8 +504,6 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     }
   }, [aiMessageHtml, hiddenReason, isManuallyClosed]);
 
-  const displayHtml = isBubbleHidden ? undefined : (aiMessageHtml || lastAiHtmlRef.current);
-
   // Derive a stable messageId for the current visible content so the speaker button
   // can reflect play/stop state consistently across renders.
   const currentMessageId = React.useMemo(() => {
@@ -501,19 +532,95 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
           draggable && "cursor-grab active:cursor-grabbing"
         )}
         style={{
-          left: position ? `${position.left}px` : 16,
-          top: position ? `${position.top}px` : "50%",
-          transform: position ? undefined : "translateY(-50%)",
+          left: position ? `${position.left}px` : "16px",
+          top: position ? `${position.top}px` : "24px",
         }}
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerMove={onPointerMove}
       >
         {/* Pet avatar and actions */}
-        <div className="pointer-events-auto flex flex-col items-center">
+        <div className="pointer-events-auto flex flex-col items-center gap-2">
+          {/* AI bubble above the pet */}
+          {!isBubbleHidden && (
+            <div className="pointer-events-auto relative">
+              <div className="bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-w-[360px]">
+                {isThinking && !displayHtml ? (
+                  <div className="flex items-center gap-1 text-sm">
+                    <span>Krafty is thinking</span>
+                    <div className="flex gap-1 ml-1">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s`, animationDuration: "1s" }} />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-base leading-relaxed pr-7">
+                    {spellInline?.show && spellInline?.word ? (
+                      <SpellBox
+                        variant="inline"
+                        isVisible={true}
+                        word={spellInline.word || undefined}
+                        sentence={spellInline.sentence || undefined}
+                        question={spellInline.question || undefined}
+                        onComplete={spellInline.onComplete}
+                        onSkip={spellInline.onSkip}
+                        onNext={spellInline.onNext}
+                        showHints={spellInline.showHints}
+                        showExplanation={spellInline.showExplanation}
+                        sendMessage={spellInline.sendMessage}
+                        interruptRealtimeSession={interruptRealtimeSession}
+                      />
+                    ) : displayHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: displayHtml }} />
+                    ) : (
+                      <span className="opacity-60">Say hi to start your adventure!</span>
+                    )}
+                  </div>
+                )}
+                {/* Close button (hidden while a question is active) */}
+                {!hasInlineQuestion && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      ttsService.stop();
+                      setIsBubbleHidden(true);
+                      setHiddenReason('manual');
+                      setIsManuallyClosed(true);
+                    }}
+                    className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
+                    aria-label="Hide message"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+                {/* Speaker control (available for AI HTML or inline SpellBox) */}
+                {(displayHtml || hasInlineQuestion) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSpeak();
+                    }}
+                    className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
+                    aria-label={isSpeakingThisMessage ? 'Stop message' : 'Play message'}
+                  >
+                    {isSpeakingThisMessage ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                  </Button>
+                )}
+              </div>
+              {/* Tail pointing down toward the pet avatar */}
+              <div className="absolute left-1/2 bottom-[-10px] -translate-x-1/2 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[10px] border-l-transparent border-r-transparent border-t-black" />
+              <div className="absolute left-1/2 bottom-[-8px] -translate-x-1/2 w-0 h-0 border-l-[9px] border-r-[9px] border-t-[9px] border-l-transparent border-r-transparent border-t-white" />
+            </div>
+          )}
+
           <div
           ref={avatarRef}
-          className="relative w-[240px] h-[240px] rounded-xl overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm"
+          className="relative w-[210px] h-[210px] rounded-xl overflow-hidden shadow-[0_6px_0_rgba(0,0,0,0.6)] border-2 border-black bg-white/70 backdrop-blur-sm"
           onClick={(e) => {
             e.stopPropagation();
             // Single click always (re)opens and resets manual-close state
@@ -721,82 +828,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
         {/* Close the avatar+actions wrapper */}
         </div>
 
-        {/* AI bubble to the right of pet */}
-        {!isBubbleHidden && (
-        <div className="pointer-events-auto relative">
-          <div className="bg-white/95 border-2 border-black rounded-2xl shadow-[0_6px_0_rgba(0,0,0,0.6)] px-4 py-3 max-w-[360px]">
-            {isThinking && !displayHtml ? (
-              <div className="flex items-center gap-1 text-sm">
-                <span>Krafty is thinking</span>
-                <div className="flex gap-1 ml-1">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s`, animationDuration: "1s" }} />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-base leading-relaxed pr-7">
-                {spellInline?.show && spellInline?.word ? (
-                  <SpellBox
-                    variant="inline"
-                    isVisible={true}
-                    word={spellInline.word || undefined}
-                    sentence={spellInline.sentence || undefined}
-                    question={spellInline.question || undefined}
-                    onComplete={spellInline.onComplete}
-                    onSkip={spellInline.onSkip}
-                    onNext={spellInline.onNext}
-                    showHints={spellInline.showHints}
-                    showExplanation={spellInline.showExplanation}
-                    sendMessage={spellInline.sendMessage}
-                    interruptRealtimeSession={interruptRealtimeSession}
-                  />
-                ) : displayHtml ? (
-                  <div dangerouslySetInnerHTML={{ __html: displayHtml }} />
-                ) : (
-                  <span className="opacity-60">Say hi to start your adventure!</span>
-                )}
-              </div>
-            )}
-            {/* Close button (hidden while a question is active) */}
-            {!hasInlineQuestion && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  ttsService.stop();
-                  setIsBubbleHidden(true);
-                  setHiddenReason('manual');
-                  setIsManuallyClosed(true);
-                }}
-                className="absolute top-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
-                aria-label="Hide message"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            )}
-            {/* Speaker control (available for AI HTML or inline SpellBox) */}
-            {(displayHtml || hasInlineQuestion) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSpeak();
-                }}
-                className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
-                aria-label={isSpeakingThisMessage ? 'Stop message' : 'Play message'}
-              >
-                {isSpeakingThisMessage ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
-              </Button>
-            )}
-          </div>
-          {/* Tail pointing to pet */}
-          <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[10px] border-b-[10px] border-r-[10px] border-t-transparent border-b-transparent border-r-black" />
-          <div className="absolute left-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[9px] border-b-[9px] border-r-[9px] border-t-transparent border-b-transparent border-r-white" />
-        </div>
-        )}
+        {/* AI bubble moved inside avatar wrapper when hidden */}
       </div>
     </div>
   );
