@@ -12,13 +12,11 @@ interface Props {
 }
 
 function getLocalTodayDateString(): string {
-  // Use US/Eastern to match streak day-boundary logic in PetPage
   try {
     const now = new Date();
-    const east = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-    const y = east.getFullYear();
-    const m = String(east.getMonth() + 1).padStart(2, '0');
-    const d = String(east.getDate()).padStart(2, '0');
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   } catch {
     return '';
@@ -124,11 +122,18 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
   // Strict consecutive streak (no weekly fallback here)
   const displayStreak = useMemo(() => {
     try {
-      return Math.max(0, Number(currentStreak || 0));
+      let s = Math.max(0, Number(currentStreak || 0));
+      // If today's heart is filled but streak is 0 (e.g., first day), show 1
+      try {
+        const today = getLocalTodayDateString();
+        const isTodayFilled = !!weekly[today];
+        if (s <= 0 && isTodayFilled) s = 1;
+      } catch {}
+      return s;
     } catch {
       return 0;
     }
-  }, [currentStreak]);
+  }, [currentStreak, weekly]);
 
   // Thoughts buckets
   const oneDayThoughts = useMemo(() => [

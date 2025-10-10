@@ -132,6 +132,23 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   };
   const [weeklyHeartsCount, setWeeklyHeartsCount] = useState<number>(() => getWeeklyHeartsCount());
 
+  // Is today's weekly heart filled? Merge server-broadcast map and local per-week cache
+  const isTodayHeartFilled = () => {
+    try {
+      const today = ymd(new Date());
+      const weekKey = `week_${ymd(getMondayOfCurrentWeek())}`;
+      const raw = localStorage.getItem('litkraft_weekly_hearts');
+      const map = raw ? (JSON.parse(raw) as Record<string, Record<string, boolean>>) : {};
+      const week = (map && map[weekKey]) || {};
+      if (Object.prototype.hasOwnProperty.call(week, today)) return !!week[today];
+      const localRaw = localStorage.getItem(`litkraft_weekly_streak_hearts_${weekKey}`);
+      const localWeek = localRaw ? (JSON.parse(localRaw) as Record<string, boolean>) : {};
+      return !!localWeek[today];
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     const onWeeklyHearts = () => {
       try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
@@ -140,6 +157,24 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Prime once on mount
     onWeeklyHearts();
     return () => { try { window.removeEventListener('weeklyHeartsUpdated', onWeeklyHearts as any); } catch {} };
+  }, []);
+
+  // Keep streakForModal synced with the modal's single source of truth (localStorage 'litkraft_streak')
+  useEffect(() => {
+    try {
+      const s = Number(localStorage.getItem('litkraft_streak') || '0');
+      setStreakForModal(Number.isNaN(s) ? 0 : s);
+    } catch { setStreakForModal(0); }
+    const handler = (e: any) => {
+      try {
+        const fromEvent = (e?.detail && typeof e.detail.streak !== 'undefined') ? e.detail.streak : undefined;
+        const raw = fromEvent ?? (localStorage.getItem('litkraft_streak') ?? '0');
+        const s = Number(raw);
+        setStreakForModal(Number.isNaN(s) ? 0 : s);
+      } catch {}
+    };
+    try { window.addEventListener('streakChanged', handler as any); } catch {}
+    return () => { try { window.removeEventListener('streakChanged', handler as any); } catch {} };
   }, []);
 
   const playShutterSound = () => {
@@ -492,11 +527,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     return () => { try { window.removeEventListener('streakChanged', onStreakChanged as any); } catch {}; };
   }, []);
 
-  // Get current date in US timezone (Eastern Time)
+  // Get current date in local timezone
   const getCurrentUSDate = () => {
     const now = new Date();
-    const usDate = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
-    return usDate.toDateString(); // Returns format like "Mon Jan 01 2024"
+    return now.toDateString(); // Local date string like "Mon Jan 01 2024"
   };
 
   // Load and validate streak data
@@ -1194,6 +1228,13 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           
           updateSleepClicks(newSleepClicks, now, sleepEndTime);
           setSleepCompleted(true);
+
+          // Always update daily streak on sleep completion (independent of quests)
+          try {
+            const newStreakImmediate = updateStreak();
+            try { setCurrentStreak(newStreakImmediate); } catch {}
+          } catch {}
+
           try {
             // If today's assigned quest is done for ANY pet, and we haven't shown modal today, show it now.
             const hasShownKey = 'litkraft_reinforced_streak_last_shown_date';
@@ -1215,6 +1256,13 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
             } catch {}
 
             if (anyPetDone && lastShown !== todayStr) {
+              // Read the latest streak (already updated above) for the modal
+              let modalStreak = 0;
+              try {
+                const s = Number(localStorage.getItem('litkraft_streak') || '0');
+                modalStreak = Number.isNaN(s) ? 0 : s;
+              } catch {}
+              try { setStreakForModal(modalStreak); } catch {}
               // Fill today's weekly heart, set streak, and open modal
               markTodayHeartFilled();
               // Refresh local weekly hearts count immediately (works even before Firestore roundtrip)
@@ -1245,10 +1293,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
                   })();
                 }
               } catch {}
-              try {
-                const s = Number(localStorage.getItem('litkraft_streak') || '0');
-                setStreakForModal(Number.isNaN(s) ? 0 : s);
-              } catch { setStreakForModal(0); }
+              // streakForModal already set from updateStreak()
               setShowStreakModal(true);
               localStorage.setItem(hasShownKey, todayStr);
             }
@@ -1423,8 +1468,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // Update cumulative care level - increment feeding count
     incrementFeedingCount();
     
-    // Update streak based on calendar days
-    const newStreak = updateStreak();
+    // Feeding should not change streak anymore; streak is updated on sleep completion
+    const newStreak = getStreakData().streak;
 
     // Trigger heart animation
     setShowHeartAnimation(true);
@@ -3436,14 +3481,18 @@ const getSleepyPetImage = (clicks: number) => {
           aria-label="Open weekly hearts"
           onClick={() => {
             try {
-              setStreakForModal(Number.isNaN(Number(currentStreak)) ? 0 : Number(currentStreak));
+              const s = Number(localStorage.getItem('litkraft_streak') || '0');
+              setStreakForModal(Number.isNaN(s) ? 0 : s);
             } catch { setStreakForModal(0); }
             setShowStreakModal(true);
           }}
         >
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
             <span className="text-xl">❤️</span>
-            <span>{Number.isNaN(Number(currentStreak)) ? 0 : Number(currentStreak)}</span>
+            <span>{(() => {
+              const s = Math.max(0, Number(streakForModal || 0));
+              return (s <= 0 && isTodayHeartFilled()) ? 1 : s;
+            })()}</span>
           </div>
         </div>
         
@@ -3982,7 +4031,7 @@ const getSleepyPetImage = (clicks: number) => {
             open={showStreakModal}
             currentStreak={streakForModal}
             celebrationUrl={celebrationUrl}
-            onClose={() => setShowStreakModal(false)}
+            onClose={() => { setShowStreakModal(false); try { const s = Number(localStorage.getItem('litkraft_streak') || '0'); if (!Number.isNaN(s)) setCurrentStreak(s); } catch {} }}
           />
         );
       })()}
