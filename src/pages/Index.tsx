@@ -1155,13 +1155,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     colorThemes.find(t => t.name === "Teal") || colorThemes[0]
   );
   
-  const changeTheme = useCallback(async (theme: typeof colorThemes[0]) => {
-    playClickSound();
-    const granted = await ensureMicPermission();
-    if (!granted) {
-      toast.error('Enable Mic Access');
-      return;
-    }
+  const changeTheme = useCallback((theme: typeof colorThemes[0]) => {
+    // Theme changes should not request microphone permission or play sounds automatically
     setSelectedTheme(theme);
     
     // Update CSS variables on the document root
