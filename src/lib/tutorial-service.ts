@@ -276,36 +276,59 @@ class TutorialService {
       console.log('📚 Migrated legacy SpellBox tutorial state');
     }
 
-    // Heuristic migration for returning users: if pet progress shows prior activity,
-    // consider steps 5–6 completed so the trainer does not run.
+    // Heuristic migration for returning users (tightened):
+    // Only consider as returning if there is strong evidence of prior activity
+    // from a previous calendar day. Owning a pet alone does not qualify.
     try {
       const anyPetKeys = [] as string[];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i) || '';
         if (k.startsWith('litkraft_pet_progress_')) anyPetKeys.push(k);
       }
-      // If any pet has coins/adventures, treat as returning user
+
+      const todayIsoDate = new Date().toISOString().slice(0, 10);
+      const isOlderThanToday = (ts: number): boolean => {
+        try {
+          if (!ts || typeof ts !== 'number') return false;
+          const d = new Date(ts).toISOString().slice(0, 10);
+          return d < todayIsoDate;
+        } catch {
+          return false;
+        }
+      };
+
       let isReturning = false;
       for (const key of anyPetKeys) {
         try {
           const raw = localStorage.getItem(key);
           if (!raw) continue;
           const parsed = JSON.parse(raw);
-          const coins = parsed?.heartData?.adventureCoins || 0;
-          const totalAdventures = parsed?.achievementData?.totalAdventuresSinceOwned || 0;
-          const owned = parsed?.generalData?.isOwned;
-          if (coins > 0 || totalAdventures > 0 || owned) {
+
+          const totalEarned: number = parsed?.levelData?.totalAdventureCoinsEarned || 0;
+          const firstAdventure: number = parsed?.achievementData?.firstAdventureDate || 0;
+          const lastUpdated: number = parsed?.generalData?.lastUpdated || 0;
+          const perType: Record<string, number> = parsed?.adventureCoinsByType || {};
+          const anyTypeCoins = perType && Object.values(perType).some((v: any) => typeof v === 'number' && v > 0);
+
+          // Strong signals of prior activity before today
+          const earnedBeforeToday = totalEarned > 0 && isOlderThanToday(firstAdventure || lastUpdated);
+          const perTypeBeforeToday = !!anyTypeCoins && isOlderThanToday(lastUpdated);
+
+          if (earnedBeforeToday || perTypeBeforeToday) {
             isReturning = true;
             break;
           }
         } catch {}
       }
+
       if (isReturning) {
         this.updateTutorialState({
           adventureStep5IntroCompleted: true,
           adventureStep6IntroCompleted: true,
         });
-        console.log('📚 Returning user detected — marked steps 5–6 as completed');
+        console.log('📚 Returning user (prior-day activity) — marked steps 5–6 as completed');
+      } else {
+        console.log('📚 No prior-day activity detected — keeping steps 5–6 for first-time flow');
       }
     } catch {}
   }
