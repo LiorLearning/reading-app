@@ -508,7 +508,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+      colors: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'],
+      zIndex: 2147483647
     });
     
     // Add a second burst with different settings
@@ -518,7 +519,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: ['#FF6B6B', '#4ECDC4', '#45B7D1']
+        colors: ['#FF6B6B', '#4ECDC4', '#45B7D1'],
+        zIndex: 2147483647
       });
     }, 250);
     
@@ -529,7 +531,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: ['#FFD700', '#96CEB4', '#FFEAA7']
+        colors: ['#FFD700', '#96CEB4', '#FFEAA7'],
+        zIndex: 2147483647
       });
     }, 400);
   }, []);
@@ -670,8 +673,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         }
         
         if (onComplete) {
-          // Enhanced callback includes complete word and attempt count
-          onComplete(true, completeWord, attempts + 1);
+          // Delay advancing slightly to ensure confetti is visible on screen
+          const ADVANCE_DELAY_MS = 500;
+          setTimeout(() => {
+            // Enhanced callback includes complete word and attempt count
+            onComplete(true, completeWord, attempts + 1);
+          }, ADVANCE_DELAY_MS);
         }
       } else {
         console.log('❌ SPELLBOX: Incorrect answer, generating hint');
