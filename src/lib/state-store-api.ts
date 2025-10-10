@@ -55,6 +55,8 @@ import {
     coins: number;
     streak: number;
     lastStreakIncrementAt?: Timestamp | null;
+    // Client-local calendar day used for streak computation in local timezone (YYYY-MM-DD)
+    lastStreakLocalDate?: string | null;
     // Weekly hearts map keyed by week key (e.g., "week_2025-10-06") and then by date (YYYY-MM-DD)
     // Example: weeklyHearts: { "week_2025-10-06": { "2025-10-07": true } }
     weeklyHearts?: Record<string, Record<string, boolean>>;
@@ -104,6 +106,7 @@ import {
       coins: 0,
       streak: 0,
       lastStreakIncrementAt: null,
+      lastStreakLocalDate: null,
       weeklyHearts: {},
       createdAt: nowServerTimestamp(),
       updatedAt: nowServerTimestamp(),
@@ -680,6 +683,7 @@ import {
     clearPetSleep,
     setPetName,
     setWeeklyHeart,
+    incrementStreakIfEligible,
   };
   
   // ==========================
@@ -847,5 +851,110 @@ import {
     );
   }
   
+  // ==========================
+  // Streak: increment only if (any quest completed today) AND (called on sleep)
+  // ==========================
+
+  export interface IncrementStreakIfEligibleInput {
+    userId: string;
+    localDate: string; // YYYY-MM-DD in user's local timezone
+  }
+
+  function toLocalYmd(ms: number): string {
+    try {
+      const d = new Date(ms);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    } catch {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    }
+  }
+
+  function isPreviousDay(prevYmd: string | null | undefined, currYmd: string): boolean {
+    if (!prevYmd) return false;
+    try {
+      const [py, pm, pd] = prevYmd.split('-').map((s) => Number(s));
+      const [cy, cm, cd] = currYmd.split('-').map((s) => Number(s));
+      const prev = new Date(py, (pm || 1) - 1, pd || 1);
+      const curr = new Date(cy, (cm || 1) - 1, cd || 1);
+      const diffDays = Math.floor((curr.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000));
+      return diffDays === 1;
+    } catch {
+      return false;
+    }
+  }
+
+  export async function incrementStreakIfEligible(input: IncrementStreakIfEligibleInput): Promise<number> {
+    const { userId, localDate } = input;
+    if (!userId || !localDate) return 0;
+    return await runTransaction(db, async (txn) => {
+      const userRef = userStateDocRef(userId);
+      const questsRef = dailyQuestsDocRef(userId);
+      const userSnap = await txn.get(userRef);
+      const questsSnap = await txn.get(questsRef);
+
+      // Initialize user state if missing
+      if (!userSnap.exists()) {
+        txn.set(userRef, createDefaultUserState());
+      }
+
+      const userData = (userSnap.exists() ? (userSnap.data() as any) : {}) as any;
+      const currentStreak = Number(userData?.streak ?? 0);
+      const lastLocal = (userData?.lastStreakLocalDate ?? null) as string | null;
+
+      // If already incremented for localDate, return early
+      if (lastLocal === localDate) {
+        return currentStreak;
+      }
+
+      // Determine if any pet's quest was completed today (based on _completedAt local day)
+      let anyCompletedToday = false;
+      if (questsSnap.exists()) {
+        const qData = questsSnap.data() as any;
+        const petKeys = Object.keys(qData).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+        for (const pet of petKeys) {
+          try {
+            const petObj = qData[pet] || {};
+            const completedAt = petObj?._completedAt as Timestamp | null;
+            if (completedAt) {
+              const completedYmd = toLocalYmd(completedAt.toMillis());
+              if (completedYmd === localDate) {
+                anyCompletedToday = true;
+                break;
+              }
+            }
+          } catch {}
+        }
+      }
+
+      if (!anyCompletedToday) {
+        // Not eligible: do not change streak
+        return currentStreak;
+      }
+
+      // Compute next streak based on previous local day
+      const nextStreak = isPreviousDay(lastLocal, localDate) ? currentStreak + 1 : 1;
+
+      txn.set(
+        userRef,
+        {
+          streak: nextStreak,
+          lastStreakIncrementAt: Timestamp.now(),
+          lastStreakLocalDate: localDate,
+          updatedAt: nowServerTimestamp(),
+        } as any,
+        { merge: true }
+      );
+
+      return nextStreak;
+    });
+  }
+
   
   

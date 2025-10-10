@@ -1229,10 +1229,38 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           updateSleepClicks(newSleepClicks, now, sleepEndTime);
           setSleepCompleted(true);
 
-          // Always update daily streak on sleep completion (independent of quests)
+          // Update streak only if any pet's daily quest is completed today
           try {
-            const newStreakImmediate = updateStreak();
-            try { setCurrentStreak(newStreakImmediate); } catch {}
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+            let anyPetDone = false;
+            try {
+              const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+              if (questStatesRaw) {
+                const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; progress: number; target?: number }>;
+                anyPetDone = Array.isArray(arr) && arr.some((x) => Number(x?.progress || 0) >= Number(x?.target || 0));
+              }
+            } catch {}
+
+            if (anyPetDone) {
+              // Server: increment streak with quest+sleep rule
+              try {
+                const userObj = auth.currentUser;
+                if (userObj) {
+                  await stateStoreApi.incrementStreakIfEligible({ userId: userObj.uid, localDate: todayStr });
+                }
+              } catch {}
+              // Local: maintain legacy localStorage streak for offline consistency
+              const newStreakImmediate = updateStreak();
+              try { setCurrentStreak(newStreakImmediate); } catch {}
+              try {
+                localStorage.setItem('litkraft_streak', String(newStreakImmediate));
+                window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: newStreakImmediate } }));
+              } catch {}
+            }
           } catch {}
 
           try {

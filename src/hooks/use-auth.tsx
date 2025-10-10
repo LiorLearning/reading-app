@@ -129,77 +129,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
             setHasGoogleAccount(isGoogleUser);
             
-            // Transaction: update streak in userStates and lastLoginAt in users atomically
+            // Update only users/{uid}.lastLoginAt; do not mutate streak on login
             try {
-              await runTransaction(db, async (txn) => {
-                const usersRef = userDocRef;
-                const userStateRef = doc(db, 'userStates', user.uid);
-                const usersSnap = await txn.get(usersRef);
-                const userStateSnap = await txn.get(userStateRef);
-
-                const now = new Date();
-                const nowTs = Timestamp.fromDate(now);
-
-                // previous lastLoginAt from users/{uid}
-                let prevLoginMs: number | null = null;
-                try {
-                  const prev = (usersSnap.data() as any)?.lastLoginAt;
-                  if (prev?.toMillis) prevLoginMs = prev.toMillis();
-                  else if (prev) prevLoginMs = new Date(prev).getTime();
-                } catch {}
-
-                // current streak and lastStreakIncrementAt from userStates/{uid}
-                const stateData = (userStateSnap.exists() ? userStateSnap.data() : null) as any;
-                const currentStreak = Number(stateData?.streak ?? 0);
-                const lastInc = stateData?.lastStreakIncrementAt;
-                let lastIncMs: number | null = null;
-                try {
-                  if (lastInc?.toMillis) lastIncMs = lastInc.toMillis();
-                  else if (lastInc) lastIncMs = new Date(lastInc).getTime();
-                } catch {}
-
-                const nowMs = now.getTime();
-                const diffMs = prevLoginMs ? (nowMs - prevLoginMs) : null;
-
-                // Apply rule: within 24h -> +1, else reset to 0
-                let newStreak = 0;
-                const within24h = diffMs !== null && diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000;
-
-                if (within24h) {
-                  // Optional guard: only increment once per 24h window
-                  const guardOk = !lastIncMs || (nowMs - lastIncMs) > 24 * 60 * 60 * 1000;
-                  newStreak = guardOk ? currentStreak + 1 : currentStreak;
-                } else {
-                  newStreak = 0;
-                }
-
-                // Initialize userState doc if missing
-                if (!userStateSnap.exists()) {
-                  txn.set(userStateRef, {
-                    pets: {},
-                    petnames: {},
-                    petquestions: {},
-                    coins: 0,
-                    streak: newStreak,
-                    lastStreakIncrementAt: within24h ? nowTs : (stateData?.lastStreakIncrementAt ?? null),
-                    createdAt: Timestamp.now(),
-                    updatedAt: Timestamp.now(),
-                  });
-                } else {
-                  txn.update(userStateRef, {
-                    streak: newStreak,
-                    ...(within24h ? { lastStreakIncrementAt: nowTs } : {}),
-                    updatedAt: Timestamp.now(),
-                  });
-                }
-
-                // Always set users/{uid}.lastLoginAt to now
-                txn.update(usersRef, { lastLoginAt: now });
-              });
+              await updateDoc(userDocRef, { lastLoginAt: new Date() });
             } catch (e) {
-              console.warn('Streak transaction failed:', e);
-              // Fallback: still update lastLoginAt non-transactionally to avoid blocking sign in
-              try { await updateDoc(userDocRef, { lastLoginAt: new Date() }); } catch {}
+              console.warn('Failed to update lastLoginAt:', e);
             }
           } else {
             // New user, set initial data
