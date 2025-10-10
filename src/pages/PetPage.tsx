@@ -517,6 +517,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     try {
       localStorage.setItem('pet_feeding_streak_data', JSON.stringify(streakData));
       setCurrentStreak(streakData.streak);
+      // Mirror to global streak source for UI and broadcast change
+      try {
+        localStorage.setItem('litkraft_streak', String(streakData.streak));
+        window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: streakData.streak } }));
+      } catch {}
     } catch (error) {
       console.warn('Failed to save streak data:', error);
     }
@@ -3438,7 +3443,7 @@ const getSleepyPetImage = (clicks: number) => {
         >
           <div className="flex items-center gap-2 text-white font-bold text-lg drop-shadow-md">
             <span className="text-xl">❤️</span>
-            <span>{weeklyHeartsCount}</span>
+            <span>{Number.isNaN(Number(currentStreak)) ? 0 : Number(currentStreak)}</span>
           </div>
         </div>
         
