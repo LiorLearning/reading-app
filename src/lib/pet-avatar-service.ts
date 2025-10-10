@@ -797,13 +797,13 @@ export const useCurrentPetAvatarImage = () => {
     // Check if Dragon is owned and being displayed - map from careState buckets (TBD GIFs)
     if (currentPetId === 'dragon' && isPetOwned('dragon')) {
       if (gifKey === 'coins_50') {
-        return "TBD";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070717_media-2--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       } else if (gifKey === 'coins_30') {
-        return "TBD";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070719_media-3--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       } else if (gifKey === 'coins_10') {
-        return "TBD";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070718_media-4--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       } else {
-        return "TBD";
+        return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070724_media-5--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
       }
     }
     
@@ -934,10 +934,10 @@ const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>
     needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-sad-unscreen.gif?alt=media&token=3fbbd435-b1de-4932-a693-137c626e20e4',
   },
   dragon: {
-    feed: '/placeholder.svg',
-    water: '/placeholder.svg',
-    pat: 'TBD', // coins_30 equivalent
-    needy: 'TBD', // sad equivalent
+    feed: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_071046_media-6--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    water: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_071028_media-7--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
+    pat: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_071029_media-8--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN', // coins_30 equivalent
+    needy: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070724_media-5--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN', // sad equivalent
   },
   unicorn: {
     feed: '/placeholder.svg',
@@ -1014,7 +1014,7 @@ const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
   hamster: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-yawn-unscreen.gif?alt=media&token=10c574d7-3bb4-43a1-b137-7fa6f00c5d21',
   parrot: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-yawn-unscreen.gif?alt=media&token=59ec008d-1f70-4bc6-9034-3b30912139d9',
   monkey: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-yawn-unscreen.gif?alt=media&token=4f1f7d6f-4dc6-46f3-b871-952b62de55d3',
-  dragon: '/placeholder.svg',
+  dragon: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070033_media-1--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
   unicorn: '/placeholder.svg',
 };
 
