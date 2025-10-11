@@ -107,6 +107,8 @@ Rules you must always follow:
 - Do not add explanations — only output the cleaned prompt.
 6. PET PERSONA MAPPING
 - ${personaInstruction}
+7. Person
+- replace any human characters with a child 
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  
    - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, robes, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  

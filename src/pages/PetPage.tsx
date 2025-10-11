@@ -62,6 +62,16 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   
   // Get Firebase authenticated user for adventure loading and user data for personalized pet thoughts
   const { user, userData, signOut, loading, updateUserData } = useAuth();
+
+  useEffect(() => {
+    const ph = (window as any).posthog;
+    if (!ph?.identify) return;
+
+    if (user && !user.isAnonymous) {
+      const name = (userData?.username || user.displayName || '').trim();
+      ph.identify(user.uid, name ? { name } : undefined);
+    }
+  }, [user?.uid, user?.isAnonymous, userData?.username, user?.displayName]);
   
   // Use shared pet data system
   const { careLevel, ownedPets, audioEnabled, setCareLevel, addOwnedPet, setAudioEnabled, isPetOwned, getCoinsSpentForCurrentStage, getPetCoinsSpent, addPetCoinsSpent, incrementFeedingCount, addAdventureCoins, setSleepCompleted, getCumulativeCarePercentage, getCumulativeCareLevel, isSleepAvailable, resetCumulativeCareLevel, migrateToCumulativeCareSystem, checkAndPerform24HourReset, checkAndPerform8HourReset } = usePetData();
