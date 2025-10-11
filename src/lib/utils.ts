@@ -707,7 +707,7 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   }
   // Kindergarten should reflect kindergarten content
   if (gradeDisplayName === 'Kindergarten') {
-    return 'K';
+    return '1';
   }
   // Default to grade 1 for any other cases
   return '1';

@@ -3741,11 +3741,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // Update the counter IMMEDIATELY to prevent duplicate triggers
       setLastAutoImageMessageCount(currentMessageCount);
-      
       // Small delay to ensure message rendering is complete, then run Layer 2 check
-      setTimeout(() => {
-        // Auto-image disabled
-      }, 1000);
     } else {
       if (unifiedCalledForCurrentMessage && isExactInterval) {
         // Skip this cycle due to clash, wait for next cycle
