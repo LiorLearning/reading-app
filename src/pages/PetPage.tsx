@@ -3099,7 +3099,7 @@ const getSleepyPetImage = (clicks: number) => {
                     const match = currentGrade.match(/\d+/);
                     return match ? match[0] : currentGrade;
                   })();
-                  const buttonText = `${userName}'s Grade: ${gradeLabel}`;
+                  const buttonText = `${userName.charAt(0).toUpperCase()}${userName.slice(1)}'s Progress`;
                   return buttonText;
                 })()}
                 <ChevronDown className="h-4 w-4" />
@@ -3151,7 +3151,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">1st Grade</span>
+                  <span className="font-semibold">1st Level</span>
                   {selectedGradeAndLevel?.grade === '1st' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
@@ -3188,7 +3188,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">2nd Grade</span>
+                  <span className="font-semibold">2nd Level</span>
                   {selectedGradeAndLevel?.grade === '2nd' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
@@ -3225,7 +3225,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">3rd Grade</span>
+                  <span className="font-semibold">3rd Level</span>
                   {selectedGradeAndLevel?.grade === '3rd' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
@@ -3262,7 +3262,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">4th Grade</span>
+                  <span className="font-semibold">4th Level</span>
                   {selectedGradeAndLevel?.grade === '4th' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
@@ -3299,7 +3299,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">5th Grade</span>
+                  <span className="font-semibold">5th Level</span>
                   {selectedGradeAndLevel?.grade === '5th' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
