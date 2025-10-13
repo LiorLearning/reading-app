@@ -490,26 +490,56 @@ export const saveUserProgress = (progress: UserProgress): void => {
 export const loadUserProgress = (): UserProgress | null => {
   try {
     const stored = localStorage.getItem(USER_PROGRESS_KEY);
-    if (!stored) {
-      return null;
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (
+        typeof parsed === 'object' &&
+        parsed !== null &&
+        Array.isArray(parsed.completedTopics) &&
+        typeof parsed.totalTopicsCompleted === 'number' &&
+        typeof parsed.lastPlayedAt === 'number'
+      ) {
+        return parsed as UserProgress;
+      }
     }
-    
-    const parsed = JSON.parse(stored);
-    
-    // Validate the structure
-    if (
-      typeof parsed === 'object' && 
-      parsed !== null &&
-      Array.isArray(parsed.completedTopics) &&
-      typeof parsed.totalTopicsCompleted === 'number' &&
-      typeof parsed.lastPlayedAt === 'number'
-    ) {
-      return parsed as UserProgress;
-    }
-    
-    return null;
   } catch (error) {
     console.warn('Failed to load user progress from local storage:', error);
+  }
+
+  // Fallback: derive progress from Spellbox topic progress when available
+  try {
+    const gradeSelection = loadGradeSelection();
+    const gradeDisplayName = gradeSelection?.gradeDisplayName;
+
+    if (!gradeDisplayName) {
+      return null;
+    }
+
+    const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+    if (!gradeProgress) {
+      return null;
+    }
+
+    const spellboxTopics = Object.values(gradeProgress.topicProgress || {});
+
+    const completedTopics: TopicProgress[] = spellboxTopics.map(topic => {
+      const passed = topic.isCompleted && topic.successRate >= 70;
+      return {
+        topicId: topic.topicId,
+        completed: passed,
+        score: Math.round((topic.successRate / 100) * 10),
+        completedAt: topic.completedAt,
+      };
+    });
+
+    return {
+      completedTopics,
+      currentTopicId: gradeProgress.currentTopicId ?? undefined,
+      totalTopicsCompleted: completedTopics.filter(topic => topic.completed).length,
+      lastPlayedAt: gradeProgress.timestamp || Date.now(),
+    };
+  } catch (error) {
+    console.warn('Failed to derive user progress from Spellbox data:', error);
     return null;
   }
 };
@@ -821,119 +851,34 @@ export const loadGradeSelection = (): GradeSelection | null => {
  * Uses the actual ordering from mcq-questions.tsx data file
  */
 export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle', gradeDisplayName?: string): string | null => {
-  const progress = loadUserProgress();
-  
-  // Map selected grade to content grade
-  const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';
-  console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
-  console.log(`📚 Available topic IDs (first 10):`, allTopicIds.slice(0, 10));
-  
-  // Filter topics by grade first to see what's available
-  const gradeTopics = allTopicIds.filter(id => {
-    if (contentGrade === 'K') return id.startsWith('K-');
-    if (contentGrade === '1') return id.startsWith('1-');
-    if (contentGrade === '2') return id.startsWith('2-');
-    if (contentGrade === '3') return id.startsWith('3-');
-    return false;
-  });
-  
-  console.log(`📖 Found ${gradeTopics.length} topics for grade ${contentGrade}:`, gradeTopics.slice(0, 5));
-  
-  // Find starting index based on content grade and level
-  let startIndex = 0;
-  
-  // Find the first topic that matches the content grade
-  if (contentGrade === 'K') {
-    // Start with Kindergarten topics (K- prefix)
-    startIndex = allTopicIds.findIndex(id => id.startsWith('K-'));
-    if (startIndex === -1) startIndex = 0;
-  } else if (contentGrade === '1') {
-    if (level === 'start') {
-      // Grade 1 start level - find first 1- topic or use K- if 1- not found
-      startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
-      if (startIndex === -1) {
-        startIndex = allTopicIds.findIndex(id => id.startsWith('K-'));
-        if (startIndex === -1) startIndex = 0;
-      }
-    } else {
-      // Grade 1 middle level - find 1-Q.4 or first 1- topic
-      startIndex = allTopicIds.findIndex(id => id === '1-Q.4');
-      if (startIndex === -1) {
-        startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
-        if (startIndex === -1) startIndex = 0;
-      }
-    }
-  } else if (contentGrade === '2') {
-    // Grade 2 content - find first 2- topic
-    startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
-    if (startIndex === -1) {
-      console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
-      // Fallback to grade 1 if grade 2 topics not found
-      startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
-      if (startIndex === -1) startIndex = 0;
-    }
-  } else if (contentGrade === '3') {
-    // Grade 3 content - find first 3- topic
-    startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
-    if (startIndex === -1) {
-      console.log(`⚠️ No Grade 3 topics found, falling back to Grade 2`);
-      // Fallback to grade 2 if grade 3 topics not found
-      startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
-      if (startIndex === -1) {
-        console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
-        startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
-        if (startIndex === -1) startIndex = 0;
-      }
-    }
+  const gradeSelection = loadGradeSelection();
+  const effectiveGrade = gradeSelection?.gradeDisplayName ?? gradeDisplayName;
+
+  if (!effectiveGrade) {
+    console.log('⚠️ getNextTopicByPreference: no grade set, using first available topic');
+    return allTopicIds[0] ?? null;
   }
-  
-  console.log(`📍 Starting search from index ${startIndex}, topic: ${allTopicIds[startIndex] || 'none'}`);
-  
-  if (!progress) {
-    // First time playing, return first topic from preferred starting point
-    const selectedTopic = allTopicIds[startIndex] || null;
-    console.log(`🚀 First time playing - Starting with topic: ${selectedTopic} at index ${startIndex}`);
-    return selectedTopic;
+
+  const gradeProgress = loadSpellboxTopicProgress(effectiveGrade);
+
+  if (!gradeProgress) {
+    console.log('ℹ️ getNextTopicByPreference: no Spellbox progress yet, returning first topic');
+    return allTopicIds[0] ?? null;
   }
-  
-  console.log(`👤 User has progress data with ${progress.completedTopics.length} completed topics`);
-  
-  // Find first uncompleted topic starting from the preferred level and grade
-  for (let i = startIndex; i < allTopicIds.length; i++) {
-    const topicId = allTopicIds[i];
-    const topicProgress = progress.completedTopics.find(
-      t => t.topicId === topicId
-    );
-    
-    // Topic is available if:
-    // 1. Never attempted (not in completedTopics)
-    // 2. Attempted but not completed with passing grade
-    if (!topicProgress || !topicProgress.completed) {
-      console.log(`✅ Found available topic: ${topicId} at index ${i} (${topicProgress ? 'attempted but not completed' : 'never attempted'})`);
-      return topicId;
-    }
+
+  const nextSpellboxTopic = getNextSpellboxTopic(effectiveGrade, allTopicIds);
+  if (nextSpellboxTopic) {
+    console.log(`🎯 getNextTopicByPreference: selected Spellbox topic ${nextSpellboxTopic}`);
+    return nextSpellboxTopic;
   }
-  
-  console.log(`🔄 All topics from ${startIndex} onwards are completed, checking earlier topics`);
-  
-  // All topics from preferred starting point completed, check from beginning
-  if (startIndex > 0) {
-    for (let i = 0; i < startIndex; i++) {
-      const topicId = allTopicIds[i];
-      const topicProgress = progress.completedTopics.find(
-        t => t.topicId === topicId
-      );
-      
-      if (!topicProgress || !topicProgress.completed) {
-        console.log(`✅ Found available earlier topic: ${topicId} at index ${i}`);
-        return topicId;
-      }
-    }
+
+  if (gradeProgress.currentTopicId) {
+    console.log('🔁 getNextTopicByPreference: reusing current Spellbox topic', gradeProgress.currentTopicId);
+    return gradeProgress.currentTopicId;
   }
-  
-  // All topics completed, return first topic for replay
-  console.log(`🔁 All topics completed, returning first topic for replay: ${allTopicIds[0]}`);
-  return allTopicIds[0] || null;
+
+  console.log('🔁 getNextTopicByPreference: Spellbox returned nothing, falling back to first topic');
+  return allTopicIds[0] ?? null;
 };
 
 // Local storage key for cached adventure images

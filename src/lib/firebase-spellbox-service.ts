@@ -56,12 +56,12 @@ class FirebaseSpellboxService {
   async loadSpellboxProgressFirebase(userId: string, gradeDisplayName: string): Promise<SpellboxGradeProgress | null> {
     try {
       const docId = `${userId}_${gradeDisplayName.replace(/\s+/g, '_')}`;
+      console.log("docId stripe: ", docId)
       const docRef = doc(db, this.COLLECTION_NAME, docId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         const data = docSnap.data() as FirebaseSpellboxProgress;
-        
         // Convert Firebase Timestamp to number for compatibility
         const gradeProgress: SpellboxGradeProgress = {
           gradeDisplayName: data.gradeDisplayName,

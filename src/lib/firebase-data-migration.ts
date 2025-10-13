@@ -38,8 +38,9 @@ export const migrateLocalStorageToFirebase = async (userId: string): Promise<voi
 
     // 2. Migrate topic preferences
     const topicPreference = loadTopicPreference();
-    if (topicPreference?.preferredTopics) {
-      await saveTopicPreferencesHybrid(userId, topicPreference.preferredTopics);
+    const preferredTopics = (topicPreference as any)?.preferredTopics as string[] | undefined;
+    if (preferredTopics && Array.isArray(preferredTopics) && preferredTopics.length > 0) {
+      await saveTopicPreferencesHybrid(userId, preferredTopics);
       migratedCount++;
     }
 
