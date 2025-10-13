@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { playClickSound } from "@/lib/sounds";
 import { ChevronRight, User, GraduationCap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import analytics from '@/lib/analytics';
 import { useAuth } from "@/hooks/use-auth";
 
 interface UserOnboardingProps {
@@ -52,6 +53,13 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     if (username.trim()) {
       playClickSound();
       setStep(2);
+      try {
+        analytics.capture('user_name_entered', {
+          user_name: username.trim(),
+          first_time: !userData?.username,
+          changed_from_previous: !!(userData?.username && userData.username.trim() && userData.username.trim() !== username.trim()),
+        });
+      } catch {}
     }
   };
 
@@ -82,6 +90,13 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
           levelDisplayName: selectedLevelObj?.displayName || selectedLevel,
           isFirstTime: false
         });
+        try {
+          analytics.capture('user_name_entered', {
+            user_name: username.trim(),
+            first_time: !userData?.username,
+            changed_from_previous: !!(userData?.username && userData.username.trim() && userData.username.trim() !== username.trim()),
+          });
+        } catch {}
         
         onComplete();
       } catch (error) {

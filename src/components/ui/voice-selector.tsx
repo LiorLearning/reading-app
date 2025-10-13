@@ -62,9 +62,9 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
           variant="outline" 
           size="icon" 
           aria-label={`Current voice: ${selectedVoice.name}`}
-          className={`border-2 border-foreground shadow-solid bg-white text-black btn-animate w-10 h-10 rounded-full flex items-center justify-center text-lg leading-none ${className}`}
+          className={`border-2 border-foreground shadow-solid bg-white text-black btn-animate w-10 h-10 rounded-full flex items-center justify-center ${className}`}
         >
-          <span role="img" aria-hidden="true">🔊</span>
+          <Volume2 className="h-5 w-5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-4 border border-white/40 bg-white/95 text-slate-900 rounded-2xl shadow-xl" align="end">

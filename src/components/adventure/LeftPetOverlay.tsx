@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight } from "lucide-react";
+import { playClickSound } from "@/lib/sounds";
 import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
 import SpellBox from "@/components/comic/SpellBox";
@@ -40,6 +41,8 @@ interface LeftPetOverlayProps {
     /** When true, visually highlight the Next chevron to guide the user */
     highlightNext?: boolean;
     sendMessage?: (text: string) => void;
+    promptText?: string;
+    isDisabled?: boolean;
   };
   // Emotion/heart UI
   emotionActive?: boolean;
@@ -557,8 +560,15 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="text-base leading-relaxed pr-7">
-                    {spellInline?.show && spellInline?.word ? (
+                  <div className="text-base leading-relaxed pr-7" style={{ fontFamily: 'Fredoka, sniglet, "Comic Sans MS", system-ui, -apple-system, sans-serif' }}>
+                    {spellInline?.show && spellInline?.promptText ? (
+                      <SpellBoxPromptInline
+                        text={spellInline.promptText}
+                        onNext={spellInline.onNext}
+                        highlightNext={spellInline.highlightNext}
+                        isDisabled={spellInline.isDisabled}
+                      />
+                    ) : spellInline?.show && spellInline?.word ? (
                       <SpellBox
                         variant="inline"
                         isVisible={true}
@@ -838,5 +848,59 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
 };
 
 export default LeftPetOverlay;
+
+const SpellBoxPromptInline: React.FC<{
+  text: string;
+  onNext?: () => void;
+  highlightNext?: boolean;
+  isDisabled?: boolean;
+}> = ({ text, onNext, highlightNext, isDisabled }) => {
+  React.useEffect(() => {
+    if (!text) return;
+    try { ttsService.stop(); } catch {}
+    const selectedVoice = (() => {
+      try { return ttsService.getSelectedVoice?.().id; } catch { return undefined; }
+    })();
+    const selectedSpeed = (() => {
+      try { return ttsService.getSelectedSpeed?.(); } catch { return undefined; }
+    })() || 0.8;
+    ttsService.speak(text, {
+      messageId: 'krafty-whiteboard-prompt',
+      voice: selectedVoice,
+      stability: 0.7,
+      similarity_boost: 0.9,
+      speed: selectedSpeed,
+    }).catch(() => {});
+  }, [text]);
+
+  return (
+    <div className="relative">
+      <div
+        className="pointer-events-auto whitespace-pre-wrap"
+        style={{ fontFamily: 'Fredoka, sniglet, "Comic Sans MS", system-ui, -apple-system, sans-serif', fontSize: 20, lineHeight: 1.5 }}
+      >
+        {text}
+      </div>
+      {onNext && (
+        <div className="absolute top-1/2 -translate-y-1/2 -right-[60px]">
+          <Button
+            variant="comic"
+            size="icon"
+            aria-label="Next"
+            disabled={isDisabled}
+            onClick={() => {
+              if (isDisabled) return;
+              playClickSound();
+              onNext();
+            }}
+            className={`h-10 w-10 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] ${isDisabled ? 'opacity-60 cursor-not-allowed' : 'hover:scale-105'} ${highlightNext && !isDisabled ? 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300' : ''}`}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 
