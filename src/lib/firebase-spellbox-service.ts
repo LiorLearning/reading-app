@@ -162,7 +162,8 @@ class FirebaseSpellboxService {
       // Common grade names to check
       const commonGrades = [
         'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
-        'Kindergarten', 'Pre-K', '1st Grade', '2nd Grade', '3rd Grade'
+        'Kindergarten', 'Pre-K', '1st Grade', '2nd Grade', '3rd Grade',
+        'Assignment'
       ];
 
       for (const grade of commonGrades) {

@@ -3122,13 +3122,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const handlePreferenceSelection = React.useCallback(async (level: 'start' | 'middle', gradeDisplayName?: string) => {
     playClickSound();
     
+    const normalizedLevel: 'start' | 'middle' = gradeDisplayName === 'Assignment' ? 'start' : level;
+
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
       // Save grade selection to localStorage for persistence
       saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
-      setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+      setSelectedGradeAndLevel({ grade: gradeDisplayName, level: normalizedLevel });
     }
     
     // Persist selection to Firebase (minimal write)
@@ -3140,11 +3142,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         if (name === '2nd Grade') return 'grade2';
         // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
         if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+        if (name === 'Assignment') return 'assignment';
         return '';
       };
       const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
-      const levelCode = level === 'middle' ? 'mid' : level;
-      const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
+      const levelCode = normalizedLevel === 'middle' ? 'mid' : normalizedLevel;
+      const levelDisplayName = normalizedLevel === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
       if (gradeCode) {
         await updateUserData({
@@ -3162,14 +3165,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const allTopicIds = Object.keys(sampleMCQData.topics);
     
     // Save preference and get the specific topic immediately
-    const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
+    const specificTopic = saveTopicPreference(normalizedLevel, allTopicIds, gradeDisplayName);
     
-    console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
+    console.log(`Preference selection - Level: ${normalizedLevel}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
-    setSelectedPreference(level);
+    setSelectedPreference(normalizedLevel);
     setSelectedTopicFromPreference(specificTopic);
     
-    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
+    console.log(`State updated - selectedPreference: ${normalizedLevel}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
 
   // Handle sequential back navigation from MCQ screen
@@ -4301,6 +4304,43 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                           <div className="text-sm text-gray-500">Intermediate level</div>
                         </div>
                         {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  {/* Assignment */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Assignment' ? 'bg-blue-100' : ''}`}>
+                      <span className="text-lg">🎓</span>
+                      <span className="font-semibold">Assignment</span>
+                      {selectedGradeAndLevel?.grade === 'Assignment' && (
+                        <span className="ml-auto text-blue-600 text-sm">✓</span>
+                      )}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent 
+                      className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
+                    >
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Assignment' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('start', 'Assignment')}
+                      >
+                        <span className="text-lg">🌱</span>
+                        <div>
+                          <div className="font-semibold">Start</div>
+                          <div className="text-sm text-gray-500">Beginning level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === 'Assignment' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Assignment' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                        onClick={() => handlePreferenceSelection('middle', 'Assignment')}
+                      >
+                        <span className="text-lg">🚀</span>
+                        <div>
+                          <div className="font-semibold">Middle</div>
+                          <div className="text-sm text-gray-500">Intermediate level</div>
+                        </div>
+                        {selectedGradeAndLevel?.grade === 'Assignment' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>

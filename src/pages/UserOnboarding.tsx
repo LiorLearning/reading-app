@@ -32,6 +32,7 @@ const grades: GradeOption[] = [
   { value: "grade3", label: "3rd Grade", displayName: "3rd Grade" },
   { value: "grade4", label: "4th Grade", displayName: "4th Grade" },
   { value: "grade5", label: "5th Grade", displayName: "5th Grade" },
+  { value: "assignment", label: "Assignment", displayName: "Assignment" },
 ];
 
 const levels: LevelOption[] = [
@@ -55,15 +56,10 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     }
   };
 
-  const handleGradeSelect = (gradeValue: string) => {
-    playClickSound();
-    setSelectedGrade(gradeValue);
-  };
-
-  const handleLevelSelect = (levelValue: string) => {
-    playClickSound();
-    setSelectedLevel(levelValue);
-  };
+  React.useEffect(() => {
+    setSelectedGrade("assignment");
+    setSelectedLevel("start");
+  }, []);
 
   const handleComplete = async () => {
     if (username.trim() && selectedGrade && selectedLevel) {
@@ -72,14 +68,15 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
       
       try {
         const selectedGradeObj = grades.find(g => g.value === selectedGrade);
-        const selectedLevelObj = levels.find(l => l.value === selectedLevel);
+        const levelValueToUse = selectedGrade === 'assignment' ? 'start' : selectedLevel;
+        const selectedLevelObj = levels.find(l => l.value === levelValueToUse);
         
         await updateUserData({
           username: username.trim(),
           grade: selectedGrade,
           gradeDisplayName: selectedGradeObj?.displayName || selectedGrade,
-          level: selectedLevel,
-          levelDisplayName: selectedLevelObj?.displayName || selectedLevel,
+          level: levelValueToUse,
+          levelDisplayName: selectedLevelObj?.displayName || 'Start Level',
           isFirstTime: false
         });
         
@@ -100,6 +97,17 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
         handleComplete();
       }
     }
+  };
+
+  const mapDisplayToCode = (name?: string): string => {
+    if (!name) return '';
+    if (name === 'Kindergarten') return 'gradeK';
+    if (name === '1st Grade') return 'grade1';
+    if (name === '2nd Grade') return 'grade2';
+    // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
+    if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+    if (name === 'Assignment') return 'assignment';
+    return '';
   };
 
   return (
@@ -192,12 +200,12 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold text-gray-800">
-                {step === 1 ? "Welcome to Your Adventure!" : "What's Your Grade?"}
+                {step === 1 ? "Welcome to Your Adventure!" : "Personalize Your Learning"}
               </CardTitle>
               <CardDescription className="text-base text-gray-600">
                 {step === 1 
                   ? "Let's start by getting to know you better. What should we call you?"
-                  : "Tell us your grade so we can customize your learning experience!"
+                  : "We've picked the best starting path for you—just press Let's Go!"
                 }
               </CardDescription>
             </CardHeader>
@@ -266,100 +274,21 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
               ) : (
                 // Grade Selection Step
                 <div className="space-y-4">
-                  <div>
-                    <label htmlFor="grade" className="block text-lg font-semibold text-gray-700 mb-3">
-                      Select Your Grade:
-                    </label>
-                    <Select onValueChange={handleGradeSelect} value={selectedGrade}>
-                      <SelectTrigger 
-                        id="grade"
-                        className="h-14 text-lg border-3 border-black rounded-xl bg-white hover:bg-gray-50 focus:bg-gray-50"
-                        style={{ boxShadow: '0 4px 0 black' }}
-                      >
-                        <SelectValue placeholder="Choose your grade..." />
-                      </SelectTrigger>
-                      <SelectContent className="border-2 border-black rounded-xl bg-white">
-                        {grades.map((grade) => (
-                          <SelectItem 
-                            key={grade.value} 
-                            value={grade.value}
-                            className="text-lg py-3 hover:bg-primary/10 cursor-pointer"
-                          >
-                            {grade.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  {/* <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl text-blue-800 text-center">
+                    We're setting you up with the Assignment path to jump right in.
                   </div>
-
-                  {/* Level Selection - Only show when grade is selected */}
-                  {selectedGrade && (
-                    <div>
-                      <label htmlFor="level" className="block text-lg font-semibold text-gray-700 mb-3">
-                        Select Your Level:
-                      </label>
-                      <Select onValueChange={handleLevelSelect} value={selectedLevel}>
-                        <SelectTrigger 
-                          id="level"
-                          className="h-14 text-lg border-3 border-black rounded-xl bg-white hover:bg-gray-50 focus:bg-gray-50"
-                          style={{ boxShadow: '0 4px 0 black' }}
-                        >
-                          <SelectValue placeholder="Choose your level..." />
-                        </SelectTrigger>
-                        <SelectContent className="border-2 border-black rounded-xl bg-white">
-                          {levels.map((level) => (
-                            <SelectItem 
-                              key={level.value} 
-                              value={level.value}
-                              className="text-lg py-3 hover:bg-primary/10 cursor-pointer"
-                            >
-                              {level.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {/* Preview */}
-                  {selectedGrade && selectedLevel && (
-                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
-                      <p className="text-blue-800 font-medium text-center flex items-center justify-center gap-2">
-                        <Sparkles className="h-4 w-4" />
-                        Hello {username}! Ready for {grades.find(g => g.value === selectedGrade)?.label} {levels.find(l => l.value === selectedLevel)?.label} adventures?
-                        <Sparkles className="h-4 w-4" />
-                      </p>
-                    </div>
-                  )}
-                  
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={() => setStep(1)}
-                      variant="outline"
-                      className="flex-1 h-12 text-lg font-semibold rounded-xl border-3 border-gray-400 bg-white hover:bg-gray-50"
-                      style={{ boxShadow: '0 4px 0 #9ca3af' }}
-                    >
-                      Back
-                    </Button>
-                    
-                    <Button
-                      onClick={handleComplete}
-                      disabled={!selectedGrade || !selectedLevel}
-                      className={cn(
-                        "flex-1 h-12 text-lg font-bold rounded-xl border-3 btn-animate flex items-center justify-center gap-2",
-                        (selectedGrade && selectedLevel)
-                          ? "bg-green-600 hover:bg-green-700 text-white" 
-                          : "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      )}
-                      style={{ 
-                        borderColor: (selectedGrade && selectedLevel) ? '#16a34a' : '#9ca3af',
-                        boxShadow: (selectedGrade && selectedLevel) ? '0 6px 0 #16a34a' : '0 4px 0 #6b7280'
-                      }}
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Let's Go!
-                    </Button>
-                  </div>
+                   */}
+                  <Button
+                    onClick={handleComplete}
+                    className="w-full h-12 text-lg font-bold rounded-xl border-3 btn-animate flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                    style={{ 
+                      borderColor: '#16a34a',
+                      boxShadow: '0 6px 0 #16a34a'
+                    }}
+                  >
+                     <Sparkles className="h-4 w-4" />
+                    Let's Go!
+                  </Button>
                 </div>
               )}
             </CardContent>

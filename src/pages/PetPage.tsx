@@ -2177,12 +2177,14 @@ const getSleepyPetImage = (clicks: number) => {
     playClickSound();
     
     // Update selected grade if provided
+    const normalizedLevel: 'start' | 'middle' = gradeDisplayName === 'Assignment' ? 'start' : level;
+
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
       // Save grade selection to localStorage for persistence
       saveGradeSelection(gradeDisplayName);
       // Track the combined grade and level selection for highlighting
-      setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+      setSelectedGradeAndLevel({ grade: gradeDisplayName, level: normalizedLevel });
     }
     
     // Persist selection to Firebase (minimal write)
@@ -2194,11 +2196,12 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === '2nd Grade') return 'grade2';
         // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
         if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+        if (name === 'Assignment') return 'assignment';
         return '';
       };
       const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
-      const levelCode = level === 'middle' ? 'mid' : level;
-      const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
+      const levelCode = normalizedLevel === 'middle' ? 'mid' : normalizedLevel;
+      const levelDisplayName = normalizedLevel === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
       if (gradeCode) {
         await updateUserData({
@@ -2216,14 +2219,14 @@ const getSleepyPetImage = (clicks: number) => {
     const allTopicIds = Object.keys(sampleMCQData.topics);
     
     // Save preference and get the specific topic immediately
-    const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
+    const specificTopic = saveTopicPreference(normalizedLevel, allTopicIds, gradeDisplayName);
     
-    console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
+    console.log(`Preference selection - Level: ${normalizedLevel}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
-    setSelectedPreference(level);
+    setSelectedPreference(normalizedLevel);
     setSelectedTopicFromPreference(specificTopic);
     
-    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
+    console.log(`State updated - selectedPreference: ${normalizedLevel}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
 
   const handlePetPurchase = async (petType: string, cost: number) => {
@@ -3111,10 +3114,10 @@ const getSleepyPetImage = (clicks: number) => {
             >
               {/* Kindergarten */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' ? 'bg-blue-100' : ''}`}>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
                   <span className="font-semibold">Kindergarten</span>
-                  {selectedGradeAndLevel?.grade === 'K' && (
+                  {selectedGradeAndLevel?.grade === 'Kindergarten' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
                 </DropdownMenuSubTrigger>
@@ -3122,7 +3125,7 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
                     onClick={() => handlePreferenceSelection('start', 'Kindergarten')}
                   >
                     
@@ -3131,10 +3134,10 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Start</div>
                       <div className="text-sm text-gray-500">Beginning level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
                     onClick={() => handlePreferenceSelection('middle', 'Kindergarten')}
                   >
                     <span className="text-lg">🚀</span>
@@ -3142,17 +3145,17 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Middle</div>
                       <div className="text-sm text-gray-500">Intermediate level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === 'K' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
               {/* 1st Grade */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' ? 'bg-blue-100' : ''}`}>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">1st Level</span>
-                  {selectedGradeAndLevel?.grade === '1st' && (
+                  <span className="font-semibold">1st Grade</span>
+                  {selectedGradeAndLevel?.grade === '1st Grade' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
                 </DropdownMenuSubTrigger>
@@ -3160,7 +3163,7 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
                     onClick={() => handlePreferenceSelection('start', '1st Grade')}
                   >
                     <span className="text-lg">🌱</span>
@@ -3168,10 +3171,10 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Start</div>
                       <div className="text-sm text-gray-500">Beginning level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
                     onClick={() => handlePreferenceSelection('middle', '1st Grade')}
                   >
                     <span className="text-lg">🚀</span>
@@ -3179,17 +3182,17 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Middle</div>
                       <div className="text-sm text-gray-500">Intermediate level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '1st' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
               {/* 2nd Grade */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' ? 'bg-blue-100' : ''}`}>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">2nd Level</span>
-                  {selectedGradeAndLevel?.grade === '2nd' && (
+                  <span className="font-semibold">2nd Grade</span>
+                  {selectedGradeAndLevel?.grade === '2nd Grade' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
                 </DropdownMenuSubTrigger>
@@ -3197,7 +3200,7 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
                     onClick={() => handlePreferenceSelection('start', '2nd Grade')}
                   >
                     <span className="text-lg">🌱</span>
@@ -3205,10 +3208,10 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Start</div>
                       <div className="text-sm text-gray-500">Beginning level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
                     onClick={() => handlePreferenceSelection('middle', '2nd Grade')}
                   >
                     <span className="text-lg">🚀</span>
@@ -3216,17 +3219,17 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Middle</div>
                       <div className="text-sm text-gray-500">Intermediate level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '2nd' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
               {/* 3rd Grade */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' ? 'bg-blue-100' : ''}`}>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">3rd Level</span>
-                  {selectedGradeAndLevel?.grade === '3rd' && (
+                  <span className="font-semibold">3rd Grade</span>
+                  {selectedGradeAndLevel?.grade === '3rd Grade' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
                 </DropdownMenuSubTrigger>
@@ -3234,7 +3237,7 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
                     onClick={() => handlePreferenceSelection('start', '3rd Grade')}
                   >
                     <span className="text-lg">🌱</span>
@@ -3242,10 +3245,10 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Start</div>
                       <div className="text-sm text-gray-500">Beginning level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
                     onClick={() => handlePreferenceSelection('middle', '3rd Grade')}
                   >
                     <span className="text-lg">🚀</span>
@@ -3253,17 +3256,17 @@ const getSleepyPetImage = (clicks: number) => {
                       <div className="font-semibold">Middle</div>
                       <div className="text-sm text-gray-500">Intermediate level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '3rd' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
               {/* 4th Grade */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' ? 'bg-blue-100' : ''}`}>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">4th Level</span>
-                  {selectedGradeAndLevel?.grade === '4th' && (
+                  <span className="font-semibold">4th Grade</span>
+                  {selectedGradeAndLevel?.grade === '4th Grade' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
                 </DropdownMenuSubTrigger>
@@ -3271,36 +3274,36 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '4th')}
+                    className={`flex items-center gap-2 px-4 py-3 hover.bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '4th Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
                       <div className="font-semibold">Start</div>
                       <div className="text-sm text-gray-500">Beginning level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '4th')}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '4th Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
                       <div className="font-semibold">Middle</div>
                       <div className="text-sm text-gray-500">Intermediate level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
               {/* 5th Grade */}
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' ? 'bg-blue-100' : ''}`}>
+                <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' ? 'bg-blue-100' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">5th Level</span>
-                  {selectedGradeAndLevel?.grade === '5th' && (
+                  <span className="font-semibold">5th Grade</span>
+                  {selectedGradeAndLevel?.grade === '5th Grade' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
                 </DropdownMenuSubTrigger>
@@ -3308,29 +3311,44 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '5th')}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', '5th Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
                       <div className="font-semibold">Start</div>
                       <div className="text-sm text-gray-500">Beginning level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '5th')}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('middle', '5th Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
                       <div className="font-semibold">Middle</div>
                       <div className="text-sm text-gray-500">Intermediate level</div>
                     </div>
-                    {selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
+                    {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? <span className="ml-auto text-blue-600">✓</span> : null}
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+
+              {/* Assignment */}
+              <DropdownMenuItem 
+                className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Assignment' ? 'bg-blue-100' : ''}`}
+                onClick={() => handlePreferenceSelection('start', 'Assignment')}
+              >
+                <span className="text-lg">🎓</span>
+                <div>
+                  <div className="font-semibold">Assignment</div>
+                  <div className="text-sm text-gray-500">Single level path</div>
+                </div>
+                {selectedGradeAndLevel?.grade === 'Assignment' ? (
+                  <span className="ml-auto text-blue-600 text-sm">✓</span>
+                ) : null}
+              </DropdownMenuItem>
               
               {/* View Progress Button */}
               <DropdownMenuItem 

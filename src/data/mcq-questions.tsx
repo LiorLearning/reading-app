@@ -102,6 +102,206 @@ export interface MCQData {
 }
 export const sampleMCQData: MCQData = {
   "topics": {
+    'A-': {
+      topicInfo: {
+        topicId: 'A-',
+        topicName: 'assignment',
+        progressTopicName: 'Assignment practice',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank'
+      },
+      questions: [
+      {
+        id: 1,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "Great job! The word is 'whack'.",
+        questionText: "Complete the word to match the picture: _ack",
+        correctAnswer: 'whack',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ack",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+          audio: "whack"
+        },
+      {
+        id: 2,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "Excellent! The word is 'grab'.",
+        questionText: "Complete the word to match the picture: _ab",
+        correctAnswer: 'grab',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ab",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+          audio: "grab"
+        },
+      {
+        id: 3,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "Well done! The word is 'step'.",
+        questionText: "Complete the word to match the picture: _ep",
+        correctAnswer: 'step',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ep",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+        audio: "step"
+      },
+      {
+        id: 4,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "Awesome! The word is 'block'.",
+        questionText: "Complete the word to match the picture: _ock",
+        correctAnswer: 'blend',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ock",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+        audio: "block"
+      },
+      {
+        id: 5,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "Nice work! The word is 'crab'.",
+        questionText: "Complete the word to match the picture: _ab",
+        correctAnswer: 'crab',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ab",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+        audio: "crab"
+      },
+      {
+        id: 6,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "You did it! The word is 'trap'.",
+        questionText: "Complete the word to match the picture: _ap",
+        correctAnswer: 'trap',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ap",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+        audio: "trap"
+      },
+      {
+        id: 7,
+        topicId: 'A-',
+        topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'blend',
+        imageUrl: null,
+        explanation: "Fantastic! The word is 'spade'.",
+        questionText: "Complete the word to match the picture: _ade",
+        correctAnswer: 'spade',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [2,3,4],
+        aiHook: {
+          targetWord: 'blend',
+          intent: 'fill_blank',
+          questionLine: "Complete the word to match the picture: _ade",
+          imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+        },
+        audio: "spade"
+      }
+    ]},
     'K-F.2': {
       topicInfo: {
         topicId: 'K-F.2',
@@ -384,7 +584,6 @@ export const sampleMCQData: MCQData = {
         }
       ],
     },
-  
     '1-B.1': {
       topicInfo: {
         topicId: '1-B.1',
@@ -2937,7 +3136,7 @@ export const sampleMCQData: MCQData = {
     },
     '1-H.1': {
       topicInfo: {
-        topicId: '1-H.1',
+        topicId: 'assignment',
         topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
         progressTopicName: 'Fill in the missing sounds',
         questionElements: 'image + text',
@@ -2947,7 +3146,7 @@ export const sampleMCQData: MCQData = {
     questions: [
       {
         id: 1,
-        topicId: '1-H.1',
+        topicId: 'assignment',
         topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
           progressTopicName: 'Fill in the missing sounds',
         questionElements: 'image + text',
@@ -2974,7 +3173,7 @@ export const sampleMCQData: MCQData = {
         },
       {
         id: 2,
-        topicId: '1-H.1',
+        topicId: 'assignment',
         topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
           progressTopicName: 'Fill in the missing sounds',
         questionElements: 'image + text',
@@ -3001,7 +3200,7 @@ export const sampleMCQData: MCQData = {
         },
       {
         id: 3,
-        topicId: '1-H.1',
+        topicId: 'assignment',
         topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
           progressTopicName: 'Fill in the missing sounds',
         questionElements: 'image + text',
@@ -3028,7 +3227,7 @@ export const sampleMCQData: MCQData = {
       },
       {
         id: 4,
-        topicId: '1-H.1',
+        topicId: 'assignment',
         topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
           progressTopicName: 'Fill in the missing sounds',
         questionElements: 'image + text',

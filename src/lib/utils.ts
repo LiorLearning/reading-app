@@ -701,6 +701,10 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   if (gradeDisplayName === '3rd Grade') {
     return '3';
   }
+  // Assignment path should use the dedicated assignment content stream
+  if (gradeDisplayName === 'Assignment') {
+    return 'A';
+  }
   // Grade 1 should reflect grade 1 content
   if (gradeDisplayName === '1st Grade') {
     return '1';
@@ -830,10 +834,11 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
   
   // Filter topics by grade first to see what's available
   const gradeTopics = allTopicIds.filter(id => {
-    if (contentGrade === 'K') return id.startsWith('K-');
-    if (contentGrade === '1') return id.startsWith('1-');
-    if (contentGrade === '2') return id.startsWith('2-');
-    if (contentGrade === '3') return id.startsWith('3-');
+  if (contentGrade === 'K') return id.startsWith('K-');
+  if (contentGrade === '1') return id.startsWith('1-');
+  if (contentGrade === '2') return id.startsWith('2-');
+  if (contentGrade === '3') return id.startsWith('3-');
+  if (contentGrade === 'A') return id.startsWith('A-');
     return false;
   });
   
@@ -884,6 +889,14 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
         startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
         if (startIndex === -1) startIndex = 0;
       }
+    }
+  } else if (contentGrade === 'assignment') {
+    // Assignment topics - find first assignment topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('A-'));
+    if (startIndex === -1) {
+      console.log(`⚠️ No Assignment topics found, falling back to Grade 1`);
+      startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+      if (startIndex === -1) startIndex = 0;
     }
   }
   

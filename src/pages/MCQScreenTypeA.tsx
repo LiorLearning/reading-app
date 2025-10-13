@@ -326,6 +326,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   // Helper function to extract grade level from topicId
   const getGradeLevel = (topicId: string): string => {
     const gradeMatch = topicId.match(/^([KG0-9]+)/);
+    console.log('🔍 Getting grade level for topicId:', gradeMatch, topicId);
     if (!gradeMatch) return "Elementary";
     
     const grade = gradeMatch[1];
@@ -335,6 +336,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     if (grade === '3') return "Grade 3";
     if (grade === '4') return "Grade 4";
     if (grade === '5') return "Grade 5";
+    if (grade === 'A') return "Assignment";
     return `Grade ${grade}`;
   };
   

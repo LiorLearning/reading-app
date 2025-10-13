@@ -225,7 +225,7 @@ export const getSpellingTopicIds = (gradeDisplayName?: string): string[] => {
   const allSpellingQuestions = getAllSpellingQuestions();
   
   let filteredQuestions = allSpellingQuestions;
-  
+  console.info('🔍 Getting spelling topic ids for grade:', gradeDisplayName);
   if (gradeDisplayName) {
     const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
     filteredQuestions = allSpellingQuestions.filter(question => {

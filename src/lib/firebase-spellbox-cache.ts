@@ -100,7 +100,7 @@ export const loadAllSpellboxProgressHybrid = async (
     
     const commonGrades = [
       'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
-      'Kindergarten', 'Pre-K'
+      'Kindergarten', 'Pre-K', 'Assignment'
     ];
     
     for (const grade of commonGrades) {
