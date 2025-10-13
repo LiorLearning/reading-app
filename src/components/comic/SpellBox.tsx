@@ -55,6 +55,9 @@ interface SpellBoxProps {
   // Realtime session integration
   sendMessage?: (text: string) => void;
   interruptRealtimeSession?: () => void;
+
+  // Optional delay to enable the Next chevron after a correct answer (ms)
+  nextUnlockDelayMs?: number;
 }
 
 const SpellBox: React.FC<SpellBoxProps> = ({
@@ -81,7 +84,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   
   // Realtime session integration
   sendMessage,
-  interruptRealtimeSession
+  interruptRealtimeSession,
+  nextUnlockDelayMs = 0
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -91,6 +95,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [attempts, setAttempts] = useState(0);
   const [aiHint, setAiHint] = useState<string>('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
+  const [canClickNext, setCanClickNext] = useState(false);
   
   // Tutorial system integration
   const {
@@ -431,7 +436,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
   // Generate stable messageId for TTS (only changes when targetWord changes)
   const messageId = useMemo(() => 
-    `spellbox-audio-${targetWord}-${Date.now()}`, 
+    `krafty-spellbox-audio-${targetWord}-${Date.now()}`, 
     [targetWord]
   );
   const isSpeaking = useTTSSpeaking(messageId);
@@ -631,6 +636,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       });
     }
   }, [audioText, targetWord, messageId, isSpeaking]);
+
+  // Gate the Next chevron after a correct answer if a delay is requested
+  useEffect(() => {
+    let timer: number | undefined;
+    if (isCorrect) {
+      if (nextUnlockDelayMs > 0) {
+        setCanClickNext(false);
+        timer = window.setTimeout(() => setCanClickNext(true), nextUnlockDelayMs);
+      } else {
+        setCanClickNext(true);
+      }
+    } else {
+      setCanClickNext(false);
+    }
+    return () => { if (timer) window.clearTimeout(timer); };
+  }, [isCorrect, nextUnlockDelayMs]);
 
   // Handle answer change
   const handleAnswerChange = useCallback((newAnswer: string) => {
@@ -1109,7 +1130,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           
 
           {/* AI-powered hints for incorrect words */}
-          {isComplete && !isCorrect && showHints && (
+                  {false && isComplete && !isCorrect && showHints && (
             <div style={{
               padding: '12px 0',
               marginBottom: '20px',
@@ -1177,7 +1198,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           )}
 
           {/* Next chevron - circular, positioned on the right of the spellbox */}
-          {isCorrect && onNext && (
+          {isCorrect && onNext && canClickNext && (
             <div className="absolute top-1/2 -translate-y-1/2 -right-[24px] z-20">
               <Button
                 variant="comic"

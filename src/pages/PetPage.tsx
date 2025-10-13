@@ -14,6 +14,7 @@ import { useTutorial } from '@/hooks/use-tutorial';
 import tutorialService from '@/lib/tutorial-service';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import PetNamingModal from '@/components/PetNamingModal';
+import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
@@ -900,6 +901,14 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           const endMs = (s.sleepEndAt as any).toMillis ? (s.sleepEndAt as any).toMillis() : new Date(s.sleepEndAt as any).getTime();
           if (endMs && Date.now() < endMs) {
             updateSleepClicks(3, startMs || Date.now(), endMs);
+            try {
+              const levelInfo = getLevelInfo();
+              analytics.capture('pet_put_to_sleep', {
+                pet_type: currentPet,
+                pet_level: levelInfo.currentLevel,
+                time_sleep_started_ms: startMs || Date.now(),
+              });
+            } catch {}
           }
         }
       } catch {}
@@ -2297,11 +2306,22 @@ const getSleepyPetImage = (clicks: number) => {
       try {
         if (user?.uid) {
           stateStoreApi.setPetName({ userId: user.uid, pet: petType, name: chosenName.trim() });
+          try { analytics.capture('pet_named', { pet_id: petType, pet_name: chosenName.trim(), pet_type: petType, pet_coins_spent: cost, pet_level: getLevelInfo().currentLevel }); } catch {}
           // Force purchased pet to be sad on purchase day
           stateStoreApi.ensurePetSadToday({ userId: user.uid, pet: petType });
         }
       } catch {}
     }
+
+    try {
+      analytics.capture('pet_bought', {
+        transaction_id: crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        pet_id: petType,
+        pet_type: petType,
+        pet_coins_spent: cost,
+        pet_level: getLevelInfo().currentLevel,
+      });
+    } catch {}
   };
 
   // Pet store data structure - dynamically updated with current ownership status

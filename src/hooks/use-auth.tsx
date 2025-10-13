@@ -20,6 +20,7 @@ import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import { CoinSystem } from '@/pages/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
+import analytics from '@/lib/analytics';
 
 // Google Identity Services types
 declare global {
@@ -101,6 +102,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
       
       if (user) {
+        // Identify in analytics after auth is ready
+        try { analytics.identify(user.uid, { is_anonymous: user.isAnonymous }); } catch {}
         // Mark that this device has previously signed in with a real account
         try {
           if (!user.isAnonymous) {
@@ -438,6 +441,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
 
+            // Emit todo_event when activity starts/completes (single event model)
+            try {
+              const todayKey = new Date().toISOString().slice(0, 10);
+              states.forEach((s: any) => {
+                const todoType = s.activity;
+                const todoId = `${s.pet}:${todayKey}:${todoType}`;
+                const status = s.completed ? 'completed' : 'started';
+                analytics.capture('todo_event', {
+                  todo_id: todoId,
+                  todo_type: todoType,
+                  status,
+                });
+              });
+            } catch {}
+
             // Enable sleep when the CURRENT pet's daily quest progress >= 5
             try {
               const currentPet = PetProgressStorage.getCurrentSelectedPet() || ownedPets[0];
@@ -497,6 +515,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUserData(null);
         setHasGoogleAccount(false);
+        try { analytics.identify('anonymous'); } catch {}
         // Cleanup live listeners on sign-out
         try {
           if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
