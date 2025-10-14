@@ -40,7 +40,7 @@ import { useSessionCoins } from "@/hooks/use-session-coins";
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
 import WhiteboardLesson from "@/components/adventure/WhiteboardLesson";
-import { getLessonScript } from "@/data/lesson-scripts";
+import { getLessonScript, lessonScripts } from "@/data/lesson-scripts";
 import RightUserOverlay from "@/components/adventure/RightUserOverlay";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
@@ -66,7 +66,7 @@ import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
-import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
+import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion, getGlobalSpellingLessonNumber } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
@@ -560,6 +560,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   });
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
+  const currentGradeDisplayName = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').trim();
+  const whiteboardGradeEligible = currentGradeDisplayName === '1st Grade';
+
   // Automatic Flow Control System
   const ADVENTURE_PROMPT_THRESHOLD = 3; // Configurable threshold for when user can access questions
   const [adventurePromptCount, setAdventurePromptCount] = React.useState<number>(0); // Track adventure prompts
@@ -833,6 +836,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
       
       // Generate initial AI message using real-time AI generation
+      // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
+      const shouldSkipInitialGreetingForWhiteboard = whiteboardGradeEligible && (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled);
+      if (shouldSkipInitialGreetingForWhiteboard || suppressInitialGreetingRef.current) {
+        console.log('⏭️ Skipping initial AI message: whiteboard will run');
+        return;
+      }
       const generateInitialResponse = async () => {
         try {
           console.log('🎯 generateInitialResponse called with currentAdventureType:', currentAdventureType);
@@ -859,7 +868,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             currentAdventureType // adventureType - back to using state
           );
 
-          // Add the initial AI message
+          // Add the initial AI message (guarded against suppression)
+          if (suppressInitialGreetingRef.current) {
+            console.log('⏭️ Skipping initial AI message (post-gen due to suppression)');
+            return;
+          }
           const aiMessage: ChatMessage = {
             type: 'ai',
             content: initialMessage,
@@ -869,11 +882,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setChatMessages(prev => {
             setLastMessageCount(prev.length + 1);
             playMessageSound();
-            // Auto-speak the initial AI message and wait for completion
+            // Auto-speak the initial AI message and wait for completion (guarded)
             const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
-            ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
-              console.error('TTS error for initial message:', error)
-            );
+            if (!suppressInitialGreetingRef.current) {
+              ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
+                console.error('TTS error for initial message:', error)
+              );
+            }
             return [...prev, aiMessage];
           });
           
@@ -887,7 +902,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             ? "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀"
             : "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟";
 
-          // Add the fallback AI message
+          // Add the fallback AI message (guarded against suppression)
+          if (suppressInitialGreetingRef.current) {
+            console.log('⏭️ Skipping fallback initial AI message due to suppression');
+            return;
+          }
           const aiMessage: ChatMessage = {
             type: 'ai',
             content: fallbackMessage,
@@ -897,11 +916,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setChatMessages(prev => {
             setLastMessageCount(prev.length + 1);
             playMessageSound();
-            // Auto-speak the fallback message
+            // Auto-speak the fallback message (guarded)
             const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
-            ttsService.speakAIMessage(fallbackMessage, messageId).catch(error => 
-              console.error('TTS error for fallback message:', error)
-            );
+            if (!suppressInitialGreetingRef.current) {
+              ttsService.speakAIMessage(fallbackMessage, messageId).catch(error => 
+                console.error('TTS error for fallback message:', error)
+              );
+            }
             return [...prev, aiMessage];
           });
           
@@ -1009,7 +1030,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return;
     }
     
-    // Generate initial AI message using real-time AI generation
+      // Generate initial AI message using real-time AI generation
+      // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
+      if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
+        console.log('⏭️ Skipping initial AI message: whiteboard will run');
+        return;
+      }
     const generateInitialResponse = async () => {
       try {
         console.log('🎯 generateInitialResponse called with explicitAdventureType:', explicitAdventureType);
@@ -1036,19 +1062,29 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           explicitAdventureType // Use explicit adventure type instead of state
         );
 
-        // Add the initial AI message
+        // Add the initial AI message (guard again in case state flipped meanwhile)
+        if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
+          console.log('⏭️ Skipping initial AI message (post-gen): whiteboard active');
+          return;
+        }
         const aiMessage: ChatMessage = {
           type: 'ai',
           content: initialMessage,
           timestamp: Date.now()
         };
 
+        // Guard enqueue in case suppression toggled between checks
+        if (suppressInitialGreetingRef.current) {
+          console.log('⏭️ Skipping enqueue of initial AI message due to suppression');
+          return;
+        }
         setChatMessages(prev => [...prev, aiMessage]);
 
         // Speak the initial message using the same messageId the overlay derives
         // from the bubble HTML so the stop icon shows immediately.
         const messageId = bubbleMessageIdFromHtml(formatAIMessage(initialMessage));
         setTimeout(async () => {
+          if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) return;
           await ttsService.speakAIMessage(initialMessage, messageId);
         }, 500);
 
@@ -1479,15 +1515,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Mute pet audio and hide pet dialogue while whiteboard is active
   React.useEffect(() => {
-    const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
+    const urlEnabled = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('whiteboard') === '1';
+    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
     if (lessonEnabled) {
       try { ttsService.stop(); } catch {}
       try { ttsService.setSuppressNonKrafty(true); } catch {}
     } else {
       try { ttsService.setSuppressNonKrafty(false); } catch {}
     }
-  }, [devWhiteboardEnabled]);
+  }, [devWhiteboardEnabled, whiteboardGradeEligible]);
   
   // Sync legacy loading state with unified system for UI consistency
   React.useEffect(() => {
@@ -2934,6 +2970,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return;
     }
     isStartingAdventureRef.current = true;
+    // For the very first adventure session start, allow immediate whiteboard on first question (id === 1)
+    if (whiteboardGradeEligible && !firstAdventureStartedRef.current) {
+      shouldTriggerWhiteboardOnFirstQuestionRef.current = true;
+      suppressInitialGreetingRef.current = true;
+      firstAdventureStartedRef.current = true;
+    } else {
+      shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
+    }
     playClickSound();
     setSelectedTopicId(topicId);
     setAdventureMode(mode);
@@ -3032,7 +3076,38 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // Use setTimeout to ensure state updates have been processed before changing screen
     setTimeout(() => {
-      setCurrentScreen(1); // Go to adventure screen first to show AI response
+      setCurrentScreen(1); // Go to adventure screen
+      // If first-question whiteboard is pending, immediately show the prompt and enable lesson (no AI message)
+      if (whiteboardGradeEligible && shouldTriggerWhiteboardOnFirstQuestionRef.current) {
+        // Guard: proactively determine the first SpellBox question because the initial greeting
+        // is suppressed (so currentSpellQuestion may not be set yet for brand new users)
+        const gradeName = currentGradeDisplayName;
+        const initialSpellQuestion = gradeName ? getNextSpellboxQuestion(gradeName) : null;
+        const initialSpellTopicId = initialSpellQuestion ? (initialSpellQuestion.topicId || initialSpellQuestion.topicName) : null;
+        const isFirstSpellQuestion = initialSpellQuestion?.id === 1;
+        const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
+        const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
+        if (isFirstSpellQuestion && !hasMidTopicProgress) {
+          try { ttsService.stop(); } catch {}
+          const name = userData?.username?.trim() || 'friend';
+          setWhiteboardPrompt({
+            topicId: WHITEBOARD_LESSON_TOPIC,
+            text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
+            shouldAutoplay: true,
+            isAcknowledged: false,
+          });
+          setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
+          setWhiteboardPromptLocked(false);
+          setLessonReady(false);
+          setIsWhiteboardPromptActive(true);
+          setDevWhiteboardEnabled(true);
+          // Consume the flag only after we actually trigger the lesson
+          shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
+        } else {
+          // Leave the flag as true to allow the later effect (that watches currentSpellQuestion)
+          // to trigger once the first question materializes.
+        }
+      }
     }, 0);
     
     // Release the start guard slightly later to avoid double-taps
@@ -3924,6 +3999,50 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const nextFirstCorrect = prevFirstCorrect + (isFirstAttempt ? 1 : 0);
         const optimisticPct = Math.round((nextFirstCorrect / nextAttempted) * 100);
         setHeaderTopicProgressPct(optimisticPct);
+        // If this was the final question (10th), immediately launch whiteboard for next topic
+        if (whiteboardGradeEligible && nextAttempted >= 10) {
+          try { ttsService.stop(); } catch {}
+          // Persist final attempt so topic is marked completed for SpellBox progress
+          try {
+            updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid).catch(() => {});
+          } catch {}
+          // Hide SpellBox immediately
+          setShowSpellBox(false);
+          setCurrentSpellQuestion(null);
+          // Determine next SpellBox topic based on grade progression
+          const allSpellTopics = getSpellingTopicIds(currentGrade);
+          let nextTopicId = getNextSpellboxTopic(currentGrade, allSpellTopics) || null;
+          // If progression returns the same topic (e.g., not passing), move to the next in list
+          if (!nextTopicId || nextTopicId === currentSpellQuestion.topicId) {
+            const idx = allSpellTopics.indexOf(currentSpellQuestion.topicId);
+            const nextIdx = idx >= 0 ? (idx + 1) % (allSpellTopics.length || 1) : 0;
+            nextTopicId = allSpellTopics[nextIdx] || currentSpellQuestion.topicId;
+          }
+          if (nextTopicId) {
+            setSelectedTopicId(nextTopicId);
+            try { whiteboardTriggeredTopicsRef.current.add(nextTopicId); } catch {}
+          }
+          // Switch to adventure and show whiteboard prompt (with chevron) for next topic
+          setCurrentScreen(1);
+          const name = userData?.username?.trim() || 'friend';
+          if (whiteboardGradeEligible) {
+            const introText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
+            setWhiteboardPrompt({
+              topicId: WHITEBOARD_LESSON_TOPIC,
+              text: introText,
+              shouldAutoplay: true,
+              isAcknowledged: false,
+            });
+            setWhiteboardPinnedText(introText);
+            setWhiteboardPromptLocked(false);
+            setLessonReady(false);
+            setIsWhiteboardPromptActive(true);
+          }
+          // Note: enabling the lesson is deferred to chevron via dismissWhiteboardPrompt()
+          // Do not proceed with normal continuation flow
+          isAdvancingSpellRef.current = false;
+          return;
+        }
       } catch {}
       updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
         .then(() => {
@@ -3975,6 +4094,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // Add adventure story using functional state (avoids stale closure)
     setChatMessages(prev => {
+      // Suppress continuation chat if whiteboard is active or its prompt is visible
+      if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) {
+        return prev;
+      }
       const latestWithContinuation = prev
         .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
         .slice(-1)[0] as any;
@@ -4057,6 +4180,28 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setCurrentSpellQuestion(null);
   }, [currentSpellQuestion, setChatMessages]);
 
+  // DEV: Instantly advance the current SpellBox without typing
+  const devAdvanceSpellbox = useCallback(() => {
+    try { ttsService.stop(); } catch {}
+    // If a SpellBox is active, simulate a correct completion and advance
+    if (showSpellBox && currentSpellQuestion) {
+      try {
+        // Mark as completed correctly (attemptCount = 1)
+        handleSpellComplete(true, currentSpellQuestion.word, 1);
+      } catch {}
+      // Proceed to next immediately (no UI interaction required)
+      try {
+        handleSpellNext();
+      } catch {}
+    }
+  }, [showSpellBox, currentSpellQuestion, handleSpellComplete, handleSpellNext]);
+
+  // DEV: Send the message 'else' through the same flow as the input bar
+  const devSendElse = useCallback(() => {
+    try { ttsService.stop(); } catch {}
+    onGenerate('else');
+  }, [onGenerate]);
+
   // Removed manual Next handler; flow advances automatically on completion
 
   // Special handling for pet page - render full screen without header
@@ -4091,23 +4236,36 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [whiteboardPromptLocked, setWhiteboardPromptLocked] = React.useState(false);
   // Keep the original whiteboard intro text fixed in the pet bubble while lesson runs
   const [whiteboardPinnedText, setWhiteboardPinnedText] = React.useState<string | null>(null);
+  const lastSpellTopicRef = React.useRef<string | null>(null);
+  const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
+  const firstAdventureStartedRef = React.useRef<boolean>(false);
+  const suppressInitialGreetingRef = React.useRef<boolean>(false);
 
   // Consider the whiteboard lesson "active" whenever the dev toggle (or URL flag)
   // is on AND a script exists for the selected topic. We use this to
   // 1) keep the input dock disabled, and 2) avoid mutating the pet bubble.
   const isWhiteboardLessonActive = React.useMemo(() => {
     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
+    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
     if (!lessonEnabled) return false;
     const script = getLessonScript(selectedTopicId) || getLessonScript('1-H.1');
     return !!script;
-  }, [devWhiteboardEnabled, selectedTopicId]);
+  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible]);
 
   React.useEffect(() => {
+    if (!whiteboardGradeEligible) return;
     if (!selectedTopicId || selectedTopicId !== WHITEBOARD_LESSON_TOPIC) return;
+    // Avoid double-start: skip if we are about to trigger via first-question path,
+    // or if a prompt is already active, or if lesson already enabled.
+    if (shouldTriggerWhiteboardOnFirstQuestionRef.current) return;
+    if (isWhiteboardPromptActive) return;
+    if (devWhiteboardEnabled) return;
     const name = userData?.username?.trim() || 'friend';
     const alreadySeen = whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
     if (alreadySeen) return;
+    // Defer whiteboard prompt until trainer (Krafty) overlay is not showing,
+    // otherwise their voices will clash for new users.
+    if (showStep5Intro) return;
     setWhiteboardPrompt({
       topicId: WHITEBOARD_LESSON_TOPIC,
       text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
@@ -4118,7 +4276,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setWhiteboardPromptLocked(false);
     setLessonReady(false);
     setIsWhiteboardPromptActive(true);
-  }, [selectedTopicId, whiteboardSeenThisSession, userData?.username]);
+  }, [selectedTopicId, whiteboardSeenThisSession, userData?.username, devWhiteboardEnabled, isWhiteboardPromptActive]);
 
   React.useEffect(() => {
     // Intentionally do nothing here when dev whiteboard is enabled.
@@ -4136,6 +4294,73 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
   }, [devWhiteboardEnabled]);
 
+  // Trigger the whiteboard once per SpellBox topic change using the current spelling question's topic
+  const whiteboardTriggeredTopicsRef = React.useRef<Set<string>>(new Set());
+  React.useEffect(() => {
+    if (!whiteboardGradeEligible) return;
+    const spellTopic = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName;
+    if (!spellTopic) return;
+    const isFirstQuestionId = currentSpellQuestion?.id === 1;
+    const name = userData?.username?.trim() || 'friend';
+    const alreadySeenLesson = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
+
+    // First adventure start: if first question (id === 1) and flag set, trigger immediately with custom prompt
+    if (whiteboardGradeEligible && shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
+      shouldTriggerWhiteboardOnFirstQuestionRef.current = false; // consume flag so it doesn't re-trigger later
+      whiteboardTriggeredTopicsRef.current.add(spellTopic);
+      // Do not force-stop here so we don't cut off ongoing trainer voice
+      setWhiteboardPrompt({
+        topicId: WHITEBOARD_LESSON_TOPIC,
+        text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
+        shouldAutoplay: true,
+        isAcknowledged: false,
+      });
+      setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
+      setWhiteboardPromptLocked(false);
+      setLessonReady(false);
+      setIsWhiteboardPromptActive(true);
+      setCurrentScreen(1);
+      setDevWhiteboardEnabled(true);
+      lastSpellTopicRef.current = spellTopic;
+      return;
+    }
+    // If this is the first detected spell topic for the session, remember it but don't trigger
+    if (lastSpellTopicRef.current === null) {
+      lastSpellTopicRef.current = spellTopic;
+      return;
+    }
+    // Only trigger on actual topic transitions (previous topic exists and is different)
+    if (spellTopic !== lastSpellTopicRef.current) {
+      // Only allow auto-trigger if the first question id for this topic is 1, otherwise skip
+      // And skip activation when resuming mid-topic per saved SpellBox topic progress
+      if (!isFirstQuestionId) {
+        lastSpellTopicRef.current = spellTopic;
+        return;
+      }
+      const topicIdForProgress = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || '';
+      const topicProgress = (currentGradeDisplayName && topicIdForProgress) ? getSpellboxTopicProgress(currentGradeDisplayName, topicIdForProgress) : null;
+      const isMidTopic = !!topicProgress && (topicProgress.questionsAttempted || 0) >= 1;
+      if (isMidTopic) {
+        lastSpellTopicRef.current = spellTopic;
+        return;
+      }
+      // Do not auto-trigger if we explicitly just enabled via chevron or end-of-topic
+        if (whiteboardGradeEligible && !devWhiteboardEnabled && !whiteboardTriggeredTopicsRef.current.has(spellTopic) && !alreadySeenLesson) {
+        whiteboardTriggeredTopicsRef.current.add(spellTopic);
+        try { ttsService.stop(); } catch {}
+        setCurrentScreen(1);
+        setDevWhiteboardEnabled(true);
+        // Ensure the pet bubble shows the whiteboard intro instead of any prior continuation
+        const introText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
+        setWhiteboardPinnedText(introText);
+      }
+      lastSpellTopicRef.current = spellTopic;
+      return;
+    }
+    // Keep ref in sync
+    lastSpellTopicRef.current = spellTopic;
+  }, [currentSpellQuestion?.topicId, currentSpellQuestion?.topicName, devWhiteboardEnabled, whiteboardSeenThisSession]);
+
   const shouldShowWhiteboardPrompt = !!whiteboardPrompt;
   const dismissWhiteboardPrompt = React.useCallback(() => {
     if (!whiteboardPrompt || whiteboardPromptLocked) return;
@@ -4146,6 +4371,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setLessonReady(true);
     setDevWhiteboardEnabled(true);
     setIsWhiteboardPromptActive(false);
+    // After Step 5 overlay is dismissed, previously suppressed non-Krafty
+    // messages (like whiteboard prompt) should be replayed
+    try { ttsService.replayLastSuppressed?.(); } catch {}
   }, [whiteboardPrompt, whiteboardPromptLocked]);
 
   const showWhiteboardPromptAgain = React.useCallback(() => {
@@ -4158,16 +4386,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       delete next[WHITEBOARD_LESSON_TOPIC];
       return next;
     });
-    const nextText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
-    setWhiteboardPrompt({
-      topicId: WHITEBOARD_LESSON_TOPIC,
-      text: nextText,
-      shouldAutoplay: true,
-      isAcknowledged: false,
-    });
-    setWhiteboardPinnedText(nextText);
-    setIsWhiteboardPromptActive(true);
-  }, [userData?.username]);
+    if (whiteboardGradeEligible) {
+      const nextText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
+      setWhiteboardPrompt({
+        topicId: WHITEBOARD_LESSON_TOPIC,
+        text: nextText,
+        shouldAutoplay: true,
+        isAcknowledged: false,
+      });
+      setWhiteboardPinnedText(nextText);
+      setIsWhiteboardPromptActive(true);
+    } else {
+      setWhiteboardPrompt(null);
+      setWhiteboardPinnedText(null);
+      setIsWhiteboardPromptActive(false);
+      setDevWhiteboardEnabled(false);
+    }
+  }, [userData?.username, whiteboardGradeEligible]);
 
   const clearLessonIntroForDev = React.useCallback(() => {
     try {
@@ -4258,7 +4493,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           >
             {userData && currentScreen !== -1 && (
               <Button 
-                variant="default" 
+                variant="default"
+                size="icon"
                 onClick={async () => {
                   playClickSound();
                   await handleCloseSession(); // Save current adventure before going home
@@ -4270,10 +4506,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     navigate('/');
                   }
                 }}
-                className="flex items-center gap-2 rounded-full px-4 py-2 bg-white text-black font-semibold border-2 border-foreground shadow-solid btn-animate"
+                className="w-10 h-10 rounded-full bg-white text-black font-semibold border-2 border-foreground shadow-solid btn-animate flex items-center justify-center"
               >
-                <Home className="h-4 w-3" />
-                <span></span>
+                <Home className="h-5 w-5" />
               </Button>
             )}
 
@@ -4284,7 +4519,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 style={{ minWidth: '220px' }}
               >
                 <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">
-                  Lesson {(() => { const s = (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')); const m = ((s?.topicId) || (selectedTopicId||'')).match(/(\d+)$/); return m ? m[1] : '1'; })()}
+                  Lesson {(() => { const topicId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1'; const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}
                 </span>
                 <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">
                   • {(getLessonScript(selectedTopicId) || getLessonScript('1-H.1'))?.title || selectedTopicId}
@@ -4804,6 +5039,40 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           >
             {/* Glass blur overlay to soften the background */}
             <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
+
+            {/* DEV tools: top-right */}
+            {currentScreen === 1 && (
+              <div className="fixed right-4 top-4 z-50 flex flex-col items-end gap-2">
+                {/* Skip SpellBox when active */}
+                {/*
+                  DEV: Next Spell button intentionally disabled
+                  {showSpellBox && currentSpellQuestion && (
+                    <button
+                      type="button"
+                      onClick={() => { playClickSound(); devAdvanceSpellbox(); }}
+                      className="px-3 py-1 rounded-md text-xs font-bold border-2 border-black bg-amber-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105 active:translate-y-[1px]"
+                      aria-label="DEV: Skip SpellBox"
+                      title="DEV: Skip SpellBox"
+                    >
+                      DEV: Next Spell
+                    </button>
+                  )}
+                */}
+                {/* Send 'else' using input flow */}
+                {/*
+                  DEV: Send "else" button intentionally disabled
+                  <button
+                    type="button"
+                    onClick={() => { playClickSound(); devSendElse(); }}
+                    className="px-3 py-1 rounded-md text-xs font-bold border-2 border-black bg-cyan-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105 active:translate-y-[1px]"
+                    aria-label="DEV: Send 'else'"
+                    title="DEV: Send 'else'"
+                  >
+                    DEV: Send "else"
+                  </button>
+                */}
+              </div>
+            )}
             
             {/* Left Arrow Navigation - Outside the main container */}
             {currentScreen === 1 && isInQuestionMode === false && (
@@ -4964,7 +5233,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {(() => {
                     // When the whiteboard lesson is active, show a soft blurred thematic background on the left side
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-                    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
+                    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
                     const hasLesson = !!(selectedTopicId && getLessonScript('1-H.1'));
                     if (!(lessonEnabled && hasLesson)) return null;
                     const bgImage = (current?.image && typeof current.image === 'string') ? current.image : (rocket1 as string);
@@ -4987,9 +5256,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   })()}
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-                    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
-                    const script = lessonEnabled ? (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')) : null;
-                    if (lessonEnabled && script) {
+                    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
+                    // Resolve lesson script from the next Spellbox question at topic start (id === 1)
+                    const nextSpellQuestion = lessonEnabled ? getNextSpellboxQuestion(currentGradeDisplayName) : null;
+                    const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
+                      ? (nextSpellQuestion.topicId || nextSpellQuestion.topicName)
+                      : null;
+                    const script = (lessonEnabled && nextSpellTopicId) ? getLessonScript(nextSpellTopicId) : null;
+                    if (lessonEnabled && script && !shouldShowWhiteboardPrompt) {
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
@@ -4997,6 +5271,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             setLessonReady(false);
                             setDevWhiteboardEnabled(false);
                             setWhiteboardPromptLocked(false);
+                            // Mark lesson as seen so the intro prompt does not reappear
+                            setWhiteboardSeenThisSession(prev => ({ ...prev, [WHITEBOARD_LESSON_TOPIC]: true }));
+                            // Clear any pinned intro text from the pet bubble
+                            setWhiteboardPinnedText(null);
                             const name = userData?.username?.trim() || 'friend';
                             const celebration = `Great job!`;
                             setWhiteboardPrompt({
@@ -5023,27 +5301,49 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               }).catch(() => {});
                             }, 150);
                             setTimeout(() => {
+                              // Clear celebration prompt
                               setWhiteboardPrompt(null);
-                              const latestAi = chatMessagesRef.current.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0];
-                              if (latestAi) {
-                                const html = formatAIMessage(latestAi.content, latestAi.spelling_word);
-                                const text = extractTextFromHtml(html);
-                                const messageId = bubbleMessageIdFromHtml(html);
-                                try { ttsService.stop(); } catch {}
-                                const selectedVoice = (() => {
-                                  try { return ttsService.getSelectedVoice?.().id; } catch { return undefined; }
-                                })();
-                                const selectedSpeed = (() => {
-                                  try { return ttsService.getSelectedSpeed?.(); } catch { return undefined; }
-                                })() || 0.8;
-                                ttsService.speak(text, {
-                                  messageId,
-                                  voice: selectedVoice,
-                                  stability: 0.7,
-                                  similarity_boost: 0.9,
-                                  speed: selectedSpeed,
-                                }).catch(() => {});
-                              }
+                              // Lift suppression so a fresh, natural follow-up can be generated if needed
+                              suppressInitialGreetingRef.current = false;
+                              // AI-generated conversational follow-up (no spelling word → no SpellBox)
+                              (async () => {
+                                try {
+                                  const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                                  const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+                                  const petType = PetProgressStorage.getPetType(currentPetId);
+                                  const postLessonUserCue = `POST_LESSON_FOLLOWUP: We just finished a quick skill lesson on the whiteboard. Write one short, friendly line as the ${petType} speaking to ${name}. Keep it conversational and inviting, ask a light next-step question, do not mention spelling or lessons, no emojis, under 18 words.`;
+                                  const resp = await aiService.generateResponse(
+                                    postLessonUserCue,
+                                    chatMessagesRef.current,
+                                    null,
+                                    userData,
+                                    undefined,
+                                    currentAdventureContext,
+                                    undefined,
+                                    currentAdventureContext?.summary,
+                                    petName,
+                                    petType,
+                                    currentAdventureType || 'food'
+                                  );
+                                  const followUp = (resp?.adventure_story || '').trim() || `Great work! What should we do next?`;
+                                  const msg: ChatMessage = {
+                                    type: 'ai',
+                                    content: followUp,
+                                    timestamp: Date.now()
+                                  };
+                                  setChatMessages(prev => {
+                                    const next = [...prev, msg];
+                                    try {
+                                      const id = bubbleMessageIdFromHtml(formatAIMessage(followUp));
+                                      ttsService.speakAIMessage(followUp, id).catch(() => {});
+                                    } catch {}
+                                    try {
+                                      if (currentSessionId) adventureSessionService.addChatMessage(currentSessionId, msg);
+                                    } catch {}
+                                    return next;
+                                  });
+                                } catch {}
+                              })();
                             }, 3600);
                           }}
                           sendMessage={sendMessage}
@@ -5056,7 +5356,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {/* Left pet overlay with AI bubble - overlays inside the stage container */}
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-                    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
+                    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
                     return (
                   <LeftPetOverlay 
                     petImageUrl={currentPetAvatarImage}
@@ -5139,8 +5439,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   />
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-                    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
+                    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
                     const scriptAvailable = lessonEnabled ? (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')) : null;
+                    // Hide ComicPanel only while the whiteboard lesson is actively mounted.
+                    // Keep it visible during the interim prompt so the panel isn't blank.
                     return !(lessonEnabled && scriptAvailable);
                   })() && (
                   <ComicPanelComponent
@@ -5367,6 +5669,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                            </aside>
               </div>
             </div>
+            {/*
+              DEV: Increment whiteboard lesson button intentionally disabled
+              {import.meta.env.DEV && (
+                <button
+                  aria-label="dev-increment-whiteboard-lesson"
+                  title="Next whiteboard lesson"
+                  onClick={() => {
+                    try {
+                      const keys = Object.keys(lessonScripts);
+                      const currentId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1';
+                      const idx = keys.indexOf(currentId);
+                      const next = keys[(idx >= 0 ? idx + 1 : 1) % keys.length];
+                      setSelectedTopicId(next);
+                      setLessonReady(true);
+                      setDevWhiteboardEnabled(true);
+                    } catch (e) {
+                      console.warn('Dev increment lesson failed', e);
+                    }
+                  }}
+                  className="fixed top-2 right-2 w-9 h-9 rounded-full border-2 border-black bg-yellow-300 text-black shadow-lg z-[9999]"
+                  style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.6)' }}
+                >
+                  +1
+                </button>
+              )}
+            */}
           </main>
         ) : (
           <MCQScreenTypeA
@@ -5415,6 +5743,27 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               playClickSound();
               
               console.log(`🔍 DEBUG: Question completed. Current topicQuestionIndex: ${topicQuestionIndex}`);
+              // If whiteboard lesson is available, override normal flow and launch it immediately
+              try { ttsService.stop(); } catch {}
+              const hasLesson = whiteboardGradeEligible && !!(getLessonScript('1-H.1'));
+              const alreadySeenLesson = !!whiteboardSeenThisSession?.[WHITEBOARD_LESSON_TOPIC];
+              // Guard: Only enable whiteboard takeover if we're at the true start of a topic (first question id===1)
+              // and not resuming mid-topic based on saved SpellBox topic progress.
+              const isFirstSpellQuestion = (currentSpellQuestion?.id === 1);
+              const progressTopicId = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || '';
+              const topicProgress = (currentGradeDisplayName && progressTopicId) ? getSpellboxTopicProgress(currentGradeDisplayName, progressTopicId) : null;
+              const isMidTopic = !!topicProgress && (topicProgress.questionsAttempted || 0) >= 1;
+              if (hasLesson && !alreadySeenLesson && isFirstSpellQuestion && !isMidTopic) {
+                // Ensure the next topic is selected first (if provided)
+                if (nextTopicId) {
+                  setSelectedTopicId(nextTopicId);
+                  try { whiteboardTriggeredTopicsRef.current.add(nextTopicId); } catch {}
+                }
+                // Switch to Adventure screen where the whiteboard is rendered
+                setCurrentScreen(1);
+                setDevWhiteboardEnabled(true);
+                return; // Do not render the regular SpellBox message; whiteboard takes over
+              }
               
               // Handle question progression in the automatic flow
               if (isInQuestionMode) {
@@ -5590,6 +5939,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       try { ttsService.setSuppressNonKrafty(false); } catch {}
                       setShowStep5Intro(false);
                       completeAdventureStep5Intro();
+                      // If the whiteboard prompt was suppressed while the trainer spoke,
+                      // play it now so the Jessica message is heard immediately
+                      try { ttsService.replayLastSuppressed(); } catch {}
                     }}
                   >
                     Next
@@ -5693,3 +6045,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 };
 
 export default Index;
+
+
+

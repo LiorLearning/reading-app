@@ -1,4 +1,5 @@
 import { sampleMCQData } from '@/data/mcq-questions';
+import { lessonScripts } from '@/data/lesson-scripts';
 import { mapSelectedGradeToContentGrade, getNextSpellboxTopic, getSpellboxTopicProgress } from './utils';
 
 // Interface for spelling question data
@@ -246,6 +247,76 @@ export const getSpellingTopicIds = (gradeDisplayName?: string): string[] => {
 export const getSpellingQuestionsByTopic = (topicId: string): SpellingQuestion[] => {
   const allSpellingQuestions = getAllSpellingQuestions();
   return allSpellingQuestions.filter(question => question.topicId === topicId);
+};
+
+/**
+ * Get the global sequential lesson number for a topic across ALL grades,
+ * considering only topics that have at least one question where isSpelling === true.
+ * The sequence follows the insertion order in sampleMCQData.topics which is our
+ * canonical curriculum ordering (starts at Kindergarten, then Grade 1, ...).
+ */
+export const getGlobalSpellingLessonNumber = (topicId: string): number | null => {
+  try {
+    const topics = sampleMCQData.topics as Record<string, any>;
+    const idSet = new Set<string>();
+
+    // 1) Collect spelling-topic IDs from MCQ data
+    for (const [id, topic] of Object.entries(topics)) {
+      const hasSpelling = Array.isArray(topic?.questions)
+        && topic.questions.some((q: any) => q?.isSpelling === true);
+      if (hasSpelling) idSet.add(id);
+    }
+
+    // 2) Include all whiteboard lesson script topic IDs
+    Object.keys(lessonScripts).forEach((id) => idSet.add(id));
+
+    // 3) Sort by natural topicId order so 1-T.2.3 follows 1-T.2.2, K precedes 1, etc.
+    const tokenize = (id: string): (string | number)[] => {
+      const parts = id.replace(/[.-]/g, ' ').split(/\s+/).filter(Boolean);
+      const tokens: (string | number)[] = [];
+      for (const part of parts) {
+        const matches = part.match(/\d+|[A-Za-z]+/g) || [];
+        for (const m of matches) {
+          if (/^\d+$/.test(m)) tokens.push(parseInt(m, 10));
+          else tokens.push(m.toLowerCase());
+        }
+      }
+      // Special-case grade K → numeric 0 so it sorts before 1
+      if (typeof tokens[0] === 'string' && tokens[0] === 'k') tokens[0] = 0;
+      return tokens;
+    };
+
+    const compareIds = (a: string, b: string): number => {
+      const ta = tokenize(a);
+      const tb = tokenize(b);
+      const len = Math.max(ta.length, tb.length);
+      for (let i = 0; i < len; i++) {
+        const va = ta[i];
+        const vb = tb[i];
+        if (va === undefined) return -1;
+        if (vb === undefined) return 1;
+        const aNum = typeof va === 'number';
+        const bNum = typeof vb === 'number';
+        if (aNum && bNum) {
+          if (va as number !== (vb as number)) return (va as number) - (vb as number);
+        } else if (!aNum && !bNum) {
+          if ((va as string) !== (vb as string)) return (va as string).localeCompare(vb as string);
+        } else {
+          // numbers come before letters at the same position
+          return aNum ? -1 : 1;
+        }
+      }
+      return 0;
+    };
+
+    const orderedTopicIds = Array.from(idSet).sort(compareIds);
+
+    const index = orderedTopicIds.indexOf(topicId);
+    if (index === -1) return null;
+    return index + 1; // 1-based numbering for display
+  } catch {
+    return null;
+  }
 };
 
 /**
