@@ -78,7 +78,7 @@ export const lessonScripts: Record<string, LessonScript> = {
     practice: [
       {
         word: 'pond',
-        prompt: "Let's finish the word 'po__'.",
+        prompt: "Let\'s spell pond.",
         hints: [
           'Listen: you hear /n/ and /d/ at the end.',
           "'nd' is the final blend joining /n/ and /d/."
@@ -106,7 +106,7 @@ export const lessonScripts: Record<string, LessonScript> = {
     practice: [
       {
         word: 'bag',
-        prompt: "Let’s complete 'b_g'.",
+        prompt: "Let’s spell bag.",
         hints: [
           'Listen for the short /a/ sound in the middle.',
           'Spell it with the letter “a”.'
@@ -137,7 +137,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'car',
-          prompt: "Complete the word: 'c__'.",
+          prompt: "Let’s spell car.",
           hints: [
             'Listen for /ar/ after /k/.',
             "Spell the /ar/ sound with 'ar'."
@@ -156,7 +156,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'horn',
-          prompt: "Complete the word: 'h__n'.",
+          prompt: "Let’s spell horn.",
           hints: [
             'Hear the /or/ in the middle.',
             "Spell the /or/ sound with 'or'."
@@ -188,7 +188,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'her',
-          prompt: "Complete the word: 'h__'.",
+          prompt: "Let’s spell her.",
           hints: [
             'Listen for /ər/ after /h/.',
             "Spell the /ər/ sound with 'er'."
@@ -224,7 +224,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'bird',
-          prompt: "Complete the word: 'b__d'.",
+          prompt: "Let’s spell bird.",
           hints: [
             'Hear the /ər/ in the middle.',
             "Spell the /ər/ sound with 'ir'."
@@ -273,7 +273,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'fur',
-          prompt: "Complete the word: 'f__'.",
+            prompt: "Let’s spell fur.",
           hints: [
             'Listen for the /ər/ sound after /f/.',
             "Spell the /ər/ sound with 'ur'."
