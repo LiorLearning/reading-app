@@ -4436,7 +4436,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           >
             {userData && currentScreen !== -1 && (
               <Button 
-                variant="default" 
+                variant="default"
+                size="icon"
                 onClick={async () => {
                   playClickSound();
                   await handleCloseSession(); // Save current adventure before going home
@@ -4448,10 +4449,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     navigate('/');
                   }
                 }}
-                className="flex items-center gap-2 rounded-full px-4 py-2 bg-white text-black font-semibold border-2 border-foreground shadow-solid btn-animate"
+                className="w-10 h-10 rounded-full bg-white text-black font-semibold border-2 border-foreground shadow-solid btn-animate flex items-center justify-center"
               >
-                <Home className="h-4 w-3" />
-                <span></span>
+                <Home className="h-5 w-5" />
               </Button>
             )}
 
@@ -4462,7 +4462,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 style={{ minWidth: '220px' }}
               >
                 <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">
-                  Lesson {(() => { const n = getGlobalSpellingLessonNumber(selectedTopicId || ''); return n || 1; })()}
+                  Lesson {(() => { const topicId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1'; const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}
                 </span>
                 <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">
                   • {(getLessonScript(selectedTopicId) || getLessonScript('1-H.1'))?.title || selectedTopicId}
@@ -5351,8 +5351,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
                     const lessonEnabled = urlEnabled || devWhiteboardEnabled;
                     const scriptAvailable = lessonEnabled ? (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')) : null;
-                    // Hide ComicPanel while lesson is active OR while prompt is active (right side empty)
-                    return !(lessonEnabled && scriptAvailable) && !shouldShowWhiteboardPrompt;
+                    // Hide ComicPanel only while the whiteboard lesson is actively mounted.
+                    // Keep it visible during the interim prompt so the panel isn't blank.
+                    return !(lessonEnabled && scriptAvailable);
                   })() && (
                   <ComicPanelComponent
                     image={current.image}
