@@ -30113,7 +30113,7 @@ aiTutor: {
           isSorting: false,
           isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0,1,4],
+        prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "crow",
             intent: "fill_blank",

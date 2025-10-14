@@ -857,7 +857,8 @@ const SpellBoxPromptInline: React.FC<{
 }> = ({ text, onNext, highlightNext, isDisabled }) => {
   React.useEffect(() => {
     if (!text) return;
-    try { ttsService.stop(); } catch {}
+    // Do not stop current audio if non-Krafty is suppressed (e.g., trainer speaking)
+    try { if (!ttsService.isNonKraftySuppressed?.()) { ttsService.stop(); } } catch {}
     const selectedVoice = (() => {
       try { return ttsService.getSelectedVoice?.().id; } catch { return undefined; }
     })();
@@ -865,7 +866,8 @@ const SpellBoxPromptInline: React.FC<{
       try { return ttsService.getSelectedSpeed?.(); } catch { return undefined; }
     })() || 0.8;
     ttsService.speak(text, {
-      messageId: 'krafty-whiteboard-prompt',
+      // Mark as non-Krafty so it respects suppression during trainer overlays
+      messageId: 'whiteboard-prompt',
       voice: selectedVoice,
       stability: 0.7,
       similarity_boost: 0.9,
