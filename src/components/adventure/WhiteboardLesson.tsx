@@ -5,6 +5,7 @@ import SpellBox from '@/components/comic/SpellBox';
 import { trackEvent } from '@/lib/feedback-service';
 import { useRealtimeSession } from '@/hooks/useRealtimeSession';
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
+import { getGlobalSpellingLessonNumber } from '@/lib/questionBankUtils';
 
 interface WhiteboardLessonProps {
   topicId: string;
@@ -17,8 +18,12 @@ interface WhiteboardLessonProps {
 // v0 keeps visuals simple; we can enhance animations later.
 const WhiteboardLesson: React.FC<WhiteboardLessonProps> = ({ topicId, onCompleted, sendMessage: parentSendMessage, interruptRealtimeSession }) => {
   const script = getLessonScript(topicId);
-  const modelWord = script?.modelWord || script?.model?.word;
-  const hasMultiSteps = !!(script?.modelSteps && script.modelSteps.length > 0 && modelWord);
+  const [segmentIndex, setSegmentIndex] = React.useState(0);
+  const hasSegments = !!(script?.segments && script.segments.length > 0);
+  const segment = hasSegments ? script!.segments![segmentIndex] : null;
+  const modelWord = hasSegments ? segment!.modelWord : (script?.modelWord || script?.model?.word);
+  const steps = hasSegments ? (segment?.modelSteps || []) : (script?.modelSteps || []);
+  const hasMultiSteps = !!(steps && steps.length > 0 && modelWord);
   const [phase, setPhase] = React.useState<'intro' | 'model' | 'practice' | 'done'>('intro');
   const [modelStepIndex, setModelStepIndex] = React.useState(0);
   const [practiceIndex, setPracticeIndex] = React.useState(0);
@@ -80,8 +85,8 @@ Never initiate conversation; only speak the text you receive.`,
       // speak each step on entry or when index changes; keep short
       try { ttsService.stop(); } catch {}
       if (hasMultiSteps) {
-        if (rtStatus === 'CONNECTED') {
-          speak(script.modelSteps![modelStepIndex].say);
+        if (rtStatus === 'CONNECTED' && steps[modelStepIndex]) {
+          speak(steps[modelStepIndex].say);
         }
       } else if (!hasSpokenModelRef.current) {
         hasSpokenModelRef.current = true;
@@ -96,9 +101,10 @@ Never initiate conversation; only speak the text you receive.`,
       }
     }
     // Speak the practice prompt verbatim once via ElevenLabs
-    if (phase === 'practice' && !hasSpokenPracticeRef.current[practiceIndex]) {
-      hasSpokenPracticeRef.current[practiceIndex] = true;
-      const p = script.practice[practiceIndex];
+    const practiceKey = hasSegments ? segmentIndex : practiceIndex;
+    if (phase === 'practice' && !hasSpokenPracticeRef.current[practiceKey]) {
+      hasSpokenPracticeRef.current[practiceKey] = true;
+      const p = hasSegments ? segment!.practice : script!.practice![practiceIndex];
       try { ttsService.stop(); } catch {}
       ttsService.speak(p.prompt, {
         messageId: 'krafty-whiteboard-practice',
@@ -108,11 +114,11 @@ Never initiate conversation; only speak the text you receive.`,
         speed: 0.7,
       }).catch(() => {});
     }
-  }, [phase, practiceIndex, script, rtStatus, modelStepIndex, hasMultiSteps]);
+  }, [phase, practiceIndex, script, rtStatus, modelStepIndex, hasMultiSteps, hasSegments, segmentIndex, steps, jessicaVoiceId]);
 
   if (!script) return null;
 
-  const currentPractice = script.practice[practiceIndex];
+  const currentPractice = hasSegments ? segment!.practice : script!.practice![practiceIndex];
 
   return (
     <div className="absolute inset-y-0 right-0 w-1/2 bg-transparent flex flex-col" style={{ zIndex: 20 }}>
@@ -152,7 +158,7 @@ Never initiate conversation; only speak the text you receive.`,
                 <div className="rounded-3xl p-6 sm:p-8 bg-white ring-1 ring-[hsl(var(--border))] shadow-xl">
                   {/* Lesson header */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-kids leading-tight">Lesson {(() => { const m = (topicId||'').match(/(\d+)$/); return m ? m[1] : '1'; })()}</div>
+                    <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-kids leading-tight">Lesson {(() => { const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}</div>
                   </div>
                   {/* What you will learn */}
                   <div className="text-xl sm:text-2xl leading-relaxed text-gray-900" style={{fontFamily:'system-ui, -apple-system, sans-serif'}}>
@@ -175,7 +181,7 @@ Never initiate conversation; only speak the text you receive.`,
               <div className="flex flex-col items-center gap-3">
                 <div className="text-4xl md:text-5xl font-bold tracking-wider">
                   {modelWord!.split('').map((ch, idx) => {
-                    const highlights = script!.modelSteps![modelStepIndex].highlights;
+                    const highlights = steps[modelStepIndex].highlights;
                     const isHighlighted = highlights.some(([s,e]) => idx >= s && idx < e);
                     return (
                       <span
@@ -184,7 +190,7 @@ Never initiate conversation; only speak the text you receive.`,
                         onClick={() => {
                           if (isHighlighted) {
                             try { ttsService.stop(); } catch {}
-                            speak(script!.modelSteps![modelStepIndex].say);
+                            speak(steps[modelStepIndex].say);
                           }
                         }}
                       >
@@ -194,14 +200,14 @@ Never initiate conversation; only speak the text you receive.`,
                   })}
                 </div>
                 <div className="text-center text-base max-w-xl">
-                  <div className="mb-1">{script!.modelSteps![modelStepIndex].say}</div>
+                  <div className="mb-1">{steps[modelStepIndex].say}</div>
                 </div>
                 <div className="flex gap-3">
                   <button
                     className="mt-2 rounded-full p-3 border-2 border-black bg-black text-white transition-transform duration-150 hover:scale-110"
                     onClick={() => {
                       try { ttsService.stop(); } catch {}
-                      speak(script!.modelSteps![modelStepIndex].say);
+                      speak(steps[modelStepIndex].say);
                     }}
                     aria-label="Replay step"
                   >
@@ -211,7 +217,7 @@ Never initiate conversation; only speak the text you receive.`,
                     className="mt-2 rounded-full p-3 border-2 border-black bg-primary text-primary-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] ring-2 ring-[hsl(var(--primary)/0.35)] transition-transform duration-150 hover:scale-110"
                     onClick={() => {
                       const next = modelStepIndex + 1;
-                      if (next < script!.modelSteps!.length) {
+                      if (next < steps.length) {
                         setModelStepIndex(next);
                         // speak next line automatically when rt connected (effect will handle)
                       } else {
@@ -274,30 +280,55 @@ Never initiate conversation; only speak the text you receive.`,
                     if (ok) {
                       trackEvent('lesson_practice_completed', { topicId, word: currentPractice.word, index: practiceIndex });
                       setCanContinue(true);
-                      // Reinforce with realtime phoneme playback: "Great, /gr/ /a/ /b/, grab."
+                      // Reinforce with realtime phoneme playback
                       try { ttsService.stop(); } catch {}
                       if (rtStatus === 'CONNECTED') {
-                        const baseWord = (script.modelWord || currentPractice.word || '').toLowerCase();
-                        let spoken = 'Great,';
-                        if (baseWord) {
-                          // Try to use first multi-letter highlight if available, else first two letters
-                          let blend = '';
-                          if (hasMultiSteps && script.modelSteps && script.modelSteps[2]?.highlights?.[0]) {
-                            const [s,e] = script.modelSteps[2].highlights[0];
-                            blend = baseWord.slice(s, e);
-                          } else {
-                            blend = baseWord.slice(0, Math.min(2, baseWord.length));
+                        const scripted = (currentPractice as any).reinforce as string | undefined;
+                        if (scripted && scripted.trim().length > 0) {
+                          speak(scripted);
+                        } else {
+                          const baseWord = ((modelWord as string) || currentPractice.word || '').toLowerCase();
+                          let spoken = 'Great,';
+                          if (baseWord) {
+                            // Try to use the first multi-letter highlight across steps; fallback to first two letters
+                            let blend = '';
+                            if (hasMultiSteps) {
+                              const currentSteps = hasSegments ? script!.segments![segmentIndex].modelSteps : (script!.modelSteps || []);
+                              let found: [number, number] | null = null;
+                              for (const st of currentSteps) {
+                                const multi = (st.highlights || []).find(([s,e]) => (e - s) >= 2);
+                                if (multi) { found = multi; break; }
+                              }
+                              if (found) {
+                                const [s,e] = found;
+                                blend = baseWord.slice(s, e);
+                              } else {
+                                blend = baseWord.slice(0, Math.min(2, baseWord.length));
+                              }
+                            } else {
+                              blend = baseWord.slice(0, Math.min(2, baseWord.length));
+                            }
+                            const remainder = baseWord.slice(blend.length).split('');
+                            const phonemes = [`/${blend}/`, ...remainder.map(ch => `/${ch}/`)];
+                            spoken = `Great, ${phonemes.join(' ')}, ${baseWord}.`;
                           }
-                          const remainder = baseWord.slice(blend.length).split('');
-                          const phonemes = [`/${blend}/`, ...remainder.map(ch => `/${ch}/`)];
-                          spoken = `Great, ${phonemes.join(' ')}, ${baseWord}.`;
+                          speak(spoken);
                         }
-                        speak(spoken);
                       }
                     }
                   }}
                   onNext={() => {
-                    // Exit whiteboard immediately after the learner presses Next on a correct answer
+                    // For segmented lessons, advance to next segment; otherwise exit
+                    if (hasSegments) {
+                      const nextSeg = segmentIndex + 1;
+                      if (nextSeg < (script!.segments!.length)) {
+                        setSegmentIndex(nextSeg);
+                        setModelStepIndex(0);
+                        setPhase('model');
+                        return;
+                      }
+                    }
+                    // Exit whiteboard after the final segment or non-segment lesson
                     trackEvent('lesson_completed', { topicId });
                     onCompleted();
                   }}

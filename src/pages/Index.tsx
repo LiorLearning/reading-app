@@ -40,7 +40,7 @@ import { useSessionCoins } from "@/hooks/use-session-coins";
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
 import WhiteboardLesson from "@/components/adventure/WhiteboardLesson";
-import { getLessonScript } from "@/data/lesson-scripts";
+import { getLessonScript, lessonScripts } from "@/data/lesson-scripts";
 import RightUserOverlay from "@/components/adventure/RightUserOverlay";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
@@ -66,7 +66,7 @@ import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
-import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion } from "@/lib/questionBankUtils";
+import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion, getGlobalSpellingLessonNumber } from "@/lib/questionBankUtils";
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
@@ -4284,7 +4284,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 style={{ minWidth: '220px' }}
               >
                 <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">
-                  Lesson {(() => { const s = (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')); const m = ((s?.topicId) || (selectedTopicId||'')).match(/(\d+)$/); return m ? m[1] : '1'; })()}
+                  Lesson {(() => { const n = getGlobalSpellingLessonNumber(selectedTopicId || ''); return n || 1; })()}
                 </span>
                 <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">
                   • {(getLessonScript(selectedTopicId) || getLessonScript('1-H.1'))?.title || selectedTopicId}
@@ -4992,6 +4992,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     if (lessonEnabled && script) {
                       return (
                         <WhiteboardLesson
+                          key={`wb-${script.topicId}`}
                           topicId={script.topicId}
                           onCompleted={() => {
                             setLessonReady(false);
@@ -5367,6 +5368,29 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                            </aside>
               </div>
             </div>
+            {import.meta.env.DEV && (
+              <button
+                aria-label="dev-increment-whiteboard-lesson"
+                title="Next whiteboard lesson"
+                onClick={() => {
+                  try {
+                    const keys = Object.keys(lessonScripts);
+                    const currentId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1';
+                    const idx = keys.indexOf(currentId);
+                    const next = keys[(idx >= 0 ? idx + 1 : 1) % keys.length];
+                    setSelectedTopicId(next);
+                    setLessonReady(true);
+                    setDevWhiteboardEnabled(true);
+                  } catch (e) {
+                    console.warn('Dev increment lesson failed', e);
+                  }
+                }}
+                className="fixed top-2 right-2 w-9 h-9 rounded-full border-2 border-black bg-yellow-300 text-black shadow-lg z-[9999]"
+                style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.6)' }}
+              >
+                +1
+              </button>
+            )}
           </main>
         ) : (
           <MCQScreenTypeA
