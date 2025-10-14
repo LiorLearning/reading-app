@@ -6036,3 +6036,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 };
 
 export default Index;
+
+
+
