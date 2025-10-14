@@ -3292,7 +3292,7 @@ const getSleepyPetImage = (clicks: number) => {
                 >
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '4th')}
+                    onClick={() => handlePreferenceSelection('start', '4th Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
@@ -3303,7 +3303,7 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '4th')}
+                    onClick={() => handlePreferenceSelection('middle', '4th Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>
@@ -3329,7 +3329,7 @@ const getSleepyPetImage = (clicks: number) => {
                 >
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('start', '5th')}
+                    onClick={() => handlePreferenceSelection('start', '5th Grade')}
                   >
                     <span className="text-lg">🌱</span>
                     <div>
@@ -3340,7 +3340,7 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                    onClick={() => handlePreferenceSelection('middle', '5th')}
+                    onClick={() => handlePreferenceSelection('middle', '5th Grade')}
                   >
                     <span className="text-lg">🚀</span>
                     <div>

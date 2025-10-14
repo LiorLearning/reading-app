@@ -2891,6 +2891,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setCurrentAdventureId(targetAdventure.id);
       const topicId = targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '';
       setSelectedTopicId(topicId);
+      // Grade 1: immediately reflect the actual upcoming spell topic in the header
+      if (whiteboardGradeEligible) {
+        try {
+          const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName);
+          const initialTopicId = nextSpell ? (nextSpell.topicId || (nextSpell as any).topicName) : null;
+          if (initialTopicId) setGrade1DisplayedTopicId(initialTopicId);
+        } catch {}
+      }
       setAdventureMode('continue');
       
       // Set adventure context for contextual AI responses
@@ -2980,6 +2988,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
     playClickSound();
     setSelectedTopicId(topicId);
+    // Grade 1: immediately reflect the actual upcoming spell topic in the header
+    if (whiteboardGradeEligible) {
+      try {
+        const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName);
+        const initialTopicId = nextSpell ? (nextSpell.topicId || (nextSpell as any).topicName) : null;
+        if (initialTopicId) setGrade1DisplayedTopicId(initialTopicId);
+      } catch {}
+    }
     setAdventureMode(mode);
     console.log('🎯 Setting currentAdventureType to:', adventureType);
     setCurrentAdventureType(adventureType);
@@ -3084,6 +3100,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const gradeName = currentGradeDisplayName;
         const initialSpellQuestion = gradeName ? getNextSpellboxQuestion(gradeName) : null;
         const initialSpellTopicId = initialSpellQuestion ? (initialSpellQuestion.topicId || initialSpellQuestion.topicName) : null;
+        if (initialSpellTopicId) {
+          try { setGrade1DisplayedTopicId(initialSpellTopicId); } catch {}
+        }
         const isFirstSpellQuestion = initialSpellQuestion?.id === 1;
         const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
         const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
@@ -4236,6 +4255,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [whiteboardPromptLocked, setWhiteboardPromptLocked] = React.useState(false);
   // Keep the original whiteboard intro text fixed in the pet bubble while lesson runs
   const [whiteboardPinnedText, setWhiteboardPinnedText] = React.useState<string | null>(null);
+  // Grade 1 only: topic shown in the top-left chip that updates exactly when whiteboard triggers
+  const [grade1DisplayedTopicId, setGrade1DisplayedTopicId] = React.useState<string | null>(null);
   const lastSpellTopicRef = React.useRef<string | null>(null);
   const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
   const firstAdventureStartedRef = React.useRef<boolean>(false);
@@ -4321,6 +4342,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setIsWhiteboardPromptActive(true);
       setCurrentScreen(1);
       setDevWhiteboardEnabled(true);
+      // Grade 1 only: update displayed topic at the moment whiteboard is triggered
+      if (whiteboardGradeEligible && spellTopic) {
+        setGrade1DisplayedTopicId(spellTopic);
+      }
       lastSpellTopicRef.current = spellTopic;
       return;
     }
@@ -4353,6 +4378,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Ensure the pet bubble shows the whiteboard intro instead of any prior continuation
         const introText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
         setWhiteboardPinnedText(introText);
+        // Grade 1 only: update displayed topic at the moment whiteboard is triggered
+        if (spellTopic) {
+          setGrade1DisplayedTopicId(spellTopic);
+        }
       }
       lastSpellTopicRef.current = spellTopic;
       return;
@@ -4371,6 +4400,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setLessonReady(true);
     setDevWhiteboardEnabled(true);
     setIsWhiteboardPromptActive(false);
+    // Grade 1 only: set the displayed topic at the moment whiteboard flow is confirmed via chevron
+    if (whiteboardGradeEligible) {
+      try {
+        const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName);
+        const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
+          ? (nextSpellQuestion.topicId || (nextSpellQuestion as any).topicName)
+          : (lastSpellTopicRef.current || null);
+        if (nextSpellTopicId) {
+          setGrade1DisplayedTopicId(nextSpellTopicId);
+        }
+      } catch {}
+    }
     // After Step 5 overlay is dismissed, previously suppressed non-Krafty
     // messages (like whiteboard prompt) should be replayed
     try { ttsService.replayLastSuppressed?.(); } catch {}
@@ -4428,6 +4469,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   React.useEffect(() => {
     chatMessagesRef.current = chatMessages;
   }, [chatMessages]);
+
+  // Grade 1: initialize displayed topic from the current question topic
+  // when the adventure mounts/resumes, but only if not already set by a whiteboard trigger
+  React.useEffect(() => {
+    if (!whiteboardGradeEligible) return;
+    if (grade1DisplayedTopicId) return;
+    const topicFromQuestion = currentSpellQuestion?.topicId || (currentSpellQuestion as any)?.topicName || null;
+    if (topicFromQuestion) {
+      setGrade1DisplayedTopicId(topicFromQuestion);
+    }
+  }, [whiteboardGradeEligible, grade1DisplayedTopicId, currentSpellQuestion?.topicId]);
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
 
@@ -4518,12 +4570,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 className="hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative"
                 style={{ minWidth: '220px' }}
               >
-                <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">
-                  Lesson {(() => { const topicId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1'; const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}
-                </span>
-                <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">
-                  • {(getLessonScript(selectedTopicId) || getLessonScript('1-H.1'))?.title || selectedTopicId}
-                </span>
+                {(() => {
+                  const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
+                  const scriptForChip = getLessonScript(topicForChip);
+                  const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
+                  const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
+                  const lessonTitle = (scriptForChip?.title) || topicForChip;
+                  return (
+                    <>
+                      <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
+                      <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">{` • ${lessonTitle}`}</span>
+                    </>
+                  );
+                })()}
               </div>
             )}
             
