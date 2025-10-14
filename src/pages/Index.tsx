@@ -3072,22 +3072,35 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setTimeout(() => {
       setCurrentScreen(1); // Go to adventure screen
       // If first-question whiteboard is pending, immediately show the prompt and enable lesson (no AI message)
-      if (shouldTriggerWhiteboardOnFirstQuestionRef.current) {
-        try { ttsService.stop(); } catch {}
-        const name = userData?.username?.trim() || 'friend';
-        setWhiteboardPrompt({
-          topicId: WHITEBOARD_LESSON_TOPIC,
-          text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
-          shouldAutoplay: true,
-          isAcknowledged: false,
-        });
-        setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
-        setWhiteboardPromptLocked(false);
-        setLessonReady(false);
-        setIsWhiteboardPromptActive(true);
-        setDevWhiteboardEnabled(true);
-        // Prevent the first-question effect from firing a second time
-        shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
+      if (whiteboardGradeEligible && shouldTriggerWhiteboardOnFirstQuestionRef.current) {
+        // Guard: proactively determine the first SpellBox question because the initial greeting
+        // is suppressed (so currentSpellQuestion may not be set yet for brand new users)
+        const gradeName = currentGradeDisplayName;
+        const initialSpellQuestion = gradeName ? getNextSpellboxQuestion(gradeName) : null;
+        const initialSpellTopicId = initialSpellQuestion ? (initialSpellQuestion.topicId || initialSpellQuestion.topicName) : null;
+        const isFirstSpellQuestion = initialSpellQuestion?.id === 1;
+        const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
+        const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
+        if (isFirstSpellQuestion && !hasMidTopicProgress) {
+          try { ttsService.stop(); } catch {}
+          const name = userData?.username?.trim() || 'friend';
+          setWhiteboardPrompt({
+            topicId: WHITEBOARD_LESSON_TOPIC,
+            text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
+            shouldAutoplay: true,
+            isAcknowledged: false,
+          });
+          setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
+          setWhiteboardPromptLocked(false);
+          setLessonReady(false);
+          setIsWhiteboardPromptActive(true);
+          setDevWhiteboardEnabled(true);
+          // Consume the flag only after we actually trigger the lesson
+          shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
+        } else {
+          // Leave the flag as true to allow the later effect (that watches currentSpellQuestion)
+          // to trigger once the first question materializes.
+        }
       }
     }, 0);
     
@@ -4309,7 +4322,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Only trigger on actual topic transitions (previous topic exists and is different)
     if (spellTopic !== lastSpellTopicRef.current) {
       // Only allow auto-trigger if the first question id for this topic is 1, otherwise skip
+      // And skip activation when resuming mid-topic per saved SpellBox topic progress
       if (!isFirstQuestionId) {
+        lastSpellTopicRef.current = spellTopic;
+        return;
+      }
+      const topicIdForProgress = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || '';
+      const topicProgress = (currentGradeDisplayName && topicIdForProgress) ? getSpellboxTopicProgress(currentGradeDisplayName, topicIdForProgress) : null;
+      const isMidTopic = !!topicProgress && (topicProgress.questionsAttempted || 0) >= 1;
+      if (isMidTopic) {
         lastSpellTopicRef.current = spellTopic;
         return;
       }
@@ -5212,8 +5233,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   })()}
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
-                    const lessonEnabled = urlEnabled || devWhiteboardEnabled;
-                    const script = lessonEnabled ? (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')) : null;
+                    const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
+                    // Resolve lesson script from the next Spellbox question at topic start (id === 1)
+                    const nextSpellQuestion = lessonEnabled ? getNextSpellboxQuestion(currentGradeDisplayName) : null;
+                    const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
+                      ? (nextSpellQuestion.topicId || nextSpellQuestion.topicName)
+                      : null;
+                    const script = (lessonEnabled && nextSpellTopicId) ? getLessonScript(nextSpellTopicId) : null;
                     if (lessonEnabled && script && !shouldShowWhiteboardPrompt) {
                       return (
                         <WhiteboardLesson
@@ -5256,14 +5282,45 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               setWhiteboardPrompt(null);
                               // Lift suppression so a fresh, natural follow-up can be generated if needed
                               suppressInitialGreetingRef.current = false;
-                              // If there is no AI message yet, trigger a fresh initial response now
-                              const latestAi = chatMessagesRef.current.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0];
-                              if (!latestAi) {
+                              // AI-generated conversational follow-up (no spelling word → no SpellBox)
+                              (async () => {
                                 try {
-                                  triggerInitialResponseGeneration(currentAdventureType);
+                                  const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                                  const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+                                  const petType = PetProgressStorage.getPetType(currentPetId);
+                                  const postLessonUserCue = `POST_LESSON_FOLLOWUP: We just finished a quick skill lesson on the whiteboard. Write one short, friendly line as the ${petType} speaking to ${name}. Keep it conversational and inviting, ask a light next-step question, do not mention spelling or lessons, no emojis, under 18 words.`;
+                                  const resp = await aiService.generateResponse(
+                                    postLessonUserCue,
+                                    chatMessagesRef.current,
+                                    null,
+                                    userData,
+                                    undefined,
+                                    currentAdventureContext,
+                                    undefined,
+                                    currentAdventureContext?.summary,
+                                    petName,
+                                    petType,
+                                    currentAdventureType || 'food'
+                                  );
+                                  const followUp = (resp?.adventure_story || '').trim() || `Great work! What should we do next?`;
+                                  const msg: ChatMessage = {
+                                    type: 'ai',
+                                    content: followUp,
+                                    timestamp: Date.now()
+                                  };
+                                  setChatMessages(prev => {
+                                    const next = [...prev, msg];
+                                    try {
+                                      const id = bubbleMessageIdFromHtml(formatAIMessage(followUp));
+                                      ttsService.speakAIMessage(followUp, id).catch(() => {});
+                                    } catch {}
+                                    try {
+                                      if (currentSessionId) adventureSessionService.addChatMessage(currentSessionId, msg);
+                                    } catch {}
+                                    return next;
+                                  });
                                 } catch {}
-                              }
-                              // Otherwise do nothing: avoid replaying any pre-lesson greeting
+                              })();
                             }, 3600);
                           }}
                           sendMessage={sendMessage}
@@ -5664,7 +5721,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               try { ttsService.stop(); } catch {}
               const hasLesson = !!(getLessonScript('1-H.1'));
               const alreadySeenLesson = !!whiteboardSeenThisSession?.[WHITEBOARD_LESSON_TOPIC];
-              if (hasLesson && !alreadySeenLesson) {
+              // Guard: Only enable whiteboard takeover if we're at the true start of a topic (first question id===1)
+              // and not resuming mid-topic based on saved SpellBox topic progress.
+              const isFirstSpellQuestion = (currentSpellQuestion?.id === 1);
+              const progressTopicId = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || '';
+              const topicProgress = (currentGradeDisplayName && progressTopicId) ? getSpellboxTopicProgress(currentGradeDisplayName, progressTopicId) : null;
+              const isMidTopic = !!topicProgress && (topicProgress.questionsAttempted || 0) >= 1;
+              if (hasLesson && !alreadySeenLesson && isFirstSpellQuestion && !isMidTopic) {
                 // Ensure the next topic is selected first (if provided)
                 if (nextTopicId) {
                   setSelectedTopicId(nextTopicId);
