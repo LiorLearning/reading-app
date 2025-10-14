@@ -834,7 +834,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // Generate initial AI message using real-time AI generation
       // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
-      if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled) {
+      if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
         console.log('⏭️ Skipping initial AI message: whiteboard will run');
         return;
       }
@@ -864,7 +864,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             currentAdventureType // adventureType - back to using state
           );
 
-          // Add the initial AI message
+          // Add the initial AI message (guarded against suppression)
+          if (suppressInitialGreetingRef.current) {
+            console.log('⏭️ Skipping initial AI message (post-gen due to suppression)');
+            return;
+          }
           const aiMessage: ChatMessage = {
             type: 'ai',
             content: initialMessage,
@@ -874,11 +878,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setChatMessages(prev => {
             setLastMessageCount(prev.length + 1);
             playMessageSound();
-            // Auto-speak the initial AI message and wait for completion
+            // Auto-speak the initial AI message and wait for completion (guarded)
             const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
-            ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
-              console.error('TTS error for initial message:', error)
-            );
+            if (!suppressInitialGreetingRef.current) {
+              ttsService.speakAIMessage(initialMessage, messageId).catch(error => 
+                console.error('TTS error for initial message:', error)
+              );
+            }
             return [...prev, aiMessage];
           });
           
@@ -892,7 +898,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             ? "🌟 Welcome, brave adventurer! I'm Krafty, your adventure companion! What kind of amazing adventure would you like to create today? 🚀"
             : "🎯 Welcome back, adventurer! I'm excited to continue our journey together! What amazing direction should we take our adventure today? 🌟";
 
-          // Add the fallback AI message
+          // Add the fallback AI message (guarded against suppression)
+          if (suppressInitialGreetingRef.current) {
+            console.log('⏭️ Skipping fallback initial AI message due to suppression');
+            return;
+          }
           const aiMessage: ChatMessage = {
             type: 'ai',
             content: fallbackMessage,
@@ -902,11 +912,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setChatMessages(prev => {
             setLastMessageCount(prev.length + 1);
             playMessageSound();
-            // Auto-speak the fallback message
+            // Auto-speak the fallback message (guarded)
             const messageId = `index-chat-${aiMessage.timestamp}-${prev.length}`;
-            ttsService.speakAIMessage(fallbackMessage, messageId).catch(error => 
-              console.error('TTS error for fallback message:', error)
-            );
+            if (!suppressInitialGreetingRef.current) {
+              ttsService.speakAIMessage(fallbackMessage, messageId).catch(error => 
+                console.error('TTS error for fallback message:', error)
+              );
+            }
             return [...prev, aiMessage];
           });
           
@@ -1016,7 +1028,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
       // Generate initial AI message using real-time AI generation
       // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
-      if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled) {
+      if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
         console.log('⏭️ Skipping initial AI message: whiteboard will run');
         return;
       }
@@ -1047,7 +1059,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         );
 
         // Add the initial AI message (guard again in case state flipped meanwhile)
-        if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled) {
+        if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
           console.log('⏭️ Skipping initial AI message (post-gen): whiteboard active');
           return;
         }
@@ -1057,13 +1069,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           timestamp: Date.now()
         };
 
+        // Guard enqueue in case suppression toggled between checks
+        if (suppressInitialGreetingRef.current) {
+          console.log('⏭️ Skipping enqueue of initial AI message due to suppression');
+          return;
+        }
         setChatMessages(prev => [...prev, aiMessage]);
 
         // Speak the initial message using the same messageId the overlay derives
         // from the bubble HTML so the stop icon shows immediately.
         const messageId = bubbleMessageIdFromHtml(formatAIMessage(initialMessage));
         setTimeout(async () => {
-          if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled) return;
+          if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) return;
           await ttsService.speakAIMessage(initialMessage, messageId);
         }, 500);
 
@@ -2952,6 +2969,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // For the very first adventure session start, allow immediate whiteboard on first question (id === 1)
     if (!firstAdventureStartedRef.current) {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = true;
+      suppressInitialGreetingRef.current = true;
       firstAdventureStartedRef.current = true;
     }
     playClickSound();
@@ -4200,6 +4218,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const lastSpellTopicRef = React.useRef<string | null>(null);
   const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
   const firstAdventureStartedRef = React.useRef<boolean>(false);
+  const suppressInitialGreetingRef = React.useRef<boolean>(false);
 
   // Consider the whiteboard lesson "active" whenever the dev toggle (or URL flag)
   // is on AND a script exists for the selected topic. We use this to
@@ -5233,27 +5252,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               }).catch(() => {});
                             }, 150);
                             setTimeout(() => {
+                              // Clear celebration prompt
                               setWhiteboardPrompt(null);
+                              // Lift suppression so a fresh, natural follow-up can be generated if needed
+                              suppressInitialGreetingRef.current = false;
+                              // If there is no AI message yet, trigger a fresh initial response now
                               const latestAi = chatMessagesRef.current.filter(m => !m.hiddenInChat && m.type === 'ai').slice(-1)[0];
-                              if (latestAi) {
-                                const html = formatAIMessage(latestAi.content, latestAi.spelling_word);
-                                const text = extractTextFromHtml(html);
-                                const messageId = bubbleMessageIdFromHtml(html);
-                                try { ttsService.stop(); } catch {}
-                                const selectedVoice = (() => {
-                                  try { return ttsService.getSelectedVoice?.().id; } catch { return undefined; }
-                                })();
-                                const selectedSpeed = (() => {
-                                  try { return ttsService.getSelectedSpeed?.(); } catch { return undefined; }
-                                })() || 0.8;
-                                ttsService.speak(text, {
-                                  messageId,
-                                  voice: selectedVoice,
-                                  stability: 0.7,
-                                  similarity_boost: 0.9,
-                                  speed: selectedSpeed,
-                                }).catch(() => {});
+                              if (!latestAi) {
+                                try {
+                                  triggerInitialResponseGeneration(currentAdventureType);
+                                } catch {}
                               }
+                              // Otherwise do nothing: avoid replaying any pre-lesson greeting
                             }, 3600);
                           }}
                           sendMessage={sendMessage}
