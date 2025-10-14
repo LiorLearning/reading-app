@@ -43,6 +43,7 @@ export interface UserData {
   uid: string;
   username: string;
   email: string;
+  age?: number;
   grade: string;
   gradeDisplayName: string;
   level: string;
@@ -144,6 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               uid: user.uid,
               username: user.displayName || '',
               email: user.email || '',
+              age: undefined,
               grade: '',
               gradeDisplayName: '',
               level: '',

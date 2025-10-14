@@ -45,8 +45,10 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   const navigate = useNavigate();
   const { updateUserData, userData, user } = useAuth();
   const [username, setUsername] = useState("");
-  const [selectedGrade, setSelectedGrade] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("");
+  const [selectedGrade, setSelectedGrade] = useState("assignment");
+  const [selectedLevel, setSelectedLevel] = useState("start");
+  const [age, setAge] = useState<string>("");
+  const [ageError, setAgeError] = useState<string>("");
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
   const [loading, setLoading] = useState(false);
 
@@ -65,14 +67,24 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   };
 
   React.useEffect(() => {
-    setSelectedGrade("assignment");
-    setSelectedLevel("start");
-  }, []);
+    if (userData?.age) {
+      setAge(String(userData.age));
+    }
+  }, [userData?.age]);
 
   const handleComplete = async () => {
+    const parsedAge = Number(age);
+    const isValidAge = Number.isFinite(parsedAge) && parsedAge > 3 && parsedAge < 15;
+
+    if (!isValidAge) {
+      setAgeError("Please enter an age between 4 and 14.");
+      return;
+    }
+
     if (username.trim() && selectedGrade && selectedLevel) {
       playClickSound();
       setLoading(true);
+      setAgeError("");
       
       try {
         const selectedGradeObj = grades.find(g => g.value === selectedGrade);
@@ -81,6 +93,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
         
         await updateUserData({
           username: username.trim(),
+          age: parsedAge,
           grade: selectedGrade,
           gradeDisplayName: selectedGradeObj?.displayName || selectedGrade,
           level: levelValueToUse,
@@ -220,7 +233,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
               <CardDescription className="text-base text-gray-600">
                 {step === 1 
                   ? "Let's start by getting to know you better. What should we call you?"
-                  : "We've picked the best starting path for you—just press Let's Go!"
+                  : "Tell us your age so personalized learning can begin!"
                 }
               </CardDescription>
             </CardHeader>
@@ -287,21 +300,53 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                   )}
                 </div>
               ) : (
-                // Grade Selection Step
+                // Personalize Step
                 <div className="space-y-4">
-                  {/* <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl text-blue-800 text-center">
-                    We're setting you up with the Assignment path to jump right in.
+                  <div>
+                    <label htmlFor="age" className="block text-lg font-semibold text-gray-700 mb-3">
+                      How old are you?
+                    </label>
+                    <Input
+                      id="age"
+                      type="number"
+                      inputMode="numeric"
+                      min={4}
+                      max={14}
+                      placeholder="Enter your age"
+                      value={age}
+                      onChange={(e) => {
+                        const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
+                        setAge(digitsOnly);
+                        setAgeError("");
+                      }}
+                      onKeyPress={handleKeyPress}
+                      className="h-14 text-lg border-3 border-black rounded-xl bg-white focus:bg-gray-50"
+                      style={{ boxShadow: '0 4px 0 black' }}
+                    />
+                    {ageError && (
+                      <p className="mt-2 text-sm text-red-600 font-semibold">{ageError}</p>
+                    )}
                   </div>
-                   */}
+
+                  <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl text-blue-800 text-center">
+                    Personalized learning starts as soon as we know your age!
+                  </div>
+
                   <Button
                     onClick={handleComplete}
-                    className="w-full h-12 text-lg font-bold rounded-xl border-3 btn-animate flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                    disabled={Boolean(loading || !age || !Number.isFinite(Number(age)) || Number(age) <= 3 || Number(age) >= 15)}
+                    className={cn(
+                      "w-full h-12 text-lg font-bold rounded-xl border-3 btn-animate flex items-center justify-center gap-2",
+                      loading || !age || !Number.isFinite(Number(age)) || Number(age) <= 3 || Number(age) >= 15
+                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                    )}
                     style={{ 
-                      borderColor: '#16a34a',
-                      boxShadow: '0 6px 0 #16a34a'
+                      borderColor: (loading || !age || !Number.isFinite(Number(age)) || Number(age) <= 3 || Number(age) >= 15) ? '#9ca3af' : '#16a34a',
+                      boxShadow: (loading || !age || !Number.isFinite(Number(age)) || Number(age) <= 3 || Number(age) >= 15) ? '0 4px 0 #6b7280' : '0 6px 0 #16a34a'
                     }}
                   >
-                     <Sparkles className="h-4 w-4" />
+                    <Sparkles className="h-4 w-4" />
                     Let's Go!
                   </Button>
                 </div>
