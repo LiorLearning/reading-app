@@ -5044,27 +5044,33 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             {currentScreen === 1 && (
               <div className="fixed right-4 top-4 z-50 flex flex-col items-end gap-2">
                 {/* Skip SpellBox when active */}
-                {showSpellBox && currentSpellQuestion && (
+                {/*
+                  DEV: Next Spell button intentionally disabled
+                  {showSpellBox && currentSpellQuestion && (
+                    <button
+                      type="button"
+                      onClick={() => { playClickSound(); devAdvanceSpellbox(); }}
+                      className="px-3 py-1 rounded-md text-xs font-bold border-2 border-black bg-amber-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105 active:translate-y-[1px]"
+                      aria-label="DEV: Skip SpellBox"
+                      title="DEV: Skip SpellBox"
+                    >
+                      DEV: Next Spell
+                    </button>
+                  )}
+                */}
+                {/* Send 'else' using input flow */}
+                {/*
+                  DEV: Send "else" button intentionally disabled
                   <button
                     type="button"
-                    onClick={() => { playClickSound(); devAdvanceSpellbox(); }}
-                    className="px-3 py-1 rounded-md text-xs font-bold border-2 border-black bg-amber-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105 active:translate-y-[1px]"
-                    aria-label="DEV: Skip SpellBox"
-                    title="DEV: Skip SpellBox"
+                    onClick={() => { playClickSound(); devSendElse(); }}
+                    className="px-3 py-1 rounded-md text-xs font-bold border-2 border-black bg-cyan-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105 active:translate-y-[1px]"
+                    aria-label="DEV: Send 'else'"
+                    title="DEV: Send 'else'"
                   >
-                    DEV: Next Spell
+                    DEV: Send "else"
                   </button>
-                )}
-                {/* Send 'else' using input flow */}
-                <button
-                  type="button"
-                  onClick={() => { playClickSound(); devSendElse(); }}
-                  className="px-3 py-1 rounded-md text-xs font-bold border-2 border-black bg-cyan-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105 active:translate-y-[1px]"
-                  aria-label="DEV: Send 'else'"
-                  title="DEV: Send 'else'"
-                >
-                  DEV: Send "else"
-                </button>
+                */}
               </div>
             )}
             
@@ -5663,29 +5669,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                            </aside>
               </div>
             </div>
-            {import.meta.env.DEV && (
-              <button
-                aria-label="dev-increment-whiteboard-lesson"
-                title="Next whiteboard lesson"
-                onClick={() => {
-                  try {
-                    const keys = Object.keys(lessonScripts);
-                    const currentId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1';
-                    const idx = keys.indexOf(currentId);
-                    const next = keys[(idx >= 0 ? idx + 1 : 1) % keys.length];
-                    setSelectedTopicId(next);
-                    setLessonReady(true);
-                    setDevWhiteboardEnabled(true);
-                  } catch (e) {
-                    console.warn('Dev increment lesson failed', e);
-                  }
-                }}
-                className="fixed top-2 right-2 w-9 h-9 rounded-full border-2 border-black bg-yellow-300 text-black shadow-lg z-[9999]"
-                style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.6)' }}
-              >
-                +1
-              </button>
-            )}
+            {/*
+              DEV: Increment whiteboard lesson button intentionally disabled
+              {import.meta.env.DEV && (
+                <button
+                  aria-label="dev-increment-whiteboard-lesson"
+                  title="Next whiteboard lesson"
+                  onClick={() => {
+                    try {
+                      const keys = Object.keys(lessonScripts);
+                      const currentId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1';
+                      const idx = keys.indexOf(currentId);
+                      const next = keys[(idx >= 0 ? idx + 1 : 1) % keys.length];
+                      setSelectedTopicId(next);
+                      setLessonReady(true);
+                      setDevWhiteboardEnabled(true);
+                    } catch (e) {
+                      console.warn('Dev increment lesson failed', e);
+                    }
+                  }}
+                  className="fixed top-2 right-2 w-9 h-9 rounded-full border-2 border-black bg-yellow-300 text-black shadow-lg z-[9999]"
+                  style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.6)' }}
+                >
+                  +1
+                </button>
+              )}
+            */}
           </main>
         ) : (
           <MCQScreenTypeA
