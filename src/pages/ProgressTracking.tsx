@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CheckCircle, AlertCircle, Circle, TrendingUp, Award, RefreshCw } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, Circle, TrendingUp, Award, RefreshCw, Eye } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { 
   loadSpellboxTopicProgress, 
@@ -16,6 +16,8 @@ import {
 } from '@/lib/utils';
 import { getSpellingTopicIds, getAllSpellingQuestions } from '@/lib/questionBankUtils';
 import { sampleMCQData } from '@/data/mcq-questions';
+import WhiteboardLesson from '@/components/adventure/WhiteboardLesson';
+import { getLessonScript } from '@/data/lesson-scripts';
 
 interface TopicProgressCard {
   topicId: string;
@@ -39,6 +41,12 @@ export function ProgressTracking(): JSX.Element {
     totalQuestionsAttempted: 0
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [whiteboardTopicId, setWhiteboardTopicId] = useState<string | null>(null);
+
+  const isGrade1 = useMemo(() => {
+    const g = (gradeDisplayName || '').toLowerCase();
+    return g.includes('1st') || g.includes('grade 1');
+  }, [gradeDisplayName]);
 
   // Fresh grade detection function - inspired by spellbox approach
   const getCurrentGrade = useCallback(() => {
@@ -344,7 +352,7 @@ export function ProgressTracking(): JSX.Element {
             return (
               <Card 
                 key={card.topicId} 
-                className={`p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 ${config.bgColor} backdrop-blur-md`}
+                className={`relative p-6 transition-all duration-200 hover:shadow-lg hover:scale-105 ${config.bgColor} backdrop-blur-md`}
               >
                 <div className="flex items-start justify-between mb-4">
                   <StatusIcon className={`h-6 w-6 ${config.color}`} />
@@ -406,6 +414,18 @@ export function ProgressTracking(): JSX.Element {
                     </p>
                   </div>
                 )}
+
+                {/* View Whiteboard - Grade 1 only */}
+                {isGrade1 && !!getLessonScript(card.topicId) && (
+                  <button
+                    aria-label="View whiteboard"
+                    title="View whiteboard"
+                    onClick={() => { playClickSound(); setWhiteboardTopicId(card.topicId); }}
+                    className="absolute bottom-3 right-3 w-9 h-9 rounded-full border-2 border-foreground shadow-solid bg-white text-black flex items-center justify-center hover:bg-gray-50"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                )}
               </Card>
             );
           })}
@@ -435,6 +455,15 @@ export function ProgressTracking(): JSX.Element {
           </p>
         </div>
       </div>
+      {/* Floating Whiteboard Overlay */}
+      {isGrade1 && whiteboardTopicId && !!getLessonScript(whiteboardTopicId) && (
+        <WhiteboardLesson
+          topicId={whiteboardTopicId}
+          fullscreen
+          onRequestClose={() => setWhiteboardTopicId(null)}
+          onCompleted={() => setWhiteboardTopicId(null)}
+        />
+      )}
     </div>
   );
 }

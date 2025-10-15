@@ -683,26 +683,23 @@ export interface GradeSelection {
  * Map selected grade to content grade based on new requirements
  */
 export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string => {
-  // Grade 4 and Grade 5 selections should reflect grade 3 content
-  if (gradeDisplayName === '4th Grade' || gradeDisplayName === '5th Grade') {
+  const normalized = (gradeDisplayName || '').trim();
+  // Accept both full and short forms
+  if (normalized === '4th Grade' || normalized === '4th' || normalized === '5th Grade' || normalized === '5th') {
     return '3';
   }
-  // Grade 2 and Grade 3 selections should reflect their respective content
-  if (gradeDisplayName === '2nd Grade') {
+  if (normalized === '3rd Grade' || normalized === '3rd') {
+    return '3';
+  }
+  if (normalized === '2nd Grade' || normalized === '2nd') {
     return '2';
   }
-  if (gradeDisplayName === '3rd Grade') {
-    return '3';
-  }
-  // Grade 1 should reflect grade 1 content
-  if (gradeDisplayName === '1st Grade') {
+  if (normalized === '1st Grade' || normalized === '1st') {
     return '1';
   }
-  // Kindergarten should reflect kindergarten content
-  if (gradeDisplayName === 'Kindergarten') {
+  if (normalized === 'Kindergarten' || normalized === 'K' || normalized === 'KG') {
     return '1';
   }
-  // Default to grade 1 for any other cases
   return '1';
 };
 
