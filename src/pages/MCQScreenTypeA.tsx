@@ -17,6 +17,7 @@ import { sampleMCQData, type MCQData, type MCQQuestion, type DragDropQuestion, t
 import { adventureSessionService } from '@/lib/adventure-session-service';
 import { useCoins } from '@/pages/coinSystem';
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
+import { useAuth } from "@/hooks/use-auth";
 
 // Remove duplicate interface definitions (lines 16-105) since they're now imported
 
@@ -48,6 +49,21 @@ const loadTopicScores = (topicId: string): Record<number, boolean> => {
     console.warn('Failed to load topic scores:', error);
     return {};
   }
+};
+
+// Assignment grade mapping based on question ID
+const getDowngradedGrade = (questionId: number) => {
+  const map: Record<number, { code: string; displayName: string; level: string; levelDisplay: string }> = {
+    1: { code: "gradeK", displayName: "Kindergarten", level: "start", levelDisplay: "Start Level" },
+    2: { code: "gradeK", displayName: "Kindergarten", level: "start", levelDisplay: "Start Level" },
+    3: { code: "gradeK", displayName: "Kindergarten", level: "mid", levelDisplay: "Mid Level" },
+    4: { code: "grade1", displayName: "1st Grade", level: "start", levelDisplay: "Start Level" },
+    5: { code: "grade1", displayName: "1st Grade", level: "mid", levelDisplay: "Mid Level" },
+    6: { code: "grade2", displayName: "2nd Grade", level: "start", levelDisplay: "Start Level" },
+    7: { code: "grade2", displayName: "2nd Grade", level: "mid", levelDisplay: "Mid Level" },
+    8: { code: "grade3", displayName: "3rd Grade", level: "start", levelDisplay: "Start Level" }
+  };
+  return map[questionId] || map[1];
 };
 
 const clearTopicScores = (topicId: string): void => {
@@ -201,6 +217,9 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const currentPetAvatarImage = useCurrentPetAvatarImage();
   const resizeRef = React.useRef<HTMLDivElement>(null);
   const nextButtonRef = React.useRef<HTMLButtonElement>(null);
+  
+  // Auth integration
+  const { userData, updateUserData } = useAuth();
   
   // Coin system integration
   const { addAdventureCoins } = useCoins();
@@ -366,6 +385,24 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       ttsService.stop();
     }
   }, [isInReflectionMode]);
+
+  // Reset assignment progress when switching TO assignment grade
+  useEffect(() => {
+    const handleGradeChange = () => {
+      if (userData?.grade === "assignment" && selectedTopicId.startsWith('A-')) {
+        setCurrentQuestionIndex(0);
+        setQuestionScores({});
+        setFirstAttempts({});
+        setHasAnswered(false);
+        setIsCorrect(false);
+        setSelectedAnswer(null);
+        setShowFeedback(false);
+      }
+    };
+    
+    window.addEventListener('gradeSelectionChanged', handleGradeChange);
+    return () => window.removeEventListener('gradeSelectionChanged', handleGradeChange);
+  }, [selectedTopicId, userData?.grade]);
   
   // Get all topic IDs in order
   const topicIds = Object.keys(sampleMCQData.topics);
@@ -436,6 +473,34 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     return helpKeywords.some(keyword => lowercaseText.includes(keyword));
   };
   
+  const handleAssignmentDowngrade = useCallback(async (questionIndex: number) => {
+    const newGrade = getDowngradedGrade(questionIndex + 1);
+    await updateUserData({
+      grade: newGrade.code,
+      gradeDisplayName: newGrade.displayName,
+      level: newGrade.level,
+      levelDisplayName: newGrade.levelDisplay,
+      assignmentPlacement: {
+        decidedGrade: newGrade.code,
+        decidedGradeDisplayName: newGrade.displayName,
+        decidedLevel: newGrade.level,
+        decidedLevelDisplayName: newGrade.levelDisplay,
+        decidedAt: new Date(),
+        firstIncorrectQuestion: questionIndex + 1,
+        topicId: selectedTopicId
+      }
+    });
+
+    const gradePrefix = newGrade.code === "gradeK" ? "K" :
+                        newGrade.code === "grade1" ? "1" :
+                        newGrade.code === "grade2" ? "2" : "3";
+    const newTopicId = Object.keys(sampleMCQData.topics).find(tid => tid.startsWith(gradePrefix));
+
+    if (onNextTopic && newTopicId) {
+      setTimeout(() => onNextTopic(newTopicId), 100);
+    }
+  }, [onNextTopic, selectedTopicId, updateUserData]);
+
 
 
   const handleAnswerClick = useCallback(async (answerIndex: number) => {
@@ -456,14 +521,19 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
     
     setIsCorrect(correct);
+    // Assignment downgrade on first incorrect attempt
+    if (!correct && isFirstAttempt && userData?.grade === "assignment") {
+      await handleAssignmentDowngrade(currentQuestionIndex);
+      return;
+    }
     
-    // Optional: Track answer in Firebase session (track all answers, not just correct ones)
+    // Track answer in Firebase session
     if (currentSessionId && currentQuestion) {
       adventureSessionService.trackMCQAnswer(
         currentSessionId,
         currentQuestion.id,
-        answerIndex, // Use the actual answer index
-        correct,     // Use local variable, not async state
+        answerIndex,
+        correct,
         selectedTopicId,
         currentQuestionIndex
       );
@@ -563,14 +633,13 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     // Auto-expand chat to show feedback
     // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages, currentAdventureType]); // Removed setSidebarCollapsed from dependencies
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, displayQuestionText, firstAttempts, currentQuestionIndex, setChatMessages, currentAdventureType, userData, handleAssignmentDowngrade]);
 
   // Handle fill blank answer submission
   const handleFillBlankSubmit = useCallback(async () => {
     if (hasAnswered || isGeneratingQuestion || isInReflectionMode || !fillBlankAnswer.trim()) return;
     
     playClickSound();
-    setHasAnswered(true);
     
     const currentFillBlankQuestion = currentQuestion as FillBlankQuestion;
     const userAnswer = fillBlankAnswer.trim().toLowerCase();
@@ -587,6 +656,13 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
     
     setIsCorrect(isAnswerCorrect);
+    
+    if (!isAnswerCorrect && isFirstAttempt && userData?.grade === "assignment") {
+      await handleAssignmentDowngrade(currentQuestionIndex);
+      return;
+    }
+
+    setHasAnswered(true);
     
     // Optional: Track fill-blank answer in Firebase session (track all answers)
     if (currentSessionId && currentQuestion) {
@@ -693,7 +769,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     
     // Auto-expand chat to show feedback
     // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
-  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages, currentAdventureType]); // Removed setSidebarCollapsed from dependencies
+  }, [hasAnswered, isCorrect, isGeneratingQuestion, isInReflectionMode, currentQuestion, fillBlankAnswer, setChatMessages, currentAdventureType, firstAttempts, currentQuestionIndex, currentSessionId, selectedTopicId, userData, handleAssignmentDowngrade]);
 
   // Handle student reflection response
   const handleReflectionResponse = useCallback(async (studentReflection: string) => {
@@ -1519,6 +1595,12 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
 
     setIsCorrect(isCorrect);
+
+    if (!isCorrect && isFirstAttempt && userData?.grade === "assignment") {
+      await handleAssignmentDowngrade(currentQuestionIndex);
+      return;
+    }
+
     setHasAnswered(true);
     setShowFeedback(true);
 
@@ -1614,7 +1696,7 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     }
 
     // setSidebarCollapsed(false); // Commented out - don't auto-open chat panel
-  }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages, currentAdventureType]);
+  }, [isDragDropType, currentQuestion, availableWords.length, sortedWords, setChatMessages, currentAdventureType, firstAttempts, currentQuestionIndex, currentSessionId, selectedTopicId, userData, handleAssignmentDowngrade]);
 
   // Reset quiz UI state only (preserves saved scores)
   const resetQuizState = useCallback(() => {

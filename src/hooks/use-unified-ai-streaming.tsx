@@ -48,7 +48,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
 
   // Handle stream events - STABLE callback to prevent useEffect cleanup
   const handleStreamEventRef = useRef((event: StreamEvent) => {
-    console.log('📡 Stream event received:', event.type, event.content.substring(0, 100));
+     // console.log('📡 Stream event received:', event.type, event.content.substring(0, 100));
     
     setStreamingState(prev => {
       const newState = { ...prev };
@@ -59,13 +59,13 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           break;
           
         case 'image_start':
-          console.log('🎯 Image generation started');
+          // // console.log('🎯 Image generation started');
           newState.isGeneratingImage = true;
           // Loading sound is handled in response processor
           break;
           
         case 'image_complete':
-          console.log('🎨 Image complete event received');
+          // // console.log('🎨 Image complete event received');
           newState.isGeneratingImage = false;
           // leave streaming flags alone; let callers decide when to stop loading
           newState.isUnifiedSessionActive = false;
@@ -76,10 +76,10 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
             const isNewImage = existingFirst !== nextImageUrl;
 
             if (isNewImage) {
-              console.log('🖼️ New inline image received, updating state');
+              // // console.log('🖼️ New inline image received, updating state');
               newState.generatedImages = [nextImageUrl];
             } else {
-              console.log('ℹ️ Inline image unchanged, skipping state update to prevent flicker');
+              // // console.log('ℹ️ Inline image unchanged, skipping state update to prevent flicker');
             }
             // Call callback for new image
             if (onNewImage && event.metadata.prompt) {
@@ -112,7 +112,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
           break;
           
         case 'complete':
-          console.log('✅ Stream complete');
+          // // console.log('✅ Stream complete');
           newState.isStreaming = false;
           newState.isGeneratingImage = false;
           newState.isUnifiedSessionActive = false;
@@ -141,12 +141,12 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   // Register/unregister stream event listener - STABLE to prevent cleanup during re-renders
   useEffect(() => {
     if (aiService.isUnifiedSystemReady()) {
-      console.log(`🔗 Registering stream event listener for session: ${sessionId}`);
+      // // console.log(`🔗 Registering stream event listener for session: ${sessionId}`);
       aiService.onUnifiedStreamEvent(sessionId, (event) => handleStreamEventRef.current(event));
     }
     
     return () => {
-      console.log(`🔗 Cleaning up stream event listener for session: ${sessionId}`);
+      // // console.log(`🔗 Cleaning up stream event listener for session: ${sessionId}`);
       aiService.removeUnifiedStreamListener(sessionId);
     };
   }, [sessionId]); // Only depends on sessionId - stable!
@@ -155,7 +155,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
   useEffect(() => {
     return () => {
       if (delayTimeoutRef.current) {
-        console.log('🧹 Cleaning up delay timeout on unmount');
+        // // console.log('🧹 Cleaning up delay timeout on unmount');
         clearTimeout(delayTimeoutRef.current);
         delayTimeoutRef.current = null;
       }
@@ -177,7 +177,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
     
     // 🛠️ IMPROVED: Better handling of existing streaming state
     if (streamingState.isStreaming) {
-      console.log('⚠️ Already streaming - aborting previous request');
+      // // console.log('⚠️ Already streaming - aborting previous request');
       
       try {
         aiService.abortUnifiedStream(sessionId);
@@ -199,11 +199,11 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       }
     }
     
-    console.log('🎯 Starting new unified streaming request:', {
-      sessionId,
-      messagePreview: message.substring(0, 50),
-      previouslyStreaming: streamingState.isStreaming
-    });
+    // // console.log('🎯 Starting new unified streaming request:', {
+    //   sessionId,
+    //   messagePreview: message.substring(0, 50),
+    //   previouslyStreaming: streamingState.isStreaming
+    // });
     
     // Reset state for new message
     setStreamingState(prev => ({
@@ -221,16 +221,16 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
     let streamingTimeout: NodeJS.Timeout | null = null;
     
     try {
-      console.log('🚀 [UnifiedAIStreaming.sendMessage()] Sending message through unified AI system:', message.substring(0, 50));
-      console.log('🔍 [UnifiedAIStreaming.sendMessage()] Current state before processing:', {
-        isStreaming: streamingState.isStreaming,
-        isGeneratingImage: streamingState.isGeneratingImage,
-        isUnifiedSessionActive: streamingState.isUnifiedSessionActive,
-        sessionId: sessionId
-      });
+      // // console.log('🚀 [UnifiedAIStreaming.sendMessage()] Sending message through unified AI system:', message.substring(0, 50));
+      // // console.log('🔍 [UnifiedAIStreaming.sendMessage()] Current state before processing:', {
+      //   isStreaming: streamingState.isStreaming,
+      //   isGeneratingImage: streamingState.isGeneratingImage,
+      //   isUnifiedSessionActive: streamingState.isUnifiedSessionActive,
+      //   sessionId: sessionId
+      // });
       
       streamingTimeout = setTimeout(() => {
-        console.log('🚨 STREAMING TIMEOUT: Force-resetting stuck state after 35 seconds');
+        // // console.log('🚨 STREAMING TIMEOUT: Force-resetting stuck state after 35 seconds');
         setStreamingState(prev => ({
           ...prev,
           isStreaming: false,
@@ -262,7 +262,7 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         clearTimeout(streamingTimeout);
       }
       
-      console.log(`✅ Unified response received with ${response.imageUrls.length} images`);
+      // // console.log(`✅ Unified response received with ${response.imageUrls.length} images`);
       
       // Update final state - DON'T reset isGeneratingImage here as timeout handles it
       setStreamingState(prev => ({
@@ -291,13 +291,13 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
       
       // Handle aborted requests gracefully
       if (error instanceof Error && (error.name === 'APIUserAbortError' || error.message.includes('aborted'))) {
-        console.log('ℹ️ Request aborted (new message sent or component unmounted)');
-        console.log('🔍 Hook abort details:', {
-          errorName: error.name,
-          errorMessage: error.message,
-          sessionId: sessionId,
-          currentStreamingState: streamingState.isStreaming
-        });
+        // // console.log('ℹ️ Request aborted (new message sent or component unmounted)');
+        // // console.log('🔍 Hook abort details:', {
+        //   errorName: error.name,
+        //   errorMessage: error.message,
+        //   sessionId: sessionId,
+        //   currentStreamingState: streamingState.isStreaming
+        // });
         
         // No sounds on abort
         

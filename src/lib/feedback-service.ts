@@ -32,7 +32,7 @@ export const feedbackService = {
 
       // Save to Firestore 'feedbacks' collection
       const docRef = await addDoc(collection(db, 'feedbacks'), feedbackData);
-      console.log('Feedback saved successfully with ID:', docRef.id);
+      // console.log('Feedback saved successfully with ID:', docRef.id);
       
     } catch (error) {
       console.error('Error saving feedback to Firestore:', error);
@@ -49,6 +49,6 @@ export function trackEvent(eventName: string, payload?: Record<string, any>) {
       ts: Date.now(),
       ...(payload || {})
     };
-    console.log('[telemetry]', data);
+    // console.log('[telemetry]', data);
   } catch {}
 }

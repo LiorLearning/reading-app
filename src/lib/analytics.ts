@@ -75,12 +75,7 @@ export const analytics = {
     try {
       posthog.capture(event, { ...base, ...(props || {}) });
     } catch {}
-    try {
-      // Mirror to console for dev visibility
-      // eslint-disable-next-line no-console
-      console.log('[analytics]', { event, ...base, ...(props || {}) });
-    } catch {}
-  },
+    },
 };
 
 export default analytics;

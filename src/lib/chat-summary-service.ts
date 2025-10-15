@@ -86,7 +86,7 @@ Generate an updated summary that combines the previous context with new informat
         return this.getFallbackSummary(messages, previousSummary);
       }
 
-      console.log('✅ Generated chat summary:', summary.substring(0, 50) + '...');
+      // console.log('✅ Generated chat summary:', summary.substring(0, 50) + '...');
       return summary;
 
     } catch (error) {
