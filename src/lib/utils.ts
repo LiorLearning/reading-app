@@ -346,15 +346,6 @@ const generateAdventureSummaryFallback = (messages: ChatMessage[]): string => {
  */
 export const generateAdventureName = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "Untitled Adventure";
-  
-  // Check if OpenAI API key is available for AI generation
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    // Fallback to rule-based generation
-    return generateAdventureNameFallback(messages);
-  }
-
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
