@@ -708,7 +708,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     const currentLevel = getCurrentPetLevel();
     if (currentLevel > previousLevel) {
       // Level up detected!
-      console.log(`🎉 Level up! ${previousLevel} → ${currentLevel}`);
+      // console.log(`🎉 Level up! ${previousLevel} → ${currentLevel}`);
       playEvolutionSound();
       
       // Show level up animation
@@ -1003,7 +1003,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         preferenceLevel = userData.level as 'start' | 'middle';
       }
       
-      console.log('Setting selectedPreference to:', preferenceLevel);
+      // console.log('Setting selectedPreference to:', preferenceLevel);
       setSelectedPreference(preferenceLevel);
       
       // Initialize the combined grade and level selection for proper highlighting
@@ -1012,19 +1012,19 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
           grade: userData.gradeDisplayName, 
           level: preferenceLevel 
         });
-        console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
+        // console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
       }
       
       // First, check if there's a current topic saved from previous selection
       if (userProgress?.currentTopicId) {
-        console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
+        // console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
         setSelectedTopicFromPreference(userProgress.currentTopicId);
       } else if (savedPreference) {
         // Preference no longer stores a specific topicId; pick next topic via preference
         const allTopicIds = Object.keys(sampleMCQData.topics);
         const nextByPref = getNextTopicByPreference(allTopicIds, savedPreference.level as 'start' | 'middle', userData.gradeDisplayName);
         if (nextByPref) {
-          console.log('Loading topic from level preference:', nextByPref);
+          // console.log('Loading topic from level preference:', nextByPref);
           setSelectedTopicFromPreference(nextByPref);
         }
       }
@@ -1093,10 +1093,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
   // Handle adventure button click
   const handleAdventureClick = async (adventureType: string = 'food') => {
-    console.log('🎯 PetPage handleAdventureClick called with adventureType:', adventureType);
+    // console.log('🎯 PetPage handleAdventureClick called with adventureType:', adventureType);
     // Prevent multiple clicks by checking if already loading
     if (isAdventureLoading) {
-      console.log('🎯 Adventure already loading, skipping');
+      // console.log('🎯 Adventure already loading, skipping');
       return;
     }
 
@@ -1143,12 +1143,12 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         adventureType
       );
 
-      console.log('🎯 PetPage: Existing adventure check:', existingAdventure);
+      // console.log('🎯 PetPage: Existing adventure check:', existingAdventure);
 
       if (existingAdventure.exists && existingAdventure.adventureId) {
         // Continue existing adventure with context
-        console.log('🔄 PetPage: Continuing existing adventure:', existingAdventure.adventureId);
-        console.log('🔄 PetPage: Adventure has', existingAdventure.messageCount, 'messages');
+        // console.log('🔄 PetPage: Continuing existing adventure:', existingAdventure.adventureId);
+        // console.log('🔄 PetPage: Adventure has', existingAdventure.messageCount, 'messages');
         
         // Use onStartAdventure with 'continue' mode and pass the adventure context
         // This will trigger the AI to generate a "welcome back" message with context
@@ -1176,7 +1176,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         const newAdventureId = crypto.randomUUID();
         const topicId = selectedTopicFromPreference || 'K-F.2';
         
-        console.log('🚀 PetPage: Starting new adventure with type:', adventureType, 'ID:', newAdventureId);
+        // console.log('🚀 PetPage: Starting new adventure with type:', adventureType, 'ID:', newAdventureId);
         
         // Track the new adventure
         await PetAdventureTracker.startNewAdventure(
@@ -1212,7 +1212,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   };
 
   const handleActionClick = async (actionId: string) => {
-    console.log('🎯 PetPage: handleActionClick called with actionId:', actionId);
+    // console.log('🎯 PetPage: handleActionClick called with actionId:', actionId);
     // Handle sleep action
     if (actionId === 'sleep') {
       // If Step 8 is still active, immediately transition into Step 9 before handling sleep
@@ -1400,7 +1400,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle friend action - starts new friend adventure
     if (actionId === 'friend') {
-      console.log('🎯 PetPage: Friend button clicked, calling handleAdventureClick with "friend"');
+      // console.log('🎯 PetPage: Friend button clicked, calling handleAdventureClick with "friend"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1412,7 +1412,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle dressing competition action - starts new dressing-competition adventure
     if (actionId === 'dressing-competition') {
-      console.log('🎯 PetPage: Dressing Competition clicked, calling handleAdventureClick with "dressing-competition"');
+      // console.log('🎯 PetPage: Dressing Competition clicked, calling handleAdventureClick with "dressing-competition"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1424,7 +1424,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle investigation action - starts new sick investigation adventure
     if (actionId === 'who-made-the-pets-sick') {
-      console.log('🎯 PetPage: Who Made The Pets Sick clicked, calling handleAdventureClick with "who-made-the-pets-sick"');
+      // console.log('🎯 PetPage: Who Made The Pets Sick clicked, calling handleAdventureClick with "who-made-the-pets-sick"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1436,7 +1436,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle house action - starts new house adventure
     if (actionId === 'house') {
-      console.log('🎯 PetPage: House button clicked, calling handleAdventureClick with "house"');
+      // console.log('🎯 PetPage: House button clicked, calling handleAdventureClick with "house"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1448,7 +1448,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle travel action - starts new travel adventure
     if (actionId === 'travel') {
-      console.log('🎯 PetPage: Travel button clicked, calling handleAdventureClick with "travel"');
+      // console.log('🎯 PetPage: Travel button clicked, calling handleAdventureClick with "travel"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1460,7 +1460,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle story action - starts new story adventure
     if (actionId === 'story') {
-      console.log('🎯 PetPage: Story button clicked, calling handleAdventureClick with "story"');
+      // console.log('🎯 PetPage: Story button clicked, calling handleAdventureClick with "story"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1472,7 +1472,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Handle plant dreams action - starts new plant dreams adventure
     if (actionId === 'plant-dreams') {
-      console.log('🎯 PetPage: Plant Dreams button clicked, calling handleAdventureClick with "plant-dreams"');
+      // console.log('🎯 PetPage: Plant Dreams button clicked, calling handleAdventureClick with "plant-dreams"');
       const granted = await ensureMicPermission();
       if (!granted) {
         toast.error('Enable Mic Access');
@@ -1719,7 +1719,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.3);
     } catch (error) {
-      console.log('Audio not supported');
+      // console.log('Audio not supported');
     }
   };
 
@@ -1749,7 +1749,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         oscillator.stop(audioContext.currentTime + index * 0.1 + 0.8);
       });
     } catch (error) {
-      console.log('Audio not supported');
+      // console.log('Audio not supported');
     }
   };
 
@@ -2014,7 +2014,7 @@ const getSleepyPetImage = (clicks: number) => {
   // Get cumulative care image for April based on coin progression
   const getCumulativeCareImage = () => {
     // Debug logging
-    console.log('🐶 Coin-based Care Debug:', { coins, carePercentage: getCumulativeCarePercentage() });
+    // console.log('🐶 Coin-based Care Debug:', { coins, carePercentage: getCumulativeCarePercentage() });
     
     let currentImage;
     let previousCareStage = 0; // Track previous stage for animation
@@ -2227,12 +2227,12 @@ const getSleepyPetImage = (clicks: number) => {
     // Save preference and get the specific topic immediately
     const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
     
-    console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
+    // console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
     setSelectedPreference(level);
     setSelectedTopicFromPreference(specificTopic);
     
-    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
+    // console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
 
   const handlePetPurchase = async (petType: string, cost: number) => {
@@ -2744,13 +2744,13 @@ const getSleepyPetImage = (clicks: number) => {
     const cumulativeCare = getCumulativeCareLevel();
     
     // Debug logging to understand heart fill calculation
-    console.log('❤️ Heart Fill Debug:', {
-      percentage,
-      feedingCount: cumulativeCare.feedingCount,
-      adventureCoins: cumulativeCare.adventureCoins,
-      sleepCompleted: cumulativeCare.sleepCompleted,
-      sleepClicks
-    });
+    // console.log('❤️ Heart Fill Debug:', {
+    //   percentage,
+    //   feedingCount: cumulativeCare.feedingCount,
+    //   adventureCoins: cumulativeCare.adventureCoins,
+    //   sleepCompleted: cumulativeCare.sleepCompleted,
+    //   sleepClicks
+    // });
     
     return percentage;
   };
@@ -3460,7 +3460,7 @@ const getSleepyPetImage = (clicks: number) => {
             // Also update pet adventure coins for care progression
             addAdventureCoins(10);
             
-            console.log('🧪 Simulated 10 coins earned via spellbox');
+            // console.log('🧪 Simulated 10 coins earned via spellbox');
           }}
           className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
           title="Testing: Simulate spellbox coin earnings"
@@ -3498,7 +3498,7 @@ const getSleepyPetImage = (clicks: number) => {
             // Also update pet adventure coins for care progression
             addAdventureCoins(10);
             
-            console.log('🧪 Added 10 coins (both global and adventure coins for testing)');
+            // console.log('🧪 Added 10 coins (both global and adventure coins for testing)');
           }}
           className="bg-transparent hover:bg-white/5 px-3 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"
           title="Testing: Add 10 adventure coins"
@@ -3511,7 +3511,7 @@ const getSleepyPetImage = (clicks: number) => {
           onClick={() => {
             localStorage.removeItem('pet_last_reset_time'); // Force reset
             const wasReset = checkAndPerform8HourReset();
-            console.log('🧪 Forced 8-hour reset:', wasReset);
+            // console.log('🧪 Forced 8-hour reset:', wasReset);
             window.location.reload(); // Reload to see changes
           }}
           className="bg-transparent hover:bg-white/5 px-2 py-1 rounded text-transparent hover:text-white/20 text-xs transition-all duration-300 opacity-5 hover:opacity-30"

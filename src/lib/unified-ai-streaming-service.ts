@@ -48,14 +48,14 @@ export class UnifiedAIStreamingService {
         baseURL: 'https://api.readkraft.com/api/v1'
       });
       this.isInitialized = true;
-      console.log('✅ UnifiedAIStreamingService initialized');
+      // console.log('✅ UnifiedAIStreamingService initialized');
   }
   
   /**
    * Register callback for streaming events
    */
   onStreamEvent(sessionId: string, callback: (event: StreamEvent) => void) {
-    console.log(`🔗 onStreamEvent registered for session: ${sessionId}`);
+    // console.log(`🔗 onStreamEvent registered for session: ${sessionId}`);
     this.eventCallbacks.set(sessionId, callback);
   }
   
@@ -63,8 +63,8 @@ export class UnifiedAIStreamingService {
    * Remove callback and cleanup
    */
   removeStreamListener(sessionId: string) {
-    console.log(`🧹 removeStreamListener called for session: ${sessionId}`);
-    console.log(`🧹 Had callback: ${this.eventCallbacks.has(sessionId)}, Had controller: ${this.abortControllers.has(sessionId)}`);
+    // console.log(`🧹 removeStreamListener called for session: ${sessionId}`);
+    // console.log(`🧹 Had callback: ${this.eventCallbacks.has(sessionId)}, Had controller: ${this.abortControllers.has(sessionId)}`);
     
     // Only remove callback, but be careful with aborting active controllers
     this.eventCallbacks.delete(sessionId);
@@ -73,11 +73,11 @@ export class UnifiedAIStreamingService {
     const controller = this.abortControllers.get(sessionId);
     if (controller) {
       if (controller.signal.aborted) {
-        console.log(`🧹 Controller already aborted for session: ${sessionId}`);
+        // console.log(`🧹 Controller already aborted for session: ${sessionId}`);
         this.abortControllers.delete(sessionId);
       } else {
-        console.log(`🚨 WARNING: Active controller found during cleanup for session: ${sessionId}`);
-        console.log(`🚨 This might be premature cleanup! Controller will NOT be aborted to prevent request interruption.`);
+        // console.log(`🚨 WARNING: Active controller found during cleanup for session: ${sessionId}`);
+        // console.log(`🚨 This might be premature cleanup! Controller will NOT be aborted to prevent request interruption.`);
         // Only delete the controller reference, don't abort
         // This allows ongoing requests to complete
       }
@@ -105,7 +105,7 @@ export class UnifiedAIStreamingService {
     // Clean up any existing controller for this session first
     const existingController = this.abortControllers.get(sessionId);
     if (existingController && !existingController.signal.aborted) {
-      console.log('🔄 Aborting previous request for same session');
+      // console.log('🔄 Aborting previous request for same session');
       existingController.abort();
     }
     this.abortControllers.delete(sessionId);
@@ -113,14 +113,14 @@ export class UnifiedAIStreamingService {
     const abortController = new AbortController();
     this.abortControllers.set(sessionId, abortController);
     
-    console.log(`🎯 Created new AbortController for session: ${sessionId}`);
+    // console.log(`🎯 Created new AbortController for session: ${sessionId}`);
     
     try {
-      console.log('🚀 [UnifiedAIStreamingService.generateUnifiedResponse()] Generating unified AI response with potential images...');
-      console.log('📝 [UnifiedAIStreamingService.generateUnifiedResponse()] User message:', userMessage);
-      console.log('👤 [UnifiedAIStreamingService.generateUnifiedResponse()] User ID:', userId);
-      console.log('🎯 [UnifiedAIStreamingService.generateUnifiedResponse()] Session ID:', sessionId);
-      console.log('🎨 [UnifiedAIStreamingService.generateUnifiedResponse()] Adventure ID:', adventureId);
+      // console.log('🚀 [UnifiedAIStreamingService.generateUnifiedResponse()] Generating unified AI response with potential images...');
+      // console.log('📝 [UnifiedAIStreamingService.generateUnifiedResponse()] User message:', userMessage);
+      // console.log('👤 [UnifiedAIStreamingService.generateUnifiedResponse()] User ID:', userId);
+      // console.log('🎯 [UnifiedAIStreamingService.generateUnifiedResponse()] Session ID:', sessionId);
+      // console.log('🎨 [UnifiedAIStreamingService.generateUnifiedResponse()] Adventure ID:', adventureId);
       
       // 🎯 NEW: Signal automatic generation cancellation at start of unified session
       const { aiService } = await import('./ai-service');
@@ -142,20 +142,20 @@ export class UnifiedAIStreamingService {
       // Pass user message for fallback visual detection, not AI response content
       const hasImages = ResponseProcessor.containsImageRequests(aiResponse, userMessage);
       
-      console.log('🔍 [UnifiedAIStreamingService.generateUnifiedResponse()] Image generation analysis:', {
-        userMessage: userMessage,
-        responsePreview: aiResponse.substring(0, 200) + '...',
-        hasExplicitTags: aiResponse.includes('<generateImage>'),
-        userHasVisualKeywords: userMessage ? ResponseProcessor.shouldGenerateImageFromContent(userMessage) : false,
-        aiHasVisualKeywords: ResponseProcessor.shouldGenerateImageFromContent(aiResponse),
-        willGenerateImages: hasImages,
-        extractedImagePrompts: ResponseProcessor.extractImagePrompts(aiResponse),
-        reason: aiResponse.includes('<generateImage>') ? 'explicit_tags' : (userMessage && ResponseProcessor.shouldGenerateImageFromContent(userMessage) ? 'user_visual_content' : 'no_images')
-      });
+      // console.log('🔍 [UnifiedAIStreamingService.generateUnifiedResponse()] Image generation analysis:', {
+      //   userMessage: userMessage,
+      //   responsePreview: aiResponse.substring(0, 200) + '...',
+      //   hasExplicitTags: aiResponse.includes('<generateImage>'),
+      //   userHasVisualKeywords: userMessage ? ResponseProcessor.shouldGenerateImageFromContent(userMessage) : false,
+      //   aiHasVisualKeywords: ResponseProcessor.shouldGenerateImageFromContent(aiResponse),
+      //   willGenerateImages: hasImages,
+      //   extractedImagePrompts: ResponseProcessor.extractImagePrompts(aiResponse),
+      //   reason: aiResponse.includes('<generateImage>') ? 'explicit_tags' : (userMessage && ResponseProcessor.shouldGenerateImageFromContent(userMessage) ? 'user_visual_content' : 'no_images')
+      // });
       
       if (!hasImages) {
         // Force image generation using Flux-first pipeline on every prompt
-        console.log('🖼️ Forcing image generation (Flux priority) even without explicit tags...');
+        // console.log('🖼️ Forcing image generation (Flux priority) even without explicit tags...');
         const streamEvents: StreamEvent[] = [];
         const imageUrls: string[] = [];
         let textContent = '';
@@ -193,7 +193,7 @@ export class UnifiedAIStreamingService {
       }
       
       // Process response with image generation
-      console.log('🎨 AI response contains image generation requests');
+      // console.log('🎨 AI response contains image generation requests');
       const streamEvents: StreamEvent[] = [];
       const imageUrls: string[] = [];
       let textContent = '';
@@ -242,10 +242,10 @@ export class UnifiedAIStreamingService {
       }
       
       const completionTimestamp = Date.now();
-      console.log(`✅ [UnifiedAIStreamingService.generateUnifiedResponse()] Unified response generated with ${imageUrls.length} images`);
-      console.log(`⏰ [UnifiedAIStreamingService.generateUnifiedResponse()] Completion timestamp: ${completionTimestamp}`);
+      // console.log(`✅ [UnifiedAIStreamingService.generateUnifiedResponse()] Unified response generated with ${imageUrls.length} images`);
+      // console.log(`⏰ [UnifiedAIStreamingService.generateUnifiedResponse()] Completion timestamp: ${completionTimestamp}`);
       if (imageUrls.length > 0) {
-        console.log(`🖼️ [UnifiedAIStreamingService.generateUnifiedResponse()] Generated image URLs:`, imageUrls);
+        // console.log(`🖼️ [UnifiedAIStreamingService.generateUnifiedResponse()] Generated image URLs:`, imageUrls);
       }
       
       return {
@@ -259,13 +259,13 @@ export class UnifiedAIStreamingService {
     } catch (error) {
       // Handle different types of errors gracefully
       if (error instanceof Error && (error.name === 'APIUserAbortError' || error.message.includes('aborted'))) {
-        console.log('ℹ️ Request was aborted (likely due to new message sent)');
-        console.log('🔍 Abort details:', {
-          errorName: error.name,
-          errorMessage: error.message,
-          sessionId: sessionId,
-          controllerExists: this.abortControllers.has(sessionId)
-        });
+        // console.log('ℹ️ Request was aborted (likely due to new message sent)');
+        // console.log('🔍 Abort details:', {
+        //   errorName: error.name,
+        //   errorMessage: error.message,
+        //   sessionId: sessionId,
+        //   controllerExists: this.abortControllers.has(sessionId)
+        // });
         
         // For aborted requests, don't return an error - let the new request take over
         throw error; // Re-throw so it can be handled by the calling code
@@ -291,7 +291,7 @@ export class UnifiedAIStreamingService {
       // Clean up the abort controller when the request completes
       const controller = this.abortControllers.get(sessionId);
       if (controller) {
-        console.log(`🧹 Cleaning up completed request controller for session: ${sessionId}`);
+        // console.log(`🧹 Cleaning up completed request controller for session: ${sessionId}`);
         this.abortControllers.delete(sessionId);
       }
     }
@@ -312,7 +312,7 @@ export class UnifiedAIStreamingService {
     }
 
     // 🧹 NEW: Sanitize the user prompt upfront before processing
-    console.log('🧹 Sanitizing user prompt before unified processing...');
+    // console.log('🧹 Sanitizing user prompt before unified processing...');
     const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
     
     let sanitizedUserMessage = userMessage;
@@ -320,11 +320,11 @@ export class UnifiedAIStreamingService {
       const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userMessage);
       if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
         sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
-        console.log('✅ Prompt sanitized successfully');
-        console.log('🔄 Original:', userMessage.substring(0, 100) + '...');
-        console.log('✨ Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
+        // console.log('✅ Prompt sanitized successfully');
+        // console.log('🔄 Original:', userMessage.substring(0, 100) + '...');
+        // console.log('✨ Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
       } else {
-        console.log('⚠️ Sanitization failed, using original prompt');
+        // console.log('⚠️ Sanitization failed, using original prompt');
       }
     } catch (sanitizationError) {
       console.warn('⚠️ Prompt sanitization error, using original prompt:', sanitizationError);
@@ -419,10 +419,10 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       { role: "user", content: enhancedUserMessage }
     ];
     
-    console.log('🤖 Calling OpenAI with enhanced image-aware prompt...');
-    console.log('📝 System prompt preview:', systemPrompt.substring(0, 200) + '...');
-    console.log('💬 Original user message:', userMessage);
-    console.log('🧹 Sanitized user message:', sanitizedUserMessage);
+    // console.log('🤖 Calling OpenAI with enhanced image-aware prompt...');
+    // console.log('📝 System prompt preview:', systemPrompt.substring(0, 200) + '...');
+    // console.log('💬 Original user message:', userMessage);
+    // console.log('🧹 Sanitized user message:', sanitizedUserMessage);
     
     const response = await this.client.chat.completions.create({
       model: "gpt-4o", // Use GPT-4o for best image decision making
@@ -438,10 +438,10 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       throw new Error('No response content received from AI');
     }
     
-    console.log('🤖 RAW AI Response received:', content);
-    console.log('🔍 Contains <generateImage> tags:', content.includes('<generateImage>'));
-    console.log('🎯 User message was about visual content:', userMessage.toLowerCase().includes('dragon') || userMessage.toLowerCase().includes('robot') || userMessage.toLowerCase().includes('fight'));
-    console.log('📝 System prompt included image generation instructions:', messages[0].content.includes('generateImage'));
+    // console.log('🤖 RAW AI Response received:', content);
+    // console.log('🔍 Contains <generateImage> tags:', content.includes('<generateImage>'));
+    // console.log('🎯 User message was about visual content:', userMessage.toLowerCase().includes('dragon') || userMessage.toLowerCase().includes('robot') || userMessage.toLowerCase().includes('fight'));
+    // console.log('📝 System prompt included image generation instructions:', messages[0].content.includes('generateImage'));
     
     return content;
   }
@@ -519,11 +519,11 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
     adventureId?: string
   ): Promise<UnifiedAIResponse> {
     try {
-      console.log('🔄 Calling legacy AI service as fallback...');
-      console.log('🎯 COORDINATION: Legacy fallback - session remains active, automatic generation blocked');
+      // console.log('🔄 Calling legacy AI service as fallback...');
+      // console.log('🎯 COORDINATION: Legacy fallback - session remains active, automatic generation blocked');
       
       // 🧹 NEW: Sanitize the user prompt for legacy system too
-      console.log('🧹 Sanitizing user prompt for legacy fallback...');
+      // console.log('🧹 Sanitizing user prompt for legacy fallback...');
       const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
       
       let sanitizedUserMessage = userMessage;
@@ -531,11 +531,11 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
         const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userMessage);
         if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
           sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
-          console.log('✅ Legacy fallback: Prompt sanitized successfully');
-          console.log('🔄 Legacy Original:', userMessage.substring(0, 100) + '...');
-          console.log('✨ Legacy Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
+          // console.log('✅ Legacy fallback: Prompt sanitized successfully');
+          // console.log('🔄 Legacy Original:', userMessage.substring(0, 100) + '...');
+          // console.log('✨ Legacy Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
         } else {
-          console.log('⚠️ Legacy fallback: Sanitization failed, using original prompt');
+          // console.log('⚠️ Legacy fallback: Sanitization failed, using original prompt');
         }
       } catch (sanitizationError) {
         console.warn('⚠️ Legacy fallback: Prompt sanitization error, using original prompt:', sanitizationError);
@@ -551,7 +551,7 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       const shouldTryLegacyImage = this.shouldTryLegacyImageGeneration(sanitizedUserMessage, aiResponse);
       
       if (shouldTryLegacyImage) {
-        console.log('🎨 Legacy system attempting image generation...');
+        // console.log('🎨 Legacy system attempting image generation...');
         
         try {
           // Use recent 6 messages instead of full chatHistory for legacy fallback
@@ -566,8 +566,8 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
           );
           
           if (legacyImageResult?.imageUrl) {
-            console.log('✅ [UnifiedAIStreamingService.generateUnifiedResponse()] Legacy system generated image successfully');
-            console.log('🖼️ [UnifiedAIStreamingService.generateUnifiedResponse()] Legacy image URL:', legacyImageResult.imageUrl);
+            // console.log('✅ [UnifiedAIStreamingService.generateUnifiedResponse()] Legacy system generated image successfully');
+            // console.log('🖼️ [UnifiedAIStreamingService.generateUnifiedResponse()] Legacy image URL:', legacyImageResult.imageUrl);
             
             return {
               hasImages: true,
@@ -600,7 +600,7 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       }
       
       // Return text-only response if no image was generated
-      console.log('📝 Fallback: Returning text-only response');
+      // console.log('📝 Fallback: Returning text-only response');
       return {
         hasImages: false,
         textContent: aiResponse,
@@ -637,11 +637,11 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       userLower.includes(keyword) || aiLower.includes(keyword)
     );
     
-    console.log('🔍 Legacy image generation check:', {
-      userMessage: userMessage.substring(0, 50),
-      hasVisualKeywords,
-      foundKeywords: visualKeywords.filter(k => userLower.includes(k) || aiLower.includes(k))
-    });
+    // console.log('🔍 Legacy image generation check:', {
+    //   userMessage: userMessage.substring(0, 50),
+    //   hasVisualKeywords,
+    //   foundKeywords: visualKeywords.filter(k => userLower.includes(k) || aiLower.includes(k))
+    // });
     
     return hasVisualKeywords;
   }

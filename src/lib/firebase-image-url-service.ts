@@ -41,7 +41,7 @@ class FirebaseImageUrlService {
     source: 'dalle' | 'local' | 'other' = 'dalle'
   ): Promise<StoredImageUrl | null> {
     try {
-      console.log('💾 Storing image URL to Firebase Firestore...');
+      // console.log('💾 Storing image URL to Firebase Firestore...');
 
       // Save URL metadata to Firestore (no file upload)
       const imageMetadata: Omit<StoredImageUrl, 'id'> = {
@@ -62,7 +62,7 @@ class FirebaseImageUrlService {
         timestamp: Timestamp.now() // Use current time for local representation
       };
 
-      console.log(`✅ Image URL stored successfully: ${prompt.substring(0, 30)}...`);
+      // console.log(`✅ Image URL stored successfully: ${prompt.substring(0, 30)}...`);
 
       // Clean up old image URLs after successful storage
       await this.cleanupOldImageUrls(userId, adventureId);
@@ -151,7 +151,7 @@ class FirebaseImageUrlService {
         }
       }
       
-      console.log(`🗑️ Cleaned up ${imagesToDelete.length} old image URLs for adventure ${adventureId}`);
+      // console.log(`🗑️ Cleaned up ${imagesToDelete.length} old image URLs for adventure ${adventureId}`);
     }
   }
 
@@ -170,7 +170,7 @@ class FirebaseImageUrlService {
         }
       }
       
-      console.log(`🗑️ Cleaned up ${imagesToDelete.length} old image URLs for user ${userId}`);
+      // console.log(`🗑️ Cleaned up ${imagesToDelete.length} old image URLs for user ${userId}`);
     }
   }
 
@@ -236,7 +236,7 @@ class FirebaseImageUrlService {
         }
       }
       
-      console.log(`🗑️ Cleared all ${userImages.length} image URLs for user ${userId}`);
+      // console.log(`🗑️ Cleared all ${userImages.length} image URLs for user ${userId}`);
     } catch (error) {
       console.error('❌ Failed to clear user image URLs:', error);
     }

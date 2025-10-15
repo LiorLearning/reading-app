@@ -129,7 +129,7 @@ export class ResponseProcessor {
       const rawFallbackPrompt = originalUserMessage || this.generateFallbackImagePrompt(response, '');
       
       // 🧹 Sanitize fallback prompt
-      console.log('🧹 ResponseProcessor: Sanitizing fallback prompt...');
+      // console.log('🧹 ResponseProcessor: Sanitizing fallback prompt...');
       const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
       
       let sanitizedFallbackPrompt = rawFallbackPrompt;
@@ -137,9 +137,9 @@ export class ResponseProcessor {
         const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(rawFallbackPrompt);
         if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
           sanitizedFallbackPrompt = sanitizationResult.sanitizedPrompt;
-          console.log('✅ ResponseProcessor: Fallback prompt sanitized successfully');
+          // console.log('✅ ResponseProcessor: Fallback prompt sanitized successfully');
         } else {
-          console.log('⚠️ ResponseProcessor: Fallback sanitization failed, using original prompt');
+          // console.log('⚠️ ResponseProcessor: Fallback sanitization failed, using original prompt');
         }
       } catch (sanitizationError) {
         console.warn('⚠️ ResponseProcessor: Fallback prompt sanitization error, using original prompt:', sanitizationError);
@@ -148,7 +148,7 @@ export class ResponseProcessor {
       // Apply enhanced safety prompt to fallback as well
       const enhancedFallbackPrompt = `No text in image. Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${sanitizedFallbackPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
       
-      console.log(`🎨 [ResponseProcessor.processResponseWithImages()] Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
+      // console.log(`🎨 [ResponseProcessor.processResponseWithImages()] Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
       
       // Yield text first
       yield { 
@@ -174,7 +174,7 @@ export class ResponseProcessor {
         const duration = Date.now() - startTime;
         
         if (result.success && result.imageUrl) {
-          console.log(`✅ Fallback image generated successfully in ${duration}ms`);
+          // console.log(`✅ Fallback image generated successfully in ${duration}ms`);
           
           yield { 
             type: 'image', 
@@ -209,7 +209,7 @@ export class ResponseProcessor {
       return; // Exit after handling fallback
     }
     
-    console.log(`🎨 Found ${imagePrompts.length} image generation request(s) in AI response`);
+    // console.log(`🎨 Found ${imagePrompts.length} image generation request(s) in AI response`);
     
     let lastEnd = 0;
     let hasGeneratedSuccessfulImage = false;
@@ -246,7 +246,7 @@ export class ResponseProcessor {
       
       // If we already generated a successful image, skip this image prompt but continue with text
       if (hasGeneratedSuccessfulImage) {
-        console.log(`🛑 [ResponseProcessor.processResponseWithImages()] Skipping image ${index + 1} - already generated a successful image`);
+        // console.log(`🛑 [ResponseProcessor.processResponseWithImages()] Skipping image ${index + 1} - already generated a successful image`);
         // Skip the image tag content and its immediate caption line
         lastEnd = skipCaptionAfter(response, end);
         continue;
@@ -265,7 +265,7 @@ export class ResponseProcessor {
         const rawPrompt = originalUserMessage || prompt;
         
         // 🧹 NEW: Sanitize both the raw prompt and conversation context
-        console.log('🧹 ResponseProcessor: Sanitizing prompt and context for image generation...');
+        // console.log('🧹 ResponseProcessor: Sanitizing prompt and context for image generation...');
         const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
         
         // Extract context from recent 6 messages with 80/20 weighting
@@ -280,13 +280,13 @@ export class ResponseProcessor {
           if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
             sanitizedRawPrompt = sanitizationResult.sanitizedPrompt;
             sanitizedConversationContext = sanitizationResult.sanitizedContext || originalConversationContext;
-            console.log('✅ ResponseProcessor: Prompt and context sanitized successfully');
-            console.log('🔄 Original prompt:', rawPrompt.substring(0, 100) + '...');
-            console.log('✨ Sanitized prompt:', sanitizedRawPrompt.substring(0, 100) + '...');
-            console.log('🔄 Original context:', originalConversationContext.substring(0, 100) + '...');
-            console.log('✨ Sanitized context:', sanitizedConversationContext.substring(0, 100) + '...');
+            // console.log('✅ ResponseProcessor: Prompt and context sanitized successfully');
+            // console.log('🔄 Original prompt:', rawPrompt.substring(0, 100) + '...');
+            // console.log('✨ Sanitized prompt:', sanitizedRawPrompt.substring(0, 100) + '...');
+            // console.log('🔄 Original context:', originalConversationContext.substring(0, 100) + '...');
+            // console.log('✨ Sanitized context:', sanitizedConversationContext.substring(0, 100) + '...');
           } else {
-            console.log('⚠️ ResponseProcessor: Sanitization failed, using original prompt and context');
+            // console.log('⚠️ ResponseProcessor: Sanitization failed, using original prompt and context');
           }
         } catch (sanitizationError) {
           console.warn('⚠️ ResponseProcessor: Prompt sanitization error, using original prompt and context:', sanitizationError);
@@ -335,13 +335,13 @@ The final output must look like a **natural, realistic photograph** while keepin
 ${sanitizedConversationContext}`;
         
         const startTime = Date.now();
-        console.log(`🎯 [ResponseProcessor.processResponseWithImages()] Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
-        console.log(`📝 [ResponseProcessor.processResponseWithImages()] Original user input: ${rawPrompt}`);
-        console.log(`🧹 [ResponseProcessor.processResponseWithImages()] Sanitized user input: ${sanitizedRawPrompt}`);
-        console.log(`🗣️ [ResponseProcessor.processResponseWithImages()] Original context: ${originalConversationContext.substring(0, 200)}${originalConversationContext.length > 200 ? '...' : ''}`);
-        console.log(`🧹 [ResponseProcessor.processResponseWithImages()] Sanitized context: ${sanitizedConversationContext.substring(0, 200)}${sanitizedConversationContext.length > 200 ? '...' : ''}`);
-        console.log(`🛡️ [ResponseProcessor.processResponseWithImages()] Enhanced prompt: ${enhancedPrompt}`);
-        console.log(`🎯 dall-e prompt primary final: ${enhancedPrompt}`);
+        // console.log(`🎯 [ResponseProcessor.processResponseWithImages()] Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
+        // console.log(`📝 [ResponseProcessor.processResponseWithImages()] Original user input: ${rawPrompt}`);
+        // console.log(`🧹 [ResponseProcessor.processResponseWithImages()] Sanitized user input: ${sanitizedRawPrompt}`);
+        // console.log(`🗣️ [ResponseProcessor.processResponseWithImages()] Original context: ${originalConversationContext.substring(0, 200)}${originalConversationContext.length > 200 ? '...' : ''}`);
+        // console.log(`🧹 [ResponseProcessor.processResponseWithImages()] Sanitized context: ${sanitizedConversationContext.substring(0, 200)}${sanitizedConversationContext.length > 200 ? '...' : ''}`);
+        // console.log(`🛡️ [ResponseProcessor.processResponseWithImages()] Enhanced prompt: ${enhancedPrompt}`);
+        // console.log(`🎯 dall-e prompt primary final: ${enhancedPrompt}`);
         
         const result = await imageGenerator.generateWithFallback(sanitizedRawPrompt, userId, {
           sanitizedConversationContext,
@@ -352,8 +352,8 @@ ${sanitizedConversationContext}`;
         const duration = Date.now() - startTime;
         
         if (result.success && result.imageUrl) {
-          console.log(`✅ [ResponseProcessor.processResponseWithImages()] Image ${index + 1} generated successfully in ${duration}ms`);
-          console.log(`🏢 [ResponseProcessor.processResponseWithImages()] Provider used: ${result.provider}`);
+          // console.log(`✅ [ResponseProcessor.processResponseWithImages()] Image ${index + 1} generated successfully in ${duration}ms`);
+          // console.log(`🏢 [ResponseProcessor.processResponseWithImages()] Provider used: ${result.provider}`);
           hasGeneratedSuccessfulImage = true; // Mark as successful, stop generating more
           
           // No loading sound to stop
@@ -417,7 +417,7 @@ ${sanitizedConversationContext}`;
       };
     }
     
-    console.log('✅ Response processing completed');
+    // console.log('✅ Response processing completed');
   }
   
   /**
@@ -440,7 +440,7 @@ ${sanitizedConversationContext}`;
     
     // If explicit <generateImage> tags found in AI response, return true
     if (explicitImageRequests) {
-      console.log('✅ Found explicit image generation tags in AI response');
+      // console.log('✅ Found explicit image generation tags in AI response');
       return true;
     }
     
@@ -449,15 +449,15 @@ ${sanitizedConversationContext}`;
     if (userMessage) {
       const hasExplicitRequest = this.shouldGenerateImageFromContent(userMessage);
       if (hasExplicitRequest) {
-        console.log('✅ Found explicit visual request in user message:', userMessage);
+        // console.log('✅ Found explicit visual request in user message:', userMessage);
         return true;
       } else {
-        console.log('🚫 No explicit visual request found in user message:', userMessage);
+        // console.log('🚫 No explicit visual request found in user message:', userMessage);
         return false;
       }
     }
     
-    console.log('🚫 No image generation signals detected');
+    // console.log('🚫 No image generation signals detected');
     return false;
   }
   
@@ -489,12 +489,12 @@ ${sanitizedConversationContext}`;
     
     const hasExplicitVisualRequest = foundVisualRequests.length > 0;
     
-    console.log('🔍 Visual content detection (EXTREMELY SELECTIVE):', {
-      responseText: lowerResponse,
-      foundVisualRequests,
-      hasExplicitVisualRequest,
-      shouldGenerate: hasExplicitVisualRequest
-    });
+    // console.log('🔍 Visual content detection (EXTREMELY SELECTIVE):', {
+    //   responseText: lowerResponse,
+    //   foundVisualRequests,
+    //   hasExplicitVisualRequest,
+    //   shouldGenerate: hasExplicitVisualRequest
+    // });
     
     // Only generate image if there's an explicit visual request
     return hasExplicitVisualRequest;
