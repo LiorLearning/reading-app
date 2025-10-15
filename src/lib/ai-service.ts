@@ -1345,26 +1345,12 @@ Generate responses that make the child feel like their ${petTypeDescription} com
   }
 
   private initialize() {
-    // Check if OpenAI API key is available
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    
-    console.log('🔑 AI Service initialization:', { 
-      hasApiKey: !!apiKey, 
-      apiKeyLength: apiKey?.length || 0,
-      apiKeyStart: apiKey?.substring(0, 7) || 'none'
-    });
-    
-    if (apiKey) {
       this.client = new OpenAI({
-        apiKey: apiKey,
-        dangerouslyAllowBrowser: true // Required for client-side usage
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1',
       });
       this.isInitialized = true;
-      console.log('✅ AI Service initialized successfully');
-    } else {
-      console.warn('⚠️ VITE_OPENAI_API_KEY not found. AI responses will use fallback mode.');
-      this.isInitialized = false;
-    }
   }
 
   // Fallback responses when API is not available

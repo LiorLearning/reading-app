@@ -364,13 +364,11 @@ class OpenAIProvider implements ImageProvider {
   private client: OpenAI | null = null;
   
   constructor() {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (apiKey) {
       this.client = new OpenAI({
-        apiKey: apiKey,
-        dangerouslyAllowBrowser: true
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1'
       });
-    }
   }
   
   isConfigured(): boolean {

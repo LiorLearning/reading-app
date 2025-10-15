@@ -265,20 +265,12 @@ export const loadAdventureSummaries = (): AdventureSummary[] => {
  */
 export const generateAdventureSummary = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "An empty adventure waiting to be filled with excitement!";
-  
-  // Check if OpenAI API key is available for AI generation
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    // Fallback to rule-based generation
-    return generateAdventureSummaryFallback(messages);
-  }
-
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+        apiKey: null,
+      baseURL: 'https://api.readkraft.com/api/v1'
     });
 
     // Get a sample of the conversation for AI analysis
@@ -366,8 +358,9 @@ export const generateAdventureName = async (messages: ChatMessage[]): Promise<st
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+        apiKey: null,
+      baseURL: 'https://api.readkraft.com/api/v1'
     });
 
     // Get key conversation elements for AI analysis

@@ -17,18 +17,12 @@ class ChatSummaryService {
   }
 
   private initialize() {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    
-    if (apiKey) {
       this.client = new OpenAI({
-        apiKey: apiKey,
-        dangerouslyAllowBrowser: true
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1'
       });
       this.isInitialized = true;
-    } else {
-      console.warn('VITE_OPENAI_API_KEY not found. Summary generation will use fallback mode.');
-      this.isInitialized = false;
-    }
   }
 
   /**
