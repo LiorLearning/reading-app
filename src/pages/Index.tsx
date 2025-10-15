@@ -4257,6 +4257,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [whiteboardPinnedText, setWhiteboardPinnedText] = React.useState<string | null>(null);
   // Grade 1 only: topic shown in the top-left chip that updates exactly when whiteboard triggers
   const [grade1DisplayedTopicId, setGrade1DisplayedTopicId] = React.useState<string | null>(null);
+  // Manual toggle for fullscreen whiteboard overlay via lesson chip
+  const [isManualWhiteboardOpen, setIsManualWhiteboardOpen] = React.useState(false);
   const lastSpellTopicRef = React.useRef<string | null>(null);
   const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
   const firstAdventureStartedRef = React.useRef<boolean>(false);
@@ -4564,26 +4566,40 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               </Button>
             )}
 
-            {/* Lesson chip with inline progress - shown when a topic is active */}
+            {/* Lesson chip with inline progress - shown when a topic is active. Click to toggle whiteboard */}
             {selectedTopicId && (
-              <div
-                className="hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative"
-                style={{ minWidth: '220px' }}
-              >
-                {(() => {
-                  const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
-                  const scriptForChip = getLessonScript(topicForChip);
-                  const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
-                  const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
-                  const lessonTitle = (scriptForChip?.title) || topicForChip;
-                  return (
-                    <>
-                      <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
-                      <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">{` • ${lessonTitle}`}</span>
-                    </>
-                  );
-                })()}
-              </div>
+              (() => {
+                const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
+                const scriptForChip = getLessonScript(topicForChip);
+                const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
+                const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
+                const lessonTitle = (scriptForChip?.title) || topicForChip;
+                const canOpen = !!scriptForChip;
+                const handleToggle = () => {
+                  if (!canOpen) return;
+                  setIsManualWhiteboardOpen(prev => !prev);
+                };
+                const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleToggle();
+                  }
+                };
+                return (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleToggle}
+                    onKeyDown={handleKeyDown}
+                    title={canOpen ? 'Open whiteboard' : 'Whiteboard unavailable'}
+                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative ${canOpen ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-80'}`}
+                    style={{ minWidth: '220px' }}
+                  >
+                    <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
+                    <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">{` • ${lessonTitle}`}</span>
+                  </div>
+                );
+              })()
             )}
             
             {/* Grade Selection Button - Only show on HomePage */}
@@ -5316,16 +5332,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
                     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
-                    // Resolve lesson script from the next Spellbox question at topic start (id === 1)
+                    // Auto-trigger path: Resolve from the next Spellbox question at topic start (id === 1)
                     const nextSpellQuestion = lessonEnabled ? getNextSpellboxQuestion(currentGradeDisplayName) : null;
                     const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
                       ? (nextSpellQuestion.topicId || nextSpellQuestion.topicName)
                       : null;
-                    const script = (lessonEnabled && nextSpellTopicId) ? getLessonScript(nextSpellTopicId) : null;
-                    if (lessonEnabled && script && !shouldShowWhiteboardPrompt) {
+                    const autoScript = (lessonEnabled && nextSpellTopicId) ? getLessonScript(nextSpellTopicId) : null;
+                    // Manual toggle path: Use the topic shown in the lesson chip
+                    const manualTopicId = isManualWhiteboardOpen
+                      ? (whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId)
+                      : null;
+                    const manualScript = (isManualWhiteboardOpen && manualTopicId) ? getLessonScript(manualTopicId) : null;
+                    const script = manualScript || autoScript;
+                    if ((lessonEnabled && script && !shouldShowWhiteboardPrompt) || (isManualWhiteboardOpen && script)) {
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
+                          fullscreen={isManualWhiteboardOpen}
+                          onRequestClose={() => setIsManualWhiteboardOpen(false)}
                           onCompleted={() => {
                             setLessonReady(false);
                             setDevWhiteboardEnabled(false);
@@ -5343,6 +5367,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               isAcknowledged: true,
                             });
                             setIsWhiteboardPromptActive(false);
+                            setIsManualWhiteboardOpen(false);
                             setTimeout(() => {
                               try { ttsService.stop(); } catch {}
                               const selectedVoice = (() => {
