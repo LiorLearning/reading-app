@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic } from "@/lib/utils";
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
@@ -561,7 +561,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   const currentGradeDisplayName = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').trim();
-  const whiteboardGradeEligible = currentGradeDisplayName === '1st Grade';
+  // Reinterpret eligibility: true if a whiteboard lesson script is available (current topic or any fallback)
+  const whiteboardGradeEligible = React.useMemo(() => {
+    const hasCurrentTopicScript = !!(selectedTopicId && getLessonScript(selectedTopicId));
+    const hasAnyScript = Object.keys(lessonScripts || {}).length > 0;
+    return hasCurrentTopicScript || hasAnyScript;
+  }, [selectedTopicId]);
 
   // Automatic Flow Control System
   const ADVENTURE_PROMPT_THRESHOLD = 3; // Configurable threshold for when user can access questions
@@ -3109,13 +3114,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         if (isFirstSpellQuestion && !hasMidTopicProgress) {
           try { ttsService.stop(); } catch {}
           const name = userData?.username?.trim() || 'friend';
+          const topicForLesson = (initialSpellTopicId && getLessonScript(initialSpellTopicId)) ? initialSpellTopicId : WHITEBOARD_LESSON_TOPIC;
+          const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
           setWhiteboardPrompt({
-            topicId: WHITEBOARD_LESSON_TOPIC,
-            text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
+            topicId: topicForLesson,
+            text: introText,
             shouldAutoplay: true,
             isAcknowledged: false,
           });
-          setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
+          setWhiteboardPinnedText(introText);
           setWhiteboardPromptLocked(false);
           setLessonReady(false);
           setIsWhiteboardPromptActive(true);
@@ -3917,7 +3924,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [highlightSpellNext, setHighlightSpellNext] = useState<boolean>(false);
   const [isWhiteboardPromptActive, setIsWhiteboardPromptActive] = React.useState(false);
   const WHITEBOARD_PROMPT_TTS_VOICE = AVAILABLE_VOICES.find(v => v.name === 'Jessica')?.id || 'cgSgspJ2msm6clMCkdW9';
-  const WHITEBOARD_LESSON_TOPIC = '1-H.1';
+  const WHITEBOARD_LESSON_TOPIC = React.useMemo(() => {
+    // Prefer the currently selected topic if it has a script; otherwise fall back to the first available script
+    if (selectedTopicId && getLessonScript(selectedTopicId)) return selectedTopicId;
+    const keys = Object.keys(lessonScripts || {});
+    return keys[0] || '1-H.1';
+  }, [selectedTopicId]);
   const whiteboardSuppressionKey = `lesson-active-${WHITEBOARD_LESSON_TOPIC}`;
 
   // Header topic progress (Spellbox) - tracked separately to ensure rerenders
@@ -4039,15 +4051,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           }
           if (nextTopicId) {
             setSelectedTopicId(nextTopicId);
+            try { setCurrentTopic(nextTopicId); } catch {}
             try { whiteboardTriggeredTopicsRef.current.add(nextTopicId); } catch {}
+            try { clearQuestionProgress(); } catch {}
           }
           // Switch to adventure and show whiteboard prompt (with chevron) for next topic
           setCurrentScreen(1);
           const name = userData?.username?.trim() || 'friend';
           if (whiteboardGradeEligible) {
-            const introText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
+            const topicForLesson = (nextTopicId && getLessonScript(nextTopicId)) ? nextTopicId : WHITEBOARD_LESSON_TOPIC;
+            const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
             setWhiteboardPrompt({
-              topicId: WHITEBOARD_LESSON_TOPIC,
+              topicId: topicForLesson,
               text: introText,
               shouldAutoplay: true,
               isAcknowledged: false,
@@ -4271,7 +4286,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
     if (!lessonEnabled) return false;
-    const script = getLessonScript(selectedTopicId) || getLessonScript('1-H.1');
+    const script = getLessonScript(selectedTopicId) || getLessonScript(WHITEBOARD_LESSON_TOPIC);
     return !!script;
   }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible]);
 
@@ -4289,13 +4304,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Defer whiteboard prompt until trainer (Krafty) overlay is not showing,
     // otherwise their voices will clash for new users.
     if (showStep5Intro) return;
+    const topicForLesson = (WHITEBOARD_LESSON_TOPIC && getLessonScript(WHITEBOARD_LESSON_TOPIC)) ? WHITEBOARD_LESSON_TOPIC : selectedTopicId;
+    const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
     setWhiteboardPrompt({
-      topicId: WHITEBOARD_LESSON_TOPIC,
-      text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
+      topicId: topicForLesson,
+      text: introText,
       shouldAutoplay: true,
       isAcknowledged: false,
     });
-    setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
+    setWhiteboardPinnedText(introText);
     setWhiteboardPromptLocked(false);
     setLessonReady(false);
     setIsWhiteboardPromptActive(true);
@@ -4332,13 +4349,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false; // consume flag so it doesn't re-trigger later
       whiteboardTriggeredTopicsRef.current.add(spellTopic);
       // Do not force-stop here so we don't cut off ongoing trainer voice
+      const topicForLesson = (spellTopic && getLessonScript(spellTopic)) ? spellTopic : WHITEBOARD_LESSON_TOPIC;
+      const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
       setWhiteboardPrompt({
-        topicId: WHITEBOARD_LESSON_TOPIC,
-        text: `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`,
+        topicId: topicForLesson,
+        text: introText,
         shouldAutoplay: true,
         isAcknowledged: false,
       });
-      setWhiteboardPinnedText(`${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`);
+      setWhiteboardPinnedText(introText);
       setWhiteboardPromptLocked(false);
       setLessonReady(false);
       setIsWhiteboardPromptActive(true);
@@ -4378,7 +4397,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         setCurrentScreen(1);
         setDevWhiteboardEnabled(true);
         // Ensure the pet bubble shows the whiteboard intro instead of any prior continuation
-        const introText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
+        const topicForLesson = (spellTopic && getLessonScript(spellTopic)) ? spellTopic : WHITEBOARD_LESSON_TOPIC;
+        const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
         setWhiteboardPinnedText(introText);
         // Grade 1 only: update displayed topic at the moment whiteboard is triggered
         if (spellTopic) {
@@ -4430,9 +4450,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return next;
     });
     if (whiteboardGradeEligible) {
-      const nextText = `${name}, looks like we need to skill up so I can keep growing!\nReady? 🌱`;
+      const topicForLesson = (WHITEBOARD_LESSON_TOPIC && getLessonScript(WHITEBOARD_LESSON_TOPIC)) ? WHITEBOARD_LESSON_TOPIC : (selectedTopicId || WHITEBOARD_LESSON_TOPIC);
+      const nextText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
       setWhiteboardPrompt({
-        topicId: WHITEBOARD_LESSON_TOPIC,
+        topicId: topicForLesson,
         text: nextText,
         shouldAutoplay: true,
         isAcknowledged: false,
@@ -5309,8 +5330,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     // When the whiteboard lesson is active, show a soft blurred thematic background on the left side
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
                     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
-                    const hasLesson = !!(selectedTopicId && getLessonScript('1-H.1'));
-                    if (!(lessonEnabled && hasLesson)) return null;
+                    const hasLesson = !!(lessonEnabled && (getLessonScript(selectedTopicId) || getLessonScript(WHITEBOARD_LESSON_TOPIC)));
+                    if (!hasLesson) return null;
                     const bgImage = (current?.image && typeof current.image === 'string') ? current.image : (rocket1 as string);
                     return (
                       <div
@@ -5332,19 +5353,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
                     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
-                    // Auto-trigger path: Resolve from the next Spellbox question at topic start (id === 1)
-                    const nextSpellQuestion = lessonEnabled ? getNextSpellboxQuestion(currentGradeDisplayName) : null;
-                    const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
-                      ? (nextSpellQuestion.topicId || nextSpellQuestion.topicName)
-                      : null;
-                    const autoScript = (lessonEnabled && nextSpellTopicId) ? getLessonScript(nextSpellTopicId) : null;
-                    // Manual toggle path: Use the topic shown in the lesson chip
-                    const manualTopicId = isManualWhiteboardOpen
-                      ? (whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId)
-                      : null;
-                    const manualScript = (isManualWhiteboardOpen && manualTopicId) ? getLessonScript(manualTopicId) : null;
-                    const script = manualScript || autoScript;
-                    if ((lessonEnabled && script && !shouldShowWhiteboardPrompt) || (isManualWhiteboardOpen && script)) {
+                    // Prefer explicit selection (e.g., from top-right +1 button) when dev whiteboard is enabled
+                    const selectedScript = lessonEnabled ? (getLessonScript(selectedTopicId) || null) : null;
+                    let script = selectedScript;
+                    if (!script && lessonEnabled) {
+                      // Fallback: resolve from next Spellbox topic
+                      const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName);
+                      const nextSpellTopicId = nextSpellQuestion
+                        ? (nextSpellQuestion.topicId || nextSpellQuestion.topicName)
+                        : null;
+                      script = nextSpellTopicId ? getLessonScript(nextSpellTopicId) : null;
+                    }
+                    if (lessonEnabled && script && !shouldShowWhiteboardPrompt) {
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
@@ -5524,7 +5544,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
                     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
-                    const scriptAvailable = lessonEnabled ? (getLessonScript(selectedTopicId) || getLessonScript('1-H.1')) : null;
+                    const scriptAvailable = lessonEnabled ? (getLessonScript(selectedTopicId) || getLessonScript(WHITEBOARD_LESSON_TOPIC)) : null;
                     // Hide ComicPanel only while the whiteboard lesson is actively mounted.
                     // Keep it visible during the interim prompt so the panel isn't blank.
                     return !(lessonEnabled && scriptAvailable);
@@ -5753,32 +5773,30 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                            </aside>
               </div>
             </div>
-            {/*
-              DEV: Increment whiteboard lesson button intentionally disabled
-              {import.meta.env.DEV && (
-                <button
-                  aria-label="dev-increment-whiteboard-lesson"
-                  title="Next whiteboard lesson"
-                  onClick={() => {
-                    try {
-                      const keys = Object.keys(lessonScripts);
-                      const currentId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1';
-                      const idx = keys.indexOf(currentId);
-                      const next = keys[(idx >= 0 ? idx + 1 : 1) % keys.length];
-                      setSelectedTopicId(next);
-                      setLessonReady(true);
-                      setDevWhiteboardEnabled(true);
-                    } catch (e) {
-                      console.warn('Dev increment lesson failed', e);
-                    }
-                  }}
-                  className="fixed top-2 right-2 w-9 h-9 rounded-full border-2 border-black bg-yellow-300 text-black shadow-lg z-[9999]"
-                  style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.6)' }}
-                >
-                  +1
-                </button>
-              )}
-            */}
+            {/* Dev: Top-right hotspot to increment the whiteboard lesson by 1 */}
+            {import.meta.env.DEV && currentScreen === 1 && (
+              <button
+                aria-label="dev-increment-whiteboard-lesson"
+                title="Next whiteboard lesson"
+                onClick={() => {
+                  try {
+                    const keys = Object.keys(lessonScripts);
+                    const currentId = (getLessonScript(selectedTopicId)?.topicId) || WHITEBOARD_LESSON_TOPIC;
+                    const idx = keys.indexOf(currentId);
+                    const next = keys[(idx >= 0 ? idx + 1 : 1) % keys.length];
+                    setSelectedTopicId(next);
+                    setLessonReady(true);
+                    setDevWhiteboardEnabled(true);
+                  } catch (e) {
+                    console.warn('Dev increment lesson failed', e);
+                  }
+                }}
+                className="fixed top-2 right-2 w-9 h-9 rounded-full border-2 border-black bg-yellow-300 text-black shadow-lg z-[9999]"
+                style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.6)' }}
+              >
+                +1
+              </button>
+            )}
           </main>
         ) : (
           <MCQScreenTypeA
@@ -5829,7 +5847,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               // console.log(`🔍 DEBUG: Question completed. Current topicQuestionIndex: ${topicQuestionIndex}`);
               // If whiteboard lesson is available, override normal flow and launch it immediately
               try { ttsService.stop(); } catch {}
-              const hasLesson = whiteboardGradeEligible && !!(getLessonScript('1-H.1'));
+              const hasLesson = whiteboardGradeEligible && !!(getLessonScript(WHITEBOARD_LESSON_TOPIC));
               const alreadySeenLesson = !!whiteboardSeenThisSession?.[WHITEBOARD_LESSON_TOPIC];
               // Guard: Only enable whiteboard takeover if we're at the true start of a topic (first question id===1)
               // and not resuming mid-topic based on saved SpellBox topic progress.
@@ -5975,12 +5993,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           />
         )}
 
-        {/* Invisible dev trigger to start Whiteboard Lesson on any topic */}
+        {/* Invisible dev trigger to show pet dialogue (Spellbox + chevron) for whiteboard */}
         {currentScreen === 1 && (
           <button
             aria-label="dev-whiteboard-trigger"
             onClick={() => {
-              showWhiteboardPromptAgain();
+              try {
+                showWhiteboardPromptAgain();
+              } catch (e) {
+                console.warn('Dev whiteboard prompt trigger failed:', e);
+              }
             }}
             className="fixed bottom-3 right-3 w-10 h-10 opacity-0 focus:opacity-100"
             style={{ zIndex: 60 }}
