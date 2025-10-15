@@ -306,6 +306,184 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     rewards: { coins: 2 },
   },
+  '2-J.1': {
+    topicId: '2-J.1',
+    title: 'Sneaky Silent E: Short and Long Vowel Sounds',
+    intro: [
+      'Let\'s meet sneaky e! It can make vowels say their names.',
+    ],
+    segments: [
+      {
+        modelWord: 'kit',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"k" says /k/.' },
+          { highlights: [[1,2]], say: '"i" says /ĭ/, the short \"i\" sound.' },
+          { highlights: [[2,3]], say: '"t" says /t/.' },
+          { highlights: [[0,3]], say: "/k/ /ĭ/ /t/ — 'kit', with the short /ĭ/!" }
+        ],
+        practice: {
+          word: 'kit',
+          prompt: "Let’s spell 'kit'",
+          hints: [
+            "Does the vowel say its name? No — it's short.",
+            "Short i makes /ĭ/ (like 'sit', 'fish')."
+          ],
+          reinforce: "Nice! /k/ /ĭ/ /t/ — with the short /ĭ/.",
+          ...( { isPrefilled: true, prefilledIndexes: [0] } as any ),
+          meta: {
+            explanation: "Nice job! The word 'kit' has a short i sound.",
+            aiHook: {
+              targetWord: 'kit',
+              intent: 'fill_blank',
+              questionLine: "Listen to the word 'kit'. Does it have a short or long vowel sound?",
+              imagePrompt: 'A small first-aid kit on a table for the word kit'
+            },
+            aiTutor: {
+              target_word: 'kit',
+              question: "Listen carefully to the word 'kit'. Does the vowel say its name or make a short sound?",
+              student_entry: '',
+              topic_to_reinforce: 'Sort short and long vowel sounds',
+              spelling_pattern_or_rule:
+                "The vowel i is short in 'kit' because there’s no silent e at the end. Short vowels make quick sounds — /ĭ/ in 'kit'."
+            },
+            audio: 'kit'
+          }
+        }
+      },
+      {
+        modelWord: 'kite',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"k" says /k/.' },
+          { highlights: [[1,2]], say: '"i" says /ī/ — because of the "e" at the end!' },
+          { highlights: [[2,3]], say: '"t" says /t/.' },
+          { highlights: [[3,4]], say: '"e" is silent, but it changes the /ĭ/ to a long /ī/. Sneaky e!' },
+          { highlights: [[0,4]], say: "/k/ /ī/ /t/ — 'kite'." }
+        ],
+        practice: {
+          word: 'kite',
+          prompt: "Let’s spell 'kite'",
+          hints: [
+            'There’s a silent e — it doesn’t talk, but it changes the vowel.',
+            'Now i says its name: /ī/. '
+          ],
+          reinforce: "Excellent! Sneaky e made the i long in 'kite'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0] } as any ),
+          meta: {
+            explanation: "Excellent! The word 'kite' has a long i sound made by the sneaky silent e.",
+            aiHook: {
+              targetWord: 'kite',
+              intent: 'fill_blank',
+              questionLine: "Listen to the word 'kite'. Does it have a short or long vowel sound?",
+              imagePrompt: 'A bright red kite flying high in the blue sky for the word kite'
+            },
+            aiTutor: {
+              target_word: 'kite',
+              question: "Listen carefully to the word 'kite'. Does the vowel say its name or make a short sound?",
+              student_entry: '',
+              topic_to_reinforce: 'Sort short and long vowel sounds',
+              spelling_pattern_or_rule:
+                "Add a silent e to the end and the vowel says its name. 'Kit' becomes 'kite' — short i turns into long i."
+            },
+            audio: 'kite'
+          }
+        }
+      }
+    ],
+    completion: [
+      'Sneaky e spotted! You turned short i into long i.',
+      'Awesome work — ready for another vowel pair?'
+    ],
+    rewards: { coins: 2 }
+  },
+  '2-K.2': {
+    topicId: '2-K.2',
+    title: 'Long A Patterns: ai & ay',
+    intro: [
+      "Meet long A teams: 'ai' and 'ay'."
+    ],
+    segments: [
+      // --- Segment 1: ray (AY at the end) ---
+      {
+        modelWord: 'ray',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"r" says /r/.' },
+          { highlights: [[1,3]], say: "'ay' makes /ā/." },
+          { highlights: [[0,3]], say: "/r/ /ā/ → 'ray'. We usually use 'ay' at the end for the long /ā/ sound." }
+        ],
+        practice: {
+          word: 'ray',
+          prompt: "Let’s spell 'ray'.",
+          hints: [
+            "Use 'ay' when /ā/ is at the end (day, play, ray).",
+            "Say it and check: r + ay → 'ray'."
+          ],
+          reinforce: "Great! 'ay' makes /ā/ — /r/ /ā/ = 'ray'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0] } as any ),
+          meta: {
+            explanation: "Nice! The word is 'ray' (long A spelled with 'ay' at the end).",
+            aiHook: {
+              targetWord: 'ray',
+              intent: 'fill_blank',
+              questionLine: 'r__',
+              imagePrompt: 'A sunbeam (ray) shining through clouds'
+            },
+            aiTutor: {
+              target_word: 'ray',
+              question: 'r__',
+              student_entry: '',
+              topic_to_reinforce: 'Spell the long A word',
+              spelling_pattern_or_rule:
+                "Use 'ay' to spell the long A /ā/ at the END of a word (day, play, ray). Use 'ai' in the MIDDLE (rain, train). Use a_e when there’s a silent e (cake, name). Trick: “AI stays inside, AY says goodbye!”"
+            },
+            audio: 'ray'
+          }
+        }
+      },
+      // --- Segment 2: rain (AI in the middle) ---
+      {
+        modelWord: 'rain',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"r" says /r/.' },
+          { highlights: [[1,3]], say: "'ai' makes /ā/." },
+          { highlights: [[3,4]], say: '"n" says /n/.' },
+          { highlights: [[0,4]], say: "/r/ /ā/ /n/ → 'rain'. We usually use 'ai' in the middle for the long /ā/ sound." }
+        ],
+        practice: {
+          word: 'rain',
+          prompt: "Let’s spell 'rain'. Which letters make the /ā/ in the middle?",
+          hints: [
+            "Use 'ai' when /ā/ is inside the word (rain, train, chain).",
+            "Say it and check: r + ai + n → 'rain'."
+          ],
+          reinforce: "Yes! 'ai' makes /ā/ — /r/ /ā/ /n/ = 'rain'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0, 3] } as any ),
+          meta: {
+            explanation: "Excellent! The word is 'rain' (long A spelled with 'ai' in the middle).",
+            aiHook: {
+              targetWord: 'rain',
+              intent: 'fill_blank',
+              questionLine: 'r__n',
+              imagePrompt: 'Rain falling from clouds with puddles'
+            },
+            aiTutor: {
+              target_word: 'rain',
+              question: 'r__n',
+              student_entry: '',
+              topic_to_reinforce: 'Spell the long A word',
+              spelling_pattern_or_rule:
+                "Use 'ai' to spell the long A /ā/ in the MIDDLE of a word (rain, train, paint). Use 'ay' at the END (day, play). Trick: “AI stays inside, AY says goodbye!”"
+            },
+            audio: 'rain'
+          }
+        }
+      }
+    ],
+    completion: [
+      "Pattern power! You found 'ai' in the middle and 'ay' at the end for long A.",
+      'Awesome spelling — ready to explore more long vowels?'
+    ],
+    rewards: { coins: 2 }
+  },
 };
 
 export function getLessonScript(topicId: string): LessonScript | null {

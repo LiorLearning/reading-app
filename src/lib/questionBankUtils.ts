@@ -224,21 +224,31 @@ export const getSpellingQuestionCount = (gradeDisplayName?: string): number => {
  */
 export const getSpellingTopicIds = (gradeDisplayName?: string): string[] => {
   const allSpellingQuestions = getAllSpellingQuestions();
-  
-  let filteredQuestions = allSpellingQuestions;
-  
-  if (gradeDisplayName) {
-    const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
-    filteredQuestions = allSpellingQuestions.filter(question => {
-      return question.topicId.startsWith(`${contentGrade}-`);
-    });
+
+  // If a grade is provided, map to content grade (e.g. "2nd Grade" → "2")
+  const contentGrade = gradeDisplayName
+    ? mapSelectedGradeToContentGrade(gradeDisplayName)
+    : null;
+
+  // Build a set of allowed topicIds (filtered by grade if provided)
+  const allowedTopicIds = new Set(
+    allSpellingQuestions
+      .filter((question) => {
+        if (!contentGrade) return true;
+        return question.topicId.startsWith(`${contentGrade}-`);
+      })
+      .map((q) => q.topicId)
+  );
+
+  // Preserve the canonical insertion order from sampleMCQData.topics
+  const orderedTopicIds: string[] = [];
+  for (const topicId of Object.keys(sampleMCQData.topics)) {
+    if (allowedTopicIds.has(topicId)) {
+      orderedTopicIds.push(topicId);
+    }
   }
-  
-  // Get unique topic IDs
-  const topicIds = [...new Set(filteredQuestions.map(q => q.topicId))];
-  
-  // Sort topic IDs for consistent ordering
-  return topicIds.sort();
+
+  return orderedTopicIds;
 };
 
 /**
