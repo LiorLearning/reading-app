@@ -265,20 +265,12 @@ export const loadAdventureSummaries = (): AdventureSummary[] => {
  */
 export const generateAdventureSummary = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "An empty adventure waiting to be filled with excitement!";
-  
-  // Check if OpenAI API key is available for AI generation
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    // Fallback to rule-based generation
-    return generateAdventureSummaryFallback(messages);
-  }
-
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+        apiKey: null,
+      baseURL: 'https://api.readkraft.com/api/v1'
     });
 
     // Get a sample of the conversation for AI analysis
@@ -354,20 +346,12 @@ const generateAdventureSummaryFallback = (messages: ChatMessage[]): string => {
  */
 export const generateAdventureName = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "Untitled Adventure";
-  
-  // Check if OpenAI API key is available for AI generation
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    // Fallback to rule-based generation
-    return generateAdventureNameFallback(messages);
-  }
-
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+        apiKey: null,
+      baseURL: 'https://api.readkraft.com/api/v1'
     });
 
     // Get key conversation elements for AI analysis
@@ -690,30 +674,27 @@ export interface GradeSelection {
  * Map selected grade to content grade based on new requirements
  */
 export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string => {
-  // Grade 4 and Grade 5 selections should reflect grade 3 content
-  if (gradeDisplayName === '4th Grade' || gradeDisplayName === '5th Grade') {
+  const normalized = (gradeDisplayName || '').trim();
+  // Accept both full and short forms
+  if (normalized === '4th Grade' || normalized === '4th' || normalized === '5th Grade' || normalized === '5th') {
     return '3';
   }
-  // Grade 2 and Grade 3 selections should reflect their respective content
-  if (gradeDisplayName === '2nd Grade') {
-    return '2';
-  }
-  if (gradeDisplayName === '3rd Grade') {
+  if (normalized === '3rd Grade' || normalized === '3rd') {
     return '3';
   }
   // Assignment path should use the dedicated assignment content stream
   if (gradeDisplayName === 'Assignment') {
     return 'A';
   }
-  // Grade 1 should reflect grade 1 content
-  if (gradeDisplayName === '1st Grade') {
+  if (normalized === '2nd Grade' || normalized === '2nd') {
+    return '2';
+  }
+  if (normalized === '1st Grade' || normalized === '1st') {
     return '1';
   }
-  // Kindergarten should reflect kindergarten content
-  if (gradeDisplayName === 'Kindergarten') {
+  if (normalized === 'Kindergarten' || normalized === 'K' || normalized === 'KG') {
     return '1';
   }
-  // Default to grade 1 for any other cases
   return '1';
 };
 

@@ -3294,7 +3294,7 @@ const getSleepyPetImage = (clicks: number) => {
                   className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                 >
                   <DropdownMenuItem 
-                    className={`flex items-center gap-2 px-4 py-3 hover.bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
                     onClick={() => handlePreferenceSelection('start', '4th Grade')}
                   >
                     <span className="text-lg">🌱</span>
