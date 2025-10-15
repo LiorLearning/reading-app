@@ -38,6 +38,16 @@ declare global {
   }
 }
 
+export interface AssignmentPlacementDecision {
+  decidedGrade: string;
+  decidedGradeDisplayName: string;
+  decidedLevel: string;
+  decidedLevelDisplayName: string;
+  decidedAt: Date;
+  firstIncorrectQuestion: number;
+  topicId: string;
+}
+
 // Enhanced user data interface that includes Firebase user info
 export interface UserData {
   uid: string;
@@ -51,6 +61,7 @@ export interface UserData {
   isFirstTime: boolean;
   createdAt: Date;
   lastLoginAt: Date;
+  assignmentPlacement?: AssignmentPlacementDecision | null;
 }
 
 interface AuthContextType {
@@ -118,6 +129,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
+            const hasAssignmentPlacement = !!(data.assignmentPlacement && (data.assignmentPlacement as any).decidedAt);
+            if (hasAssignmentPlacement) {
+              const ap = data.assignmentPlacement as any;
+              data.assignmentPlacement = {
+                decidedGrade: ap.decidedGrade,
+                decidedGradeDisplayName: ap.decidedGradeDisplayName,
+                decidedLevel: ap.decidedLevel,
+                decidedLevelDisplayName: ap.decidedLevelDisplayName,
+                decidedAt: ap.decidedAt instanceof Timestamp ? ap.decidedAt.toDate() : new Date(ap.decidedAt),
+                firstIncorrectQuestion: ap.firstIncorrectQuestion,
+                topicId: ap.topicId,
+              };
+            }
             // Backfill email if Auth has it and doc is missing/different
             try {
               const authEmail = user.email || '';
@@ -145,14 +169,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               uid: user.uid,
               username: user.displayName || '',
               email: user.email || '',
-              age: undefined,
+              age: 0,
               grade: '',
               gradeDisplayName: '',
               level: '',
               levelDisplayName: '',
               isFirstTime: true,
               createdAt: new Date(),
-              lastLoginAt: new Date()
+              lastLoginAt: new Date(),
+              assignmentPlacement: null
             };
             
             await setDoc(userDocRef, newUserData);
@@ -643,10 +668,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     try {
       const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, data);
+      const payload = { ...data } as Partial<UserData>;
+      if (payload.assignmentPlacement) {
+        const placement = payload.assignmentPlacement;
+        payload.assignmentPlacement = {
+          ...placement,
+          decidedAt: placement.decidedAt instanceof Date ? Timestamp.fromDate(placement.decidedAt) : Timestamp.fromDate(new Date(placement.decidedAt || Date.now())),
+        } as any;
+      }
+      await updateDoc(userDocRef, payload);
       
       // Update local state
-      setUserData(prev => prev ? { ...prev, ...data } : null);
+      setUserData(prev => {
+        if (!prev) return null;
+        const next = { ...prev, ...data } as UserData;
+        return next;
+      });
     } catch (error) {
       console.error('Error updating user data:', error);
       throw error;

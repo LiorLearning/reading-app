@@ -98,7 +98,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
     }
 
     if (resolvedImageUrl !== currentImage) {
-      console.log(`🔄 ComicPanel: Image resolved from ${isExpiredUrl ? 'expired DALL-E URL' : 'original'} to: ${resolvedImageUrl.substring(0, 50)}...`);
+      // console.log(`🔄 ComicPanel: Image resolved from ${isExpiredUrl ? 'expired DALL-E URL' : 'original'} to: ${resolvedImageUrl.substring(0, 50)}...`);
       setCurrentImage(resolvedImageUrl);
     }
   }, [resolvedImageUrl, currentImage, isExpiredUrl, incomingImageIsDataUrl, image]);
@@ -140,7 +140,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           }
         })
         .catch((error) => {
-          console.warn('Failed to preload image, showing anyway:', error);
+          // console.warn('Failed to preload image, showing anyway:', error);
           fadeTimeoutRef.current = setTimeout(() => {
             if (!isGenerating) {
               setShowImageAfterLoad(true);
@@ -186,7 +186,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           setIsImageLoading(false);
         })
         .catch((error) => {
-          console.warn('Failed to preload image during update, showing anyway:', error);
+          // console.warn('Failed to preload image during update, showing anyway:', error);
           setCurrentImage(image);
           setShowImageAfterLoad(true);
           setIsImageLoading(false);
@@ -210,7 +210,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
           setIsImageLoading(false);
         })
         .catch((error) => {
-          console.warn('Failed to preload image during timeout handling, showing anyway:', error);
+          // console.warn('Failed to preload image during timeout handling, showing anyway:', error);
           setCurrentImage(image);
           setShowImageAfterLoad(true);
           setIsImageLoading(false);

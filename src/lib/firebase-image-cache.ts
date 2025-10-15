@@ -72,7 +72,7 @@ export const cacheAdventureImageFirebase = async (
     );
 
     if (urlMetadata) {
-      console.log(`🔄 Image cached to Firebase with metadata: ${prompt.substring(0, 30)}...`);
+      // console.log(`🔄 Image cached to Firebase with metadata: ${prompt.substring(0, 30)}...`);
       return finalImageUrl;
     } else {
       console.warn('Failed to store image URL metadata to Firebase');
