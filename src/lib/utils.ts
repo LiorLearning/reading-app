@@ -265,20 +265,12 @@ export const loadAdventureSummaries = (): AdventureSummary[] => {
  */
 export const generateAdventureSummary = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "An empty adventure waiting to be filled with excitement!";
-  
-  // Check if OpenAI API key is available for AI generation
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    // Fallback to rule-based generation
-    return generateAdventureSummaryFallback(messages);
-  }
-
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+        apiKey: null,
+      baseURL: 'https://api.readkraft.com/api/v1'
     });
 
     // Get a sample of the conversation for AI analysis
@@ -318,7 +310,7 @@ Generate a short, exciting adventure description:`;
     const aiDescription = response.choices[0]?.message?.content?.trim();
     
     if (aiDescription && aiDescription.length > 10) {
-      console.log('✨ AI-generated adventure description:', aiDescription);
+      // console.log('✨ AI-generated adventure description:', aiDescription);
       return aiDescription;
     } else {
       console.warn('⚠️ AI description too short or empty, using fallback');
@@ -354,20 +346,12 @@ const generateAdventureSummaryFallback = (messages: ChatMessage[]): string => {
  */
 export const generateAdventureName = async (messages: ChatMessage[]): Promise<string> => {
   if (messages.length === 0) return "Untitled Adventure";
-  
-  // Check if OpenAI API key is available for AI generation
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!apiKey) {
-    // Fallback to rule-based generation
-    return generateAdventureNameFallback(messages);
-  }
-
   try {
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+        apiKey: null,
+      baseURL: 'https://api.readkraft.com/api/v1'
     });
 
     // Get key conversation elements for AI analysis
@@ -410,7 +394,7 @@ Generate an exciting adventure title (2-4 words):`;
     if (aiTitle && aiTitle.length > 3 && aiTitle.length < 50) {
       // Clean up the title (remove quotes if AI added them)
       const cleanTitle = aiTitle.replace(/^["']|["']$/g, '');
-      console.log('✨ AI-generated adventure title:', cleanTitle);
+      // console.log('✨ AI-generated adventure title:', cleanTitle);
       return cleanTitle;
     } else {
       console.warn('⚠️ AI title invalid length, using fallback');
@@ -568,7 +552,7 @@ export const markTopicCompleted = (topicId: string, score: number): void => {
   saveUserProgress(currentProgress);
   
   // Log progress update for debugging
-  console.log(`Topic ${topicId} attempted with score ${score}/10. ${isPassingGrade ? 'PASSED' : 'NEEDS PRACTICE'} - Total completed: ${currentProgress.totalTopicsCompleted}`);
+  // console.log(`Topic ${topicId} attempted with score ${score}/10. ${isPassingGrade ? 'PASSED' : 'NEEDS PRACTICE'} - Total completed: ${currentProgress.totalTopicsCompleted}`);
 };
 
 /**
@@ -769,7 +753,7 @@ export const saveGradeSelection = (gradeDisplayName: string): void => {
       lastSelected: Date.now()
     };
     localStorage.setItem(GRADE_SELECTION_KEY, JSON.stringify(gradeSelection));
-    console.log(`💾 Saved grade selection: ${gradeDisplayName}`);
+    // console.log(`💾 Saved grade selection: ${gradeDisplayName}`);
     
     // Dispatch custom event for same-window real-time updates (like progress tracking page)
     window.dispatchEvent(new CustomEvent('gradeSelectionChanged', {
@@ -798,7 +782,7 @@ export const loadGradeSelection = (): GradeSelection | null => {
       typeof parsed.gradeDisplayName === 'string' &&
       typeof parsed.lastSelected === 'number'
     ) {
-      console.log(`📖 Loaded grade selection: ${parsed.gradeDisplayName}`);
+      // console.log(`📖 Loaded grade selection: ${parsed.gradeDisplayName}`);
       return parsed as GradeSelection;
     }
     
@@ -818,8 +802,8 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
   
   // Map selected grade to content grade
   const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';
-  console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
-  console.log(`📚 Available topic IDs (first 10):`, allTopicIds.slice(0, 10));
+  // console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
+  // console.log(`📚 Available topic IDs (first 10):`, allTopicIds.slice(0, 10));
   
   // Filter topics by grade first to see what's available
   const gradeTopics = allTopicIds.filter(id => {
@@ -830,7 +814,7 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     return false;
   });
   
-  console.log(`📖 Found ${gradeTopics.length} topics for grade ${contentGrade}:`, gradeTopics.slice(0, 5));
+  // console.log(`📖 Found ${gradeTopics.length} topics for grade ${contentGrade}:`, gradeTopics.slice(0, 5));
   
   // Find starting index based on content grade and level
   let startIndex = 0;
@@ -860,7 +844,7 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // Grade 2 content - find first 2- topic
     startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
     if (startIndex === -1) {
-      console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
+      // console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
       // Fallback to grade 1 if grade 2 topics not found
       startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
       if (startIndex === -1) startIndex = 0;
@@ -869,27 +853,27 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // Grade 3 content - find first 3- topic
     startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
     if (startIndex === -1) {
-      console.log(`⚠️ No Grade 3 topics found, falling back to Grade 2`);
+      // console.log(`⚠️ No Grade 3 topics found, falling back to Grade 2`);
       // Fallback to grade 2 if grade 3 topics not found
       startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
       if (startIndex === -1) {
-        console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
+        // console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
         startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
         if (startIndex === -1) startIndex = 0;
       }
     }
   }
   
-  console.log(`📍 Starting search from index ${startIndex}, topic: ${allTopicIds[startIndex] || 'none'}`);
+  // console.log(`📍 Starting search from index ${startIndex}, topic: ${allTopicIds[startIndex] || 'none'}`);
   
   if (!progress) {
     // First time playing, return first topic from preferred starting point
     const selectedTopic = allTopicIds[startIndex] || null;
-    console.log(`🚀 First time playing - Starting with topic: ${selectedTopic} at index ${startIndex}`);
+    // console.log(`🚀 First time playing - Starting with topic: ${selectedTopic} at index ${startIndex}`);
     return selectedTopic;
   }
   
-  console.log(`👤 User has progress data with ${progress.completedTopics.length} completed topics`);
+  // console.log(`👤 User has progress data with ${progress.completedTopics.length} completed topics`);
   
   // Find first uncompleted topic starting from the preferred level and grade
   for (let i = startIndex; i < allTopicIds.length; i++) {
@@ -902,12 +886,12 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     // 1. Never attempted (not in completedTopics)
     // 2. Attempted but not completed with passing grade
     if (!topicProgress || !topicProgress.completed) {
-      console.log(`✅ Found available topic: ${topicId} at index ${i} (${topicProgress ? 'attempted but not completed' : 'never attempted'})`);
+      // console.log(`✅ Found available topic: ${topicId} at index ${i} (${topicProgress ? 'attempted but not completed' : 'never attempted'})`);
       return topicId;
     }
   }
   
-  console.log(`🔄 All topics from ${startIndex} onwards are completed, checking earlier topics`);
+  // console.log(`🔄 All topics from ${startIndex} onwards are completed, checking earlier topics`);
   
   // All topics from preferred starting point completed, check from beginning
   if (startIndex > 0) {
@@ -918,14 +902,14 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
       );
       
       if (!topicProgress || !topicProgress.completed) {
-        console.log(`✅ Found available earlier topic: ${topicId} at index ${i}`);
+        // console.log(`✅ Found available earlier topic: ${topicId} at index ${i}`);
         return topicId;
       }
     }
   }
   
   // All topics completed, return first topic for replay
-  console.log(`🔁 All topics completed, returning first topic for replay: ${allTopicIds[0]}`);
+  // console.log(`🔁 All topics completed, returning first topic for replay: ${allTopicIds[0]}`);
   return allTopicIds[0] || null;
 };
 
@@ -979,7 +963,7 @@ export const cacheAdventureImage = (
 
     localStorage.setItem(CACHED_ADVENTURE_IMAGES_KEY, JSON.stringify(updatedImages));
     
-    console.log(`🖼️ Cached adventure image: ${prompt.substring(0, 50)}...`);
+    // console.log(`🖼️ Cached adventure image: ${prompt.substring(0, 50)}...`);
   } catch (error) {
     console.warn('Failed to cache adventure image:', error);
   }
@@ -1041,7 +1025,7 @@ export const getRecentCachedAdventureImages = (limit: number = 5): CachedAdventu
 export const clearCachedAdventureImages = (): void => {
   try {
     localStorage.removeItem(CACHED_ADVENTURE_IMAGES_KEY);
-    console.log('🗑️ Cleared all cached adventure images');
+    // console.log('🗑️ Cleared all cached adventure images');
   } catch (error) {
     console.warn('Failed to clear cached adventure images:', error);
   }
@@ -1082,7 +1066,7 @@ export const saveQuestionProgress = (topicId: string, questionIndex: number): vo
       timestamp: Date.now()
     };
     localStorage.setItem(QUESTION_PROGRESS_KEY, JSON.stringify(progress));
-    console.log(`💾 Saved question progress: Topic ${topicId}, Question ${questionIndex + 1}`);
+    // console.log(`💾 Saved question progress: Topic ${topicId}, Question ${questionIndex + 1}`);
   } catch (error) {
     console.warn('Failed to save question progress to localStorage:', error);
   }
@@ -1121,7 +1105,7 @@ export const loadQuestionProgress = (): QuestionProgress | null => {
 export const clearQuestionProgress = (): void => {
   try {
     localStorage.removeItem(QUESTION_PROGRESS_KEY);
-    console.log('🗑️ Cleared question progress');
+    // console.log('🗑️ Cleared question progress');
   } catch (error) {
     console.warn('Failed to clear question progress from localStorage:', error);
   }
@@ -1135,7 +1119,7 @@ export const getStartingQuestionIndex = (topicId: string): number => {
   
   // If there's saved progress for the same topic, resume from there
   if (progress && progress.topicId === topicId) {
-    console.log(`🔄 Resuming topic ${topicId} from question ${progress.questionIndex + 1}`);
+    // console.log(`🔄 Resuming topic ${topicId} from question ${progress.questionIndex + 1}`);
     return progress.questionIndex;
   }
   
@@ -1168,7 +1152,7 @@ export const saveSpellingProgress = (gradeDisplayName: string, currentIndex: num
     // Store progress per grade using a composite key
     const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
     localStorage.setItem(key, JSON.stringify(progress));
-    console.log(`📝 Saved spelling progress: Grade ${gradeDisplayName}, Index ${currentIndex}, Completed: ${completedIds.length}`);
+    // console.log(`📝 Saved spelling progress: Grade ${gradeDisplayName}, Index ${currentIndex}, Completed: ${completedIds.length}`);
   } catch (error) {
     console.warn('Failed to save spelling progress to localStorage:', error);
   }
@@ -1213,7 +1197,7 @@ export const clearSpellingProgress = (gradeDisplayName: string): void => {
   try {
     const key = `${SPELLING_PROGRESS_KEY}_${gradeDisplayName}`;
     localStorage.removeItem(key);
-    console.log(`🗑️ Cleared spelling progress for grade ${gradeDisplayName}`);
+    // console.log(`🗑️ Cleared spelling progress for grade ${gradeDisplayName}`);
   } catch (error) {
     console.warn('Failed to clear spelling progress from localStorage:', error);
   }
@@ -1224,7 +1208,7 @@ export const clearSpellingProgress = (gradeDisplayName: string): void => {
  */
 export const resetSpellingProgress = (gradeDisplayName: string): void => {
   saveSpellingProgress(gradeDisplayName, 0, []);
-  console.log(`🔄 Reset spelling progress for grade ${gradeDisplayName}`);
+  // console.log(`🔄 Reset spelling progress for grade ${gradeDisplayName}`);
 };
 
 // Spellbox Topic Progress System - separate from main topic progress
@@ -1254,7 +1238,7 @@ export const saveSpellboxTopicProgress = (gradeDisplayName: string, progress: Sp
   try {
     const key = `${SPELLBOX_TOPIC_PROGRESS_KEY}_${gradeDisplayName}`;
     localStorage.setItem(key, JSON.stringify(progress));
-    console.log(`📝 Saved Spellbox topic progress: Grade ${gradeDisplayName}, Current Topic: ${progress.currentTopicId}`);
+    // console.log(`📝 Saved Spellbox topic progress: Grade ${gradeDisplayName}, Current Topic: ${progress.currentTopicId}`);
   } catch (error) {
     console.warn('Failed to save Spellbox topic progress to localStorage:', error);
   }
@@ -1335,7 +1319,7 @@ export const clearSpellboxTopicProgress = (gradeDisplayName: string): void => {
   try {
     const key = `${SPELLBOX_TOPIC_PROGRESS_KEY}_${gradeDisplayName}`;
     localStorage.removeItem(key);
-    console.log(`🗑️ Cleared Spellbox topic progress for grade ${gradeDisplayName}`);
+    // console.log(`🗑️ Cleared Spellbox topic progress for grade ${gradeDisplayName}`);
   } catch (error) {
     console.warn('Failed to clear Spellbox topic progress from localStorage:', error);
   }
@@ -1377,7 +1361,7 @@ export const updateSpellboxTopicProgress = async (
   const existingProgress = gradeProgress.topicProgress[topicId];
   if (!existingProgress || (existingProgress.isCompleted && existingProgress.successRate < 70)) {
     if (existingProgress?.isCompleted && existingProgress.successRate < 70) {
-      console.log(`🔄 Resetting failed topic ${topicId} (${existingProgress.successRate.toFixed(1)}% < 70%)`);
+      // console.log(`🔄 Resetting failed topic ${topicId} (${existingProgress.successRate.toFixed(1)}% < 70%)`);
     }
     
     gradeProgress.topicProgress[topicId] = {
@@ -1425,7 +1409,7 @@ export const updateSpellboxTopicProgress = async (
     saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
   }
   
-  console.log(`📊 Spellbox Topic Progress Updated: ${topicId} - ${topicProgress.questionsAttempted}/10 questions, ${topicProgress.firstAttemptCorrect} first-attempt correct (${topicProgress.successRate.toFixed(1)}%)`);
+  // console.log(`📊 Spellbox Topic Progress Updated: ${topicId} - ${topicProgress.questionsAttempted}/10 questions, ${topicProgress.firstAttemptCorrect} first-attempt correct (${topicProgress.successRate.toFixed(1)}%)`);
   
   return topicProgress;
 };
@@ -1477,7 +1461,7 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
  */
 export const resetSpellboxTopicProgress = (gradeDisplayName: string): void => {
   clearSpellboxTopicProgress(gradeDisplayName);
-  console.log(`🔄 Reset Spellbox topic progress for grade ${gradeDisplayName}`);
+  // console.log(`🔄 Reset Spellbox topic progress for grade ${gradeDisplayName}`);
 };
 
 /**
