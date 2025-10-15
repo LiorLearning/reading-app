@@ -22,18 +22,11 @@ class AIPromptSanitizer {
   }
 
   private initialize() {
-    const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    console.log('🔑 AI Sanitizer: Checking API key...', openaiApiKey ? 'FOUND' : 'MISSING');
-    if (!openaiApiKey) {
-      console.error('❌ AI Sanitizer: OpenAI API key not found');
-      console.error('❌ AI Sanitizer: Expected env var: VITE_OPENAI_API_KEY');
-      return;
-    }
-
     try {
       this.client = new OpenAI({
-        apiKey: openaiApiKey,
-        dangerouslyAllowBrowser: true
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1'
       });
       this.isInitialized = true;
       console.log('✅ AI Sanitizer: Initialized successfully');

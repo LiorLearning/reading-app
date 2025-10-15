@@ -31,16 +31,13 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   
   // Initialize OpenAI client for Whisper
   const openaiClient = React.useMemo(() => {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (apiKey) {
       setUseWhisper(true);
       return new OpenAI({
-        apiKey: apiKey,
-        dangerouslyAllowBrowser: true
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1'
       });
-    }
-    return null;
-  }, []);
+    }, []);
 
   // Waveform Visualizer Component
   const WaveformVisualizer = () => {
