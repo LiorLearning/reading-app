@@ -674,23 +674,19 @@ export interface GradeSelection {
  * Map selected grade to content grade based on new requirements
  */
 export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string => {
-  const normalized = (gradeDisplayName || '').trim();
-  // Accept both full and short forms
-  if (normalized === '4th Grade' || normalized === '4th' || normalized === '5th Grade' || normalized === '5th') {
-    return '3';
-  }
-  if (normalized === '3rd Grade' || normalized === '3rd') {
-    return '3';
-  }
-  if (normalized === '2nd Grade' || normalized === '2nd') {
-    return '2';
-  }
-  if (normalized === '1st Grade' || normalized === '1st') {
-    return '1';
-  }
-  if (normalized === 'Kindergarten' || normalized === 'K' || normalized === 'KG') {
-    return '1';
-  }
+  const name = (gradeDisplayName || '').trim().toLowerCase();
+  // Normalize common variants (including stored codes like grade3)
+  const isGrade = (n: string, targets: Array<string | number>) =>
+    targets.some(t => (typeof t === 'number' ? n.includes(`${t}`) : n.includes(t.toLowerCase())));
+
+  // 4th/5th behave like grade 3 content
+  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '3';
+  if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '3';
+  if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
+  if (isGrade(name, ['2nd', 'second', 'grade 2', 'grade2', '2'])) return '2';
+  if (isGrade(name, ['1st', 'first', 'grade 1', 'grade1', '1'])) return '1';
+  if (isGrade(name, ['kindergarten', 'k', 'gradek'])) return '1';
+  // Default to grade 1 content
   return '1';
 };
 
