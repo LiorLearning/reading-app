@@ -141,7 +141,7 @@ const IndexPanelImageFigure: React.FC<{
   
   React.useEffect(() => {
     if (isExpiredUrl && resolvedImageUrl !== panel.image) {
-      console.log(`🔄 Index Panel ${index + 1}: Resolved expired image to Firebase URL: ${resolvedImageUrl.substring(0, 50)}...`);
+      // console.log(`🔄 Index Panel ${index + 1}: Resolved expired image to Firebase URL: ${resolvedImageUrl.substring(0, 50)}...`);
     }
   }, [resolvedImageUrl, panel.image, index, isExpiredUrl]);
 
@@ -383,7 +383,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const incrementMessageCycle = useCallback(() => {
     setMessageCycleCount(prev => {
       const newCount = (prev + 1) % 6;
-      console.log(`🔄 Message cycle incremented: ${prev} → ${newCount} (${newCount < 3 ? 'Pure Adventure' : 'Spelling Phase'})`);
+      // console.log(`🔄 Message cycle incremented: ${prev} → ${newCount} (${newCount < 3 ? 'Pure Adventure' : 'Spelling Phase'})`);
       return newCount;
     });
   }, []);
@@ -398,7 +398,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Console log when realtime session starts
   useEffect(() => {
     if (status === "CONNECTED") {
-      console.log("OPENAI REALTIME STARTED:");
+      // console.log("OPENAI REALTIME STARTED:");
     }
   }, [status]);
   
@@ -489,7 +489,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const wrongMedia = getPetEmotionActionMedia(petType, 'needy');
       trackEvent('action_clicked', { petId: currentPetId, action });
       const chosenMedia = isCorrect ? successMedia : wrongMedia;
-      console.log('[Emotion Debug] chosenMedia:', { petType, action, isCorrect, chosenMedia });
+      // console.log('[Emotion Debug] chosenMedia:', { petType, action, isCorrect, chosenMedia });
       setOverridePetMediaUrl(chosenMedia);
       // Cancel any prior revert timer
       if (overrideMediaClearRef.current) {
@@ -575,7 +575,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Initialize with saved progress if available - this allows seamless resume after page refresh
     const savedProgress = loadQuestionProgress();
     if (savedProgress && selectedTopicId && savedProgress.topicId === selectedTopicId) {
-      console.log(`🔄 Initializing with saved progress: Topic ${savedProgress.topicId}, Question ${savedProgress.questionIndex + 1}`);
+      // console.log(`🔄 Initializing with saved progress: Topic ${savedProgress.topicId}, Question ${savedProgress.questionIndex + 1}`);
       return savedProgress.questionIndex;
     }
     return 0;
@@ -648,7 +648,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setCurrentScreen(-1);
     
     try {
-      console.log('Feedback submitted:', feedbackData);
+      // console.log('Feedback submitted:', feedbackData);
       
       // Only save if user is authenticated (required by security rules)
       if (!user?.uid) {
@@ -666,7 +666,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         feedbackData.enjoymentAnswer
       );
       
-      console.log('Feedback saved successfully to Firestore');
+      // console.log('Feedback saved successfully to Firestore');
       
     } catch (error) {
       console.error('Error saving feedback:', error);
@@ -681,29 +681,29 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
     if (currentSpellingWord && currentScreen === 1 && currentSpellingWord !== lastResolvedWordRef.current) {
-      console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
-        currentSpellingWord,
-        hasOriginalQuestion: !!originalSpellingQuestion,
-        originalQuestionWord: originalSpellingQuestion?.word,
-        originalQuestionAudio: originalSpellingQuestion?.audio,
-        actualSpellingWord: originalSpellingQuestion?.audio,
-        originalQuestionIsPrefilled: originalSpellingQuestion?.isPrefilled,
-        originalQuestionPrefilledIndexes: originalSpellingQuestion?.prefilledIndexes,
-        wordsMatch: originalSpellingQuestion?.audio.toLowerCase() === currentSpellingWord.toLowerCase(),
-        messageCycleCount
-      });
+      // console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
+      //   currentSpellingWord,
+      //   hasOriginalQuestion: !!originalSpellingQuestion,
+      //   originalQuestionWord: originalSpellingQuestion?.word,
+      //   originalQuestionAudio: originalSpellingQuestion?.audio,
+      //   actualSpellingWord: originalSpellingQuestion?.audio,
+      //   originalQuestionIsPrefilled: originalSpellingQuestion?.isPrefilled,
+      //   originalQuestionPrefilledIndexes: originalSpellingQuestion?.prefilledIndexes,
+      //   wordsMatch: originalSpellingQuestion?.audio.toLowerCase() === currentSpellingWord.toLowerCase(),
+      //   messageCycleCount
+      // });
       
       // Use the original spelling question (with prefilled data) if available and matches
       // Compare against the audio field (actual spelling word), not the word field
       if (originalSpellingQuestion && originalSpellingQuestion.audio.toLowerCase() === currentSpellingWord.toLowerCase()) {
-        console.log('🔤 USING ORIGINAL SPELLING QUESTION WITH PREFILLED DATA:', {
-          id: originalSpellingQuestion.id,
-          word: originalSpellingQuestion.word,
-          audio: originalSpellingQuestion.audio,
-          actualSpellingWord: originalSpellingQuestion.audio,
-          isPrefilled: originalSpellingQuestion.isPrefilled,
-          prefilledIndexes: originalSpellingQuestion.prefilledIndexes
-        });
+        // console.log('🔤 USING ORIGINAL SPELLING QUESTION WITH PREFILLED DATA:', {
+        //   id: originalSpellingQuestion.id,
+        //   word: originalSpellingQuestion.word,
+        //   audio: originalSpellingQuestion.audio,
+        //   actualSpellingWord: originalSpellingQuestion.audio,
+        //   isPrefilled: originalSpellingQuestion.isPrefilled,
+        //   prefilledIndexes: originalSpellingQuestion.prefilledIndexes
+        // });
         
         // Update the question text with the AI-generated sentence but keep all other data
         // IMPORTANT: Use the audio field (actual spelling word) as the word field for SpellBox
@@ -716,13 +716,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         setCurrentSpellQuestion(enhancedQuestion);
       } else {
         // Fallback: Convert the spelling word to a SpellingQuestion format (no prefilled data)
-        console.log('🔤 FALLBACK: Creating new spelling question without prefilled data', {
-          reason: !originalSpellingQuestion ? 'No original question stored' : 'Word mismatch',
-          currentSpellingWord,
-          originalQuestionWord: originalSpellingQuestion?.word,
-          originalQuestionAudio: originalSpellingQuestion?.audio,
-          actualSpellingWord: originalSpellingQuestion?.audio
-        });
+        // console.log('🔤 FALLBACK: Creating new spelling question without prefilled data', {
+        //   reason: !originalSpellingQuestion ? 'No original question stored' : 'Word mismatch',
+        //   currentSpellingWord,
+        //   originalQuestionWord: originalSpellingQuestion?.word,
+        //   originalQuestionAudio: originalSpellingQuestion?.audio,
+        //   actualSpellingWord: originalSpellingQuestion?.audio
+        // });
         const spellQuestion: SpellingQuestion = {
           id: Date.now(),
           topicId: selectedTopicId,
@@ -755,13 +755,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Stop all ElevenLabs TTS when switching between screens
   React.useEffect(() => {
     // Stop any playing TTS audio to prevent overlap when switching screens
-    console.log('🔧 Screen change cleanup: Stopping TTS for screen', currentScreen);
+    // console.log('🔧 Screen change cleanup: Stopping TTS for screen', currentScreen);
     ttsService.stop();
     // No image loading sound to stop
     
     // Clean up any ongoing image generation when navigating to home page
     if (currentScreen === -1 && imageGenerationController.current) {
-      console.log('🏠 Navigating to home page - cleaning up image generation');
+      // console.log('🏠 Navigating to home page - cleaning up image generation');
       imageGenerationController.current = null;
       // Only reset loading state if unified system is not actively generating
       if (!unifiedAIStreaming.isGeneratingImage) {
@@ -772,7 +772,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // Add a small delay to ensure TTS is fully stopped
     const timeoutId = setTimeout(() => {
-      console.log('🔧 TTS cleanup completed for screen transition');
+      // console.log('🔧 TTS cleanup completed for screen transition');
     }, 100);
     
     return () => clearTimeout(timeoutId);
@@ -786,7 +786,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Cleanup TTS on component unmount
   React.useEffect(() => {
     return () => {
-      console.log('🔧 Index component cleanup: Stopping TTS');
+      // console.log('🔧 Index component cleanup: Stopping TTS');
       ttsService.stop();
     };
   }, []);
@@ -812,7 +812,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         };
         
         reset(updatedPanels);
-        console.log(`📸 Restored latest image for adventure on page refresh: ${storedAdventureId}`);
+        // console.log(`📸 Restored latest image for adventure on page refresh: ${storedAdventureId}`);
       }
     }
   }, []); // Run only once on mount
@@ -826,7 +826,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (currentScreen === 1 && adventureMode) {
       // If we have initial adventure props with adventureType, wait for it to be processed
       if (initialAdventureProps?.adventureType && currentAdventureType === 'food' && initialAdventureProps.adventureType !== 'food') {
-        console.log('🎯 Waiting for adventure type to be set from initialAdventureProps:', initialAdventureProps.adventureType);
+        // console.log('🎯 Waiting for adventure type to be set from initialAdventureProps:', initialAdventureProps.adventureType);
         return;
       }
       
@@ -844,12 +844,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
       const shouldSkipInitialGreetingForWhiteboard = whiteboardGradeEligible && (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled);
       if (shouldSkipInitialGreetingForWhiteboard || suppressInitialGreetingRef.current) {
-        console.log('⏭️ Skipping initial AI message: whiteboard will run');
+        // console.log('⏭️ Skipping initial AI message: whiteboard will run');
         return;
       }
       const generateInitialResponse = async () => {
         try {
-          console.log('🎯 generateInitialResponse called with currentAdventureType:', currentAdventureType);
+          // console.log('🎯 generateInitialResponse called with currentAdventureType:', currentAdventureType);
           // Mark as generating immediately to prevent duplicate triggers
           isGeneratingInitialRef.current = true;
           initialResponseSentRef.current = sessionKey;
@@ -860,7 +860,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           const petType = PetProgressStorage.getPetType(currentPetId);
           
           // Generate initial message using AI service with adventure prompt
-          console.log('🔍 Calling generateInitialMessage with adventure type:', currentAdventureType);
+          // console.log('🔍 Calling generateInitialMessage with adventure type:', currentAdventureType);
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
             chatMessages,
@@ -875,7 +875,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
           // Add the initial AI message (guarded against suppression)
           if (suppressInitialGreetingRef.current) {
-            console.log('⏭️ Skipping initial AI message (post-gen due to suppression)');
+            // console.log('⏭️ Skipping initial AI message (post-gen due to suppression)');
             return;
           }
           const aiMessage: ChatMessage = {
@@ -909,7 +909,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
           // Add the fallback AI message (guarded against suppression)
           if (suppressInitialGreetingRef.current) {
-            console.log('⏭️ Skipping fallback initial AI message due to suppression');
+            // console.log('⏭️ Skipping fallback initial AI message due to suppression');
             return;
           }
           const aiMessage: ChatMessage = {
@@ -968,7 +968,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Debug useEffect to track currentAdventureType changes
   React.useEffect(() => {
-    console.log('🎯 currentAdventureType changed to:', currentAdventureType);
+    // console.log('🎯 currentAdventureType changed to:', currentAdventureType);
   }, [currentAdventureType]);
 
   // Track persistent adventure progress to trigger Step 6 when full
@@ -1017,11 +1017,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Function to trigger initial response generation with explicit adventure type
   const triggerInitialResponseGeneration = React.useCallback(async (explicitAdventureType: string) => {
-    console.log('🎯 triggerInitialResponseGeneration called with explicitAdventureType:', explicitAdventureType);
+    // console.log('🎯 triggerInitialResponseGeneration called with explicitAdventureType:', explicitAdventureType);
     
     // Only generate if we're on the adventure screen and have the necessary data
     if (currentScreen !== 1 || !currentAdventureId || !userData?.username) {
-      console.log('🎯 Skipping initial response generation - not ready');
+      // console.log('🎯 Skipping initial response generation - not ready');
       return;
     }
 
@@ -1031,19 +1031,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // Check if we've already sent an initial response for this session
     if (initialResponseSentRef.current === sessionKey || isGeneratingInitialRef.current) {
-      console.log('🎯 Skipping initial response generation - already generated for this session');
+      // console.log('🎯 Skipping initial response generation - already generated for this session');
       return;
     }
     
       // Generate initial AI message using real-time AI generation
       // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
       if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
-        console.log('⏭️ Skipping initial AI message: whiteboard will run');
+        // console.log('⏭️ Skipping initial AI message: whiteboard will run');
         return;
       }
     const generateInitialResponse = async () => {
       try {
-        console.log('🎯 generateInitialResponse called with explicitAdventureType:', explicitAdventureType);
+        // console.log('🎯 generateInitialResponse called with explicitAdventureType:', explicitAdventureType);
         // Mark as generating immediately to prevent duplicate triggers
         isGeneratingInitialRef.current = true;
         initialResponseSentRef.current = sessionKey;
@@ -1054,7 +1054,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const petType = PetProgressStorage.getPetType(currentPetId);
         
         // Generate initial message using AI service with adventure prompt
-        console.log('🔍 Calling generateInitialMessage with explicit adventure type:', explicitAdventureType);
+        // console.log('🔍 Calling generateInitialMessage with explicit adventure type:', explicitAdventureType);
         const initialMessage = await aiService.generateInitialMessage(
           adventureMode,
           chatMessages,
@@ -1069,7 +1069,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
         // Add the initial AI message (guard again in case state flipped meanwhile)
         if (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled || suppressInitialGreetingRef.current) {
-          console.log('⏭️ Skipping initial AI message (post-gen): whiteboard active');
+          // console.log('⏭️ Skipping initial AI message (post-gen): whiteboard active');
           return;
         }
         const aiMessage: ChatMessage = {
@@ -1080,7 +1080,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
         // Guard enqueue in case suppression toggled between checks
         if (suppressInitialGreetingRef.current) {
-          console.log('⏭️ Skipping enqueue of initial AI message due to suppression');
+          // console.log('⏭️ Skipping enqueue of initial AI message due to suppression');
           return;
         }
         setChatMessages(prev => [...prev, aiMessage]);
@@ -1157,7 +1157,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // If current state doesn't match saved progress for this grade, update it
       if (spellingProgressIndex !== expectedIndex || completedSpellingIds.length !== expectedCompletedIds.length) {
-        console.log(`🔄 Grade changed to ${currentGrade}, updating spelling progress from index ${spellingProgressIndex} to ${expectedIndex}`);
+        // console.log(`🔄 Grade changed to ${currentGrade}, updating spelling progress from index ${spellingProgressIndex} to ${expectedIndex}`);
         setSpellingProgressIndex(expectedIndex);
         setCompletedSpellingIds(expectedCompletedIds);
       }
@@ -1233,7 +1233,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   useEffect(() => {
     const savedGrade = loadGradeSelection();
     if (savedGrade && !selectedGradeFromDropdown) {
-      console.log(`🔄 Loading saved grade selection on mount: ${savedGrade.gradeDisplayName}`);
+      // console.log(`🔄 Loading saved grade selection on mount: ${savedGrade.gradeDisplayName}`);
       setSelectedGradeFromDropdown(savedGrade.gradeDisplayName);
     }
   }, []); // Run once on mount
@@ -1249,18 +1249,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // First check localStorage for user's manual selection
       const preference = loadTopicPreference();
-      console.log('Loaded preference from localStorage:', preference);
+      // console.log('Loaded preference from localStorage:', preference);
       
       if (preference?.level) {
         preferenceLevel = preference.level;
-        console.log('Using saved preference:', preferenceLevel);
+        // console.log('Using saved preference:', preferenceLevel);
       } else if (userData?.level) {
         // Fallback to userData level only if no saved preference
         preferenceLevel = userData.level === 'mid' ? 'middle' : userData.level as 'start' | 'middle';
-        console.log('Using userData.level:', userData.level, 'converted to:', preferenceLevel);
+        // console.log('Using userData.level:', userData.level, 'converted to:', preferenceLevel);
       }
       
-      console.log('Setting selectedPreference to:', preferenceLevel);
+      // console.log('Setting selectedPreference to:', preferenceLevel);
       setSelectedPreference(preferenceLevel);
       
       // Initialize the combined grade and level selection for proper highlighting
@@ -1273,24 +1273,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           grade: gradeToUse, 
           level: preferenceLevel 
         });
-        console.log('Initialized selectedGradeAndLevel:', { grade: gradeToUse, level: preferenceLevel, source: savedGrade ? 'localStorage' : 'Firebase' });
+        // console.log('Initialized selectedGradeAndLevel:', { grade: gradeToUse, level: preferenceLevel, source: savedGrade ? 'localStorage' : 'Firebase' });
       }
       
       // First, check if there's a current topic saved from previous selection
       if (userProgress?.currentTopicId) {
-        console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
+        // console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
         setSelectedTopicFromPreference(userProgress.currentTopicId);
       } else if (preferenceLevel) {
         // If no saved current topic, generate one based on preference level
-        console.log('Generating new topic for preference level:', preferenceLevel);
+        // console.log('Generating new topic for preference level:', preferenceLevel);
         const allTopicIds = Object.keys(sampleMCQData.topics);
         const preferredTopic = getNextTopicByPreference(allTopicIds, preferenceLevel);
         if (preferredTopic) {
-          console.log('Generated preferred topic:', preferredTopic);
+          // console.log('Generated preferred topic:', preferredTopic);
           setSelectedTopicFromPreference(preferredTopic);
         }
       } else {
-        console.log('No preference level or current topic found');
+        // console.log('No preference level or current topic found');
       }
     }
   }, [userData, currentScreen]);
@@ -1321,7 +1321,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (currentScreen === 1) {
       // Start with chat panel collapsed so the floating mini chat is visible
       setSidebarCollapsed(true);
-      console.log('🗨️ Adventure mode started - chat panel minimized by default');
+      // console.log('🗨️ Adventure mode started - chat panel minimized by default');
     }
   }, [currentScreen]);
   
@@ -1380,7 +1380,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     userId: user?.uid || 'anonymous',
     adventureId: currentAdventureId || undefined,
     onNewImage: async (imageUrl: string, prompt: string) => {
-      console.log('🎨 NEW: Image generated by unified AI system:', imageUrl);
+      // console.log('🎨 NEW: Image generated by unified AI system:', imageUrl);
       try {
         const isDalle = imageUrl.includes('oaidalleapiprodscus.blob.core.windows.net') || imageUrl.includes('dalle');
         const tool = isDalle ? 'dalle3' : 'flux';
@@ -1411,15 +1411,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           : ((Math.floor((currentUserCount - AUTO_IMAGE_TRIGGER_OFFSET) / AUTO_IMAGE_TRIGGER_INTERVAL) + 1) * AUTO_IMAGE_TRIGGER_INTERVAL) + AUTO_IMAGE_TRIGGER_OFFSET;
         const messagesUntilNextAuto = Math.max(0, nextAutoTriggerAt - currentUserCount);
         
-        console.log('📉 COMMUNICATION: Unified system generated image → resetting auto-generation counter:', {
-          previousAutoCount: prev,
-          currentUserMessageCount: currentUserCount,
-          newAutoCount: newCount,
-          nextAutoTriggerAt,
-          messagesUntilNextAuto,
-          reason: 'unified_system_coordination',
-          message: `Auto-gen will now trigger at user message #${nextAutoTriggerAt} (in ${messagesUntilNextAuto})`
-        });
+        // console.log('📉 COMMUNICATION: Unified system generated image → resetting auto-generation counter:', {
+        //   previousAutoCount: prev,
+        //   currentUserMessageCount: currentUserCount,
+        //   newAutoCount: newCount,
+        //   nextAutoTriggerAt,
+        //   messagesUntilNextAuto,
+        //   reason: 'unified_system_coordination',
+        //   message: `Auto-gen will now trigger at user message #${nextAutoTriggerAt} (in ${messagesUntilNextAuto})`
+        // });
         
         return newCount;
       });
@@ -1495,12 +1495,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         console.warn('⚠️ NEW: Failed to cache unified AI image:', error);
       }
       
-      console.log(`🎨 PANEL DEBUG: Image handled (optimistic for data URLs): ${imageUrl.substring(0, 60)}...`);
+      // console.log(`🎨 PANEL DEBUG: Image handled (optimistic for data URLs): ${imageUrl.substring(0, 60)}...`);
       
       // Completion sound is now handled by the unified streaming hook timeout
     },
     onResponseComplete: (response) => {
-      console.log('✅ NEW: Unified AI response completed:', response);
+      // console.log('✅ NEW: Unified AI response completed:', response);
     }
   });
   
@@ -1534,19 +1534,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   React.useEffect(() => {
     // 🛠️ CRITICAL FIX: Don't sync when legacy system is running independently
     if (isLegacySystemRunning) {
-      console.log('🚫 SYNC BLOCKED: Legacy system is running independently, skipping sync');
+      // console.log('🚫 SYNC BLOCKED: Legacy system is running independently, skipping sync');
       return;
     }
     
-    console.log('🎯 🚨 CRITICAL SYNC: unifiedAIStreaming.isGeneratingImage changed from', isGeneratingAdventureImage, 'to', unifiedAIStreaming.isGeneratingImage);
+    // console.log('🎯 🚨 CRITICAL SYNC: unifiedAIStreaming.isGeneratingImage changed from', isGeneratingAdventureImage, 'to', unifiedAIStreaming.isGeneratingImage);
     setIsGeneratingAdventureImage(unifiedAIStreaming.isGeneratingImage);
   }, [unifiedAIStreaming.isGeneratingImage, isGeneratingAdventureImage, isLegacySystemRunning]);
 
   // 🚨 CRITICAL SYNC: Monitor unified AI streaming state changes with detailed logging
   React.useEffect(() => {
-    console.log('🚨 CRITICAL SYNC: unifiedAIStreaming.isGeneratingImage changed to:', unifiedAIStreaming.isGeneratingImage);
+    // console.log('🚨 CRITICAL SYNC: unifiedAIStreaming.isGeneratingImage changed to:', unifiedAIStreaming.isGeneratingImage);
     if (unifiedAIStreaming.isGeneratingImage) {
-      console.log('🎯 NEW MESSAGE: Current isGeneratingImage state: true');
+      // console.log('🎯 NEW MESSAGE: Current isGeneratingImage state: true');
     }
   }, [unifiedAIStreaming.isGeneratingImage]);
 
@@ -1561,7 +1561,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           currentSummary = sessionData?.chatSummary?.summary;
           
           if (currentSummary) {
-            console.log('🧠 Using chat summary for AI context:', currentSummary.substring(0, 100) + '...');
+            // console.log('🧠 Using chat summary for AI context:', currentSummary.substring(0, 100) + '...');
           }
         } catch (summaryError) {
           console.warn('⚠️ Could not load chat summary, continuing without it:', summaryError);
@@ -1573,7 +1573,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const petName = PetProgressStorage.getPetDisplayName(currentPetId);
       const petType = PetProgressStorage.getPetType(currentPetId);
       
-      console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType, adventureType: currentAdventureType });
+      // console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType, adventureType: currentAdventureType });
       
       const result = await aiService.generateResponse(
         userText, 
@@ -1589,7 +1589,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         currentAdventureType // adventureType - now dynamic!
       );
       
-      console.log('✅ AI service returned:', result);
+      // console.log('✅ AI service returned:', result);
       return result;
     } catch (error) {
       console.error('Error generating AI response:', error);
@@ -1603,7 +1603,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Legacy image generation fallback when unified system fails
   const handleLegacyImageFallback = useCallback(async (text: string, imageSubject?: string) => {
-    console.log('🔄 LEGACY FALLBACK: Starting legacy image generation for failed unified request');
+    // console.log('🔄 LEGACY FALLBACK: Starting legacy image generation for failed unified request');
     
     // Double-check with keyword detection - only proceed if this is truly an image request
     const imageKeywords = ['create', 'make', 'generate', 'build', 'design', 'show me', 'what does', 'look like', 'i want to see', 'draw', 'picture', 'image'];
@@ -1611,15 +1611,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const hasImageKeywords = imageKeywords.some(keyword => lowerText.includes(keyword));
     
     if (!hasImageKeywords) {
-      console.log('🚫 LEGACY FALLBACK: No image keywords detected, skipping legacy generation');
+      // console.log('🚫 LEGACY FALLBACK: No image keywords detected, skipping legacy generation');
       return;
     }
     
-    console.log('✅ LEGACY FALLBACK: Image keywords detected, proceeding with legacy generation');
+    // console.log('✅ LEGACY FALLBACK: Image keywords detected, proceeding with legacy generation');
     
     // 🧹 START AI SANITIZATION WITH TIMEOUT
     const originalPrompt = imageSubject || text;
-    console.log('🧹 LEGACY FALLBACK: Starting AI prompt sanitization for:', originalPrompt.substring(0, 50) + '...');
+    // console.log('🧹 LEGACY FALLBACK: Starting AI prompt sanitization for:', originalPrompt.substring(0, 50) + '...');
     setSanitizationInProgress(true);
     
     // Extract adventure context for full sanitization
@@ -1628,7 +1628,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Start sanitization but with timeout - WAIT for result before proceeding 
     let sanitizationResult: any = null;
     try {
-      console.log('🧹 LEGACY FALLBACK: Waiting for AI sanitization (max 8 seconds)...');
+      // console.log('🧹 LEGACY FALLBACK: Waiting for AI sanitization (max 8 seconds)...');
       const startTime = Date.now();
       
       sanitizationResult = await Promise.race([
@@ -1638,9 +1638,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       const elapsed = Date.now() - startTime;
       if (sanitizationResult) {
-        console.log(`✅ AI Full Sanitization completed in ${elapsed}ms:`, sanitizationResult.sanitizedPrompt?.substring(0, 80) + '...');
+        // console.log(`✅ AI Full Sanitization completed in ${elapsed}ms:`, sanitizationResult.sanitizedPrompt?.substring(0, 80) + '...');
         if (sanitizationResult.sanitizedContext) {
-          console.log('✅ Adventure context also sanitized:', sanitizationResult.sanitizedContext.substring(0, 80) + '...');
+          // console.log('✅ Adventure context also sanitized:', sanitizationResult.sanitizedContext.substring(0, 80) + '...');
         }
         setAiSanitizedPrompt(sanitizationResult);
       }
@@ -1668,17 +1668,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Extract adventure context for caching
       const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
       
-      console.log('🎨 LEGACY FALLBACK: Calling legacy aiService.generateAdventureImage()');
+      // console.log('🎨 LEGACY FALLBACK: Calling legacy aiService.generateAdventureImage()');
       
       // Use the fresh sanitizationResult instead of state (which might be stale)
       const finalSanitizedResult = sanitizationResult || aiSanitizedPrompt;
       
       // Debug sanitization state
-      console.log('🧹 LEGACY DEBUG: finalSanitizedResult state:', finalSanitizedResult ? 'PRESENT' : 'NULL');
+      // console.log('🧹 LEGACY DEBUG: finalSanitizedResult state:', finalSanitizedResult ? 'PRESENT' : 'NULL');
       if (finalSanitizedResult) {
-        console.log('🧹 LEGACY DEBUG: sanitizedPrompt preview:', finalSanitizedResult.sanitizedPrompt?.substring(0, 100) + '...');
-        console.log('🧹 LEGACY DEBUG: sanitizedContext preview:', finalSanitizedResult.sanitizedContext?.substring(0, 100) + '...');
-        console.log('🧹 LEGACY DEBUG: sanitization success:', finalSanitizedResult.success);
+        // console.log('🧹 LEGACY DEBUG: sanitizedPrompt preview:', finalSanitizedResult.sanitizedPrompt?.substring(0, 100) + '...');
+        // console.log('🧹 LEGACY DEBUG: sanitizedContext preview:', finalSanitizedResult.sanitizedContext?.substring(0, 100) + '...');
+        // console.log('🧹 LEGACY DEBUG: sanitization success:', finalSanitizedResult.success);
       }
       
       const sanitizedResult = finalSanitizedResult ? {
@@ -1686,7 +1686,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         sanitizedContext: finalSanitizedResult.sanitizedContext
       } : undefined;
       
-      console.log('🧹 LEGACY DEBUG: Passing sanitizedResult to generateAdventureImage:', sanitizedResult ? 'PRESENT' : 'UNDEFINED');
+      // console.log('🧹 LEGACY DEBUG: Passing sanitizedResult to generateAdventureImage:', sanitizedResult ? 'PRESENT' : 'UNDEFINED');
       
       const generatedImageResult = await aiService.generateAdventureImage(
         imagePrompt,
@@ -1699,11 +1699,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       if (generatedImageResult) {
         // 🛡️ RACE CONDITION PREVENTION: Validate that this image is for the current adventure
         if (generatedImageResult.adventureId && generatedImageResult.adventureId !== currentAdventureId) {
-          console.log(`🚫 IMAGE VALIDATION: Ignoring image from wrong adventure`, {
-            imageAdventureId: generatedImageResult.adventureId,
-            currentAdventureId: currentAdventureId,
-            reason: 'adventure_mismatch'
-          });
+          // console.log(`🚫 IMAGE VALIDATION: Ignoring image from wrong adventure`, {
+          //   imageAdventureId: generatedImageResult.adventureId,
+          //   currentAdventureId: currentAdventureId,
+          //   reason: 'adventure_mismatch'
+          // });
           return;
         }
         
@@ -1734,7 +1734,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         // No completion sound
         
-        console.log('✅ LEGACY FALLBACK: Successfully generated image and added panel');
+        // console.log('✅ LEGACY FALLBACK: Successfully generated image and added panel');
         
         // Add AI message to chat with proper side effects (TTS, sounds, etc.)
         const userMessage: ChatMessage = {
@@ -1762,7 +1762,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             console.error('TTS error for legacy AI message:', error)
           );
           
-          console.log('🔊 LEGACY FALLBACK: Triggered TTS for AI message');
+          // console.log('🔊 LEGACY FALLBACK: Triggered TTS for AI message');
           
           // Optional: Save AI message to Firebase session
           if (currentSessionId) {
@@ -1777,7 +1777,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         });
         
       } else {
-        console.log('⚠️ LEGACY FALLBACK: Image generation failed, using fallback image');
+        // console.log('⚠️ LEGACY FALLBACK: Image generation failed, using fallback image');
         
         // Use fallback image
         const fallbackImage = images[Math.floor(Math.random() * images.length)];
@@ -1808,7 +1808,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     } finally {
       // 🛠️ CRITICAL FIX: Always stop loading state in legacy fallback
       // The unified system has already failed, so we need to clear the loading state
-      console.log('🔄 LEGACY FALLBACK: Clearing loading state in finally block');
+      // console.log('🔄 LEGACY FALLBACK: Clearing loading state in finally block');
       setIsGeneratingAdventureImage(false);
       
       // 🛠️ CRITICAL FIX: Mark legacy system as no longer running to re-enable sync
@@ -1841,8 +1841,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const adventureContext = chatMessages.slice(-5).map(msg => msg.content).join(" ");
         
         // 🚫 DISABLED: Legacy image generation to prevent duplicates with unified system
-        console.log('🚫 [Index.onGenerateImage()] Skipping legacy manual image generation - unified system handles this now');
-        console.log('📝 [Index.onGenerateImage()] Requested prompt:', imagePrompt);
+        // console.log('🚫 [Index.onGenerateImage()] Skipping legacy manual image generation - unified system handles this now');
+        // console.log('📝 [Index.onGenerateImage()] Requested prompt:', imagePrompt);
         const generatedImageResult = null;
         
         // ORIGINAL CODE (DISABLED):
@@ -1966,19 +1966,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         lastMessage.content === 'transcribing...';
       
       // NEW: Try unified AI system first (if available and ready)
-      console.log('🔧 Unified system check:', {
-        isUnifiedSystemReady,
-        streamingIsReady: unifiedAIStreaming.isReady(),
-        streamingState: {
-          isStreaming: unifiedAIStreaming.isStreaming,
-          error: unifiedAIStreaming.error
-        }
-      });
+      // console.log('🔧 Unified system check:', {
+      //   isUnifiedSystemReady,
+      //   streamingIsReady: unifiedAIStreaming.isReady(),
+      //   streamingState: {
+      //     isStreaming: unifiedAIStreaming.isStreaming,
+      //     error: unifiedAIStreaming.error
+      //   }
+      // });
       
       // 🛠️ IMPROVED: Better handling of stuck streaming state
       let skipUnifiedBackground = false;
       if (unifiedAIStreaming.isStreaming) {
-        console.log('⚠️ Unified system appears to be streaming');
+        // console.log('⚠️ Unified system appears to be streaming');
         
         // 🔧 Check if this is a stuck state by looking for suspicious conditions
         const streamingTimeout = 30000; // 30 seconds max streaming time
@@ -1986,7 +1986,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const timeSinceLastMessage = Date.now() - lastMessageTime;
         
         if (timeSinceLastMessage > streamingTimeout) {
-          console.log('🚨 STUCK STATE DETECTED: Streaming for too long, forcing reset');
+          // console.log('🚨 STUCK STATE DETECTED: Streaming for too long, forcing reset');
           
           // Force abort the stuck stream
           try {
@@ -1998,11 +1998,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           // Small delay to let abort complete, then continue with new request
           await new Promise(resolve => setTimeout(resolve, 200));
           
-          console.log('✅ Stuck state cleared, proceeding with new request');
+          // console.log('✅ Stuck state cleared, proceeding with new request');
         } else {
           // Normal case - actually streaming. Do NOT block user text submission;
           // just skip triggering another unified background task this turn.
-          console.log('⚠️ Valid streaming in progress - skipping unified background call but continuing text flow');
+          // console.log('⚠️ Valid streaming in progress - skipping unified background call but continuing text flow');
           skipUnifiedBackground = true;
         }
       }
@@ -2032,7 +2032,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         // 🛠️ CRITICAL: Always detect "create image:" format from button clicks
         if (lowerText.startsWith('create image:')) {
-          console.log('✅ Detected "create image:" format from button click');
+          // console.log('✅ Detected "create image:" format from button click');
           return true;
         }
         
@@ -2069,7 +2069,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const isImageRequest = detectImageIntent(text);
       
       // REGULAR AI SYSTEM: Use legacy system for all non-image requests (including spelling)
-      console.log('📝 Using regular AI system for text/spelling responses');
+      // console.log('📝 Using regular AI system for text/spelling responses');
       
       // Note: isImageRequest is already declared above
       
@@ -2161,23 +2161,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
 
       // Track adventure prompt count and implement automatic flow
-      console.log(`🔍 DEBUG: Message sent - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}, isInQuestionMode: ${isInQuestionMode}`);
+      // console.log(`🔍 DEBUG: Message sent - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}, isInQuestionMode: ${isInQuestionMode}`);
       
       if (currentScreen === 1 && !isImageRequest) {
         const newAdventurePromptCount = adventurePromptCount + 1;
-        console.log(`🔍 DEBUG: Adventure prompt sent. Count: ${adventurePromptCount} -> ${newAdventurePromptCount}, Threshold: ${ADVENTURE_PROMPT_THRESHOLD}`);
+        // console.log(`🔍 DEBUG: Adventure prompt sent. Count: ${adventurePromptCount} -> ${newAdventurePromptCount}, Threshold: ${ADVENTURE_PROMPT_THRESHOLD}`);
         setAdventurePromptCount(newAdventurePromptCount);
         
         // Check if user has met the threshold for accessing questions
         if (newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD && !canAccessQuestions) {
-          console.log(`🔍 DEBUG: Threshold reached! Setting canAccessQuestions to true`);
+          // console.log(`🔍 DEBUG: Threshold reached! Setting canAccessQuestions to true`);
           setCanAccessQuestions(true);
         }
         
         // Implement automatic flow: adventure->q1->q2->q3->adventure->q4->q5->q6->adventure->q7->q8->q9->q10
         // Only trigger automatic transitions if user has met the prompt threshold
         const hasMetThreshold = canAccessQuestions || newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD;
-        console.log(`🔍 DEBUG: Threshold check - canAccessQuestions: ${canAccessQuestions}, newCount >= threshold: ${newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD}, hasMetThreshold: ${hasMetThreshold}`);
+        // console.log(`🔍 DEBUG: Threshold check - canAccessQuestions: ${canAccessQuestions}, newCount >= threshold: ${newAdventurePromptCount >= ADVENTURE_PROMPT_THRESHOLD}, hasMetThreshold: ${hasMetThreshold}`);
         
         // COMMENTED OUT: Adventure to Questions Auto-move
         /*
@@ -2187,19 +2187,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
           if (topicQuestionIndex === 0) {
             // Start with questions after initial adventure phase (Q1-Q3)
-            console.log(`🔍 DEBUG: Starting Q1-Q3 sequence`);
+            // console.log(`🔍 DEBUG: Starting Q1-Q3 sequence`);
             shouldTransitionToQuestions = true;
           } else if (topicQuestionIndex === 3) {
             // After Q1->Q2->Q3->adventure, now go to Q4->Q5->Q6
-            console.log(`🔍 DEBUG: Starting Q4-Q6 sequence`);
+            // console.log(`🔍 DEBUG: Starting Q4-Q6 sequence`);
             shouldTransitionToQuestions = true;
           } else if (topicQuestionIndex === 6) {
             // After Q4->Q5->Q6->adventure, now go to Q7->Q8->Q9
-            console.log(`🔍 DEBUG: Starting Q7-Q9 sequence`);
+            // console.log(`🔍 DEBUG: Starting Q7-Q9 sequence`);
             shouldTransitionToQuestions = true;
           } else if (topicQuestionIndex === 9) {
             // After Q7->Q8->Q9->adventure, now go to Q10
-            console.log(`🔍 DEBUG: Starting Q10 sequence`);
+            // console.log(`🔍 DEBUG: Starting Q10 sequence`);
             shouldTransitionToQuestions = true;
           }
           
@@ -2234,7 +2234,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
         */
       } else {
-        console.log(`🔍 DEBUG: Skipping adventure prompt tracking - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}`);
+        // console.log(`🔍 DEBUG: Skipping adventure prompt tracking - currentScreen: ${currentScreen}, isImageRequest: ${isImageRequest}`);
       }
       
       // Continue with the story text flow without adding any image loading sound/caption to chat.
@@ -2259,13 +2259,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
           
-        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
+        // console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
         // Additional debug info
         const savedGradeFromStorage = loadGradeSelection();
           
-        console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
-        console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
+        // console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
+        // console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
           
         // NEW: Use topic-based question selection for Spellbox progression
           
@@ -2274,17 +2274,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Store the original spelling question (with prefilled data) for later use
           
         if (spellingQuestion) {
-          console.log('🔤 STORING ORIGINAL SPELLING QUESTION:', {
-            id: spellingQuestion.id,
-            word: spellingQuestion.word,
-            audio: spellingQuestion.audio,
-            actualSpellingWord: spellingQuestion.audio,
-            isPrefilled: spellingQuestion.isPrefilled,
-            prefilledIndexes: spellingQuestion.prefilledIndexes
-          });
+          // console.log('🔤 STORING ORIGINAL SPELLING QUESTION:', {
+          //   id: spellingQuestion.id,
+          //   word: spellingQuestion.word,
+          //   audio: spellingQuestion.audio,
+          //   actualSpellingWord: spellingQuestion.audio,
+          //   isPrefilled: spellingQuestion.isPrefilled,
+          //   prefilledIndexes: spellingQuestion.prefilledIndexes
+          // });
           setOriginalSpellingQuestion(spellingQuestion);
         }
-        console.log(`🔄 Message cycle: ${messageCycleCount}, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < SPELLING_CYCLE_OFFSET ? 'Initial Pure Adventure' : isSpellingPhase ? 'Spelling Trio' : 'Adventure Break'})`);
+        // console.log(`🔄 Message cycle: ${messageCycleCount}, Phase: ${isSpellingPhase ? '📝 SPELLING' : '🏰 ADVENTURE'} (${messageCycleCount < SPELLING_CYCLE_OFFSET ? 'Initial Pure Adventure' : isSpellingPhase ? 'Spelling Trio' : 'Adventure Break'})`);
         
         const aiResponse = await generateAIResponse(text, currentMessages, spellingQuestion);
         
@@ -2294,12 +2294,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         // First, add the spelling sentence message if we have one
         if (aiResponse.spelling_sentence && spellingQuestion) {
-          console.log('📝 Creating spelling message:', {
-            spellingWord: spellingQuestion.audio,
-            spellingSentence: aiResponse.spelling_sentence,
-            adventureStory: aiResponse.adventure_story,
-            wordInSentence: aiResponse.spelling_sentence.toLowerCase().includes(spellingQuestion.audio.toLowerCase())
-          });
+          // console.log('📝 Creating spelling message:', {
+          //   spellingWord: spellingQuestion.audio,
+          //   spellingSentence: aiResponse.spelling_sentence,
+          //   adventureStory: aiResponse.adventure_story,
+          //   wordInSentence: aiResponse.spelling_sentence.toLowerCase().includes(spellingQuestion.audio.toLowerCase())
+          // });
           
           // Ensure we always have a continuation for after spelling.
           // If the AI didn't provide an adventure story, synthesize a gentle prompt
@@ -2432,18 +2432,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Auto-assign topic based on level and navigate - FIXED to respect grade selection
   const autoAssignTopicAndNavigate = React.useCallback((level: 'start' | 'middle') => {
-    console.log(`🎯 autoAssignTopicAndNavigate called with level: ${level}`);
+    // console.log(`🎯 autoAssignTopicAndNavigate called with level: ${level}`);
     
     // Use proper grade-aware topic selection instead of hardcoded values
     const allTopicIds = Object.keys(sampleMCQData.topics);
     const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
     
-    console.log(`🎓 Current grade for auto-assignment: ${currentGrade}`);
+    // console.log(`🎓 Current grade for auto-assignment: ${currentGrade}`);
     
     // Get topic based on grade and level preference
     const topicId = getNextTopicByPreference(allTopicIds, level, currentGrade);
     
-    console.log(`✨ Auto-assigned topic: ${topicId} for grade ${currentGrade}, level ${level}`);
+    // console.log(`✨ Auto-assigned topic: ${topicId} for grade ${currentGrade}, level ${level}`);
     
     if (topicId) {
       setSelectedTopicId(topicId);
@@ -2473,7 +2473,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const startingIndex = getStartingQuestionIndex(selectedTopicId);
       // Only update if different from current to avoid unnecessary re-renders
       if (startingIndex !== topicQuestionIndex) {
-        console.log(`🔄 Topic changed to ${selectedTopicId}, loading progress: Question ${startingIndex + 1}`);
+        // console.log(`🔄 Topic changed to ${selectedTopicId}, loading progress: Question ${startingIndex + 1}`);
         setTopicQuestionIndex(startingIndex);
       }
     }
@@ -2496,7 +2496,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     playClickSound();
     
     // Stop any ongoing TTS before navigation
-    console.log('🔧 Home navigation cleanup: Stopping TTS');
+    // console.log('🔧 Home navigation cleanup: Stopping TTS');
     ttsService.stop();
     
     if (path === 'topics') {
@@ -2509,15 +2509,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Handle pet page navigation
   const handlePetNavigation = React.useCallback(() => {
-    console.log('🎯 Index: handlePetNavigation called - navigating to pet page (screen 4)');
+    // console.log('🎯 Index: handlePetNavigation called - navigating to pet page (screen 4)');
     playClickSound();
     
     // Stop any ongoing TTS before navigation
-    console.log('🔧 Pet navigation cleanup: Stopping TTS');
+    // console.log('🔧 Pet navigation cleanup: Stopping TTS');
     ttsService.stop();
     
     setCurrentScreen(4); // Go to pet page
-    console.log('🎯 Index: Set currentScreen to 4 (PetPage)');
+    // console.log('🎯 Index: Set currentScreen to 4 (PetPage)');
   }, []);
 
   // Handle chat summary generation (every 2 messages)
@@ -2540,7 +2540,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         return; // Not time for summary yet
       }
 
-      console.log(`🧠 Generating chat summary (${currentMessages.length} messages total)`);
+      // console.log(`🧠 Generating chat summary (${currentMessages.length} messages total)`);
 
       // Get recent messages for summarization (typically last 2-4 messages)
       const messagesToSummarize = currentMessages.slice(-4); // Last 4 messages for context
@@ -2569,7 +2569,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Save summary to Firebase (non-blocking)
       adventureSessionService.updateChatSummary(sessionId, summaryObject);
       
-      console.log('✅ Chat summary generated and saved');
+      // console.log('✅ Chat summary generated and saved');
       
     } catch (error) {
       console.warn('⚠️ Failed to generate chat summary (continuing normally):', error);
@@ -2614,21 +2614,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Only save panels with generated images (not default local assets)
       const generatedPanels = panels.filter(panel => !isDefaultOrLocalImage(panel.image));
       
-      console.log(`💾 SAVE DEBUG: Saving adventure with ${panels.length} total panels, ${generatedPanels.length} generated panels`);
+      // console.log(`💾 SAVE DEBUG: Saving adventure with ${panels.length} total panels, ${generatedPanels.length} generated panels`);
       panels.forEach((panel, index) => {
         const isDefault = isDefaultOrLocalImage(panel.image);
-        console.log(`💾 Panel ${index} ${isDefault ? '[SKIPPED - DEFAULT]' : '[SAVING]'}: ${panel.image.substring(0, 60)}...`);
-        console.log(`💾 Panel ${index} text: "${panel.text?.substring(0, 50)}..."`);
+        // console.log(`💾 Panel ${index} ${isDefault ? '[SKIPPED - DEFAULT]' : '[SAVING]'}: ${panel.image.substring(0, 60)}...`);
+        // console.log(`💾 Panel ${index} text: "${panel.text?.substring(0, 50)}..."`);
       });
       
-      console.log(`💾 Generated panels being saved:`, generatedPanels.map((panel, index) => ({
-        index,
-        id: panel.id,
-        image: panel.image.substring(0, 60) + '...',
-        text: panel.text?.substring(0, 30) + '...',
-        isFirebase: panel.image.includes('firebasestorage.googleapis.com'),
-        isDalle: panel.image.includes('oaidalleapiprodscus.blob.core.windows.net')
-      })));
+      // console.log(`💾 Generated panels being saved:`, generatedPanels.map((panel, index) => ({
+      //   index,
+      //   id: panel.id,
+      //   image: panel.image.substring(0, 60) + '...',
+      //   text: panel.text?.substring(0, 30) + '...',
+      //   isFirebase: panel.image.includes('firebasestorage.googleapis.com'),
+      //   isDalle: panel.image.includes('oaidalleapiprodscus.blob.core.windows.net')
+      // })));
       
       const adventure: SavedAdventure = {
         id: currentAdventureId,
@@ -2652,22 +2652,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
       
       // // Create a new comic panel for this adventure every 10 messages
-      // console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
+      // // console.log(`🖼️ AUTO IMAGE CHECK: Total messages: ${chatMessages.length}, Multiple of 10: ${chatMessages.length % 10 === 0}, Meets threshold: ${chatMessages.length >= 10}`);
       
       // if (chatMessages.length >= 10 && chatMessages.length % 10 === 0) { // Generate every 10 messages regularly
       //   const userMessages = chatMessages.filter(msg => msg.type === 'user');
-      //   console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 2`);
+      //   // console.log(`🖼️ AUTO IMAGE: Conditions met! User messages: ${userMessages.length}, Required: >= 2`);
         
       //   if (userMessages.length >= 2) {
       //     const adventureContext = userMessages.slice(-6).map(msg => msg.content).join(' '); // Use recent user messages for context
-      //     console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
+      //     // console.log(`🖼️ AUTO IMAGE: Generating image with context: "${adventureContext}"`);
       //     // Generate new panel based on adventure content
       //     onGenerateImage(adventureContext);
       //   } else {
-      //     console.log(`🖼️ AUTO IMAGE: Skipped - not enough user messages (${userMessages.length} < 2)`);
+      //     // console.log(`🖼️ AUTO IMAGE: Skipped - not enough user messages (${userMessages.length} < 2)`);
       //   }
       // } else {
-      //   console.log(`🖼️ AUTO IMAGE: Not triggered - need ${10 - (chatMessages.length % 10)} more messages to reach next multiple of 10`);
+      //   // console.log(`🖼️ AUTO IMAGE: Not triggered - need ${10 - (chatMessages.length % 10)} more messages to reach next multiple of 10`);
       // }
       
       // Update adventure summaries
@@ -2754,32 +2754,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const targetAdventure = savedAdventures.find(adv => adv.id === adventureId);
     
     if (targetAdventure) {
-      console.log(`🔄 RESTORATION DEBUG: Loading adventure "${targetAdventure.name}" with ID: ${adventureId}`);
+      // console.log(`🔄 RESTORATION DEBUG: Loading adventure "${targetAdventure.name}" with ID: ${adventureId}`);
       
       // Get cached images for this adventure to find the latest generated image from Firebase
       const cachedImages = user ? await getCachedImagesForAdventureFirebase(user.uid, adventureId) : getCachedImagesForAdventure(adventureId);
       const latestCachedImage = cachedImages.length > 0 ? cachedImages[0] : null; // First item is most recent (sorted by timestamp)
       
-      console.log(`🔄 RESTORATION DEBUG: Found ${cachedImages.length} cached images for this adventure`);
+      // console.log(`🔄 RESTORATION DEBUG: Found ${cachedImages.length} cached images for this adventure`);
       if (cachedImages.length > 0) {
-        console.log('🔄 RESTORATION DEBUG: Cached images:', cachedImages.map(img => ({
-          url: img.url.substring(0, 50) + '...',
-          prompt: img.prompt?.substring(0, 30) + '...',
-          adventureId: img.adventureId
-        })));
+        // console.log('🔄 RESTORATION DEBUG: Cached images:', cachedImages.map(img => ({
+        //   url: img.url.substring(0, 50) + '...',
+        //   prompt: img.prompt?.substring(0, 30) + '...',
+        //   adventureId: img.adventureId
+        // })));
       }
       
       // Restore comic panels from saved adventure if available
       if (targetAdventure.comicPanels && targetAdventure.comicPanels.length > 0) {
-        console.log(`🔄 RESTORATION DEBUG: Found ${targetAdventure.comicPanels.length} saved comic panels`);
+        // console.log(`🔄 RESTORATION DEBUG: Found ${targetAdventure.comicPanels.length} saved comic panels`);
         targetAdventure.comicPanels.forEach((panel, index) => {
-          console.log(`🔄 PANEL ${index}:`, {
-            image: panel.image.substring(0, 50) + '...',
-            text: panel.text.substring(0, 30) + '...',
-            isExpiredDalle: panel.image.includes('oaidalleapiprodscus.blob.core.windows.net'),
-            isHttps: panel.image.startsWith('https://'),
-            isLocal: panel.image.startsWith('/') || !panel.image.includes('http')
-          });
+          // console.log(`🔄 PANEL ${index}:`, {
+          //   image: panel.image.substring(0, 50) + '...',
+          //   text: panel.text.substring(0, 30) + '...',
+          //   isExpiredDalle: panel.image.includes('oaidalleapiprodscus.blob.core.windows.net'),
+          //   isHttps: panel.image.startsWith('https://'),
+          //   isLocal: panel.image.startsWith('/') || !panel.image.includes('http')
+          // });
         });
         // Helper function to check if a URL is an expired DALL-E URL
         const isExpiredDalleUrl = (url: string): boolean => {
@@ -2800,8 +2800,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           let imageToUse = panel.image;
           let restorationMethod = 'original';
           
-          console.log(`🔄 RESTORING PANEL ${index}: ${panel.text.substring(0, 30)}...`);
-          console.log(`🔄 Original image URL: ${panel.image.substring(0, 60)}...`);
+          // console.log(`🔄 RESTORING PANEL ${index}: ${panel.text.substring(0, 30)}...`);
+          // console.log(`🔄 Original image URL: ${panel.image.substring(0, 60)}...`);
           
           // If image is an expired DALL-E URL or looks like a temporary URL, try to find better alternatives
           // BUT KEEP Firebase URLs as they are permanent
@@ -2813,10 +2813,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             (panel.image.startsWith('https://') && panel.image.includes('dalle'))
           );
           
-          console.log(`🔄 URL Analysis: Firebase=${isFirebaseUrl}, Local=${isLocalUrl}, NeedsRestoration=${needsRestoration}`);
+          // console.log(`🔄 URL Analysis: Firebase=${isFirebaseUrl}, Local=${isLocalUrl}, NeedsRestoration=${needsRestoration}`);
           
           if (needsRestoration) {
-            console.log(`🔄 Panel ${index} needs restoration (expired/temporary URL)`);
+            // console.log(`🔄 Panel ${index} needs restoration (expired/temporary URL)`);
             
             // Method 1: Try to find any cached Firebase image for this adventure (simplified matching)
             if (cachedImages.length > 0) {
@@ -2826,23 +2826,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               if (cachedImage && cachedImage.url !== panel.image) {
                 imageToUse = cachedImage.url;
                 restorationMethod = 'firebase_cached';
-                console.log(`✅ Restored cached image for panel ${index}: ${cachedImage.url.substring(0, 60)}...`);
+                // console.log(`✅ Restored cached image for panel ${index}: ${cachedImage.url.substring(0, 60)}...`);
               } else {
                 // Method 2: Use default fallback
                 const fallbackIndex = index % defaultImages.length;
                 imageToUse = defaultImages[fallbackIndex];
                 restorationMethod = 'default_fallback';
-                console.log(`📸 Using default fallback image for panel ${index}: ${imageToUse}`);
+                // console.log(`📸 Using default fallback image for panel ${index}: ${imageToUse}`);
               }
             } else {
               // Method 2: Use default fallback
               const fallbackIndex = index % defaultImages.length;
               imageToUse = defaultImages[fallbackIndex];
               restorationMethod = 'default_fallback';
-              console.log(`📸 No cached images found, using default fallback for panel ${index}: ${imageToUse}`);
+              // console.log(`📸 No cached images found, using default fallback for panel ${index}: ${imageToUse}`);
             }
           } else {
-            console.log(`✅ Panel ${index} keeping original image (valid URL)`);
+            // console.log(`✅ Panel ${index} keeping original image (valid URL)`);
           }
           
           return {
@@ -2859,16 +2859,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             image: latestCachedImage.url,
             text: restoredPanels[0].text // Keep the original text
           };
-          console.log(`📸 Set latest generated image as default for adventure: ${targetAdventure.name}`);
+          // console.log(`📸 Set latest generated image as default for adventure: ${targetAdventure.name}`);
         }
         
-        console.log('🔄 FINAL RESTORATION SUMMARY:');
+        // console.log('🔄 FINAL RESTORATION SUMMARY:');
         restoredPanels.forEach((panel, index) => {
-          console.log(`📋 Panel ${index}: ${panel.restorationMethod} - Image: ${panel.image.substring(0, 60)}...`);
+          // console.log(`📋 Panel ${index}: ${panel.restorationMethod} - Image: ${panel.image.substring(0, 60)}...`);
         });
         
         reset(restoredPanels);
-        console.log(`✅ Restored ${restoredPanels.length} comic panels for adventure: ${targetAdventure.name}`);
+        // console.log(`✅ Restored ${restoredPanels.length} comic panels for adventure: ${targetAdventure.name}`);
       } else {
         // No saved panels - create initial panel with latest generated image or default
         let initialPanelImage = rocket1; // default
@@ -2896,6 +2896,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setCurrentAdventureId(targetAdventure.id);
       const topicId = targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '';
       setSelectedTopicId(topicId);
+      // Grade 1: immediately reflect the actual upcoming spell topic in the header
+      if (whiteboardGradeEligible) {
+        try {
+          const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName);
+          const initialTopicId = nextSpell ? (nextSpell.topicId || (nextSpell as any).topicName) : null;
+          if (initialTopicId) setGrade1DisplayedTopicId(initialTopicId);
+        } catch {}
+      }
       setAdventureMode('continue');
       
       // Set adventure context for contextual AI responses
@@ -2943,7 +2951,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setCurrentScreen(1); // Go to adventure screen
     } else {
       // Fallback if adventure not found
-      console.log('🚨 Index: Fallback handleStartAdventure call (no adventureType) - this might override friend adventure!');
+      // console.log('🚨 Index: Fallback handleStartAdventure call (no adventureType) - this might override friend adventure!');
       handleStartAdventure(getNextTopic(Object.keys(sampleMCQData.topics)) || '', 'continue');
     }
   }, [reset, initialPanels, user]);
@@ -2951,8 +2959,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Handle start adventure from progress tracking
   const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new', adventureType: string = 'food') => {
     const callId = `index-${Date.now()}`;
-    console.log('🎯 Index handleStartAdventure called with adventureType:', adventureType, 'callId:', callId);
-    console.log('🎯 Index Current currentAdventureType before update:', currentAdventureType, 'callId:', callId);
+    // console.log('🎯 Index handleStartAdventure called with adventureType:', adventureType, 'callId:', callId);
+    // console.log('🎯 Index Current currentAdventureType before update:', currentAdventureType, 'callId:', callId);
     
     // Ensure mic permission so browser shows prompt immediately on click
     try {
@@ -2965,13 +2973,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     // If this is a fallback call with default 'food' and we already have a non-food adventure type set, ignore it
     if (adventureType === 'food' && currentAdventureType !== 'food') {
-      console.log('🚨 Index: Ignoring fallback food call - already have explicit adventure type:', currentAdventureType);
+      // console.log('🚨 Index: Ignoring fallback food call - already have explicit adventure type:', currentAdventureType);
       return;
     }
     
     // Prevent rapid duplicate invocations
     if (isStartingAdventureRef.current) {
-      console.log('🚨 Index: Adventure already starting, ignoring duplicate call');
+      // console.log('🚨 Index: Adventure already starting, ignoring duplicate call');
       return;
     }
     isStartingAdventureRef.current = true;
@@ -2985,8 +2993,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
     playClickSound();
     setSelectedTopicId(topicId);
+    // Grade 1: immediately reflect the actual upcoming spell topic in the header
+    if (whiteboardGradeEligible) {
+      try {
+        const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName);
+        const initialTopicId = nextSpell ? (nextSpell.topicId || (nextSpell as any).topicName) : null;
+        if (initialTopicId) setGrade1DisplayedTopicId(initialTopicId);
+      } catch {}
+    }
     setAdventureMode(mode);
-    console.log('🎯 Setting currentAdventureType to:', adventureType);
+    // console.log('🎯 Setting currentAdventureType to:', adventureType);
     setCurrentAdventureType(adventureType);
     // Reset the initial response ref when starting a new adventure
     initialResponseSentRef.current = null;
@@ -3030,12 +3046,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Complete adventure tutorial for first-time users
       if (isFirstTimeAdventurer) {
         completeAdventureTutorial();
-        console.log('🎓 Completed adventure tutorial for first-time user');
+        // console.log('🎓 Completed adventure tutorial for first-time user');
       }
       // Reset session coins for new adventure
       resetSessionCoins();
       
-      console.log('🚀 Started new adventure with default rocket image and reset all flow states');
+      // console.log('🚀 Started new adventure with default rocket image and reset all flow states');
     } else {
       // For continuing, keep existing adventure ID or create new one
       adventureId = currentAdventureId || crypto.randomUUID();
@@ -3089,6 +3105,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const gradeName = currentGradeDisplayName;
         const initialSpellQuestion = gradeName ? getNextSpellboxQuestion(gradeName) : null;
         const initialSpellTopicId = initialSpellQuestion ? (initialSpellQuestion.topicId || initialSpellQuestion.topicName) : null;
+        if (initialSpellTopicId) {
+          try { setGrade1DisplayedTopicId(initialSpellTopicId); } catch {}
+        }
         const isFirstSpellQuestion = initialSpellQuestion?.id === 1;
         const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
         const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
@@ -3129,7 +3148,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const timer = setTimeout(() => {
       // Don't auto-start adventures if we're already starting one explicitly
       if (isStartingAdventureRef.current) {
-        console.log('🚨 Index: Skipping initial adventure props - already starting adventure explicitly');
+        // console.log('🚨 Index: Skipping initial adventure props - already starting adventure explicitly');
         return;
       }
       
@@ -3139,17 +3158,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           handleContinueSpecificAdventure(initialAdventureProps.adventureId);
         } else if (initialAdventureProps.topicId && initialAdventureProps.mode) {
           // Start new or continue adventure with topic
-          console.log('🚨 Index: Initial adventure props handleStartAdventure call with adventureType:', initialAdventureProps.adventureType);
+          // console.log('🚨 Index: Initial adventure props handleStartAdventure call with adventureType:', initialAdventureProps.adventureType);
           
           // Set the adventure ID from the props (whether new or continuing)
           if (initialAdventureProps.adventureId) {
-            console.log('🎯 Index: Using adventure ID from props:', initialAdventureProps.adventureId);
+            // console.log('🎯 Index: Using adventure ID from props:', initialAdventureProps.adventureId);
             setCurrentAdventureId(initialAdventureProps.adventureId);
           }
           
           // If we have chat history, this is a continuation from our new tracking system
           if (initialAdventureProps.chatHistory && initialAdventureProps.chatHistory.length > 0) {
-            console.log('🔄 Index: Continuing adventure with', initialAdventureProps.chatHistory.length, 'previous messages');
+            // console.log('🔄 Index: Continuing adventure with', initialAdventureProps.chatHistory.length, 'previous messages');
             
             // Load the chat history
             setChatMessages(initialAdventureProps.chatHistory);
@@ -3162,7 +3181,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             
             // Restore comic panels if available
             if (initialAdventureProps.comicPanels && initialAdventureProps.comicPanels.length > 0) {
-              console.log('🖼️ Index: Restoring', initialAdventureProps.comicPanels.length, 'comic panels');
+              // console.log('🖼️ Index: Restoring', initialAdventureProps.comicPanels.length, 'comic panels');
               
               // Import default images for fallback
               const rocket1 = '/src/assets/comic-rocket-1.jpg';
@@ -3187,13 +3206,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   if (cachedImage && cachedImage.url !== panel.image) {
                     imageToUse = cachedImage.url;
                     restorationMethod = 'firebase_cached';
-                    console.log(`✅ Restored cached image for panel ${index}: ${cachedImage.url.substring(0, 60)}...`);
+                    // console.log(`✅ Restored cached image for panel ${index}: ${cachedImage.url.substring(0, 60)}...`);
                   } else {
                     // Use default fallback
                     const fallbackIndex = index % defaultImages.length;
                     imageToUse = defaultImages[fallbackIndex];
                     restorationMethod = 'default_fallback';
-                    console.log(`📸 Using default fallback image for panel ${index}: ${imageToUse}`);
+                    // console.log(`📸 Using default fallback image for panel ${index}: ${imageToUse}`);
                   }
                 }
                 
@@ -3207,14 +3226,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               // Don't override panels - restore them as they were saved
               // The cached images are already used above for restoration if needed
               
-              console.log('🔄 PANEL RESTORATION SUMMARY:');
+              // console.log('🔄 PANEL RESTORATION SUMMARY:');
               restoredPanels.forEach((panel, index) => {
-                console.log(`📋 Panel ${index}: ${panel.restorationMethod} - Image: ${panel.image.substring(0, 60)}...`);
+                // console.log(`📋 Panel ${index}: ${panel.restorationMethod} - Image: ${panel.image.substring(0, 60)}...`);
               });
               
               // Restore the panels
               reset(restoredPanels);
-              console.log(`✅ Restored ${restoredPanels.length} comic panels for continued adventure`);
+              // console.log(`✅ Restored ${restoredPanels.length} comic panels for continued adventure`);
             } else if (initialAdventureProps.cachedImages && initialAdventureProps.cachedImages.length > 0) {
               // No saved panels but we have cached images - create initial panel with latest image
               const latestCachedImage = initialAdventureProps.cachedImages[0];
@@ -3226,7 +3245,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 }
               ];
               reset(defaultPanels);
-              console.log(`📸 Created initial panel with latest cached image for continued adventure`);
+              // console.log(`📸 Created initial panel with latest cached image for continued adventure`);
             }
           }
           
@@ -3290,12 +3309,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Save preference and get the specific topic immediately
     const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
     
-    console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
+    // console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
     setSelectedPreference(level);
     setSelectedTopicFromPreference(specificTopic);
     
-    console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
+    // console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
 
   // Handle sequential back navigation from MCQ screen
@@ -3340,7 +3359,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     } else {
       // Go to previous question - update topicQuestionIndex and return action type
       const newTopicQuestionIndex = topicQuestionIndex - 1;
-      console.log(`🔍 DEBUG MCQ Back: Going from topicQuestionIndex ${topicQuestionIndex} to ${newTopicQuestionIndex}`);
+      // console.log(`🔍 DEBUG MCQ Back: Going from topicQuestionIndex ${topicQuestionIndex} to ${newTopicQuestionIndex}`);
       setTopicQuestionIndex(newTopicQuestionIndex);
       
       return 'previous_question';
@@ -3416,17 +3435,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Reset auto image counter when adventure changes - smart reset based on adventure mode
   React.useEffect(() => {
-    console.log(`🔄 ADVENTURE CHANGE DETECTED - Smart counter reset`);
-    console.log(`🔄 Previous lastAutoImageMessageCount:`, lastAutoImageMessageCount);
-    console.log(`🔄 New currentAdventureId:`, currentAdventureId);
-    console.log(`🔄 Adventure mode:`, adventureMode);
+    // console.log(`🔄 ADVENTURE CHANGE DETECTED - Smart counter reset`);
+    // console.log(`🔄 Previous lastAutoImageMessageCount:`, lastAutoImageMessageCount);
+    // console.log(`🔄 New currentAdventureId:`, currentAdventureId);
+    // console.log(`🔄 Adventure mode:`, adventureMode);
     
     // Smart reset: only reset to 0 for new adventures, for loaded adventures set to current user message count
     const currentUserMessageCount = chatMessages.filter(msg => msg.type === 'user').length;
     
     // 🧹 CLEANUP: Clear any ongoing image generation from previous adventure
     if (imageGenerationController.current) {
-      console.log('🔄 ADVENTURE SWITCH CLEANUP: Clearing previous image generation');
+      // console.log('🔄 ADVENTURE SWITCH CLEANUP: Clearing previous image generation');
       imageGenerationController.current = null;
     }
     // Reset image generation state unless unified system is active
@@ -3436,14 +3455,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setIsExplicitImageRequest(false);
     
     if (adventureMode === 'new') {
-      console.log(`🔄 NEW ADVENTURE: Setting counter to current user message count (${currentUserMessageCount}) to prevent immediate auto-generation`);
+      // console.log(`🔄 NEW ADVENTURE: Setting counter to current user message count (${currentUserMessageCount}) to prevent immediate auto-generation`);
       setLastAutoImageMessageCount(currentUserMessageCount);
     } else if (adventureMode === 'continue') {
-      console.log(`🔄 LOADED ADVENTURE: Setting counter to current user message count (${currentUserMessageCount}) to prevent immediate auto-generation`);
+      // console.log(`🔄 LOADED ADVENTURE: Setting counter to current user message count (${currentUserMessageCount}) to prevent immediate auto-generation`);
       setLastAutoImageMessageCount(currentUserMessageCount);
     } else {
       // Fallback to current behavior for undefined modes
-      console.log(`🔄 UNKNOWN MODE: Using fallback reset to 0`);
+      // console.log(`🔄 UNKNOWN MODE: Using fallback reset to 0`);
       setLastAutoImageMessageCount(0);
     }
   }, [currentAdventureId, adventureMode]); // Reset when adventure ID or mode changes
@@ -3467,8 +3486,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Also reset if counter is higher than total user messages (stale state)
     if ((userMessageCount < 2 && lastAutoImageMessageCount > 0) || 
         (lastAutoImageMessageCount > userMessageCount)) {
-      console.log(`🔄 SAFETY RESET - ${lastAutoImageMessageCount > userMessageCount ? 'Stale counter detected' : 'Chat cleared or new adventure started'}`);
-      console.log(`🔄 userMessageCount: ${userMessageCount}, lastAutoImageMessageCount: ${lastAutoImageMessageCount}`);
+      // console.log(`🔄 SAFETY RESET - ${lastAutoImageMessageCount > userMessageCount ? 'Stale counter detected' : 'Chat cleared or new adventure started'}`);
+      // console.log(`🔄 userMessageCount: ${userMessageCount}, lastAutoImageMessageCount: ${lastAutoImageMessageCount}`);
       setLastAutoImageMessageCount(0);
     }
   }, [chatMessages.length, currentScreen]); // Reset when messages or screen change
@@ -3478,13 +3497,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Auto image generation disabled
   const generateAutoImage = useCallback(async () => {
     try {
-      console.log('🚫 [generateAutoImage()] Disabled - auto image creation turned off');
+      // console.log('🚫 [generateAutoImage()] Disabled - auto image creation turned off');
       return;
-      console.log(`🎨 [generateAutoImage()] === STARTING GENERATION PROCESS ===`);
-      console.log(`🎨 [generateAutoImage()] Function called at:`, new Date().toISOString());
+      // console.log(`🎨 [generateAutoImage()] === STARTING GENERATION PROCESS ===`);
+      // console.log(`🎨 [generateAutoImage()] Function called at:`, new Date().toISOString());
       
       // 🔍 CRITICAL: Add stack trace to see where this is being called from
-      console.log(`🔍 [generateAutoImage()] CALL STACK:`, new Error().stack?.split('\n').slice(1, 4).join('\n'));
+      // console.log(`🔍 [generateAutoImage()] CALL STACK:`, new Error().stack?.split('\n').slice(1, 4).join('\n'));
       
       // 🛡️ ABSOLUTE OVERRIDE: Block ALL auto generation if unified/legacy system has recent activity
       const hasRecentUnifiedActivity = unifiedAIStreaming.lastResponse && 
@@ -3496,17 +3515,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         (Date.now() - (msg.timestamp || 0)) < 5000 // Within last 5 seconds
       );
       
-      console.log(`🔍 [generateAutoImage()] ABSOLUTE COORDINATION CHECK:`, {
-        isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
-        isStreaming: unifiedAIStreaming.isStreaming,
-        isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-        hasRecentUnifiedActivity: hasRecentUnifiedActivity,
-        hasRecentLegacyImage: hasRecentLegacyImage,
-        lastResponseTimestamp: unifiedAIStreaming.lastResponse?.timestamp,
-        timeSinceLastResponse: unifiedAIStreaming.lastResponse ? Date.now() - unifiedAIStreaming.lastResponse.timestamp : 'N/A',
-        currentAdventureId: currentAdventureId,
-        chatMessagesLength: chatMessages.length
-      });
+      // console.log(`🔍 [generateAutoImage()] ABSOLUTE COORDINATION CHECK:`, {
+      //   isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+      //   isStreaming: unifiedAIStreaming.isStreaming,
+      //   isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+      //   hasRecentUnifiedActivity: hasRecentUnifiedActivity,
+      //   hasRecentLegacyImage: hasRecentLegacyImage,
+      //   lastResponseTimestamp: unifiedAIStreaming.lastResponse?.timestamp,
+      //   timeSinceLastResponse: unifiedAIStreaming.lastResponse ? Date.now() - unifiedAIStreaming.lastResponse.timestamp : 'N/A',
+      //   currentAdventureId: currentAdventureId,
+      //   chatMessagesLength: chatMessages.length
+      // });
       
       // 🚫 ABSOLUTE BLOCK: If unified system is active OR legacy system recently ran, don't generate
       if (unifiedAIStreaming.isUnifiedSessionActive || 
@@ -3514,41 +3533,41 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           unifiedAIStreaming.isGeneratingImage || 
           hasRecentUnifiedActivity ||
           hasRecentLegacyImage) {
-        console.log(`🚫 [generateAutoImage()] ABSOLUTE BLOCK - Unified/Legacy system active or recent activity detected`);
-        console.log(`🚫 [generateAutoImage()] Blocking reason:`, {
-          isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
-          isStreaming: unifiedAIStreaming.isStreaming,
-          isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-          hasRecentUnifiedActivity: hasRecentUnifiedActivity,
-          hasRecentLegacyImage: hasRecentLegacyImage,
-          blockingSystem: hasRecentLegacyImage ? 'legacy' : 'unified'
-        });
+        // console.log(`🚫 [generateAutoImage()] ABSOLUTE BLOCK - Unified/Legacy system active or recent activity detected`);
+        // console.log(`🚫 [generateAutoImage()] Blocking reason:`, {
+        //   isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+        //   isStreaming: unifiedAIStreaming.isStreaming,
+        //   isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+        //   hasRecentUnifiedActivity: hasRecentUnifiedActivity,
+        //   hasRecentLegacyImage: hasRecentLegacyImage,
+        //   blockingSystem: hasRecentLegacyImage ? 'legacy' : 'unified'
+        // });
         return; // Exit without generating
       }
       
-      console.log(`✅ [generateAutoImage()] ABSOLUTE COORDINATION PASSED - Safe to proceed with generation`);
+      // console.log(`✅ [generateAutoImage()] ABSOLUTE COORDINATION PASSED - Safe to proceed with generation`);
       
       // Get current adventure summary from session
       let adventureSummary = '';
-      console.log(`🎨 AUTO IMAGE: Current session ID:`, currentSessionId);
+      // console.log(`🎨 AUTO IMAGE: Current session ID:`, currentSessionId);
       
       if (currentSessionId) {
         try {
-          console.log(`🎨 AUTO IMAGE: Fetching session data...`);
+          // console.log(`🎨 AUTO IMAGE: Fetching session data...`);
           const sessionData = await adventureSessionService.getAdventureSession(currentSessionId);
           adventureSummary = sessionData?.chatSummary?.summary || '';
           
-          console.log(`🎨 AUTO IMAGE: Session data retrieved:`, {
-            hasSessionData: !!sessionData,
-            hasSummary: !!sessionData?.chatSummary?.summary,
-            summaryLength: adventureSummary.length,
-            summaryPreview: adventureSummary.substring(0, 100) + '...'
-          });
+          // console.log(`🎨 AUTO IMAGE: Session data retrieved:`, {
+          //   hasSessionData: !!sessionData,
+          //   hasSummary: !!sessionData?.chatSummary?.summary,
+          //   summaryLength: adventureSummary.length,
+          //   summaryPreview: adventureSummary.substring(0, 100) + '...'
+          // });
         } catch (error) {
           console.warn('⚠️ AUTO IMAGE: Could not load adventure summary for auto image generation:', error);
         }
       } else {
-        console.log(`❌ AUTO IMAGE: No currentSessionId available`);
+        // console.log(`❌ AUTO IMAGE: No currentSessionId available`);
       }
       
       // Get last 30 user messages for recent context
@@ -3558,13 +3577,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Get recent AI messages
       const recentAIMessages = getRecentAIMessages();
       
-      console.log(`🎨 AUTO IMAGE: Message analysis:`, {
-        totalChatMessages: chatMessages.length,
-        totalUserMessages: userMessages.length,
-        lastThirtyUserMessages: userMessages.slice(-30).map(msg => msg.content),
-        combinedLastThirty: lastThirtyMessages,
-        recentAIMessages: recentAIMessages.substring(0, 100) + '...'
-      });
+      // console.log(`🎨 AUTO IMAGE: Message analysis:`, {
+      //   totalChatMessages: chatMessages.length,
+      //   totalUserMessages: userMessages.length,
+      //   lastThirtyUserMessages: userMessages.slice(-30).map(msg => msg.content),
+      //   combinedLastThirty: lastThirtyMessages,
+      //   recentAIMessages: recentAIMessages.substring(0, 100) + '...'
+      // });
       
       // Create enhanced prompt combining all contexts
       const combinedContext = adventureSummary 
@@ -3575,32 +3594,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const noTextRule = "There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.";
       const imagePromptForAuto = `${noTextRule} ${combinedContext}`;
       
-      console.log(`🎨 AUTO IMAGE: Final combined context:`, {
-        length: combinedContext.length,
-        hasAdventureSummary: !!adventureSummary,
-        preview: combinedContext.substring(0, 200) + '...',
-        fullContext: combinedContext
-      });
+      // console.log(`🎨 AUTO IMAGE: Final combined context:`, {
+      //   length: combinedContext.length,
+      //   hasAdventureSummary: !!adventureSummary,
+      //   preview: combinedContext.substring(0, 200) + '...',
+      //   fullContext: combinedContext
+      // });
       
       // 🎯 NEW: Final check before generation - unified system might have become active
       if (unifiedAIStreaming.isUnifiedSessionActive) {
-        console.log('🚫 AUTO IMAGE: CANCELLED - Unified session became active during setup, aborting automatic generation');
-        console.log('🔍 AUTO IMAGE COORDINATION: Session state at cancellation:', {
-          isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
-          isStreaming: unifiedAIStreaming.isStreaming,
-          isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-          reason: 'unified_session_took_priority_during_setup'
-        });
+        // console.log('🚫 AUTO IMAGE: CANCELLED - Unified session became active during setup, aborting automatic generation');
+        // console.log('🔍 AUTO IMAGE COORDINATION: Session state at cancellation:', {
+        //   isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+        //   isStreaming: unifiedAIStreaming.isStreaming,
+        //   isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+        //   reason: 'unified_session_took_priority_during_setup'
+        // });
         return;
       }
       
       // Re-enabled legacy auto image generation since unified system is not integrated yet
       // Disabled: do not call aiService.generateAdventureImage()
-      console.log(`🎨 AUTO IMAGE: Parameters:`, {
-        prompt: imagePromptForAuto,
-        chatMessagesLength: chatMessages.length,
-        fallbackPrompt: "adventure scene"
-      });
+      // console.log(`🎨 AUTO IMAGE: Parameters:`, {
+      //   prompt: imagePromptForAuto,
+      //   chatMessagesLength: chatMessages.length,
+      //   fallbackPrompt: "adventure scene"
+      // });
       
       const generatedImageResult = await aiService.generateAdventureImage(
         imagePromptForAuto,
@@ -3610,24 +3629,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         currentAdventureId || undefined
       );
       
-      console.log(`🎨 AUTO IMAGE: Generation result:`, {
-        hasResult: !!generatedImageResult,
-        imageUrl: generatedImageResult?.imageUrl?.substring(0, 50) + '...',
-        usedPrompt: generatedImageResult?.usedPrompt?.substring(0, 100) + '...'
-      });
+      // console.log(`🎨 AUTO IMAGE: Generation result:`, {
+      //   hasResult: !!generatedImageResult,
+      //   imageUrl: generatedImageResult?.imageUrl?.substring(0, 50) + '...',
+      //   usedPrompt: generatedImageResult?.usedPrompt?.substring(0, 100) + '...'
+      // });
       
       if (!generatedImageResult) {
-        console.log('❌ AUTO IMAGE: Generation failed, skipping this cycle');
+        // console.log('❌ AUTO IMAGE: Generation failed, skipping this cycle');
         return;
       }
       
       // 🛡️ RACE CONDITION PREVENTION: Validate that this image is for the current adventure
       if (generatedImageResult.adventureId && generatedImageResult.adventureId !== currentAdventureId) {
-        console.log(`🚫 AUTO IMAGE VALIDATION: Ignoring image from wrong adventure`, {
-          imageAdventureId: generatedImageResult.adventureId,
-          currentAdventureId: currentAdventureId,
-          reason: 'adventure_mismatch'
-        });
+        // console.log(`🚫 AUTO IMAGE VALIDATION: Ignoring image from wrong adventure`, {
+        //   imageAdventureId: generatedImageResult.adventureId,
+        //   currentAdventureId: currentAdventureId,
+        //   reason: 'adventure_mismatch'
+        // });
         return;
       }
       
@@ -3648,10 +3667,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           // Use the permanent Firebase URL if caching succeeded
           if (permanentUrl && permanentUrl !== generatedImageResult.imageUrl) {
             image = permanentUrl;
-            console.log(`🔄 Using permanent Firebase URL instead of temporary DALL-E URL`);
+            // console.log(`🔄 Using permanent Firebase URL instead of temporary DALL-E URL`);
           } else {
             image = generatedImageResult.imageUrl;
-            console.log(`⚠️ Using temporary DALL-E URL (Firebase caching may have failed)`);
+            // console.log(`⚠️ Using temporary DALL-E URL (Firebase caching may have failed)`);
           }
         } catch (cacheError) {
           console.warn('⚠️ Failed to cache auto-generated image:', cacheError);
@@ -3660,7 +3679,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       } else {
         // User not authenticated, use temporary URL
         image = generatedImageResult.imageUrl;
-        console.log(`⚠️ Using temporary DALL-E URL (user not authenticated)`);
+        // console.log(`⚠️ Using temporary DALL-E URL (user not authenticated)`);
       }
       
       // Generate contextual response text based on actual generated content
@@ -3684,19 +3703,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       );
 
       if (unifiedAIStreaming.isGeneratingImage || unifiedAIStreaming.isUnifiedSessionActive || hasLegacyImageInChat) {
-        console.log('🚫 AUTO IMAGE: RESULT DISCARDED - Unified/Legacy system has priority, discarding automatic image');
-        console.log('🔍 AUTO IMAGE COORDINATION: Session state at discard:', {
-          isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
-          isStreaming: unifiedAIStreaming.isStreaming,
-          isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-          hasLegacyImageInChat: hasLegacyImageInChat,
-          generatedImageUrl: image.substring(0, 50) + '...',
-          reason: hasLegacyImageInChat ? 'legacy_system_priority_discard' : 'unified_system_priority_discard'
-        });
+        // console.log('🚫 AUTO IMAGE: RESULT DISCARDED - Unified/Legacy system has priority, discarding automatic image');
+        // console.log('🔍 AUTO IMAGE COORDINATION: Session state at discard:', {
+        //   isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+        //   isStreaming: unifiedAIStreaming.isStreaming,
+        //   isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+        //   hasLegacyImageInChat: hasLegacyImageInChat,
+        //   generatedImageUrl: image.substring(0, 50) + '...',
+        //   reason: hasLegacyImageInChat ? 'legacy_system_priority_discard' : 'unified_system_priority_discard'
+        // });
         
         // 🧹 CRITICAL: Clear loading states when discarding to prevent infinite loading
         setIsGeneratingAdventureImage(false);
-        console.log('🧹 AUTO IMAGE: Cleared loading states after discard');
+        // console.log('🧹 AUTO IMAGE: Cleared loading states after discard');
         
         return; // Discard the result completely - unified/legacy system has priority
       }
@@ -3764,38 +3783,38 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const currentMessageCount = userMessages.length;
     
     // COMPREHENSIVE DEBUG LOGGING
-    console.log(`🔍 AUTO IMAGE DEBUG:`, {
-      totalChatMessages: chatMessages.length,
-      userMessageCount: currentMessageCount,
-      userMessages: userMessages.map(msg => msg.content.substring(0, 30) + '...'),
-      isAutoImageGenerationActive,
-      currentAdventureId,
-      currentScreen,
-      isInAdventureMode: currentScreen === 1,
-      lastAutoImageMessageCount,
-      AUTO_IMAGE_TRIGGER_INTERVAL,
-      messagesSinceLastAuto: currentMessageCount - lastAutoImageMessageCount
-    });
+    // console.log(`🔍 AUTO IMAGE DEBUG:`, {
+    //   totalChatMessages: chatMessages.length,
+    //   userMessageCount: currentMessageCount,
+    //   userMessages: userMessages.map(msg => msg.content.substring(0, 30) + '...'),
+    //   isAutoImageGenerationActive,
+    //   currentAdventureId,
+    //   currentScreen,
+    //   isInAdventureMode: currentScreen === 1,
+    //   lastAutoImageMessageCount,
+    //   AUTO_IMAGE_TRIGGER_INTERVAL,
+    //   messagesSinceLastAuto: currentMessageCount - lastAutoImageMessageCount
+    // });
     
     // Don't trigger if disabled, no adventure ID, no messages, or not enough messages
     if (!isAutoImageGenerationActive) {
-      console.log(`❌ AUTO IMAGE BLOCKED: isAutoImageGenerationActive = false`);
+      // console.log(`❌ AUTO IMAGE BLOCKED: isAutoImageGenerationActive = false`);
       return;
     }
     
     // Don't trigger if not in adventure mode
     if (currentScreen !== 1) {
-      console.log(`❌ AUTO IMAGE BLOCKED: Not in adventure mode (currentScreen = ${currentScreen})`);
+      // console.log(`❌ AUTO IMAGE BLOCKED: Not in adventure mode (currentScreen = ${currentScreen})`);
       return;
     }
     
     if (!currentAdventureId) {
-      console.log(`❌ AUTO IMAGE BLOCKED: No currentAdventureId`);
+      // console.log(`❌ AUTO IMAGE BLOCKED: No currentAdventureId`);
       return;
     }
     
     if (currentMessageCount < 2) {
-      console.log(`❌ AUTO IMAGE BLOCKED: Not enough user messages (${currentMessageCount} < 2)`);
+      // console.log(`❌ AUTO IMAGE BLOCKED: Not enough user messages (${currentMessageCount} < 2)`);
       return;
     }
     
@@ -3823,47 +3842,47 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
     const messagesSinceLastAuto = currentMessageCount - lastAutoImageMessageCount;
     
-    console.log(`🎨 AUTO IMAGE CALCULATION (IMPROVED):`, {
-      currentMessageCount,
-      lastAutoImageMessageCount,
-      messagesSinceLastAuto,
-      AUTO_IMAGE_TRIGGER_INTERVAL,
-      isExactInterval,
-      notAlreadyGenerated,
-      unifiedCalledForCurrentMessage,
-      latestUserMessageId: latestUserMessage?.timestamp,
-      shouldGenerate,
-      explanation: shouldGenerate ? 'EXACT_INTERVAL_MATCH' : unifiedCalledForCurrentMessage ? 'SKIPPED_DUE_TO_UNIFIED_CLASH' : 'NOT_INTERVAL_OR_ALREADY_GENERATED'
-    });
+    // console.log(`🎨 AUTO IMAGE CALCULATION (IMPROVED):`, {
+    //   currentMessageCount,
+    //   lastAutoImageMessageCount,
+    //   messagesSinceLastAuto,
+    //   AUTO_IMAGE_TRIGGER_INTERVAL,
+    //   isExactInterval,
+    //   notAlreadyGenerated,
+    //   unifiedCalledForCurrentMessage,
+    //   latestUserMessageId: latestUserMessage?.timestamp,
+    //   shouldGenerate,
+    //   explanation: shouldGenerate ? 'EXACT_INTERVAL_MATCH' : unifiedCalledForCurrentMessage ? 'SKIPPED_DUE_TO_UNIFIED_CLASH' : 'NOT_INTERVAL_OR_ALREADY_GENERATED'
+    // });
     
     // 🛡️ LAYER 1 COORDINATION: Check if unified session is active before scheduling
-    console.log('🔍 [AUTO IMAGE COORDINATION] LAYER 1 - Checking unified system state before scheduling:', {
-      isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
-      isStreaming: unifiedAIStreaming.isStreaming,
-      isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-      shouldGenerate: shouldGenerate,
-      currentSessionId: unifiedAIStreaming.sessionId
-    });
+    // console.log('🔍 [AUTO IMAGE COORDINATION] LAYER 1 - Checking unified system state before scheduling:', {
+    //   isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+    //   isStreaming: unifiedAIStreaming.isStreaming,
+    //   isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+    //   shouldGenerate: shouldGenerate,
+    //   currentSessionId: unifiedAIStreaming.sessionId
+    // });
     
     if (unifiedAIStreaming.isUnifiedSessionActive) {
-      console.log('🚫 [AUTO IMAGE COORDINATION] LAYER 1 BLOCKED - Unified session is active, skipping scheduling');
-      console.log('🔍 [AUTO IMAGE COORDINATION] LAYER 1 - Unified session state:', {
-        isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
-        isStreaming: unifiedAIStreaming.isStreaming,
-        isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
-        reason: 'unified_system_priority'
-      });
+      // console.log('🚫 [AUTO IMAGE COORDINATION] LAYER 1 BLOCKED - Unified session is active, skipping scheduling');
+      // console.log('🔍 [AUTO IMAGE COORDINATION] LAYER 1 - Unified session state:', {
+      //   isUnifiedSessionActive: unifiedAIStreaming.isUnifiedSessionActive,
+      //   isStreaming: unifiedAIStreaming.isStreaming,
+      //   isGeneratingImage: unifiedAIStreaming.isGeneratingImage,
+      //   reason: 'unified_system_priority'
+      // });
       return; // Exit early - don't schedule generation
     }
     
     if (unifiedAIStreaming.isStreaming || unifiedAIStreaming.isGeneratingImage) {
-      console.log('🚫 [AUTO IMAGE COORDINATION] LAYER 1 BLOCKED - Unified system is busy, skipping scheduling');
+      // console.log('🚫 [AUTO IMAGE COORDINATION] LAYER 1 BLOCKED - Unified system is busy, skipping scheduling');
       return; // Exit early - don't schedule generation
     }
     
     if (shouldGenerate) {
-      console.log(`✅ [AUTO IMAGE COORDINATION] LAYER 1 PASSED - Scheduling generation for message count ${currentMessageCount}`);
-      console.log(`🎨 [AUTO IMAGE COORDINATION] Setting lastAutoImageMessageCount from ${lastAutoImageMessageCount} to ${currentMessageCount}`);
+      // console.log(`✅ [AUTO IMAGE COORDINATION] LAYER 1 PASSED - Scheduling generation for message count ${currentMessageCount}`);
+      // console.log(`🎨 [AUTO IMAGE COORDINATION] Setting lastAutoImageMessageCount from ${lastAutoImageMessageCount} to ${currentMessageCount}`);
       
       // Update the counter IMMEDIATELY to prevent duplicate triggers
       setLastAutoImageMessageCount(currentMessageCount);
@@ -3872,8 +3891,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       if (unifiedCalledForCurrentMessage && isExactInterval) {
         // Skip this cycle due to clash, wait for next cycle
         const nextTrigger = currentMessageCount + AUTO_IMAGE_TRIGGER_INTERVAL;
-        console.log(`🚫 AUTO IMAGE: UNIFIED CLASH DETECTED - Skipping cycle ${currentMessageCount}, will generate at message ${nextTrigger} instead`);
-        console.log(`🔍 AUTO IMAGE: Unified system already generated image for message ${currentMessageCount}, avoiding duplicate generation`);
+        // console.log(`🚫 AUTO IMAGE: UNIFIED CLASH DETECTED - Skipping cycle ${currentMessageCount}, will generate at message ${nextTrigger} instead`);
+        // console.log(`🔍 AUTO IMAGE: Unified system already generated image for message ${currentMessageCount}, avoiding duplicate generation`);
       } else {
         // Next trigger that satisfies (n - offset) % interval === 0, strictly after current count
         const base = currentMessageCount < AUTO_IMAGE_TRIGGER_OFFSET
@@ -3883,7 +3902,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           ? base + AUTO_IMAGE_TRIGGER_INTERVAL
           : base;
         const remaining = Math.max(0, nextTrigger - currentMessageCount);
-        console.log(`⏳ AUTO IMAGE: Waiting for next interval. Current: ${currentMessageCount}, Next trigger: ${nextTrigger}, Remaining: ${remaining} messages`);
+        // console.log(`⏳ AUTO IMAGE: Waiting for next interval. Current: ${currentMessageCount}, Next trigger: ${nextTrigger}, Remaining: ${remaining} messages`);
       }
     }
   }, [
@@ -3987,7 +4006,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Save progress to localStorage
     if (currentGrade) {
       saveSpellingProgress(currentGrade, nextIndex, updatedCompletedIds);
-      console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
+      // console.log(`📝 Spelling progress saved: Grade ${currentGrade}, Index ${nextIndex}, Completed IDs: ${updatedCompletedIds.length}`);
     }
     
   // Update SpellBox topic progress with Firebase sync
@@ -4231,7 +4250,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         <PetPage 
           onStartAdventure={(topicId: string, mode: 'new' | 'continue', adventureType?: string) => {
-            console.log('🎯 Index: PetPage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
+            // console.log('🎯 Index: PetPage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
             handleStartAdventure(topicId, mode, adventureType || 'food');
           }}
           onContinueSpecificAdventure={handleContinueSpecificAdventure}
@@ -4251,6 +4270,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [whiteboardPromptLocked, setWhiteboardPromptLocked] = React.useState(false);
   // Keep the original whiteboard intro text fixed in the pet bubble while lesson runs
   const [whiteboardPinnedText, setWhiteboardPinnedText] = React.useState<string | null>(null);
+  // Grade 1 only: topic shown in the top-left chip that updates exactly when whiteboard triggers
+  const [grade1DisplayedTopicId, setGrade1DisplayedTopicId] = React.useState<string | null>(null);
+  // Manual toggle for fullscreen whiteboard overlay via lesson chip
+  const [isManualWhiteboardOpen, setIsManualWhiteboardOpen] = React.useState(false);
   const lastSpellTopicRef = React.useRef<string | null>(null);
   const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
   const firstAdventureStartedRef = React.useRef<boolean>(false);
@@ -4340,6 +4363,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setIsWhiteboardPromptActive(true);
       setCurrentScreen(1);
       setDevWhiteboardEnabled(true);
+      // Grade 1 only: update displayed topic at the moment whiteboard is triggered
+      if (whiteboardGradeEligible && spellTopic) {
+        setGrade1DisplayedTopicId(spellTopic);
+      }
       lastSpellTopicRef.current = spellTopic;
       return;
     }
@@ -4373,6 +4400,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const topicForLesson = (spellTopic && getLessonScript(spellTopic)) ? spellTopic : WHITEBOARD_LESSON_TOPIC;
         const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
         setWhiteboardPinnedText(introText);
+        // Grade 1 only: update displayed topic at the moment whiteboard is triggered
+        if (spellTopic) {
+          setGrade1DisplayedTopicId(spellTopic);
+        }
       }
       lastSpellTopicRef.current = spellTopic;
       return;
@@ -4391,6 +4422,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setLessonReady(true);
     setDevWhiteboardEnabled(true);
     setIsWhiteboardPromptActive(false);
+    // Grade 1 only: set the displayed topic at the moment whiteboard flow is confirmed via chevron
+    if (whiteboardGradeEligible) {
+      try {
+        const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName);
+        const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
+          ? (nextSpellQuestion.topicId || (nextSpellQuestion as any).topicName)
+          : (lastSpellTopicRef.current || null);
+        if (nextSpellTopicId) {
+          setGrade1DisplayedTopicId(nextSpellTopicId);
+        }
+      } catch {}
+    }
     // After Step 5 overlay is dismissed, previously suppressed non-Krafty
     // messages (like whiteboard prompt) should be replayed
     try { ttsService.replayLastSuppressed?.(); } catch {}
@@ -4449,6 +4492,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   React.useEffect(() => {
     chatMessagesRef.current = chatMessages;
   }, [chatMessages]);
+
+  // Grade 1: initialize displayed topic from the current question topic
+  // when the adventure mounts/resumes, but only if not already set by a whiteboard trigger
+  React.useEffect(() => {
+    if (!whiteboardGradeEligible) return;
+    if (grade1DisplayedTopicId) return;
+    const topicFromQuestion = currentSpellQuestion?.topicId || (currentSpellQuestion as any)?.topicName || null;
+    if (topicFromQuestion) {
+      setGrade1DisplayedTopicId(topicFromQuestion);
+    }
+  }, [whiteboardGradeEligible, grade1DisplayedTopicId, currentSpellQuestion?.topicId]);
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
 
@@ -4533,19 +4587,40 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               </Button>
             )}
 
-            {/* Lesson chip with inline progress - shown when a topic is active */}
+            {/* Lesson chip with inline progress - shown when a topic is active. Click to toggle whiteboard */}
             {selectedTopicId && (
-              <div
-                className="hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative"
-                style={{ minWidth: '220px' }}
-              >
-                <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">
-                  Lesson {(() => { const topicId = (getLessonScript(selectedTopicId)?.topicId) || '1-H.1'; const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}
-                </span>
-                <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">
-                  • {(getLessonScript(selectedTopicId) || getLessonScript('1-H.1'))?.title || selectedTopicId}
-                </span>
-              </div>
+              (() => {
+                const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
+                const scriptForChip = getLessonScript(topicForChip);
+                const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
+                const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
+                const lessonTitle = (scriptForChip?.title) || topicForChip;
+                const canOpen = !!scriptForChip;
+                const handleToggle = () => {
+                  if (!canOpen) return;
+                  setIsManualWhiteboardOpen(prev => !prev);
+                };
+                const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleToggle();
+                  }
+                };
+                return (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleToggle}
+                    onKeyDown={handleKeyDown}
+                    title={canOpen ? 'Open whiteboard' : 'Whiteboard unavailable'}
+                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative ${canOpen ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-80'}`}
+                    style={{ minWidth: '220px' }}
+                  >
+                    <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
+                    <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">{` • ${lessonTitle}`}</span>
+                  </div>
+                );
+              })()
             )}
             
             {/* Grade Selection Button - Only show on HomePage */}
@@ -4567,7 +4642,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         : selectedPreference 
                           ? `${currentGrade} ${selectedPreference === 'start' ? 'Start' : 'Middle'} Level` 
                           : 'Grade Selection';
-                      console.log('Button render - selectedGradeFromDropdown:', selectedGradeFromDropdown, 'selectedTopicFromPreference:', selectedTopicFromPreference, 'selectedPreference:', selectedPreference, 'buttonText:', buttonText);
+                      // console.log('Button render - selectedGradeFromDropdown:', selectedGradeFromDropdown, 'selectedTopicFromPreference:', selectedTopicFromPreference, 'selectedPreference:', selectedPreference, 'buttonText:', buttonText);
                       return buttonText;
                     })()}
                     <ChevronDown className="h-4 w-4 opacity-80" />
@@ -5038,7 +5113,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             userData={userData!} 
             onNavigate={handleHomeNavigation} 
             onStartAdventure={(topicId: string, mode: 'new' | 'continue', adventureType?: string) => {
-              console.log('🎯 Index: HomePage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
+              // console.log('🎯 Index: HomePage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
               handleStartAdventure(topicId, mode, adventureType || 'food');
             }} 
             onContinueSpecificAdventure={handleContinueSpecificAdventure}
@@ -5101,14 +5176,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 {/* Back Button - Only show if we have previous questions */}
                 {(() => {
                   const shouldShowBackButton = topicQuestionIndex > 0;
-                  console.log('🔍 Back button debug:', { 
-                    currentScreen, 
-                    topicQuestionIndex, 
-                    isInQuestionMode, 
-                    shouldShowBackButton,
-                    adventurePromptCount,
-                    canAccessQuestions 
-                  });
+                  // console.log('🔍 Back button debug:', { 
+                  //   currentScreen, 
+                  //   topicQuestionIndex, 
+                  //   isInQuestionMode, 
+                  //   shouldShowBackButton,
+                  //   adventurePromptCount,
+                  //   canAccessQuestions 
+                  // });
                   return shouldShowBackButton;
                 })() && (
                   <div 
@@ -5126,7 +5201,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         
                         // Navigate back in the question sequence
                         const newQuestionIndex = topicQuestionIndex - 1;
-                        console.log(`🔍 DEBUG Adventure: Going back from question ${topicQuestionIndex + 1} to ${newQuestionIndex + 1}`);
+                        // console.log(`🔍 DEBUG Adventure: Going back from question ${topicQuestionIndex + 1} to ${newQuestionIndex + 1}`);
                         
                         setTopicQuestionIndex(newQuestionIndex);
                         
@@ -5183,7 +5258,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   onClick={() => {
                     playClickSound();
                     
-                    console.log(`🔍 DEBUG Adventure: Going to next question ${topicQuestionIndex + 1}`);
+                    // console.log(`🔍 DEBUG Adventure: Going to next question ${topicQuestionIndex + 1}`);
                     
                     // Switch to MCQ mode to show the next question
                     setCurrentScreen(3);
@@ -5293,6 +5368,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
+                          fullscreen={isManualWhiteboardOpen}
+                          onRequestClose={() => setIsManualWhiteboardOpen(false)}
                           onCompleted={() => {
                             setLessonReady(false);
                             setDevWhiteboardEnabled(false);
@@ -5310,6 +5387,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               isAcknowledged: true,
                             });
                             setIsWhiteboardPromptActive(false);
+                            setIsManualWhiteboardOpen(false);
                             setTimeout(() => {
                               try { ttsService.stop(); } catch {}
                               const selectedVoice = (() => {
@@ -5478,7 +5556,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     isGenerating={isGeneratingAdventureImage}
                     softFocus={isLeftBubbleVisible && !isGeneratingAdventureImage}
                     onImageDisplayed={() => {
-                      console.log('🖼️ Image displayed for panel:', current.id);
+                      // console.log('🖼️ Image displayed for panel:', current.id);
                     }}
                     shouldZoom={current.id === zoomingPanelId}
                     onPreviousPanel={() => {
@@ -5753,7 +5831,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               setCanAccessQuestions(true); // Allow questions immediately on retry
               // Clear saved question progress for clean restart
               clearQuestionProgress();
-              console.log('🔄 RETRY: Reset to question 1, retry mode enabled, progress cleared');
+              // console.log('🔄 RETRY: Reset to question 1, retry mode enabled, progress cleared');
             }}
             onBack={handleBackFromMCQ}
             onQuestionChange={(questionIndex: number) => {
@@ -5766,7 +5844,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             onNextTopic={(nextTopicId) => {
               playClickSound();
               
-              console.log(`🔍 DEBUG: Question completed. Current topicQuestionIndex: ${topicQuestionIndex}`);
+              // console.log(`🔍 DEBUG: Question completed. Current topicQuestionIndex: ${topicQuestionIndex}`);
               // If whiteboard lesson is available, override normal flow and launch it immediately
               try { ttsService.stop(); } catch {}
               const hasLesson = whiteboardGradeEligible && !!(getLessonScript(WHITEBOARD_LESSON_TOPIC));
@@ -5796,23 +5874,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 if (isRetryMode) {
                   newQuestionIndex = retryQuestionIndex + 1;
                   setRetryQuestionIndex(newQuestionIndex);
-                  console.log(`🔍 DEBUG RETRY: Setting retryQuestionIndex to: ${newQuestionIndex}`);
+                  // console.log(`🔍 DEBUG RETRY: Setting retryQuestionIndex to: ${newQuestionIndex}`);
                   // Exit retry mode after first question progression to return to normal flow
                   if (newQuestionIndex > 0) {
                     setIsRetryMode(false);
                     setTopicQuestionIndex(newQuestionIndex);
-                    console.log(`🔍 DEBUG RETRY: Exiting retry mode, setting topicQuestionIndex to: ${newQuestionIndex}`);
+                    // console.log(`🔍 DEBUG RETRY: Exiting retry mode, setting topicQuestionIndex to: ${newQuestionIndex}`);
                   }
                 } else {
                   newQuestionIndex = topicQuestionIndex + 1;
                   setTopicQuestionIndex(newQuestionIndex);
-                  console.log(`🔍 DEBUG: Setting topicQuestionIndex to: ${newQuestionIndex}`);
+                  // console.log(`🔍 DEBUG: Setting topicQuestionIndex to: ${newQuestionIndex}`);
                 }
                 
                 // Check if we should return to adventure mode based on the flow pattern (3-1 cadence)
                 // After completing each batch of 3 questions (Q3, Q6, Q9), newQuestionIndex will be a multiple of 3 (< 10)
                 if (newQuestionIndex % 3 === 0 && newQuestionIndex < 10) {
-                  console.log(`🔍 DEBUG: Adventure break after question ${newQuestionIndex}. Going to adventure mode.`);
+                  // console.log(`🔍 DEBUG: Adventure break after question ${newQuestionIndex}. Going to adventure mode.`);
                   // After q3, q6, or q9, return to adventure mode
                   setIsInQuestionMode(false);
                   setCurrentScreen(1); // Return to adventure screen
@@ -5820,7 +5898,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   // Reset adventure threshold for next sequence - user needs to send prompts again
                   setAdventurePromptCount(0);
                   setCanAccessQuestions(false);
-                  console.log(`🔍 DEBUG: Reset adventure threshold for next sequence`);
+                  // console.log(`🔍 DEBUG: Reset adventure threshold for next sequence`);
                   
                   // Add transition message and wait for speech to complete
                   setTimeout(async () => {
@@ -5841,7 +5919,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   }, 500);
                   return;
                 } else if (newQuestionIndex === 10) {
-                  console.log(`🔍 DEBUG: All 10 questions completed! Starting new adventure for next topic.`);
+                  // console.log(`🔍 DEBUG: All 10 questions completed! Starting new adventure for next topic.`);
                   
                   // Topic completed - create completely new adventure (same as Create New Adventure button)
                   // Determine the next topic
@@ -5872,7 +5950,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     // Reset initial response ref
                     initialResponseSentRef.current = null;
                     
-                    console.log('🚀 Started completely new adventure for next topic');
+                    // console.log('🚀 Started completely new adventure for next topic');
                     
                     // Go to adventure screen to start fresh
                     setCurrentScreen(1);
@@ -5884,7 +5962,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   }
                 }
                 
-                console.log(`🔍 DEBUG: Continuing to next question. New index will be: ${newQuestionIndex}`);
+                // console.log(`🔍 DEBUG: Continuing to next question. New index will be: ${newQuestionIndex}`);
               }
               
               // If a specific next topic is provided, use it

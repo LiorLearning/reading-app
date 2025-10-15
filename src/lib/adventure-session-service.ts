@@ -108,7 +108,7 @@ class AdventureSessionService {
             initialMessages[initialMessages.length - 1]?.timestamp || Date.now()
           );
           
-          console.log(`🧠 Generated initial summary from ${initialMessageCount} existing messages:`, summaryText.substring(0, 100) + '...');
+          // console.log(`🧠 Generated initial summary from ${initialMessageCount} existing messages:`, summaryText.substring(0, 100) + '...');
         } catch (error) {
           console.warn('⚠️ Failed to generate initial summary (continuing without):', error);
         }
@@ -150,7 +150,7 @@ class AdventureSessionService {
       };
 
       const docRef = await addDoc(collection(db, this.COLLECTION_NAME), sanitizeForFirebase(newSession));
-      console.log(`✅ Created adventure session: ${docRef.id} (${sessionType})`);
+      // console.log(`✅ Created adventure session: ${docRef.id} (${sessionType})`);
       return docRef.id;
     } catch (error) {
       console.warn('⚠️ Failed to create adventure session (continuing without Firebase):', error);
@@ -179,7 +179,7 @@ class AdventureSessionService {
         
         await updateDoc(sessionRef, updateData);
 
-        console.log(`💬 Saved message to session: ${message.type}`);
+        // console.log(`💬 Saved message to session: ${message.type}`);
       }
     } catch (error) {
       console.warn('⚠️ Failed to save message to session (continuing normally):', error);
@@ -234,7 +234,7 @@ class AdventureSessionService {
         
         await updateDoc(sessionRef, updateData);
 
-        console.log(`✅ Saved MCQ answer to session: Q${mcqAnswer.questionId}, Correct: ${mcqAnswer.isCorrect}`);
+        // console.log(`✅ Saved MCQ answer to session: Q${mcqAnswer.questionId}, Correct: ${mcqAnswer.isCorrect}`);
       }
     } catch (error) {
       console.warn('⚠️ Failed to save MCQ answer to session (continuing normally):', error);
@@ -258,7 +258,7 @@ class AdventureSessionService {
       
       await updateDoc(sessionRef, updateData);
 
-      console.log(`🧠 Updated chat summary for session (${summary.messageCount} messages)`);
+      // console.log(`🧠 Updated chat summary for session (${summary.messageCount} messages)`);
     } catch (error) {
       console.warn('⚠️ Failed to update chat summary (continuing normally):', error);
       // Don't throw error - app continues working without Firebase sync
@@ -307,7 +307,7 @@ class AdventureSessionService {
       
       await updateDoc(sessionRef, updateData);
 
-      console.log(`📊 Updated adventure state for session`);
+      // console.log(`📊 Updated adventure state for session`);
     } catch (error) {
       console.warn('⚠️ Failed to update adventure state (continuing normally):', error);
       // Don't throw error - app continues working without Firebase sync
@@ -324,7 +324,7 @@ class AdventureSessionService {
     questionIndex?: number
   ): Promise<void> {
     if (!sessionId) {
-      console.log('📝 No session ID - MCQ answer not tracked (app continues normally)');
+      // console.log('📝 No session ID - MCQ answer not tracked (app continues normally)');
       return;
     }
 
@@ -407,7 +407,7 @@ class AdventureSessionService {
       
       await updateDoc(sessionRef, updateData);
 
-      console.log(`🔄 Synced current state to session`);
+      // console.log(`🔄 Synced current state to session`);
     } catch (error) {
       console.warn('⚠️ Failed to sync current state (continuing normally):', error);
     }

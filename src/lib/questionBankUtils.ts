@@ -58,15 +58,15 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
         
         // Debug: Log prefilled questions
         if (spellingQuestion.isPrefilled) {
-          console.log('🔤 PREFILLED QUESTION LOADED:', {
-            id: spellingQuestion.id,
-            word: spellingQuestion.word,
-            isPrefilled: spellingQuestion.isPrefilled,
-            prefilledIndexes: spellingQuestion.prefilledIndexes,
-            expectedDisplay: spellingQuestion.word.split('').map((char, i) => 
-              spellingQuestion.prefilledIndexes?.includes(i) ? char : '_'
-            ).join('')
-          });
+          // console.log('🔤 PREFILLED QUESTION LOADED:', {
+          //   id: spellingQuestion.id,
+          //   word: spellingQuestion.word,
+          //   isPrefilled: spellingQuestion.isPrefilled,
+          //   prefilledIndexes: spellingQuestion.prefilledIndexes,
+          //   expectedDisplay: spellingQuestion.word.split('').map((char, i) => 
+          //     spellingQuestion.prefilledIndexes?.includes(i) ? char : '_'
+          //   ).join('')
+          // });
         }
         
         spellingQuestions.push(spellingQuestion);
@@ -82,8 +82,8 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
  */
 export const getRandomSpellingQuestion = (gradeDisplayName?: string): SpellingQuestion | null => {
   const allSpellingQuestions = getAllSpellingQuestions();
-  console.log('🎲 Total available spelling questions:', allSpellingQuestions.length);
-  console.log('🎓 Grade display name received:', gradeDisplayName);
+  // console.log('🎲 Total available spelling questions:', allSpellingQuestions.length);
+  // console.log('🎓 Grade display name received:', gradeDisplayName);
   
   if (allSpellingQuestions.length === 0) {
     return null;
@@ -101,28 +101,28 @@ export const getRandomSpellingQuestion = (gradeDisplayName?: string): SpellingQu
       return question.topicId.startsWith(`${contentGrade}-`);
     });
     
-    console.log(`🎯 Grade filtering - Display: ${gradeDisplayName} → Content: ${contentGrade}`);
-    console.log(`🔍 Filtered spelling questions for grade ${contentGrade}:`, gradeFilteredQuestions.length);
+    // console.log(`🎯 Grade filtering - Display: ${gradeDisplayName} → Content: ${contentGrade}`);
+    // console.log(`🔍 Filtered spelling questions for grade ${contentGrade}:`, gradeFilteredQuestions.length);
     
     // Use filtered questions if available, otherwise fall back to all questions
     if (gradeFilteredQuestions.length > 0) {
       spellingQuestions = gradeFilteredQuestions;
     } else {
-      console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
+      // console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
     }
   }
   
   const randomIndex = Math.floor(Math.random() * spellingQuestions.length);
   const selectedQuestion = spellingQuestions[randomIndex];
   
-  console.log('🎯 Selected spelling question:', {
-    id: selectedQuestion.id,
-    topicId: selectedQuestion.topicId,
-    word: selectedQuestion.word,
-    audio: selectedQuestion.audio,
-    questionText: selectedQuestion.questionText,
-    gradeFilter: gradeDisplayName || 'none'
-  });
+  // console.log('🎯 Selected spelling question:', {
+  //   id: selectedQuestion.id,
+  //   topicId: selectedQuestion.topicId,
+  //   word: selectedQuestion.word,
+  //   audio: selectedQuestion.audio,
+  //   questionText: selectedQuestion.questionText,
+  //   gradeFilter: gradeDisplayName || 'none'
+  // });
   
   return selectedQuestion;
 };
@@ -136,12 +136,12 @@ export const getSequentialSpellingQuestion = (
   currentIndex: number = 0
 ): SpellingQuestion | null => {
   const allSpellingQuestions = getAllSpellingQuestions();
-  console.log('📚 Total available spelling questions:', allSpellingQuestions.length);
-  console.log('🎓 Grade display name received:', gradeDisplayName);
-  console.log('📍 Current index:', currentIndex);
+  // console.log('📚 Total available spelling questions:', allSpellingQuestions.length);
+  // console.log('🎓 Grade display name received:', gradeDisplayName);
+  // console.log('📍 Current index:', currentIndex);
   
   if (allSpellingQuestions.length === 0) {
-    console.log('❌ No spelling questions found in question bank');
+    // console.log('❌ No spelling questions found in question bank');
     return null;
   }
   
@@ -157,14 +157,14 @@ export const getSequentialSpellingQuestion = (
       return question.topicId.startsWith(`${contentGrade}-`);
     });
     
-    console.log(`🎯 Grade filtering - Display: ${gradeDisplayName} → Content: ${contentGrade}`);
-    console.log(`🔍 Filtered spelling questions for grade ${contentGrade}:`, gradeFilteredQuestions.length);
+    // console.log(`🎯 Grade filtering - Display: ${gradeDisplayName} → Content: ${contentGrade}`);
+    // console.log(`🔍 Filtered spelling questions for grade ${contentGrade}:`, gradeFilteredQuestions.length);
     
     // Use filtered questions if available, otherwise fall back to all questions
     if (gradeFilteredQuestions.length > 0) {
       spellingQuestions = gradeFilteredQuestions;
     } else {
-      console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
+      // console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
     }
   }
   
@@ -176,27 +176,27 @@ export const getSequentialSpellingQuestion = (
     return a.id - b.id;
   });
   
-  console.log(`📋 Sorted spelling questions: ${spellingQuestions.length} total`);
+  // console.log(`📋 Sorted spelling questions: ${spellingQuestions.length} total`);
   
   // Return question at current index, or null if we've reached the end
   if (currentIndex >= spellingQuestions.length) {
-    console.log(`🏁 Reached end of spelling questions for grade ${gradeDisplayName}. Index ${currentIndex} >= Length ${spellingQuestions.length}`);
+    // console.log(`🏁 Reached end of spelling questions for grade ${gradeDisplayName}. Index ${currentIndex} >= Length ${spellingQuestions.length}`);
     return null; // All questions completed
   }
   
   const selectedQuestion = spellingQuestions[currentIndex];
   
-  console.log('🎯 Selected sequential spelling question:', {
-    index: currentIndex,
-    totalQuestions: spellingQuestions.length,
-    id: selectedQuestion.id,
-    topicId: selectedQuestion.topicId,
-    word: selectedQuestion.word,
-    audio: selectedQuestion.audio,
-    questionText: selectedQuestion.questionText,
-    gradeFilter: gradeDisplayName || 'none',
-    progress: `${currentIndex + 1}/${spellingQuestions.length}`
-  });
+  // console.log('🎯 Selected sequential spelling question:', {
+  //   index: currentIndex,
+  //   totalQuestions: spellingQuestions.length,
+  //   id: selectedQuestion.id,
+  //   topicId: selectedQuestion.topicId,
+  //   word: selectedQuestion.word,
+  //   audio: selectedQuestion.audio,
+  //   questionText: selectedQuestion.questionText,
+  //   gradeFilter: gradeDisplayName || 'none',
+  //   progress: `${currentIndex + 1}/${spellingQuestions.length}`
+  // });
   
   return selectedQuestion;
 };
@@ -356,7 +356,7 @@ export const getNextSpellboxQuestion = (
   const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds);
   
   if (!currentTopicId) {
-    console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
+    // console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
     return null;
   }
   
@@ -375,14 +375,14 @@ export const getNextSpellboxQuestion = (
   // If topic is completed but didn't pass, we'll let the progress system handle the restart
   // The topic will be restarted when updateSpellboxTopicProgress detects a failed topic
   if (topicProgress?.isCompleted && topicProgress.successRate < 70) {
-    console.log(`🔄 getNextSpellboxQuestion: Topic ${currentTopicId} needs restart (${topicProgress.successRate.toFixed(1)}% < 70%)`);
+    // console.log(`🔄 getNextSpellboxQuestion: Topic ${currentTopicId} needs restart (${topicProgress.successRate.toFixed(1)}% < 70%)`);
     // Return first question of this topic - the progress will be reset when the next question is answered
     const firstQuestion = topicQuestions[0];
-    console.log(`🎯 getNextSpellboxQuestion: Selected first question for restart of topic ${currentTopicId}:`, {
-      id: firstQuestion.id,
-      word: firstQuestion.word,
-      topicName: firstQuestion.topicName
-    });
+    // console.log(`🎯 getNextSpellboxQuestion: Selected first question for restart of topic ${currentTopicId}:`, {
+    //   id: firstQuestion.id,
+    //   word: firstQuestion.word,
+    //   topicName: firstQuestion.topicName
+    // });
     return firstQuestion;
   }
   
@@ -390,13 +390,13 @@ export const getNextSpellboxQuestion = (
   const questionIndex = Math.min(questionsAttempted, 9); // Max 10 questions (0-9 index)
   const selectedQuestion = topicQuestions[questionIndex] || topicQuestions[0];
   
-  console.log(`🎯 getNextSpellboxQuestion: Selected question ${questionIndex + 1}/10 for topic ${currentTopicId}:`, {
-    id: selectedQuestion.id,
-    word: selectedQuestion.word,
-    topicName: selectedQuestion.topicName,
-    questionsAttempted,
-    topicProgress: topicProgress?.successRate?.toFixed(1) + '%' || 'New topic'
-  });
+  // console.log(`🎯 getNextSpellboxQuestion: Selected question ${questionIndex + 1}/10 for topic ${currentTopicId}:`, {
+  //   id: selectedQuestion.id,
+  //   word: selectedQuestion.word,
+  //   topicName: selectedQuestion.topicName,
+  //   questionsAttempted,
+  //   topicProgress: topicProgress?.successRate?.toFixed(1) + '%' || 'New topic'
+  // });
   
   return selectedQuestion;
 };

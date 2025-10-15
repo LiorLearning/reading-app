@@ -98,7 +98,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
     }
 
     if (resolvedImageUrl !== currentImage) {
-      console.log(`🔄 ComicPanel: Image resolved from ${isExpiredUrl ? 'expired DALL-E URL' : 'original'} to: ${resolvedImageUrl.substring(0, 50)}...`);
+      // console.log(`🔄 ComicPanel: Image resolved from ${isExpiredUrl ? 'expired DALL-E URL' : 'original'} to: ${resolvedImageUrl.substring(0, 50)}...`);
       setCurrentImage(resolvedImageUrl);
     }
   }, [resolvedImageUrl, currentImage, isExpiredUrl, incomingImageIsDataUrl, image]);

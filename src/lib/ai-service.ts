@@ -1345,26 +1345,12 @@ Generate responses that make the child feel like their ${petTypeDescription} com
   }
 
   private initialize() {
-    // Check if OpenAI API key is available
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    
-    console.log('🔑 AI Service initialization:', { 
-      hasApiKey: !!apiKey, 
-      apiKeyLength: apiKey?.length || 0,
-      apiKeyStart: apiKey?.substring(0, 7) || 'none'
-    });
-    
-    if (apiKey) {
       this.client = new OpenAI({
-        apiKey: apiKey,
-        dangerouslyAllowBrowser: true // Required for client-side usage
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1',
       });
       this.isInitialized = true;
-      console.log('✅ AI Service initialized successfully');
-    } else {
-      console.warn('⚠️ VITE_OPENAI_API_KEY not found. AI responses will use fallback mode.');
-      this.isInitialized = false;
-    }
   }
 
   // Fallback responses when API is not available
@@ -1435,11 +1421,11 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     const adventureTheme = currentAdventure?.theme || 'adventure';
 
     // Get adventure configuration
-    console.log('🎯 buildChatContext: Using adventure type:', adventureType);
-    console.log('🎯 buildChatContext: Available adventure configs:', Object.keys(this.adventureConfigs));
+    // console.log('🎯 buildChatContext: Using adventure type:', adventureType);
+    // console.log('🎯 buildChatContext: Available adventure configs:', Object.keys(this.adventureConfigs));
     const config = this.adventureConfigs[adventureType] || this.adventureConfigs.food;
-    console.log('🎯 buildChatContext: Config found:', !!config, 'Using fallback:', adventureType !== 'food' && !this.adventureConfigs[adventureType]);
-    console.log('🎯 buildChatContext: Selected config type:', adventureType in this.adventureConfigs ? adventureType : 'food (fallback)');
+    // console.log('🎯 buildChatContext: Config found:', !!config, 'Using fallback:', adventureType !== 'food' && !this.adventureConfigs[adventureType]);
+    // console.log('🎯 buildChatContext: Selected config type:', adventureType in this.adventureConfigs ? adventureType : 'food (fallback)');
     
     // Generate system prompt using the configuration template
     const systemPrompt = adventureType === 'story'
@@ -1514,13 +1500,13 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
 
   async generateResponse(userText: string, chatHistory: ChatMessage[] = [], spellingQuestion: SpellingQuestion | null, userData?: { username: string; [key: string]: any } | null, adventureState?: string, currentAdventure?: any, storyEventsContext?: string, summary?: string, petName?: string, petType?: string, adventureType: string = 'food'): Promise<AdventureResponse> {
 
-    console.log('🤖 AI Service generateResponse called:', { 
-      userText, 
-      hasSpellingQuestion: !!spellingQuestion, 
-      spellingWord: spellingQuestion?.audio,
-      isInitialized: this.isInitialized, 
-      hasClient: !!this.client 
-    });
+    // console.log('🤖 AI Service generateResponse called:', { 
+    //   userText, 
+    //   hasSpellingQuestion: !!spellingQuestion, 
+    //   spellingWord: spellingQuestion?.audio,
+    //   isInitialized: this.isInitialized, 
+    //   hasClient: !!this.client 
+    // });
     
     // If not initialized or no API key, use fallback
     if (!this.isInitialized || !this.client) {
@@ -1529,7 +1515,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     }
 
     // 🧹 NEW: Sanitize the user prompt upfront for legacy AI service too
-    console.log('🧹 Legacy AI Service: Sanitizing user prompt...');
+    // console.log('🧹 Legacy AI Service: Sanitizing user prompt...');
     const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
     
     let sanitizedUserText = userText;
@@ -1537,11 +1523,11 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userText);
       if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
         sanitizedUserText = sanitizationResult.sanitizedPrompt;
-        console.log('✅ Legacy AI Service: Prompt sanitized successfully');
-        console.log('🔄 Legacy Original:', userText.substring(0, 100) + '...');
-        console.log('✨ Legacy Sanitized:', sanitizedUserText.substring(0, 100) + '...');
+        // console.log('✅ Legacy AI Service: Prompt sanitized successfully');
+        // console.log('🔄 Legacy Original:', userText.substring(0, 100) + '...');
+        // console.log('✨ Legacy Sanitized:', sanitizedUserText.substring(0, 100) + '...');
       } else {
-        console.log('⚠️ Legacy AI Service: Sanitization failed, using original prompt');
+        // console.log('⚠️ Legacy AI Service: Sanitization failed, using original prompt');
       }
     } catch (sanitizationError) {
       console.warn('⚠️ Legacy AI Service: Prompt sanitization error, using original prompt:', sanitizationError);
@@ -1560,10 +1546,10 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     while (attempt <= maxRetries) {
       
     try {
-      console.log('🚀 Building chat context with spelling word:', stringSpellingWord);
+      // console.log('🚀 Building chat context with spelling word:', stringSpellingWord);
       const messages = this.buildChatContext(chatHistory, userText, stringSpellingWord, adventureState, currentAdventure, storyEventsContext, summary, userData, petName, petType, adventureType);
       
-      console.log('📤 Sending request to OpenAI with', messages.length, 'messages');
+      // console.log('📤 Sending request to OpenAI with', messages.length, 'messages');
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
         messages: messages,
@@ -1577,9 +1563,9 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       });
 
       const response = completion.choices[0]?.message?.content;
-      console.log('📥 OpenAI Response:', response);
-      console.log('📥 OpenAI Response Length:', response?.length);
-      console.log('📥 Expected Spelling Word:', spellingQuestion?.audio);
+      // console.log('📥 OpenAI Response:', response);
+      // console.log('📥 OpenAI Response Length:', response?.length);
+      // console.log('📥 Expected Spelling Word:', spellingQuestion?.audio);
       
       if (response) {
         let adventureText = response.trim();
@@ -1590,7 +1576,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
           
           // PRE-PROCESSING: Ensure word is included before extraction
           if (!adventureText.toLowerCase().includes(spellingWord.toLowerCase())) {
-            console.log(`🔧 PRE-PROCESSING: AI didn't include "${spellingWord}", injecting it now...`);
+            // console.log(`🔧 PRE-PROCESSING: AI didn't include "${spellingWord}", injecting it now...`);
             
             // Create natural injection patterns based on common story contexts
             const naturalPatterns = [
@@ -1603,28 +1589,28 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
             
             const selectedPattern = naturalPatterns[Math.floor(Math.random() * naturalPatterns.length)];
             adventureText = `${selectedPattern} ${adventureText}`;
-            console.log(`🔧 Enhanced response with pattern: "${selectedPattern}"`);
-            console.log(`🔧 Full enhanced response: "${adventureText}"`);
+            // console.log(`🔧 Enhanced response with pattern: "${selectedPattern}"`);
+            // console.log(`🔧 Full enhanced response: "${adventureText}"`);
           }
           
-          console.log(`🔍 Extracting spelling sentence for word: "${spellingWord}" from: "${adventureText}"`);
-          console.log(`🔍 Raw AI Response for debugging: "${response}"`);
-          console.log(`🔍 Adventure Text (trimmed): "${adventureText}"`);
+          // console.log(`🔍 Extracting spelling sentence for word: "${spellingWord}" from: "${adventureText}"`);
+          // console.log(`🔍 Raw AI Response for debugging: "${response}"`);
+          // console.log(`🔍 Adventure Text (trimmed): "${adventureText}"`);
           
           // First, verify the word is actually in the response
           const wordFoundInResponse = adventureText.toLowerCase().includes(spellingWord.toLowerCase());
-          console.log(`🎯 Target word "${spellingWord}" found in response: ${wordFoundInResponse}`);
+          // console.log(`🎯 Target word "${spellingWord}" found in response: ${wordFoundInResponse}`);
           
           // More detailed debugging
-          console.log(`🔍 Searching for word: "${spellingWord.toLowerCase()}" in text: "${adventureText.toLowerCase()}"`);
+          // console.log(`🔍 Searching for word: "${spellingWord.toLowerCase()}" in text: "${adventureText.toLowerCase()}"`);
           const debugWordIndex = adventureText.toLowerCase().indexOf(spellingWord.toLowerCase());
-          console.log(`🔍 Word index in text: ${debugWordIndex}`);
+          // console.log(`🔍 Word index in text: ${debugWordIndex}`);
           
           if (!wordFoundInResponse) {
             console.error(`❌ CRITICAL ERROR: Word "${spellingWord}" should have been included by pre-processing but wasn't found!`);
-            console.log(`📝 This should not happen - check pre-processing logic`);
-            console.log(`📝 AI Response: "${adventureText}"`);
-            console.log(`🔤 Expected word: "${spellingWord}"`);
+            // console.log(`📝 This should not happen - check pre-processing logic`);
+            // console.log(`📝 AI Response: "${adventureText}"`);
+            // console.log(`🔤 Expected word: "${spellingWord}"`);
             
             // Emergency fallback - this should rarely be reached now
             return {
@@ -1663,16 +1649,16 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
             
             // Check if this sentence can actually create fill-in-the-blanks
             const canCreateBlanks = this.canCreateFillInTheBlanks(cleanSentence, spellingWord);
-            console.log(`🔍 Can create fill-in-the-blanks for "${spellingWord}" in "${cleanSentence}": ${canCreateBlanks}`);
+            // console.log(`🔍 Can create fill-in-the-blanks for "${spellingWord}" in "${cleanSentence}": ${canCreateBlanks}`);
             
             if (canCreateBlanks) {
-              console.log(`✅ Extracted spelling sentence: "${cleanSentence}"`);
+              // console.log(`✅ Extracted spelling sentence: "${cleanSentence}"`);
               return {
                 spelling_sentence: cleanSentence,
                 adventure_story: adventureText
               };
             } else {
-              console.log(`⚠️ Sentence found but cannot create blanks, will retry if attempts remain`);
+              // console.log(`⚠️ Sentence found but cannot create blanks, will retry if attempts remain`);
               // Continue to retry logic below
             }
           }
@@ -1701,10 +1687,10 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
             
             // Check if this fallback sentence can create blanks
             const canCreateBlanks = this.canCreateFillInTheBlanks(finalSentence, spellingWord);
-            console.log(`🔍 Fallback sentence can create blanks: ${canCreateBlanks}`);
+            // console.log(`🔍 Fallback sentence can create blanks: ${canCreateBlanks}`);
             
             if (canCreateBlanks) {
-              console.log(`✅ Fallback extracted sentence: "${finalSentence}"`);
+              // console.log(`✅ Fallback extracted sentence: "${finalSentence}"`);
               return {
                 spelling_sentence: finalSentence,
                 adventure_story: adventureText
@@ -1714,7 +1700,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
           
           // If we still can't create blanks and have retries left, try again
           if (attempt < maxRetries) {
-            console.log(`🔄 Cannot create fill-in-the-blanks, retrying... (attempt ${attempt + 1}/${maxRetries + 1})`);
+            // console.log(`🔄 Cannot create fill-in-the-blanks, retrying... (attempt ${attempt + 1}/${maxRetries + 1})`);
             attempt++;
             continue; // Go to next iteration of while loop
           } else {
@@ -1744,7 +1730,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
         }
         
         // Otherwise, try again
-        console.log(`🔄 Error occurred, retrying... (attempt ${attempt + 1}/${maxRetries + 1})`);
+        // console.log(`🔄 Error occurred, retrying... (attempt ${attempt + 1}/${maxRetries + 1})`);
         attempt++;
         continue;
       }
@@ -1785,11 +1771,11 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
                                 petType || 'pet';
 
       // Get adventure configuration
-      console.log('🎯 generateInitialMessage: Using adventure type:', adventureType);
-      console.log('🎯 generateInitialMessage: Available adventure configs:', Object.keys(this.adventureConfigs));
+      // console.log('🎯 generateInitialMessage: Using adventure type:', adventureType);
+      // console.log('🎯 generateInitialMessage: Available adventure configs:', Object.keys(this.adventureConfigs));
       const config = this.adventureConfigs[adventureType] || this.adventureConfigs.food;
-      console.log('🎯 generateInitialMessage: Config found:', !!config, 'Using fallback:', adventureType !== 'food' && !this.adventureConfigs[adventureType]);
-      console.log('🎯 generateInitialMessage: Selected config type:', adventureType in this.adventureConfigs ? adventureType : 'food (fallback)');
+      // console.log('🎯 generateInitialMessage: Config found:', !!config, 'Using fallback:', adventureType !== 'food' && !this.adventureConfigs[adventureType]);
+      // console.log('🎯 generateInitialMessage: Selected config type:', adventureType in this.adventureConfigs ? adventureType : 'food (fallback)');
       
       // Generate system prompt using the configuration template
       const systemContent = config.initialMessageTemplate(
@@ -1938,11 +1924,11 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       }
     }
 
-    console.log('Extracted recent 6 messages context with 60/20/20 weighting:', {
-      recentMessages: recentMessages.length,
-      hasLatestAi: !!latestAiMessage,
-      context: context.substring(0, 200) + '...'
-    });
+    // console.log('Extracted recent 6 messages context with 60/20/20 weighting:', {
+    //   recentMessages: recentMessages.length,
+    //   hasLatestAi: !!latestAiMessage,
+    //   context: context.substring(0, 200) + '...'
+    // });
     
     return context;
   }
@@ -1974,10 +1960,10 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       formattedContext += `\nAI's last response: "${lastAIMessage.content}"`;
     }
 
-    console.log('Contextualized with user-focused messages:', {
-      userMessageCount: userMessages.length,
-      hasAIContext: !!lastAIMessage
-    });
+    // console.log('Contextualized with user-focused messages:', {
+    //   userMessageCount: userMessages.length,
+    //   hasAIContext: !!lastAIMessage
+    // });
 
     return formattedContext;
   }
@@ -2037,14 +2023,14 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
   ): Promise<string> {
     // If not initialized or no API key, return original question
     if (!this.isInitialized || !this.client) {
-      console.log('AI service not initialized, returning original question');
+      // console.log('AI service not initialized, returning original question');
       return originalQuestion;
     }
 
     try {
       // Extract structured adventure context
       const adventureContext = this.extractAdventureContext(userAdventure);
-      console.log('Adventure context for question generation:', adventureContext);
+      // console.log('Adventure context for question generation:', adventureContext);
 
       // Get the correct answer option
       const correctOption = options[correctAnswer];
@@ -2054,7 +2040,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
         option.split(/\s+/).filter(word => word.length > 3 && /^[a-zA-Z]+$/.test(word))
       );
       
-      console.log('Educational words to preserve in question:', wordsToPreserve);
+      // console.log('Educational words to preserve in question:', wordsToPreserve);
 
       const contextualPrompt = `You write Kindergarten read-aloud educational questions that are fun, playful, and tightly tied to the child's ongoing adventure. Your success lies in keeping the question at the right difficulty level while also contextualising it perfectly to the adventure to keep it coherent and interesting.
 
@@ -2094,7 +2080,7 @@ WORDS TO PRESERVE: ${wordsToPreserve.join(', ')}
 
 Return ONLY the new question text, nothing else.`;
 
-      console.log('Sending contextualized question prompt to AI:', contextualPrompt);
+      // console.log('Sending contextualized question prompt to AI:', contextualPrompt);
 
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
@@ -2112,15 +2098,15 @@ Return ONLY the new question text, nothing else.`;
       
       if (response && response.trim()) {
         const contextualQuestion = response.trim();
-        console.log('Generated contextualized question:', contextualQuestion);
+        // console.log('Generated contextualized question:', contextualQuestion);
         return contextualQuestion;
       } else {
-        console.log('No valid response received from AI, returning original question');
+        // console.log('No valid response received from AI, returning original question');
         return originalQuestion;
       }
     } catch (error) {
       console.error('OpenAI API error generating contextual question:', error);
-      console.log('Falling back to original question due to error');
+      // console.log('Falling back to original question due to error');
       // Return original question on error
       return originalQuestion;
     }
@@ -2134,21 +2120,21 @@ Return ONLY the new question text, nothing else.`;
   ): Promise<string> {
     // If not initialized or no API key, return original passage
     if (!this.isInitialized || !this.client) {
-      console.log('AI service not initialized, returning original passage');
+      // console.log('AI service not initialized, returning original passage');
       return originalPassage;
     }
 
     try {
       // Extract structured adventure context
       const adventureContext = this.extractAdventureContext(userAdventure);
-      console.log('Adventure context for reading passage generation:', adventureContext);
+      // console.log('Adventure context for reading passage generation:', adventureContext);
 
       // Extract important educational words from the original passage
       const educationalWords = originalPassage.split(/\s+/)
         .filter(word => word.length > 3 && /^[a-zA-Z]+$/.test(word.replace(/[.,!?]/g, '')))
         .map(word => word.replace(/[.,!?]/g, ''));
         
-      console.log('Educational words to preserve in reading passage:', educationalWords);
+      // console.log('Educational words to preserve in reading passage:', educationalWords);
 
       const contextualPrompt = `You are creating an engaging reading passage for a child by incorporating their adventure story context.
 
@@ -2177,7 +2163,7 @@ EXAMPLE:
 
 Return ONLY the new reading passage, nothing else.`;
 
-      console.log('Sending contextualized reading passage prompt to AI:', contextualPrompt);
+      // console.log('Sending contextualized reading passage prompt to AI:', contextualPrompt);
 
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
@@ -2198,14 +2184,14 @@ Return ONLY the new reading passage, nothing else.`;
       const generatedPassage = completion.choices[0]?.message?.content?.trim();
       
       if (generatedPassage && generatedPassage !== originalPassage) {
-        console.log('✅ Successfully generated contextualized reading passage:', {
-          original: originalPassage,
-          contextualized: generatedPassage,
-          context: adventureContext
-        });
+        // console.log('✅ Successfully generated contextualized reading passage:', {
+        //   original: originalPassage,
+        //   contextualized: generatedPassage,
+        //   context: adventureContext
+        // });
         return generatedPassage;
       } else {
-        console.log('⚠️ AI returned same or empty passage, using original');
+        // console.log('⚠️ AI returned same or empty passage, using original');
         return originalPassage;
       }
 
@@ -2388,7 +2374,7 @@ Return ONLY the new reading passage, nothing else.`;
     }
 
     try {
-      console.log('Generating contextual image with conversation history:', audioText);
+      // console.log('Generating contextual image with conversation history:', audioText);
 
       // Get last 10 messages for conversation context
       const last10Messages = userAdventure.slice(-10);
@@ -2406,12 +2392,12 @@ Return ONLY the new reading passage, nothing else.`;
         ? `${conversationContext}\n\nRecent AI responses: ${recentAIMessages}`
         : conversationContext;
 
-      console.log('Using conversation context for image generation:', fullContext);
+      // console.log('Using conversation context for image generation:', fullContext);
 
       // Generate contextually aware prompt options
       const promptOptions = this.generateContextualPrompts(audioText, fullContext, imagePrompt);
 
-      console.log('Generated contextual prompt options:', promptOptions);
+      // console.log('Generated contextual prompt options:', promptOptions);
 
       // Try each prompt option until one succeeds
       for (let i = 0; i < promptOptions.length; i++) {
@@ -2421,7 +2407,7 @@ Return ONLY the new reading passage, nothing else.`;
           // Ensure prompt is not too long
           const finalPrompt = prompt.length > 400 ? prompt.substring(0, 390) + "..." : prompt;
           
-          console.log(`Trying contextual DALL-E prompt ${i + 1}:`, finalPrompt);
+          // console.log(`Trying contextual DALL-E prompt ${i + 1}:`, finalPrompt);
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -2435,11 +2421,11 @@ Return ONLY the new reading passage, nothing else.`;
           const imageUrl = response.data[0]?.url;
           
           if (imageUrl) {
-            console.log(`Contextual DALL-E prompt ${i + 1} succeeded`);
+            // console.log(`Contextual DALL-E prompt ${i + 1} succeeded`);
             return imageUrl;
           }
         } catch (promptError: any) {
-          console.log(`Contextual DALL-E prompt ${i + 1} failed:`, promptError.message);
+          // console.log(`Contextual DALL-E prompt ${i + 1} failed:`, promptError.message);
           
           // If this isn't a safety error, or it's the last prompt, throw the error
           if (!promptError.message?.includes('safety system') || i === promptOptions.length - 1) {
@@ -2507,7 +2493,7 @@ Return ONLY the new reading passage, nothing else.`;
 
     // Prevent multiple simultaneous image generation calls
     if (this.isGeneratingImage) {
-      console.log('🚫 Image generation already in progress, skipping duplicate call');
+      // console.log('🚫 Image generation already in progress, skipping duplicate call');
       return null;
     }
 
@@ -2516,28 +2502,28 @@ Return ONLY the new reading passage, nothing else.`;
     
     // 🛡️ Track current adventure ID for race condition prevention
     const currentAdventureId = adventureId;
-    console.log(`🎯 ADVENTURE TRACKING: Starting image generation for adventure ID: ${currentAdventureId || 'unknown'}`);
+    // console.log(`🎯 ADVENTURE TRACKING: Starting image generation for adventure ID: ${currentAdventureId || 'unknown'}`);
 
     // 🛠️ Safety timeout to prevent permanent stuck state
     const safetyTimeout = setTimeout(() => {
-      console.log('🚨 SAFETY TIMEOUT: Clearing stuck isGeneratingImage flag after 40 seconds');
+      // console.log('🚨 SAFETY TIMEOUT: Clearing stuck isGeneratingImage flag after 40 seconds');
       this.isGeneratingImage = false;
     }, 40000);
 
     try {
-      console.log('🌟 [AIService.generateAdventureImage()] Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
-      console.log('📝 [AIService.generateAdventureImage()] Input prompt:', prompt);
-      console.log('👤 [AIService.generateAdventureImage()] Adventure ID:', adventureId);
-      console.log('📜 [AIService.generateAdventureImage()] User adventure context length:', userAdventure.length);
+      // console.log('🌟 [AIService.generateAdventureImage()] Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
+      // console.log('📝 [AIService.generateAdventureImage()] Input prompt:', prompt);
+      // console.log('👤 [AIService.generateAdventureImage()] Adventure ID:', adventureId);
+      // console.log('📜 [AIService.generateAdventureImage()] User adventure context length:', userAdventure.length);
 
       // Extract adventure context with high priority on recent messages
       const adventureContext = this.extractAdventureContext(userAdventure);
-      console.log('[AIService.generateAdventureImage()] Adventure context for image:', adventureContext);
+      // console.log('[AIService.generateAdventureImage()] Adventure context for image:', adventureContext);
 
       // Generate one optimized prompt first, then fallback prompts if needed
       const primaryPrompt = this.generatePrimaryAdventurePrompt(prompt, userAdventure, fallbackPrompt);
       
-      console.log('🎯 [AIService.generateAdventureImage()] Trying PRIMARY adventure prompt first:', primaryPrompt);
+      // console.log('🎯 [AIService.generateAdventureImage()] Trying PRIMARY adventure prompt first:', primaryPrompt);
 
       // Try primary prompt first
       try {
@@ -2545,10 +2531,10 @@ Return ONLY the new reading passage, nothing else.`;
           ? primaryPrompt.substring(0, 3990) + "..." 
           : primaryPrompt;
         
-        console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
-        console.log(`📝 [AIService.generateAdventureImage()] Final prompt length: ${finalPrompt.length} characters`);
-        console.log(`📝 [AIService.generateAdventureImage()] Final prompt: ${finalPrompt}`);
-        console.log(`🎯 dall-e prompt primary final: ${finalPrompt}`);
+        // console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
+        // console.log(`📝 [AIService.generateAdventureImage()] Final prompt length: ${finalPrompt.length} characters`);
+        // console.log(`📝 [AIService.generateAdventureImage()] Final prompt: ${finalPrompt}`);
+        // console.log(`🎯 dall-e prompt primary final: ${finalPrompt}`);
 
         const response = await this.client.images.generate({
           model: "dall-e-3",
@@ -2562,13 +2548,13 @@ Return ONLY the new reading passage, nothing else.`;
         const imageUrl = response.data[0]?.url;
         
         if (imageUrl) {
-          console.log(`✅ [AIService.generateAdventureImage()] PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
+          // console.log(`✅ [AIService.generateAdventureImage()] PRIMARY adventure prompt succeeded - EARLY EXIT (no fallback prompts needed)`);
           clearTimeout(safetyTimeout); // Clear safety timeout
           this.isGeneratingImage = false; // Clear generation flag
           return { imageUrl, usedPrompt: finalPrompt, adventureId };
         }
       } catch (primaryError: any) {
-        console.log(`❌ [AIService.generateAdventureImage()] Primary adventure prompt failed:`, primaryError.message);
+        // console.log(`❌ [AIService.generateAdventureImage()] Primary adventure prompt failed:`, primaryError.message);
         
         // Only proceed to fallback if it's a safety/policy issue
         if (!primaryError.message?.includes('safety system')) {
@@ -2576,14 +2562,14 @@ Return ONLY the new reading passage, nothing else.`;
           throw primaryError;
         }
         
-        console.log('🔄 [AIService.generateAdventureImage()] Primary prompt blocked by safety system - trying fallback prompts');
+        // console.log('🔄 [AIService.generateAdventureImage()] Primary prompt blocked by safety system - trying fallback prompts');
       }
 
       // Only if primary fails, generate fallback prompts
-      console.log('🔄 [AIService.generateAdventureImage()] Generating fallback prompts (primary prompt failed)');
+      // console.log('🔄 [AIService.generateAdventureImage()] Generating fallback prompts (primary prompt failed)');
       const fallbackPrompts = this.generateFallbackAdventurePrompts(prompt, userAdventure, fallbackPrompt, aiSanitizedResult);
 
-      console.log('Generated fallback prompt options:', fallbackPrompts);
+      // console.log('Generated fallback prompt options:', fallbackPrompts);
 
       // Try each fallback prompt option until one succeeds
       for (let i = 0; i < fallbackPrompts.length; i++) {
@@ -2593,12 +2579,12 @@ Return ONLY the new reading passage, nothing else.`;
           const maxLength = isAISanitized ? 2000 : 2000; // Allow longer prompts for AI sanitized
           const truncateLength = isAISanitized ? 1990 : 1990;
           
-          console.log(`🔍 Prompt ${i + 1} length check:`, {
-            isAISanitized,
-            originalLength: fallbackPrompts[i].length,
-            maxLength,
-            willTruncate: fallbackPrompts[i].length > maxLength
-          });
+          // console.log(`🔍 Prompt ${i + 1} length check:`, {
+          //   isAISanitized,
+          //   originalLength: fallbackPrompts[i].length,
+          //   maxLength,
+          //   willTruncate: fallbackPrompts[i].length > maxLength
+          // });
           
           const finalPrompt = fallbackPrompts[i].length > maxLength 
             ? fallbackPrompts[i].substring(0, truncateLength) + "..." 
@@ -2611,8 +2597,8 @@ Return ONLY the new reading passage, nothing else.`;
           else if (i === 2) promptType = ' (Thrilling Safe)';
           else if (i === 3) promptType = ' (Simple Safe)';
           
-          console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}${promptType}:`, finalPrompt.substring(0, 200) + '...');
-          console.log(`🎯 fallback${i + 1} dalle prompt: ${finalPrompt}`);
+          // console.log(`🎨 Trying fallback DALL-E prompt ${i + 1}${promptType}:`, finalPrompt.substring(0, 200) + '...');
+          // console.log(`🎯 fallback${i + 1} dalle prompt: ${finalPrompt}`);
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -2627,13 +2613,13 @@ Return ONLY the new reading passage, nothing else.`;
           
           if (imageUrl) {
             const promptType = i === 0 ? ' (Epic Dynamic)' : i === 1 ? '  (AI Sanitized ✨)' : i === 2 ? ' (Thrilling Safe)' : ' (Simple Safe)';
-            console.log(`✅ Fallback DALL-E prompt ${i + 1}${promptType} succeeded! 🎉`);
+            // console.log(`✅ Fallback DALL-E prompt ${i + 1}${promptType} succeeded! 🎉`);
             clearTimeout(safetyTimeout); // Clear safety timeout
             this.isGeneratingImage = false; // Clear generation flag
             return { imageUrl, usedPrompt: finalPrompt, adventureId };
           }
         } catch (promptError: any) {
-          console.log(`❌ Fallback DALL-E prompt ${i + 1} failed:`, promptError.message);
+          // console.log(`❌ Fallback DALL-E prompt ${i + 1} failed:`, promptError.message);
           
           if (!promptError.message?.includes('safety system') || i === fallbackPrompts.length - 1) {
             this.isGeneratingImage = false; // Clear generation flag
@@ -2669,12 +2655,12 @@ Return ONLY the new reading passage, nothing else.`;
     }
 
     try {
-      console.log('📚 Generating educational question image (no adventure context):', audioText);
+      // console.log('📚 Generating educational question image (no adventure context):', audioText);
 
       // Generate educational-focused prompts without adventure context
       const educationalPrompts = this.generateEducationalPrompts(audioText, imagePrompt, topicName);
 
-      console.log('Generated educational prompt options:', educationalPrompts);
+      // console.log('Generated educational prompt options:', educationalPrompts);
 
       // Try each prompt option until one succeeds
       for (let i = 0; i < educationalPrompts.length; i++) {
@@ -2683,7 +2669,7 @@ Return ONLY the new reading passage, nothing else.`;
             ? educationalPrompts[i].substring(0, 390) + "..." 
             : educationalPrompts[i];
           
-          console.log(`📖 Trying educational DALL-E prompt ${i + 1}:`, finalPrompt);
+          // console.log(`📖 Trying educational DALL-E prompt ${i + 1}:`, finalPrompt);
 
           const response = await this.client.images.generate({
             model: "dall-e-3",
@@ -2697,11 +2683,11 @@ Return ONLY the new reading passage, nothing else.`;
           const imageUrl = response.data[0]?.url;
           
           if (imageUrl) {
-            console.log(`✅ Educational DALL-E prompt ${i + 1} succeeded`);
+            // console.log(`✅ Educational DALL-E prompt ${i + 1} succeeded`);
             return imageUrl;
           }
         } catch (promptError: any) {
-          console.log(`❌ Educational DALL-E prompt ${i + 1} failed:`, promptError.message);
+          // console.log(`❌ Educational DALL-E prompt ${i + 1} failed:`, promptError.message);
           
           if (!promptError.message?.includes('safety system') || i === educationalPrompts.length - 1) {
             throw promptError;
@@ -2759,21 +2745,21 @@ Return ONLY the new reading passage, nothing else.`;
 
   // Helper: Generate the primary optimized adventure prompt (used first)
   private generatePrimaryAdventurePrompt(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string): string {
-    console.log('=== PRIMARY ADVENTURE PROMPT GENERATION ===');
-    console.log('Function: AIService.generatePrimaryAdventurePrompt');
-    console.log('Current input prompt:', prompt);
+    // console.log('=== PRIMARY ADVENTURE PROMPT GENERATION ===');
+    // console.log('Function: AIService.generatePrimaryAdventurePrompt');
+    // console.log('Current input prompt:', prompt);
 
     // Get conversation history for weighted prompt generation (last 6 messages - OpenAI style)
     const conversationHistory = this.getLastConversationMessages(userAdventure);
-    console.log('Conversation history (last 6 - OpenAI style):', conversationHistory);
+    // console.log('Conversation history (last 6 - OpenAI style):', conversationHistory);
 
     // Generate weighted prompt: 60% user input + 20% latest AI response + 20% conversation history
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);
-    console.log('Weighted content (60% user input, 20% latest AI response, 20% conversation history in context):', weightedContent);
+    // console.log('Weighted content (60% user input, 20% latest AI response, 20% conversation history in context):', weightedContent);
 
     // Build context from conversation for better image generation
     const conversationContext = this.buildImageGenerationContext(userAdventure);
-    console.log('Conversation context for image:', conversationContext.substring(0, 500));
+    // console.log('Conversation context for image:', conversationContext.substring(0, 500));
 
     // Create exciting, adventurous images that kids will love while maintaining safety
     const enhancedPrompt = `Remove parts that make it moderated. Eliminate sexual parts if any. 
@@ -2806,24 +2792,24 @@ Absolutely avoid any text in the image (no signs, labels, words, or letters).
 
 ${conversationContext}`;
     
-    console.log('PRIMARY adventure prompt:', enhancedPrompt);
-    console.log('WEIGHTING: 60% User Input + 20% Latest AI Response + 20% Conversation History');
-    console.log('================================================');
+    // console.log('PRIMARY adventure prompt:', enhancedPrompt);
+    // console.log('WEIGHTING: 60% User Input + 20% Latest AI Response + 20% Conversation History');
+    // console.log('================================================');
 
     return enhancedPrompt;
   }
 
   // Helper: Generate fallback adventure prompts (only used if primary fails)
   private generateFallbackAdventurePrompts(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string, aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string }): string[] {
-    console.log('=== FALLBACK ADVENTURE PROMPTS GENERATION ===');
-    console.log('Function: AIService.generateFallbackAdventurePrompts');
-    console.log('Current input prompt:', prompt);
-    console.log('🧹 AI Sanitized Result:', aiSanitizedResult ? 'PRESENT' : 'MISSING');
+    // console.log('=== FALLBACK ADVENTURE PROMPTS GENERATION ===');
+    // console.log('Function: AIService.generateFallbackAdventurePrompts');
+    // console.log('Current input prompt:', prompt);
+    // console.log('🧹 AI Sanitized Result:', aiSanitizedResult ? 'PRESENT' : 'MISSING');
     if (aiSanitizedResult) {
-      console.log('🧹 Sanitized prompt preview:', aiSanitizedResult.sanitizedPrompt?.substring(0, 80) + '...');
-      console.log('🧹 Sanitized context preview:', aiSanitizedResult.sanitizedContext?.substring(0, 80) + '...');
-      console.log('🧹 Has valid sanitized prompt:', !!aiSanitizedResult.sanitizedPrompt);
-      console.log('🧹 Has valid sanitized context:', !!aiSanitizedResult.sanitizedContext);
+      // console.log('🧹 Sanitized prompt preview:', aiSanitizedResult.sanitizedPrompt?.substring(0, 80) + '...');
+      // console.log('🧹 Sanitized context preview:', aiSanitizedResult.sanitizedContext?.substring(0, 80) + '...');
+      // console.log('🧹 Has valid sanitized prompt:', !!aiSanitizedResult.sanitizedPrompt);
+      // console.log('🧹 Has valid sanitized context:', !!aiSanitizedResult.sanitizedContext);
     }
 
     // Get conversation history for weighted prompt generation
@@ -2834,7 +2820,7 @@ ${conversationContext}`;
     // Use sanitized context if available, otherwise use original
     const conversationContext = aiSanitizedResult?.sanitizedContext || this.buildImageGenerationContext(userAdventure);
     
-    console.log('🧹 Using context:', aiSanitizedResult?.sanitizedContext ? 'SANITIZED' : 'ORIGINAL');
+    // console.log('🧹 Using context:', aiSanitizedResult?.sanitizedContext ? 'SANITIZED' : 'ORIGINAL');
 
     const prompts: string[] = [];
 
@@ -2865,13 +2851,13 @@ Absolutely no text or written content in the image.
 ${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt1);
 
-    console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
+    // console.log('Fallback prompt 1 (Epic Dynamic):', sanitizedEnhancedPrompt1);
     
 
 
     // Add AI-sanitized prompt as 4th attempt if available (highest success chance)
     if (aiSanitizedResult?.sanitizedPrompt) {
-      console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 2! ✨');
+      // console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 2! ✨');
       // Use the sanitized context we already selected above
 //       const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
@@ -2907,9 +2893,9 @@ ${conversationContext}`;
 
       prompts.push(aiSanitizedWithContext);
 
-      console.log('Fallback prompt 2 (AI Sanitized):', aiSanitizedWithContext);
+      // console.log('Fallback prompt 2 (AI Sanitized):', aiSanitizedWithContext);
     } else {
-      console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
+      // console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
     }
 
     // Fallback Option 2: Thrilling adventure with safe content
@@ -2918,19 +2904,19 @@ ${conversationContext}`;
 ${conversationContext}`;
     prompts.push(sanitizedEnhancedPrompt2);
     
-    console.log('Fallback prompt 2 (Thrilling Safe):', sanitizedEnhancedPrompt2);
+    // console.log('Fallback prompt 2 (Thrilling Safe):', sanitizedEnhancedPrompt2);
 
 //     // Add AI-sanitized prompt as 4th attempt if available (highest success chance)
 //     if (aiSanitizedResult?.sanitizedPrompt) {
-//       console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 4! ✨');
+//       // console.log('🧹 ADDING AI-SANITIZED PROMPT AS ATTEMPT 4! ✨');
 //       // Use the sanitized context we already selected above
 //       const aiSanitizedWithContext = `${aiSanitizedResult.sanitizedPrompt}. Style: realistic and vivid details and engaging for children.if there are real pop culture refrences such as any show, video game, or something like that make sure you add some of the character's appearance or famous objects etc. There should be no text in the image whatsoever - no words, letters, signs, or any written content anywhere in the image.
 
 // ${conversationContext}`;
 //       prompts.push(aiSanitizedWithContext);
-//       console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
+//       // console.log('Fallback prompt 3 (AI Sanitized):', aiSanitizedWithContext);
 //     } else {
-//       console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
+//       // console.log('🚫 NOT adding AI-sanitized prompt - no valid sanitized prompt available');
 //     }
 
     // Add simple fallback if all enhanced approaches fail
@@ -2940,11 +2926,11 @@ Create an awesome adventure image: ${prompt}, ${fallbackPrompt}. Style: realisti
 
 ${conversationContext}`;
       prompts.push(simpleFallback);
-      console.log('Final fallback prompt (Simple Safe):', simpleFallback);
+      // console.log('Final fallback prompt (Simple Safe):', simpleFallback);
     }
 
-    console.log('================================================');
-    console.log(`🎯 Generated ${prompts.length} fallback prompt options total`);
+    // console.log('================================================');
+    // console.log(`🎯 Generated ${prompts.length} fallback prompt options total`);
     return prompts;
   }
 
@@ -3530,7 +3516,7 @@ Generate a hint at level ${hintLevel}:`;
     sessionId: string = crypto.randomUUID(),
     adventureId?: string
   ): Promise<UnifiedAIResponse> {
-    console.log('🚀 Using NEW unified AI response generation system');
+    // console.log('🚀 Using NEW unified AI response generation system');
     
     return await this.unifiedStreamingService.generateUnifiedResponse(
       userText,
@@ -3582,11 +3568,11 @@ Generate a hint at level ${hintLevel}:`;
    */
   cancelAutomaticImageGeneration(): boolean {
     if (this.isGeneratingImage) {
-      console.log('🚫 COORDINATION: Cancelling ongoing automatic image generation for unified system priority');
+      // console.log('🚫 COORDINATION: Cancelling ongoing automatic image generation for unified system priority');
       this.isGeneratingImage = false; // Clear the flag to allow unified system
       return true; // Successfully cancelled
     }
-    console.log('✅ COORDINATION: No automatic image generation to cancel');
+    // console.log('✅ COORDINATION: No automatic image generation to cancel');
     return false; // Nothing was running
   }
 
@@ -3604,10 +3590,10 @@ Generate a hint at level ${hintLevel}:`;
    */
   unifiedSystemTakingOver(): void {
     if (this.isGeneratingImage) {
-      console.log('🔄 COORDINATION: Unified system taking over - automatic generation cancelled');
+      // console.log('🔄 COORDINATION: Unified system taking over - automatic generation cancelled');
       this.cancelAutomaticImageGeneration();
     } else {
-      console.log('🔄 COORDINATION: Unified system taking over - no automatic generation to cancel');
+      // console.log('🔄 COORDINATION: Unified system taking over - no automatic generation to cancel');
     }
   }
 }

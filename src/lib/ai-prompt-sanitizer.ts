@@ -22,21 +22,14 @@ class AIPromptSanitizer {
   }
 
   private initialize() {
-    const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    console.log('🔑 AI Sanitizer: Checking API key...', openaiApiKey ? 'FOUND' : 'MISSING');
-    if (!openaiApiKey) {
-      console.error('❌ AI Sanitizer: OpenAI API key not found');
-      console.error('❌ AI Sanitizer: Expected env var: VITE_OPENAI_API_KEY');
-      return;
-    }
-
     try {
       this.client = new OpenAI({
-        apiKey: openaiApiKey,
-        dangerouslyAllowBrowser: true
+        dangerouslyAllowBrowser: true,
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1'
       });
       this.isInitialized = true;
-      console.log('✅ AI Sanitizer: Initialized successfully');
+      // console.log('✅ AI Sanitizer: Initialized successfully');
     } catch (error) {
       console.error('❌ AI Sanitizer: Failed to initialize:', error);
     }
@@ -45,23 +38,23 @@ class AIPromptSanitizer {
   async sanitizePromptAndContext(originalPrompt: string, adventureContext?: string): Promise<SanitizedPromptResult> {
     const startTime = Date.now();
     
-    console.log('🧹 AI Sanitizer: Starting FULL sanitization (prompt + context) for:', originalPrompt.substring(0, 100) + '...');
-    console.log('📥 AI Sanitizer INPUT - Original Prompt (FULL):', originalPrompt);
-    console.log('📥 AI Sanitizer INPUT - Adventure Context (FULL):', adventureContext || 'No context provided');
-    console.log('🔧 AI Sanitizer: Cache key:', `full_${originalPrompt.substring(0, 30)}_${(adventureContext || '').substring(0, 30)}`);
+    // console.log('🧹 AI Sanitizer: Starting FULL sanitization (prompt + context) for:', originalPrompt.substring(0, 100) + '...');
+    // console.log('📥 AI Sanitizer INPUT - Original Prompt (FULL):', originalPrompt);
+    // console.log('📥 AI Sanitizer INPUT - Adventure Context (FULL):', adventureContext || 'No context provided');
+    // console.log('🔧 AI Sanitizer: Cache key:', `full_${originalPrompt.substring(0, 30)}_${(adventureContext || '').substring(0, 30)}`);
 
     // Check cache first
     const cacheKey = `full_${originalPrompt}_${adventureContext || ''}`;
     if (this.sanitizationCache.has(cacheKey)) {
-      console.log('💾 AI Sanitizer: Using cached full sanitization result');
+      // console.log('💾 AI Sanitizer: Using cached full sanitization result');
       const cachedResult = this.sanitizationCache.get(cacheKey)!;
-      console.log('📤 AI Sanitizer CACHED OUTPUT - Sanitized Prompt:', cachedResult.sanitizedPrompt);
-      console.log('📤 AI Sanitizer CACHED OUTPUT - Sanitized Context:', cachedResult.sanitizedContext || 'No context');
+      // console.log('📤 AI Sanitizer CACHED OUTPUT - Sanitized Prompt:', cachedResult.sanitizedPrompt);
+      // console.log('📤 AI Sanitizer CACHED OUTPUT - Sanitized Context:', cachedResult.sanitizedContext || 'No context');
       return cachedResult;
     }
 
     if (!this.isInitialized || !this.client) {
-      console.log('❌ AI Sanitizer: Not initialized, using fallback sanitization');
+      // console.log('❌ AI Sanitizer: Not initialized, using fallback sanitization');
       return this.fallbackFullSanitization(originalPrompt, adventureContext, startTime);
     }
 
@@ -148,10 +141,10 @@ Now clean the actual content provided below:`;
 
 Adventure Context: ${adventureContext || 'No additional context provided'}`;
       
-      console.log('🤖 AI Sanitizer: Sending to GPT-4o-mini...');
-      console.log('📨 AI Sanitizer SYSTEM PROMPT:', systemPrompt.substring(0, 200) + '...');
-      console.log('📨 AI Sanitizer USER MESSAGE:', userMessage);
-      console.log('⏳ AI Sanitizer: Making OpenAI API call...');
+      // console.log('🤖 AI Sanitizer: Sending to GPT-4o-mini...');
+      // console.log('📨 AI Sanitizer SYSTEM PROMPT:', systemPrompt.substring(0, 200) + '...');
+      // console.log('📨 AI Sanitizer USER MESSAGE:', userMessage);
+      // console.log('⏳ AI Sanitizer: Making OpenAI API call...');
 
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
@@ -163,45 +156,45 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
         temperature: 0.7,
       });
       
-      console.log('✅ AI Sanitizer: Received response from OpenAI');
+      // console.log('✅ AI Sanitizer: Received response from OpenAI');
 
       const responseText = completion.choices[0]?.message?.content?.trim() || '';
       
-      console.log('📨 AI Sanitizer RAW RESPONSE from GPT-4o-mini:', responseText);
-      console.log('📊 AI Sanitizer: Response length:', responseText.length, 'characters');
-      console.log('🔍 AI Sanitizer: Response contains "CLEANED_PROMPT":', responseText.includes('CLEANED_PROMPT'));
-      console.log('🔍 AI Sanitizer: Response contains "---":', responseText.includes('---'));
+      // console.log('📨 AI Sanitizer RAW RESPONSE from GPT-4o-mini:', responseText);
+      // console.log('📊 AI Sanitizer: Response length:', responseText.length, 'characters');
+      // console.log('🔍 AI Sanitizer: Response contains "CLEANED_PROMPT":', responseText.includes('CLEANED_PROMPT'));
+      // console.log('🔍 AI Sanitizer: Response contains "---":', responseText.includes('---'));
       
       let sanitizedPrompt = '';
       let sanitizedContext = '';
       
       // Parse the simple format: PROMPT\n---\nCONTEXT
       try {
-        console.log('🔍 AI Sanitizer: Parsing response format...');
+        // console.log('🔍 AI Sanitizer: Parsing response format...');
         const parts = responseText.split('---');
-        console.log('🔍 AI Sanitizer: Found', parts.length, 'parts after splitting on "---"');
+        // console.log('🔍 AI Sanitizer: Found', parts.length, 'parts after splitting on "---"');
         
         if (parts.length >= 2) {
           sanitizedPrompt = parts[0].trim();
           sanitizedContext = parts[1].trim();
-          console.log('🧹 Successfully parsed prompt and context using simple format');
-          console.log('📤 AI Sanitizer PARSED - Sanitized Prompt:', sanitizedPrompt);
-          console.log('📤 AI Sanitizer PARSED - Sanitized Context:', sanitizedContext);
+          // console.log('🧹 Successfully parsed prompt and context using simple format');
+          // console.log('📤 AI Sanitizer PARSED - Sanitized Prompt:', sanitizedPrompt);
+          // console.log('📤 AI Sanitizer PARSED - Sanitized Context:', sanitizedContext);
         } else {
           // Fallback: treat entire response as prompt
           sanitizedPrompt = responseText;
           sanitizedContext = adventureContext || '';
-          console.log('🔧 No separator found, using entire response as prompt');
-          console.log('📤 AI Sanitizer FALLBACK - Using full response as prompt:', sanitizedPrompt);
-          console.log('📤 AI Sanitizer FALLBACK - Using original context:', sanitizedContext);
+          // console.log('🔧 No separator found, using entire response as prompt');
+          // console.log('📤 AI Sanitizer FALLBACK - Using full response as prompt:', sanitizedPrompt);
+          // console.log('📤 AI Sanitizer FALLBACK - Using original context:', sanitizedContext);
         }
       } catch (parseError) {
         console.warn('⚠️ Simple parsing failed:', parseError);
         sanitizedPrompt = responseText || originalPrompt;
         sanitizedContext = adventureContext || '';
-        console.log('❌ AI Sanitizer PARSE ERROR - Using fallback values');
-        console.log('📤 AI Sanitizer ERROR FALLBACK - Prompt:', sanitizedPrompt);
-        console.log('📤 AI Sanitizer ERROR FALLBACK - Context:', sanitizedContext);
+        // console.log('❌ AI Sanitizer PARSE ERROR - Using fallback values');
+        // console.log('📤 AI Sanitizer ERROR FALLBACK - Prompt:', sanitizedPrompt);
+        // console.log('📤 AI Sanitizer ERROR FALLBACK - Context:', sanitizedContext);
       }
 
       if (!sanitizedPrompt) {
@@ -230,22 +223,22 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       // Cache the result
       this.sanitizationCache.set(cacheKey, result);
       
-      console.log('✅ AI Sanitizer: Successfully sanitized prompt + context');
-      console.log('🔄 BEFORE - Original prompt (FULL):', originalPrompt);
-      console.log('✨ AFTER - Sanitized prompt (FULL):', sanitizedPrompt);
+      // console.log('✅ AI Sanitizer: Successfully sanitized prompt + context');
+      // console.log('🔄 BEFORE - Original prompt (FULL):', originalPrompt);
+      // console.log('✨ AFTER - Sanitized prompt (FULL):', sanitizedPrompt);
       if (adventureContext && sanitizedContext) {
-        console.log('🔄 BEFORE - Original context (FULL):', adventureContext);
-        console.log('✨ AFTER - Sanitized context (FULL):', sanitizedContext);
+        // console.log('🔄 BEFORE - Original context (FULL):', adventureContext);
+        // console.log('✨ AFTER - Sanitized context (FULL):', sanitizedContext);
       }
-      console.log('⏱️ Processing time:', result.processingTimeMs + 'ms');
-      console.log('📊 AI Sanitizer FINAL RESULT:', result);
+      // console.log('⏱️ Processing time:', result.processingTimeMs + 'ms');
+      // console.log('📊 AI Sanitizer FINAL RESULT:', result);
 
       return result;
 
     } catch (error: any) {
       console.error('❌ AI Sanitizer: Failed to sanitize prompt + context:', error.message);
       console.error('❌ AI Sanitizer ERROR DETAILS:', error);
-      console.log('🔄 AI Sanitizer: Falling back to rule-based sanitization...');
+      // console.log('🔄 AI Sanitizer: Falling back to rule-based sanitization...');
       return this.fallbackFullSanitization(originalPrompt, adventureContext, startTime);
     }
   }
@@ -253,17 +246,17 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
   async sanitizePrompt(originalPrompt: string, context?: string): Promise<SanitizedPromptResult> {
     const startTime = Date.now();
     
-    console.log('🧹 AI Sanitizer: Starting prompt sanitization for:', originalPrompt.substring(0, 100) + '...');
+    // console.log('🧹 AI Sanitizer: Starting prompt sanitization for:', originalPrompt.substring(0, 100) + '...');
 
     // Check cache first
     const cacheKey = `${originalPrompt}_${context || ''}`;
     if (this.sanitizationCache.has(cacheKey)) {
-      console.log('💾 AI Sanitizer: Using cached result');
+      // console.log('💾 AI Sanitizer: Using cached result');
       return this.sanitizationCache.get(cacheKey)!;
     }
 
     if (!this.isInitialized || !this.client) {
-      console.log('❌ AI Sanitizer: Not initialized, using fallback sanitization');
+      // console.log('❌ AI Sanitizer: Not initialized, using fallback sanitization');
       return this.fallbackSanitization(originalPrompt, startTime);
     }
 
@@ -334,10 +327,10 @@ Transform this image request:`;
       // Cache the result
       this.sanitizationCache.set(cacheKey, result);
       
-      console.log('✅ AI Sanitizer: Successfully sanitized prompt');
-      console.log('🔄 Original:', originalPrompt.substring(0, 80) + '...');
-      console.log('✨ Sanitized:', sanitizedPrompt.substring(0, 80) + '...');
-      console.log('⏱️ Processing time:', result.processingTimeMs + 'ms');
+      // console.log('✅ AI Sanitizer: Successfully sanitized prompt');
+      // console.log('🔄 Original:', originalPrompt.substring(0, 80) + '...');
+      // console.log('✨ Sanitized:', sanitizedPrompt.substring(0, 80) + '...');
+      // console.log('⏱️ Processing time:', result.processingTimeMs + 'ms');
 
       return result;
 
@@ -348,9 +341,9 @@ Transform this image request:`;
   }
 
   private fallbackFullSanitization(originalPrompt: string, adventureContext: string | undefined, startTime: number): SanitizedPromptResult {
-    console.log('🔧 AI Sanitizer: Using rule-based fallback FULL sanitization');
-    console.log('📥 AI Sanitizer FALLBACK INPUT - Original Prompt:', originalPrompt);
-    console.log('📥 AI Sanitizer FALLBACK INPUT - Adventure Context:', adventureContext || 'No context');
+    // console.log('🔧 AI Sanitizer: Using rule-based fallback FULL sanitization');
+    // console.log('📥 AI Sanitizer FALLBACK INPUT - Original Prompt:', originalPrompt);
+    // console.log('📥 AI Sanitizer FALLBACK INPUT - Adventure Context:', adventureContext || 'No context');
     
     // Rule-based sanitization as fallback
     const currentPetId = ((): string => {
@@ -411,16 +404,16 @@ Transform this image request:`;
       processingTimeMs: Date.now() - startTime
     };
 
-    console.log('🔧 Fallback full sanitization completed in', result.processingTimeMs + 'ms');
-    console.log('📤 AI Sanitizer FALLBACK OUTPUT - Sanitized Prompt:', sanitizedPrompt);
-    console.log('📤 AI Sanitizer FALLBACK OUTPUT - Sanitized Context:', sanitizedContext);
-    console.log('📊 AI Sanitizer FALLBACK FINAL RESULT:', result);
+    // console.log('🔧 Fallback full sanitization completed in', result.processingTimeMs + 'ms');
+    // console.log('📤 AI Sanitizer FALLBACK OUTPUT - Sanitized Prompt:', sanitizedPrompt);
+    // console.log('📤 AI Sanitizer FALLBACK OUTPUT - Sanitized Context:', sanitizedContext);
+    // console.log('📊 AI Sanitizer FALLBACK FINAL RESULT:', result);
     
     return result;
   }
 
   private fallbackSanitization(originalPrompt: string, startTime: number): SanitizedPromptResult {
-    console.log('🔧 AI Sanitizer: Using rule-based fallback sanitization');
+    // console.log('🔧 AI Sanitizer: Using rule-based fallback sanitization');
     
     // Rule-based sanitization as fallback
     const currentPetId = ((): string => {
@@ -470,7 +463,7 @@ Transform this image request:`;
       processingTimeMs: Date.now() - startTime
     };
 
-    console.log('🔧 Fallback sanitization completed in', result.processingTimeMs + 'ms');
+    // console.log('🔧 Fallback sanitization completed in', result.processingTimeMs + 'ms');
     
     return result;
   }
@@ -478,7 +471,7 @@ Transform this image request:`;
   // Clear cache periodically to prevent memory issues
   clearCache() {
     this.sanitizationCache.clear();
-    console.log('🗑️ AI Sanitizer: Cache cleared');
+    // console.log('🗑️ AI Sanitizer: Cache cleared');
   }
 }
 
