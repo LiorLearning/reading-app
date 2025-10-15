@@ -28563,6 +28563,76 @@ aiTutor: {
             spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"cup"
+        },
+        {
+          id: 12,
+          topicId: '2-J.1',
+          topicName: 'Sort_short_and_long_vowel_words',
+          progressTopicName: 'Sneaky Silent E: Short and Long Vowels',
+          questionElements: 'image + audio',
+          answerElements: 'image',
+          templateType: 'fill_blank',
+          word: "kite",
+          imageUrl: null,
+          explanation: "Excellent! The word 'kite' has a long i sound made by the sneaky silent e.",
+          questionText: "Listen to the word 'kite'. Does it have a short or long vowel sound?",
+          correctAnswer: "long",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [2],
+          aiHook: {
+            targetWord: "kite",
+            intent: "fill_blank",
+            questionLine: "Listen to the word 'kite'. Does it have a short or long vowel sound?",
+            imagePrompt: "A bright red kite flying high in the blue sky for the word kite"
+          },
+          aiTutor: {
+            target_word: 'kite',
+            question: "Listen carefully to the word 'kite'. Does the vowel say its name or make a short sound?",
+            student_entry: "",
+            topic_to_reinforce: 'Sort short and long vowel sounds',
+            spelling_pattern_or_rule:
+              "When you add a silent e to the end of a word, it makes the vowel say its name. 'Kit' becomes 'kite' — short i turns into long i."
+          },
+          audio: "kite"
+        },
+        {
+          id: 11,
+          topicId: '2-J.1',
+          topicName: 'Sort_short_and_long_vowel_words',
+          progressTopicName: 'Sneaky Silent E: Short and Long Vowels',
+          questionElements: 'image + audio',
+          answerElements: 'image',
+          templateType: 'fill_blank',
+          word: "kit",
+          imageUrl: null,
+          explanation: "Nice job! The word 'kit' has a short i sound.",
+          questionText: "Listen to the word 'kit'. Does it have a short or long vowel sound?",
+          correctAnswer: "short",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [2],
+          aiHook: {
+            targetWord: "kit",
+            intent: "fill_blank",
+            questionLine: "Listen to the word 'kit'. Does it have a short or long vowel sound?",
+            imagePrompt: "A small first-aid kit on a table for the word kit"
+          },
+          aiTutor: {
+            target_word: 'kit',
+            question: "Listen carefully to the word 'kit'. Does the vowel say its name or make a short sound?",
+            student_entry: "",
+            topic_to_reinforce: 'Sort short and long vowel sounds',
+            spelling_pattern_or_rule:
+              "The vowel i is short in 'kit' because there’s no silent e at the end. Short vowels say their quick sounds — /ĭ/ in 'kit'."
+          },
+          audio: "kit"
         }
       ]
     }
@@ -32090,700 +32160,670 @@ aiTutor: {
   ]
 }
 ,
-   '2-K.6': {
+   '2-K.6.1': {
   topicInfo: {
-    topicId: '2-K.6',
-    topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-    progressTopicName: 'Spell the long u word',
+    topicId: '2-K.6.1',
+    topicName: 'Spell_the_long_u_word_u_e_and_oo',
+    progressTopicName: 'Spell the long U word: u_e and oo',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
   },
   questions: [
+    // --- First 2: u_e ---
     {
       id: 1,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "dew",
-      imageUrl: null,
-      explanation: "Great job! The missing vowel team is 'ew'. The word is 'dew'.",
-      questionText: "Complete the word: d__",
-      correctAnswer: "ew",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
-      aiHook: {
-        targetWord: "dew",
-        intent: "fill_blank",
-        questionLine: "Complete the word: d__",
-        imagePrompt: "Morning dew drops on a green leaf"
-      },
-      aiTutor: {
-        target_word: 'dew',
-        question: "d__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ew' makes the long u sound in 'dew'."
-      },
-      audio: "dew"
-    },
-    {
-      id: 2,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "blue",
-      imageUrl: null,
-      explanation: "Nice! The missing vowel team is 'ue'. The word is 'blue'.",
-      questionText: "Complete the word: bl__",
-      correctAnswer: "ue",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "blue",
-        intent: "fill_blank",
-        questionLine: "Complete the word: bl__",
-        imagePrompt: "A blue balloon floating in the air"
-      },
-      aiTutor: {
-        target_word: 'blue',
-        question: "bl__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ue' makes the long u sound in 'blue'."
-      },
-      audio: "blue"
-    },
-    {
-      id: 3,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "moon",
-      imageUrl: null,
-      explanation: "Good work! The missing vowel team is 'oo'. The word is 'moon'.",
-      questionText: "Complete the word: m__n",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "moon",
-        intent: "fill_blank",
-        questionLine: "Complete the word: m__n",
-        imagePrompt: "A bright full moon in the night sky"
-      },
-      aiTutor: {
-        target_word: 'moon',
-        question: "m__n",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'moon'."
-      },
-      audio: "moon"
-    },
-    {
-      id: 4,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "tune",
-      imageUrl: null,
-      explanation: "Excellent! The missing vowel is 'u'. The word is 'tune'.",
-      questionText: "Complete the word: t__e",
-      correctAnswer: "un",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "tune",
-        intent: "fill_blank",
-        questionLine: "Complete the word: t__e",
-        imagePrompt: "A musician tuning a guitar"
-      },
-      aiTutor: {
-        target_word: 'tune',
-        question: "t__e",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "Silent e makes the u long in 'tune'."
-      },
-      audio: "tune"
-    },
-    {
-      id: 5,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "stew",
-      imageUrl: null,
-      explanation: "Good! The missing vowel team is 'ew'. The word is 'stew'.",
-      questionText: "Complete the word: st__",
-      correctAnswer: "ew",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "stew",
-        intent: "fill_blank",
-        questionLine: "Complete the word: st__",
-        imagePrompt: "A bowl of hot stew on the table"
-      },
-      aiTutor: {
-        target_word: 'stew',
-        question: "st__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ew' makes the long u sound in 'stew'."
-      },
-      audio: "stew"
-    },    {
-      id: 6,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "glue",
-      imageUrl: null,
-      explanation: "Nice job! The missing vowel team is 'ue'. The word is 'glue'.",
-      questionText: "Complete the word: gl__",
-      correctAnswer: "ue",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "glue",
-        intent: "fill_blank",
-        questionLine: "Complete the word: gl__",
-        imagePrompt: "A bottle of glue used for crafts"
-      },
-      aiTutor: {
-        target_word: 'glue',
-        question: "gl__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ue' makes the long u sound in 'glue'."
-      },
-      audio: "glue"
-    },
-    {
-      id: 7,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "food",
-      imageUrl: null,
-      explanation: "Great! The missing vowel team is 'oo'. The word is 'food'.",
-      questionText: "Complete the word: f__d",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "food",
-        intent: "fill_blank",
-        questionLine: "Complete the word: f__d",
-        imagePrompt: "A plate of delicious food"
-      },
-      aiTutor: {
-        target_word: 'food',
-        question: "f__d",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'food'."
-      },
-      audio: "food"
-    },
-    {
-      id: 8,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "true",
-      imageUrl: null,
-      explanation: "Good! The missing vowel team is 'ue'. The word is 'true'.",
-      questionText: "Complete the word: tr__",
-      correctAnswer: "ue",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "true",
-        intent: "fill_blank",
-        questionLine: "Complete the word: tr__",
-        imagePrompt: "A checkmark showing something true or correct"
-      },
-      aiTutor: {
-        target_word: 'true',
-        question: "tr__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ue' makes the long u sound in 'true'."
-      },
-      audio: "true"
-    },
-    {
-      id: 9,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "spoon",
-      imageUrl: null,
-      explanation: "Well done! The missing vowel team is 'oo'. The word is 'spoon'.",
-      questionText: "Complete the word: sp__n",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
-      aiHook: {
-        targetWord: "spoon",
-        intent: "fill_blank",
-        questionLine: "Complete the word: sp__n",
-        imagePrompt: "A shiny silver spoon on a table"
-      },
-      aiTutor: {
-        target_word: 'spoon',
-        question: "sp__n",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'spoon'."
-      },
-      audio: "spoon"
-    },
-    {
-      id: 10,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "cube",
       imageUrl: null,
-      explanation: "Excellent! The missing vowel is 'u'. The word is 'cube'.",
-      questionText: "Complete the word: c__e",
-      correctAnswer: "ub",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
+      explanation: "Great job! The word is 'cube' (u_e makes the long /yoo/ sound).",
+      questionText: "Complete the word: c _ _ b _",
+      correctAnswer: "cube",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "cube",
         intent: "fill_blank",
-        questionLine: "Complete the word: c__e",
-        imagePrompt: "A 3D cube block shape"
+        questionLine: "Complete the word: c _ _ b _",
+        imagePrompt: "A 3D cube block shape on a table"
       },
       aiTutor: {
-        target_word: 'cube',
-        question: "c__e",
+        target_word: "cube",
+        question: "c _ _ b _",
         student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "Silent e makes the u long in 'cube'."
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
       },
       audio: "cube"
     },
     {
-      id: 11,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "few",
-      imageUrl: null,
-      explanation: "Great job! The missing vowel team is 'ew'. The word is 'few'.",
-      questionText: "Complete the word: f__",
-      correctAnswer: "ew",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
-      aiHook: {
-        targetWord: "few",
-        intent: "fill_blank",
-        questionLine: "Complete the word: f__",
-        imagePrompt: "A few apples in a basket"
-      },
-      aiTutor: {
-        target_word: 'few',
-        question: "f__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ew' makes the long u sound in 'few'."
-      },
-      audio: "few"
-    },
-    {
-      id: 12,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "blew",
-      imageUrl: null,
-      explanation: "Nice work! The missing vowel team is 'ew'. The word is 'blew'.",
-      questionText: "Complete the word: bl__",
-      correctAnswer: "ew",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "blew",
-        intent: "fill_blank",
-        questionLine: "Complete the word: bl__",
-        imagePrompt: "A child blowing air to move paper"
-      },
-      aiTutor: {
-        target_word: 'blew',
-        question: "bl__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ew' makes the long u sound in 'blew'."
-      },
-      audio: "blew"
-    },
-    {
-      id: 13,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "grew",
-      imageUrl: null,
-      explanation: "Good! The missing vowel team is 'ew'. The word is 'grew'.",
-      questionText: "Complete the word: gr__",
-      correctAnswer: "ew",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "grew",
-        intent: "fill_blank",
-        questionLine: "Complete the word: gr__",
-        imagePrompt: "A plant that grew tall with green leaves"
-      },
-      aiTutor: {
-        target_word: 'grew',
-        question: "gr__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ew' makes the long u sound in 'grew'."
-      },
-      audio: "grew"
-    },
-    {
-      id: 14,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "room",
-      imageUrl: null,
-      explanation: "Excellent! The missing vowel team is 'oo'. The word is 'room'.",
-      questionText: "Complete the word: r__m",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "room",
-        intent: "fill_blank",
-        questionLine: "Complete the word: r__m",
-        imagePrompt: "A cozy room with a bed and lamp"
-      },
-      aiTutor: {
-        target_word: 'room',
-        question: "r__m",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'room'."
-      },
-      audio: "room"
-    },
-    {
-      id: 15,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "clue",
-      imageUrl: null,
-      explanation: "Nice! The missing vowel team is 'ue'. The word is 'clue'.",
-      questionText: "Complete the word: cl__",
-      correctAnswer: "ue",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "clue",
-        intent: "fill_blank",
-        questionLine: "Complete the word: cl__",
-        imagePrompt: "A detective finding a clue with a magnifying glass"
-      },
-      aiTutor: {
-        target_word: 'clue',
-        question: "cl__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ue' makes the long u sound in 'clue'."
-      },
-      audio: "clue"
-    },
-    {
-      id: 16,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "pool",
-      imageUrl: null,
-      explanation: "Good work! The missing vowel team is 'oo'. The word is 'pool'.",
-      questionText: "Complete the word: p__l",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "pool",
-        intent: "fill_blank",
-        questionLine: "Complete the word: p__l",
-        imagePrompt: "A swimming pool with blue water"
-      },
-      aiTutor: {
-        target_word: 'pool',
-        question: "p__l",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'pool'."
-      },
-      audio: "pool"
-    },
-    {
-      id: 17,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "broom",
-      imageUrl: null,
-      explanation: "Nice work! The missing vowel team is 'oo'. The word is 'broom'.",
-      questionText: "Complete the word: br__m",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
-      aiHook: {
-        targetWord: "broom",
-        intent: "fill_blank",
-        questionLine: "Complete the word: br__m",
-        imagePrompt: "A broom used for sweeping the floor"
-      },
-      aiTutor: {
-        target_word: 'broom',
-        question: "br__m",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'broom'."
-      },
-      audio: "broom"
-    },
-    {
-      id: 18,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "chew",
-      imageUrl: null,
-      explanation: "Good! The missing vowel team is 'ew'. The word is 'chew'.",
-      questionText: "Complete the word: ch__",
-      correctAnswer: "ew",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1],
-      aiHook: {
-        targetWord: "chew",
-        intent: "fill_blank",
-        questionLine: "Complete the word: ch__",
-        imagePrompt: "A dog chewing a bone"
-      },
-      aiTutor: {
-        target_word: 'chew',
-        question: "ch__",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'ew' makes the long u sound in 'chew'."
-      },
-      audio: "chew"
-    },
-    {
-      id: 19,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
+      id: 2,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "flute",
       imageUrl: null,
-      explanation: "Excellent! The missing vowel is 'u'. The word is 'flute'.",
-      questionText: "Complete the word: fl__e",
-      correctAnswer: "ut",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
+      explanation: "Excellent! The word is 'flute' (silent e makes the u long).",
+      questionText: "Complete the word: f l _ _ t _",
+      correctAnswer: "flute",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "flute",
         intent: "fill_blank",
-        questionLine: "Complete the word: fl__e",
-        imagePrompt: "A musician playing the flute"
+        questionLine: "Complete the word: f l _ _ t _",
+        imagePrompt: "A musician playing a silver flute"
       },
       aiTutor: {
-        target_word: 'flute',
-        question: "fl__e",
+        target_word: "flute",
+        question: "f l _ _ t _",
         student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "Silent e makes the u long in 'flute'."
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
       },
       audio: "flute"
     },
+
+    // --- Next 2: oo ---
     {
-      id: 20,
-      topicId: '2-K.6',
-      topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
-      progressTopicName: 'Spell the long u word',
+      id: 3,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "zoo",
+      word: "moon",
       imageUrl: null,
-      explanation: "Great job! The missing vowel team is 'oo'. The word is 'zoo'.",
-      questionText: "Complete the word: z__",
-      correctAnswer: "oo",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
+      explanation: "Nice! The word is 'moon' (oo makes the smooth /oo/ sound).",
+      questionText: "Complete the word: m _ _ n",
+      correctAnswer: "moon",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
-        targetWord: "zoo",
+        targetWord: "moon",
         intent: "fill_blank",
-        questionLine: "Complete the word: z__",
-        imagePrompt: "A zoo with animals like lions, elephants, and monkeys"
+        questionLine: "Complete the word: m _ _ n",
+        imagePrompt: "A bright full moon in the night sky"
       },
       aiTutor: {
-        target_word: 'zoo',
-        question: "z__",
+        target_word: "moon",
+        question: "m _ _ n",
         student_entry: "",
-        topic_to_reinforce: 'Spell the long u word',
-        spelling_pattern_or_rule: "The vowel team 'oo' makes the long u sound in 'zoo'."
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
       },
-      audio: "zoo"
+      audio: "moon"
+    },
+    {
+      id: 4,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "food",
+      imageUrl: null,
+      explanation: "Great! The word is 'food' (oo makes the long /oo/ sound).",
+      questionText: "Complete the word: f _ _ d",
+      correctAnswer: "food",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: "food",
+        intent: "fill_blank",
+        questionLine: "Complete the word: f _ _ d",
+        imagePrompt: "A plate of delicious food"
+      },
+      aiTutor: {
+        target_word: "food",
+        question: "f _ _ d",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "food"
+    },
+
+    // --- Mixed (random order, not alternating) ---
+    {
+      id: 5,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "tune",
+      imageUrl: null,
+      explanation: "Good! The word is 'tune' (silent e makes the u long).",
+      questionText: "Complete the word: t _ _ n _",
+      correctAnswer: "tune",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: "tune",
+        intent: "fill_blank",
+        questionLine: "Complete the word: t _ _ n _",
+        imagePrompt: "A musician tuning a guitar"
+      },
+      aiTutor: {
+        target_word: "tune",
+        question: "t _ _ n _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "tune"
+    },
+    {
+      id: 6,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "room",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'room' (oo makes the long /oo/ sound).",
+      questionText: "Complete the word: r _ _ m",
+      correctAnswer: "room",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: "room",
+        intent: "fill_blank",
+        questionLine: "Complete the word: r _ _ m",
+        imagePrompt: "A cozy room with a bed and lamp"
+      },
+      aiTutor: {
+        target_word: "room",
+        question: "r _ _ m",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "room"
+    },
+    {
+      id: 7,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "mule",
+      imageUrl: null,
+      explanation: "Nice! The word is 'mule' (silent e makes the u long).",
+      questionText: "Complete the word: m _ l _",
+      correctAnswer: "mule",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: "mule",
+        intent: "fill_blank",
+        questionLine: "Complete the word: m _ l _",
+        imagePrompt: "A mule standing near a barn"
+      },
+      aiTutor: {
+        target_word: "mule",
+        question: "m _ l _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "mule"
+    },
+    {
+      id: 8,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "broom",
+      imageUrl: null,
+      explanation: "Great! The word is 'broom' (oo makes the long /oo/ sound).",
+      questionText: "Complete the word: b r _ _ m",
+      correctAnswer: "broom",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "broom",
+        intent: "fill_blank",
+        questionLine: "Complete the word: b r _ _ m",
+        imagePrompt: "A broom used for sweeping the floor"
+      },
+      aiTutor: {
+        target_word: "broom",
+        question: "b r _ _ m",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "broom"
+    },
+    {
+      id: 9,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "tube",
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'tube' (u_e makes the long /yoo/ sound).",
+      questionText: "Complete the word: t _ _ b _",
+      correctAnswer: "tube",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: "tube",
+        intent: "fill_blank",
+        questionLine: "Complete the word: t _ _ b _",
+        imagePrompt: "A toothpaste tube being squeezed"
+      },
+      aiTutor: {
+        target_word: "tube",
+        question: "t _ _ b _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "tube"
+    },
+    {
+      id: 10,
+      topicId: '2-K.6.1',
+      topicName: 'Spell_the_long_u_word_u_e_and_oo',
+      progressTopicName: 'Spell the long U word: u_e and oo',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "spoon",
+      imageUrl: null,
+      explanation: "Good work! The word is 'spoon' (oo makes the long /oo/ sound).",
+      questionText: "Complete the word: s p _ _ n",
+      correctAnswer: "spoon",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "spoon",
+        intent: "fill_blank",
+        questionLine: "Complete the word: s p _ _ n",
+        imagePrompt: "A shiny silver spoon on a table"
+      },
+      aiTutor: {
+        target_word: "spoon",
+        question: "s p _ _ n",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule: "Use u_e when you hear the /yoo/ sound (cube, tune). Use oo when you hear the smooth /oo/ sound (moon, spoon), especially in the middle."
+      },
+      audio: "spoon"
     }
   ]
-}
+},
+'2-K.6.2': {
+  topicInfo: {
+    topicId: '2-K.6.2',
+    topicName: 'Spell_the_long_u_word_ue_and_ew',
+    progressTopicName: 'Spell the long U word: ue and ew',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // --- First 2: ue ---
+    {
+      id: 1,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "blue",
+      imageUrl: null,
+      explanation: "Great job! The word is 'blue' (ue spells the long U).",
+      questionText: "Complete the word: b l _ _",
+      correctAnswer: "blue",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "blue",
+        intent: "fill_blank",
+        questionLine: "Complete the word: b l _ _",
+        imagePrompt: "A blue balloon floating in the sky"
+      },
+      aiTutor: {
+        target_word: "blue",
+        question: "b l _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "blue"
+    },
+    {
+      id: 2,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "glue",
+      imageUrl: null,
+      explanation: "Nice! The word is 'glue' (ue spells the long U).",
+      questionText: "Complete the word: g l _ _",
+      correctAnswer: "glue",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "glue",
+        intent: "fill_blank",
+        questionLine: "Complete the word: g l _ _",
+        imagePrompt: "A bottle of glue used for crafts"
+      },
+      aiTutor: {
+        target_word: "glue",
+        question: "g l _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "glue"
+    },
 
+    // --- Next 2: ew ---
+    {
+      id: 3,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "stew",
+      imageUrl: null,
+      explanation: "Great! The word is 'stew' (ew spells the long U).",
+      questionText: "Complete the word: s t _ _",
+      correctAnswer: "stew",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "stew",
+        intent: "fill_blank",
+        questionLine: "Complete the word: s t _ _",
+        imagePrompt: "A bowl of hot stew on a table"
+      },
+      aiTutor: {
+        target_word: "stew",
+        question: "s t _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "stew"
+    },
+    {
+      id: 4,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "grew",
+      imageUrl: null,
+      explanation: "Nice! The word is 'grew' (ew spells the long U).",
+      questionText: "Complete the word: g r _ _",
+      correctAnswer: "grew",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "grew",
+        intent: "fill_blank",
+        questionLine: "Complete the word: g r _ _",
+        imagePrompt: "A plant that grew tall with green leaves"
+      },
+      aiTutor: {
+        target_word: "grew",
+        question: "g r _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "grew"
+    },
 
-,
+    // --- Mixed random order ---
+    {
+      id: 5,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "few",
+      imageUrl: null,
+      explanation: "Good! The word is 'few' (ew spells the long U).",
+      questionText: "Complete the word: f _ _",
+      correctAnswer: "few",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0],
+      aiHook: {
+        targetWord: "few",
+        intent: "fill_blank",
+        questionLine: "Complete the word: f _ _",
+        imagePrompt: "A few apples in a basket"
+      },
+      aiTutor: {
+        target_word: "few",
+        question: "f _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "few"
+    },
+    {
+      id: 6,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "true",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'true' (ue spells the long U).",
+      questionText: "Complete the word: t r _ _",
+      correctAnswer: "true",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "true",
+        intent: "fill_blank",
+        questionLine: "Complete the word: t r _ _",
+        imagePrompt: "A checkmark showing something true or correct"
+      },
+      aiTutor: {
+        target_word: "true",
+        question: "t r _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "true"
+    },
+    {
+      id: 7,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "chew",
+      imageUrl: null,
+      explanation: "Good job! The word is 'chew' (ew spells the long U).",
+      questionText: "Complete the word: c h _ _",
+      correctAnswer: "chew",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "chew",
+        intent: "fill_blank",
+        questionLine: "Complete the word: c h _ _",
+        imagePrompt: "A dog chewing on a bone"
+      },
+      aiTutor: {
+        target_word: "chew",
+        question: "c h _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "chew"
+    },
+    {
+      id: 8,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "clue",
+      imageUrl: null,
+      explanation: "Nice work! The word is 'clue' (ue spells the long U).",
+      questionText: "Complete the word: c l _ _",
+      correctAnswer: "clue",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "clue",
+        intent: "fill_blank",
+        questionLine: "Complete the word: c l _ _",
+        imagePrompt: "A detective finding a clue with a magnifying glass"
+      },
+      aiTutor: {
+        target_word: "clue",
+        question: "c l _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "clue"
+    },
+    {
+      id: 9,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "new",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'new' (ew spells the long U).",
+      questionText: "Complete the word: n _ _",
+      correctAnswer: "new",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0],
+      aiHook: {
+        targetWord: "new",
+        intent: "fill_blank",
+        questionLine: "Complete the word: n _ _",
+        imagePrompt: "A new toy in a box"
+      },
+      aiTutor: {
+        target_word: "new",
+        question: "n _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "new"
+    },
+    {
+      id: 10,
+      topicId: '2-K.6.2',
+      topicName: 'Spell_the_long_u_word_ue_and_ew',
+      progressTopicName: 'Spell the long U word: ue and ew',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "rescue",
+      imageUrl: null,
+      explanation: "Wonderful! The word is 'rescue' (ue spells the long U).",
+      questionText: "Complete the word: r e s c _ _",
+      correctAnswer: "rescue",
+      template: "fill_blank",
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: "rescue",
+        intent: "fill_blank",
+        questionLine: "Complete the word: r e s c _ _",
+        imagePrompt: "A firefighter performing a rescue"
+      },
+      aiTutor: {
+        target_word: "rescue",
+        question: "r e s c _ _",
+        student_entry: "",
+        topic_to_reinforce: "Spell the long U word",
+        spelling_pattern_or_rule:
+          "Words ending with 'ew' are usually one-syllable words like chew, flew, stew, grew, and new. Words ending with 'ue' are often two-syllable words like rescue, continue, argue — but can sometimes be one-syllable like blue or glue."
+      },
+      audio: "rescue"
+    }
+  ]
+},
     '2-M.2': {
   topicInfo: {
     topicId: '2-M.2',

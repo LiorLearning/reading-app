@@ -561,11 +561,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   const currentGradeDisplayName = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').trim();
-  // Reinterpret eligibility: true if a whiteboard lesson script is available (current topic or any fallback)
+  // Eligibility: only when the CURRENT selected topic actually has a whiteboard script
   const whiteboardGradeEligible = React.useMemo(() => {
-    const hasCurrentTopicScript = !!(selectedTopicId && getLessonScript(selectedTopicId));
-    const hasAnyScript = Object.keys(lessonScripts || {}).length > 0;
-    return hasCurrentTopicScript || hasAnyScript;
+    return !!(selectedTopicId && getLessonScript(selectedTopicId));
   }, [selectedTopicId]);
 
   // Automatic Flow Control System
@@ -842,7 +840,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // Generate initial AI message using real-time AI generation
       // Skip if whiteboard prompt/lesson will take over (first-question or active lesson)
-      const shouldSkipInitialGreetingForWhiteboard = whiteboardGradeEligible && (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled);
+      const shouldSkipInitialGreetingForWhiteboard = (shouldTriggerWhiteboardOnFirstQuestionRef.current || isWhiteboardPromptActive || devWhiteboardEnabled);
       if (shouldSkipInitialGreetingForWhiteboard || suppressInitialGreetingRef.current) {
         console.log('⏭️ Skipping initial AI message: whiteboard will run');
         return;
@@ -2975,11 +2973,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return;
     }
     isStartingAdventureRef.current = true;
-    // For the very first adventure session start, allow immediate whiteboard on first question (id === 1)
-    if (whiteboardGradeEligible && !firstAdventureStartedRef.current) {
-      shouldTriggerWhiteboardOnFirstQuestionRef.current = true;
-      suppressInitialGreetingRef.current = true;
-      firstAdventureStartedRef.current = true;
+    // For the very first adventure session start, allow immediate whiteboard on first question
+    // only if the next due topic actually has a prepared whiteboard lesson script
+    if (!firstAdventureStartedRef.current) {
+      const gradeName = currentGradeDisplayName;
+      const allTopics = getSpellingTopicIds(gradeName);
+      const dueTopic = getNextSpellboxTopic(gradeName, allTopics);
+      const hasLessonForDueTopic = !!(dueTopic && getLessonScript(dueTopic));
+      if (hasLessonForDueTopic) {
+        shouldTriggerWhiteboardOnFirstQuestionRef.current = true;
+        suppressInitialGreetingRef.current = true;
+        firstAdventureStartedRef.current = true;
+      } else {
+        shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
+      }
     } else {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
     }
@@ -3083,7 +3090,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setTimeout(() => {
       setCurrentScreen(1); // Go to adventure screen
       // If first-question whiteboard is pending, immediately show the prompt and enable lesson (no AI message)
-      if (whiteboardGradeEligible && shouldTriggerWhiteboardOnFirstQuestionRef.current) {
+      if (shouldTriggerWhiteboardOnFirstQuestionRef.current) {
         // Guard: proactively determine the first SpellBox question because the initial greeting
         // is suppressed (so currentSpellQuestion may not be set yet for brand new users)
         const gradeName = currentGradeDisplayName;
@@ -3092,10 +3099,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const isFirstSpellQuestion = initialSpellQuestion?.id === 1;
         const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
         const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
-        if (isFirstSpellQuestion && !hasMidTopicProgress) {
+        const canShowLesson = !!(initialSpellTopicId && getLessonScript(initialSpellTopicId || ''));
+        if (isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson) {
           try { ttsService.stop(); } catch {}
           const name = userData?.username?.trim() || 'friend';
-          const topicForLesson = (initialSpellTopicId && getLessonScript(initialSpellTopicId)) ? initialSpellTopicId : WHITEBOARD_LESSON_TOPIC;
+          const topicForLesson = initialSpellTopicId!;
           const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
           setWhiteboardPrompt({
             topicId: topicForLesson,
@@ -4012,7 +4020,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const optimisticPct = Math.round((nextFirstCorrect / nextAttempted) * 100);
         setHeaderTopicProgressPct(optimisticPct);
         // If this was the final question (10th), immediately launch whiteboard for next topic
-        if (whiteboardGradeEligible && nextAttempted >= 10) {
+        if (nextAttempted >= 10) {
           try { ttsService.stop(); } catch {}
           // Persist final attempt so topic is marked completed for SpellBox progress
           try {
@@ -4039,8 +4047,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           // Switch to adventure and show whiteboard prompt (with chevron) for next topic
           setCurrentScreen(1);
           const name = userData?.username?.trim() || 'friend';
-          if (whiteboardGradeEligible) {
-            const topicForLesson = (nextTopicId && getLessonScript(nextTopicId)) ? nextTopicId : WHITEBOARD_LESSON_TOPIC;
+          if (nextTopicId && getLessonScript(nextTopicId)) {
+            const topicForLesson = nextTopicId;
             const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
             setWhiteboardPrompt({
               topicId: topicForLesson,
@@ -4314,19 +4322,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Trigger the whiteboard once per SpellBox topic change using the current spelling question's topic
   const whiteboardTriggeredTopicsRef = React.useRef<Set<string>>(new Set());
   React.useEffect(() => {
+    // Only proceed if current topic actually has a lesson script
     if (!whiteboardGradeEligible) return;
     const spellTopic = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName;
     if (!spellTopic) return;
+    if (!getLessonScript(spellTopic)) return;
     const isFirstQuestionId = currentSpellQuestion?.id === 1;
     const name = userData?.username?.trim() || 'friend';
     const alreadySeenLesson = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
 
     // First adventure start: if first question (id === 1) and flag set, trigger immediately with custom prompt
-    if (whiteboardGradeEligible && shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
+    if (shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false; // consume flag so it doesn't re-trigger later
       whiteboardTriggeredTopicsRef.current.add(spellTopic);
       // Do not force-stop here so we don't cut off ongoing trainer voice
-      const topicForLesson = (spellTopic && getLessonScript(spellTopic)) ? spellTopic : WHITEBOARD_LESSON_TOPIC;
+      const topicForLesson = spellTopic;
       const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
       setWhiteboardPrompt({
         topicId: topicForLesson,
@@ -4388,6 +4398,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setWhiteboardPromptLocked(true);
     setWhiteboardSeenThisSession(prev => ({ ...prev, [topicId]: true }));
     setWhiteboardPrompt(null);
+    // Ensure the selected topic matches the lesson topic so eligibility and script resolution align
+    try { setSelectedTopicId(topicId); } catch {}
     setLessonReady(true);
     setDevWhiteboardEnabled(true);
     setIsWhiteboardPromptActive(false);
