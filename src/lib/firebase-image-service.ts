@@ -72,7 +72,7 @@ class FirebaseImageService {
       });
 
       if (!response.ok) {
-        console.log('❌ Cloud function failed, falling back to metadata-only storage...');
+        // console.log('❌ Cloud function failed, falling back to metadata-only storage...');
         // Fallback: Store metadata with original URL (will expire but at least tracks the image)
         return await this.storeImageMetadata(userId, adventureId, imageUrl, prompt, adventureContext, 0);
       }
@@ -80,7 +80,7 @@ class FirebaseImageService {
       const result = await response.json();
       
       if (result.success) {
-        console.log(`✅ Image uploaded successfully via Cloud Function: ${result.filename}`);
+        // console.log(`✅ Image uploaded successfully via Cloud Function: ${result.filename}`);
         
         // Clean up old images after successful upload
         await this.cleanupOldImages(userId, adventureId);
@@ -92,7 +92,7 @@ class FirebaseImageService {
 
     } catch (error) {
       console.error('❌ Failed to upload via Cloud Function:', error);
-      console.log('📝 Storing metadata only (URL will expire)...');
+      // console.log('📝 Storing metadata only (URL will expire)...');
       
       // Final fallback: Store just the metadata
       return await this.storeImageMetadata(userId, adventureId, imageUrl, prompt, adventureContext, 0);
@@ -130,13 +130,13 @@ class FirebaseImageService {
       });
 
       if (!response.ok) {
-        console.log('❌ Cloud function uploadImagen failed, storing metadata only...');
+        // console.log('❌ Cloud function uploadImagen failed, storing metadata only...');
         return await this.storeImageMetadata(userId, adventureId, imageData, prompt, adventureContext, 0);
       }
 
       const result = await response.json();
       if (result.success) {
-        console.log(`✅ Image uploaded successfully via uploadImagen: ${result.filename}`);
+        // console.log(`✅ Image uploaded successfully via uploadImagen: ${result.filename}`);
         await this.cleanupOldImages(userId, adventureId);
         return result.storedImage as StoredImage;
       } else {
@@ -197,7 +197,7 @@ class FirebaseImageService {
         timestamp: Timestamp.now()
       };
 
-      console.log(`📝 Stored image metadata: ${prompt.substring(0, 30)}... (URL will expire)`);
+      // console.log(`📝 Stored image metadata: ${prompt.substring(0, 30)}... (URL will expire)`);
       return storedImage;
     } catch (error) {
       console.error('❌ Failed to store image metadata:', error);
@@ -256,8 +256,8 @@ class FirebaseImageService {
    */
   private async cleanupOldImages(userId: string, adventureId: string): Promise<void> {
     try {
-      console.log('🧹 Cleanup temporarily disabled until Firestore indexes are created');
-      console.log('📝 Current storage: unlimited until indexes are ready');
+      // console.log('🧹 Cleanup temporarily disabled until Firestore indexes are created');
+      // console.log('📝 Current storage: unlimited until indexes are ready');
       
       // TODO: Re-enable after creating Firestore indexes:
       // 1. Go to Firebase Console → Firestore → Indexes
@@ -284,7 +284,7 @@ class FirebaseImageService {
         await this.deleteImage(image);
       }
       
-      console.log(`🗑️ Cleaned up ${imagesToDelete.length} old images for adventure ${adventureId}`);
+      // console.log(`🗑️ Cleaned up ${imagesToDelete.length} old images for adventure ${adventureId}`);
     }
   }
 
@@ -301,7 +301,7 @@ class FirebaseImageService {
         await this.deleteImage(image);
       }
       
-      console.log(`🗑️ Cleaned up ${imagesToDelete.length} old images for user ${userId}`);
+      // console.log(`🗑️ Cleaned up ${imagesToDelete.length} old images for user ${userId}`);
     }
   }
 
@@ -321,7 +321,7 @@ class FirebaseImageService {
         await deleteDoc(doc(db, this.COLLECTION_NAME, image.id));
       }
 
-      console.log(`🗑️ Deleted image: ${image.storagePath}`);
+      // console.log(`🗑️ Deleted image: ${image.storagePath}`);
     } catch (error) {
       console.warn(`⚠️ Failed to delete image ${image.storagePath}:`, error);
     }
@@ -359,7 +359,7 @@ class FirebaseImageService {
         }
       });
 
-      console.log(`🖼️ Successfully fetched ${Object.keys(latestImages).length} adventure cover images via optimized query`);
+      // console.log(`🖼️ Successfully fetched ${Object.keys(latestImages).length} adventure cover images via optimized query`);
       return latestImages;
     } catch (error) {
       console.warn('⚠️ Optimized query failed (likely missing composite index), trying fallback approach...');
@@ -399,13 +399,13 @@ class FirebaseImageService {
           }
         });
 
-        console.log(`🖼️ Successfully fetched ${Object.keys(latestImages).length} adventure cover images via fallback query`);
+        // console.log(`🖼️ Successfully fetched ${Object.keys(latestImages).length} adventure cover images via fallback query`);
         
         // Log the index creation instruction
         if (Object.keys(latestImages).length > 0) {
-          console.log('📝 To improve performance, create a composite index in Firebase Console:');
-          console.log('📝 Collection: adventureImages, Fields: userId (Ascending), timestamp (Descending)');
-          console.log('📝 Or visit: https://console.firebase.google.com/project/litkraft-8d090/firestore/indexes');
+          // console.log('📝 To improve performance, create a composite index in Firebase Console:');
+          // console.log('📝 Collection: adventureImages, Fields: userId (Ascending), timestamp (Descending)');
+          // console.log('📝 Or visit: https://console.firebase.google.com/project/litkraft-8d090/firestore/indexes');
         }
         
         return latestImages;
@@ -478,7 +478,7 @@ class FirebaseImageService {
         await this.deleteImage(image);
       }
       
-      console.log(`🗑️ Cleared all ${userImages.length} images for user ${userId}`);
+      // console.log(`🗑️ Cleared all ${userImages.length} images for user ${userId}`);
     } catch (error) {
       console.error('❌ Failed to clear user images:', error);
     }
