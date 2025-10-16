@@ -33107,21 +33107,405 @@ aiTutor: {
       audio: "rescue"
     }
   ]
-},
-    '2-M.2': {
+}
+,
+'2-M.2.1': {
   topicInfo: {
-    topicId: '2-M.2',
-    topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-    progressTopicName: 'Fill in the missing diphthong',
+    topicId: '2-M.2.1',
+    topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+    progressTopicName: 'Spell diphthongs: oi and oy',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
   },
   questions: [
+    // --- 1. oi ---
     {
       id: 1,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'coin',
+      imageUrl: null,
+      explanation: "Nice! The missing diphthong is 'oi'. The word is 'coin'.",
+      questionText: "Complete the word: c__n",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'coin',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: c__n',
+        imagePrompt: 'A shiny gold coin on a table'
+      },
+      aiTutor: {
+        target_word: 'coin',
+        question: 'c__n',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'coin'
+    },
+
+    // --- 2. oy ---
+    {
+      id: 2,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'boy',
+      imageUrl: null,
+      explanation: "Good! The missing diphthong is 'oy'. The word is 'boy'.",
+      questionText: "Complete the word: b__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'boy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: b__',
+        imagePrompt: 'A smiling boy waving his hand'
+      },
+      aiTutor: {
+        target_word: 'boy',
+        question: 'b__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'boy'
+    },
+
+    // --- 3. oi ---
+    {
+      id: 3,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'boil',
+      imageUrl: null,
+      explanation: "Nice job! The missing diphthong is 'oi'. The word is 'boil'.",
+      questionText: "Complete the word: b__l",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'boil',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: b__l',
+        imagePrompt: 'A pot of water boiling on a stove'
+      },
+      aiTutor: {
+        target_word: 'boil',
+        question: 'b__l',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'boil'
+    },
+
+    // --- 4. oy ---
+    {
+      id: 4,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'toy',
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'oy'. The word is 'toy'.",
+      questionText: "Complete the word: t__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'toy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: t__',
+        imagePrompt: 'A colorful toy car'
+      },
+      aiTutor: {
+        target_word: 'toy',
+        question: 't__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'toy'
+    },
+
+    // --- 5. oi ---
+    {
+      id: 5,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'soil',
+      imageUrl: null,
+      explanation: "Well done! The missing diphthong is 'oi'. The word is 'soil'.",
+      questionText: "Complete the word: s__l",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'soil',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: s__l',
+        imagePrompt: 'Dark brown soil in a garden'
+      },
+      aiTutor: {
+        target_word: 'soil',
+        question: 's__l',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'soil'
+    },
+
+    // --- 6. oy ---
+    {
+      id: 6,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'enjoy',
+      imageUrl: null,
+      explanation: "Great! The missing diphthong is 'oy'. The word is 'enjoy'.",
+      questionText: "Complete the word: enj__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'enjoy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: enj__',
+        imagePrompt: 'Children enjoy playing outside'
+      },
+      aiTutor: {
+        target_word: 'enjoy',
+        question: 'enj__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'enjoy'
+    },
+
+    // --- 7. oi ---
+    {
+      id: 7,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'join',
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'oi'. The word is 'join'.",
+      questionText: "Complete the word: j__n",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'join',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: j__n',
+        imagePrompt: 'Two puzzle pieces joining together'
+      },
+      aiTutor: {
+        target_word: 'join',
+        question: 'j__n',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'join'
+    },
+
+    // --- 8. oy ---
+    {
+      id: 8,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'toy',
+      imageUrl: null,
+      explanation: "Nice! The missing diphthong is 'oy'. The word is 'toy'.",
+      questionText: "Complete the word: t__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'toy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: t__',
+        imagePrompt: 'A toy robot with colorful buttons'
+      },
+      aiTutor: {
+        target_word: 'toy',
+        question: 't__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'toy'
+    },
+
+    // --- 9. oi ---
+    {
+      id: 9,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'spoil',
+      imageUrl: null,
+      explanation: "Good job! The missing diphthong is 'oi'. The word is 'spoil'.",
+      questionText: "Complete the word: sp__l",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: 'spoil',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: sp__l',
+        imagePrompt: 'Food starting to spoil on a counter'
+      },
+      aiTutor: {
+        target_word: 'spoil',
+        question: 'sp__l',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'spoil'
+    },
+
+    // --- 10. oy ---
+    {
+      id: 10,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'joy',
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'oy'. The word is 'joy'.",
+      questionText: "Complete the word: j__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'joy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: j__',
+        imagePrompt: 'A child jumping with joy'
+      },
+      aiTutor: {
+        target_word: 'joy',
+        question: 'j__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'joy'
+    },
+  ],
+},
+
+'2-M.2.2': {
+  topicInfo: {
+    topicId: '2-M.2.2',
+    topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+    progressTopicName: 'Spell diphthongs: ou and ow',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // 1–2: OU first
+    {
+      id: 1,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
@@ -33132,113 +33516,72 @@ aiTutor: {
       questionText: "Complete the word: sh__t",
       correctAnswer: "ou",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shout",
         intent: "fill_blank",
         questionLine: "Complete the word: sh__t",
-        imagePrompt: "A girl shouting loudly with her hands near her mouth"
+        imagePrompt: "A kid shouting with hands cupped around mouth"
       },
       aiTutor: {
         target_word: 'shout',
         question: "sh__t",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'shout'."
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle of words (shout, cloud, house). Use 'ow' at the end or before n/l (cow, down, owl)."
       },
       audio: "shout"
     },
     {
       id: 2,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "coin",
+      word: "cloud",
       imageUrl: null,
-      explanation: "Nice! The missing diphthong is 'oi'. The word is 'coin'.",
-      questionText: "Complete the word: c__n",
-      correctAnswer: "oi",
+      explanation: "Nicely done! The missing diphthong is 'ou'. The word is 'cloud'.",
+      questionText: "Complete the word: cl__d",
+      correctAnswer: "ou",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
-        targetWord: "coin",
+        targetWord: "cloud",
         intent: "fill_blank",
-        questionLine: "Complete the word: c__n",
-        imagePrompt: "A shiny gold coin on a white background"
+        questionLine: "Complete the word: cl__d",
+        imagePrompt: "A fluffy white cloud in a blue sky"
       },
       aiTutor: {
-        target_word: 'coin',
-        question: "c__n",
+        target_word: 'cloud',
+        question: "cl__d",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'coin'."
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle of words (shout, cloud, house). Use 'ow' at the end or before n/l (cow, down, owl)."
       },
-      audio: "coin"
-    },
+      audio: "cloud"
+    },    // 3–4: OW next
     {
       id: 3,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "boy",
-      imageUrl: null,
-      explanation: "Good! The missing diphthong is 'oy'. The word is 'boy'.",
-      questionText: "Complete the word: b__",
-      correctAnswer: "oy",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
-      aiHook: {
-        targetWord: "boy",
-        intent: "fill_blank",
-        questionLine: "Complete the word: b__",
-        imagePrompt: "A smiling young boy waving his hand"
-      },
-      aiTutor: {
-        target_word: 'boy',
-        question: "b__",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oy' makes the /oi/ sound in 'boy'."
-      },
-      audio: "boy"
-    },
-    {
-      id: 4,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "cow",
       imageUrl: null,
-      explanation: "Nice work! The missing diphthong is 'ow'. The word is 'cow'.",
+      explanation: "Good! The missing diphthong is 'ow'. The word is 'cow'.",
       questionText: "Complete the word: c__",
       correctAnswer: "ow",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0],
       aiHook: {
         targetWord: "cow",
         intent: "fill_blank",
@@ -33250,14 +33593,177 @@ aiTutor: {
         question: "c__",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'cow'."
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (cow, down, owl). Use 'ou' in the middle (cloud, house)."
       },
       audio: "cow"
     },
     {
+      id: 4,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "owl",
+      imageUrl: null,
+      explanation: "Great! The missing diphthong is 'ow'. The word is 'owl'.",
+      questionText: "Complete the word: __l",
+      correctAnswer: "ow",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [2],
+      aiHook: {
+        targetWord: "owl",
+        intent: "fill_blank",
+        questionLine: "Complete the word: __l",
+        imagePrompt: "A wise owl perched on a branch"
+      },
+      aiTutor: {
+        target_word: 'owl',
+        question: "__l",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (cow, down, owl). Use 'ou' in the middle (cloud, house)."
+      },
+      audio: "owl"
+    },
+
+    // 5–10: Randomly mixed (not alternating in strict order)
+    {
       id: 5,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "house",
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'ou'. The word is 'house'.",
+      questionText: "Complete the word: h__se",
+      correctAnswer: "ou",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "house",
+        intent: "fill_blank",
+        questionLine: "Complete the word: h__se",
+        imagePrompt: "A small house with a yard"
+      },
+      aiTutor: {
+        target_word: 'house',
+        question: "h__se",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle (house, mouse). Use 'ow' at the end or before n/l (cow, down, owl)."
+      },
+      audio: "house"
+    },
+    {
+      id: 6,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "brown",
+      imageUrl: null,
+      explanation: "Nice! The missing diphthong is 'ow'. The word is 'brown'.",
+      questionText: "Complete the word: br__n",
+      correctAnswer: "ow",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "brown",
+        intent: "fill_blank",
+        questionLine: "Complete the word: br__n",
+        imagePrompt: "A brown crayon drawing a line"
+      },
+      aiTutor: {
+        target_word: 'brown',
+        question: "br__n",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (brown, owl). Use 'ou' in the middle (cloud, house)."
+      },
+      audio: "brown"
+    },
+    {
+      id: 7,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "mouse",
+      imageUrl: null,
+      explanation: "Good work! The missing diphthong is 'ou'. The word is 'mouse'.",
+      questionText: "Complete the word: m__se",
+      correctAnswer: "ou",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "mouse",
+        intent: "fill_blank",
+        questionLine: "Complete the word: m__se",
+        imagePrompt: "A small gray mouse"
+      },
+      aiTutor: {
+        target_word: 'mouse',
+        question: "m__se",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle (mouse, house). Use 'ow' at the end or before n/l (cow, crown, owl)."
+      },
+      audio: "mouse"
+    },
+    {
+      id: 8,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "crown",
+      imageUrl: null,
+      explanation: "Great! The missing diphthong is 'ow'. The word is 'crown'.",
+      questionText: "Complete the word: cr__n",
+      correctAnswer: "ow",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "crown",
+        intent: "fill_blank",
+        questionLine: "Complete the word: cr__n",
+        imagePrompt: "A golden crown with jewels"
+      },
+      aiTutor: {
+        target_word: 'crown',
+        question: "cr__n",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (crown, owl). Use 'ou' in the middle (cloud, house)."
+      },
+      audio: "crown"
+    },
+    {
+      id: 9,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
@@ -33268,11 +33774,8 @@ aiTutor: {
       questionText: "Complete the word: l__d",
       correctAnswer: "ou",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "loud",
         intent: "fill_blank",
@@ -33284,527 +33787,51 @@ aiTutor: {
         question: "l__d",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'loud'."
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle (loud, mouse). Use 'ow' at the end or before n/l (cow, brown, owl)."
       },
       audio: "loud"
     },
     {
-      id: 6,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "toy",
-      imageUrl: null,
-      explanation: "Great! The missing diphthong is 'oy'. The word is 'toy'.",
-      questionText: "t__",
-      correctAnswer: "oy",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
-      aiHook: {
-        targetWord: "toy",
-        intent: "fill_blank",
-        questionLine: "t__",
-        imagePrompt: "A small toy car"
-      },
-      aiTutor: {
-        target_word: 'toy',
-        question: "t__",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oy' makes the /oi/ sound at the end of 'toy'."
-      },
-      audio: "toy"
-    },
-    {
-      id: 7,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "soil",
-      imageUrl: null,
-      explanation: "Nice job! The missing diphthong is 'oi'. The word is 'soil'.",
-      questionText: "s__l",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "soil",
-        intent: "fill_blank",
-        questionLine: "s__l",
-        imagePrompt: "Brown soil in a garden bed"
-      },
-      aiTutor: {
-        target_word: 'soil',
-        question: "s__l",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'soil'."
-      },
-      audio: "soil"
-    },
-    {
-      id: 8,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "mouse",
-      imageUrl: null,
-      explanation: "Good! The missing diphthong is 'ou'. The word is 'mouse'.",
-      questionText: "m__se",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "mouse",
-        intent: "fill_blank",
-        questionLine: "m__se",
-        imagePrompt: "A small gray mouse"
-      },
-      aiTutor: {
-        target_word: 'mouse',
-        question: "m__se",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'mouse'."
-      },
-      audio: "mouse"
-    },
-    {
-      id: 9,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "cloud",
-      imageUrl: null,
-      explanation: "Great work! The missing diphthong is 'ou'. The word is 'cloud'.",
-      questionText: "cl__d",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
-      aiHook: {
-        targetWord: "cloud",
-        intent: "fill_blank",
-        questionLine: "cl__d",
-        imagePrompt: "A fluffy white cloud in the sky"
-      },
-      aiTutor: {
-        target_word: 'cloud',
-        question: "cl__d",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'cloud'."
-      },
-      audio: "cloud"
-    },
-    {
       id: 10,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "crown",
+      word: "down",
       imageUrl: null,
-      explanation: "Excellent! The missing diphthong is 'ow'. The word is 'crown'.",
-      questionText: "cr__n",
+      explanation: "Nice work! The missing diphthong is 'ow'. The word is 'down'.",
+      questionText: "Complete the word: d__n",
       correctAnswer: "ow",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3],
       aiHook: {
-        targetWord: "crown",
+        targetWord: "down",
         intent: "fill_blank",
-        questionLine: "cr__n",
-        imagePrompt: "A golden crown with jewels"
+        questionLine: "Complete the word: d__n",
+        imagePrompt: "An arrow pointing down or someone going down stairs"
       },
       aiTutor: {
-        target_word: 'crown',
-        question: "cr__n",
+        target_word: 'down',
+        question: "d__n",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'crown'."
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (down, owl). Use 'ou' in the middle (cloud, shout)."
       },
-      audio: "crown"
-    },
-    {
-      id: 11,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "boil",
-      imageUrl: null,
-      explanation: "Nice! The missing diphthong is 'oi'. The word is 'boil'.",
-      questionText: "b__l",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "boil",
-        intent: "fill_blank",
-        questionLine: "b__l",
-        imagePrompt: "A pot of water starting to boil"
-      },
-      aiTutor: {
-        target_word: 'boil',
-        question: "b__l",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'boil'."
-      },
-      audio: "boil"
-    },
-    {
-      id: 12,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "sound",
-      imageUrl: null,
-      explanation: "Good! The missing diphthong is 'ou'. The word is 'sound'.",
-      questionText: "s__nd",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "sound",
-        intent: "fill_blank",
-        questionLine: "s__nd",
-        imagePrompt: "Sound waves coming from a speaker"
-      },
-      aiTutor: {
-        target_word: 'sound',
-        question: "s__nd",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'sound'."
-      },
-      audio: "sound"
-    },
-    {
-      id: 13,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "owl",
-      imageUrl: null,
-      explanation: "Great job! The missing diphthong is 'ow'. The word is 'owl'.",
-      questionText: "__l",
-      correctAnswer: "ow",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2],
-      aiHook: {
-        targetWord: "owl",
-        intent: "fill_blank",
-        questionLine: "__l",
-        imagePrompt: "A wise owl sitting on a branch"
-      },
-      aiTutor: {
-        target_word: 'owl',
-        question: "__l",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound at the start of 'owl'."
-      },
-      audio: "owl"
-    },
-    {
-      id: 14,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "join",
-      imageUrl: null,
-      explanation: "Nice work! The missing diphthong is 'oi'. The word is 'join'.",
-      questionText: "j__n",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "join",
-        intent: "fill_blank",
-        questionLine: "j__n",
-        imagePrompt: "Two puzzle pieces joining together"
-      },
-      aiTutor: {
-        target_word: 'join',
-        question: "j__n",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'join'."
-      },
-      audio: "join"
-    },
-    {
-      id: 15,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "town",
-      imageUrl: null,
-      explanation: "Excellent! The missing diphthong is 'ow'. The word is 'town'.",
-      questionText: "t__n",
-      correctAnswer: "ow",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "town",
-        intent: "fill_blank",
-        questionLine: "t__n",
-        imagePrompt: "A small town with houses and a clock tower"
-      },
-      aiTutor: {
-        target_word: 'town',
-        question: "t__n",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'town'."
-      },
-      audio: "town"
-    },
-    {
-      id: 16,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "noise",
-      imageUrl: null,
-      explanation: "Great! The missing diphthong is 'oi'. The word is 'noise'.",
-      questionText: "n__se",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "noise",
-        intent: "fill_blank",
-        questionLine: "n__se",
-        imagePrompt: "Loud noise shown with sound lines from speakers"
-      },
-      aiTutor: {
-        target_word: 'noise',
-        question: "n__se",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'noise'."
-      },
-      audio: "noise"
-    },
-    {
-      id: 17,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "enjoy",
-      imageUrl: null,
-      explanation: "Nice! The missing diphthong is 'oy'. The word is 'enjoy'.",
-      questionText: "enj__",
-      correctAnswer: "oy",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,2],
-      aiHook: {
-        targetWord: "enjoy",
-        intent: "fill_blank",
-        questionLine: "enj__",
-        imagePrompt: "Kids enjoy playing outside"
-      },
-      aiTutor: {
-        target_word: 'enjoy',
-        question: "enj__",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oy' makes the /oi/ sound at the end of 'enjoy'."
-      },
-      audio: "enjoy"
-    },
-    {
-      id: 18,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "house",
-      imageUrl: null,
-      explanation: "Good work! The missing diphthong is 'ou'. The word is 'house'.",
-      questionText: "h__se",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "house",
-        intent: "fill_blank",
-        questionLine: "h__se",
-        imagePrompt: "A small house with a yard"
-      },
-      aiTutor: {
-        target_word: 'house',
-        question: "h__se",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'house'."
-      },
-      audio: "house"
-    },
-    {
-      id: 19,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "brown",
-      imageUrl: null,
-      explanation: "Excellent! The missing diphthong is 'ow'. The word is 'brown'.",
-      questionText: "br__n",
-      correctAnswer: "ow",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
-      aiHook: {
-        targetWord: "brown",
-        intent: "fill_blank",
-        questionLine: "br__n",
-        imagePrompt: "A brown crayon drawing a line"
-      },
-      aiTutor: {
-        target_word: 'brown',
-        question: "br__n",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'brown'."
-      },
-      audio: "brown"
-    },
-    {
-      id: 20,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "couch",
-      imageUrl: null,
-      explanation: "Great job! The missing diphthong is 'ou'. The word is 'couch'.",
-      questionText: "c__ch",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "couch",
-        intent: "fill_blank",
-        questionLine: "c__ch",
-        imagePrompt: "A comfy couch in a living room"
-      },
-      aiTutor: {
-        target_word: 'couch',
-        question: "c__ch",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'couch'."
-      },
-      audio: "couch"
+      audio: "down"
     }
-  ]}
+  ]
+}
 ,
     '2-N.1': {
   topicInfo: {
     topicId: '2-N.1',
     topicName: 'Complete_words_with_variant_vowels',
-    progressTopicName: 'Fill in the missing variant vowels',
+    progressTopicName: 'Revision: common vowel teams',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
