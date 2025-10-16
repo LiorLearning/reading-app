@@ -29209,7 +29209,7 @@ aiTutor: {
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0,4],
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "paint",
         intent: "fill_blank",
@@ -51865,11 +51865,364 @@ aiTutor: {
 
       ]
     },
-    '3-A.3': {
+
+    '3-A.3.1': {
   topicInfo: {
-    topicId: '3-A.3',
-    topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-    progressTopicName: 'Spell the long a word',
+    topicId: '3-A.3.1',
+    topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+    progressTopicName: 'Spell the long A word: ai, ay and silent e',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "hay",
+      imageUrl: null,
+      explanation: "Great job! The word is 'hay' (long a spelled with 'ay').",
+      questionText: "h__",
+      correctAnswer: "hay",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: "hay",
+        intent: "fill_blank",
+        questionLine: "h__",
+        imagePrompt: "A pile of hay"
+      },
+      aiTutor: {
+        target_word: 'hay',
+        question: "h__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "hay"
+    },
+    {
+      id: 2,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "cake",
+      imageUrl: null,
+      explanation: "Yum! The word is 'cake' (long a spelled with silent e).",
+      questionText: "c_k_",
+      correctAnswer: "cake",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "cake",
+        intent: "fill_blank",
+        questionLine: "c_k_",
+        imagePrompt: "A birthday cake with candles"
+      },
+      aiTutor: {
+        target_word: 'cake',
+        question: "c_k_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "cake"
+    },
+    {
+      id: 3,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "rain",
+      imageUrl: null,
+      explanation: "Nice! The word is 'rain' (long a spelled with 'ai').",
+      questionText: "r__n",
+      correctAnswer: "rain",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: "rain",
+        intent: "fill_blank",
+        questionLine: "r__n",
+        imagePrompt: "Rain falling from clouds"
+      },
+      aiTutor: {
+        target_word: 'rain',
+        question: "r__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "rain"
+    },
+    {
+      id: 4,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "play",
+      imageUrl: null,
+      explanation: "Good job! The word is 'play' (long a spelled with 'ay').",
+      questionText: "pl__",
+      correctAnswer: "play",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "play",
+        intent: "fill_blank",
+        questionLine: "pl__",
+        imagePrompt: "Kids playing outside"
+      },
+      aiTutor: {
+        target_word: 'play',
+        question: "pl__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "play"
+    },
+    {
+      id: 5,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "gate",
+      imageUrl: null,
+      explanation: "Great! The word is 'gate' (long a with silent e).",
+      questionText: "g_t_",
+      correctAnswer: "gate",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "gate",
+        intent: "fill_blank",
+        questionLine: "g_t_",
+        imagePrompt: "A wooden garden gate"
+      },
+      aiTutor: {
+        target_word: 'gate',
+        question: "g_t_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "gate"
+    },
+    {
+      id: 6,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "mail",
+      imageUrl: null,
+      explanation: "Nice work! The word is 'mail' (long a with 'ai').",
+      questionText: "m__l",
+      correctAnswer: "mail",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: "mail",
+        intent: "fill_blank",
+        questionLine: "m__l",
+        imagePrompt: "Letters in a mailbox"
+      },
+      aiTutor: {
+        target_word: 'mail',
+        question: "m__l",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "mail"
+    },
+    {
+      id: 7,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "day",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'day' (long a with 'ay').",
+      questionText: "d__",
+      correctAnswer: "day",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: "day",
+        intent: "fill_blank",
+        questionLine: "d__",
+        imagePrompt: "A bright sunny day"
+      },
+      aiTutor: {
+        target_word: 'day',
+        question: "d__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "day"
+    },
+    {
+      id: 8,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "game",
+      imageUrl: null,
+      explanation: "Well done! The word is 'game' (long a with silent e).",
+      questionText: "g_m_",
+      correctAnswer: "game",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "game",
+        intent: "fill_blank",
+        questionLine: "g_m_",
+        imagePrompt: "Children playing a board game"
+      },
+      aiTutor: {
+        target_word: 'game',
+        question: "g_m_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "game"
+    },
+    {
+      id: 9,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "rainbow",
+      imageUrl: null,
+      explanation: "Beautiful! The word is 'rainbow' (long a in 'rain').",
+      questionText: "r__nbow",
+      correctAnswer: "rainbow",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4],
+      aiHook: {
+        targetWord: "rainbow",
+        intent: "fill_blank",
+        questionLine: "r__nbow",
+        imagePrompt: "A colorful rainbow in the sky"
+      },
+      aiTutor: {
+        target_word: 'rainbow',
+        question: "r__nbow",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "rainbow"
+    },
+    {
+      id: 10,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "bake",
+      imageUrl: null,
+      explanation: "Great! The word is 'bake' (long a with silent e).",
+      questionText: "b_k_",
+      correctAnswer: "bake",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "bake",
+        intent: "fill_blank",
+        questionLine: "b_k_",
+        imagePrompt: "A baker putting cookies into an oven"
+      },
+      aiTutor: {
+        target_word: 'bake',
+        question: "b_k_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "bake"
+    }],
+  },
+
+  '3-A.3.2': {
+  topicInfo: {
+    topicId: '3-A.3.2',
+    topicName: 'Spell_the_long_a_word_ea_ey',
+    progressTopicName: 'Spell the long A word: ea and ey',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -51877,7 +52230,705 @@ aiTutor: {
   questions: [
     {
       id: 1,
-      topicId: '3-A.3',
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "steak",
+      imageUrl: null,
+      explanation: "Nice job! The vowel team 'ea' makes the long a sound in 'steak'.",
+      questionText: "Complete the word: st__k",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "steak",
+        intent: "fill_blank",
+        questionLine: "Complete the word: st__k",
+        imagePrompt: "A juicy grilled steak on a plate"
+      },
+      aiTutor: {
+        target_word: 'steak',
+        question: "st__k",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "steak"
+    },
+    {
+      id: 2,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "they",
+      imageUrl: null,
+      explanation: "Good work! The 'ey' makes the long a sound in 'they'.",
+      questionText: "Complete the word: th__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: "they",
+        intent: "fill_blank",
+        questionLine: "Complete the word: th__",
+        imagePrompt: "Two friends waving at each other"
+      },
+      aiTutor: {
+        target_word: 'they',
+        question: "th__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "they"
+    },
+    {
+      id: 3,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "break",
+      imageUrl: null,
+      explanation: "Well done! The vowel team 'ea' makes the long a sound in 'break'.",
+      questionText: "Complete the word: br__k",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "break",
+        intent: "fill_blank",
+        questionLine: "Complete the word: br__k",
+        imagePrompt: "A person taking a short break from work"
+      },
+      aiTutor: {
+        target_word: 'break',
+        question: "br__k",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "break"
+    },
+    {
+      id: 4,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "prey",
+      imageUrl: null,
+      explanation: "Great job! The 'ey' makes the long a sound in 'prey'.",
+      questionText: "Complete the word: pr__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: "prey",
+        intent: "fill_blank",
+        questionLine: "Complete the word: pr__",
+        imagePrompt: "A hawk swooping down to catch its prey"
+      },
+      aiTutor: {
+        target_word: 'prey',
+        question: "pr__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "prey"
+    },
+    {
+      id: 5,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "great",
+      imageUrl: null,
+      explanation: "Excellent! The 'ea' makes the long a sound in 'great'.",
+      questionText: "Complete the word: gr__t",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "great",
+        intent: "fill_blank",
+        questionLine: "Complete the word: gr__t",
+        imagePrompt: "A child giving a thumbs-up showing something great"
+      },
+      aiTutor: {
+        target_word: 'great',
+        question: "gr__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "great"
+    },
+    {
+      id: 6,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "obey",
+      imageUrl: null,
+      explanation: "Good work! The 'ey' makes the long a sound in 'obey'.",
+      questionText: "Complete the word: ob__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: "obey",
+        intent: "fill_blank",
+        questionLine: "Complete the word: ob__",
+        imagePrompt: "A child following a parent’s instruction"
+      },
+      aiTutor: {
+        target_word: 'obey',
+        question: "ob__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "obey"
+    },
+    {
+      id: 7,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "breakfast",
+      imageUrl: null,
+      explanation: "You’re right! The 'ea' in 'breakfast' doesn’t say long a — but in 'break' it does!",
+      questionText: "Which word has 'ea' saying /ā/? (choose) break / breakfast",
+      correctAnswer: "break",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "break",
+        intent: "fill_blank",
+        questionLine: "Which word has 'ea' saying /ā/? break / breakfast",
+        imagePrompt: "A plate of breakfast food beside the word break"
+      },
+      aiTutor: {
+        target_word: 'break',
+        question: "br_ _ k",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "break"
+    },
+    {
+      id: 8,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "survey",
+      imageUrl: null,
+      explanation: "Excellent! The 'ey' makes the long a sound at the end of 'survey'.",
+      questionText: "Complete the word: surv__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: "survey",
+        intent: "fill_blank",
+        questionLine: "Complete the word: surv__",
+        imagePrompt: "A person answering questions in a survey form"
+      },
+      aiTutor: {
+        target_word: 'survey',
+        question: "surv__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "survey"
+    },
+    {
+      id: 9,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "gray",
+      imageUrl: null,
+      explanation: "Great! The 'ay' makes the long a sound in 'gray', while 'ey' can too, like in 'they'.",
+      questionText: "Compare the endings: Which word uses 'ey'? gray / they",
+      correctAnswer: "they",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "they",
+        intent: "fill_blank",
+        questionLine: "Which word uses 'ey'? gray / they",
+        imagePrompt: "Two words compared: gray and they"
+      },
+      aiTutor: {
+        target_word: 'they',
+        question: "th__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "they"
+    },
+    {
+      id: 10,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "great",
+      imageUrl: null,
+      explanation: "Well done! The 'ea' in 'great' makes the long a sound.",
+      questionText: "Complete the word: gr__t",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "great",
+        intent: "fill_blank",
+        questionLine: "Complete the word: gr__t",
+        imagePrompt: "A gold star for doing something great"
+      },
+      aiTutor: {
+        target_word: 'great',
+        question: "gr__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "great"
+    }
+  ]
+}
+,
+'3-A.3.3': {
+topicInfo: {
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell the long A word: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank'
+},
+questions: [
+// --- First 3: EIGH (student fills "eigh") ---
+{
+id: 1,
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell long A: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'eight',
+imageUrl: null,
+explanation: "Great! The missing pattern is 'eigh'. The word is 'eight' (/ā/).",
+questionText: "Complete the word: t",
+correctAnswer: 'eigh',
+template: 'fill_blank',
+isSpacing: false, isSorting: false, isSpelling: true,
+isPrefilled: true, prefilledIndexes: [4],
+aiHook: {
+targetWord: 'eight',
+intent: 'fill_blank',
+questionLine: 'Complete the word: ____t',
+imagePrompt: 'A large blue number 8 with sparkles'
+},
+aiTutor: {
+target_word: 'eight',
+question: '____t',
+student_entry: '',
+topic_to_reinforce: 'Spell the long A word',
+spelling_pattern_or_rule:
+"The letters 'eigh' can spell the long A sound in a small set of words (eight, weigh, neighbor). It’s rarer than a_e, ai, ay, ea, or ey—so remember these!"
+},
+audio: 'eight'
+},
+{
+id: 2,
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell long A: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'weigh',
+imageUrl: null,
+explanation: "Nice! The missing pattern is 'eigh'. The word is 'weigh' (/ā/).",
+questionText: "Complete the word: w",
+correctAnswer: 'eigh',
+template: 'fill_blank',
+isSpacing: false, isSorting: false, isSpelling: true,
+isPrefilled: true, prefilledIndexes: [0],
+aiHook: {
+targetWord: 'weigh',
+intent: 'fill_blank',
+questionLine: 'Complete the word: w____',
+imagePrompt: 'A scale weighing fruit in a grocery store'
+},
+aiTutor: {
+target_word: 'weigh',
+question: 'w____',
+student_entry: '',
+topic_to_reinforce: 'Spell the long A word',
+spelling_pattern_or_rule:
+"Remember: 'eigh' can say /ā/ (weigh, eight). It’s a less common pattern compared to a_e (cake), ai (train), ay (day), ea (break), or ey (they)."
+},
+audio: 'weigh'
+},
+{
+id: 3,
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell long A: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'sleigh',
+imageUrl: null,
+explanation: "Well done! The missing pattern is 'eigh'. The word is 'sleigh' (/ā/).",
+questionText: "Complete the word: sl____",
+correctAnswer: 'eigh',
+template: 'fill_blank',
+isSpacing: false, isSorting: false, isSpelling: true,
+isPrefilled: true, prefilledIndexes: [0,1],
+aiHook: {
+targetWord: 'sleigh',
+intent: 'fill_blank',
+questionLine: 'Complete the word: sl____',
+imagePrompt: 'A red sleigh gliding over snow'
+},
+aiTutor: {
+target_word: 'sleigh',
+question: 'sl____',
+student_entry: '',
+topic_to_reinforce: 'Spell the long A word',
+spelling_pattern_or_rule:
+"'eigh' can make /ā/ in a few words (sleigh, eight, weigh). It’s rare—memorize these special spellings."
+},
+audio: 'sleigh'
+},
+// --- Mixed (EIGH, EY, EA) ---
+{
+  id: 4,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'they',
+  imageUrl: null,
+  explanation: "Good! The missing ending is 'ey'. The word is 'they' (/ā/).",
+  questionText: "Complete the word: th__",
+  correctAnswer: 'ey',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1],
+  aiHook: {
+    targetWord: 'they',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: th__',
+    imagePrompt: 'Two friends waving to each other'
+  },
+  aiTutor: {
+    target_word: 'they',
+    question: 'th__',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "At word ends, long A is usually 'ay' (day), but sometimes 'ey' (they, prey, obey). Listen for /ā/ at the end and remember these common 'ey' words."
+  },
+  audio: 'they'
+},
+{
+  id: 5,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'break',
+  imageUrl: null,
+  explanation: "Great! The missing team is 'ea'. The word is 'break' (/ā/).",
+  questionText: "Complete the word: br__k",
+  correctAnswer: 'ea',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1,4],
+  aiHook: {
+    targetWord: 'break',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: br__k',
+    imagePrompt: 'A student taking a short break on a bench'
+  },
+  aiTutor: {
+    target_word: 'break',
+    question: 'br__k',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "'ea' can sometimes spell long A in common exception words (break, steak, great). More often, long A is spelled a_e, ai, or ay."
+  },
+  audio: 'break'
+},
+{
+  id: 6,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'neighbor',
+  imageUrl: null,
+  explanation: "Excellent! The missing pattern is 'eigh'. The word is 'neighbor' (/ā/).",
+  questionText: "Complete the word: n____bor",
+  correctAnswer: 'eigh',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,5,6,7],
+  aiHook: {
+    targetWord: 'neighbor',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: n____bor',
+    imagePrompt: 'Two neighbors waving across their yards'
+  },
+  aiTutor: {
+    target_word: 'neighbor',
+    question: 'n____bor',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "'eigh' can spell /ā/ in a few words (neighbor, eight, weigh). It’s a rare pattern—compare with a_e, ai, ay, ea, and ey."
+  },
+  audio: 'neighbor'
+},
+{
+  id: 7,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'prey',
+  imageUrl: null,
+  explanation: "Nice! The missing ending is 'ey'. The word is 'prey' (/ā/).",
+  questionText: "Complete the word: pr__",
+  correctAnswer: 'ey',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1],
+  aiHook: {
+    targetWord: 'prey',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: pr__',
+    imagePrompt: 'A hawk searching for prey in a field'
+  },
+  aiTutor: {
+    target_word: 'prey',
+    question: 'pr__',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "Long A at the end is usually 'ay' (day), but sometimes 'ey' (prey, they, obey). Listen for /ā/ at the word’s end."
+  },
+  audio: 'prey'
+},
+{
+  id: 8,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'great',
+  imageUrl: null,
+  explanation: "Good! The missing team is 'ea'. The word is 'great' (/ā/).",
+  questionText: "Complete the word: gr__t",
+  correctAnswer: 'ea',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1,4],
+  aiHook: {
+    targetWord: 'great',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: gr__t',
+    imagePrompt: 'A gold star with the word GREAT!'
+  },
+  aiTutor: {
+    target_word: 'great',
+    question: 'gr__t',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "'ea' sometimes spells /ā/ in exception words (great, steak, break). Often, long A is a_e, ai, or ay instead."
+  },
+  audio: 'great'
+},
+{
+  id: 9,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'weight',
+  imageUrl: null,
+  explanation: "Great work! The missing pattern is 'eigh'. The word is 'weight' (/ā/).",
+  questionText: "Complete the word: w____t",
+  correctAnswer: 'eigh',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,5],
+  aiHook: {
+    targetWord: 'weight',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: w____t',
+    imagePrompt: 'A kettlebell or dumbbell showing weight'
+  },
+  aiTutor: {
+    target_word: 'weight',
+    question: 'w____t',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "‘eigh’ spells /ā/ in a few words (weight, eight). It’s uncommon—compare with a_e, ai, ay, ea, ey."
+  },
+  audio: 'weight'
+},
+{
+  id: 10,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'obey',
+  imageUrl: null,
+  explanation: "Excellent! The missing ending is 'ey'. The word is 'obey' (/ā/).",
+  questionText: "Complete the word: ob__",
+  correctAnswer: 'ey',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1],
+  aiHook: {
+    targetWord: 'obey',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: ob__',
+    imagePrompt: 'A child following a sign that says OBEY RULES'
+  },
+  aiTutor: {
+    target_word: 'obey',
+    question: 'ob__',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "At word ends, long A is usually 'ay' (day), but some words use 'ey' (obey, they, prey). Choose based on position and the word you know."
+  },
+  audio: 'obey'
+}
+]
+},
+
+  '3-A.3.4': {
+  topicInfo: {
+    topicId: '3-A.3.4',
+    topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+    progressTopicName: 'Revision: Spell the long A word',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
       progressTopicName: 'Spell the long a word',
       questionElements: 'image + text',
@@ -51905,15 +52956,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e makes the a long in 'shake'."
+        spelling_pattern_or_rule: "Use a_e (silent e) to make 'a' long in CVCe: sh–a–k–e."
       },
       audio: "shake"
     },
     {
       id: 2,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -51939,15 +52990,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ai' makes the long a sound in 'train'."
+        spelling_pattern_or_rule: "In the middle of a word, use 'ai' for long a: tr–ai–n."
       },
       audio: "train"
     },
     {
       id: 3,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -51973,15 +53024,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ay' at the end makes the long a sound in 'day'."
+        spelling_pattern_or_rule: "At the end of a word, use 'ay' for long a: d–ay."
       },
       audio: "day"
     },
     {
       id: 4,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52007,15 +53058,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e at the end makes the a long in 'plate'."
+        spelling_pattern_or_rule: "CVCe frame: final 'e' makes 'a' long—pl–a–t–e."
       },
       audio: "plate"
     },
     {
       id: 5,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52041,15 +53092,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ai' vowel team makes the long a sound in 'rain'."
+        spelling_pattern_or_rule: "Middle long a—use 'ai': r–ai–n (sometimes 'ea' in rare words)."
       },
       audio: "rain"
     },
     {
       id: 6,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52075,15 +53126,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'eigh' spelling makes the long a sound in 'eight'."
+        spelling_pattern_or_rule: "‘eigh’ chunk says long a—memorize this club pattern."
       },
       audio: "eight"
     },
     {
       id: 7,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52109,15 +53160,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ay' makes the long a sound in 'gray'."
+        spelling_pattern_or_rule: "End of word—use 'ay' for long a: gr–ay."
       },
       audio: "gray"
     },
     {
       id: 8,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52143,15 +53194,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ea' vowel team can make the long a sound in words like 'break'."
+        spelling_pattern_or_rule: "‘ea’ sometimes says long a—learn break/steak/great by heart."
       },
       audio: "break"
     },
     {
       id: 9,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52177,15 +53228,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ey' spelling can make the long a sound in 'they'."
+        spelling_pattern_or_rule: "‘ey’ is a rare long a—remember ‘they’, ‘prey’, ‘obey’."
       },
       audio: "they"
     },
     {
       id: 10,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52211,15 +53262,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ai' makes the long a sound in 'paint'."
+        spelling_pattern_or_rule: "Middle long a—use 'ai': p–ai–nt (not 'ay')."
       },
       audio: "paint"
     },
     {
       id: 11,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52245,15 +53296,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ay' at the end makes the long a sound in 'play'."
+        spelling_pattern_or_rule: "End with long a—use 'ay': pl–ay."
       },
       audio: "play"
     },
     {
       id: 12,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52279,15 +53330,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ai' makes the long a sound in 'chain'."
+        spelling_pattern_or_rule: "Inside the word, long a is 'ai': ch–ai–n."
       },
       audio: "chain"
     },
     {
       id: 13,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52313,21 +53364,21 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e at the end makes the a long in 'parade'."
+        spelling_pattern_or_rule: "In open syllables with silent e, 'a' stays long: par–a(de)."
       },
       audio: "parade"
     },
     {
       id: 14,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "steak",
       imageUrl: null,
-      explanation: "Nice work! The vowel team 'ea' makes the long a sound in 'steak'.",
+      explanation: "Good job! The vowel team 'ea' makes the long a sound in 'steak'.",
       questionText: "Spell the word: _____",
       correctAnswer: "steak",
       template: 'fill_blank',
@@ -52340,62 +53391,28 @@ aiTutor: {
         targetWord: "steak",
         intent: "fill_blank",
         questionLine: "Spell the word: _____",
-        imagePrompt: "A grilled steak on a plate for the word steak"
+        imagePrompt: "A juicy grilled steak on a plate for the word steak"
       },
       aiTutor: {
         target_word: 'steak',
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "In some words like 'steak', 'ea' makes the long a sound."
+        spelling_pattern_or_rule: "‘ea’ can say long a in rare words: break/steak/great."
       },
       audio: "steak"
     },
     {
       id: 15,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "whale",
-      imageUrl: null,
-      explanation: "Fantastic! The silent e makes the a long in 'whale'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "whale",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "whale",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A giant blue whale swimming in the ocean for the word whale"
-      },
-      aiTutor: {
-        target_word: 'whale',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e at the end makes the a long in 'whale'."
-      },
-      audio: "whale"
-    },
-    {
-      id: 16,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "relay",
       imageUrl: null,
-      explanation: "Good job! The 'ay' at the end makes the long a sound in 'relay'.",
+      explanation: "Nice work! The word 'relay' ends with 'ay' for long a.",
       questionText: "Spell the word: _____",
       correctAnswer: "relay",
       template: 'fill_blank',
@@ -52408,130 +53425,28 @@ aiTutor: {
         targetWord: "relay",
         intent: "fill_blank",
         questionLine: "Spell the word: _____",
-        imagePrompt: "Athletes passing a baton in a relay race for the word relay"
+        imagePrompt: "A relay race with runners passing a baton for the word relay"
       },
       aiTutor: {
         target_word: 'relay',
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ay' ending makes the long a sound in 'relay'."
+        spelling_pattern_or_rule: "End syllable uses 'ay' for long a: re–lay."
       },
       audio: "relay"
     },
     {
-      id: 17,
-      topicId: '3-A.3',
+      id: 16,
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "weigh",
-      imageUrl: null,
-      explanation: "Excellent! The 'eigh' makes the long a sound in 'weigh'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "weigh",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "weigh",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A weighing scale with fruits for the word weigh"
-      },
-      aiTutor: {
-        target_word: 'weigh',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'eigh' vowel team makes the long a sound in 'weigh'."
-      },
-      audio: "weigh"
-    },
-    {
-      id: 18,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "display",
-      imageUrl: null,
-      explanation: "Nice! The 'ay' at the end makes the long a sound in 'display'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "display",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "display",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A store display with colorful products for the word display"
-      },
-      aiTutor: {
-        target_word: 'display',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ay' at the end makes the long a sound in 'display'."
-      },
-      audio: "display"
-    },
-    {
-      id: 19,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "faint",
-      imageUrl: null,
-      explanation: "Great work! The 'ai' vowel team makes the long a sound in 'faint'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "faint",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "faint",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A person feeling dizzy and about to faint for the word faint"
-      },
-      aiTutor: {
-        target_word: 'faint',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ai' vowel team makes the long a sound in 'faint'."
-      },
-      audio: "faint"
-    },
-    {
-      id: 20,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "neighbor",
       imageUrl: null,
-      explanation: "Fantastic! The 'eigh' makes the long a sound in 'neighbor'.",
+      explanation: "Well done! The 'eigh' in 'neighbor' makes the long a sound.",
       questionText: "Spell the word: _____",
       correctAnswer: "neighbor",
       template: 'fill_blank',
@@ -52544,27 +53459,1212 @@ aiTutor: {
         targetWord: "neighbor",
         intent: "fill_blank",
         questionLine: "Spell the word: _____",
-        imagePrompt: "Two neighbors waving across their yards for the word neighbor"
+        imagePrompt: "Two friendly neighbors waving from their houses for the word neighbor"
       },
       aiTutor: {
         target_word: 'neighbor',
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'eigh' spelling makes the long a sound in 'neighbor'."
+        spelling_pattern_or_rule: "‘eigh’ is a rare long a pattern: eight/weigh/neighbor."
       },
       audio: "neighbor"
     },
-    
-    
+    {
+      id: 17,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "whale",
+      imageUrl: null,
+      explanation: "Great job! The silent e makes the a long in 'whale'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "whale",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "whale",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A large blue whale swimming in the ocean for the word whale"
+      },
+      aiTutor: {
+        target_word: 'whale',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Silent e makes 'a' long: wh–a–l–e."
+      },
+      audio: "whale"
+    },
+    {
+      id: 18,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "display",
+      imageUrl: null,
+      explanation: "Nice! The ending 'ay' makes the long a sound in 'display'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "display",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "display",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A colorful art display on a wall for the word display"
+      },
+      aiTutor: {
+        target_word: 'display',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "End syllable long a—use 'ay': dis–play."
+      },
+      audio: "display"
+    },
+    {
+      id: 19,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "obey",
+      imageUrl: null,
+      explanation: "Well done! The ending 'ey' makes the long a sound in 'obey'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "obey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "obey",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A child following directions for the word obey"
+      },
+      aiTutor: {
+        target_word: 'obey',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "‘ey’ says long a in rare words like they/prey/obey."
+      },
+      audio: "obey"
+    },
+    {
+      id: 20,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "faint",
+      imageUrl: null,
+      explanation: "Excellent! The vowel team 'ai' makes the long a sound in 'faint'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "faint",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "faint",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A person feeling faint and dizzy for the word faint"
+      },
+      aiTutor: {
+        target_word: 'faint',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Inside the word, use 'ai' for long a: f–ai–nt."
+      },
+      audio: "faint"
+    }
   ]
 }
 ,
-    '3-A.4': {
+'3-A.4.1': {
   topicInfo: {
-    topicId: '3-A.4',
+    topicId: '3-A.4.1',
+    topicName: 'Spell_the_long_e_word_ee_ea',
+    progressTopicName: 'Spell the long e word: ee and ea',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "see",
+      imageUrl: null,
+      explanation: "Good job! The word is 'see' (long e with 'ee').",
+      questionText: "__ __ __",
+      correctAnswer: "see",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0], // s shown; student types 'ee'
+      aiHook: {
+        targetWord: "see",
+        intent: "fill_blank",
+        questionLine: "__ __ __",
+        imagePrompt: "A child looking through binoculars"
+      },
+      aiTutor: {
+        target_word: 'see',
+        question: "s __ __",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "see"
+    },
+    {
+      id: 2,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "tree",
+      imageUrl: null,
+      explanation: "Great! The word is 'tree' (long e with 'ee').",
+      questionText: "t r __ __",
+      correctAnswer: "tree",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1], // t,r shown; student types 'ee'
+      aiHook: {
+        targetWord: "tree",
+        intent: "fill_blank",
+        questionLine: "t r __ __",
+        imagePrompt: "A tall green tree"
+      },
+      aiTutor: {
+        target_word: 'tree',
+        question: "t r __ __",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "tree"
+    },
+    {
+      id: 3,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "bee",
+      imageUrl: null,
+      explanation: "Buzz! The word is 'bee' (long e with 'ee').",
+      questionText: "b __ __",
+      correctAnswer: "bee",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0], // b shown; student types 'ee'
+      aiHook: {
+        targetWord: "bee",
+        intent: "fill_blank",
+        questionLine: "b __ __",
+        imagePrompt: "A buzzing bee near a flower"
+      },
+      aiTutor: {
+        target_word: 'bee',
+        question: "b __ __",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "bee"
+    },
+    {
+      id: 4,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "green",
+      imageUrl: null,
+      explanation: "Nice! The word is 'green' (long e with 'ee').",
+      questionText: "gr__n",
+      correctAnswer: "green",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // g,r,n shown; student types 'ee'
+      aiHook: {
+        targetWord: "green",
+        intent: "fill_blank",
+        questionLine: "gr__n",
+        imagePrompt: "A green leaf"
+      },
+      aiTutor: {
+        target_word: 'green',
+        question: "gr__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "green"
+    },
+    {
+      id: 5,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "leaf",
+      imageUrl: null,
+      explanation: "Great! The word is 'leaf' (long e with 'ea').",
+      questionText: "l__f",
+      correctAnswer: "leaf",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // l,f shown; student types 'ea'
+      aiHook: {
+        targetWord: "leaf",
+        intent: "fill_blank",
+        questionLine: "l__f",
+        imagePrompt: "A single green leaf"
+      },
+      aiTutor: {
+        target_word: '3-A.4.1',
+        question: "l__f",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "leaf"
+    },
+    {
+      id: 6,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "beach",
+      imageUrl: null,
+      explanation: "Awesome! The word is 'beach' (long e with 'ea').",
+      questionText: "b__ch",
+      correctAnswer: "beach",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4], // b,c,h shown; student types 'ea'
+      aiHook: {
+        targetWord: "beach",
+        intent: "fill_blank",
+        questionLine: "b__ch",
+        imagePrompt: "A sandy beach with waves"
+      },
+      aiTutor: {
+        target_word: 'beach',
+        question: "b__ch",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "beach"
+    },
+    {
+      id: 7,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "sleep",
+      imageUrl: null,
+      explanation: "Nice! The word is 'sleep' (long e with 'ee').",
+      questionText: "sl__p",
+      correctAnswer: "sleep",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // s,l,p shown; student types 'ee'
+      aiHook: {
+        targetWord: "sleep",
+        intent: "fill_blank",
+        questionLine: "sl__p",
+        imagePrompt: "A child sleeping peacefully in bed"
+      },
+      aiTutor: {
+        target_word: 'sleep',
+        question: "sl__p",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "sleep"
+    },
+    {
+      id: 8,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "meat",
+      imageUrl: null,
+      explanation: "Good job! The word is 'meat' (long e with 'ea').",
+      questionText: "m__t",
+      correctAnswer: "meat",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // m,t shown; student types 'ea'
+      aiHook: {
+        targetWord: "meat",
+        intent: "fill_blank",
+        questionLine: "m__t",
+        imagePrompt: "Slices of cooked meat on a plate"
+      },
+      aiTutor: {
+        target_word: 'meat',
+        question: "m__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "meat"
+    },
+    {
+      id: 9,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "feet",
+      imageUrl: null,
+      explanation: "Well done! The word is 'feet' (long e with 'ee').",
+      questionText: "f__t",
+      correctAnswer: "feet",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // f,t shown; student types 'ee'
+      aiHook: {
+        targetWord: "feet",
+        intent: "fill_blank",
+        questionLine: "f__t",
+        imagePrompt: "Two bare feet on the sand"
+      },
+      aiTutor: {
+        target_word: 'feet',
+        question: "f__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "feet"
+    },
+    {
+      id: 10,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "clean",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'clean' (long e with 'ea').",
+      questionText: "cl__n",
+      correctAnswer: "clean",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // c,l,n shown; student types 'ea'
+      aiHook: {
+        targetWord: "clean",
+        intent: "fill_blank",
+        questionLine: "cl__n",
+        imagePrompt: "A person cleaning with a mop"
+      },
+      aiTutor: {
+        target_word: 'clean',
+        question: "cl__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "clean"
+    },
+    {
+      id: 11,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "read",
+      imageUrl: null,
+      explanation: "Great! The word is 'read' (long e with 'ea').",
+      questionText: "r__d",
+      correctAnswer: "read",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // r,d shown; student types 'ea'
+      aiHook: {
+        targetWord: "read",
+        intent: "fill_blank",
+        questionLine: "r__d",
+        imagePrompt: "A boy reading a book under a lamp"
+      },
+      aiTutor: {
+        target_word: 'read',
+        question: "r__d",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "read"
+    },
+    {
+      id: 12,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "street",
+      imageUrl: null,
+      explanation: "Well done! The word is 'street' (long e with 'ee').",
+      questionText: "str__t",
+      correctAnswer: "street",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5], // s,t,r,t shown; student types 'ee'
+      aiHook: {
+        targetWord: "street",
+        intent: "fill_blank",
+        questionLine: "str__t",
+        imagePrompt: "A quiet street with houses on both sides"
+      },
+      aiTutor: {
+        target_word: 'street',
+        question: "str__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "street"
+    },
+    {
+      id: 13,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "peach",
+      imageUrl: null,
+      explanation: "Yum! The word is 'peach' (long e with 'ea').",
+      questionText: "p__ch",
+      correctAnswer: "peach",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4], // p,c,h shown; student types 'ea'
+      aiHook: {
+        targetWord: "peach",
+        intent: "fill_blank",
+        questionLine: "p__ch",
+        imagePrompt: "A ripe peach fruit"
+      },
+      aiTutor: {
+        target_word: 'peach',
+        question: "p__ch",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "peach"
+    },
+    {
+      id: 14,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "sheep",
+      imageUrl: null,
+      explanation: "Nice work! The word is 'sheep' (long e with 'ee').",
+      questionText: "sh__p",
+      correctAnswer: "sheep",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // s,h,p shown; student types 'ee'
+      aiHook: {
+        targetWord: "sheep",
+        intent: "fill_blank",
+        questionLine: "sh__p",
+        imagePrompt: "A fluffy white sheep"
+      },
+      aiTutor: {
+        target_word: 'sheep',
+        question: "sh__p",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "sheep"
+    },
+    {
+      id: 15,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "team",
+      imageUrl: null,
+      explanation: "Great! The word is 'team' (long e with 'ea').",
+      questionText: "t__m",
+      correctAnswer: "team",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // t,m shown; student types 'ea'
+      aiHook: {
+        targetWord: "team",
+        intent: "fill_blank",
+        questionLine: "t__m",
+        imagePrompt: "A soccer team posing together"
+      },
+      aiTutor: {
+        target_word: 'team',
+        question: "t__m",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "team"
+    },
+    {
+      id: 16,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "teach",
+      imageUrl: null,
+      explanation: "Awesome! The word is 'teach' (long e with 'ea').",
+      questionText: "t__ch",
+      correctAnswer: "teach",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4], // t,c,h shown; student types 'ea'
+      aiHook: {
+        targetWord: "teach",
+        intent: "fill_blank",
+        questionLine: "t__ch",
+        imagePrompt: "A teacher writing on the board"
+      },
+      aiTutor: {
+        target_word: 'teach',
+        question: "t__ch",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "teach"
+    },
+    {
+      id: 17,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "seat",
+      imageUrl: null,
+      explanation: "Well done! The word is 'seat' (long e with 'ea').",
+      questionText: "s__t",
+      correctAnswer: "seat",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // s,t shown; student types 'ea'
+      aiHook: {
+        targetWord: "seat",
+        intent: "fill_blank",
+        questionLine: "s__t",
+        imagePrompt: "A chair or seat to sit on"
+      },
+      aiTutor: {
+        target_word: 'seat',
+        question: "s__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "seat"
+    },
+    {
+      id: 18,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "knee",
+      imageUrl: null,
+      explanation: "Good! The word is 'knee' (long e with 'ee').",
+      questionText: "kn__",
+      correctAnswer: "knee",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1], // k,n shown; student types 'ee'
+      aiHook: {
+        targetWord: "knee",
+        intent: "fill_blank",
+        questionLine: "kn__",
+        imagePrompt: "A bent knee of a person"
+      },
+      aiTutor: {
+        target_word: 'knee',
+        question: "kn__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "knee"
+    },
+    {
+      id: 19,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "dream",
+      imageUrl: null,
+      explanation: "Nice! The word is 'dream' (long e with 'ea').",
+      questionText: "dr__m",
+      correctAnswer: "dream",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // d,r,m shown; student types 'ea'
+      aiHook: {
+        targetWord: "dream",
+        intent: "fill_blank",
+        questionLine: "dr__m",
+        imagePrompt: "A child dreaming while asleep"
+      },
+      aiTutor: {
+        target_word: 'dream',
+        question: "dr__m",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "dream"
+    },
+    {
+      id: 20,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "queen",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'queen' (long e with 'ee').",
+      questionText: "qu__n",
+      correctAnswer: "queen",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // q,u,n shown; student types 'ee'
+      aiHook: {
+        targetWord: "queen",
+        intent: "fill_blank",
+        questionLine: "qu__n",
+        imagePrompt: "A royal queen wearing a crown"
+      },
+      aiTutor: {
+        target_word: 'queen',
+        question: "qu__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "queen"
+    }
+  ]
+}
+,
+'3-A.4.2': {
+  topicInfo: {
+    topicId: '3-A.4.2',
+    topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+    progressTopicName: 'Spell the long E word: e_e and ie',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // --- Silent e (e_e) ---
+    {
+      id: 1,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (silent e)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "these",
+      imageUrl: null,
+      explanation: "The silent e makes the first e long in 'these'.",
+      questionText: "Complete the word: th _ s _",
+      correctAnswer: "these",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "these",
+        intent: "fill_blank",
+        questionLine: "Complete the word: th _ s _",
+        imagePrompt: "A person pointing to several objects saying 'these'"
+      },
+      aiTutor: {
+        target_word: 'these',
+        question: "th _ s _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long, as in 'these' and 'scene'. Magic e stretches the vowel sound across one consonant, while 'ee' or 'ea' are used for long e in the middle of words."
+      },
+      audio: "these"
+    },
+    {
+      id: 2,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (silent e)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "scene",
+      imageUrl: null,
+      explanation: "The silent e makes the first e long in 'scene'.",
+      questionText: "Complete the word: sc _ n _",
+      correctAnswer: "scene",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "scene",
+        intent: "fill_blank",
+        questionLine: "Complete the word: sc _ n _",
+        imagePrompt: "Actors performing on a stage for the word scene"
+      },
+      aiTutor: {
+        target_word: 'scene',
+        question: "sc _ n _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long in 'scene'. Use 'ee' or 'ea' for long e in the middle of words like 'green' or 'leaf'. Magic e often appears at the end to stretch the vowel."
+      },
+      audio: "scene"
+    },
+
+    // --- ie ---
+    {
+      id: 3,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (ie)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "field",
+      imageUrl: null,
+      explanation: "The 'ie' makes the long e sound in 'field'.",
+      questionText: "Complete the word: f _ _ l d",
+      correctAnswer: "field",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "field",
+        intent: "fill_blank",
+        questionLine: "Complete the word: f _ _ l d",
+        imagePrompt: "A green grassy field under blue sky"
+      },
+      aiTutor: {
+        target_word: 'field',
+        question: "f _ _ l d",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "The 'ie' pattern spells long e before letters like f, l, or d, as in 'field' or 'chief'. Use 'ee' or 'ea' for long e in the middle of other words like 'green' or 'beach'."
+      },
+      audio: "field"
+    },
+    {
+      id: 4,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (ie)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "chief",
+      imageUrl: null,
+      explanation: "The 'ie' makes the long e sound in 'chief'.",
+      questionText: "Complete the word: ch _ _ f",
+      correctAnswer: "chief",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "chief",
+        intent: "fill_blank",
+        questionLine: "Complete the word: ch _ _ f",
+        imagePrompt: "A leader wearing a feathered headdress for the word chief"
+      },
+      aiTutor: {
+        target_word: 'chief',
+        question: "ch _ _ f",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "The 'ie' pattern makes long e before f, l, or d, as in 'chief' and 'field'. After c, switch to 'ei'—like 'ceiling' or 'receive'."
+      },
+      audio: "chief"
+    },
+
+    // --- Mixed ---
+    {
+      id: 5,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "niece",
+      imageUrl: null,
+      explanation: "‘ie’ spells long e in 'niece'.",
+      questionText: "Complete the word: n _ _ c e",
+      correctAnswer: "niece",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "niece",
+        intent: "fill_blank",
+        questionLine: "Complete the word: n _ _ c e",
+        imagePrompt: "An aunt hugging her young niece"
+      },
+      aiTutor: {
+        target_word: 'niece',
+        question: "n _ _ c e",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Use 'ie' for long e before c, f, or l, like 'niece' or 'chief'. After c, it changes to 'ei', as in 'ceiling' and 'receive'."
+      },
+      audio: "niece"
+    },
+    {
+      id: 6,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "believe",
+      imageUrl: null,
+      explanation: "‘ie’ makes the long e sound in 'believe'.",
+      questionText: "Complete the word: bel _ _ v e",
+      correctAnswer: "believe",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5,6],
+      aiHook: {
+        targetWord: "believe",
+        intent: "fill_blank",
+        questionLine: "Complete the word: bel _ _ v e",
+        imagePrompt: "A person closing eyes with a hopeful smile for the word believe"
+      },
+      aiTutor: {
+        target_word: 'believe',
+        question: "bel _ _ v e",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "The 'ie' pattern shows long e in the middle of longer words like 'believe' or 'relieve'. After c, switch to 'ei'."
+      },
+      audio: "believe"
+    },
+    {
+      id: 7,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "complete",
+      imageUrl: null,
+      explanation: "Silent e makes the long e in 'complete'.",
+      questionText: "Complete the word: compl _ t _",
+      correctAnswer: "complete",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,6],
+      aiHook: {
+        targetWord: "complete",
+        intent: "fill_blank",
+        questionLine: "Complete the word: compl _ t _",
+        imagePrompt: "A finished checklist with all boxes ticked"
+      },
+      aiTutor: {
+        target_word: 'complete',
+        question: "compl _ t _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long in words like 'complete' and 'scene'. Use 'ee' or 'ea' for long e in middle syllables."
+      },
+      audio: "complete"
+    },
+    {
+      id: 8,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "athlete",
+      imageUrl: null,
+      explanation: "Silent e makes the long e across the final consonant in 'athlete'.",
+      questionText: "Complete the word: athl _ t _",
+      correctAnswer: "athlete",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,5],
+      aiHook: {
+        targetWord: "athlete",
+        intent: "fill_blank",
+        questionLine: "Complete the word: athl _ t _",
+        imagePrompt: "A runner at the starting line for the word athlete"
+      },
+      aiTutor: {
+        target_word: 'athlete',
+        question: "athl _ t _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long in 'athlete'. It’s common at the end, while 'ee' and 'ea' appear inside words."
+      },
+      audio: "athlete"
+    },
+    {
+      id: 9,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "piece",
+      imageUrl: null,
+      explanation: "‘ie’ makes the long e in 'piece'.",
+      questionText: "Complete the word: p _ _ c e",
+      correctAnswer: "piece",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "piece",
+        intent: "fill_blank",
+        questionLine: "Complete the word: p _ _ c e",
+        imagePrompt: "A jigsaw puzzle piece held in a hand"
+      },
+      aiTutor: {
+        target_word: 'piece',
+        question: "p _ _ c e",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Use 'ie' for long e before c, f, or l, as in 'piece', 'chief', and 'field'. After c, use 'ei'—like 'ceiling'."
+      },
+      audio: "piece"
+    },
+    {
+      id: 10,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "theme",
+      imageUrl: null,
+      explanation: "Silent e makes the long e in 'theme'.",
+      questionText: "Complete the word: th _ m _",
+      correctAnswer: "theme",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "theme",
+        intent: "fill_blank",
+        questionLine: "Complete the word: th _ m _",
+        imagePrompt: "A title card that says THEME with decorative elements"
+      },
+      aiTutor: {
+        target_word: 'theme',
+        question: "th _ m _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the vowel long in 'theme'. Use 'ee' or 'ea' for long e in middle positions (tree, beach), and 'ie' before letters like f or l."
+      },
+      audio: "theme"
+    }
+  ]
+}
+,
+ '3-A.4.3': {
+  topicInfo: {
+    topicId: '3-A.4.3',
     topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-    progressTopicName: 'Spell the long e word',
+    progressTopicName: 'Spell the long E word: Revision',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -52572,7 +54672,7 @@ aiTutor: {
   questions: [
     {
       id: 1,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52580,33 +54680,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "tree",
       imageUrl: null,
-      explanation: "Great job! The 'ee' vowel team makes the long e sound in 'tree'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ee' vowel team makes the long e sound in 'tree'.",
+      questionText: "Complete the word: tr _ _",
       correctAnswer: "tree",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "tree",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: tr _ _",
         imagePrompt: "A tall green tree with leaves for the word tree"
       },
       aiTutor: {
         target_word: 'tree',
-        question: "_____",
+        question: "tr _ _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The vowel team 'ee' makes the long e sound in 'tree'."
+        spelling_pattern_or_rule: "Use 'ee' for long e in the middle: tr–ee."
       },
       audio: "tree"
     },
     {
       id: 2,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52614,33 +54714,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "beach",
       imageUrl: null,
-      explanation: "Nice work! The 'ea' vowel team makes the long e sound in 'beach'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'beach'.",
+      questionText: "Complete the word: b _ _ ch",
       correctAnswer: "beach",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "beach",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: b _ _ ch",
         imagePrompt: "A sunny beach with sand and ocean waves for the word beach"
       },
       aiTutor: {
         target_word: 'beach',
-        question: "_____",
+        question: "b _ _ ch",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The vowel team 'ea' makes the long e sound in 'beach'."
+        spelling_pattern_or_rule: "In the middle, 'ea' often spells long e: b–ea–ch."
       },
       audio: "beach"
     },
     {
       id: 3,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52648,33 +54748,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "sweet",
       imageUrl: null,
-      explanation: "Excellent! The 'ee' vowel team makes the long e sound in 'sweet'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'sweet'.",
+      questionText: "Complete the word: sw _ _ t",
       correctAnswer: "sweet",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "sweet",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: sw _ _ t",
         imagePrompt: "A piece of candy or dessert for the word sweet"
       },
       aiTutor: {
         target_word: 'sweet',
-        question: "_____",
+        question: "sw _ _ t",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The double 'ee' makes the long e sound in 'sweet'."
+        spelling_pattern_or_rule: "Use 'ee' to show long e: sw–ee–t."
       },
       audio: "sweet"
     },
     {
       id: 4,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52682,67 +54782,101 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "field",
       imageUrl: null,
-      explanation: "Good job! The 'ie' makes the long e sound in 'field'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ie' spelling makes the long e sound in 'field'.",
+      questionText: "Complete the word: f _ _ ld",
       correctAnswer: "field",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "field",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: f _ _ ld",
         imagePrompt: "A green grassy field under blue sky for the word field"
       },
       aiTutor: {
         target_word: 'field',
-        question: "_____",
+        question: "f _ _ ld",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ie' spelling makes the long e sound in 'field'."
+        spelling_pattern_or_rule: "Use 'ie' for long e before l/d/f: f–ie–ld."
       },
       audio: "field"
     },
     {
       id: 5,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "these",
       imageUrl: null,
-      explanation: "Great! The silent e makes the e long in 'these'.",
-      questionText: "Spell the word: _____",
+      explanation: "Silent e makes the first e long in 'these'.",
+      questionText: "Complete the word: th _ s _",
       correctAnswer: "these",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "these",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A person pointing to several objects saying 'these' for the word these"
+        questionLine: "Complete the word: th _ s _",
+        imagePrompt: "A person pointing to several objects saying 'these'"
       },
       aiTutor: {
         target_word: 'these',
-        question: "_____",
+        question: "th _ s _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The silent e makes the first e long in 'these'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e: th–e–s–e."
       },
       audio: "these"
     },
     {
       id: 6,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
+      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "scene",
+      imageUrl: null,
+      explanation: "Silent e makes the first e long in 'scene'.",
+      questionText: "Complete the word: sc _ n _",
+      correctAnswer: "scene",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "scene",
+        intent: "fill_blank",
+        questionLine: "Complete the word: sc _ n _",
+        imagePrompt: "Actors performing on a stage for the word scene"
+      },
+      aiTutor: {
+        target_word: 'scene',
+        question: "sc _ n _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Fill both e’s in e_e: sc–e–n–e."
+      },
+      audio: "scene"
+    },
+    {
+      id: 7,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52750,33 +54884,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "leaf",
       imageUrl: null,
-      explanation: "Well done! The 'ea' vowel team makes the long e sound in 'leaf'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'leaf'.",
+      questionText: "Complete the word: l _ _ f",
       correctAnswer: "leaf",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "leaf",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: l _ _ f",
         imagePrompt: "A green leaf from a tree for the word leaf"
       },
       aiTutor: {
         target_word: 'leaf',
-        question: "_____",
+        question: "l _ _ f",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ea' vowel team makes the long e sound in 'leaf'."
+        spelling_pattern_or_rule: "Use 'ea' to show long e: l–ea–f."
       },
       audio: "leaf"
     },
     {
-      id: 7,
-      topicId: '3-A.4',
+      id: 8,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52784,33 +54918,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "sleep",
       imageUrl: null,
-      explanation: "Fantastic! The 'ee' vowel team makes the long e sound in 'sleep'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'sleep'.",
+      questionText: "Complete the word: sl _ _ p",
       correctAnswer: "sleep",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "sleep",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: sl _ _ p",
         imagePrompt: "A child sleeping peacefully in bed for the word sleep"
       },
       aiTutor: {
         target_word: 'sleep',
-        question: "_____",
+        question: "sl _ _ p",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The double 'ee' makes the long e sound in 'sleep'."
+        spelling_pattern_or_rule: "Use 'ee' for the long e: sl–ee–p."
       },
       audio: "sleep"
     },
     {
-      id: 8,
-      topicId: '3-A.4',
+      id: 9,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52818,33 +54952,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "peace",
       imageUrl: null,
-      explanation: "Excellent! The 'ea' vowel team makes the long e sound in 'peace'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'peace'.",
+      questionText: "Complete the word: p _ _ ce",
       correctAnswer: "peace",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "peace",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: p _ _ ce",
         imagePrompt: "A peace symbol or people shaking hands for the word peace"
       },
       aiTutor: {
         target_word: 'peace',
-        question: "_____",
+        question: "p _ _ ce",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ea' vowel team makes the long e sound in 'peace'."
+        spelling_pattern_or_rule: "In the middle, 'ea' can spell long e: p–ea–ce."
       },
       audio: "peace"
     },
     {
-      id: 9,
-      topicId: '3-A.4',
+      id: 10,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52852,67 +54986,101 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "chief",
       imageUrl: null,
-      explanation: "Great! The 'ie' spelling makes the long e sound in 'chief'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ie' spelling makes the long e sound in 'chief'.",
+      questionText: "Complete the word: ch _ _ f",
       correctAnswer: "chief",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "chief",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A leader or chief wearing a feathered headdress for the word chief"
+        questionLine: "Complete the word: ch _ _ f",
+        imagePrompt: "A leader wearing a feathered headdress for the word chief"
       },
       aiTutor: {
         target_word: 'chief',
-        question: "_____",
+        question: "ch _ _ f",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ie' spelling makes the long e sound in 'chief'."
+        spelling_pattern_or_rule: "Use 'ie' for long e before f, l, or d: ch–ie–f."
       },
       audio: "chief"
     },
     {
-      id: 10,
-      topicId: '3-A.4',
+      id: 11,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "scene",
+      word: "theme",
       imageUrl: null,
-      explanation: "Well done! The silent e makes the e long in 'scene'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "scene",
+      explanation: "Silent e makes the vowel long in 'theme'.",
+      questionText: "Complete the word: th _ m _",
+      correctAnswer: "theme",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
       aiHook: {
-        targetWord: "scene",
+        targetWord: "theme",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A movie or theater scene with actors performing for the word scene"
+        questionLine: "Complete the word: th _ m _",
+        imagePrompt: "A title card that says THEME with decorative elements"
       },
       aiTutor: {
-        target_word: 'scene',
-        question: "_____",
+        target_word: 'theme',
+        question: "th _ m _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The silent e at the end makes the first e long in 'scene'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e: th–e–m–e."
       },
-      audio: "scene"
+      audio: "theme"
     },
     {
-      id: 11,
-      topicId: '3-A.4',
+      id: 12,
+      topicId: '3-A.4.3',
+      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "complete",
+      imageUrl: null,
+      explanation: "Silent e makes the first e long in 'complete'.",
+      questionText: "Complete the word: compl _ t _",
+      correctAnswer: "complete",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,6],
+      aiHook: {
+        targetWord: "complete",
+        intent: "fill_blank",
+        questionLine: "Complete the word: compl _ t _",
+        imagePrompt: "A finished checklist with all boxes marked for the word complete"
+      },
+      aiTutor: {
+        target_word: 'complete',
+        question: "compl _ t _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Fill both e’s in e_e across syllables: com–pl–e–t–e."
+      },
+      audio: "complete"
+    },
+    {
+      id: 13,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52920,33 +55088,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "green",
       imageUrl: null,
-      explanation: "Great job! The double 'ee' makes the long e sound in 'green'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'green'.",
+      questionText: "Complete the word: gr _ _ n",
       correctAnswer: "green",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "green",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: gr _ _ n",
         imagePrompt: "A bright green leaf and grass to show the color green"
       },
       aiTutor: {
         target_word: 'green',
-        question: "_____",
+        question: "gr _ _ n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'green'."
+        spelling_pattern_or_rule: "Put 'ee' in the middle to say /ē/: gr–ee–n."
       },
       audio: "green"
     },
     {
-      id: 12,
-      topicId: '3-A.4',
+      id: 14,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52954,33 +55122,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "speak",
       imageUrl: null,
-      explanation: "Nice work! The vowel team 'ea' makes the long e sound in 'speak'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'speak'.",
+      questionText: "Complete the word: sp _ _ k",
       correctAnswer: "speak",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "speak",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: sp _ _ k",
         imagePrompt: "A person talking with sound waves coming from the mouth for the word speak"
       },
       aiTutor: {
         target_word: 'speak',
-        question: "_____",
+        question: "sp _ _ k",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The vowel team 'ea' makes the long e sound in 'speak'."
+        spelling_pattern_or_rule: "Choose 'ea' to show long e in the middle: sp–ea–k."
       },
       audio: "speak"
     },
     {
-      id: 13,
-      topicId: '3-A.4',
+      id: 15,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52988,33 +55156,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "thief",
       imageUrl: null,
-      explanation: "Excellent! The spelling 'ie' makes the long e sound in 'thief'.",
-      questionText: "Spell the word: _____",
+      explanation: "The letters 'ie' make the long e sound in 'thief'.",
+      questionText: "Complete the word: th _ _ f",
       correctAnswer: "thief",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "thief",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: th _ _ f",
         imagePrompt: "A sneaky cartoon thief tiptoeing with a small bag"
       },
       aiTutor: {
         target_word: 'thief',
-        question: "_____",
+        question: "th _ _ f",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The letters 'ie' make the long e sound in 'thief'."
+        spelling_pattern_or_rule: "Use 'ie' to say /ē/ before f/l/d: th–ie–f."
       },
       audio: "thief"
     },
     {
-      id: 14,
-      topicId: '3-A.4',
+      id: 16,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -53022,33 +55190,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "cheese",
       imageUrl: null,
-      explanation: "Great! Double 'ee' makes the long e sound in 'cheese'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'cheese'.",
+      questionText: "Complete the word: ch _ _ se",
       correctAnswer: "cheese",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5],
       aiHook: {
         targetWord: "cheese",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: ch _ _ se",
         imagePrompt: "A wedge of yellow cheese with holes for the word cheese"
       },
       aiTutor: {
         target_word: 'cheese',
-        question: "_____",
+        question: "ch _ _ se",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'cheese'."
+        spelling_pattern_or_rule: "Choose 'ee' for long e: ch–ee–se."
       },
       audio: "cheese"
     },
     {
-      id: 15,
-      topicId: '3-A.4',
+      id: 17,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -53056,67 +55224,67 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "breeze",
       imageUrl: null,
-      explanation: "Nice job! Double 'ee' makes the long e sound in 'breeze'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'breeze'.",
+      questionText: "Complete the word: br _ _ ze",
       correctAnswer: "breeze",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5],
       aiHook: {
         targetWord: "breeze",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: br _ _ ze",
         imagePrompt: "Leaves gently blowing in a light wind for the word breeze"
       },
       aiTutor: {
         target_word: 'breeze',
-        question: "_____",
+        question: "br _ _ ze",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'breeze'."
+        spelling_pattern_or_rule: "Use 'ee' for the long e: br–ee–ze."
       },
       audio: "breeze"
     },
     {
-      id: 16,
-      topicId: '3-A.4',
+      id: 18,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "athlete",
       imageUrl: null,
-      explanation: "Well done! The silent-e pattern (e_e) makes the long e sound in 'athlete'.",
-      questionText: "Spell the word: _____",
+      explanation: "Silent e makes the first e long in 'athlete'.",
+      questionText: "Complete the word: athl _ t _",
       correctAnswer: "athlete",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,5],
       aiHook: {
         targetWord: "athlete",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: athl _ t _",
         imagePrompt: "A runner at a starting line for the word athlete"
       },
       aiTutor: {
         target_word: 'athlete',
-        question: "_____",
+        question: "athl _ t _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The e_e pattern makes the long e sound in the second syllable of 'athlete'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e across syllables: athl–e–t–e."
       },
       audio: "athlete"
     },
     {
-      id: 17,
-      topicId: '3-A.4',
+      id: 19,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -53124,132 +55292,64 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "queen",
       imageUrl: null,
-      explanation: "Excellent! Double 'ee' makes the long e sound in 'queen'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'queen'.",
+      questionText: "Complete the word: qu _ _ n",
       correctAnswer: "queen",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "queen",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: qu _ _ n",
         imagePrompt: "A queen wearing a crown and robe for the word queen"
       },
       aiTutor: {
         target_word: 'queen',
-        question: "_____",
+        question: "qu _ _ n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'queen'."
+        spelling_pattern_or_rule: "Middle long e? Try 'ee': qu–ee–n."
       },
       audio: "queen"
     },
     {
-      id: 18,
-      topicId: '3-A.4',
-      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "reach",
-      imageUrl: null,
-      explanation: "Great! The vowel team 'ea' makes the long e sound in 'reach'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "reach",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "reach",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A child stretching arms up high to reach a shelf for the word reach"
-      },
-      aiTutor: {
-        target_word: 'reach',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ea' vowel team makes the long e sound in 'reach'."
-      },
-      audio: "reach"
-    },
-    {
-      id: 19,
-      topicId: '3-A.4',
-      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "niece",
-      imageUrl: null,
-      explanation: "Nice work! The spelling 'ie' makes the long e sound in 'niece'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "niece",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "niece",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "An aunt hugging her young niece for the word niece"
-      },
-      aiTutor: {
-        target_word: 'niece',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The letters 'ie' make the long e sound in 'niece'."
-      },
-      audio: "niece"
-    },
-    {
       id: 20,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "complete",
+      word: "theme",
       imageUrl: null,
-      explanation: "Fantastic! The silent-e pattern (e_e) makes the long e sound in 'complete'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "complete",
+      explanation: "Silent e makes the vowel long in 'theme'.",
+      questionText: "Complete the word: th _ m _",
+      correctAnswer: "theme",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
       aiHook: {
-        targetWord: "complete",
+        targetWord: "theme",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A finished checklist with all boxes marked for the word complete"
+        questionLine: "Complete the word: th _ m _",
+        imagePrompt: "A title card that says THEME with decorative elements"
       },
       aiTutor: {
-        target_word: 'complete',
-        question: "_____",
+        target_word: 'theme',
+        question: "th _ m _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The e_e pattern makes the long e sound in the second syllable of 'complete'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e: th–e–m–e."
       },
-      audio: "complete"
-    }    
+      audio: "theme"
+    }
   ]
 }
 ,
