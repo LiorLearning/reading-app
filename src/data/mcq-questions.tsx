@@ -114,6 +114,290 @@ export interface MCQData {
 }
 export const sampleMCQData: MCQData = {
   "topics": {
+    "A-": {
+      topicInfo: {
+        topicId: 'A-',
+        topicName: 'assignment',
+        progressTopicName: 'Assignment practice',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank'
+      },
+      questions: [
+        {
+          id: 1,
+          topicId: 'A-',
+          topicName: 'Spell_the_short_vowel_word',
+          progressTopicName: 'Spell the short vowel word',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'spelling',
+          word: 'cat',
+          imageUrl: 'cat_image_url_here',
+          explanation: "Well done! The short vowel sound is /a/ as in 'cat'.",
+          questionText: "Listen to the word. Then, spell it.",
+          correctAnswer: 'cat',
+          template: 'spelling',
+          isSpacing: false,
+          isSorting: true,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'cat',
+            intent: 'spelling',
+            questionLine: "Listen to the word. Then, spell it.",
+            imagePrompt: 'A cute cat for the word cat'
+          },
+          aiTutor: {
+            target_word: 'cat',
+            question: "_ _ _",
+            student_entry: "",
+            topic_to_reinforce: 'Spell the short vowel word',
+            spelling_pattern_or_rule: "Short vowel /a/ as in 'cat'."
+          },
+          audio: "cat"
+        },
+        {
+          id: 2,
+          topicId: 'A-',
+          topicName: 'Spell_the_short_vowel_word',
+          progressTopicName: 'Spell the short vowel word',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'spelling',
+          word: 'dog',
+          imageUrl: 'dog_image_url_here',
+          explanation: "Awesome! The short vowel sound is /o/ as in 'dog'.",
+          questionText: "Listen to the word. Then, spell it.",
+          correctAnswer: 'dog',
+          template: 'spelling',
+          isSpacing: false,
+          isSorting: true,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'dog',
+            intent: 'spelling',
+            questionLine: "Listen to the word. Then, spell it.",
+            imagePrompt: 'A brown dog for the word dog'
+          },
+          aiTutor: {
+            target_word: 'dog',
+            question: "_ _ _",
+            student_entry: "",
+            topic_to_reinforce: 'Spell the short vowel word',
+            spelling_pattern_or_rule: "Short vowel /o/ as in 'dog'."
+          },
+          audio: "dog"
+        },
+        {
+          id: 3,
+          topicId: 'A-',
+          topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'blend',
+          imageUrl: null,
+          explanation: "Well done! The word is 'step'.",
+          questionText: 'Complete the word to match the picture: _ep',
+          correctAnswer: 'step',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [2,3],
+          aiHook: {
+            targetWord: 'blend',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word to match the picture: _ep',
+            imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+          },
+          aiTutor: {
+            target_word: 'step',
+            question: '_ _ e p',
+            student_entry: '',
+            topic_to_reinforce: 'Initial consonant blends',
+            spelling_pattern_or_rule: "The 'st' blend joins the /s/ and /t/ sounds at the start of words like 'step' and 'stop'."
+          },
+          audio: 'step'
+        },
+        {
+          id: 4,
+          topicId: 'A-',
+          topicName: 'Complete_the_word_with_ar_or_r_controlled_vowel',
+          progressTopicName: 'Fill in the AR and OR sound words',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'bark',
+          imageUrl: null,
+          explanation: "Well done! The word is 'bark'.",
+          questionText: "Complete the word: b__k",
+          correctAnswer: 'bark',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [0, 3],
+          aiHook: {
+            targetWord: 'bark',
+            intent: 'fill_blank',
+            questionLine: "Complete the word: b__k",
+            imagePrompt: 'Educational scene showing complete_the_word_with_ar_or_r_controlled_vowel concepts'
+          },
+          aiTutor: {
+            target_word: 'bark',
+            question: 'b _ _ k',
+            student_entry: '',
+            topic_to_reinforce: 'R-controlled vowel sound /ar/',
+            spelling_pattern_or_rule: "The letters 'ar' make the /ar/ sound, as in 'car', 'farm', and 'star'."
+          },
+          audio: 'bark'
+        },
+        {
+          id: 5,
+          topicId: 'A-',
+          topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+          progressTopicName: 'Spell Long A Words',
+          questionElements: 'image + audio',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "cake",
+          imageUrl: null,
+          explanation: "Great job! 'Cake' uses the silent 'e' to make the long 'a' sound.",
+          questionText: "Listen to the word for a sweet dessert. Then, spell it.",
+          correctAnswer: "cake",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
+          aiHook: {
+            targetWord: "cake",
+            intent: "fill_blank",
+            questionLine: "Listen to the word for a sweet dessert. Then, spell it.",
+            imagePrompt: "Educational scene showing spell the long a word silent e ai ay concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"cake"
+        },
+        {
+          id: 6,
+          topicId: 'A-',
+          topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
+          progressTopicName: 'Spelling long U sounds',
+          questionElements: 'audio + image',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "glue",
+          imageUrl: null,
+          explanation: "Well done! 'Glue' ends with 'ue'.",
+          questionText: "Spell the sticky substance using the long 'u' sound.",
+          correctAnswer: "glue",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
+          aiHook: {
+            targetWord: "glue",
+            intent: "fill_blank",
+            questionLine: "Spell the sticky substance using the long 'u' sound.",
+            imagePrompt: "Educational scene showing spell the long u word silent e ue oo ew concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"glue"
+        },
+        {
+          id: 7,
+          topicId: 'A-',
+          topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ae_eigh',
+          progressTopicName: 'Spell long A words',
+          questionElements: 'audio',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "weight",
+          imageUrl: null,
+          explanation: "Good job! The word 'weight' uses 'eigh' to make the long 'a' sound.",
+          questionText: "Listen to the word. Then, spell it: w___ht",
+          correctAnswer: "weight",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,4,5],
+          aiHook: {
+            targetWord: "weight",
+            intent: "fill_blank",
+            questionLine: "Listen to the word. Then, spell it: w___ht",
+            imagePrompt: "Educational scene showing spell the long a word silent e ai ay ae eigh concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"weight"
+        },
+        {
+          id: 8,
+          topicId: 'A-',
+          topicName: 'Spell_consonant_le_words',
+          progressTopicName: 'Spell consonant-le words',
+          questionElements: 'audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "noodle",
+          imageUrl: null,
+          explanation: "Great job! 'Noodle' has a consonant-le ending.",
+          questionText: "Fill in the blank: I ate a ___.",
+          correctAnswer: "noodle",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
+          aiHook: {
+            targetWord: "noodle",
+            intent: "fill_blank",
+            questionLine: "Fill in the blank: I ate a ___.",
+            imagePrompt: "Educational scene showing spell consonant le words concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"noodle"
+        },
+      ],
+  },
     'K-P.2': {
   topicInfo: {
     topicId: 'K-P.2',

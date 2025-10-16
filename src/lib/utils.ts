@@ -675,6 +675,10 @@ export interface GradeSelection {
  */
 export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string => {
   const normalized = (gradeDisplayName || '').trim();
+  // Special-case assignment grade → content prefix 'A' (topics like A-)
+  if (normalized.toLowerCase() === 'assignment') {
+    return 'A';
+  }
   // Accept both full and short forms
   if (normalized === '4th Grade' || normalized === '4th' || normalized === '5th Grade' || normalized === '5th') {
     return '3';
@@ -803,6 +807,11 @@ export const loadGradeSelection = (): GradeSelection | null => {
  */
 export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle', gradeDisplayName?: string): string | null => {
   const progress = loadUserProgress();
+  
+  // Special-case: assignment grade always routes to A- topic only
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    return 'A-';
+  }
   
   // Map selected grade to content grade
   const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';

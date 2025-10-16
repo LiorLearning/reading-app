@@ -43,6 +43,7 @@ export interface UserData {
   uid: string;
   username: string;
   email: string;
+  age?: number;
   grade: string;
   gradeDisplayName: string;
   level: string;
@@ -139,15 +140,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               console.warn('Failed to update lastLoginAt:', e);
             }
           } else {
-            // New user, set initial data
+            // New user, set initial data - default grade is "assignment"
             const newUserData: UserData = {
               uid: user.uid,
               username: user.displayName || '',
               email: user.email || '',
-              grade: '',
-              gradeDisplayName: '',
-              level: '',
-              levelDisplayName: '',
+              grade: 'assignment',
+              gradeDisplayName: 'assignment',
+              level: 'start',
+              levelDisplayName: 'Start Level',
               isFirstTime: true,
               createdAt: new Date(),
               lastLoginAt: new Date()

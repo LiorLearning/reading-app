@@ -705,6 +705,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         // console.log('❌ SPELLBOX: Incorrect answer, generating hint');
         // Increment attempts for incorrect answer
         setAttempts(prev => prev + 1);
+        // Notify parent on first incorrect attempt so callers can react (e.g., assignment switch)
+        try {
+          if (onComplete && attempts === 0) {
+            // attempts is current count before increment; first incorrect means attempts === 0
+            onComplete(false, completeWord, 1);
+          }
+        } catch {}
         // Generate AI hint for incorrect answer
         generateAIHint(completeWord);
         // Send target word to realtime session for pronunciation help
