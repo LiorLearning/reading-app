@@ -1020,8 +1020,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                           handleAnswerChange(newUserAnswer);
                                           playClickSound();
                                           
-                                            if (newValue && letterIndex < expectedLength - 1) {
-                                            const nextBox = document.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement;
+                                          if (newValue) {
+                                            const nextBox = document.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                             if (nextBox) {
                                               // console.log(`🔤 SPELLBOX INPUT: Moving focus to next box (${letterIndex + 1})`);
                                               setTimeout(() => nextBox.focus(), 10);
