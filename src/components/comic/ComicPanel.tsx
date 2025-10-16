@@ -42,6 +42,8 @@ interface ComicPanelProps {
   // Realtime session integration
   sendMessage?: (text: string) => void;
   interruptRealtimeSession?: () => void;
+  /** When true, treat as assignment flow to allow realtime hinting */
+  isAssignmentFlow?: boolean;
 }
 
 const ComicPanel: React.FC<ComicPanelProps> = ({ 
@@ -70,7 +72,8 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
   showExplanation = true,
   // Realtime session integration
   sendMessage,
-  interruptRealtimeSession
+  interruptRealtimeSession,
+  isAssignmentFlow
 }) => {
   // Get current adventure ID for Firebase image resolution
   const currentAdventureId = useCurrentAdventureId();
@@ -386,6 +389,7 @@ const ComicPanel: React.FC<ComicPanelProps> = ({
             interruptRealtimeSession={interruptRealtimeSession}
             showHints={showHints}
             showExplanation={showExplanation}
+            isAssignmentFlow={!!isAssignmentFlow}
           />
         
         {/* Navigation Buttons - Always visible and positioned around the image */}

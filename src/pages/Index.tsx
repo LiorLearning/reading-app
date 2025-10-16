@@ -3997,6 +3997,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
     }).catch(() => {});
 
+    // In assignment mode, the first incorrect will restart the adventure and change grade.
+    // Do not continue with any encouragement message or TTS; exit early.
+    const isAssignmentFlowEarly = ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment';
+    if (!isCorrect && attemptCount === 1 && isAssignmentFlowEarly) {
+      return;
+    }
+
     if (isCorrect) {
       // Defer progression and messaging until user clicks Next
       lastSpellAttemptCountRef.current = attemptCount;
@@ -4004,21 +4011,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setDisableInputForSpell(true);
       // Do not highlight yet; wait for user to tap the disabled input
     } else {
-      // Provide encouragement for incorrect answers
-      const encouragementMessage: ChatMessage = {
-        type: 'ai',
-        content: `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`,
-        timestamp: Date.now()
-      };
-      
-      setChatMessages(prev => {
-        playMessageSound();
-        // Auto-speak the encouragement
-        const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
-        ttsService.speakAIMessage(encouragementMessage.content, messageId)
-          .catch(error => console.error('TTS error for encouragement:', error));
-        return [...prev, encouragementMessage];
-      });
+      // Non-assignment flows: keep UI stable and avoid chat messages; no audio either
+      const encouragementText = `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`;
+      void encouragementText; // placeholder to avoid unused string if later needed
     }
   }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
 
@@ -5571,6 +5566,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             onNext: handleSpellNext,
                             highlightNext: highlightSpellNext,
                             sendMessage,
+                            isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
                     }
                   />

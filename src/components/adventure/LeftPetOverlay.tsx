@@ -43,6 +43,8 @@ interface LeftPetOverlayProps {
     sendMessage?: (text: string) => void;
     promptText?: string;
     isDisabled?: boolean;
+    /** When true, treat as assignment flow to allow realtime hinting */
+    isAssignmentFlow?: boolean;
   };
   // Emotion/heart UI
   emotionActive?: boolean;
@@ -583,6 +585,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                         showExplanation={spellInline.showExplanation}
                         sendMessage={spellInline.sendMessage}
                         interruptRealtimeSession={interruptRealtimeSession}
+                        isAssignmentFlow={!!spellInline.isAssignmentFlow}
                       />
                     ) : displayHtml ? (
                       <div dangerouslySetInnerHTML={{ __html: displayHtml }} />

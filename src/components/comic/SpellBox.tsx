@@ -58,6 +58,8 @@ interface SpellBoxProps {
 
   // Optional delay to enable the Next chevron after a correct answer (ms)
   nextUnlockDelayMs?: number;
+  /** When true, enable realtime speech hinting on incorrect attempts (assignment-only) */
+  isAssignmentFlow?: boolean;
 }
 
 const SpellBox: React.FC<SpellBoxProps> = ({
@@ -86,6 +88,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   sendMessage,
   interruptRealtimeSession,
   nextUnlockDelayMs = 0
+  , isAssignmentFlow = false
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -712,11 +715,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             onComplete(false, completeWord, 1);
           }
         } catch {}
-        // Generate AI hint for incorrect answer
+        // In assignment mode, the adventure restarts and grade changes on first incorrect.
+        // Do not generate hints or send realtime messages; the context will reset.
+        if (isAssignmentFlow) {
+          return;
+        }
+        // Generate AI hint for incorrect answer (non-assignment flows only)
         generateAIHint(completeWord);
-        // Send target word to realtime session for pronunciation help
+        // Trigger realtime pronunciation coach prompt (non-assignment flows)
         if (sendMessage && targetWord) {
-          sendMessage(`correct answer is ${targetWord}, student response is ${completeWord}`);
+          try {
+            sendMessage(`correct answer is ${targetWord}, student response is ${completeWord}`);
+          } catch {}
         }
       }
     } else {
@@ -724,7 +734,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setIsComplete(false);
       setIsCorrect(false);
     }
-  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, sendMessage]);
+  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, sendMessage, isAssignmentFlow]);
 
   // Focus next empty box
   const focusNextEmptyBox = useCallback(() => {
