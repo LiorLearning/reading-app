@@ -176,11 +176,15 @@ Never initiate conversation; only speak the text you receive.`,
                 <div className="rounded-3xl p-6 sm:p-8 bg-white ring-1 ring-[hsl(var(--border))] shadow-xl">
                   {/* Lesson header */}
                   <div className="flex items-center justify-between mb-4">
-                    <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-kids leading-tight">Lesson {(() => { const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}</div>
+                    <div className="text-3xl sm:text-4xl font-extrabold tracking-tight font-kids leading-tight">
+                      <span className="text-[hsl(var(--primary))]">Lesson {(() => { const n = getGlobalSpellingLessonNumber(topicId); return n || 1; })()}</span>
+                    </div>
                   </div>
-                  {/* What you will learn */}
+                  {/* Intro lines from script */}
                   <div className="text-xl sm:text-2xl leading-relaxed text-gray-900" style={{fontFamily:'system-ui, -apple-system, sans-serif'}}>
-                    You will learn <span className="font-semibold text-[hsl(var(--primary))]">{script.title.toLowerCase()}</span> in words like <span className="font-semibold text-[hsl(var(--primary))]">{modelWord}</span>.
+                    {script.intro.map((line, i) => (
+                      <div key={i} className="mb-1">{line}</div>
+                    ))}
                   </div>
                   {/* Actions */}
                   <div className="mt-6 flex justify-end">
