@@ -17,7 +17,7 @@ export const saveSpellboxProgressHybrid = async (
     const { saveSpellboxTopicProgress } = await import('./utils');
     saveSpellboxTopicProgress(gradeProgress.gradeDisplayName, gradeProgress);
     
-    console.log(`💾 Spellbox progress saved to both Firebase and localStorage: ${gradeProgress.gradeDisplayName}`);
+    // console.log(`💾 Spellbox progress saved to both Firebase and localStorage: ${gradeProgress.gradeDisplayName}`);
   } catch (error) {
     console.error('Firebase save failed, falling back to localStorage only:', error);
     
@@ -43,12 +43,12 @@ export const loadSpellboxProgressHybrid = async (
       const { saveSpellboxTopicProgress } = await import('./utils');
       saveSpellboxTopicProgress(gradeDisplayName, firebaseProgress);
       
-      console.log(`💾 Spellbox progress loaded from Firebase: ${gradeDisplayName}`);
+      // console.log(`💾 Spellbox progress loaded from Firebase: ${gradeDisplayName}`);
       return firebaseProgress;
     }
     
     // Fallback to localStorage
-    console.log(`💾 No Firebase data, checking localStorage for: ${gradeDisplayName}`);
+    // console.log(`💾 No Firebase data, checking localStorage for: ${gradeDisplayName}`);
     const { loadSpellboxTopicProgress } = await import('./utils');
     const localProgress = loadSpellboxTopicProgress(gradeDisplayName);
     
@@ -56,7 +56,7 @@ export const loadSpellboxProgressHybrid = async (
       // Migrate localStorage data to Firebase for future sync
       try {
         await firebaseSpellboxService.saveSpellboxProgressFirebase(userId, localProgress);
-        console.log(`🔄 Migrated localStorage Spellbox progress to Firebase: ${gradeDisplayName}`);
+        // console.log(`🔄 Migrated localStorage Spellbox progress to Firebase: ${gradeDisplayName}`);
       } catch (migrationError) {
         console.warn('Failed to migrate localStorage to Firebase:', migrationError);
       }
@@ -89,12 +89,12 @@ export const loadAllSpellboxProgressHybrid = async (
         saveSpellboxTopicProgress(gradeProgress.gradeDisplayName, gradeProgress);
       });
       
-      console.log(`💾 All Spellbox progress loaded from Firebase`);
+      // console.log(`💾 All Spellbox progress loaded from Firebase`);
       return firebaseProgress;
     }
     
     // Fallback: check localStorage for common grades
-    console.log(`💾 No Firebase data, checking localStorage for all grades`);
+    // console.log(`💾 No Firebase data, checking localStorage for all grades`);
     const { loadSpellboxTopicProgress } = await import('./utils');
     const allProgress: Record<string, SpellboxGradeProgress> = {};
     
@@ -139,7 +139,7 @@ export const clearSpellboxProgressHybrid = async (
     const { clearSpellboxTopicProgress } = await import('./utils');
     clearSpellboxTopicProgress(gradeDisplayName);
     
-    console.log(`🗑️ Spellbox progress cleared from both Firebase and localStorage: ${gradeDisplayName}`);
+    // console.log(`🗑️ Spellbox progress cleared from both Firebase and localStorage: ${gradeDisplayName}`);
   } catch (error) {
     console.error('Failed to clear from Firebase, clearing localStorage only:', error);
     
@@ -157,7 +157,7 @@ export const autoMigrateSpellboxOnLogin = async (userId: string): Promise<void> 
     const migratedCount = await firebaseSpellboxService.migrateLocalStorageToFirebase(userId);
     
     if (migratedCount > 0) {
-      console.log(`✅ Auto-migrated ${migratedCount} Spellbox grade progress to Firebase on login`);
+      // console.log(`✅ Auto-migrated ${migratedCount} Spellbox grade progress to Firebase on login`);
     }
   } catch (error) {
     console.warn('Auto-migration of Spellbox progress failed:', error);

@@ -11,8 +11,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic } from "@/lib/utils";
+import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
+import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
+import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
 import analytics from '@/lib/analytics';
 
@@ -553,11 +556,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
   const [selectedTopicFromPreference, setSelectedTopicFromPreference] = React.useState<string | null>(null);
-  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(() => {
-    // Load saved grade selection on initialization
-    const savedGrade = loadGradeSelection();
-    return savedGrade?.gradeDisplayName || null;
-  });
+  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(null);
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   const currentGradeDisplayName = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').trim();
@@ -1227,14 +1226,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     changeTheme(selectedTheme);
   }, [selectedTheme, changeTheme]);
   
-  // Ensure grade selection is loaded from localStorage on mount
+  // Sync grade selection from Firebase userData (drop localStorage)
   useEffect(() => {
-    const savedGrade = loadGradeSelection();
-    if (savedGrade && !selectedGradeFromDropdown) {
-      // console.log(`🔄 Loading saved grade selection on mount: ${savedGrade.gradeDisplayName}`);
-      setSelectedGradeFromDropdown(savedGrade.gradeDisplayName);
+    if (userData?.gradeDisplayName) {
+      setSelectedGradeFromDropdown(userData.gradeDisplayName);
     }
-  }, []); // Run once on mount
+  }, [userData?.gradeDisplayName]);
 
   // Grade selection logic (for HomePage only)
   useEffect(() => {
@@ -1261,10 +1258,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // console.log('Setting selectedPreference to:', preferenceLevel);
       setSelectedPreference(preferenceLevel);
       
-      // Initialize the combined grade and level selection for proper highlighting
-      // Use saved grade selection if available, otherwise fall back to userData
-      const savedGrade = loadGradeSelection();
-      const gradeToUse = savedGrade?.gradeDisplayName || userData?.gradeDisplayName;
+      // Initialize the combined grade and level selection for proper highlighting (Firebase only)
+      const gradeToUse = userData?.gradeDisplayName;
       
       if (preferenceLevel && gradeToUse) {
         setSelectedGradeAndLevel({ 
@@ -1292,6 +1287,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
     }
   }, [userData, currentScreen]);
+
+  // Force dropdown grade to Firebase when assignment is set (ignore localStorage)
+  useEffect(() => {
+    if (userData?.gradeDisplayName && userData.gradeDisplayName.toLowerCase() === 'assignment') {
+      setSelectedGradeFromDropdown('assignment');
+    }
+  }, [userData?.gradeDisplayName]);
 
   //   // Update currentScreen when userData loads to prevent flashing TopicSelection before onboarding
   // useEffect(() => {
@@ -2259,10 +2261,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         // console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
-        // Additional debug info
-        const savedGradeFromStorage = loadGradeSelection();
-          
-        // console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
+        // Additional debug info removed (localStorage dropped)
         // console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
           
         // NEW: Use topic-based question selection for Spellbox progression
@@ -2892,8 +2891,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Load the adventure's messages and state
       setChatMessages(targetAdventure.messages);
       setCurrentAdventureId(targetAdventure.id);
+      const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
       const topicId = targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '';
-      setSelectedTopicId(topicId);
+      const finalTopicId = effectiveGrade === 'assignment' ? 'A-' : topicId;
+      setSelectedTopicId(finalTopicId);
       // Grade 1: immediately reflect the actual upcoming spell topic in the header
       if (whiteboardGradeEligible) {
         try {
@@ -2937,7 +2938,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           user.uid,
           'continue_specific',
           targetAdventure.id,
-          topicId,
+          finalTopicId,
           'continue',
           targetAdventure.name,
           targetAdventure.messages, // Pass existing messages for AI context
@@ -2999,7 +3000,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
     }
     playClickSound();
-    setSelectedTopicId(topicId);
+    // Force assignment topic when grade is assignment
+    const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
+    const finalTopicId = effectiveGrade === 'assignment' ? 'A-' : topicId;
+    setSelectedTopicId(finalTopicId);
     // Grade 1: immediately reflect the actual upcoming spell topic in the header
     if (whiteboardGradeEligible) {
       try {
@@ -3090,7 +3094,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           user.uid,
           mode === 'new' ? 'new_adventure' : 'continue_adventure',
           adventureId,
-          topicId,
+          finalTopicId,
           mode,
           undefined, // title
           undefined, // existingMessages
@@ -3278,8 +3282,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
-      // Save grade selection to localStorage for persistence
-      saveGradeSelection(gradeDisplayName);
+      // Do not save grade selection to localStorage; Firebase is source of truth
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
     }
@@ -3288,6 +3291,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     try {
       const mapDisplayToCode = (name?: string): string => {
         if (!name) return '';
+        if (name.toLowerCase() === 'assignment') return 'assignment';
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
@@ -3295,10 +3299,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
         return '';
       };
-      const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
+      const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
+      const previousGradeDisplayName = userData?.gradeDisplayName || '';
+      const gradeCode = mapDisplayToCode(incomingGradeDisplayName);
       const levelCode = level === 'middle' ? 'mid' : level;
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
-      const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
+      const gradeName = incomingGradeDisplayName;
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -3306,6 +3312,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           level: levelCode,
           levelDisplayName
         });
+      }
+
+      // If selecting assignment, ALWAYS reset assignment progress in Firebase and start from A-
+      const isSelectingAssignment = incomingGradeDisplayName.toLowerCase() === 'assignment';
+      const changed = previousGradeDisplayName.toLowerCase() !== incomingGradeDisplayName.toLowerCase();
+      const involvesAssignment = previousGradeDisplayName.toLowerCase() === 'assignment' || incomingGradeDisplayName.toLowerCase() === 'assignment';
+      if ((isSelectingAssignment || (changed && involvesAssignment)) && user?.uid) {
+        try {
+          await clearSpellboxProgressHybrid(user.uid, 'assignment');
+          await firebaseSpellboxService.saveSpellboxProgressFirebase(user.uid, {
+            gradeDisplayName: 'assignment',
+            currentTopicId: 'A-',
+            topicProgress: {},
+            timestamp: Date.now()
+          } as any);
+          setSelectedTopicFromPreference('A-');
+        } catch (err) {
+          console.warn('Failed to reset assignment progress:', err);
+        }
       }
     } catch (e) {
       console.error('Failed to persist grade/level selection:', e);
@@ -3315,12 +3340,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const allTopicIds = Object.keys(sampleMCQData.topics);
     
     // Save preference and get the specific topic immediately
-    const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
+    const specificTopic = (gradeDisplayName && gradeDisplayName.toLowerCase() === 'assignment')
+      ? 'A-'
+      : saveTopicPreference(level, allTopicIds, gradeDisplayName);
     
     // console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
     setSelectedPreference(level);
     setSelectedTopicFromPreference(specificTopic);
+
+    // If assignment is selected, immediately start a new adventure on A-
+    if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+      try {
+        handleStartAdventure('A-', 'new');
+      } catch {}
+    }
     
     // console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
@@ -3966,6 +4000,30 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
     playClickSound();
     
+    // If first incorrect attempt on assignment, stop realtime speech and use shared handler
+    if (!isCorrect && attemptCount === 1) {
+      try { interruptRealtimeSession?.(); } catch {}
+    }
+    handleFirstIncorrectAssignment(!isCorrect && attemptCount === 1, {
+      currentGradeDisplayName: selectedGradeFromDropdown || userData?.gradeDisplayName,
+      updateUserData,
+      handleStartAdventure,
+      isCorrect,
+      questionId: currentSpellQuestion?.id || 1
+    }).then((switched) => {
+      if (switched) {
+        setSelectedGradeFromDropdown('2nd Grade');
+        setSelectedGradeAndLevel({ grade: '2nd Grade', level: 'start' });
+      }
+    }).catch(() => {});
+
+    // In assignment mode, the first incorrect will restart the adventure and change grade.
+    // Do not continue with any encouragement message or TTS; exit early.
+    const isAssignmentFlowEarly = ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment';
+    if (!isCorrect && attemptCount === 1 && isAssignmentFlowEarly) {
+      return;
+    }
+
     if (isCorrect) {
       // Defer progression and messaging until user clicks Next
       lastSpellAttemptCountRef.current = attemptCount;
@@ -3973,21 +4031,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setDisableInputForSpell(true);
       // Do not highlight yet; wait for user to tap the disabled input
     } else {
-      // Provide encouragement for incorrect answers
-      const encouragementMessage: ChatMessage = {
-        type: 'ai',
-        content: `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`,
-        timestamp: Date.now()
-      };
-      
-      setChatMessages(prev => {
-        playMessageSound();
-        // Auto-speak the encouragement
-        const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
-        ttsService.speakAIMessage(encouragementMessage.content, messageId)
-          .catch(error => console.error('TTS error for encouragement:', error));
-        return [...prev, encouragementMessage];
-      });
+      // Non-assignment flows: keep UI stable and avoid chat messages; no audio either
+      const encouragementText = `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`;
+      void encouragementText; // placeholder to avoid unused string if later needed
     }
   }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
 
@@ -4664,6 +4710,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   className="w-64 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                   align="start"
                 >
+                  {/* Assignment (Start only) */}
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'assignment' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', 'assignment')}
+                  >
+                    <span className="text-lg">📝</span>
+                    <div>
+                      <div className="font-semibold">Assignment</div>
+                      {/* <div className="text-sm text-gray-500">Start only</div> */}
+                    </div>
+                    {selectedGradeAndLevel?.grade === 'assignment' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
                   {/* Kindergarten */}
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''}`}>
@@ -5540,6 +5598,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             onNext: handleSpellNext,
                             highlightNext: highlightSpellNext,
                             sendMessage,
+                            isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
                     }
                   />
@@ -5979,7 +6038,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               
               // If a specific next topic is provided, use it
               // Otherwise, determine the next topic from progress tracking
-              const topicToNavigateTo = nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics));
+              const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
+              const topicToNavigateTo = effectiveGrade === 'assignment' ? 'A-' : (nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics)));
               
               if (topicToNavigateTo) {
                 // Navigate to the next topic

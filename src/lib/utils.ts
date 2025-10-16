@@ -800,6 +800,11 @@ export const loadGradeSelection = (): GradeSelection | null => {
 export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle', gradeDisplayName?: string): string | null => {
   const progress = loadUserProgress();
   
+  // Special-case: assignment grade always routes to A- topic only
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    return 'A-';
+  }
+  
   // Map selected grade to content grade
   const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';
   // console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
