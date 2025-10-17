@@ -1,4 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { google } from 'googleapis';
 import { initializeApp } from 'firebase-admin/app';
 import { getStorage } from 'firebase-admin/storage';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
@@ -352,3 +354,300 @@ export const generateFluxSchnell = onRequest(
     }
   }
 );
+
+// ==========================
+// Analytics Export → Google Sheets (Sessions)
+// ==========================
+
+type ChatMessage = { type: 'user' | 'ai'; content: string; timestamp: number; hiddenInChat?: boolean };
+type MCQAnswer = { questionId: number; selectedAnswer: number; isCorrect: boolean; timestamp: number; topicId: string };
+
+interface AdventureSessionDoc {
+  userId: string;
+  petId?: string;
+  adventureId: string;
+  topicId?: string;
+  chatMessages: ChatMessage[];
+  totalChatMessages?: number;
+  mcqAnswers?: MCQAnswer[];
+  totalQuestionsAnswered?: number;
+  correctAnswers?: number;
+  adventurePromptCount?: number;
+  createdAt?: FirebaseFirestore.Timestamp;
+  updatedAt?: FirebaseFirestore.Timestamp;
+  lastActivityAt?: FirebaseFirestore.Timestamp;
+}
+
+const SHEET_ID = process.env.SHEET_ID || process.env.GSHEET_ID || '';
+const SHEET_TAB = process.env.SHEET_TAB || 'Analytics';
+const TIMEZONE = process.env.TIMEZONE || 'Asia/Kolkata';
+
+async function getSheetsClient() {
+  const auth = await google.auth.getClient({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
+  return google.sheets({ version: 'v4', auth });
+}
+
+function toTzString(ms: number | undefined | null): string {
+  if (!ms || Number.isNaN(ms)) return '';
+  try {
+    return new Intl.DateTimeFormat('en-IN', {
+      timeZone: TIMEZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).format(new Date(ms));
+  } catch {
+    return new Date(ms).toISOString();
+  }
+}
+
+function countWords(text: string): number {
+  const t = (text || '').trim();
+  if (!t) return 0;
+  return t.split(/\s+/).filter(Boolean).length;
+}
+
+interface UserProfile { username: string; country?: string | null; countryCode?: string | null }
+
+async function getUserProfile(uid: string): Promise<UserProfile> {
+  try {
+    const userDoc = await firestore.collection('users').doc(uid).get();
+    const data = userDoc.data() as any;
+    const name = (data?.username || '').trim();
+    const country = (data?.country || data?.countryName || null) as string | null;
+    const countryCode = (data?.countryCode || data?.country_code || null) as string | null;
+    return { username: name || uid, country, countryCode };
+  } catch {
+    return { username: uid, country: null, countryCode: null };
+  }
+}
+
+async function countImagesForSession(uid: string, adventureId: string, startMs: number, endMs: number): Promise<number> {
+  let total = 0;
+  // adventureImages (uploaded via CF)
+  try {
+    const snap = await firestore
+      .collection('adventureImages')
+      .where('userId', '==', uid)
+      .where('adventureId', '==', adventureId)
+      .get();
+    snap.forEach((d) => {
+      const ts = (d.get('timestamp') as FirebaseFirestore.Timestamp | null)?.toMillis?.() || 0;
+      if (!startMs || !endMs || (ts >= startMs && ts <= endMs)) total += 1;
+    });
+  } catch {}
+
+  // adventureImageUrls (metadata-only)
+  try {
+    const snap2 = await firestore
+      .collection('adventureImageUrls')
+      .where('userId', '==', uid)
+      .where('adventureId', '==', adventureId)
+      .get();
+    snap2.forEach((d) => {
+      const ts = (d.get('timestamp') as FirebaseFirestore.Timestamp | null)?.toMillis?.() || 0;
+      if (!startMs || !endMs || (ts >= startMs && ts <= endMs)) total += 1;
+    });
+  } catch {}
+
+  return total;
+}
+
+async function countDailyQuestsCompleted(uid: string): Promise<number> {
+  try {
+    const snap = await firestore.collection('dailyQuests').doc(uid).get();
+    if (!snap.exists) return 0;
+    const data = snap.data() as any;
+    const petKeys = Object.keys(data || {}).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+    let completed = 0;
+    for (const pet of petKeys) {
+      const petObj = data[pet] || {};
+      // Find any numeric progress (current activity), treat >=5 as completed
+      const entries = Object.entries(petObj).filter(([k, v]) => !k.startsWith('_') && typeof v === 'number');
+      const prog = entries.length > 0 ? Number(entries[0][1]) : 0;
+      if (prog >= 5) completed += 1;
+    }
+    return completed;
+  } catch {
+    return 0;
+  }
+}
+
+function buildRow(sessionId: string, uid: string, username: string, countryLabel: string, s: AdventureSessionDoc) {
+  const messages = Array.isArray(s.chatMessages) ? (s.chatMessages as ChatMessage[]) : [];
+  const userMsgs = messages.filter((m) => m?.type === 'user' && !m?.hiddenInChat);
+  const firstTs = messages.length > 0 ? Number(messages[0]?.timestamp || 0) : (s.createdAt?.toMillis?.() || 0);
+  const lastTs = messages.length > 0 ? Number(messages[messages.length - 1]?.timestamp || 0) : (s.lastActivityAt?.toMillis?.() || s.updatedAt?.toMillis?.() || 0);
+  const durationMin = firstTs && lastTs && lastTs >= firstTs ? Math.round((lastTs - firstTs) / 60000) : 0;
+  const userWords = userMsgs.reduce((sum, m) => sum + countWords(m?.content || ''), 0);
+
+  const mcq = Array.isArray(s.mcqAnswers) ? (s.mcqAnswers as MCQAnswer[]) : [];
+  const attempts = mcq.length;
+  const correct = mcq.filter((a) => !!a?.isCorrect).length;
+  const incorrect = attempts - correct;
+  const uniqueQ = new Set(mcq.map((a) => a?.questionId)).size;
+
+  const createdStr = toTzString(s.createdAt?.toMillis?.() || firstTs || 0);
+  const lastStr = toTzString(s.lastActivityAt?.toMillis?.() || lastTs || 0);
+  const stamp = s.lastActivityAt?.toMillis?.() || lastTs || 0;
+
+  const pets = s.petId ? 1 : 0;
+  const petActions = Number(s.adventurePromptCount || 0);
+  const petsUsed = pets; // current model supports one pet per session
+
+  // placeholders (phase 1)
+  const imagesGenerated = 0; // will be filled after async count
+  const imageGenSeconds = '';
+
+  const row: any[] = [
+    username,
+    createdStr,
+    lastStr,
+    durationMin,
+    stamp,
+    userMsgs.length,
+    userWords,
+    pets,
+    petActions,
+    petsUsed,
+    0, // daily_quests_completed (filled later)
+    '', // total_quests_completed (not tracked yet)
+    imagesGenerated,
+    imageGenSeconds,
+    attempts,
+    correct,
+    incorrect,
+    uniqueQ,
+    countryLabel,
+    sessionId, // hidden id for dedupe
+  ];
+  return { row, firstTs, lastTs } as const;
+}
+
+async function exportSessionsToSheet(startMs: number, endMs: number, options?: { excludeCountry?: string }): Promise<{ exported: number; lastExportedAt: number }> {
+  if (!SHEET_ID) throw new Error('SHEET_ID not configured');
+  const sheets = await getSheetsClient();
+
+  const watermarkRef = firestore.collection('analyticsExports').doc('sheets');
+  const watermarkSnap = await watermarkRef.get();
+  const prevExportedAt = watermarkSnap.exists ? (watermarkSnap.get('lastExportedAt') as FirebaseFirestore.Timestamp | null)?.toMillis?.() || 0 : 0;
+
+  const effectiveStart = Math.max(startMs || 0, prevExportedAt || 0);
+
+  const results: any[][] = [];
+  let lastSeen = effectiveStart;
+  const PAGE = 200; // smaller page to lower memory
+  const APPEND_CHUNK = 200; // append to Sheets in chunks
+
+  let queryRef = firestore.collection('adventureSessions').orderBy('lastActivityAt').startAfter(Timestamp.fromMillis(effectiveStart)).limit(PAGE);
+
+  while (true) {
+    const snap = await queryRef.get();
+    if (snap.empty) break;
+
+    for (const doc of snap.docs) {
+      const data = doc.data() as unknown as AdventureSessionDoc;
+      const lastAt = (data.lastActivityAt || data.updatedAt || data.createdAt)?.toMillis?.() || 0;
+      if (endMs && lastAt > endMs) {
+        lastSeen = Math.max(lastSeen, lastAt);
+        continue;
+      }
+
+      const uid = data.userId;
+      const profile = await getUserProfile(uid);
+
+      // Optional exclusion by country
+      if (options?.excludeCountry) {
+        const ex = options.excludeCountry.trim().toLowerCase();
+        const userCountry = (profile.country || '').trim().toLowerCase();
+        const userCountryCode = (profile.countryCode || '').trim().toLowerCase();
+        // Treat 'India' and 'IN' as matches
+        const isExcluded = userCountry === ex || userCountryCode === ex || (ex === 'india' && (userCountryCode === 'in'));
+        if (isExcluded) {
+          lastSeen = Math.max(lastSeen, lastAt);
+          continue;
+        }
+      }
+
+      const countryLabel = (profile.country || profile.countryCode || '') || '';
+      const { row, firstTs, lastTs } = buildRow(doc.id, uid, profile.username, countryLabel, data);
+
+      // Fill async counts
+      try {
+        const [images, dailyCompleted] = await Promise.all([
+          countImagesForSession(uid, data.adventureId, firstTs, lastTs),
+          countDailyQuestsCompleted(uid),
+        ]);
+        row[12] = images; // # Images generated
+        row[10] = dailyCompleted; // #daily_quests_completed
+      } catch {}
+
+      results.push(row);
+      lastSeen = Math.max(lastSeen, lastAt);
+    }
+
+    const lastDoc = snap.docs[snap.docs.length - 1];
+    // Append periodically to keep memory low
+    if (results.length >= APPEND_CHUNK) {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: `${SHEET_TAB}!A2`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: results.splice(0, results.length) },
+      });
+    }
+
+    queryRef = firestore
+      .collection('adventureSessions')
+      .orderBy('lastActivityAt')
+      .startAfter(lastDoc.get('lastActivityAt'))
+      .limit(PAGE);
+  }
+
+  if (results.length > 0) {
+    // Append in one batch
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: `${SHEET_TAB}!A2`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: results },
+    });
+  }
+
+  // Update watermark
+  await watermarkRef.set({ lastExportedAt: Timestamp.fromMillis(lastSeen) }, { merge: true });
+
+  return { exported: results.length, lastExportedAt: lastSeen };
+}
+
+export const exportAnalytics = onRequest({ cors: true, region: 'us-central1', secrets: ['SHEET_ID','SHEET_TAB','TIMEZONE'], timeoutSeconds: 540, memory: '512MiB' }, async (req, res) => {
+  try {
+    // Optional auth: allow only signed-in; for now, accept admin-only if provided
+    // If you want to enforce, uncomment verifyIdToken and check custom claims
+    const mode = String(req.query.mode || 'incremental');
+    const startAt = req.query.startAt ? Date.parse(String(req.query.startAt)) : 0;
+    const endAt = req.query.endAt ? Date.parse(String(req.query.endAt)) : 0;
+
+    const startMs = mode === 'backfill' ? startAt : 0;
+    const endMs = endAt || 0;
+
+    const exclude = (req.query.excludeCountry ? String(req.query.excludeCountry) : '').trim();
+    const { exported, lastExportedAt } = await exportSessionsToSheet(startMs, endMs, { excludeCountry: exclude || undefined });
+    res.json({ success: true, exported, lastExportedAt });
+  } catch (err) {
+    console.error('exportAnalytics failed:', err);
+    res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'Unknown error' });
+  }
+});
+
+export const exportAnalyticsHourly = onSchedule({ schedule: 'every 60 minutes', timeZone: TIMEZONE, secrets: ['SHEET_ID','SHEET_TAB','TIMEZONE'] }, async () => {
+  try {
+    await exportSessionsToSheet(0, 0);
+  } catch (err) {
+    console.error('exportAnalyticsHourly failed:', err);
+  }
+});

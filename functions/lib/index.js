@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateFluxSchnell = exports.uploadImagen = exports.uploadImage = void 0;
+exports.exportAnalyticsHourly = exports.exportAnalytics = exports.generateFluxSchnell = exports.uploadImagen = exports.uploadImage = void 0;
 const https_1 = require("firebase-functions/v2/https");
+const scheduler_1 = require("firebase-functions/v2/scheduler");
+const googleapis_1 = require("googleapis");
 const app_1 = require("firebase-admin/app");
 const storage_1 = require("firebase-admin/storage");
 const firestore_1 = require("firebase-admin/firestore");
@@ -288,6 +290,262 @@ exports.generateFluxSchnell = (0, https_1.onRequest)({
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error',
         });
+    }
+});
+const SHEET_ID = process.env.SHEET_ID || process.env.GSHEET_ID || '';
+const SHEET_TAB = process.env.SHEET_TAB || 'Analytics';
+const TIMEZONE = process.env.TIMEZONE || 'Asia/Kolkata';
+async function getSheetsClient() {
+    const auth = await googleapis_1.google.auth.getClient({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
+    return googleapis_1.google.sheets({ version: 'v4', auth });
+}
+function toTzString(ms) {
+    if (!ms || Number.isNaN(ms))
+        return '';
+    try {
+        return new Intl.DateTimeFormat('en-IN', {
+            timeZone: TIMEZONE,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        }).format(new Date(ms));
+    }
+    catch (_a) {
+        return new Date(ms).toISOString();
+    }
+}
+function countWords(text) {
+    const t = (text || '').trim();
+    if (!t)
+        return 0;
+    return t.split(/\s+/).filter(Boolean).length;
+}
+async function getUserProfile(uid) {
+    try {
+        const userDoc = await firestore.collection('users').doc(uid).get();
+        const data = userDoc.data();
+        const name = ((data === null || data === void 0 ? void 0 : data.username) || '').trim();
+        const country = ((data === null || data === void 0 ? void 0 : data.country) || (data === null || data === void 0 ? void 0 : data.countryName) || null);
+        const countryCode = ((data === null || data === void 0 ? void 0 : data.countryCode) || (data === null || data === void 0 ? void 0 : data.country_code) || null);
+        return { username: name || uid, country, countryCode };
+    }
+    catch (_a) {
+        return { username: uid, country: null, countryCode: null };
+    }
+}
+async function countImagesForSession(uid, adventureId, startMs, endMs) {
+    let total = 0;
+    // adventureImages (uploaded via CF)
+    try {
+        const snap = await firestore
+            .collection('adventureImages')
+            .where('userId', '==', uid)
+            .where('adventureId', '==', adventureId)
+            .get();
+        snap.forEach((d) => {
+            var _a, _b;
+            const ts = ((_b = (_a = d.get('timestamp')) === null || _a === void 0 ? void 0 : _a.toMillis) === null || _b === void 0 ? void 0 : _b.call(_a)) || 0;
+            if (!startMs || !endMs || (ts >= startMs && ts <= endMs))
+                total += 1;
+        });
+    }
+    catch (_a) { }
+    // adventureImageUrls (metadata-only)
+    try {
+        const snap2 = await firestore
+            .collection('adventureImageUrls')
+            .where('userId', '==', uid)
+            .where('adventureId', '==', adventureId)
+            .get();
+        snap2.forEach((d) => {
+            var _a, _b;
+            const ts = ((_b = (_a = d.get('timestamp')) === null || _a === void 0 ? void 0 : _a.toMillis) === null || _b === void 0 ? void 0 : _b.call(_a)) || 0;
+            if (!startMs || !endMs || (ts >= startMs && ts <= endMs))
+                total += 1;
+        });
+    }
+    catch (_b) { }
+    return total;
+}
+async function countDailyQuestsCompleted(uid) {
+    try {
+        const snap = await firestore.collection('dailyQuests').doc(uid).get();
+        if (!snap.exists)
+            return 0;
+        const data = snap.data();
+        const petKeys = Object.keys(data || {}).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+        let completed = 0;
+        for (const pet of petKeys) {
+            const petObj = data[pet] || {};
+            // Find any numeric progress (current activity), treat >=5 as completed
+            const entries = Object.entries(petObj).filter(([k, v]) => !k.startsWith('_') && typeof v === 'number');
+            const prog = entries.length > 0 ? Number(entries[0][1]) : 0;
+            if (prog >= 5)
+                completed += 1;
+        }
+        return completed;
+    }
+    catch (_a) {
+        return 0;
+    }
+}
+function buildRow(sessionId, uid, username, countryLabel, s) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+    const messages = Array.isArray(s.chatMessages) ? s.chatMessages : [];
+    const userMsgs = messages.filter((m) => (m === null || m === void 0 ? void 0 : m.type) === 'user' && !(m === null || m === void 0 ? void 0 : m.hiddenInChat));
+    const firstTs = messages.length > 0 ? Number(((_a = messages[0]) === null || _a === void 0 ? void 0 : _a.timestamp) || 0) : (((_c = (_b = s.createdAt) === null || _b === void 0 ? void 0 : _b.toMillis) === null || _c === void 0 ? void 0 : _c.call(_b)) || 0);
+    const lastTs = messages.length > 0 ? Number(((_d = messages[messages.length - 1]) === null || _d === void 0 ? void 0 : _d.timestamp) || 0) : (((_f = (_e = s.lastActivityAt) === null || _e === void 0 ? void 0 : _e.toMillis) === null || _f === void 0 ? void 0 : _f.call(_e)) || ((_h = (_g = s.updatedAt) === null || _g === void 0 ? void 0 : _g.toMillis) === null || _h === void 0 ? void 0 : _h.call(_g)) || 0);
+    const durationMin = firstTs && lastTs && lastTs >= firstTs ? Math.round((lastTs - firstTs) / 60000) : 0;
+    const userWords = userMsgs.reduce((sum, m) => sum + countWords((m === null || m === void 0 ? void 0 : m.content) || ''), 0);
+    const mcq = Array.isArray(s.mcqAnswers) ? s.mcqAnswers : [];
+    const attempts = mcq.length;
+    const correct = mcq.filter((a) => !!(a === null || a === void 0 ? void 0 : a.isCorrect)).length;
+    const incorrect = attempts - correct;
+    const uniqueQ = new Set(mcq.map((a) => a === null || a === void 0 ? void 0 : a.questionId)).size;
+    const createdStr = toTzString(((_k = (_j = s.createdAt) === null || _j === void 0 ? void 0 : _j.toMillis) === null || _k === void 0 ? void 0 : _k.call(_j)) || firstTs || 0);
+    const lastStr = toTzString(((_m = (_l = s.lastActivityAt) === null || _l === void 0 ? void 0 : _l.toMillis) === null || _m === void 0 ? void 0 : _m.call(_l)) || lastTs || 0);
+    const stamp = ((_p = (_o = s.lastActivityAt) === null || _o === void 0 ? void 0 : _o.toMillis) === null || _p === void 0 ? void 0 : _p.call(_o)) || lastTs || 0;
+    const pets = s.petId ? 1 : 0;
+    const petActions = Number(s.adventurePromptCount || 0);
+    const petsUsed = pets; // current model supports one pet per session
+    // placeholders (phase 1)
+    const imagesGenerated = 0; // will be filled after async count
+    const imageGenSeconds = '';
+    const row = [
+        username,
+        createdStr,
+        lastStr,
+        durationMin,
+        stamp,
+        userMsgs.length,
+        userWords,
+        pets,
+        petActions,
+        petsUsed,
+        0, // daily_quests_completed (filled later)
+        '', // total_quests_completed (not tracked yet)
+        imagesGenerated,
+        imageGenSeconds,
+        attempts,
+        correct,
+        incorrect,
+        uniqueQ,
+        countryLabel,
+        sessionId, // hidden id for dedupe
+    ];
+    return { row, firstTs, lastTs };
+}
+async function exportSessionsToSheet(startMs, endMs, options) {
+    var _a, _b, _c, _d;
+    if (!SHEET_ID)
+        throw new Error('SHEET_ID not configured');
+    const sheets = await getSheetsClient();
+    const watermarkRef = firestore.collection('analyticsExports').doc('sheets');
+    const watermarkSnap = await watermarkRef.get();
+    const prevExportedAt = watermarkSnap.exists ? ((_b = (_a = watermarkSnap.get('lastExportedAt')) === null || _a === void 0 ? void 0 : _a.toMillis) === null || _b === void 0 ? void 0 : _b.call(_a)) || 0 : 0;
+    const effectiveStart = Math.max(startMs || 0, prevExportedAt || 0);
+    const results = [];
+    let lastSeen = effectiveStart;
+    const PAGE = 200; // smaller page to lower memory
+    const APPEND_CHUNK = 200; // append to Sheets in chunks
+    let queryRef = firestore.collection('adventureSessions').orderBy('lastActivityAt').startAfter(firestore_1.Timestamp.fromMillis(effectiveStart)).limit(PAGE);
+    while (true) {
+        const snap = await queryRef.get();
+        if (snap.empty)
+            break;
+        for (const doc of snap.docs) {
+            const data = doc.data();
+            const lastAt = ((_d = (_c = (data.lastActivityAt || data.updatedAt || data.createdAt)) === null || _c === void 0 ? void 0 : _c.toMillis) === null || _d === void 0 ? void 0 : _d.call(_c)) || 0;
+            if (endMs && lastAt > endMs) {
+                lastSeen = Math.max(lastSeen, lastAt);
+                continue;
+            }
+            const uid = data.userId;
+            const profile = await getUserProfile(uid);
+            // Optional exclusion by country
+            if (options === null || options === void 0 ? void 0 : options.excludeCountry) {
+                const ex = options.excludeCountry.trim().toLowerCase();
+                const userCountry = (profile.country || '').trim().toLowerCase();
+                const userCountryCode = (profile.countryCode || '').trim().toLowerCase();
+                // Treat 'India' and 'IN' as matches
+                const isExcluded = userCountry === ex || userCountryCode === ex || (ex === 'india' && (userCountryCode === 'in'));
+                if (isExcluded) {
+                    lastSeen = Math.max(lastSeen, lastAt);
+                    continue;
+                }
+            }
+            const countryLabel = (profile.country || profile.countryCode || '') || '';
+            const { row, firstTs, lastTs } = buildRow(doc.id, uid, profile.username, countryLabel, data);
+            // Fill async counts
+            try {
+                const [images, dailyCompleted] = await Promise.all([
+                    countImagesForSession(uid, data.adventureId, firstTs, lastTs),
+                    countDailyQuestsCompleted(uid),
+                ]);
+                row[12] = images; // # Images generated
+                row[10] = dailyCompleted; // #daily_quests_completed
+            }
+            catch (_e) { }
+            results.push(row);
+            lastSeen = Math.max(lastSeen, lastAt);
+        }
+        const lastDoc = snap.docs[snap.docs.length - 1];
+        // Append periodically to keep memory low
+        if (results.length >= APPEND_CHUNK) {
+            await sheets.spreadsheets.values.append({
+                spreadsheetId: SHEET_ID,
+                range: `${SHEET_TAB}!A2`,
+                valueInputOption: 'USER_ENTERED',
+                requestBody: { values: results.splice(0, results.length) },
+            });
+        }
+        queryRef = firestore
+            .collection('adventureSessions')
+            .orderBy('lastActivityAt')
+            .startAfter(lastDoc.get('lastActivityAt'))
+            .limit(PAGE);
+    }
+    if (results.length > 0) {
+        // Append in one batch
+        await sheets.spreadsheets.values.append({
+            spreadsheetId: SHEET_ID,
+            range: `${SHEET_TAB}!A2`,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: { values: results },
+        });
+    }
+    // Update watermark
+    await watermarkRef.set({ lastExportedAt: firestore_1.Timestamp.fromMillis(lastSeen) }, { merge: true });
+    return { exported: results.length, lastExportedAt: lastSeen };
+}
+exports.exportAnalytics = (0, https_1.onRequest)({ cors: true, region: 'us-central1', secrets: ['SHEET_ID', 'SHEET_TAB', 'TIMEZONE'], timeoutSeconds: 540, memory: '512MiB' }, async (req, res) => {
+    try {
+        // Optional auth: allow only signed-in; for now, accept admin-only if provided
+        // If you want to enforce, uncomment verifyIdToken and check custom claims
+        const mode = String(req.query.mode || 'incremental');
+        const startAt = req.query.startAt ? Date.parse(String(req.query.startAt)) : 0;
+        const endAt = req.query.endAt ? Date.parse(String(req.query.endAt)) : 0;
+        const startMs = mode === 'backfill' ? startAt : 0;
+        const endMs = endAt || 0;
+        const exclude = (req.query.excludeCountry ? String(req.query.excludeCountry) : '').trim();
+        const { exported, lastExportedAt } = await exportSessionsToSheet(startMs, endMs, { excludeCountry: exclude || undefined });
+        res.json({ success: true, exported, lastExportedAt });
+    }
+    catch (err) {
+        console.error('exportAnalytics failed:', err);
+        res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'Unknown error' });
+    }
+});
+exports.exportAnalyticsHourly = (0, scheduler_1.onSchedule)({ schedule: 'every 60 minutes', timeZone: TIMEZONE, secrets: ['SHEET_ID', 'SHEET_TAB', 'TIMEZONE'] }, async () => {
+    try {
+        await exportSessionsToSheet(0, 0);
+    }
+    catch (err) {
+        console.error('exportAnalyticsHourly failed:', err);
     }
 });
 //# sourceMappingURL=index.js.map
