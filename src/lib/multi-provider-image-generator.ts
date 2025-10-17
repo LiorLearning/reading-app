@@ -161,7 +161,7 @@ export class MultiProviderImageGenerator {
         break;
         
       case 'flux-schnell':
-        refinedPrompt = `${refinedPrompt}, cinematic, richly detailed, ultra vivid lighting`;
+        refinedPrompt = `${refinedPrompt}, , realistic and vibrant style, cozy and friendly atmosphere, bright natural lighting, warm sunlight streaming in, cheerful and safe mood, soft highlights and vivid colors`;
         break;
 
       case 'google-imagen':
