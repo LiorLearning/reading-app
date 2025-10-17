@@ -4076,7 +4076,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           nextTopicId: nextTopic,
           gradeCode: tier.grade,
           levelCode: tier.level,
-          numericLevel: Math.min(5, Math.max(0, (targetTierIdx - 1))),
+          // Map pairs (1-2→0, 3-4→1, 5-6→2, 7-8→3)
+          numericLevel: Math.floor((targetTierIdx - 1) / 2),
         });
       } catch {}
       return;
@@ -4314,11 +4315,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) {
         return prev;
       }
-      const latestWithContinuation = prev
-        .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
-        .slice(-1)[0] as any;
-
-      const continuation = latestWithContinuation?.content_after_spelling || currentSpellingSentence || "Great job! Let's continue our adventure! ✨";
+      // Prefer the most recent AI message for THIS word, and only after assignment exit (if set)
+      const nowWord = (currentSpellQuestion?.audio || currentSpellQuestion?.word || '').trim().toLowerCase();
+      const exitAt = assignmentExitAtRef.current || 0;
+      const reverse = [...prev].reverse();
+      const lastForCurrentWord = reverse.find(m => {
+        const ai = (m as any);
+        return m.type === 'ai'
+          && typeof ai?.spelling_word === 'string'
+          && ai.spelling_word.trim().toLowerCase() === nowWord
+          && (!exitAt || (typeof ai.timestamp === 'number' ? ai.timestamp > exitAt : true));
+      }) as any;
+      const latestWithContinuation = reverse.find(m => (m.type === 'ai' && (m as any).content_after_spelling)) as any;
+      const continuation = (lastForCurrentWord?.content_after_spelling
+        || lastForCurrentWord?.spelling_sentence
+        || latestWithContinuation?.content_after_spelling
+        || (nowWord ? `Great job spelling "${currentSpellQuestion?.word || currentSpellQuestion?.audio}"!` : "Great job! Let's continue our adventure! ✨"));
 
       const adventureStoryMessage: ChatMessage = {
         type: 'ai',
@@ -6212,7 +6224,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               <div className="text-sm text-foreground/70">{`We found your personalized starting point`}</div>
               <p className="mt-1 text-4xl font-extrabold tracking-tight">
                 <span className="text-primary">
-                  {`Level ${typeof levelSwitchModal.numericLevel === 'number' ? levelSwitchModal.numericLevel : (levelSwitchModal.levelDisplayName === 'Start Level' ? 0 : 1)}`}
+                  {`Level ${levelSwitchModal.numericLevel ?? 0}`}
                 </span>
               </p>
               <div className="mt-5">
