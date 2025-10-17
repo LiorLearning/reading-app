@@ -373,11 +373,13 @@ ${sanitizedConversationContext}`;
           };
           
           // Update adventure context with the generated image
+          // Add a non-intrusive log entry for history/analytics, but hide it from chat UI.
           adventureContext.push({
             type: 'ai',
             content: '[Generated Image] Image created successfully (content not stored in chat).',
-            timestamp: Date.now()
-          });
+            timestamp: Date.now(),
+            hiddenInChat: true
+          } as any);
           
         } else {
           console.error(`❌ Image ${index + 1} generation failed:`, result.error);

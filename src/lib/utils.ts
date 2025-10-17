@@ -685,7 +685,7 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
   if (isGrade(name, ['2nd', 'second', 'grade 2', 'grade2', '2'])) return '2';
   if (isGrade(name, ['1st', 'first', 'grade 1', 'grade1', '1'])) return '1';
-  if (isGrade(name, ['kindergarten', 'k', 'gradek'])) return '1';
+  if (isGrade(name, ['kindergarten', 'k', 'gradek'])) return 'K';
   // Default to grade 1 content
   return '1';
 };
@@ -799,6 +799,11 @@ export const loadGradeSelection = (): GradeSelection | null => {
  */
 export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' | 'middle', gradeDisplayName?: string): string | null => {
   const progress = loadUserProgress();
+  
+  // Special-case: assignment grade always routes to A- topic only
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    return 'A-';
+  }
   
   // Map selected grade to content grade
   const contentGrade = gradeDisplayName ? mapSelectedGradeToContentGrade(gradeDisplayName) : '1';
@@ -1425,6 +1430,13 @@ export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress
  * Get the next Spellbox topic for a grade
  */
 export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[]): string | null => {
+  // Special-case: assignment always stays on assignment topic list (e.g., 'A-')
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    // Prefer 'A-' if available in the provided list; fallback to first
+    const hasAssignment = allTopicIds.includes('A-');
+    return hasAssignment ? 'A-' : (allTopicIds[0] || null);
+  }
+
   const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
   
   if (!gradeProgress) {
