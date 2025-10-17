@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { ArrowLeft, CheckCircle, AlertCircle, Circle, TrendingUp, Award, Refresh
 import { playClickSound } from '@/lib/sounds';
 import { 
   loadSpellboxTopicProgress, 
+  loadSpellboxTopicProgressAsync,
   loadGradeSelection, 
   type SpellboxTopicProgress,
   type SpellboxGradeProgress,
@@ -31,6 +32,7 @@ interface TopicProgressCard {
 
 export function ProgressTracking(): JSX.Element {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, userData } = useAuth();
   const [gradeDisplayName, setGradeDisplayName] = useState<string>('');
   const [topicCards, setTopicCards] = useState<TopicProgressCard[]>([]);
@@ -42,6 +44,10 @@ export function ProgressTracking(): JSX.Element {
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [whiteboardTopicId, setWhiteboardTopicId] = useState<string | null>(null);
+
+  // Detect if this page was opened from the teacher dashboard
+  const source = searchParams.get('source');
+  const returnToUrl = searchParams.get('returnTo');
 
   const isGrade1 = useMemo(() => {
     const g = (gradeDisplayName || '').toLowerCase();
@@ -76,8 +82,16 @@ export function ProgressTracking(): JSX.Element {
       const availableTopicIds = getSpellingTopicIds(currentGrade);
       console.log(`📝 Available topics for ${currentGrade}:`, availableTopicIds);
 
+      // Determine target user (teacher viewing student if studentId provided)
+      const studentIdParam = searchParams.get('studentId') || undefined;
+
       // Load spellbox progress for this grade
-      const gradeProgress = loadSpellboxTopicProgress(currentGrade, user?.uid);
+      let gradeProgress: SpellboxGradeProgress | null = null;
+      if (studentIdParam && studentIdParam !== user?.uid) {
+        gradeProgress = await loadSpellboxTopicProgressAsync(currentGrade, studentIdParam);
+      } else {
+        gradeProgress = loadSpellboxTopicProgress(currentGrade, user?.uid);
+      }
       console.log(`💾 Loaded progress data:`, gradeProgress);
 
       // Create topic cards with progress information
@@ -222,6 +236,11 @@ export function ProgressTracking(): JSX.Element {
 
   const handleBackClick = () => {
     playClickSound();
+    if (source === 'dashboard') {
+      const dashboardUrl = returnToUrl || (import.meta as any)?.env?.VITE_DASHBOARD_URL || 'http://localhost:3000/teacher';
+      window.location.href = dashboardUrl;
+      return;
+    }
     navigate('/');
   };
 
@@ -258,19 +277,34 @@ export function ProgressTracking(): JSX.Element {
             className="text-white hover:bg-white/10 flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Pet Page
+            {source === 'dashboard' ? 'Back to Dashboard' : 'Back to Pet Page'}
           </Button>
           
-          <Button 
-            onClick={handleManualRefresh}
-            variant="ghost" 
-            size="sm"
-            disabled={isRefreshing}
-            className="text-white hover:bg-white/10 flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
+          <div className="flex items-center gap-2">
+            {source !== 'dashboard' && (
+              <Button 
+                onClick={() => {
+                  const dashboardBase = (import.meta as any)?.env?.VITE_DASHBOARD_URL || 'http://localhost:3000';
+                  window.location.href = `${dashboardBase}/teacher/login`;
+                }}
+                variant="default" 
+                size="sm"
+                className="bg-white text-black hover:bg-white/90"
+              >
+                View All Students Progress
+              </Button>
+            )}
+            <Button 
+              onClick={handleManualRefresh}
+              variant="ghost" 
+              size="sm"
+              disabled={isRefreshing}
+              className="text-white hover:bg-white/10 flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          </div>
         </div>
 
         <div className="text-center mb-8">

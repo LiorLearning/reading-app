@@ -113,6 +113,18 @@ export const AuthScreen: React.FC = () => {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex flex-col justify-center p-4 overflow-y-auto">
+      <div className="absolute top-4 right-4">
+        <Button
+          onClick={() => {
+            const dashboardBase = (import.meta as any)?.env?.VITE_DASHBOARD_URL || 'http://localhost:3000';
+            window.location.href = `${dashboardBase}/teacher/login`;
+          }}
+          className="bg-white text-black hover:bg-white/90"
+          size="sm"
+        >
+          View All Students Progress
+        </Button>
+      </div>
       <div className="w-full max-w-md mx-auto my-8">
         {/* App Header */}
         <div className="text-center mb-8">
