@@ -70,6 +70,8 @@ import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnectio
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
 import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion, getGlobalSpellingLessonNumber } from "@/lib/questionBankUtils";
+import { ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD } from '@/lib/constants';
+import { getAssignmentGate, isAssignmentGateActive, startAssignmentGate, incrementAssignmentGate, completeAssignmentGate } from '@/lib/assignment-gate';
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
@@ -678,6 +680,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
     if (currentSpellingWord && currentScreen === 1 && currentSpellingWord !== lastResolvedWordRef.current) {
+      // Ignore any AI spelling message generated before assignment exit
+      try {
+        const lastAi = chatMessages.filter(m => m.type === 'ai').slice(-1)[0] as any;
+        const lastTs = lastAi?.timestamp || 0;
+        const exitAt = assignmentExitAtRef.current || 0;
+        if (exitAt && lastTs && lastTs < exitAt) {
+          console.log('🛑 SpellBox opener: ignoring pre-diagnosis AI message', { lastTs, exitAt, currentSpellingWord });
+          return;
+        }
+      } catch {}
+      console.log('✅ SpellBox opener: proceeding with currentSpellingWord', { currentSpellingWord, topicId: selectedTopicId });
       // console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
       //   currentSpellingWord,
       //   hasOriginalQuestion: !!originalSpellingQuestion,
@@ -1290,8 +1303,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Force dropdown grade to Firebase when assignment is set (ignore localStorage)
   useEffect(() => {
-    if (userData?.gradeDisplayName && userData.gradeDisplayName.toLowerCase() === 'assignment') {
-      setSelectedGradeFromDropdown('assignment');
+    if ((userData?.gradeDisplayName || '').toLowerCase() === 'assignment') {
+      // Only force dropdown to 'assignment' while the assignment gate is active.
+      // Once the gate is completed (after diagnosis), do NOT revert to assignment.
+      try {
+        const gateActive = isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD);
+        if (!gateActive) return;
+      } catch {}
+      // Only set dropdown to assignment if it's not already set to another grade.
+      setSelectedGradeFromDropdown(prev => (prev && prev.trim() && prev.toLowerCase() !== 'assignment') ? prev : 'assignment');
     }
   }, [userData?.gradeDisplayName]);
 
@@ -2259,7 +2279,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
           
-        // console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
+        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
         // Additional debug info removed (localStorage dropped)
         // console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
@@ -2267,6 +2287,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // NEW: Use topic-based question selection for Spellbox progression
           
         const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds) : null;
+        console.log(`🔤 Fetched spelling question:`, { isSpellingPhase, currentGrade, question: spellingQuestion ? { id: spellingQuestion.id, topicId: spellingQuestion.topicId, word: spellingQuestion.audio } : null });
         
         // Store the original spelling question (with prefilled data) for later use
           
@@ -2893,7 +2914,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setCurrentAdventureId(targetAdventure.id);
       const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
       const topicId = targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '';
-      const finalTopicId = effectiveGrade === 'assignment' ? 'A-' : topicId;
+      // Only force 'A-' if no explicit topic was provided
+      const finalTopicId = (!targetAdventure.topicId && effectiveGrade === 'assignment') ? 'A-' : topicId;
       setSelectedTopicId(finalTopicId);
       // Grade 1: immediately reflect the actual upcoming spell topic in the header
       if (whiteboardGradeEligible) {
@@ -2989,7 +3011,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const allTopics = getSpellingTopicIds(gradeName);
       const dueTopic = getNextSpellboxTopic(gradeName, allTopics);
       const hasLessonForDueTopic = !!(dueTopic && getLessonScript(dueTopic));
-      if (hasLessonForDueTopic) {
+      if (hasLessonForDueTopic && !isWhiteboardSuppressedByAssignment) {
         shouldTriggerWhiteboardOnFirstQuestionRef.current = true;
         suppressInitialGreetingRef.current = true;
         firstAdventureStartedRef.current = true;
@@ -3000,9 +3022,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
     }
     playClickSound();
-    // Force assignment topic when grade is assignment
+    // Only force 'A-' if no explicit topic was provided
     const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
-    const finalTopicId = effectiveGrade === 'assignment' ? 'A-' : topicId;
+    const finalTopicId = (!topicId && effectiveGrade === 'assignment') ? 'A-' : topicId;
     setSelectedTopicId(finalTopicId);
     // Grade 1: immediately reflect the actual upcoming spell topic in the header
     if (whiteboardGradeEligible) {
@@ -3110,7 +3132,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setTimeout(() => {
       setCurrentScreen(1); // Go to adventure screen
       // If first-question whiteboard is pending, immediately show the prompt and enable lesson (no AI message)
-      if (shouldTriggerWhiteboardOnFirstQuestionRef.current) {
+      if (shouldTriggerWhiteboardOnFirstQuestionRef.current && !isWhiteboardSuppressedByAssignment) {
         // Guard: proactively determine the first SpellBox question because the initial greeting
         // is suppressed (so currentSpellQuestion may not be set yet for brand new users)
         const gradeName = currentGradeDisplayName;
@@ -3123,7 +3145,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
         const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
         const canShowLesson = !!(initialSpellTopicId && getLessonScript(initialSpellTopicId || ''));
-        if (isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson) {
+        if (!isWhiteboardSuppressedByAssignment && isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson) {
           try { ttsService.stop(); } catch {}
           const name = userData?.username?.trim() || 'friend';
           const topicForLesson = initialSpellTopicId!;
@@ -3974,6 +3996,26 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [selectedTopicId]);
   const whiteboardSuppressionKey = `lesson-active-${WHITEBOARD_LESSON_TOPIC}`;
 
+  // Assignment whiteboard gate state to force re-evaluation when counter changes
+  const [assignmentGateVersion, setAssignmentGateVersion] = React.useState<number>(0);
+  const isWhiteboardSuppressedByAssignment = React.useMemo(() => {
+    try { return isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD); } catch { return false; }
+  }, [assignmentGateVersion]);
+
+  // For new users defaulting to assignment, ensure the gate is started
+  React.useEffect(() => {
+    const gradeName = (userData?.gradeDisplayName || '').toLowerCase();
+    if (gradeName === 'assignment') {
+      try {
+        const existing = getAssignmentGate();
+        if (!existing) {
+          startAssignmentGate();
+          setAssignmentGateVersion(v => v + 1);
+        }
+      } catch {}
+    }
+  }, [userData?.gradeDisplayName]);
+
   // Header topic progress (Spellbox) - tracked separately to ensure rerenders
   const [headerTopicProgressPct, setHeaderTopicProgressPct] = React.useState<number>(0);
 
@@ -4004,6 +4046,43 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (!isCorrect && attemptCount === 1) {
       try { interruptRealtimeSession?.(); } catch {}
     }
+    // In assignment mode, handle first incorrect locally via modal (skip shared switcher)
+    const isAssignmentFlowEarly = ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment';
+    if (!isCorrect && attemptCount === 1 && isAssignmentFlowEarly) {
+      // Show level switch modal immediately and prevent further input
+      try {
+        setDisableInputForSpell(true);
+        // Mirror the mapping in assignment-switch
+          const TIERS = [
+            { gdn: 'Kindergarten', grade: 'gradeK', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 1
+            { gdn: 'Kindergarten', grade: 'gradeK', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 2
+            { gdn: '1st Grade',    grade: 'grade1', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 3
+            { gdn: '1st Grade',    grade: 'grade1', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 4
+            { gdn: '2nd Grade',    grade: 'grade2', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 5
+            { gdn: '2nd Grade',    grade: 'grade2', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 6
+            { gdn: '3rd Grade',    grade: 'grade3', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 7
+            { gdn: '3rd Grade',    grade: 'grade3', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 8
+          ];
+        const clamp = (n: number) => (n < 1 ? 1 : (n > 8 ? 8 : n));
+        const qid = typeof currentSpellQuestion?.id === 'number' ? currentSpellQuestion!.id : 1;
+        const currentTier = clamp(qid);
+        const targetTierIdx = Math.max(1, currentTier - 1);
+        const tier = TIERS[(targetTierIdx - 1) as number];
+        const allTopicIds = Object.keys(sampleMCQData.topics);
+        const nextTopic = getNextTopicByPreference(allTopicIds, tier.pref, tier.gdn) || (allTopicIds[0] || '1-H.1');
+        setLevelSwitchModal({
+          gradeDisplayName: tier.gdn,
+          levelDisplayName: tier.ldn,
+          nextTopicId: nextTopic,
+          gradeCode: tier.grade,
+          levelCode: tier.level,
+          numericLevel: Math.min(5, Math.max(0, (targetTierIdx - 1))),
+        });
+      } catch {}
+      return;
+    }
+
+    // For all other cases (non-assignment or not first incorrect), allow shared handler
     handleFirstIncorrectAssignment(!isCorrect && attemptCount === 1, {
       currentGradeDisplayName: selectedGradeFromDropdown || userData?.gradeDisplayName,
       updateUserData,
@@ -4012,17 +4091,66 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       questionId: currentSpellQuestion?.id || 1
     }).then((switched) => {
       if (switched) {
-        setSelectedGradeFromDropdown('2nd Grade');
-        setSelectedGradeAndLevel({ grade: '2nd Grade', level: 'start' });
+        // Optimistically set dropdown to the detected tier based on assignment logic
+        try {
+          const qid = typeof currentSpellQuestion?.id === 'number' ? currentSpellQuestion!.id : 1;
+          const clamp = (n: number) => (n < 1 ? 1 : (n > 8 ? 8 : n));
+          const currentTier = clamp(qid);
+          const targetTierIdx = Math.max(1, currentTier - 1); // 1..8
+          const TIERS = [
+            { gdn: 'Kindergarten', level: 'start' as const }, // 1
+            { gdn: 'Kindergarten', level: 'middle' as const }, // 2
+            { gdn: '1st Grade',    level: 'start' as const }, // 3
+            { gdn: '1st Grade',    level: 'middle' as const }, // 4
+            { gdn: '2nd Grade',    level: 'start' as const }, // 5
+            { gdn: '2nd Grade',    level: 'middle' as const }, // 6
+            { gdn: '3rd Grade',    level: 'start' as const }, // 7
+            { gdn: '3rd Grade',    level: 'middle' as const }, // 8
+          ];
+          const tier = TIERS[(targetTierIdx - 1) as number];
+          if (tier?.gdn) {
+            setSelectedGradeFromDropdown(tier.gdn);
+            setSelectedGradeAndLevel({ grade: tier.gdn, level: tier.level });
+          }
+        } catch {}
       }
     }).catch(() => {});
 
-    // In assignment mode, the first incorrect will restart the adventure and change grade.
-    // Do not continue with any encouragement message or TTS; exit early.
-    const isAssignmentFlowEarly = ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment';
-    if (!isCorrect && attemptCount === 1 && isAssignmentFlowEarly) {
-      return;
-    }
+    // Increment assignment gate on first attempt answer (either correct or incorrect)
+    try {
+      const isFirstAttempt = attemptCount === 1;
+      if (isFirstAttempt) {
+        incrementAssignmentGate(true);
+        setAssignmentGateVersion(v => v + 1);
+        const s = getAssignmentGate();
+        if (s && s.active && s.answeredCount >= ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD) {
+          completeAssignmentGate();
+          setAssignmentGateVersion(v => v + 1);
+          // Gate just lifted: if current topic has a whiteboard lesson and we haven't shown it,
+          // immediately show the pre-lesson pet message to lead into the lesson.
+          try {
+            const spellTopic = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || selectedTopicId || null;
+            const hasLesson = !!(spellTopic && getLessonScript(spellTopic));
+            const alreadySeen = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
+            if (hasLesson && !alreadySeen && !isWhiteboardPromptActive && !devWhiteboardEnabled) {
+              const topicForLesson = spellTopic as string;
+              const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
+              setWhiteboardPrompt({
+                topicId: topicForLesson,
+                text: introText,
+                shouldAutoplay: true,
+                isAcknowledged: false,
+              });
+              setWhiteboardPinnedText(introText);
+              setWhiteboardPromptLocked(false);
+              setLessonReady(false);
+              setIsWhiteboardPromptActive(true);
+              setCurrentScreen(1);
+            }
+          } catch {}
+        }
+      }
+    } catch {}
 
     if (isCorrect) {
       // Defer progression and messaging until user clicks Next
@@ -4035,7 +4163,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const encouragementText = `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`;
       void encouragementText; // placeholder to avoid unused string if later needed
     }
-  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
+  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName, selectedTopicId, isWhiteboardPromptActive, devWhiteboardEnabled]);
 
   // Proceed to next after user clicks Next in SpellBox
   const handleSpellNext = useCallback(() => {
@@ -4085,7 +4213,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const optimisticPct = Math.round((nextFirstCorrect / nextAttempted) * 100);
         setHeaderTopicProgressPct(optimisticPct);
         // If this was the final question (10th), immediately launch whiteboard for next topic
-        if (nextAttempted >= 10) {
+      if (nextAttempted >= 10 && !isWhiteboardSuppressedByAssignment) {
           try { ttsService.stop(); } catch {}
           // Persist final attempt so topic is marked completed for SpellBox progress
           try {
@@ -4112,7 +4240,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           // Switch to adventure and show whiteboard prompt (with chevron) for next topic
           setCurrentScreen(1);
           const name = userData?.username?.trim() || 'friend';
-          if (nextTopicId && getLessonScript(nextTopicId)) {
+          if (!isWhiteboardSuppressedByAssignment && nextTopicId && getLessonScript(nextTopicId)) {
             const topicForLesson = nextTopicId;
             const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
             setWhiteboardPrompt({
@@ -4332,17 +4460,29 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
   const firstAdventureStartedRef = React.useRef<boolean>(false);
   const suppressInitialGreetingRef = React.useRef<boolean>(false);
+  // Timestamp to mark when assignment mode ended; used to ignore older AI messages
+  const assignmentExitAtRef = React.useRef<number | null>(null);
+  // Assignment → Level switch modal state
+  const [levelSwitchModal, setLevelSwitchModal] = React.useState<{
+    gradeDisplayName: string;
+    levelDisplayName: string;
+    nextTopicId: string;
+    gradeCode: string;
+    levelCode: 'start' | 'mid';
+    numericLevel?: number;
+  } | null>(null);
 
   // Consider the whiteboard lesson "active" whenever the dev toggle (or URL flag)
   // is on AND a script exists for the selected topic. We use this to
   // 1) keep the input dock disabled, and 2) avoid mutating the pet bubble.
   const isWhiteboardLessonActive = React.useMemo(() => {
+    if (isWhiteboardSuppressedByAssignment) return false;
     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
     if (!lessonEnabled) return false;
     const script = getLessonScript(selectedTopicId) || getLessonScript(WHITEBOARD_LESSON_TOPIC);
     return !!script;
-  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible]);
+  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible, isWhiteboardSuppressedByAssignment]);
 
   React.useEffect(() => {
     if (!whiteboardGradeEligible) return;
@@ -4352,6 +4492,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (shouldTriggerWhiteboardOnFirstQuestionRef.current) return;
     if (isWhiteboardPromptActive) return;
     if (devWhiteboardEnabled) return;
+    if (isWhiteboardSuppressedByAssignment) return;
     const name = userData?.username?.trim() || 'friend';
     const alreadySeen = whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
     if (alreadySeen) return;
@@ -4370,7 +4511,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setWhiteboardPromptLocked(false);
     setLessonReady(false);
     setIsWhiteboardPromptActive(true);
-  }, [selectedTopicId, whiteboardSeenThisSession, userData?.username, devWhiteboardEnabled, isWhiteboardPromptActive]);
+  }, [selectedTopicId, whiteboardSeenThisSession, userData?.username, devWhiteboardEnabled, isWhiteboardPromptActive, isWhiteboardSuppressedByAssignment]);
 
   React.useEffect(() => {
     // Intentionally do nothing here when dev whiteboard is enabled.
@@ -4401,7 +4542,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const alreadySeenLesson = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
 
     // First adventure start: if first question (id === 1) and flag set, trigger immediately with custom prompt
-    if (shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
+    if (!isWhiteboardSuppressedByAssignment && shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false; // consume flag so it doesn't re-trigger later
       whiteboardTriggeredTopicsRef.current.add(spellTopic);
       // Do not force-stop here so we don't cut off ongoing trainer voice
@@ -4447,7 +4588,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         return;
       }
       // Do not auto-trigger if we explicitly just enabled via chevron or end-of-topic
-        if (whiteboardGradeEligible && !devWhiteboardEnabled && !whiteboardTriggeredTopicsRef.current.has(spellTopic) && !alreadySeenLesson) {
+        if (!isWhiteboardSuppressedByAssignment && whiteboardGradeEligible && !devWhiteboardEnabled && !whiteboardTriggeredTopicsRef.current.has(spellTopic) && !alreadySeenLesson) {
         whiteboardTriggeredTopicsRef.current.add(spellTopic);
         try { ttsService.stop(); } catch {}
         setCurrentScreen(1);
@@ -4471,6 +4612,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const shouldShowWhiteboardPrompt = !!whiteboardPrompt;
   const dismissWhiteboardPrompt = React.useCallback(() => {
     if (!whiteboardPrompt || whiteboardPromptLocked) return;
+    // Do not enable lesson while assignment suppression is active
+    if (isWhiteboardSuppressedByAssignment) {
+      setWhiteboardPrompt(null);
+      setIsWhiteboardPromptActive(false);
+      return;
+    }
     const topicId = whiteboardPrompt.topicId;
     setWhiteboardPromptLocked(true);
     setWhiteboardSeenThisSession(prev => ({ ...prev, [topicId]: true }));
@@ -5444,6 +5591,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             setLessonReady(false);
                             setDevWhiteboardEnabled(false);
                             setWhiteboardPromptLocked(false);
+                            // Re-enable adventure input after lesson completes
+                            try { setDisableInputForSpell(false); } catch {}
+                            try { setHighlightSpellNext(false); } catch {}
                             // Mark lesson as seen so the intro prompt does not reappear
                             setWhiteboardSeenThisSession(prev => ({ ...prev, [WHITEBOARD_LESSON_TOPIC]: true }));
                             // Clear any pinned intro text from the pet bubble
@@ -6039,7 +6189,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               // If a specific next topic is provided, use it
               // Otherwise, determine the next topic from progress tracking
               const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
-              const topicToNavigateTo = effectiveGrade === 'assignment' ? 'A-' : (nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics)));
+              // Only force 'A-' if no computed next topic is available
+              const topicToNavigateTo = (nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics))) || (effectiveGrade === 'assignment' ? 'A-' : null);
               
               if (topicToNavigateTo) {
                 // Navigate to the next topic
@@ -6052,6 +6203,99 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             }}
             currentSessionId={currentSessionId}
           />
+        )}
+
+        {/* Level Switch Modal */}
+        {levelSwitchModal && (
+          <Dialog open onOpenChange={(o) => { if (!o) setLevelSwitchModal(null); }}>
+            <DialogContent className="max-w-md rounded-2xl border border-primary/20 shadow-xl bg-white/95 backdrop-blur-md p-6 text-center">
+              <div className="text-sm text-foreground/70">{`We found your personalized starting point`}</div>
+              <p className="mt-1 text-4xl font-extrabold tracking-tight">
+                <span className="text-primary">
+                  {`Level ${typeof levelSwitchModal.numericLevel === 'number' ? levelSwitchModal.numericLevel : (levelSwitchModal.levelDisplayName === 'Start Level' ? 0 : 1)}`}
+                </span>
+              </p>
+              <div className="mt-5">
+                <Button
+                  className="w-full h-11 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+                  onClick={async () => {
+                    try {
+                      await updateUserData({
+                        grade: levelSwitchModal.gradeCode,
+                        gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                        level: levelSwitchModal.levelCode,
+                        levelDisplayName: levelSwitchModal.levelDisplayName,
+                      } as any);
+                    } catch {}
+                    // Stop any pending speech/streams from assignment so no late 'spelling_word' arrives
+                    try { ttsService.stop(); } catch {}
+                    try { interruptRealtimeSession?.(); } catch {}
+                    // Mark the moment assignment ended to ignore earlier AI messages
+                    assignmentExitAtRef.current = Date.now();
+                    console.log('🏁 Assignment exit marked', { assignmentExitAt: assignmentExitAtRef.current, diagnosed: { grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelDisplayName, nextTopicId: levelSwitchModal.nextTopicId } });
+                    // Switch away from assignment and set diagnosed grade/level
+                    setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                    setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                    try { completeAssignmentGate(); } catch {}
+                    try {
+                      const gateActiveNow = isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD);
+                      console.log('🚪 Assignment gate completed. Active now?', gateActiveNow);
+                    } catch {}
+                    // Clear any active assignment spell state
+                    try { setShowSpellBox(false); } catch {}
+                    try {
+                      // Treat the assignment word as resolved to avoid immediate reopen
+                      const lastWord = currentSpellQuestion?.audio || currentSpellQuestion?.word || null;
+                      lastResolvedWordRef.current = lastWord;
+                      console.log('🧹 Cleared assignment spell state', { lastWord });
+                    } catch {}
+                    try { setCurrentSpellQuestion(null); } catch {}
+                    try { setOriginalSpellingQuestion(null); } catch {}
+                    try { setSpellingProgressIndex(0); } catch {}
+                    try { setCompletedSpellingIds([]); } catch {}
+                    // Reset Spellbox progress for diagnosed grade so it starts fresh
+                    try {
+                      const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                      clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                      console.log('🔄 Cleared Spellbox progress for diagnosed grade', levelSwitchModal.gradeDisplayName);
+                    } catch (e) {
+                      console.warn('Failed to clear Spellbox progress:', e);
+                    }
+                    // Move to diagnosed topic
+                    try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                    // Inject pet continuation message to preserve flow
+                    try {
+                      setChatMessages(prev => {
+                        if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) return prev;
+                        const latestWithContinuation = prev
+                          .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
+                          .slice(-1)[0] as any;
+                        const continuation = latestWithContinuation?.content_after_spelling || "Great job! Let's continue our adventure! ✨";
+                        const adventureStoryMessage: ChatMessage = {
+                          type: 'ai',
+                          content: continuation,
+                          timestamp: Date.now() + 1
+                        };
+                        playMessageSound();
+                        const adventureMessageId = bubbleMessageIdFromHtml(formatAIMessage(adventureStoryMessage.content));
+                        ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId).catch(() => {});
+                        if (currentSessionId) {
+                          adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
+                        }
+                        return [...prev, adventureStoryMessage];
+                      });
+                    } catch {}
+                    // Close modal and re-enable input
+                    setLevelSwitchModal(null);
+                    try { setDisableInputForSpell(false); } catch {}
+                    try { setHighlightSpellNext(false); } catch {}
+                  }}
+                 >
+                  {`Let’s begin!`}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
 
         {/* Compact input dock when sidebar is collapsed (next to user avatar)

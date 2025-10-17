@@ -2265,6 +2265,11 @@ const getSleepyPetImage = (clicks: number) => {
     // If assignment is selected, immediately start a new adventure on A-
     if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
       try {
+        // Start assignment gate (whiteboard suppression until threshold)
+        try {
+          const { startAssignmentGate } = await import('@/lib/assignment-gate');
+          startAssignmentGate();
+        } catch {}
         onStartAdventure('A-', 'new', 'food');
       } catch {}
     }

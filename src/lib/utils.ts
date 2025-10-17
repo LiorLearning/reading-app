@@ -1430,6 +1430,13 @@ export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress
  * Get the next Spellbox topic for a grade
  */
 export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[]): string | null => {
+  // Special-case: assignment always stays on assignment topic list (e.g., 'A-')
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    // Prefer 'A-' if available in the provided list; fallback to first
+    const hasAssignment = allTopicIds.includes('A-');
+    return hasAssignment ? 'A-' : (allTopicIds[0] || null);
+  }
+
   const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
   
   if (!gradeProgress) {

@@ -490,7 +490,7 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     rewards: { coins: 2 }
   },
-  '2-K.3': {
+    '2-K.3': {
     topicId: '2-K.3',
     title: 'Long E Patterns: ee & ea',
     intro: [
@@ -1352,10 +1352,539 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     rewards: { coins: 2 }
   },
+  '3-A.3.1': {
+    topicId: '3-A.3.1',
+    title: 'Long A Patterns: ai & ay',
+    intro: [
+      "You will learn about long A sounds in words like ray and rain."
+    ],
+    segments: [
+      // --- Segment 1: ray (AY at the end) ---
+      {
+        modelWord: 'ray',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"r" says /r/.' },
+          { highlights: [[1,3]], say: "'a''y' makes /ā/." },
+          { highlights: [[0,3]], say: "/r/ /ā/ → 'ray'. We usually use 'ay' at the end for the long /ā/ sound." }
+        ],
+        practice: {
+          word: 'ray',
+          prompt: "Let’s spell 'ray'.",
+          hints: [
+            "Use 'ay' when /ā/ is at the end (day, play, ray).",
+            "Say it and check: r + ay → 'ray'."
+          ],
+          reinforce: "Great! /r//ā/ makes 'ray'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0] } as any ),
+          meta: {
+            explanation: "Nice! The word is 'ray' (long A spelled with 'ay' at the end).",
+            aiHook: {
+              targetWord: 'ray',
+              intent: 'fill_blank',
+              questionLine: 'r__',
+              imagePrompt: 'A sunbeam (ray) shining through clouds'
+            },
+            aiTutor: {
+              target_word: 'ray',
+              question: 'r__',
+              student_entry: '',
+              topic_to_reinforce: 'Spell the long A word',
+              spelling_pattern_or_rule:
+                "Use 'ay' to spell the long A /ā/ at the END of a word (day, play, ray). Use 'ai' in the MIDDLE (rain, train). Use a_e when there’s a silent e (cake, name). Trick: “AI stays inside, AY says goodbye!”"
+            },
+            audio: 'ray'
+          }
+        }
+      },
+      // --- Segment 2: rain (AI in the middle) ---
+      {
+        modelWord: 'rain',
+        modelSteps: [
+          // --- Segment 2: rain (AI in the middle) ---
+          { highlights: [], say: "We usually use 'ai' in the middle for the long A sound." },
+          { highlights: [[0,1]], say: '"r" says /r/.' },
+          { highlights: [[1,3]], say: "'ai' makes /ā/." },
+          { highlights: [[3,4]], say: '"n" says /n/.' },
+          { highlights: [[0,4]], say: "/r/ /ā/ /n/ → 'rain'. We usually use 'ai' in the middle for the long /ā/ sound." }
+        ],
+        practice: {
+          word: 'rain',
+          prompt: "Let’s spell 'rain'.",
+          hints: [
+            "Use 'ai' when /ā/ is inside the word (rain, train, chain).",
+            "Say it and check: r + ai + n → 'rain'."
+          ],
+          reinforce: "Yes! /r/ /ā/ /n/ makes 'rain'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0, 3] } as any ),
+          meta: {
+            explanation: "Excellent! The word is 'rain' (long A spelled with 'ai' in the middle).",
+            aiHook: {
+              targetWord: 'rain',
+              intent: 'fill_blank',
+              questionLine: 'r__n',
+              imagePrompt: 'Rain falling from clouds with puddles'
+            },
+            aiTutor: {
+              target_word: 'rain',
+              question: 'r__n',
+              student_entry: '',
+              topic_to_reinforce: 'Spell the long A word',
+              spelling_pattern_or_rule:
+                "Use 'ai' to spell the long A /ā/ in the MIDDLE of a word (rain, train, paint). Use 'ay' at the END (day, play). Trick: “AI stays inside, AY says goodbye!”"
+            },
+            audio: 'rain'
+          }
+        }
+      }
+    ],
+    completion: [
+      "Pattern power! You found 'ai' in the middle and 'ay' at the end for long A.",
+      'Awesome spelling — ready to explore more long vowels?'
+    ],
+    rewards: { coins: 2 }
+  },
+
+  '3-A.3.2': {
+  topicId: '3-A.3.2',
+  title: "Long A /ā/: 'ea' & 'ey'",
+  intro: [
+    "You will learn two slightly unusual ways to spell the long A sound: 'ea' (in the middle) and 'ey' (at the end)."
+  ],
+  segments: [
+    // --- Segment 1: EA Family — model/practice: great ---
+    {
+      modelWord: 'great',
+      emoji: '✨',
+      modelSteps: [
+        { highlights: [],       say: "Sometimes 'ea' spells the long /ā/ in the middle of a word." },
+        { highlights: [[0,1]],  say: '"g" says /g/.' },
+        { highlights: [[1,2]],  say: '"r" says /r/.' },
+        { highlights: [[2,4]],  say: "'ea' says /ā/." },
+        { highlights: [[4,5]],  say: '"t" says /t/.' },
+        { highlights: [[0,5]],  say: "/g/ /r/ /ā/ /t/ — 'great'." }
+      ],
+      familyExamples: {
+        title: "Other 'ea' (long A) words",
+        words: [
+          { word: 'steak', emoji: '🥩' },
+          { word: 'break', emoji: '🧱' },
+          { word: 'great', emoji: '🌟' }
+        ],
+        voiceSteps: [
+          { highlights: [],       say: "More 'e''a' words that say /ā/." },
+          { highlights: [[0,5]],  say: "steak",  targetIndex: 0 },
+          { highlights: [[0,5]],  say: "break",  targetIndex: 1 },
+          { highlights: [[0,5]],  say: "great",  targetIndex: 2 }
+        ]
+      },
+      practice: {
+        word: 'great',
+        prompt: "Let’s spell 'great'.",
+        hints: [
+          "Listen for the middle /ā/ sound.",
+          "Spell the middle /ā/ with 'ea'."
+        ],
+        reinforce: "Nice! /g/ /r/ /ā/ /t/ — 'great'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,4] } as any ),
+        meta: {
+          explanation: "Good work! 'ea' spells the long /ā/ in the middle of 'great'.",
+          aiHook: {
+            targetWord: 'great',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word: gr__t',
+            imagePrompt: 'A student giving a thumbs-up with a gold star sticker'
+          },
+          aiTutor: {
+            target_word: 'great',
+            question: 'gr__t',
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long A word: ea and ey',
+            spelling_pattern_or_rule:
+              "‘ea’ can spell long A /ā/ in the middle of words (great, steak, break)."
+          },
+          audio: 'great'
+        }
+      }
+    },
+
+    // --- Segment 2: EY Family — model/practice: they ---
+    {
+      modelWord: 'they',
+      emoji: '🧑‍🤝‍🧑',
+      modelSteps: [
+        { highlights: [],       say: "Sometimes, we use 'e''y' to spell the long /ā/ at the end of some words." },
+        { highlights: [[0,2]],  say: '"th" says /th/.' },
+        { highlights: [[2,4]],  say: "'ey' says /ā/." },
+        { highlights: [[0,4]],  say: "/th/ /ā/ — 'they'." }
+      ],
+      familyExamples: {
+        title: "Other 'ey' (long A) words",
+        words: [
+          { word: 'prey', emoji: '🦅' },
+          { word: 'obey', emoji: '✅' },
+          { word: 'grey', emoji: '⚪️' }
+        ],
+        voiceSteps: [
+          { highlights: [],       say: "More 'ey' words that say /ā/ at the end." },
+          { highlights: [[0,4]],  say: "prey", targetIndex: 0 },
+          { highlights: [[0,4]],  say: "obey", targetIndex: 1 },
+          { highlights: [[0,4]],  say: "grey", targetIndex: 2 }
+        ]
+      },
+      practice: {
+        word: 'they',
+        prompt: "Let’s spell 'they'.",
+        hints: [
+          "Listen for /th/ then long A at the end.",
+          "Spell that ending /ā/ with 'ey'."
+        ],
+        reinforce: "Great! /th/ /ā/ — 'they'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,1] } as any ),
+        meta: {
+          explanation: "Excellent! 'ey' spells the ending long /ā/ in 'they'.",
+          aiHook: {
+            targetWord: 'they',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word: th__',
+            imagePrompt: 'Two friends waving at each other'
+          },
+          aiTutor: {
+            target_word: 'they',
+            question: 'th__',
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long A word: ea and ey',
+            spelling_pattern_or_rule:
+              "‘ey’ can spell long /ā/ at the end of words (they, prey, obey, grey)."
+          },
+          audio: 'they'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: 'ea' = middle /ā/ (great, steak, break). 'ey' = ending /ā/ (they, prey, obey).",
+    "Awesome work—ready for mixed long A practice next?"
+  ],
+  rewards: { coins: 2 }
+},
+'3-A.3.3': {
+  topicId: '3-A.3.3',
+  title: "Long A /ā/: 'eigh' (weight)",
+  intro: [
+    "The spelling 'eigh' is an unusual way to make the long A /ā/ sound.",
+    "You’ll see it in just a few special words like 'eight', 'weigh', and 'neighbor'."
+  ],
+  segments: [
+    // --- Single Segment: EIGH — model/practice: weight ---
+    {
+      modelWord: 'weight',
+      emoji: '⚖️',
+      modelSteps: [
+        { highlights: [],        say: "'eigh' is an unusual way to spell /ā/ in some words." },
+        { highlights: [[0,1]],   say: '"w" says /w/.' },
+        { highlights: [[1,5]],   say: "'eigh' says /ā/." },
+        { highlights: [[5,6]],   say: '"t" says /t/.' },
+        { highlights: [[0,6]],   say: "/w/ /ā/ /t/ — 'weight'." }
+      ],
+      familyExamples: {
+        title: "Other 'eigh' (long A) words",
+        words: [
+          { word: 'eight', emoji: '8️⃣' },
+          { word: 'neighbor', emoji: '🏘️' },
+          { word: 'sleigh', emoji: '🛷' }
+        ],
+        voiceSteps: [
+          { highlights: [],        say: "These 'eigh' words also say /ā/." },
+          { highlights: [[0,5]],   say: "eight", targetIndex: 0 },
+          { highlights: [[0,8]],   say: "neighbor", targetIndex: 1 },
+          { highlights: [[0,6]],   say: "sleigh", targetIndex: 2 }
+        ]
+      },
+      practice: {
+        word: 'weight',
+        prompt: "Let’s spell 'weight'.",
+        hints: [
+          "Listen for the /ā/ in the middle.",
+          "Spell that sound with 'eigh'."
+        ],
+        reinforce: "Great! /w/ /ā/ /t/ — 'weight'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,5] } as any ),
+        meta: {
+          explanation: "Nice! 'eigh' spells the long /ā/ in 'weight', a rare pattern.",
+          aiHook: {
+            targetWord: 'weight',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word: w____t',
+            imagePrompt: 'A kitchen scale measuring apples'
+          },
+          aiTutor: {
+            target_word: 'weight',
+            question: 'w____t',
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long A word',
+            spelling_pattern_or_rule:
+              "'eigh' can spell the long A /ā/ sound in a few special words (weight, eight, neighbor). It’s unusual—so remember this pattern!"
+          },
+          audio: 'weight'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: 'eigh' is an unusual way to spell /ā/, found in words like 'weight', 'eight', and 'neighbor'.",
+    "Excellent work—you're mastering even the tricky spellings!"
+  ],
+  rewards: { coins: 1 }
+},
+
+'3-A.4.1': {
+    topicId: '3-A.4.1',
+    title: 'Spell the long E word: ee & ea',
+    intro: [
+      "You will learn about long E sounds in words like bee and leaf."
+    ],
+    segments: [
+      // --- Segment 1: EE Family (bee, see, tree, feet) ---
+      {
+        modelWord: 'bee',
+        emoji: '🐝',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"b" says /b/.' },
+          { highlights: [[1,3]], say: "'e' and 'e' work together to make /ē/." },
+          { highlights: [[0,3]], say: "/b/ /ē/ 'bee'! 'ee' often comes in the middle or end of short words." }
+        ],
+        familyExamples: {
+          title: "Other 'ee' Family Words",
+          words: [
+            { word: 'see', emoji: '👀' },
+            { word: 'tree', emoji: '🌳' },
+            { word: 'feet', emoji: '🦶' }
+          ],
+          voiceSteps: [
+            { highlights: [], say: "Let's look at some other 'ee' family words!" },
+            { highlights: [[0,3]], say: "see'", targetIndex: 0 },
+            { highlights: [[0,4]], say: "tree'", targetIndex: 1 },
+            { highlights: [[0,4]], say: "feet'", targetIndex: 2 }
+            
+          ]
+        },
+        practice: {
+          word: 'bee',
+          prompt: "Let’s spell 'bee'.",
+          hints: [
+            "Use 'ee' to show the long /ē/ sound, like in 'see' and 'tree'.",
+            "Say it slowly: /b/ + /ē/ → 'bee'."
+          ],
+          reinforce: "Great! /b/ /ē/ makes 'bee'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0] } as any ),
+          meta: {
+            explanation: "Nice! The word is 'bee' (long E spelled with 'ee').",
+            aiHook: {
+              targetWord: 'bee',
+              intent: 'fill_blank',
+              questionLine: 'b__',
+              imagePrompt: 'A buzzing yellow bee on a flower'
+            },
+            aiTutor: {
+              target_word: 'bee',
+              question: 'b__',
+              student_entry: '',
+              topic_to_reinforce: 'Spell the long E word',
+              spelling_pattern_or_rule:
+                "Use 'ee' to spell the long E /ē/ in the MIDDLE or END of short words (see, tree, bee). Both 'ee' and 'ea' say /ē/, but 'ee' is more common in smaller words."
+            },
+            audio: 'bee'
+          }
+        }
+      },
+      // --- Segment 2: EA Family (leaf, sea, eat) ---
+      {
+        modelWord: 'leaf',
+        emoji: '🍃',
+        modelSteps: [
+          { highlights: [], say: "Now let's meet the other long E team — 'ea'! It also makes the /ē/ sound." },
+          { highlights: [[0,1]], say: '"l" says /l/.' },
+          { highlights: [[1,3]], say: "'e''a' work together to make the long /ē/." },
+          { highlights: [[3,4]], say: '"f" says /f/.' },
+          { highlights: [[0,4]], say: "/l/ /ē/ /f/ makes 'leaf'! 'ea' often appears at the start or middle of words." }
+        ],
+        familyExamples: {
+          title: "Other 'ea' Family Words",
+          words: [
+            { word: 'sea', emoji: '🌊' },
+            { word: 'eat', emoji: '🍽️' },
+            { word: 'leaf', emoji: '🍃' }
+          ],
+          voiceSteps: [
+            { highlights: [], say: "Now let’s meet the 'e''a' family!" },
+            { highlights: [[0,3]], say: "'sea'", targetIndex: 0 },
+            { highlights: [[0,3]], say: "'eat'", targetIndex: 1 },
+            { highlights: [[0,4]], say: "And 'leaf'", targetIndex: 2 },
+            { highlights: [], say: "So both 'ee' and 'ea' say /ē/" }
+          ]
+        },
+        practice: {
+          word: 'leaf',
+          prompt: "Let’s spell 'leaf'.",
+          hints: [
+            "Use 'ea' for /ē/ when it’s in the middle (leaf, eat, sea).",
+            "Say it slowly: /l/ + /ē/ + /f/ → 'leaf'."
+          ],
+          reinforce: "Excellent! /l/ /ē/ /f/ 'leaf'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0, 3] } as any ),
+          meta: {
+            explanation: "Awesome! The word is 'leaf' (long E spelled with 'ea').",
+            aiHook: {
+              targetWord: 'leaf',
+              intent: 'fill_blank',
+              questionLine: 'l__f',
+              imagePrompt: 'A bright green leaf on a branch'
+            },
+            aiTutor: {
+              target_word: 'leaf',
+              question: 'l__f',
+              student_entry: '',
+              topic_to_reinforce: 'Spell the long E word',
+              spelling_pattern_or_rule:
+                "Use 'ea' to spell the long E /ē/ sound in the MIDDLE of a word (leaf, eat, sea). 'ee' and 'ea' both say /ē/, but 'ea' often appears in longer or middle-position words."
+            },
+            audio: 'leaf'
+          }
+        }
+      }
+    ],
+    completion: [
+      "Great job! Both 'ee' and 'ea' make the long E sound.",
+      "Now you know: 'ee' loves the end, 'ea' likes the middle! 👏"
+    ],
+    rewards: { coins: 2 }
+  },
+'3-A.4.2': {
+  topicId: '3-A.4.2',
+  title: "Long E /ē/: e_e (silent e) & ie",
+  intro: [
+    "You will learn two ways to spell the long E sound: the sneaky silent e and ie."
+  ],
+  segments: [
+    // --- Segment 1: e_e (silent e) — model/practice: scene ---
+    {
+      modelWord: 'scene',
+      emoji: '🎭',
+      modelSteps: [
+        { highlights: [],        say: "Silent e can make the earlier e say its name /ē/." },
+        { highlights: [[0,2]],   say: "'sc' says /s/ here." },
+        { highlights: [[2,3]],   say: "This 'e' says /ē/ because of the silent e at the end." },
+        { highlights: [[3,4]],   say: '"n" says /n/.' },
+        { highlights: [[4,5]],   say: "Final 'e' is silent but makes the first e long." },
+        { highlights: [[0,5]],   say: "/s/ /ē/ /n/ — 'scene'." }
+      ],
+      familyExamples: {
+        title: "Other e_e (long E) words",
+        words: [
+          { word: 'these', emoji: '☝️' },
+          { word: 'theme', emoji: '🎨' },
+          { word: 'scene', emoji: '🎬' }
+        ],
+        voiceSteps: [
+          { highlights: [],        say: "More e_e words where silent e makes /ē/." },
+          { highlights: [[0,5]],   say: "these", targetIndex: 0 },
+          { highlights: [[0,5]],   say: "theme", targetIndex: 1 },
+          { highlights: [[0,5]],   say: "scene", targetIndex: 2 }
+        ]
+      },
+      practice: {
+        word: 'scene',
+        prompt: "Let’s spell 'scene'.",
+        hints: [
+          "Hear the long /ē/ in the middle.",
+          "Use e_e: the final e makes the earlier e say /ē/."
+        ],
+        reinforce: "Great! /s/ /ē/ /n/ — 'scene'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,3] } as any ),
+        meta: {
+          explanation: "Silent e makes the earlier e long in 'scene' (e_e).",
+          aiHook: {
+            targetWord: 'scene',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word: sc _ n _',
+            imagePrompt: 'Actors performing on a stage; theater scene'
+          },
+          aiTutor: {
+            target_word: 'scene',
+            question: 'sc _ n _',
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long E word',
+            spelling_pattern_or_rule:
+              "Magic/silent e makes a previous e long (e_e) as in these, theme, scene."
+          },
+          audio: 'scene'
+        }
+      }
+    },
+
+    // --- Segment 2: ie — model/practice: field ---
+    {
+      modelWord: 'field',
+      emoji: '🌾',
+      modelSteps: [
+        { highlights: [],        say: "'i''e' can spell the long E /ē/ in some words." },
+        { highlights: [[0,1]],   say: '"f" says /f/.' },
+        { highlights: [[1,3]],   say: "'i''e' says /ē/." },
+        { highlights: [[3,5]],   say: "'l''d' says /ld/." },
+        { highlights: [[0,5]],   say: "/f/ /ē/ /ld/ — 'field'." }
+      ],
+      familyExamples: {
+        title: "Other 'ie' (long E) words",
+        words: [
+          { word: 'chief',  emoji: '🪶' },
+          { word: 'thief',  emoji: '🕵️' }, 
+          { word: 'shield', emoji: '🛡️' }
+        ],
+        voiceSteps: [
+          { highlights: [],        say: "More 'i''e' words that say /ē/." },
+          { highlights: [[0,5]],   say: "chief",  targetIndex: 0 },
+          { highlights: [[0,5]],   say: "thief",  targetIndex: 1 },
+          { highlights: [[0,6]],   say: "shield", targetIndex: 2 }
+        ]
+      },
+      practice: {
+        word: 'field',
+        prompt: "Let’s spell 'field'.",
+        hints: [
+          "Hear the long /ē/ after the first sound.",
+          "Spell that /ē/ with 'ie'."
+        ],
+        reinforce: "Nice! /f/ /ē/ /ld/ — 'field'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,3,4] } as any ),
+        meta: {
+          explanation: "'ie' spells the long E /ē/ in 'field'.",
+          aiHook: {
+            targetWord: 'field',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word: f _ _ l d',
+            imagePrompt: 'A wide green grassy field under blue sky'
+          },
+          aiTutor: {
+            target_word: 'field',
+            question: 'f _ _ l d',
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long E word',
+            spelling_pattern_or_rule:
+              "'ie' can spell /ē/ in words like field, chief, thief, shield. Use ee/ea for many mid-word /ē/ words (green, leaf)."
+          },
+          audio: 'field'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: e_e (silent e) makes an earlier e long (scene). 'ie' can also spell /ē/ (field).",
+    "Great work—ready for mixed long E practice next?"
+  ],
+  rewards: { coins: 2 }
+}
 };
 
 export function getLessonScript(topicId: string): LessonScript | null {
   return lessonScripts[topicId] || null;
 }
-
-
