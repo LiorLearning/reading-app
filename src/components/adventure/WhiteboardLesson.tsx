@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, RotateCcw } from 'lucide-react';
+import { ChevronRight, RotateCcw, X } from 'lucide-react';
 import { getLessonScript } from '@/data/lesson-scripts';
 import SpellBox from '@/components/comic/SpellBox';
 import { trackEvent } from '@/lib/feedback-service';
@@ -12,11 +12,15 @@ interface WhiteboardLessonProps {
   onCompleted: () => void;
   sendMessage?: (text: string) => void;
   interruptRealtimeSession?: () => void;
+  /** When true, render as a centered fullscreen overlay with backdrop */
+  fullscreen?: boolean;
+  /** Optional close handler for overlay mode */
+  onRequestClose?: () => void;
 }
 
 // A minimal whiteboard surface with model-then-practice flow.
 // v0 keeps visuals simple; we can enhance animations later.
-const WhiteboardLesson: React.FC<WhiteboardLessonProps> = ({ topicId, onCompleted, sendMessage: parentSendMessage, interruptRealtimeSession }) => {
+const WhiteboardLesson: React.FC<WhiteboardLessonProps> = ({ topicId, onCompleted, sendMessage: parentSendMessage, interruptRealtimeSession, fullscreen, onRequestClose }) => {
   const script = getLessonScript(topicId);
   const [segmentIndex, setSegmentIndex] = React.useState(0);
   const hasSegments = !!(script?.segments && script.segments.length > 0);
@@ -138,11 +142,44 @@ Never initiate conversation; only speak the text you receive.`,
 
   const currentPractice = hasSegments ? segment!.practice : script!.practice![practiceIndex];
 
+  // Wrapper decides between inline right panel (default) and fullscreen overlay
+  const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    if (fullscreen) {
+      return (
+        <div className="fixed inset-0 z-[100]">
+          <div className="absolute inset-0 bg-black/60" onClick={onRequestClose} />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="relative w-full max-w-3xl h-[80vh] bg-white rounded-3xl overflow-hidden ring-1 ring-[hsl(var(--border))] shadow-2xl">
+              {/* Close button */}
+              {onRequestClose && (
+                <button
+                  type="button"
+                  aria-label="Close lesson"
+                  className="absolute right-4 top-4 z-20 rounded-full border border-gray-300 bg-white/90 text-gray-700 w-8 h-8 flex items-center justify-center shadow-sm hover:bg-white"
+                  onClick={onRequestClose}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              {children}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    // Default inline right-side panel
+    return (
+      <div className="absolute inset-y-0 right-0 w-1/2 bg-transparent flex flex-col" style={{ zIndex: 20 }}>
+        {children}
+      </div>
+    );
+  };
+
   return (
-    <div className="absolute inset-y-0 right-0 w-1/2 bg-transparent flex flex-col" style={{ zIndex: 20 }}>
+    <Wrapper>
 
       {/* Board */}
-      <div className="flex-1 relative">
+      <div className="relative h-full w-full">
         <div className="absolute inset-0 overflow-hidden bg-white">
           {/* Soft brand gradient + vignette backdrop inside board */}
           <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -439,7 +476,7 @@ Never initiate conversation; only speak the text you receive.`,
       </div>
 
       {/* No sticky footer in lesson mode; navigation happens via SpellBox Next chevron */}
-    </div>
+    </Wrapper>
   );
 };
 

@@ -992,14 +992,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // console.log('🎯 currentAdventureType changed to:', currentAdventureType);
   }, [currentAdventureType]);
 
-  // Track persistent adventure progress to trigger Step 6 when full
+  // Track persistent adventure progress (for UI bar) and session coins (for Step 6 trigger)
   const { progressFraction: persistentProgressFraction, activity: persistentActivity } = useAdventurePersistentProgress();
 
-  // Show Step 6 overlay when progress is full (first-time only)
+  // Show Step 6 overlay when session has 8 correct answers (80 coins) within same quest
   React.useEffect(() => {
     try {
-      // Popup-only delay: require a slightly higher threshold before showing the trainer popup
-      const popupThresholdMet = persistentProgressFraction >= 0.8; // defer from 5/5 to ~8/10 feel without changing global completion
+      // Trigger after 8 correct answers in the same adventure (10 coins each)
+      const popupThresholdMet = sessionCoins >= 80;
 
       // High-priority UI gates: suppress trainer popup if any are active
       const assignmentJustEnded = (() => {
@@ -1021,7 +1021,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         } catch {}
       }
     } catch {}
-  }, [currentScreen, persistentProgressFraction, needsAdventureStep6Intro, showStep5Intro]);
+  }, [currentScreen, sessionCoins, needsAdventureStep6Intro, showStep5Intro]);
 
   // Enforce suppression while Step 6 overlay is visible
   React.useEffect(() => {
@@ -1985,6 +1985,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
+      // If an auth nudge is pending for anonymous user after assignment completion, re-open Level Up modal
+      try {
+        const isAnon = !!user && (user as any).isAnonymous === true;
+        const nudge = typeof window !== 'undefined' ? (localStorage.getItem('auth_nudge_pending') === '1') : false;
+        if (isAnon && nudge && !levelSwitchModal && !isWhiteboardPromptActive && !isWhiteboardLessonActive) {
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('auth_nudge_payload') : null;
+          if (cached) {
+            const payload = JSON.parse(cached);
+            setLevelSwitchModal(payload);
+            return;
+          }
+        }
+      } catch {}
       // Guest signup gate removed: do not block on prompt count
       
       // Check if the last message is "transcribing..." and replace it with actual transcription
@@ -4070,7 +4083,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const tier = TIERS[(targetTierIdx - 1) as number];
         const allTopicIds = Object.keys(sampleMCQData.topics);
         const nextTopic = getNextTopicByPreference(allTopicIds, tier.pref, tier.gdn) || (allTopicIds[0] || '1-H.1');
-        setLevelSwitchModal({
+        const payload = {
           gradeDisplayName: tier.gdn,
           levelDisplayName: tier.ldn,
           nextTopicId: nextTopic,
@@ -4078,7 +4091,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           levelCode: tier.level,
           // Map pairs (1-2→0, 3-4→1, 5-6→2, 7-8→3)
           numericLevel: Math.floor((targetTierIdx - 1) / 2),
-        });
+        };
+        setLevelSwitchModal(payload);
+        try { localStorage.setItem('auth_nudge_payload', JSON.stringify(payload)); } catch {}
+        try { localStorage.setItem('auth_nudge_pending', '1'); } catch {}
       } catch {}
       return;
     }
@@ -6184,7 +6200,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         {/* Level Switch Modal */}
         {levelSwitchModal && (
           <Dialog open onOpenChange={(o) => { if (!o) setLevelSwitchModal(null); }}>
-            <DialogContent className="max-w-md rounded-2xl border border-primary/20 shadow-xl bg-white/95 backdrop-blur-md p-6 text-center">
+            <DialogContent hideClose className="max-w-md rounded-2xl border border-primary/20 shadow-xl bg-white/95 backdrop-blur-md p-6 text-center">
               <div className="text-sm text-foreground/70">{`We found your personalized starting point`}</div>
               <p className="mt-1 text-4xl font-extrabold tracking-tight">
                 <span className="text-primary">
@@ -6222,7 +6238,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                           clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
                         } catch {}
                         try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
-                        // Navigate to upgrade flow (link anonymous to real account)
+                        // Clear nudge; navigate to upgrade flow (link anonymous to real account)
+                        try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
                         navigate('/auth?mode=upgrade&redirect=/');
                       }}
                     >
@@ -6257,7 +6274,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                           clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
                         } catch {}
                         try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
-                        // Navigate to login
+                        // Clear nudge; navigate to login
+                        try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
                         navigate('/auth?redirect=/');
                       }}
                     >

@@ -28,6 +28,14 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
   const [loading, setLoading] = useState(false);
 
+  const getAgeError = (value: string): string => {
+    if (!value) return "";
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "Please enter a valid number.";
+    if (n < 4 || n > 14) return "Please enter an age between 4 and 14.";
+    return "";
+  };
+
   const handleUsernameSubmit = () => {
     if (username.trim()) {
       playClickSound();
@@ -103,6 +111,8 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
         const n = Number(age);
         if (age && Number.isFinite(n) && n > 3 && n < 15) {
           handleComplete();
+        } else {
+          setAgeError(getAgeError(age));
         }
       }
     }
@@ -287,14 +297,15 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                       onChange={(e) => {
                         const digitsOnly = e.target.value.replace(/[^0-9]/g, "");
                         setAge(digitsOnly);
-                        setAgeError("");
+                        setAgeError(getAgeError(digitsOnly));
                       }}
+                      onBlur={() => setAgeError(getAgeError(age))}
                       onKeyPress={handleKeyPress}
                       className="h-14 text-lg border-3 border-black rounded-xl bg-white focus:bg-gray-50"
                       style={{ boxShadow: '0 4px 0 black' }}
                     />
                     {ageError && (
-                      <p className="mt-2 text-sm text-red-600 font-semibold">{ageError}</p>
+                      <p className="mt-2 text-sm text-red-600 font-semibold" aria-live="polite">{ageError}</p>
                     )}
                   </div>
 

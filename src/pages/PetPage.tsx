@@ -2270,7 +2270,7 @@ const getSleepyPetImage = (clicks: number) => {
           const { startAssignmentGate } = await import('@/lib/assignment-gate');
           startAssignmentGate();
         } catch {}
-        onStartAdventure('A-', 'new', 'food');
+        onStartAdventure('A-', 'new', 'house');
       } catch {}
     }
     
