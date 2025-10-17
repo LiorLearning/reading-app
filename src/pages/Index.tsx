@@ -334,30 +334,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [isGeneratingAdventureImage, setIsGeneratingAdventureImage] = React.useState(false);
   const [isExplicitImageRequest, setIsExplicitImageRequest] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
-  // Guest signup gate state
-  const [signupGateOpen, setSignupGateOpen] = React.useState<boolean>(() => {
-    try { return localStorage.getItem('guest_signup_gate_open') === '1'; } catch { return false; }
-  });
-  const [guestPromptCount, setGuestPromptCount] = React.useState<number>(() => {
-    try {
-      const raw = localStorage.getItem('guest_prompt_count');
-      return raw ? (parseInt(raw, 10) || 0) : 0;
-    } catch { return 0; }
-  });
-  
-  // Close and clear signup gate once user upgrades from anonymous to real account
-  React.useEffect(() => {
-    try {
-      const isAnon = !!user && (user as any).isAnonymous === true;
-      if (!isAnon) {
-        setSignupGateOpen(false);
-        try {
-          localStorage.removeItem('guest_signup_gate_open');
-          localStorage.removeItem('guest_prompt_count');
-        } catch {}
-      }
-    } catch {}
-  }, [user]);
+  // Guest signup gate removed: no prompt-count gating, no separate signup dialog
   
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
@@ -371,6 +348,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
  
   // Track message cycle for 2-2 pattern starting at chat 3 (2 pure adventure, then 2 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
+  // Timestamp of when we most recently (re)entered the adventure screen (Screen 1)
+  const enteredAdventureAtRef = React.useRef<number>(Date.now());
+  // Snapshot of message cycle count at the moment we entered adventure
+  const entryMessageCycleCountRef = React.useRef<number>(0);
 
   const {
     status,
@@ -399,6 +380,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
     setMessageCycleCount(aiMessageCount);
   }, []); // Only run on mount
+
+  // (moved below currentScreen declaration)
 
   // Console log when realtime session starts
   useEffect(() => {
@@ -439,6 +422,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Track current adventure type (food, friend, etc.)
   const [currentAdventureType, setCurrentAdventureType] = React.useState<string>('food');
+  // Keep a ref in sync to avoid stale-closure checks inside callbacks
+  const currentAdventureTypeRef = React.useRef<string>('food');
+  React.useEffect(() => {
+    currentAdventureTypeRef.current = currentAdventureType;
+  }, [currentAdventureType]);
   
   // Track current adventure context for contextual AI responses
   const [currentAdventureContext, setCurrentAdventureContext] = React.useState<{name: string, summary: string} | null>(null);
@@ -447,6 +435,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const initialResponseSentRef = React.useRef<string | null>(null);
   // Guard to prevent duplicate initial generation on re-renders
   const isGeneratingInitialRef = React.useRef<boolean>(false);
+
+  // Refresh entry baselines whenever we land on the adventure screen
+  React.useEffect(() => {
+    if (currentScreen === 1) {
+      enteredAdventureAtRef.current = Date.now();
+      entryMessageCycleCountRef.current = messageCycleCount;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentScreen]);
 
   // Emotion/heart state (persisted in Firebase per pet)
   const [emotionActive, setEmotionActive] = React.useState<boolean>(false);
@@ -689,6 +686,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           console.log('🛑 SpellBox opener: ignoring pre-diagnosis AI message', { lastTs, exitAt, currentSpellingWord });
           return;
         }
+        // Freshness/session gate: only open if the last AI message is fresh for this entry,
+        // or if a new chat cycle has occurred since we entered the adventure screen.
+        const isFreshForEntry = !!lastTs && lastTs >= (enteredAdventureAtRef.current || 0);
+        const hasNewCycleSinceEntry = messageCycleCount > (entryMessageCycleCountRef.current || 0);
+        if (!isFreshForEntry && !hasNewCycleSinceEntry) {
+          // Stale spelling message from a previous session/navigation; suppress SpellBox.
+          setShowSpellBox(false);
+          setCurrentSpellQuestion(null);
+          return;
+        }
       } catch {}
       console.log('✅ SpellBox opener: proceeding with currentSpellingWord', { currentSpellingWord, topicId: selectedTopicId });
       // console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
@@ -748,10 +755,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         setCurrentSpellQuestion(spellQuestion);
       }
       
+      // Show SpellBox and temporarily disable mic/text input below
       setShowSpellBox(true);
+      try { setDisableInputForSpell(true); } catch {}
     } else {
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
+      // Re-enable input when SpellBox is not active
+      try { setDisableInputForSpell(false); } catch {}
     }
   }, [currentSpellingWord, currentScreen, originalSpellingQuestion, messageCycleCount]);
   
@@ -987,15 +998,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Show Step 6 overlay when progress is full (first-time only)
   React.useEffect(() => {
     try {
-      if (
-        currentScreen === 1 &&
-        !showStep5Intro &&
-        needsAdventureStep6Intro &&
-        (persistentProgressFraction >= 1)
-      ) {
+      // Popup-only delay: require a slightly higher threshold before showing the trainer popup
+      const popupThresholdMet = persistentProgressFraction >= 0.8; // defer from 5/5 to ~8/10 feel without changing global completion
+
+      // High-priority UI gates: suppress trainer popup if any are active
+      const assignmentJustEnded = (() => {
+        const at = assignmentExitAtRef.current || 0;
+        return (Date.now() - at) < 12000; // ~12s cooldown after assignment completion
+      })();
+      const isAuthRoute = (typeof window !== 'undefined') && (window.location?.pathname || '').startsWith('/auth');
+      const highPriorityActive = showStep5Intro || isWhiteboardPromptActive || isWhiteboardLessonActive || !!levelSwitchModal || isAuthRoute || assignmentJustEnded;
+
+      if (currentScreen === 1 && needsAdventureStep6Intro && popupThresholdMet && !highPriorityActive) {
         setShowStep6Intro(true);
         try {
-          // Immediately stop any ongoing TTS (likely pet) and suppress non-Krafty speech
           ttsService.stop();
           ttsService.setSuppressNonKrafty(true);
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
@@ -1969,15 +1985,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
-      // If anonymous and limit reached, block and open signup gate
-      try {
-        const isAnon = !!user && (user as any).isAnonymous === true;
-        if (isAnon && guestPromptCount >= 5) {
-          setSignupGateOpen(true);
-          try { localStorage.setItem('guest_signup_gate_open', '1'); } catch {}
-          return;
-        }
-      } catch {}
+      // Guest signup gate removed: do not block on prompt count
       
       // Check if the last message is "transcribing..." and replace it with actual transcription
       const lastMessage = chatMessages[chatMessages.length - 1];
@@ -2116,21 +2124,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
       });
 
-      // Increment guest prompt counter and open gate after the 5th prompt
-      try {
-        const isAnon = !!user && (user as any).isAnonymous === true;
-        if (isAnon) {
-          const next = guestPromptCount + 1;
-          setGuestPromptCount(next);
-          try { localStorage.setItem('guest_prompt_count', String(next)); } catch {}
-          if (next === 5) {
-            setTimeout(() => {
-              setSignupGateOpen(true);
-              try { localStorage.setItem('guest_signup_gate_open', '1'); } catch {}
-            }, 0);
-          }
-        }
-      } catch {}
+      // Guest signup gate removed: do not track or open after N prompts
 
       // Sticky yawn detection (skip during MCQ screen)
       try {
@@ -2993,7 +2987,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     } catch {}
     
     // If this is a fallback call with default 'food' and we already have a non-food adventure type set, ignore it
-    if (adventureType === 'food' && currentAdventureType !== 'food') {
+    const latestType = currentAdventureTypeRef.current;
+    if (adventureType === 'food' && latestType !== 'food') {
       // console.log('🚨 Index: Ignoring fallback food call - already have explicit adventure type:', currentAdventureType);
       return;
     }
@@ -3036,7 +3031,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
     setAdventureMode(mode);
     // console.log('🎯 Setting currentAdventureType to:', adventureType);
+    // Set the type immediately and update the ref to beat any same-tick fallback calls
     setCurrentAdventureType(adventureType);
+    currentAdventureTypeRef.current = adventureType;
     // Reset the initial response ref when starting a new adventure
     initialResponseSentRef.current = null;
     
@@ -3374,7 +3371,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // If assignment is selected, immediately start a new adventure on A-
     if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
       try {
-        handleStartAdventure('A-', 'new');
+        // Reset assignment session boundary so new assignment flow can form fresh continuations
+        assignmentExitAtRef.current = 0;
+        // Start assignment with the intended first adventure type (house)
+        handleStartAdventure('A-', 'new', 'house');
       } catch {}
     }
     
@@ -4725,41 +4725,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
-      {/* Signup Gate Modal */}
-      <Dialog open={signupGateOpen && (!!user && (user as any).isAnonymous === true)} onOpenChange={(o) => {
-        setSignupGateOpen(o);
-        try { localStorage.setItem('guest_signup_gate_open', o ? '1' : ''); } catch {}
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create your account to continue</DialogTitle>
-            <DialogDescription>
-              You've reached the free trial limit. Create an account to save progress and continue your adventure.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 mt-2">
-            <Button
-              className="w-full"
-              onClick={() => {
-                playClickSound();
-                navigate('/auth?mode=upgrade&redirect=/');
-              }}
-            >
-              Create account
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                playClickSound();
-                navigate('/auth?redirect=/');
-              }}
-            >
-              I already have an account
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Guest signup gate removed */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -5597,8 +5563,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
-                          fullscreen={isManualWhiteboardOpen}
-                          onRequestClose={() => setIsManualWhiteboardOpen(false)}
                           onCompleted={() => {
                             setLessonReady(false);
                             setDevWhiteboardEnabled(false);
@@ -6227,84 +6191,136 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {`Level ${levelSwitchModal.numericLevel ?? 0}`}
                 </span>
               </p>
-              <div className="mt-5">
-                <Button
-                  className="w-full h-11 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
-                  onClick={async () => {
-                    try {
-                      await updateUserData({
-                        grade: levelSwitchModal.gradeCode,
-                        gradeDisplayName: levelSwitchModal.gradeDisplayName,
-                        level: levelSwitchModal.levelCode,
-                        levelDisplayName: levelSwitchModal.levelDisplayName,
-                      } as any);
-                    } catch {}
-                    // Stop any pending speech/streams from assignment so no late 'spelling_word' arrives
-                    try { ttsService.stop(); } catch {}
-                    try { interruptRealtimeSession?.(); } catch {}
-                    // Mark the moment assignment ended to ignore earlier AI messages
-                    assignmentExitAtRef.current = Date.now();
-                    console.log('🏁 Assignment exit marked', { assignmentExitAt: assignmentExitAtRef.current, diagnosed: { grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelDisplayName, nextTopicId: levelSwitchModal.nextTopicId } });
-                    // Switch away from assignment and set diagnosed grade/level
-                    setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
-                    setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
-                    try { completeAssignmentGate(); } catch {}
-                    try {
-                      const gateActiveNow = isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD);
-                      console.log('🚪 Assignment gate completed. Active now?', gateActiveNow);
-                    } catch {}
-                    // Clear any active assignment spell state
-                    try { setShowSpellBox(false); } catch {}
-                    try {
-                      // Treat the assignment word as resolved to avoid immediate reopen
-                      const lastWord = currentSpellQuestion?.audio || currentSpellQuestion?.word || null;
-                      lastResolvedWordRef.current = lastWord;
-                      console.log('🧹 Cleared assignment spell state', { lastWord });
-                    } catch {}
-                    try { setCurrentSpellQuestion(null); } catch {}
-                    try { setOriginalSpellingQuestion(null); } catch {}
-                    try { setSpellingProgressIndex(0); } catch {}
-                    try { setCompletedSpellingIds([]); } catch {}
-                    // Reset Spellbox progress for diagnosed grade so it starts fresh
-                    try {
-                      const { clearSpellboxTopicProgress } = await import('@/lib/utils');
-                      clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
-                      console.log('🔄 Cleared Spellbox progress for diagnosed grade', levelSwitchModal.gradeDisplayName);
-                    } catch (e) {
-                      console.warn('Failed to clear Spellbox progress:', e);
-                    }
-                    // Move to diagnosed topic
-                    try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
-                    // Inject pet continuation message to preserve flow
-                    try {
-                      setChatMessages(prev => {
-                        if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) return prev;
-                        const latestWithContinuation = prev
-                          .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
-                          .slice(-1)[0] as any;
-                        const continuation = latestWithContinuation?.content_after_spelling || "Great job! Let's continue our adventure! ✨";
-                        const adventureStoryMessage: ChatMessage = {
-                          type: 'ai',
-                          content: continuation,
-                          timestamp: Date.now() + 1
-                        };
-                        playMessageSound();
-                        const adventureMessageId = bubbleMessageIdFromHtml(formatAIMessage(adventureStoryMessage.content));
-                        ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId).catch(() => {});
-                        if (currentSessionId) {
-                          adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
-                        }
-                        return [...prev, adventureStoryMessage];
-                      });
-                    } catch {}
-                    // Close modal and re-enable input
-                    setLevelSwitchModal(null);
-                    try { setDisableInputForSpell(false); } catch {}
-                    try { setHighlightSpellNext(false); } catch {}
-                  }}
-                 >
-                  {`Let’s begin!`}
-                </Button>
+              <div className="mt-5 space-y-3">
+                {!!user && (user as any).isAnonymous === true ? (
+                  <>
+                    <Button
+                      className="w-full h-11 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={async () => {
+                        playClickSound();
+                        try {
+                          await updateUserData({
+                            grade: levelSwitchModal.gradeCode,
+                            gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                            level: levelSwitchModal.levelCode,
+                            levelDisplayName: levelSwitchModal.levelDisplayName,
+                          } as any);
+                        } catch {}
+                        try { ttsService.stop(); } catch {}
+                        try { interruptRealtimeSession?.(); } catch {}
+                        assignmentExitAtRef.current = Date.now();
+                        setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                        setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                        try { completeAssignmentGate(); } catch {}
+                        try { setShowSpellBox(false); } catch {}
+                        try { setCurrentSpellQuestion(null); } catch {}
+                        try { setOriginalSpellingQuestion(null); } catch {}
+                        try { setSpellingProgressIndex(0); } catch {}
+                        try { setCompletedSpellingIds([]); } catch {}
+                        try {
+                          const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                          clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                        } catch {}
+                        try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                        // Navigate to upgrade flow (link anonymous to real account)
+                        navigate('/auth?mode=upgrade&redirect=/');
+                      }}
+                    >
+                      Create account to continue
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full h-11 text-base font-semibold"
+                      onClick={async () => {
+                        playClickSound();
+                        try {
+                          await updateUserData({
+                            grade: levelSwitchModal.gradeCode,
+                            gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                            level: levelSwitchModal.levelCode,
+                            levelDisplayName: levelSwitchModal.levelDisplayName,
+                          } as any);
+                        } catch {}
+                        try { ttsService.stop(); } catch {}
+                        try { interruptRealtimeSession?.(); } catch {}
+                        assignmentExitAtRef.current = Date.now();
+                        setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                        setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                        try { completeAssignmentGate(); } catch {}
+                        try { setShowSpellBox(false); } catch {}
+                        try { setCurrentSpellQuestion(null); } catch {}
+                        try { setOriginalSpellingQuestion(null); } catch {}
+                        try { setSpellingProgressIndex(0); } catch {}
+                        try { setCompletedSpellingIds([]); } catch {}
+                        try {
+                          const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                          clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                        } catch {}
+                        try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                        // Navigate to login
+                        navigate('/auth?redirect=/');
+                      }}
+                    >
+                      I already have an account
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    className="w-full h-11 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+                    onClick={async () => {
+                      try {
+                        await updateUserData({
+                          grade: levelSwitchModal.gradeCode,
+                          gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                          level: levelSwitchModal.levelCode,
+                          levelDisplayName: levelSwitchModal.levelDisplayName,
+                        } as any);
+                      } catch {}
+                      try { ttsService.stop(); } catch {}
+                      try { interruptRealtimeSession?.(); } catch {}
+                      assignmentExitAtRef.current = Date.now();
+                      setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                      setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                      try { completeAssignmentGate(); } catch {}
+                      try { setShowSpellBox(false); } catch {}
+                      try { setCurrentSpellQuestion(null); } catch {}
+                      try { setOriginalSpellingQuestion(null); } catch {}
+                      try { setSpellingProgressIndex(0); } catch {}
+                      try { setCompletedSpellingIds([]); } catch {}
+                      try {
+                        const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                        clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                      } catch {}
+                      try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                      try {
+                        setChatMessages(prev => {
+                          if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) return prev;
+                          const latestWithContinuation = prev
+                            .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
+                            .slice(-1)[0] as any;
+                          const continuation = latestWithContinuation?.content_after_spelling || "Great job! Let's continue our adventure! ✨";
+                          const adventureStoryMessage: ChatMessage = {
+                            type: 'ai',
+                            content: continuation,
+                            timestamp: Date.now() + 1
+                          };
+                          playMessageSound();
+                          const adventureMessageId = bubbleMessageIdFromHtml(formatAIMessage(adventureStoryMessage.content));
+                          ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId).catch(() => {});
+                          if (currentSessionId) {
+                            adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
+                          }
+                          return [...prev, adventureStoryMessage];
+                        });
+                      } catch {}
+                      setLevelSwitchModal(null);
+                      try { setDisableInputForSpell(false); } catch {}
+                      try { setHighlightSpellNext(false); } catch {}
+                    }}
+                  >
+                    {`Let’s begin!`}
+                  </Button>
+                )}
               </div>
             </DialogContent>
           </Dialog>

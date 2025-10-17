@@ -685,7 +685,7 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
   if (isGrade(name, ['2nd', 'second', 'grade 2', 'grade2', '2'])) return '2';
   if (isGrade(name, ['1st', 'first', 'grade 1', 'grade1', '1'])) return '1';
-  if (isGrade(name, ['kindergarten', 'k', 'gradek'])) return '1';
+  if (isGrade(name, ['kindergarten', 'k', 'gradek'])) return 'K';
   // Default to grade 1 content
   return '1';
 };
