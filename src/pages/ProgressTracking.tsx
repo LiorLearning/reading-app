@@ -291,7 +291,7 @@ export function ProgressTracking(): JSX.Element {
                 size="sm"
                 className="bg-white text-black hover:bg-white/90"
               >
-                View All Students Progress
+                Track Progress
               </Button>
             )}
             <Button 

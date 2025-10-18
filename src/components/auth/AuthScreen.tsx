@@ -122,7 +122,7 @@ export const AuthScreen: React.FC = () => {
           className="bg-white text-black hover:bg-white/90"
           size="sm"
         >
-          View All Students Progress
+          Track Progress
         </Button>
       </div>
       <div className="w-full max-w-md mx-auto my-8">
