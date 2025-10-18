@@ -117,6 +117,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Determine which word to use (question takes precedence)
   const targetWord = question?.word || word || '';
   const questionText = question?.questionText;
+  const questionId = question?.id;
   
   // Ensure we have a valid sentence for spelling - create fallback if needed
   const ensureSpellingSentence = useCallback((word: string, sentence?: string, questionText?: string): string => {
@@ -736,9 +737,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, sendMessage, isAssignmentFlow]);
 
-  // Focus next empty box
+  // Focus next empty box (scoped to this component)
   const focusNextEmptyBox = useCallback(() => {
-    const inputs = document.querySelectorAll('input[data-letter]') as NodeListOf<HTMLInputElement>;
+    const scope = containerRef.current;
+    if (!scope) return false;
+    const inputs = scope.querySelectorAll('input[data-letter]') as NodeListOf<HTMLInputElement>;
     for (let i = 0; i < inputs.length; i++) {
       if (!inputs[i].value.trim()) {
         inputs[i].focus();
@@ -748,16 +751,31 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return false;
   }, []);
 
-  // Reset state when word changes
+  // Ensure a box is focused on mount and when target word changes
   useEffect(() => {
-    setUserAnswer('');
-    setIsCorrect(false);
-    setIsComplete(false);
-    setShowHint(false);
-    setAttempts(0);
-    setAiHint('');
-    setIsGeneratingHint(false);
-  }, [targetWord]);
+    setTimeout(() => { focusNextEmptyBox(); }, 0);
+  }, []);
+
+  // Reset state only when the actual question changes (stable id),
+  // not on incidental re-renders, to avoid clearing correct answers prematurely.
+  const prevQuestionIdRef = useRef<number | undefined>(undefined);
+  const prevTargetWordRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const idChanged = questionId !== prevQuestionIdRef.current && typeof questionId === 'number';
+    const wordChangedWithoutId = (typeof questionId !== 'number') && targetWord !== prevTargetWordRef.current;
+    if (idChanged || wordChangedWithoutId) {
+      setUserAnswer('');
+      setIsCorrect(false);
+      setIsComplete(false);
+      setShowHint(false);
+      setAttempts(0);
+      setAiHint('');
+      setIsGeneratingHint(false);
+      setTimeout(() => { focusNextEmptyBox(); }, 0);
+    }
+    prevQuestionIdRef.current = questionId;
+    prevTargetWordRef.current = targetWord;
+  }, [questionId, targetWord, focusNextEmptyBox]);
 
   // Play instruction audio when first-time instruction shows
   // useEffect(() => {
@@ -818,12 +836,21 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         "absolute inset-0 w-full h-full flex items-center justify-center z-20 pointer-events-none",
         className
       )}>
-        <div className={cn(
+        <div
+          ref={containerRef}
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            if (!target.closest('input[data-letter]')) {
+              focusNextEmptyBox();
+            }
+          }}
+          className={cn(
           "spellbox-container pointer-events-auto bg-white rounded-2xl p-8 border border-black/20 shadow-[0_4px_0_black] max-w-lg w-full mx-4 relative",
           showTutorial && "tutorial-spotlight",
           showTutorial && tutorialStep === 'expand' && "tutorial-expand",
           showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
-        )}>
+        )}
+        >
         <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
             { /* CONTENT START */ }
 
@@ -1007,6 +1034,20 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         value={letterValue}
                                       maxLength={1}
                                       disabled={isWordCorrectNow}
+                                      onCompositionStart={() => {
+                                        // During IME composition, defer validation until compositionend
+                                      }}
+                                      onCompositionEnd={(e) => {
+                                        const composed = (e.target as HTMLInputElement).value || '';
+                                        const finalChar = composed.slice(-1).toUpperCase();
+                                        if (finalChar.match(/[A-Z]/)) {
+                                          const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, finalChar);
+                                          handleAnswerChange(newUserAnswer);
+                                          playClickSound();
+                                          const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
+                                          if (nextBox) setTimeout(() => nextBox.focus(), 10);
+                                        }
+                                      }}
                                       onChange={(e) => {
                                         if (isWordCorrectNow) return;
                                         
@@ -1021,7 +1062,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                           playClickSound();
                                           
                                           if (newValue) {
-                                            const nextBox = document.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
+                                            const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                             if (nextBox) {
                                               // console.log(`🔤 SPELLBOX INPUT: Moving focus to next box (${letterIndex + 1})`);
                                               setTimeout(() => nextBox.focus(), 10);
@@ -1035,17 +1076,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                             e.preventDefault();
                                               const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, '');
                                             handleAnswerChange(newUserAnswer);
-                                          } else if (globalIndex > 0) {
-                                            const prevBox = document.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement;
-                                            if (prevBox) {
-                                              prevBox.focus();
-                                            }
+                                          } else if (globalIndex > 0 && containerRef.current) {
+                                            const prevBox = containerRef.current.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement | null;
+                                            if (prevBox) prevBox.focus();
                                           }
-                                        } else if (e.key === 'ArrowLeft' && globalIndex > 0) {
-                                          const prevBox = document.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement;
+                                        } else if (e.key === 'ArrowLeft' && globalIndex > 0 && containerRef.current) {
+                                          const prevBox = containerRef.current.querySelector(`input[data-letter="${globalIndex - 1}"]`) as HTMLInputElement | null;
                                           if (prevBox) prevBox.focus();
                                         } else if (e.key === 'ArrowRight') {
-                                          const nextBox = document.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement;
+                                          const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                           if (nextBox) nextBox.focus();
                                         }
                                       }}

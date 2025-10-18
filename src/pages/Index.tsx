@@ -352,6 +352,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const enteredAdventureAtRef = React.useRef<number>(Date.now());
   // Snapshot of message cycle count at the moment we entered adventure
   const entryMessageCycleCountRef = React.useRef<number>(0);
+  // Ensure the first generated message after opening adventure is never a question
+  const suppressSpellingOnceRef = React.useRef<boolean>(false);
 
   const {
     status,
@@ -441,6 +443,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (currentScreen === 1) {
       enteredAdventureAtRef.current = Date.now();
       entryMessageCycleCountRef.current = messageCycleCount;
+      // Force next generated message to be pure adventure (no spelling)
+      suppressSpellingOnceRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen]);
@@ -1149,11 +1153,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Dev tools keyboard listener for A+S+D combination
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+        return;
+      }
       const key = e.key.toLowerCase();
       setPressedKeys(prev => new Set([...prev, key]));
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+        return;
+      }
       const key = e.key.toLowerCase();
       setPressedKeys(prev => {
         const newSet = new Set(prev);
@@ -1192,6 +1204,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Check for A+S+D combination
   React.useEffect(() => {
+    const active = document.activeElement as HTMLElement | null;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+      return;
+    }
     if (pressedKeys.has('a') && pressedKeys.has('s') && pressedKeys.has('d')) {
       setDevToolsVisible(prev => !prev);
       playClickSound();
@@ -2275,11 +2291,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         // Implement 3-1 pattern: 3 spelling prompts followed by 1 pure adventure beat
         let isSpellingPhase = false;
+        // One-time suppression right after entering adventure: ensure first message is not a question
+        if (suppressSpellingOnceRef.current) {
+          isSpellingPhase = false;
+          suppressSpellingOnceRef.current = false;
+        } else {
         const SPELLING_CYCLE_OFFSET = 1; // only the very first adventure message stays pure
         const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
         if (messageCycleCount >= SPELLING_CYCLE_OFFSET) {
           const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
           isSpellingPhase = cyclePosition < 3;
+        }
         }
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
@@ -4475,6 +4497,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     shouldAutoplay: boolean;
     isAcknowledged: boolean;
   } | null>(null);
+  // Ensure the pet speaks the pre-lesson prompt exactly once per prompt text
+  const lastSpokenWhiteboardPromptRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (whiteboardPrompt && whiteboardPrompt.shouldAutoplay) {
+      const text = whiteboardPrompt.text?.trim();
+    if (text && lastSpokenWhiteboardPromptRef.current !== text) {
+      try { ttsService.stop(); } catch {}
+      // Use a Krafty-tagged messageId so it bypasses suppression, but force pet's voice
+      const petVoiceId = ttsService.getSelectedVoice().id;
+      ttsService.speak(text, {
+        messageId: 'krafty-whiteboard-prompt',
+        voice: petVoiceId,
+        stability: 0.7,
+        similarity_boost: 0.9,
+      }).catch(() => {});
+      lastSpokenWhiteboardPromptRef.current = text;
+    }
+    }
+  }, [whiteboardPrompt]);
   const [whiteboardSeenThisSession, setWhiteboardSeenThisSession] = React.useState<Record<string, boolean>>({});
   const [lessonReady, setLessonReady] = React.useState(false);
   const [whiteboardPromptLocked, setWhiteboardPromptLocked] = React.useState(false);
@@ -4793,7 +4834,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 const scriptForChip = getLessonScript(topicForChip);
                 const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
                 const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
-                const lessonTitle = (scriptForChip?.title) || topicForChip;
+                const lessonTitle = (sampleMCQData?.topics?.[resolvedTopicId]?.topicInfo?.progressTopicName)
+                  || (scriptForChip?.title)
+                  || topicForChip;
                 const canOpen = !!scriptForChip;
                 const handleToggle = () => {
                   if (!canOpen) return;

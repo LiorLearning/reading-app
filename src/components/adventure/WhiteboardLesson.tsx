@@ -142,41 +142,57 @@ Never initiate conversation; only speak the text you receive.`,
 
   const currentPractice = hasSegments ? segment!.practice : script!.practice![practiceIndex];
 
+  // Memoize the SpellBox question object unconditionally to avoid conditional hook usage
+  const spellboxQuestion = React.useMemo(() => {
+    if (!currentPractice) return null;
+    const id = computeNumericId(`${modelWord || ''}|${currentPractice.word}`);
+    const word = currentPractice.word;
+    const questionText = currentPractice.prompt;
+    const correctAnswer = currentPractice.word.toUpperCase();
+    const audio = currentPractice.word;
+    const explanation = '';
+    const isPrefilled = (currentPractice as any).isPrefilled;
+    const prefilledIndexes = (currentPractice as any).prefilledIndexes;
+    return { id, word, questionText, correctAnswer, audio, explanation, isPrefilled, prefilledIndexes };
+  }, [modelWord, currentPractice?.word, currentPractice?.prompt, (currentPractice as any)?.isPrefilled, (currentPractice as any)?.prefilledIndexes]);
+
   // Wrapper decides between inline right panel (default) and fullscreen overlay
-  const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    if (fullscreen) {
-      return (
-        <div className="fixed inset-0 z-[100]">
-          <div className="absolute inset-0 bg-black/60" onClick={onRequestClose} />
-          <div className="absolute inset-0 flex items-center justify-center p-4">
-            <div className="relative w-full max-w-3xl h-[80vh] bg-white rounded-3xl overflow-hidden ring-1 ring-[hsl(var(--border))] shadow-2xl">
-              {/* Close button */}
-              {onRequestClose && (
-                <button
-                  type="button"
-                  aria-label="Close lesson"
-                  className="absolute right-4 top-4 z-20 rounded-full border border-gray-300 bg-white/90 text-gray-700 w-8 h-8 flex items-center justify-center shadow-sm hover:bg-white"
-                  onClick={onRequestClose}
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-              {children}
-            </div>
-          </div>
-        </div>
-      );
-    }
+  // const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  //   if (fullscreen) {
+  //     return (
+  //       <div className="fixed inset-0 z-[100]">
+  //         <div className="absolute inset-0 bg-black/60" onClick={onRequestClose} />
+  //         <div className="absolute inset-0 flex items-center justify-center p-4">
+  //           <div className="relative w-full max-w-3xl h-[80vh] bg-white rounded-3xl overflow-hidden ring-1 ring-[hsl(var(--border))] shadow-2xl">
+  //             {/* Close button */}
+  //             {onRequestClose && (
+  //               <button
+  //                 type="button"
+  //                 aria-label="Close lesson"
+  //                 className="absolute right-4 top-4 z-20 rounded-full border border-gray-300 bg-white/90 text-gray-700 w-8 h-8 flex items-center justify-center shadow-sm hover:bg-white"
+  //                 onClick={onRequestClose}
+  //               >
+  //                 <X className="w-4 h-4" />
+  //               </button>
+  //             )}
+  //             {children}
+  //           </div>
+  //         </div>
+  //       </div>
+  //     );
+  //   }
     // Default inline right-side panel
     return (
-      <div className="absolute inset-y-0 right-0 w-1/2 bg-transparent flex flex-col" style={{ zIndex: 20 }}>
-        {children}
-      </div>
-    );
-  };
+      <div className={fullscreen ? "fixed inset-0 flex items-center justify-center" : "absolute inset-y-0 right-0 w-1/2 bg-transparent flex flex-col"} style={{ zIndex: fullscreen ? 60 : 20 }}>
+        {fullscreen && (
+          <>
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/50" onClick={() => { try { ttsService.stop(); } catch {}; if (onRequestClose) onRequestClose(); }} />
+          </>
+        )}
 
-  return (
-    <Wrapper>
+  
+    
 
       {/* Board */}
       <div className="relative h-full w-full">
@@ -388,16 +404,7 @@ Never initiate conversation; only speak the text you receive.`,
                 <SpellBox
                   variant="overlay"
                   isVisible={true}
-                  question={{
-                    id: computeNumericId(`${modelWord || ''}|${currentPractice.word}`),
-                    word: currentPractice.word,
-                    questionText: currentPractice.prompt,
-                    correctAnswer: currentPractice.word.toUpperCase(),
-                    audio: currentPractice.word,
-                    explanation: '',
-                    isPrefilled: (currentPractice as any).isPrefilled,
-                    prefilledIndexes: (currentPractice as any).prefilledIndexes,
-                  }}
+                  question={spellboxQuestion || undefined}
                   showHints={true}
                   showExplanation={false}
                   nextUnlockDelayMs={4500}
@@ -476,10 +483,13 @@ Never initiate conversation; only speak the text you receive.`,
       </div>
 
       {/* No sticky footer in lesson mode; navigation happens via SpellBox Next chevron */}
-    </Wrapper>
-  );
+  
+  </div>
+);
 };
 
+
 export default WhiteboardLesson;
+
 
 

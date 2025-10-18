@@ -97,6 +97,15 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return {};
     }
   });
+
+  // Update num_pets_owned user property when ownedPets changes
+  useEffect(() => {
+    try {
+      if (user?.uid) {
+        analytics.identify(user.uid, { num_pets_owned: (ownedPets || []).length });
+      }
+    } catch {}
+  }, [user?.uid, ownedPets?.length]);
   
   // Camera selfie modal state
   const [showCamera, setShowCamera] = useState(false);
@@ -2270,7 +2279,7 @@ const getSleepyPetImage = (clicks: number) => {
           const { startAssignmentGate } = await import('@/lib/assignment-gate');
           startAssignmentGate();
         } catch {}
-        onStartAdventure('A-', 'new', 'house');
+        // Do not auto-start here; Index handles assignment default to house
       } catch {}
     }
     

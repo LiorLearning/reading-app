@@ -442,17 +442,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
 
-            // Emit todo_event when activity starts/completes (single event model)
+            // Emit daily_quests (single event model)
             try {
               const todayKey = new Date().toISOString().slice(0, 10);
               states.forEach((s: any) => {
                 const todoType = s.activity;
                 const todoId = `${s.pet}:${todayKey}:${todoType}`;
                 const status = s.completed ? 'completed' : 'started';
-                analytics.capture('todo_event', {
-                  todo_id: todoId,
+                analytics.capture('daily_quests', {
                   todo_type: todoType,
                   status,
+                  pet_used_id: s.pet,
+                  progress_current: Number(s?.progress || 0),
+                  progress_target: Number((s as any)?.target || 5),
                 });
               });
             } catch {}
