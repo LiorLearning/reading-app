@@ -33,19 +33,19 @@ export const analytics = {
     try {
       const key = import.meta.env.VITE_POSTHOG_KEY;
       const host = import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com';
-      if (!key) {
-        console.warn('[analytics] POSTHOG key missing; capture will no-op');
-        return;
-      }
+      // If no env key is provided, assume snippet-based init is being used; silently no-op
+      if (!key) return;
+      // Env-based init (used when snippet is not present)
       posthog.init(key, {
         api_host: host,
-        autocapture: false,
-        capture_pageview: false,
+        autocapture: true,
+        capture_pageview: true,
         capture_pageleave: true,
-        disable_session_recording: true,
-        mask_all_text: true,
-        mask_all_element_attributes: true,
+        disable_session_recording: false,
+        mask_all_text: false,
+        mask_all_element_attributes: false,
       });
+      try { posthog.startSessionRecording(); } catch {}
     } catch (e) {
       console.warn('[analytics] init failed:', e);
     }
@@ -54,7 +54,8 @@ export const analytics = {
   identify(userId: string, properties?: Props): void {
     currentUserId = userId;
     try {
-      posthog.identify(userId, properties);
+      const ph: any = (typeof window !== 'undefined' && (window as any).posthog) || posthog;
+      ph.identify(userId, properties);
     } catch {}
   },
 
@@ -73,7 +74,8 @@ export const analytics = {
     const sn = getSessionNumber(currentUserId);
     if (sn !== null) base.session_number = sn;
     try {
-      posthog.capture(event, { ...base, ...(props || {}) });
+      const ph: any = (typeof window !== 'undefined' && (window as any).posthog) || posthog;
+      ph.capture(event, { ...base, ...(props || {}) });
     } catch {}
   },
 };

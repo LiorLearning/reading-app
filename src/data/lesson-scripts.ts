@@ -43,6 +43,222 @@ export type LessonScript = {
 };
 
 export const lessonScripts: Record<string, LessonScript> = {
+  'K-O.3': {
+  topicId: 'K-O.3',
+  title: "Short a /ă/: CVC (cat)",
+  intro: [
+    "You will practice the short a sound in words like cat."
+  ],
+  segments: [
+    // --- Single Segment — model/practice: cat (no family words) ---
+    {
+      modelWord: 'cat',
+      emoji: '🐱',
+      modelSteps: [
+        { highlights: [],       say: "In short a words, the vowel 'a' says /æ/." },
+        { highlights: [[0,1]],  say: '"c" says /k/.' },
+        { highlights: [[1,2]],  say: '"a" says /æ/.' },
+        { highlights: [[2,3]],  say: '"t" says /t/.' },
+        { highlights: [[0,3]],  say: "/k/ /æ/ /t/ 'cat'." }
+      ],
+      practice: {
+        word: 'cat',
+        prompt: "Let's spell 'cat'.",
+        hints: [
+          "Listen for /k/ /æ/ /t/.",
+          "Fill the first two letters to make the CVC word."
+        ],
+        reinforce: "Great! /k/ /æ/ /t/ — 'cat'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+        meta: {
+          explanation: "Nice! The short a /æ/ is in the middle of the CVC word 'cat'.",
+          aiHook: {
+            targetWord: 'cat',
+            intent: 'fill_blank',
+            questionLine: 'c_t',
+            imagePrompt: 'A cute orange kitten sitting and looking at the viewer'
+          },
+          aiTutor: {
+            target_word: 'cat',
+            question: 'c_t',
+            student_entry: '',
+            topic_to_reinforce: 'Complete the short a word',
+            spelling_pattern_or_rule:
+              "Short a says /æ/ in CVC words (consonant-vowel-consonant). Blend the sounds to spell the word."
+          },
+          audio: 'cat'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: In CVC words like 'cat', the middle 'a' says short /æ/.",
+    "Awesome work—ready for more short a words next?"
+  ],
+  rewards: { coins: 1 }
+},
+'K-P.2': {
+  topicId: 'K-P.2',
+  title: "Short e /ĕ/: CVC (red)",
+  intro: [
+    "You will practice the short e sound in words like red."
+  ],
+  segments: [
+    // --- Single Segment — model/practice: red ---
+    {
+      modelWord: 'red',
+      emoji: '🟥',
+      modelSteps: [
+        { highlights: [],       say: "In short e words, the vowel 'e' says /ĕ/." },
+        { highlights: [[0,1]],  say: '"r" says /r/.' },
+        { highlights: [[1,2]],  say: "'e' says /ĕ/." },
+        { highlights: [[2,3]],  say: '"d" says /d/.' },
+        { highlights: [[0,3]],  say: "/r/ /ĕ/ /d/ — 'red'." }
+      ],
+      practice: {
+        word: 'red',
+        prompt: "Let’s spell 'red'.",
+        hints: [
+          "Listen for /r/ /ĕ/ /d/.",
+          "Fill the missing first sound to make the word."
+        ],
+        reinforce: "Nice! /r/ /ĕ/ /d/ — 'red'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+        meta: {
+          explanation: "Good work! The middle 'e' says short /ĕ/ in the word 'red'.",
+          aiHook: {
+            targetWord: 'red',
+            intent: 'fill_blank',
+            questionLine: 'r_d',
+            imagePrompt: 'A bright red paintbrush painting a red line'
+          },
+          aiTutor: {
+            target_word: 'red',
+            question: 'r_d',
+            student_entry: '',
+            topic_to_reinforce: 'Complete the short e word',
+            spelling_pattern_or_rule:
+              "In CVC short e words, 'e' says /ĕ/. Blend the sounds together to spell the full word."
+          },
+          audio: 'red'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: In CVC words like 'red', the middle 'e' says short /ĕ/.",
+    "Awesome! You’re learning how vowels sound in the middle of short words."
+  ],
+  rewards: { coins: 1 }
+},
+'K-Q.2': {
+  topicId: 'K-Q.2',
+  title: "Short i /ĭ/: CVC (kit)",
+  intro: [
+    "You will practice the short i sound in words like kit."
+  ],
+  segments: [
+    // --- Single Segment — model/practice: kit ---
+    {
+      modelWord: 'kit',
+      emoji: '🧰',
+      modelSteps: [
+        { highlights: [],       say: "In short i words, the vowel 'i' says /ĭ/." },
+        { highlights: [[0,1]],  say: '"k" says /k/.' },
+        { highlights: [[1,2]],  say: '"i" says /ĭ/.' },
+        { highlights: [[2,3]],  say: '"t" says /t/.' },
+        { highlights: [[0,3]],  say: "/k/ /ĭ/ /t/ — 'kit'." }
+      ],
+      practice: {
+        word: 'kit',
+        prompt: "Let’s spell 'kit'.",
+        hints: [
+          "Listen for /k/ /ĭ/ /t/.",
+          "Fill the missing middle vowel with 'i'."
+        ],
+        reinforce: "Nice! /k/ /ĭ/ /t/ — 'kit'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+        meta: {
+          explanation: "Great! The middle short i /ĭ/ completes the CVC word 'kit'.",
+          aiHook: {
+            targetWord: 'kit',
+            intent: 'fill_blank',
+            questionLine: 'k_t',
+            imagePrompt: 'A small toolkit with simple tools arranged neatly'
+          },
+          aiTutor: {
+            target_word: 'kit',
+            question: 'k_t',
+            student_entry: '',
+            topic_to_reinforce: 'Complete the short i word',
+            spelling_pattern_or_rule:
+              "In CVC short i words, the middle 'i' says /ĭ/. Blend the sounds to spell the word."
+          },
+          audio: 'kit'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: In CVC words like 'kit', the middle 'i' says short /ĭ/.",
+    "Awesome! You’re getting strong at hearing and spelling short vowels."
+  ],
+  rewards: { coins: 1 }
+},
+'K-Q.2': {
+  topicId: 'K-Q.2',
+  title: "Short i /ĭ/: CVC (kit)",
+  intro: [
+    "You will practice the short i sound in words like kit."
+  ],
+  segments: [
+    // --- Single Segment — model/practice: kit ---
+    {
+      modelWord: 'kit',
+      emoji: '🧰',
+      modelSteps: [
+        { highlights: [],       say: "In short i words, the vowel 'i' says /ĭ/." },
+        { highlights: [[0,1]],  say: '"k" says /k/.' },
+        { highlights: [[1,2]],  say: '"i" says /ĭ/.' },
+        { highlights: [[2,3]],  say: '"t" says /t/.' },
+        { highlights: [[0,3]],  say: "/k/ /ĭ/ /t/ — 'kit'." }
+      ],
+      practice: {
+        word: 'kit',
+        prompt: "Let’s spell 'kit'.",
+        hints: [
+          "Listen for /k/ /ĭ/ /t/.",
+          "Fill the missing middle vowel with 'i'."
+        ],
+        reinforce: "Nice! /k/ /ĭ/ /t/ — 'kit'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+        meta: {
+          explanation: "Great! The middle short i /ĭ/ completes the CVC word 'kit'.",
+          aiHook: {
+            targetWord: 'kit',
+            intent: 'fill_blank',
+            questionLine: 'k_t',
+            imagePrompt: 'A small toolkit with simple tools arranged neatly'
+          },
+          aiTutor: {
+            target_word: 'kit',
+            question: 'k_t',
+            student_entry: '',
+            topic_to_reinforce: 'Complete the short i word',
+            spelling_pattern_or_rule:
+              "In CVC short i words, the middle 'i' says /ĭ/. Blend the sounds to spell the word."
+          },
+          audio: 'kit'
+        }
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: In CVC words like 'kit', the middle 'i' says short /ĭ/.",
+    "Awesome! You’re getting strong at hearing and spelling short vowels."
+  ],
+  rewards: { coins: 1 }
+},
   '1-H.1': {
     topicId: '1-H.1',
     title: 'Consonant blends',

@@ -398,7 +398,7 @@ export const sampleMCQData: MCQData = {
         },
       ],
   },
-    'K-O.3': {
+   'K-O.3': {
   topicInfo: {
     topicId: 'K-O.3',
     topicName: 'Complete_the_short_a_word',
@@ -418,19 +418,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'ran',
       imageUrl: 'running_girl_image_url_here',
-      explanation: "Great job! The word is 'ran'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
+      explanation: "Great job! Fill the first sound to make 'ran'.",
+      questionText: "_an",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'ran',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
+        questionLine: "_an",
         imagePrompt: 'A child running outdoors for the word ran'
       },
       aiTutor: {
@@ -438,7 +438,7 @@ export const sampleMCQData: MCQData = {
         question: "_an",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "ran"
     },
@@ -452,27 +452,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'cat',
       imageUrl: 'cat_image_url_here',
-      explanation: "Nice! The word is 'cat'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _at",
-      correctAnswer: 'c',
+      explanation: "Nice! Fill the first two letters to make 'cat'.",
+      questionText: "__t",
+      correctAnswer: 'ca',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cat',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _at",
+        questionLine: "__t",
         imagePrompt: 'A cute cat sitting for the word cat'
       },
       aiTutor: {
         target_word: 'cat',
-        question: "_at",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'at' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "cat"
     },
@@ -486,19 +486,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'bag',
       imageUrl: 'bag_image_url_here',
-      explanation: "Excellent! The word is 'bag'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ag",
+      explanation: "Excellent! Fill the first sound to make 'bag'.",
+      questionText: "_ag",
       correctAnswer: 'b',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'bag',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ag",
+        questionLine: "_ag",
         imagePrompt: 'A school bag for the word bag'
       },
       aiTutor: {
@@ -506,7 +506,7 @@ export const sampleMCQData: MCQData = {
         question: "_ag",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ag' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "bag"
     },
@@ -520,27 +520,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'jam',
       imageUrl: 'jam_image_url_here',
-      explanation: "Great! The word is 'jam'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _am",
-      correctAnswer: 'j',
+      explanation: "Great! Fill the first two letters to make 'jam'.",
+      questionText: "__m",
+      correctAnswer: 'ja',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'jam',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _am",
+        questionLine: "__m",
         imagePrompt: 'A jar of strawberry jam for the word jam'
       },
       aiTutor: {
         target_word: 'jam',
-        question: "_am",
+        question: "__m",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'am' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "jam"
     },
@@ -554,19 +554,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'map',
       imageUrl: 'map_image_url_here',
-      explanation: "Good job! The word is 'map'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ap",
+      explanation: "Good job! Fill the first sound to make 'map'.",
+      questionText: "_ap",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'map',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ap",
+        questionLine: "_ap",
         imagePrompt: 'A world map for the word map'
       },
       aiTutor: {
@@ -574,7 +574,7 @@ export const sampleMCQData: MCQData = {
         question: "_ap",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ap' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "map"
     },
@@ -588,27 +588,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'fan',
       imageUrl: 'fan_image_url_here',
-      explanation: "Nice work! The word is 'fan'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'f',
+      explanation: "Nice work! Fill the first two letters to make 'fan'.",
+      questionText: "__n",
+      correctAnswer: 'fa',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fan',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
+        questionLine: "__n",
         imagePrompt: 'A spinning ceiling fan for the word fan'
       },
       aiTutor: {
         target_word: 'fan',
-        question: "_an",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "fan"
     },
@@ -622,19 +622,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'pan',
       imageUrl: 'pan_image_url_here',
-      explanation: "Great! The word is 'pan'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
+      explanation: "Great! Fill the first sound to make 'pan'.",
+      questionText: "_an",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'pan',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
+        questionLine: "_an",
         imagePrompt: 'A frying pan for the word pan'
       },
       aiTutor: {
@@ -642,7 +642,7 @@ export const sampleMCQData: MCQData = {
         question: "_an",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "pan"
     },
@@ -656,27 +656,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'cap',
       imageUrl: 'cap_image_url_here',
-      explanation: "Awesome! The word is 'cap'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ap",
-      correctAnswer: 'c',
+      explanation: "Awesome! Fill the first two letters to make 'cap'.",
+      questionText: "__p",
+      correctAnswer: 'ca',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cap',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ap",
+        questionLine: "__p",
         imagePrompt: 'A baseball cap for the word cap'
       },
       aiTutor: {
         target_word: 'cap',
-        question: "_ap",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ap' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "cap"
     },
@@ -690,19 +690,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'dad',
       imageUrl: 'dad_image_url_here',
-      explanation: "Good job! The word is 'dad'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ad",
+      explanation: "Good job! Fill the first sound to make 'dad'.",
+      questionText: "_ad",
       correctAnswer: 'd',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'dad',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ad",
+        questionLine: "_ad",
         imagePrompt: 'A smiling father for the word dad'
       },
       aiTutor: {
@@ -710,7 +710,7 @@ export const sampleMCQData: MCQData = {
         question: "_ad",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ad' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "dad"
     },
@@ -724,27 +724,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'man',
       imageUrl: 'man_image_url_here',
-      explanation: "Nice! The word is 'man'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'm',
+      explanation: "Nice! Fill the first two letters to make 'man'.",
+      questionText: "__n",
+      correctAnswer: 'ma',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'man',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
+        questionLine: "__n",
         imagePrompt: 'A man standing for the word man'
       },
       aiTutor: {
         target_word: 'man',
-        question: "_an",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-          spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "man"
     },
@@ -758,19 +758,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'bat',
       imageUrl: 'bat_image_url_here',
-      explanation: "Excellent! The word is 'bat'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _at",
+      explanation: "Excellent! Fill the first sound to make 'bat'.",
+      questionText: "_at",
       correctAnswer: 'b',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'bat',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _at",
+        questionLine: "_at",
         imagePrompt: 'A baseball bat for the word bat'
       },
       aiTutor: {
@@ -778,7 +778,7 @@ export const sampleMCQData: MCQData = {
         question: "_at",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'at' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "bat"
     },
@@ -792,27 +792,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'tag',
       imageUrl: 'tag_image_url_here',
-      explanation: "Great! The word is 'tag'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ag",
-      correctAnswer: 't',
+      explanation: "Great! Fill the first two letters to make 'tag'.",
+      questionText: "__g",
+      correctAnswer: 'ta',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'tag',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ag",
+        questionLine: "__g",
         imagePrompt: 'A name tag for the word tag'
       },
       aiTutor: {
         target_word: 'tag',
-        question: "_ag",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ag' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "tag"
     },
@@ -826,19 +826,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'tap',
       imageUrl: 'tap_image_url_here',
-      explanation: "Good! The word is 'tap'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ap",
+      explanation: "Good! Fill the first sound to make 'tap'.",
+      questionText: "_ap",
       correctAnswer: 't',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'tap',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ap",
+        questionLine: "_ap",
         imagePrompt: 'A water tap for the word tap'
       },
       aiTutor: {
@@ -846,7 +846,7 @@ export const sampleMCQData: MCQData = {
         question: "_ap",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ap' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "tap"
     },
@@ -860,27 +860,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'van',
       imageUrl: 'van_image_url_here',
-      explanation: "Nice work! The word is 'van'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'v',
+      explanation: "Nice work! Fill the first two letters to make 'van'.",
+      questionText: "__n",
+      correctAnswer: 'va',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'van',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
+        questionLine: "__n",
         imagePrompt: 'A white van for the word van'
       },
       aiTutor: {
         target_word: 'van',
-        question: "_an",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "van"
     },
@@ -894,19 +894,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'jam',
       imageUrl: 'jar_of_jam_image_url_here',
-      explanation: "You did it! The word is 'jam'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _am",
+      explanation: "You did it! Fill the first sound to make 'jam'.",
+      questionText: "_am",
       correctAnswer: 'j',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'jam',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _am",
+        questionLine: "_am",
         imagePrompt: 'A jar of jam for the word jam'
       },
       aiTutor: {
@@ -914,7 +914,7 @@ export const sampleMCQData: MCQData = {
         question: "_am",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'am' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "jam"
     },
@@ -928,27 +928,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'rag',
       imageUrl: 'rag_image_url_here',
-      explanation: "Great! The word is 'rag'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ag",
-      correctAnswer: 'r',
+      explanation: "Great! Fill the first two letters to make 'rag'.",
+      questionText: "__g",
+      correctAnswer: 'ra',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'rag',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ag",
+        questionLine: "__g",
         imagePrompt: 'A cleaning rag for the word rag'
       },
       aiTutor: {
         target_word: 'rag',
-        question: "_ag",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ag' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "rag"
     },
@@ -962,19 +962,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'can',
       imageUrl: 'can_image_url_here',
-      explanation: "Good job! The word is 'can'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
+      explanation: "Good job! Fill the first sound to make 'can'.",
+      questionText: "_an",
       correctAnswer: 'c',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'can',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
+        questionLine: "_an",
         imagePrompt: 'A tin can for the word can'
       },
       aiTutor: {
@@ -982,7 +982,7 @@ export const sampleMCQData: MCQData = {
         question: "_an",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "can"
     },
@@ -996,27 +996,27 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'dad',
       imageUrl: 'father_image_url_here',
-      explanation: "Excellent! The word is 'dad'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ad",
-      correctAnswer: 'd',
+      explanation: "Excellent! Fill the first two letters to make 'dad'.",
+      questionText: "__d",
+      correctAnswer: 'da',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dad',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ad",
+        questionLine: "__d",
         imagePrompt: 'A dad smiling for the word dad'
       },
       aiTutor: {
         target_word: 'dad',
-        question: "_ad",
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-          spelling_pattern_or_rule: "first letter is empty but 'ad' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "dad"
     },
@@ -1030,19 +1030,19 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'mad',
       imageUrl: 'angry_face_image_url_here',
-      explanation: "Nice! The word is 'mad'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ad",
+      explanation: "Nice! Fill the first sound to make 'mad'.",
+      questionText: "_ad",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'mad',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ad",
+        questionLine: "_ad",
         imagePrompt: 'A cartoon angry face for the word mad'
       },
       aiTutor: {
@@ -1050,7 +1050,7 @@ export const sampleMCQData: MCQData = {
         question: "_ad",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ad' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "mad"
     },
@@ -1064,32 +1064,33 @@ export const sampleMCQData: MCQData = {
       templateType: 'fill_blank',
       word: 'ham',
       imageUrl: 'ham_image_url_here',
-      explanation: "Great! The word is 'ham'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _am",
-      correctAnswer: 'h',
+      explanation: "Great! Fill the first two letters to make 'ham'.",
+      questionText: "__m",
+      correctAnswer: 'ha',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1,2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'ham',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _am",
+        questionLine: "__m",
         imagePrompt: 'A piece of ham for the word ham'
       },
       aiTutor: {
         target_word: 'ham',
-        question: "_am",
+        question: "__m",
         student_entry: "",
         topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'am' is filled"
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
       },
       audio: "ham"
     }
   ]
-},
+}
+,
 
 'K-P.2': {
   topicInfo: {
@@ -1109,10 +1110,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'red',
       imageUrl: 'paint_brush_red_image_url_here',
-      explanation: "Good job! The missing letter is 'r'. The word is 'red'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ed",
+      explanation: "Great job! Fill the first sound to make 'red'.",
+      questionText: "_ed",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
@@ -1123,7 +1124,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'red',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
+        questionLine: "_ed",
         imagePrompt: 'An educational illustration of a paintbrush with red paint, showing the word red'
       },
       aiTutor: {
@@ -1131,7 +1132,7 @@ export const sampleMCQData: MCQData = {
         question: "_ed",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'ed' is filled"
+        spelling_pattern_or_rule: "In short e CVC words, the middle 'e' says /ĕ/. Listen to the sounds and fill the missing letter(s) to match the word."
       },
       audio: "red"
     },
@@ -1143,29 +1144,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'bed',
       imageUrl: 'bed_image_url_here',
-      explanation: "Nice work! The missing letter is 'b'. The word is 'bed'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ed",
-      correctAnswer: 'b',
+      explanation: "Nice! Fill the first two letters to make 'bed'.",
+      questionText: "__d",
+      correctAnswer: 'be',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bed',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
+        questionLine: "__d",
         imagePrompt: 'A cozy bed for early phonics practice'
       },
       aiTutor: {
         target_word: 'bed',
-        question: "_ed",
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'ed' is filled"
+        spelling_pattern_or_rule: "In short e CVC words, the middle 'e' says /ĕ/. Fill the starting consonant or the start pair (consonant + e) to complete the word."
       },
       audio: "bed"
     },
@@ -1177,10 +1178,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'pen',
       imageUrl: 'pen_image_url_here',
-      explanation: "Awesome! The missing letter is 'p'. The word is 'pen'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
+      explanation: "Awesome! Fill the first sound to make 'pen'.",
+      questionText: "_en",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -1191,7 +1192,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pen',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "_en",
         imagePrompt: 'A blue pen on a notebook, kindergarten phonics style'
       },
       aiTutor: {
@@ -1199,7 +1200,7 @@ export const sampleMCQData: MCQData = {
         question: "_en",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Short e in the middle says /ĕ/. Hear the first sound and fill the missing letter."
       },
       audio: "pen"
     },
@@ -1211,29 +1212,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'jet',
       imageUrl: 'jet_airplane_image_url_here',
-      explanation: "Great! The missing letter is 'j'. The word is 'jet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'j',
+      explanation: "Great! Fill the first two letters to make 'jet'.",
+      questionText: "__t",
+      correctAnswer: 'je',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'jet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A toy jet flying in the sky for phonics exercise'
       },
       aiTutor: {
         target_word: 'jet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "jet"
     },
@@ -1245,10 +1246,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'hen',
       imageUrl: 'hen_image_url_here',
-      explanation: "Good job! The missing letter is 'h'. The word is 'hen'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
+      explanation: "Good job! Fill the first sound to make 'hen'.",
+      questionText: "_en",
       correctAnswer: 'h',
       template: 'fill_blank',
       isSpacing: false,
@@ -1259,7 +1260,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'hen',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "_en",
         imagePrompt: 'A hen standing in the farmyard for phonics learning'
       },
       aiTutor: {
@@ -1267,7 +1268,7 @@ export const sampleMCQData: MCQData = {
         question: "_en",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Hear /h/ + /ĕ/ + /n/. Fill the missing first sound."
       },
       audio: "hen"
     },
@@ -1279,29 +1280,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'web',
       imageUrl: 'spider_web_image_url_here',
-      explanation: "Nice! The missing letter is 'w'. The word is 'web'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _eb",
-      correctAnswer: 'w',
+      explanation: "Nice! Fill the first two letters to make 'web'.",
+      questionText: "__b",
+      correctAnswer: 'we',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'web',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _eb",
+        questionLine: "__b",
         imagePrompt: 'A spider web shining with dew, short e phonics concept'
       },
       aiTutor: {
         target_word: 'web',
-        question: "_eb",
+        question: "__b",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'eb' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "web"
     },
@@ -1313,29 +1314,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'leg',
       imageUrl: 'human_leg_image_url_here',
-      explanation: "Super! The missing letter is 'l'. The word is 'leg'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _eg",
-      correctAnswer: 'l',
+      explanation: "Super! Fill the first two letters to make 'leg'.",
+      questionText: "__g",
+      correctAnswer: 'le',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'leg',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _eg",
+        questionLine: "__g",
         imagePrompt: 'A cartoon leg running, used in phonics learning'
       },
       aiTutor: {
         target_word: 'leg',
-        question: "_eg",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'eg' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "leg"
     },
@@ -1347,10 +1348,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'net',
       imageUrl: 'butterfly_net_image_url_here',
-      explanation: "Great! The missing letter is 'n'. The word is 'net'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
+      explanation: "Great! Fill the first sound to make 'net'.",
+      questionText: "_et",
       correctAnswer: 'n',
       template: 'fill_blank',
       isSpacing: false,
@@ -1361,7 +1362,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'net',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "_et",
         imagePrompt: 'A butterfly net for kindergarten short e learning'
       },
       aiTutor: {
@@ -1369,7 +1370,7 @@ export const sampleMCQData: MCQData = {
         question: "_et",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant and fill it in."
       },
       audio: "net"
     },
@@ -1381,29 +1382,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'men',
       imageUrl: 'three_men_image_url_here',
-      explanation: "Well done! The missing letter is 'm'. The word is 'men'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
-      correctAnswer: 'm',
+      explanation: "Well done! Fill the first two letters to make 'men'.",
+      questionText: "__n",
+      correctAnswer: 'me',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'men',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "__n",
         imagePrompt: 'A group of cartoon men waving, educational style'
       },
       aiTutor: {
         target_word: 'men',
-        question: "_en",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "men"
     },
@@ -1415,29 +1416,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'pet',
       imageUrl: 'puppy_pet_image_url_here',
-      explanation: "Nice job! The missing letter is 'p'. The word is 'pet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'p',
+      explanation: "Nice job! Fill the first two letters to make 'pet'.",
+      questionText: "__t",
+      correctAnswer: 'pe',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A happy pet dog sitting for short e phonics'
       },
       aiTutor: {
         target_word: 'pet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "pet"
     },
@@ -1449,10 +1450,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'den',
       imageUrl: 'fox_den_image_url_here',
-      explanation: "Nice work! The missing letter is 'd'. The word is 'den'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
+      explanation: "Nice work! Fill the first sound to make 'den'.",
+      questionText: "_en",
       correctAnswer: 'd',
       template: 'fill_blank',
       isSpacing: false,
@@ -1463,7 +1464,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'den',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "_en",
         imagePrompt: 'A woodland animal near its den for the word den'
       },
       aiTutor: {
@@ -1471,7 +1472,7 @@ export const sampleMCQData: MCQData = {
         question: "_en",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Hear /d/ + /ĕ/ + /n/. Fill the missing first sound."
       },
       audio: "den"
     },
@@ -1483,29 +1484,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'wet',
       imageUrl: 'rainy_day_wet_puddle_image_url_here',
-      explanation: "Great job! The missing letter is 'w'. The word is 'wet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'w',
+      explanation: "Great job! Fill the first two letters to make 'wet'.",
+      questionText: "__t",
+      correctAnswer: 'we',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'wet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A puddle or soaked shirt to show the word wet'
       },
       aiTutor: {
         target_word: 'wet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "wet"
     },
@@ -1517,29 +1518,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'set',
       imageUrl: 'toy_blocks_set_image_url_here',
-      explanation: "Good job! The missing letter is 's'. The word is 'set'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 's',
+      explanation: "Good job! Fill the first two letters to make 'set'.",
+      questionText: "__t",
+      correctAnswer: 'se',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'set',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A matching set of toy blocks to show the word set'
       },
       aiTutor: {
         target_word: 'set',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "set"
     },
@@ -1551,29 +1552,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'let',
       imageUrl: 'child_writing_let_note_image_url_here',
-      explanation: "Nice! The missing letter is 'l'. The word is 'let'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'l',
+      explanation: "Nice! Fill the first two letters to make 'let'.",
+      questionText: "__t",
+      correctAnswer: 'le',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'let',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A child holding a note with the word let used in context'
       },
       aiTutor: {
         target_word: 'let',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the consonant + e start to complete the short e word."
       },
       audio: "let"
     },
@@ -1585,29 +1586,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'met',
       imageUrl: 'friends_met_handshake_image_url_here',
-      explanation: "Super! The missing letter is 'm'. The word is 'met'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'm',
+      explanation: "Super! Fill the first two letters to make 'met'.",
+      questionText: "__t",
+      correctAnswer: 'me',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'met',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'Two friends meeting to show the word met'
       },
       aiTutor: {
         target_word: 'met',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "met"
     },
@@ -1619,29 +1620,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'get',
       imageUrl: 'getting_gift_image_url_here',
-      explanation: "Excellent! The missing letter is 'g'. The word is 'get'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'g',
+      explanation: "Excellent! Fill the first two letters to make 'get'.",
+      questionText: "__t",
+      correctAnswer: 'ge',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'get',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A child getting a gift to show the word get'
       },
       aiTutor: {
         target_word: 'get',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the consonant + e start to complete the short e word."
       },
       audio: "get"
     },
@@ -1653,29 +1654,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'vet',
       imageUrl: 'vet_doctor_image_url_here',
-      explanation: "Great! The missing letter is 'v'. The word is 'vet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'v',
+      explanation: "Great! Fill the first two letters to make 'vet'.",
+      questionText: "__t",
+      correctAnswer: 've',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'vet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A veterinarian with a pet to show the word vet'
       },
       aiTutor: {
         target_word: 'vet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "vet"
     },
@@ -1687,29 +1688,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'hem',
       imageUrl: 'sewing_hem_image_url_here',
-      explanation: "Nice! The missing letter is 'h'. The word is 'hem'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _em",
-      correctAnswer: 'h',
+      explanation: "Nice! Fill the first two letters to make 'hem'.",
+      questionText: "__m",
+      correctAnswer: 'he',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hem',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _em",
+        questionLine: "__m",
         imagePrompt: 'Hands sewing the edge (hem) of fabric to show the word hem'
       },
       aiTutor: {
         target_word: 'hem',
-        question: "_em",
+        question: "__m",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'em' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "hem"
     },
@@ -1721,29 +1722,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'peg',
       imageUrl: 'clothes_peg_on_line_image_url_here',
-      explanation: "Super! The missing letter is 'p'. The word is 'peg'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _eg",
-      correctAnswer: 'p',
+      explanation: "Super! Fill the first two letters to make 'peg'.",
+      questionText: "__g",
+      correctAnswer: 'pe',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'peg',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _eg",
+        questionLine: "__g",
         imagePrompt: 'A clothes peg clipped on a line to show the word peg'
       },
       aiTutor: {
         target_word: 'peg',
-        question: "_eg",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'eg' is filled"
+        spelling_pattern_or_rule: "Fill the consonant + e start to make the short e word."
       },
       audio: "peg"
     },
@@ -1755,34 +1756,35 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'bet',
       imageUrl: 'placing_bet_coins_image_url_here',
-      explanation: "Excellent! The missing letter is 'b'. The word is 'bet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'b',
+      explanation: "Excellent! Fill the first two letters to make 'bet'.",
+      questionText: "__t",
+      correctAnswer: 'be',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'Simple illustration showing choosing between two options for the word bet'
       },
       aiTutor: {
         target_word: 'bet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "bet"
     }
   ]
-},'K-Q.2': {
+}
+,'K-Q.2': {
   topicInfo: {
     topicId: 'K-Q.2',
     topicName: 'Complete_the_short_i_word',
@@ -1800,10 +1802,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'rip',
       imageUrl: 'ripping_paper_image_url_here',
-      explanation: "Good job! The missing letter is 'r'. The word is 'rip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
+      explanation: "Great job! Fill the first sound to make 'rip'.",
+      questionText: "_ip",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
@@ -1814,7 +1816,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'rip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "_ip",
         imagePrompt: 'Educational illustration showing hands ripping paper for the word rip'
       },
       aiTutor: {
@@ -1822,7 +1824,7 @@ export const sampleMCQData: MCQData = {
         question: "_ip",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Short i CVC words use /ĭ/ in the middle. Hear the first sound and fill the missing letter."
       },
       audio: "rip"
     },
@@ -1834,29 +1836,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'dip',
       imageUrl: 'dipping_chip_in_sauce_image_url_here',
-      explanation: "Great work! The missing letter is 'd'. The word is 'dip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
-      correctAnswer: 'd',
+      explanation: "Nice! Fill the starting pair to make 'dip'.",
+      questionText: "__p",
+      correctAnswer: 'di',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "__p",
         imagePrompt: 'A bowl of sauce with a chip dipping in, for the word dip'
       },
       aiTutor: {
         target_word: 'dip',
-        question: "_ip",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + i) to match the sounds /d/ + /ĭ/."
       },
       audio: "dip"
     },
@@ -1868,10 +1870,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'lip',
       imageUrl: 'lip_image_url_here',
-      explanation: "Nice! The missing letter is 'l'. The word is 'lip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
+      explanation: "Good! Fill the first sound to make 'lip'.",
+      questionText: "_ip",
       correctAnswer: 'l',
       template: 'fill_blank',
       isSpacing: false,
@@ -1882,7 +1884,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'lip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "_ip",
         imagePrompt: 'A mouth showing lips for the word lip'
       },
       aiTutor: {
@@ -1890,7 +1892,7 @@ export const sampleMCQData: MCQData = {
         question: "_ip",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant and add it to _ip."
       },
       audio: "lip"
     },
@@ -1902,29 +1904,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'tip',
       imageUrl: 'tipping_cup_image_url_here',
-      explanation: "Good job! The missing letter is 't'. The word is 'tip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
-      correctAnswer: 't',
+      explanation: "Great! Fill the starting pair to make 'tip'.",
+      questionText: "__p",
+      correctAnswer: 'ti',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'tip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "__p",
         imagePrompt: 'An illustration of tipping a cup for the word tip'
       },
       aiTutor: {
         target_word: 'tip',
-        question: "_ip",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Add the start pair (t + i) for /tĭ/."
       },
       audio: "tip"
     },
@@ -1936,10 +1938,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'sip',
       imageUrl: 'drinking_with_straw_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'sip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
+      explanation: "Awesome! Fill the first sound to make 'sip'.",
+      questionText: "_ip",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -1950,7 +1952,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "_ip",
         imagePrompt: 'A child sipping juice with a straw for the word sip'
       },
       aiTutor: {
@@ -1958,7 +1960,7 @@ export const sampleMCQData: MCQData = {
         question: "_ip",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Short i says /ĭ/. Add the first consonant you hear."
       },
       audio: "sip"
     },
@@ -1970,29 +1972,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'pin',
       imageUrl: 'safety_pin_image_url_here',
-      explanation: "Nice work! The missing letter is 'p'. The word is 'pin'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _in",
-      correctAnswer: 'p',
+      explanation: "Nice! Fill the starting pair to make 'pin'.",
+      questionText: "__n",
+      correctAnswer: 'pi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pin',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _in",
+        questionLine: "__n",
         imagePrompt: 'A safety pin for the word pin'
       },
       aiTutor: {
         target_word: 'pin',
-        question: "_in",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'in' is filled"
+        spelling_pattern_or_rule: "Blend the first consonant with i: add 'pi' to finish the word."
       },
       audio: "pin"
     },
@@ -2004,10 +2006,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'fin',
       imageUrl: 'fish_fin_image_url_here',
-      explanation: "Super! The missing letter is 'f'. The word is 'fin'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _in",
+      explanation: "Super! Fill the first sound to make 'fin'.",
+      questionText: "_in",
       correctAnswer: 'f',
       template: 'fill_blank',
       isSpacing: false,
@@ -2018,7 +2020,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'fin',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _in",
+        questionLine: "_in",
         imagePrompt: 'A fish showing its fin for the word fin'
       },
       aiTutor: {
@@ -2026,7 +2028,7 @@ export const sampleMCQData: MCQData = {
         question: "_in",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'in' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant before /ĭn/."
       },
       audio: "fin"
     },
@@ -2038,29 +2040,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'win',
       imageUrl: 'boy_winning_trophy_image_url_here',
-      explanation: "Great job! The missing letter is 'w'. The word is 'win'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _in",
-      correctAnswer: 'w',
+      explanation: "Great! Fill the starting pair to make 'win'.",
+      questionText: "__n",
+      correctAnswer: 'wi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'win',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _in",
+        questionLine: "__n",
         imagePrompt: 'A boy holding a trophy for the word win'
       },
       aiTutor: {
         target_word: 'win',
-        question: "_in",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'in' is filled"
+        spelling_pattern_or_rule: "Add the start pair (w + i) to make /wĭ/."
       },
       audio: "win"
     },
@@ -2072,10 +2074,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'sit',
       imageUrl: 'child_sitting_image_url_here',
-      explanation: "Nice! The missing letter is 's'. The word is 'sit'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _it",
+      explanation: "Nice! Fill the first sound to make 'sit'.",
+      questionText: "_it",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -2086,7 +2088,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sit',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _it",
+        questionLine: "_it",
         imagePrompt: 'A child sitting on a chair for the word sit'
       },
       aiTutor: {
@@ -2094,7 +2096,7 @@ export const sampleMCQData: MCQData = {
         question: "_it",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'it' is filled"
+        spelling_pattern_or_rule: "Hear the first consonant before /ĭt/ and write it."
       },
       audio: "sit"
     },
@@ -2106,29 +2108,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'hit',
       imageUrl: 'baseball_player_hitting_ball_image_url_here',
-      explanation: "Excellent! The missing letter is 'h'. The word is 'hit'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _it",
-      correctAnswer: 'h',
+      explanation: "Excellent! Fill the starting pair to make 'hit'.",
+      questionText: "__t",
+      correctAnswer: 'hi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hit',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _it",
+        questionLine: "__t",
         imagePrompt: 'A baseball player hitting the ball for the word hit'
       },
       aiTutor: {
         target_word: 'hit',
-        question: "_it",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'it' is filled"
+        spelling_pattern_or_rule: "Add the start pair (h + i) to make /hĭ/."
       },
       audio: "hit"
     },
@@ -2140,10 +2142,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'pig',
       imageUrl: 'pig_image_url_here',
-      explanation: "Great job! The missing letter is 'p'. The word is 'pig'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
+      explanation: "Great job! Fill the first sound to make 'pig'.",
+      questionText: "_ig",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -2154,7 +2156,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pig',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "_ig",
         imagePrompt: 'A pink pig for the word pig'
       },
       aiTutor: {
@@ -2162,7 +2164,7 @@ export const sampleMCQData: MCQData = {
         question: "_ig",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Write the starting consonant before /ĭg/."
       },
       audio: "pig"
     },
@@ -2174,29 +2176,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'dig',
       imageUrl: 'man_digging_soil_image_url_here',
-      explanation: "Nice work! The missing letter is 'd'. The word is 'dig'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
-      correctAnswer: 'd',
+      explanation: "Nice work! Fill the starting pair to make 'dig'.",
+      questionText: "__g",
+      correctAnswer: 'di',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dig',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "__g",
         imagePrompt: 'A man digging soil for the word dig'
       },
       aiTutor: {
         target_word: 'dig',
-        question: "_ig",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Blend /d/ + /ĭ/ to add the start pair 'di'."
       },
       audio: "dig"
     },
@@ -2208,10 +2210,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'wig',
       imageUrl: 'girl_wearing_wig_image_url_here',
-      explanation: "Good job! The missing letter is 'w'. The word is 'wig'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
+      explanation: "Good job! Fill the first sound to make 'wig'.",
+      questionText: "_ig",
       correctAnswer: 'w',
       template: 'fill_blank',
       isSpacing: false,
@@ -2222,7 +2224,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'wig',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "_ig",
         imagePrompt: 'A girl wearing a wig for the word wig'
       },
       aiTutor: {
@@ -2230,7 +2232,7 @@ export const sampleMCQData: MCQData = {
         question: "_ig",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant sound before /ĭg/."
       },
       audio: "wig"
     },
@@ -2242,29 +2244,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'fix',
       imageUrl: 'fixing_bike_image_url_here',
-      explanation: "Nice! The missing letter is 'f'. The word is 'fix'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ix",
-      correctAnswer: 'f',
+      explanation: "Nice! Fill the starting pair to make 'fix'.",
+      questionText: "__x",
+      correctAnswer: 'fi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fix',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ix",
+        questionLine: "__x",
         imagePrompt: 'A person fixing a bike for the word fix'
       },
       aiTutor: {
         target_word: 'fix',
-        question: "_ix",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ix' is filled"
+        spelling_pattern_or_rule: "Write the start pair (consonant + i) to make /fĭ/."
       },
       audio: "fix"
     },
@@ -2276,10 +2278,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'mix',
       imageUrl: 'mixing_bowl_image_url_here',
-      explanation: "Super! The missing letter is 'm'. The word is 'mix'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ix",
+      explanation: "Super! Fill the first sound to make 'mix'.",
+      questionText: "_ix",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -2290,7 +2292,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mix',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ix",
+        questionLine: "_ix",
         imagePrompt: 'A bowl with ingredients being mixed for the word mix'
       },
       aiTutor: {
@@ -2298,7 +2300,7 @@ export const sampleMCQData: MCQData = {
         question: "_ix",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ix' is filled"
+        spelling_pattern_or_rule: "Fill the missing first consonant before /ĭx/."
       },
       audio: "mix"
     },
@@ -2310,29 +2312,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'six',
       imageUrl: 'six_apples_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'six'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ix",
-      correctAnswer: 's',
+      explanation: "Excellent! Fill the starting pair to make 'six'.",
+      questionText: "__x",
+      correctAnswer: 'si',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'six',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ix",
+        questionLine: "__x",
         imagePrompt: 'A group of six apples for the word six'
       },
       aiTutor: {
         target_word: 'six',
-        question: "_ix",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ix' is filled"
+        spelling_pattern_or_rule: "Add the start pair (s + i) to spell /sĭ/."
       },
       audio: "six"
     },
@@ -2344,10 +2346,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'lid',
       imageUrl: 'jar_lid_image_url_here',
-      explanation: "Good job! The missing letter is 'l'. The word is 'lid'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _id",
+      explanation: "Good job! Fill the first sound to make 'lid'.",
+      questionText: "_id",
       correctAnswer: 'l',
       template: 'fill_blank',
       isSpacing: false,
@@ -2358,7 +2360,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'lid',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _id",
+        questionLine: "_id",
         imagePrompt: 'A jar with its lid for the word lid'
       },
       aiTutor: {
@@ -2366,7 +2368,7 @@ export const sampleMCQData: MCQData = {
         question: "_id",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'id' is filled"
+        spelling_pattern_or_rule: "Write the starting consonant you hear before /ĭd/."
       },
       audio: "lid"
     },
@@ -2378,29 +2380,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'kid',
       imageUrl: 'happy_kid_image_url_here',
-      explanation: "Nice! The missing letter is 'k'. The word is 'kid'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _id",
-      correctAnswer: 'k',
+      explanation: "Nice! Fill the starting pair to make 'kid'.",
+      questionText: "__d",
+      correctAnswer: 'ki',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'kid',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _id",
+        questionLine: "__d",
         imagePrompt: 'A smiling child for the word kid'
       },
       aiTutor: {
         target_word: 'kid',
-        question: "_id",
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'id' is filled"
+        spelling_pattern_or_rule: "Add the start pair (k + i) to make /kĭ/."
       },
       audio: "kid"
     },
@@ -2412,10 +2414,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'big',
       imageUrl: 'big_balloon_image_url_here',
-      explanation: "Excellent! The missing letter is 'b'. The word is 'big'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
+      explanation: "Excellent! Fill the first sound to make 'big'.",
+      questionText: "_ig",
       correctAnswer: 'b',
       template: 'fill_blank',
       isSpacing: false,
@@ -2426,7 +2428,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'big',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "_ig",
         imagePrompt: 'A big balloon for the word big'
       },
       aiTutor: {
@@ -2434,7 +2436,7 @@ export const sampleMCQData: MCQData = {
         question: "_ig",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ĭg/."
       },
       audio: "big"
     },
@@ -2446,29 +2448,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'zip',
       imageUrl: 'zipping_jacket_image_url_here',
-      explanation: "Great work! The missing letter is 'z'. The word is 'zip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
-      correctAnswer: 'z',
+      explanation: "Great work! Fill the starting pair to make 'zip'.",
+      questionText: "__p",
+      correctAnswer: 'zi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'zip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "__p",
         imagePrompt: 'A child zipping a jacket for the word zip'
       },
       aiTutor: {
         target_word: 'zip',
-        question: "_ip",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (z + i) to make /zĭ/."
       },
       audio: "zip"
     }
@@ -2492,10 +2494,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'top',
       imageUrl: 'spinning_top_image_url_here',
-      explanation: "Good job! The missing letter is 't'. The word is 'top'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
+      explanation: "Great job! Fill the first sound to make 'top'.",
+      questionText: "_op",
       correctAnswer: 't',
       template: 'fill_blank',
       isSpacing: false,
@@ -2506,7 +2508,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'top',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "_op",
         imagePrompt: 'A colorful spinning top for the word top'
       },
       aiTutor: {
@@ -2514,7 +2516,7 @@ export const sampleMCQData: MCQData = {
         question: "_op",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Short o CVC words use /ŏ/ in the middle. Add the beginning consonant you hear."
       },
       audio: "top"
     },
@@ -2526,29 +2528,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'hop',
       imageUrl: 'bunny_hopping_image_url_here',
-      explanation: "Nice work! The missing letter is 'h'. The word is 'hop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
-      correctAnswer: 'h',
+      explanation: "Nice! Add the start pair to make 'hop'.",
+      questionText: "__p",
+      correctAnswer: 'ho',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "__p",
         imagePrompt: 'A bunny hopping for the word hop'
       },
       aiTutor: {
         target_word: 'hop',
-        question: "_op",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Two blanks at the start mean add the start pair (consonant + o) to match /hŏ/."
       },
       audio: "hop"
     },
@@ -2560,10 +2562,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'pot',
       imageUrl: 'cooking_pot_image_url_here',
-      explanation: "Great! The missing letter is 'p'. The word is 'pot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
+      explanation: "Great! Fill the first sound to make 'pot'.",
+      questionText: "_ot",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -2574,7 +2576,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "_ot",
         imagePrompt: 'A kitchen pot with steam for the word pot'
       },
       aiTutor: {
@@ -2582,7 +2584,7 @@ export const sampleMCQData: MCQData = {
         question: "_ot",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant before /ŏt/ and write it."
       },
       audio: "pot"
     },
@@ -2594,29 +2596,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'log',
       imageUrl: 'wooden_log_image_url_here',
-      explanation: "Good job! The missing letter is 'l'. The word is 'log'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _og",
-      correctAnswer: 'l',
+      explanation: "Good! Add the start pair to make 'log'.",
+      questionText: "__g",
+      correctAnswer: 'lo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'log',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _og",
+        questionLine: "__g",
         imagePrompt: 'A brown wooden log for the word log'
       },
       aiTutor: {
         target_word: 'log',
-        question: "_og",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'og' is filled"
+        spelling_pattern_or_rule: "Add the start pair (l + o) to match /lŏ/."
       },
       audio: "log"
     },
@@ -2628,10 +2630,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'dog',
       imageUrl: 'brown_dog_image_url_here',
-      explanation: "Excellent! The missing letter is 'd'. The word is 'dog'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _og",
+      explanation: "Excellent! Fill the first sound to make 'dog'.",
+      questionText: "_og",
       correctAnswer: 'd',
       template: 'fill_blank',
       isSpacing: false,
@@ -2642,7 +2644,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'dog',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _og",
+        questionLine: "_og",
         imagePrompt: 'A cute brown dog for the word dog'
       },
       aiTutor: {
@@ -2650,7 +2652,7 @@ export const sampleMCQData: MCQData = {
         question: "_og",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'og' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏg/."
       },
       audio: "dog"
     },
@@ -2662,29 +2664,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'box',
       imageUrl: 'red_box_image_url_here',
-      explanation: "Super! The missing letter is 'b'. The word is 'box'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ox",
-      correctAnswer: 'b',
+      explanation: "Super! Add the start pair to make 'box'.",
+      questionText: "__x",
+      correctAnswer: 'bo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'box',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ox",
+        questionLine: "__x",
         imagePrompt: 'A red box for the word box'
       },
       aiTutor: {
         target_word: 'box',
-        question: "_ox",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ox' is filled"
+        spelling_pattern_or_rule: "Write the start pair (b + o) to make /bŏ/."
       },
       audio: "box"
     },
@@ -2696,10 +2698,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'hot',
       imageUrl: 'hot_sun_image_url_here',
-      explanation: "Nice work! The missing letter is 'h'. The word is 'hot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
+      explanation: "Nice work! Fill the first sound to make 'hot'.",
+      questionText: "_ot",
       correctAnswer: 'h',
       template: 'fill_blank',
       isSpacing: false,
@@ -2710,7 +2712,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'hot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "_ot",
         imagePrompt: 'A bright sun to show the word hot'
       },
       aiTutor: {
@@ -2718,7 +2720,7 @@ export const sampleMCQData: MCQData = {
         question: "_ot",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Hear the first consonant before /ŏt/ and write it."
       },
       audio: "hot"
     },
@@ -2730,29 +2732,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'fog',
       imageUrl: 'foggy_morning_image_url_here',
-      explanation: "Good! The missing letter is 'f'. The word is 'fog'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _og",
-      correctAnswer: 'f',
+      explanation: "Good! Add the start pair to make 'fog'.",
+      questionText: "__g",
+      correctAnswer: 'fo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fog',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _og",
+        questionLine: "__g",
         imagePrompt: 'Morning fog in the air for the word fog'
       },
       aiTutor: {
         target_word: 'fog',
-        question: "_og",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'og' is filled"
+        spelling_pattern_or_rule: "Add the start pair (f + o) for /fŏ/."
       },
       audio: "fog"
     },
@@ -2764,21 +2766,21 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'rock',
       imageUrl: 'rock_image_url_here',
-      explanation: "Excellent! The missing letter is 'r'. The word is 'rock'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ock",
+      explanation: "Excellent! Fill the first sound to make 'rock'.",
+      questionText: "_ock",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [1, 2, 3],
       aiHook: {
         targetWord: 'rock',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ock",
+        questionLine: "_ock",
         imagePrompt: 'A gray rock for the word rock'
       },
       aiTutor: {
@@ -2786,7 +2788,7 @@ export const sampleMCQData: MCQData = {
         question: "_ock",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ock' is filled"
+        spelling_pattern_or_rule: "For -ock words the first consonant is missing; /ŏ/ is already shown."
       },
       audio: "rock"
     },
@@ -2798,29 +2800,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'sock',
       imageUrl: 'sock_pair_image_url_here',
-      explanation: "Great! The missing letter is 's'. The word is 'sock'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ock",
-      correctAnswer: 's',
+      explanation: "Great! Add the start pair to make 'sock'.",
+      questionText: "__ck",
+      correctAnswer: 'so',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2, 3],
       aiHook: {
         targetWord: 'sock',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ock",
+        questionLine: "__ck",
         imagePrompt: 'A pair of socks for the word sock'
       },
       aiTutor: {
         target_word: 'sock',
-        question: "_ock",
+        question: "__ck",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ock' is filled"
+        spelling_pattern_or_rule: "Two blanks at start: add consonant + o to make the /sŏ/ start."
       },
       audio: "sock"
     },
@@ -2832,10 +2834,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'mop',
       imageUrl: 'mop_image_url_here',
-      explanation: "Good job! The missing letter is 'm'. The word is 'mop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
+      explanation: "Good job! Fill the first sound to make 'mop'.",
+      questionText: "_op",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -2846,7 +2848,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "_op",
         imagePrompt: 'A mop cleaning the floor for the word mop'
       },
       aiTutor: {
@@ -2854,7 +2856,7 @@ export const sampleMCQData: MCQData = {
         question: "_op",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏp/."
       },
       audio: "mop"
     },
@@ -2866,29 +2868,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'pop',
       imageUrl: 'balloon_pop_image_url_here',
-      explanation: "Nice! The missing letter is 'p'. The word is 'pop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
-      correctAnswer: 'p',
+      explanation: "Nice! Add the start pair to make 'pop'.",
+      questionText: "__p",
+      correctAnswer: 'po',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "__p",
         imagePrompt: 'A balloon popping for the word pop'
       },
       aiTutor: {
         target_word: 'pop',
-        question: "_op",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Write the start pair (p + o) to make /pŏ/."
       },
       audio: "pop"
     },
@@ -2900,10 +2902,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'job',
       imageUrl: 'worker_job_image_url_here',
-      explanation: "Excellent! The missing letter is 'j'. The word is 'job'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ob",
+      explanation: "Excellent! Fill the first sound to make 'job'.",
+      questionText: "_ob",
       correctAnswer: 'j',
       template: 'fill_blank',
       isSpacing: false,
@@ -2914,7 +2916,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'job',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ob",
+        questionLine: "_ob",
         imagePrompt: 'A person working at their job for the word job'
       },
       aiTutor: {
@@ -2922,7 +2924,7 @@ export const sampleMCQData: MCQData = {
         question: "_ob",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ob' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏb/."
       },
       audio: "job"
     },
@@ -2934,29 +2936,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'cob',
       imageUrl: 'corn_cob_image_url_here',
-      explanation: "Great job! The missing letter is 'c'. The word is 'cob'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ob",
-      correctAnswer: 'c',
+      explanation: "Great job! Add the start pair to make 'cob'.",
+      questionText: "__b",
+      correctAnswer: 'co',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cob',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ob",
+        questionLine: "__b",
         imagePrompt: 'Corn on the cob for the word cob'
       },
       aiTutor: {
         target_word: 'cob',
-        question: "_ob",
+        question: "__b",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ob' is filled"
+        spelling_pattern_or_rule: "Add consonant + o to make /kŏ/ at the start."
       },
       audio: "cob"
     },
@@ -2968,10 +2970,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'pod',
       imageUrl: 'pod_peas_image_url_here',
-      explanation: "Nice work! The missing letter is 'p'. The word is 'pod'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _od",
+      explanation: "Nice work! Fill the first sound to make 'pod'.",
+      questionText: "_od",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -2982,7 +2984,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pod',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _od",
+        questionLine: "_od",
         imagePrompt: 'A pea pod for the word pod'
       },
       aiTutor: {
@@ -2990,7 +2992,7 @@ export const sampleMCQData: MCQData = {
         question: "_od",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'od' is filled"
+        spelling_pattern_or_rule: "Put the starting consonant before /ŏd/."
       },
       audio: "pod"
     },
@@ -3002,29 +3004,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'dot',
       imageUrl: 'dot_on_page_image_url_here',
-      explanation: "Good job! The missing letter is 'd'. The word is 'dot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
-      correctAnswer: 'd',
+      explanation: "Good job! Add the start pair to make 'dot'.",
+      questionText: "__t",
+      correctAnswer: 'do',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "__t",
         imagePrompt: 'A single dot on a page for the word dot'
       },
       aiTutor: {
         target_word: 'dot',
-        question: "_ot",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Write the start pair (d + o) to make /dŏ/."
       },
       audio: "dot"
     },
@@ -3036,10 +3038,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'rod',
       imageUrl: 'fishing_rod_image_url_here',
-      explanation: "Great! The missing letter is 'r'. The word is 'rod'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _od",
+      explanation: "Great! Fill the first sound to make 'rod'.",
+      questionText: "_od",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
@@ -3050,7 +3052,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'rod',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _od",
+        questionLine: "_od",
         imagePrompt: 'A fishing rod for the word rod'
       },
       aiTutor: {
@@ -3058,7 +3060,7 @@ export const sampleMCQData: MCQData = {
         question: "_od",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'od' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏd/."
       },
       audio: "rod"
     },
@@ -3070,29 +3072,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'cop',
       imageUrl: 'police_cop_image_url_here',
-      explanation: "Nice! The missing letter is 'c'. The word is 'cop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
-      correctAnswer: 'c',
+      explanation: "Nice! Add the start pair to make 'cop'.",
+      questionText: "__p",
+      correctAnswer: 'co',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "__p",
         imagePrompt: 'A friendly police officer for the word cop'
       },
       aiTutor: {
         target_word: 'cop',
-        question: "_op",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Add consonant + o to start the word with /kŏ/."
       },
       audio: "cop"
     },
@@ -3104,10 +3106,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'lot',
       imageUrl: 'gold_coin_lot_image_url_here',
-      explanation: "Excellent! The missing letter is 'l'. The word is 'lot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
+      explanation: "Excellent! Fill the first sound to make 'lot'.",
+      questionText: "_ot",
       correctAnswer: 'l',
       template: 'fill_blank',
       isSpacing: false,
@@ -3118,7 +3120,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'lot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "_ot",
         imagePrompt: 'A lot of items (pile of coins) for the word lot'
       },
       aiTutor: {
@@ -3126,7 +3128,7 @@ export const sampleMCQData: MCQData = {
         question: "_ot",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Write the starting consonant you hear before /ŏt/."
       },
       audio: "lot"
     },
@@ -3138,29 +3140,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'fox',
       imageUrl: 'fox_in_den_image_url_here',
-      explanation: "Great job! The missing letter is 'f'. The word is 'fox'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ox",
-      correctAnswer: 'f',
+      explanation: "Great work! Add the start pair to make 'fox'.",
+      questionText: "__x",
+      correctAnswer: 'fo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fox',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ox",
+        questionLine: "__x",
         imagePrompt: 'A fox near a den for the word fox'
       },
       aiTutor: {
         target_word: 'fox',
-        question: "_ox",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ox' is filled"
+        spelling_pattern_or_rule: "Two blanks at start mean add consonant + o to make /fŏ/."
       },
       audio: "fox"
     }
@@ -3179,14 +3181,14 @@ export const sampleMCQData: MCQData = {
       id: 1,
       topicId: 'K-S.2',
       topicName: 'Complete_the_short_u_word',
-      progressTopicName: 'Consonants in short u words',
+      progressTopicName: 'Complete the short u word',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'mug',
       imageUrl: 'red_mug_image_url_here',
-      explanation: "Good job! The missing letter is 'm'. The word is 'mug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
+      explanation: "Great job! Add the first sound to make 'mug'.",
+      questionText: "_ug",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -3197,7 +3199,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "_ug",
         imagePrompt: 'A red mug for the word mug'
       },
       aiTutor: {
@@ -3205,7 +3207,7 @@ export const sampleMCQData: MCQData = {
         question: "_ug",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "CVC short-u words use /ŭ/ in the middle. If only the first letter is missing, add the beginning consonant you hear."
       },
       audio: "mug"
     },
@@ -3217,29 +3219,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'bug',
       imageUrl: 'brown_bug_image_url_here',
-      explanation: "Nice! The missing letter is 'b'. The word is 'bug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'b',
+      explanation: "Nice! Add the start pair to make 'bug'.",
+      questionText: "__g",
+      correctAnswer: 'bu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'A brown bug for the word bug'
       },
       aiTutor: {
         target_word: 'bug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "When two blanks appear at the start, add consonant + u to make the /Cŭ/ beginning."
       },
       audio: "bug"
     },
@@ -3251,10 +3253,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'sun',
       imageUrl: 'sun_in_sky_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'sun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
+      explanation: "Excellent! Add the first sound to make 'sun'.",
+      questionText: "_un",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -3265,7 +3267,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sun',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
+        questionLine: "_un",
         imagePrompt: 'A bright sun in the sky for the word sun'
       },
       aiTutor: {
@@ -3273,7 +3275,7 @@ export const sampleMCQData: MCQData = {
         question: "_un",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Listen for the beginning consonant before /ŭn/ and write it."
       },
       audio: "sun"
     },
@@ -3285,29 +3287,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'rug',
       imageUrl: 'brown_rug_image_url_here',
-      explanation: "Good job! The missing letter is 'r'. The word is 'rug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'r',
+      explanation: "Good! Add the start pair to make 'rug'.",
+      questionText: "__g",
+      correctAnswer: 'ru',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'rug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'A soft rug on the floor for the word rug'
       },
       aiTutor: {
         target_word: 'rug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /rŭ/ start."
       },
       audio: "rug"
     },
@@ -3319,10 +3321,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'tub',
       imageUrl: 'tub_bathtub_image_url_here',
-      explanation: "Nice work! The missing letter is 't'. The word is 'tub'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ub",
+      explanation: "Nice work! Add the first sound to make 'tub'.",
+      questionText: "_ub",
       correctAnswer: 't',
       template: 'fill_blank',
       isSpacing: false,
@@ -3333,7 +3335,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'tub',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
+        questionLine: "_ub",
         imagePrompt: 'A bathtub for the word tub'
       },
       aiTutor: {
@@ -3341,7 +3343,7 @@ export const sampleMCQData: MCQData = {
         question: "_ub",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ub' is filled"
+        spelling_pattern_or_rule: "Write the beginning consonant you hear before /ŭb/."
       },
       audio: "tub"
     },
@@ -3353,29 +3355,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'cup',
       imageUrl: 'cup_image_url_here',
-      explanation: "Super! The missing letter is 'c'. The word is 'cup'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _up",
-      correctAnswer: 'c',
+      explanation: "Super! Add the start pair to make 'cup'.",
+      questionText: "__p",
+      correctAnswer: 'cu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cup',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _up",
+        questionLine: "__p",
         imagePrompt: 'A red cup for the word cup'
       },
       aiTutor: {
         target_word: 'cup',
-        question: "_up",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'up' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /kŭ/ start."
       },
       audio: "cup"
     },
@@ -3387,10 +3389,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'mud',
       imageUrl: 'mud_puddle_image_url_here',
-      explanation: "Good job! The missing letter is 'm'. The word is 'mud'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ud",
+      explanation: "Good job! Add the first sound to make 'mud'.",
+      questionText: "_ud",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -3401,7 +3403,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mud',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ud",
+        questionLine: "_ud",
         imagePrompt: 'A puddle of mud for the word mud'
       },
       aiTutor: {
@@ -3409,7 +3411,7 @@ export const sampleMCQData: MCQData = {
         question: "_ud",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ud' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŭd/."
       },
       audio: "mud"
     },
@@ -3421,29 +3423,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'pug',
       imageUrl: 'pug_dog_image_url_here',
-      explanation: "Excellent! The missing letter is 'p'. The word is 'pug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'p',
+      explanation: "Excellent! Add the start pair to make 'pug'.",
+      questionText: "__g",
+      correctAnswer: 'pu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'A small pug dog for the word pug'
       },
       aiTutor: {
         target_word: 'pug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Write consonant + u to start the word with /pŭ/."
       },
       audio: "pug"
     },
@@ -3455,10 +3457,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'jug',
       imageUrl: 'jug_image_url_here',
-      explanation: "Great! The missing letter is 'j'. The word is 'jug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
+      explanation: "Great! Add the first sound to make 'jug'.",
+      questionText: "_ug",
       correctAnswer: 'j',
       template: 'fill_blank',
       isSpacing: false,
@@ -3469,7 +3471,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'jug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "_ug",
         imagePrompt: 'A water jug for the word jug'
       },
       aiTutor: {
@@ -3477,7 +3479,7 @@ export const sampleMCQData: MCQData = {
         question: "_ug",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant before /ŭg/."
       },
       audio: "jug"
     },
@@ -3489,29 +3491,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'hug',
       imageUrl: 'hug_scene_image_url_here',
-      explanation: "Nice work! The missing letter is 'h'. The word is 'hug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'h',
+      explanation: "Nice work! Add the start pair to make 'hug'.",
+      questionText: "__g",
+      correctAnswer: 'hu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'Two people hugging for the word hug'
       },
       aiTutor: {
         target_word: 'hug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /hŭ/ start."
       },
       audio: "hug"
     },
@@ -3523,10 +3525,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'sub',
       imageUrl: 'submarine_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'sub'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ub",
+      explanation: "Excellent! Add the first sound to make 'sub'.",
+      questionText: "_ub",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -3537,7 +3539,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sub',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
+        questionLine: "_ub",
         imagePrompt: 'A yellow submarine for the word sub'
       },
       aiTutor: {
@@ -3545,7 +3547,7 @@ export const sampleMCQData: MCQData = {
         question: "_ub",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ub' is filled"
+        spelling_pattern_or_rule: "Write the beginning consonant you hear before /ŭb/."
       },
       audio: "sub"
     },
@@ -3557,29 +3559,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'cub',
       imageUrl: 'baby_cub_image_url_here',
-      explanation: "Good! The missing letter is 'c'. The word is 'cub'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ub",
-      correctAnswer: 'c',
+      explanation: "Good! Add the start pair to make 'cub'.",
+      questionText: "__b",
+      correctAnswer: 'cu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cub',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
+        questionLine: "__b",
         imagePrompt: 'A baby bear cub for the word cub'
       },
       aiTutor: {
         target_word: 'cub',
-        question: "_ub",
+        question: "__b",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ub' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to begin the word with /kŭ/."
       },
       audio: "cub"
     },
@@ -3591,10 +3593,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'fun',
       imageUrl: 'kid_having_fun_image_url_here',
-      explanation: "Great job! The missing letter is 'f'. The word is 'fun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
+      explanation: "Great job! Add the first sound to make 'fun'.",
+      questionText: "_un",
       correctAnswer: 'f',
       template: 'fill_blank',
       isSpacing: false,
@@ -3605,7 +3607,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'fun',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
+        questionLine: "_un",
         imagePrompt: 'A kid smiling for the word fun'
       },
       aiTutor: {
@@ -3613,7 +3615,7 @@ export const sampleMCQData: MCQData = {
         question: "_un",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Insert the beginning consonant you hear before /ŭn/."
       },
       audio: "fun"
     },
@@ -3625,29 +3627,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'bun',
       imageUrl: 'bun_bakery_image_url_here',
-      explanation: "Nice! The missing letter is 'b'. The word is 'bun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
-      correctAnswer: 'b',
+      explanation: "Nice! Add the start pair to make 'bun'.",
+      questionText: "__n",
+      correctAnswer: 'bu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bun',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
+        questionLine: "__n",
         imagePrompt: 'A bread bun for the word bun'
       },
       aiTutor: {
         target_word: 'bun',
-        question: "_un",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /bŭ/ start."
       },
       audio: "bun"
     },
@@ -3659,10 +3661,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'nut',
       imageUrl: 'nut_image_url_here',
-      explanation: "Excellent! The missing letter is 'n'. The word is 'nut'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ut",
+      explanation: "Excellent! Add the first sound to make 'nut'.",
+      questionText: "_ut",
       correctAnswer: 'n',
       template: 'fill_blank',
       isSpacing: false,
@@ -3673,7 +3675,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'nut',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ut",
+        questionLine: "_ut",
         imagePrompt: 'A nut for the word nut'
       },
       aiTutor: {
@@ -3681,7 +3683,7 @@ export const sampleMCQData: MCQData = {
         question: "_ut",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ut' is filled"
+        spelling_pattern_or_rule: "Hear and write the first consonant before /ŭt/."
       },
       audio: "nut"
     },
@@ -3693,29 +3695,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'hut',
       imageUrl: 'hut_image_url_here',
-      explanation: "Good! The missing letter is 'h'. The word is 'hut'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ut",
-      correctAnswer: 'h',
+      explanation: "Good! Add the start pair to make 'hut'.",
+      questionText: "__t",
+      correctAnswer: 'hu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hut',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ut",
+        questionLine: "__t",
         imagePrompt: 'A small hut for the word hut'
       },
       aiTutor: {
         target_word: 'hut',
-        question: "_ut",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ut' is filled"
+        spelling_pattern_or_rule: "Write consonant + u to start the word with /hŭ/."
       },
       audio: "hut"
     },
@@ -3727,10 +3729,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'gum',
       imageUrl: 'gum_bubble_image_url_here',
-      explanation: "Nice work! The missing letter is 'g'. The word is 'gum'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _um",
+      explanation: "Nice work! Add the first sound to make 'gum'.",
+      questionText: "_um",
       correctAnswer: 'g',
       template: 'fill_blank',
       isSpacing: false,
@@ -3741,7 +3743,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'gum',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _um",
+        questionLine: "_um",
         imagePrompt: 'Bubble gum for the word gum'
       },
       aiTutor: {
@@ -3749,7 +3751,7 @@ export const sampleMCQData: MCQData = {
         question: "_um",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'um' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant you hear before /ŭm/."
       },
       audio: "gum"
     },
@@ -3761,29 +3763,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'pup',
       imageUrl: 'pup_puppy_image_url_here',
-      explanation: "Super! The missing letter is 'p'. The word is 'pup'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _up",
-      correctAnswer: 'p',
+      explanation: "Super! Add the start pair to make 'pup'.",
+      questionText: "__p",
+      correctAnswer: 'pu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pup',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _up",
+        questionLine: "__p",
         imagePrompt: 'A cute puppy for the word pup'
       },
       aiTutor: {
         target_word: 'pup',
-        question: "_up",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'up' is filled"
+        spelling_pattern_or_rule: "Start the word with consonant + u to make /pŭ/."
       },
       audio: "pup"
     },
@@ -3795,10 +3797,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'bus',
       imageUrl: 'bus_image_url_here',
-      explanation: "Great! The missing letter is 'b'. The word is 'bus'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _us",
+      explanation: "Great! Add the first sound to make 'bus'.",
+      questionText: "_us",
       correctAnswer: 'b',
       template: 'fill_blank',
       isSpacing: false,
@@ -3809,7 +3811,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'bus',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _us",
+        questionLine: "_us",
         imagePrompt: 'A school bus for the word bus'
       },
       aiTutor: {
@@ -3817,7 +3819,7 @@ export const sampleMCQData: MCQData = {
         question: "_us",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'us' is filled"
+        spelling_pattern_or_rule: "Write the beginning consonant you hear before /ŭs/."
       },
       audio: "bus"
     },
@@ -3829,31 +3831,31 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
-      imageUrl: 'drum_image_url_here',
-      explanation: "Excellent! The missing letter is 'd'. The word is 'sun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
-      correctAnswer: 's',
+      word: 'bud',
+      imageUrl: 'plant_bud_image_url_here',
+      explanation: "Excellent! Add the start pair to make 'bud'.",
+      questionText: "__d",
+      correctAnswer: 'bu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
-        targetWord: 'sun',
+        targetWord: 'bud',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
-        imagePrompt: 'A sun for the word sun'
+        questionLine: "__d",
+        imagePrompt: 'A plant with a small bud for the word bud'
       },
       aiTutor: {
-        target_word: 'sun',
-        question: "_un",
+        target_word: 'bud',
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Two blanks at the start: add consonant + u to make the /bŭ/ beginning."
       },
-      audio: "sun"
+      audio: "bud"
     }
   ]
 },

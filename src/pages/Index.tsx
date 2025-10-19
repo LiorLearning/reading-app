@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure } from "@/lib/utils";
 import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
@@ -323,7 +323,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [panels, currentIndex, setCurrent]);
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>(() => {
-    // Load messages from local storage on component initialization
+    // If entering via Home/Pet with explicit adventure props, start fresh.
+    // Otherwise, restore the last session for browser refresh continuity.
+    try {
+      if (initialAdventureProps) {
+        return [];
+      }
+    } catch {}
     return loadUserAdventure();
   });
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
@@ -552,6 +558,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
   const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
+  // Track session start time for summary metrics (re-added)
+  const sessionStartAtRef = React.useRef<number | null>(null);
   // Guard: prevent duplicate starts and duplicate session creation
   const isStartingAdventureRef = React.useRef<boolean>(false);
   const sessionCreatedForAdventureIdRef = React.useRef<string | null>(null);
@@ -1132,6 +1140,50 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
     generateInitialResponse();
   }, [currentScreen, currentAdventureId, adventureMode, userData?.username, chatMessages, currentAdventureContext]);
+  
+  // Fallback: if we suppressed the greeting for a possible whiteboard takeover
+  // but no prompt actually appears, auto-generate the pet's first message.
+  React.useEffect(() => {
+    // Defer until later declarations are available by checking only simple guards here
+    if (currentScreen !== 1) return;
+    const timeout = setTimeout(() => {
+      try {
+        // Access late-declared flags via window-scoped checks or safe try/catch
+        const wbActive = ((): boolean => { try { return !!isWhiteboardPromptActive; } catch { return false; } })();
+        const wbDev = ((): boolean => { try { return !!devWhiteboardEnabled; } catch { return false; } })();
+        if (currentScreen === 1 && !wbActive && !wbDev && chatMessages.length === 0) {
+          try { suppressInitialGreetingRef.current = false; } catch {}
+          try { shouldTriggerWhiteboardOnFirstQuestionRef.current = false; } catch {}
+          try { triggerInitialResponseGeneration(currentAdventureTypeRef.current); } catch {}
+        }
+      } catch {}
+    }, 1200);
+    return () => clearTimeout(timeout);
+  }, [currentScreen, chatMessages.length, triggerInitialResponseGeneration]);
+
+  // Ensure the very first visible pet message after entering adventure is auto-spoken
+  const firstEntryAutoSpokenTsRef = React.useRef<number>(0);
+  React.useEffect(() => {
+    if (currentScreen !== 1) return;
+    // Find latest visible AI message (skip hidden SpellBox lines)
+    const lastAi = chatMessages.filter(m => m.type === 'ai' && !(m as any).hiddenInChat).slice(-1)[0];
+    if (!lastAi) return;
+    if (firstEntryAutoSpokenTsRef.current === lastAi.timestamp) return;
+    // Avoid double-speaking if something is already speaking this exact message
+    const msgId = bubbleMessageIdFromHtml(formatAIMessage(lastAi.content));
+    try {
+      const alreadySpeaking = ttsService.isMessageSpeaking?.(msgId) || ttsService.getIsSpeaking?.();
+      if (alreadySpeaking) {
+        firstEntryAutoSpokenTsRef.current = lastAi.timestamp;
+        return;
+      }
+    } catch {}
+    const timer = setTimeout(() => {
+      try { ttsService.speakAIMessage(lastAi.content, msgId); } catch {}
+    }, 300);
+    firstEntryAutoSpokenTsRef.current = lastAi.timestamp;
+    return () => clearTimeout(timer);
+  }, [chatMessages, currentScreen]);
   
   React.useEffect(() => {
     
@@ -3082,9 +3134,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     if (mode === 'new') {
       // Clear chat messages for new adventures to provide clean slate (unless already set from props)
-      if (chatMessages.length === 0) {
-        setChatMessages([]);
-      }
+      try { clearUserAdventure(); } catch {}
+      setChatMessages([]);
       // Reset message cycle count for new adventure
       setMessageCycleCount(0);
       // Use existing adventure ID if already set, otherwise generate new one
@@ -3155,7 +3206,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           { petId: currentPet, adventureType } // options with pet and adventure type
         );
         setCurrentSessionId(sessionId);
-        try { analytics.setSession(sessionId || null); } catch {}
+        try {
+          analytics.setSession(sessionId || null);
+          // Emit session_started once per session
+          sessionStartAtRef.current = Date.now();
+          analytics.capture('session_started', {
+            session_id: sessionId,
+            started_at: sessionStartAtRef.current,
+            adventure_id: adventureId,
+            topic_id: finalTopicId || null,
+          });
+        } catch {}
         sessionCreatedForAdventureIdRef.current = adventureId;
       }
     }
@@ -3207,6 +3268,36 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       isStartingAdventureRef.current = false;
     }, 250);
   }, [currentAdventureId, reset, initialPanels, user]);
+ 
+  // Emit session end + summary on pagehide/navigation (re-added)
+  React.useEffect(() => {
+    const onPageHide = () => {
+      try {
+        const startedAt = sessionStartAtRef.current;
+        if (!startedAt) return;
+        const endedAt = Date.now();
+        const durationMs = endedAt - startedAt;
+        analytics.capture('session_ended', {
+          session_id: (currentSessionId || null),
+          ended_at: endedAt,
+          reason: 'pagehide',
+          adventure_id: currentAdventureId || null,
+          topic_id: selectedTopicId || null,
+        });
+        analytics.capture('session_summary', {
+          session_id: (currentSessionId || null),
+          started_at: startedAt,
+          ended_at: endedAt,
+          duration_ms: durationMs,
+          adventure_id: currentAdventureId || null,
+          topic_id: selectedTopicId || null,
+        });
+        sessionStartAtRef.current = null;
+      } catch {}
+    };
+    try { window.addEventListener('pagehide', onPageHide); } catch {}
+    return () => { try { window.removeEventListener('pagehide', onPageHide); } catch {} };
+  }, [currentSessionId, currentAdventureId, selectedTopicId]);
 
   // Handle initial adventure props from parent component
   React.useEffect(() => {
@@ -4315,6 +4406,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 questions_to_mastery: null,
                 mastery_threshold: '>=70% success over 10',
               });
+              // Also emit topic_mastery summary (re-added)
+              try {
+                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - (tp.firstAttemptCorrect || 0));
+                analytics.capture('topic_mastery', {
+                  topic_id: currentSpellQuestion.topicId,
+                  status: isSpellboxTopicPassingGrade(tp) ? 'mastered' : 'ongoing',
+                  questions_attempted: tp.questionsAttempted || 0,
+                  incorrect_attempts: incorrectAttempts,
+                });
+              } catch {}
             }
           } catch {}
         })
@@ -4831,15 +4932,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             {selectedTopicId && (
               (() => {
                 const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
-                const scriptForChip = getLessonScript(topicForChip);
-                const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
+                // Resolve effective topic id without requiring a lesson script
+                const resolvedTopicId = topicForChip;
+                // Spelling-only guard: only show chip for spelling topics for this grade
+                const spellingTopicIds = getSpellingTopicIds(currentGradeDisplayName);
+                if (!spellingTopicIds.includes(resolvedTopicId)) return null;
+                // Match View Progress naming
                 const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
                 const lessonTitle = (sampleMCQData?.topics?.[resolvedTopicId]?.topicInfo?.progressTopicName)
-                  || (scriptForChip?.title)
-                  || topicForChip;
-                const canOpen = !!scriptForChip;
+                  || resolvedTopicId;
                 const handleToggle = () => {
-                  if (!canOpen) return;
                   setIsManualWhiteboardOpen(prev => !prev);
                 };
                 const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
@@ -4854,8 +4956,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     tabIndex={0}
                     onClick={handleToggle}
                     onKeyDown={handleKeyDown}
-                    title={canOpen ? 'Open whiteboard' : 'Whiteboard unavailable'}
-                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative ${canOpen ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-80'}`}
+                    title={'Lesson'}
+                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative cursor-pointer hover:bg-gray-50`}
                     style={{ minWidth: '220px' }}
                   >
                     <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
@@ -5664,46 +5766,46 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               setWhiteboardPrompt(null);
                               // Lift suppression so a fresh, natural follow-up can be generated if needed
                               suppressInitialGreetingRef.current = false;
-                              // AI-generated conversational follow-up (no spelling word → no SpellBox)
-                              (async () => {
-                                try {
-                                  const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-                                  const petName = PetProgressStorage.getPetDisplayName(currentPetId);
-                                  const petType = PetProgressStorage.getPetType(currentPetId);
-                                  const postLessonUserCue = `POST_LESSON_FOLLOWUP: We just finished a quick skill lesson on the whiteboard. Write one short, friendly line as the ${petType} speaking to ${name}. Keep it conversational and inviting, ask a light next-step question, do not mention spelling or lessons, no emojis, under 18 words.`;
-                                  const resp = await aiService.generateResponse(
-                                    postLessonUserCue,
-                                    chatMessagesRef.current,
-                                    null,
-                                    userData,
-                                    undefined,
-                                    currentAdventureContext,
-                                    undefined,
-                                    currentAdventureContext?.summary,
-                                    petName,
-                                    petType,
-                                    currentAdventureType || 'food'
-                                  );
-                                  const followUp = (resp?.adventure_story || '').trim() || `Great work! What should we do next?`;
-                                  const msg: ChatMessage = {
-                                    type: 'ai',
-                                    content: followUp,
-                                    timestamp: Date.now()
-                                  };
-                                  setChatMessages(prev => {
-                                    const next = [...prev, msg];
-                                    try {
-                                      const id = bubbleMessageIdFromHtml(formatAIMessage(followUp));
-                                      ttsService.speakAIMessage(followUp, id).catch(() => {});
-                                    } catch {}
-                                    try {
-                                      if (currentSessionId) adventureSessionService.addChatMessage(currentSessionId, msg);
-                                    } catch {}
-                                    return next;
-                                  });
-                                } catch {}
-                              })();
-                            }, 3600);
+      // Post-lesson follow-up: use the normal adventure initial message pipeline for consistency.
+      // Previous custom generator is intentionally disabled above for now.
+      (async () => {
+        try {
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+          const petType = PetProgressStorage.getPetType(currentPetId);
+          const initialMessage = await aiService.generateInitialMessage(
+            adventureMode,
+            chatMessages,
+            currentAdventureContext,
+            undefined,
+            currentAdventureContext?.summary,
+            userData,
+            petName,
+            petType,
+            (currentAdventureType || 'food')
+          );
+          if (suppressInitialGreetingRef.current) return;
+          const msg: ChatMessage = {
+            type: 'ai',
+            content: initialMessage,
+            timestamp: Date.now()
+          };
+          setChatMessages(prev => {
+            const next = [...prev, msg];
+            try {
+              const messageId = `index-chat-${msg.timestamp}-${prev.length}`;
+              if (!suppressInitialGreetingRef.current) {
+                ttsService.speakAIMessage(initialMessage, messageId).catch(() => {});
+              }
+            } catch {}
+            try {
+              if (currentSessionId) adventureSessionService.addChatMessage(currentSessionId, msg);
+            } catch {}
+            return next;
+          });
+        } catch {}
+      })();
+    }, 1500);
                           }}
                           sendMessage={sendMessage}
                           interruptRealtimeSession={interruptRealtimeSession}
