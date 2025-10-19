@@ -35,7 +35,6 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
       return new OpenAI({
         dangerouslyAllowBrowser: true,
         apiKey: null,
-        // apiKey: import.meta.env.VITE_OPENAI_API_KEY,
         baseURL: 'https://api.readkraft.com/api/v1',
         });
     }, []);
