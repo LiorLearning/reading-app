@@ -17,6 +17,8 @@ import { sampleMCQData, type MCQData, type MCQQuestion, type DragDropQuestion, t
 import { adventureSessionService } from '@/lib/adventure-session-service';
 import { useCoins } from '@/pages/coinSystem';
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
+import { useAuth } from '@/hooks/use-auth';
+import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 
 // Remove duplicate interface definitions (lines 16-105) since they're now imported
 
@@ -277,6 +279,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   const [availableWords, setAvailableWords] = useState<string[]>([]);
   const [isDragOverBin, setIsDragOverBin] = useState<string | null>(null);
 
+  const { userData, updateUserData } = useAuth();
+
   // Reset to starting index when startingQuestionIndex changes
   React.useEffect(() => {
     if (startingQuestionIndex !== undefined) {
@@ -423,6 +427,8 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
   };
 
   // Function to detect if user is asking for help
+  // useAuth already initialized above
+
   const detectHelpRequest = (text: string): boolean => {
     const helpKeywords = [
       'help', 'hint', 'clue', 'stuck', 'don\'t know', 'confused', 'hard', 'difficult',
@@ -510,6 +516,16 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       const messageId = `mcq-chat-${feedbackMessage.timestamp}-${chatMessages.length}`;
       await ttsService.speakAIMessage(feedbackMessage.content, messageId);
     } else {
+      // First incorrect in Assignment → stop TTS and shared handler with questionId
+      try { ttsService.stop(); } catch {}
+      const switched = await handleFirstIncorrectAssignment(isFirstAttempt, {
+        currentGradeDisplayName: userData?.gradeDisplayName,
+        updateUserData,
+        onNextTopic,
+        isCorrect: false,
+        questionId: (currentQuestion as MCQQuestion)?.id || (currentQuestionIndex + 1),
+      });
+      if (switched) return;
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying other options
       
@@ -640,6 +656,16 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
       const messageId = `mcq-chat-${feedbackMessage.timestamp}-${chatMessages.length}`;
       await ttsService.speakAIMessage(feedbackMessage.content, messageId);
     } else {
+      // First incorrect in Assignment → stop TTS and shared handler with questionId
+      try { ttsService.stop(); } catch {}
+      const switched = await handleFirstIncorrectAssignment(isFirstAttempt, {
+        currentGradeDisplayName: userData?.gradeDisplayName,
+        updateUserData,
+        onNextTopic,
+        isCorrect: false,
+        questionId: (currentFillBlankQuestion as FillBlankQuestion)?.id || (currentQuestionIndex + 1),
+      });
+      if (switched) return;
       // Wrong answer - generate AI reflection prompt
       setHasAnswered(false); // Allow trying again
       

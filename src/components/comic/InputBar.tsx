@@ -7,6 +7,7 @@ import { playClickSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import OpenAI from 'openai';
 import { ttsService } from "@/lib/tts-service";
+import analytics from "@/lib/analytics";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
@@ -34,9 +35,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
       setUseWhisper(true);
       return new OpenAI({
         dangerouslyAllowBrowser: true,
-        apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-        //baseURL: 'https://api.readkraft.com/api/v1'
-      });
+        apiKey: null,
+        baseURL: 'https://api.readkraft.com/api/v1',
+        });
     }, []);
 
   // Waveform Visualizer Component
@@ -361,6 +362,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
         setIsMicActive(false);
       }
       
+      try {
+        const clean = text.trim();
+        analytics.capture('user_input_submitted', {
+          input_text: clean,
+          char_count: clean.length,
+          input_source: 'chat',
+        });
+      } catch {}
       onGenerate(text.trim());
       setText("");
       setIsSubmitting(false);

@@ -455,9 +455,9 @@ export function ProgressTracking(): JSX.Element {
                     aria-label="View whiteboard"
                     title="View whiteboard"
                     onClick={() => { playClickSound(); setWhiteboardTopicId(card.topicId); }}
-                    className="absolute bottom-3 right-3 w-9 h-9 rounded-full border-2 border-foreground shadow-solid bg-white text-black flex items-center justify-center hover:bg-gray-50"
+                    className="absolute bottom-3 right-3 w-7 h-7 rounded-full border border-gray-300/70 shadow-sm bg-white/80 text-gray-700 flex items-center justify-center hover:bg-white"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Eye className="h-3 w-3" />
                   </button>
                 )}
               </Card>

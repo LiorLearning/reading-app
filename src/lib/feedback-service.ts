@@ -1,5 +1,6 @@
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import analytics from '@/lib/analytics';
 
 export interface FeedbackData {
   adventureId: string | null;
@@ -32,7 +33,7 @@ export const feedbackService = {
 
       // Save to Firestore 'feedbacks' collection
       const docRef = await addDoc(collection(db, 'feedbacks'), feedbackData);
-      console.log('Feedback saved successfully with ID:', docRef.id);
+      // console.log('Feedback saved successfully with ID:', docRef.id);
       
     } catch (error) {
       console.error('Error saving feedback to Firestore:', error);
@@ -44,11 +45,6 @@ export const feedbackService = {
 // Lightweight telemetry helper (console for now; hook to analytics later)
 export function trackEvent(eventName: string, payload?: Record<string, any>) {
   try {
-    const data = {
-      event: eventName,
-      ts: Date.now(),
-      ...(payload || {})
-    };
-    console.log('[telemetry]', data);
+    analytics.capture(eventName, payload);
   } catch {}
 }

@@ -43,6 +43,7 @@ export interface UserData {
   uid: string;
   username: string;
   email: string;
+  age?: number;
   grade: string;
   gradeDisplayName: string;
   level: string;
@@ -139,15 +140,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               console.warn('Failed to update lastLoginAt:', e);
             }
           } else {
-            // New user, set initial data
+            // New user, set initial data - default grade is "assignment"
             const newUserData: UserData = {
               uid: user.uid,
               username: user.displayName || '',
               email: user.email || '',
-              grade: '',
-              gradeDisplayName: '',
-              level: '',
-              levelDisplayName: '',
+              grade: 'assignment',
+              gradeDisplayName: 'assignment',
+              level: 'start',
+              levelDisplayName: 'Start Level',
               isFirstTime: true,
               createdAt: new Date(),
               lastLoginAt: new Date()
@@ -441,17 +442,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
 
-            // Emit todo_event when activity starts/completes (single event model)
+            // Emit daily_quests (single event model)
             try {
               const todayKey = new Date().toISOString().slice(0, 10);
               states.forEach((s: any) => {
                 const todoType = s.activity;
                 const todoId = `${s.pet}:${todayKey}:${todoType}`;
                 const status = s.completed ? 'completed' : 'started';
-                analytics.capture('todo_event', {
-                  todo_id: todoId,
+                analytics.capture('daily_quests', {
                   todo_type: todoType,
                   status,
+                  pet_used_id: s.pet,
+                  progress_current: Number(s?.progress || 0),
+                  progress_target: Number((s as any)?.target || 5),
                 });
               });
             } catch {}
