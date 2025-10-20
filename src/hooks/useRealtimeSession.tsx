@@ -429,11 +429,10 @@ Homophone (pearl vs purl)
     console.info("Fetching ephemeral key");
     try {
       const response = await fetch(
-        "https://api.openai.com/v1/realtime/sessions",
+        "https://api.readkraft.com/api/v1/realtime/sessions",
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
             "Content-Type": "application/json",
             "OpenAI-Beta": "realtime=v1"
           },
