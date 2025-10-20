@@ -10,9 +10,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure } from "@/lib/utils";
+import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
+import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
+import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
 import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
 import analytics from '@/lib/analytics';
 
@@ -67,6 +70,8 @@ import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnectio
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
 import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion, getGlobalSpellingLessonNumber } from "@/lib/questionBankUtils";
+import { ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD } from '@/lib/constants';
+import { getAssignmentGate, isAssignmentGateActive, startAssignmentGate, incrementAssignmentGate, completeAssignmentGate } from '@/lib/assignment-gate';
 import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
@@ -318,7 +323,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [panels, currentIndex, setCurrent]);
   
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>(() => {
-    // Load messages from local storage on component initialization
+    // If entering via Home/Pet with explicit adventure props, start fresh.
+    // Otherwise, restore the last session for browser refresh continuity.
+    try {
+      if (initialAdventureProps) {
+        return [];
+      }
+    } catch {}
     return loadUserAdventure();
   });
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
@@ -329,30 +340,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [isGeneratingAdventureImage, setIsGeneratingAdventureImage] = React.useState(false);
   const [isExplicitImageRequest, setIsExplicitImageRequest] = React.useState(false);
   const messagesScrollRef = React.useRef<HTMLDivElement>(null);
-  // Guest signup gate state
-  const [signupGateOpen, setSignupGateOpen] = React.useState<boolean>(() => {
-    try { return localStorage.getItem('guest_signup_gate_open') === '1'; } catch { return false; }
-  });
-  const [guestPromptCount, setGuestPromptCount] = React.useState<number>(() => {
-    try {
-      const raw = localStorage.getItem('guest_prompt_count');
-      return raw ? (parseInt(raw, 10) || 0) : 0;
-    } catch { return 0; }
-  });
-  
-  // Close and clear signup gate once user upgrades from anonymous to real account
-  React.useEffect(() => {
-    try {
-      const isAnon = !!user && (user as any).isAnonymous === true;
-      if (!isAnon) {
-        setSignupGateOpen(false);
-        try {
-          localStorage.removeItem('guest_signup_gate_open');
-          localStorage.removeItem('guest_prompt_count');
-        } catch {}
-      }
-    } catch {}
-  }, [user]);
+  // Guest signup gate removed: no prompt-count gating, no separate signup dialog
   
   // Track ongoing image generation for cleanup
   const imageGenerationController = React.useRef<AbortController | null>(null);
@@ -366,6 +354,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
  
   // Track message cycle for 2-2 pattern starting at chat 3 (2 pure adventure, then 2 with spelling)
   const [messageCycleCount, setMessageCycleCount] = React.useState(0);
+  // Timestamp of when we most recently (re)entered the adventure screen (Screen 1)
+  const enteredAdventureAtRef = React.useRef<number>(Date.now());
+  // Snapshot of message cycle count at the moment we entered adventure
+  const entryMessageCycleCountRef = React.useRef<number>(0);
+  // Ensure the first generated message after opening adventure is never a question
+  const suppressSpellingOnceRef = React.useRef<boolean>(false);
 
   const {
     status,
@@ -394,6 +388,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const aiMessageCount = chatMessages.filter(msg => msg.type === 'ai').length;
     setMessageCycleCount(aiMessageCount);
   }, []); // Only run on mount
+
+  // (moved below currentScreen declaration)
 
   // Console log when realtime session starts
   useEffect(() => {
@@ -434,6 +430,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Track current adventure type (food, friend, etc.)
   const [currentAdventureType, setCurrentAdventureType] = React.useState<string>('food');
+  // Keep a ref in sync to avoid stale-closure checks inside callbacks
+  const currentAdventureTypeRef = React.useRef<string>('food');
+  React.useEffect(() => {
+    currentAdventureTypeRef.current = currentAdventureType;
+  }, [currentAdventureType]);
   
   // Track current adventure context for contextual AI responses
   const [currentAdventureContext, setCurrentAdventureContext] = React.useState<{name: string, summary: string} | null>(null);
@@ -442,6 +443,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const initialResponseSentRef = React.useRef<string | null>(null);
   // Guard to prevent duplicate initial generation on re-renders
   const isGeneratingInitialRef = React.useRef<boolean>(false);
+
+  // Refresh entry baselines whenever we land on the adventure screen
+  React.useEffect(() => {
+    if (currentScreen === 1) {
+      enteredAdventureAtRef.current = Date.now();
+      entryMessageCycleCountRef.current = messageCycleCount;
+      // Force next generated message to be pure adventure (no spelling)
+      suppressSpellingOnceRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentScreen]);
 
   // Emotion/heart state (persisted in Firebase per pet)
   const [emotionActive, setEmotionActive] = React.useState<boolean>(false);
@@ -546,6 +558,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Current adventure tracking - initialize from localStorage on refresh
   const [currentAdventureId, setCurrentAdventureId] = React.useState<string | null>(() => loadCurrentAdventureId());
   const [adventureSummaries, setAdventureSummaries] = React.useState<AdventureSummary[]>([]);
+  // Track session start time for summary metrics (re-added)
+  const sessionStartAtRef = React.useRef<number | null>(null);
   // Guard: prevent duplicate starts and duplicate session creation
   const isStartingAdventureRef = React.useRef<boolean>(false);
   const sessionCreatedForAdventureIdRef = React.useRef<string | null>(null);
@@ -553,11 +567,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Grade selection state (for HomePage only)
   const [selectedPreference, setSelectedPreference] = React.useState<'start' | 'middle' | null>(null);
   const [selectedTopicFromPreference, setSelectedTopicFromPreference] = React.useState<string | null>(null);
-  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(() => {
-    // Load saved grade selection on initialization
-    const savedGrade = loadGradeSelection();
-    return savedGrade?.gradeDisplayName || null;
-  });
+  const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = React.useState<string | null>(null);
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = React.useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   
   const currentGradeDisplayName = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').trim();
@@ -679,6 +689,27 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
     if (currentSpellingWord && currentScreen === 1 && currentSpellingWord !== lastResolvedWordRef.current) {
+      // Ignore any AI spelling message generated before assignment exit
+      try {
+        const lastAi = chatMessages.filter(m => m.type === 'ai').slice(-1)[0] as any;
+        const lastTs = lastAi?.timestamp || 0;
+        const exitAt = assignmentExitAtRef.current || 0;
+        if (exitAt && lastTs && lastTs < exitAt) {
+          console.log('🛑 SpellBox opener: ignoring pre-diagnosis AI message', { lastTs, exitAt, currentSpellingWord });
+          return;
+        }
+        // Freshness/session gate: only open if the last AI message is fresh for this entry,
+        // or if a new chat cycle has occurred since we entered the adventure screen.
+        const isFreshForEntry = !!lastTs && lastTs >= (enteredAdventureAtRef.current || 0);
+        const hasNewCycleSinceEntry = messageCycleCount > (entryMessageCycleCountRef.current || 0);
+        if (!isFreshForEntry && !hasNewCycleSinceEntry) {
+          // Stale spelling message from a previous session/navigation; suppress SpellBox.
+          setShowSpellBox(false);
+          setCurrentSpellQuestion(null);
+          return;
+        }
+      } catch {}
+      console.log('✅ SpellBox opener: proceeding with currentSpellingWord', { currentSpellingWord, topicId: selectedTopicId });
       // console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
       //   currentSpellingWord,
       //   hasOriginalQuestion: !!originalSpellingQuestion,
@@ -736,10 +767,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         setCurrentSpellQuestion(spellQuestion);
       }
       
+      // Show SpellBox and temporarily disable mic/text input below
       setShowSpellBox(true);
+      try { setDisableInputForSpell(true); } catch {}
     } else {
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
+      // Re-enable input when SpellBox is not active
+      try { setDisableInputForSpell(false); } catch {}
     }
   }, [currentSpellingWord, currentScreen, originalSpellingQuestion, messageCycleCount]);
   
@@ -969,21 +1004,26 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // console.log('🎯 currentAdventureType changed to:', currentAdventureType);
   }, [currentAdventureType]);
 
-  // Track persistent adventure progress to trigger Step 6 when full
+  // Track persistent adventure progress (for UI bar) and session coins (for Step 6 trigger)
   const { progressFraction: persistentProgressFraction, activity: persistentActivity } = useAdventurePersistentProgress();
 
-  // Show Step 6 overlay when progress is full (first-time only)
+  // Show Step 6 overlay when session has 8 correct answers (80 coins) within same quest
   React.useEffect(() => {
     try {
-      if (
-        currentScreen === 1 &&
-        !showStep5Intro &&
-        needsAdventureStep6Intro &&
-        (persistentProgressFraction >= 1)
-      ) {
+      // Trigger after 8 correct answers in the same adventure (10 coins each)
+      const popupThresholdMet = sessionCoins >= 80;
+
+      // High-priority UI gates: suppress trainer popup if any are active
+      const assignmentJustEnded = (() => {
+        const at = assignmentExitAtRef.current || 0;
+        return (Date.now() - at) < 12000; // ~12s cooldown after assignment completion
+      })();
+      const isAuthRoute = (typeof window !== 'undefined') && (window.location?.pathname || '').startsWith('/auth');
+      const highPriorityActive = showStep5Intro || isWhiteboardPromptActive || isWhiteboardLessonActive || !!levelSwitchModal || isAuthRoute || assignmentJustEnded;
+
+      if (currentScreen === 1 && needsAdventureStep6Intro && popupThresholdMet && !highPriorityActive) {
         setShowStep6Intro(true);
         try {
-          // Immediately stop any ongoing TTS (likely pet) and suppress non-Krafty speech
           ttsService.stop();
           ttsService.setSuppressNonKrafty(true);
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
@@ -993,7 +1033,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         } catch {}
       }
     } catch {}
-  }, [currentScreen, persistentProgressFraction, needsAdventureStep6Intro, showStep5Intro]);
+  }, [currentScreen, sessionCoins, needsAdventureStep6Intro, showStep5Intro]);
 
   // Enforce suppression while Step 6 overlay is visible
   React.useEffect(() => {
@@ -1101,6 +1141,50 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     generateInitialResponse();
   }, [currentScreen, currentAdventureId, adventureMode, userData?.username, chatMessages, currentAdventureContext]);
   
+  // Fallback: if we suppressed the greeting for a possible whiteboard takeover
+  // but no prompt actually appears, auto-generate the pet's first message.
+  React.useEffect(() => {
+    // Defer until later declarations are available by checking only simple guards here
+    if (currentScreen !== 1) return;
+    const timeout = setTimeout(() => {
+      try {
+        // Access late-declared flags via window-scoped checks or safe try/catch
+        const wbActive = ((): boolean => { try { return !!isWhiteboardPromptActive; } catch { return false; } })();
+        const wbDev = ((): boolean => { try { return !!devWhiteboardEnabled; } catch { return false; } })();
+        if (currentScreen === 1 && !wbActive && !wbDev && chatMessages.length === 0) {
+          try { suppressInitialGreetingRef.current = false; } catch {}
+          try { shouldTriggerWhiteboardOnFirstQuestionRef.current = false; } catch {}
+          try { triggerInitialResponseGeneration(currentAdventureTypeRef.current); } catch {}
+        }
+      } catch {}
+    }, 1200);
+    return () => clearTimeout(timeout);
+  }, [currentScreen, chatMessages.length, triggerInitialResponseGeneration]);
+
+  // Ensure the very first visible pet message after entering adventure is auto-spoken
+  const firstEntryAutoSpokenTsRef = React.useRef<number>(0);
+  React.useEffect(() => {
+    if (currentScreen !== 1) return;
+    // Find latest visible AI message (skip hidden SpellBox lines)
+    const lastAi = chatMessages.filter(m => m.type === 'ai' && !(m as any).hiddenInChat).slice(-1)[0];
+    if (!lastAi) return;
+    if (firstEntryAutoSpokenTsRef.current === lastAi.timestamp) return;
+    // Avoid double-speaking if something is already speaking this exact message
+    const msgId = bubbleMessageIdFromHtml(formatAIMessage(lastAi.content));
+    try {
+      const alreadySpeaking = ttsService.isMessageSpeaking?.(msgId) || ttsService.getIsSpeaking?.();
+      if (alreadySpeaking) {
+        firstEntryAutoSpokenTsRef.current = lastAi.timestamp;
+        return;
+      }
+    } catch {}
+    const timer = setTimeout(() => {
+      try { ttsService.speakAIMessage(lastAi.content, msgId); } catch {}
+    }, 300);
+    firstEntryAutoSpokenTsRef.current = lastAi.timestamp;
+    return () => clearTimeout(timer);
+  }, [chatMessages, currentScreen]);
+  
   React.useEffect(() => {
     
     const updateScreenSize = () => {
@@ -1121,11 +1205,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Dev tools keyboard listener for A+S+D combination
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+        return;
+      }
       const key = e.key.toLowerCase();
       setPressedKeys(prev => new Set([...prev, key]));
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+        return;
+      }
       const key = e.key.toLowerCase();
       setPressedKeys(prev => {
         const newSet = new Set(prev);
@@ -1164,6 +1256,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Check for A+S+D combination
   React.useEffect(() => {
+    const active = document.activeElement as HTMLElement | null;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+      return;
+    }
     if (pressedKeys.has('a') && pressedKeys.has('s') && pressedKeys.has('d')) {
       setDevToolsVisible(prev => !prev);
       playClickSound();
@@ -1227,14 +1323,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     changeTheme(selectedTheme);
   }, [selectedTheme, changeTheme]);
   
-  // Ensure grade selection is loaded from localStorage on mount
+  // Sync grade selection from Firebase userData (drop localStorage)
   useEffect(() => {
-    const savedGrade = loadGradeSelection();
-    if (savedGrade && !selectedGradeFromDropdown) {
-      // console.log(`🔄 Loading saved grade selection on mount: ${savedGrade.gradeDisplayName}`);
-      setSelectedGradeFromDropdown(savedGrade.gradeDisplayName);
+    if (userData?.gradeDisplayName) {
+      setSelectedGradeFromDropdown(userData.gradeDisplayName);
     }
-  }, []); // Run once on mount
+  }, [userData?.gradeDisplayName]);
 
   // Grade selection logic (for HomePage only)
   useEffect(() => {
@@ -1261,10 +1355,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // console.log('Setting selectedPreference to:', preferenceLevel);
       setSelectedPreference(preferenceLevel);
       
-      // Initialize the combined grade and level selection for proper highlighting
-      // Use saved grade selection if available, otherwise fall back to userData
-      const savedGrade = loadGradeSelection();
-      const gradeToUse = savedGrade?.gradeDisplayName || userData?.gradeDisplayName;
+      // Initialize the combined grade and level selection for proper highlighting (Firebase only)
+      const gradeToUse = userData?.gradeDisplayName;
       
       if (preferenceLevel && gradeToUse) {
         setSelectedGradeAndLevel({ 
@@ -1292,6 +1384,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       }
     }
   }, [userData, currentScreen]);
+
+  // Force dropdown grade to Firebase when assignment is set (ignore localStorage)
+  useEffect(() => {
+    if ((userData?.gradeDisplayName || '').toLowerCase() === 'assignment') {
+      // Only force dropdown to 'assignment' while the assignment gate is active.
+      // Once the gate is completed (after diagnosis), do NOT revert to assignment.
+      try {
+        const gateActive = isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD);
+        if (!gateActive) return;
+      } catch {}
+      // Only set dropdown to assignment if it's not already set to another grade.
+      setSelectedGradeFromDropdown(prev => (prev && prev.trim() && prev.toLowerCase() !== 'assignment') ? prev : 'assignment');
+    }
+  }, [userData?.gradeDisplayName]);
 
   //   // Update currentScreen when userData loads to prevent flashing TopicSelection before onboarding
   // useEffect(() => {
@@ -1947,15 +2053,20 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
-      // If anonymous and limit reached, block and open signup gate
+      // If an auth nudge is pending for anonymous user after assignment completion, re-open Level Up modal
       try {
         const isAnon = !!user && (user as any).isAnonymous === true;
-        if (isAnon && guestPromptCount >= 5) {
-          setSignupGateOpen(true);
-          try { localStorage.setItem('guest_signup_gate_open', '1'); } catch {}
-          return;
+        const nudge = typeof window !== 'undefined' ? (localStorage.getItem('auth_nudge_pending') === '1') : false;
+        if (isAnon && nudge && !levelSwitchModal && !isWhiteboardPromptActive && !isWhiteboardLessonActive) {
+          const cached = typeof window !== 'undefined' ? localStorage.getItem('auth_nudge_payload') : null;
+          if (cached) {
+            const payload = JSON.parse(cached);
+            setLevelSwitchModal(payload);
+            return;
+          }
         }
       } catch {}
+      // Guest signup gate removed: do not block on prompt count
       
       // Check if the last message is "transcribing..." and replace it with actual transcription
       const lastMessage = chatMessages[chatMessages.length - 1];
@@ -2094,21 +2205,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
       });
 
-      // Increment guest prompt counter and open gate after the 5th prompt
-      try {
-        const isAnon = !!user && (user as any).isAnonymous === true;
-        if (isAnon) {
-          const next = guestPromptCount + 1;
-          setGuestPromptCount(next);
-          try { localStorage.setItem('guest_prompt_count', String(next)); } catch {}
-          if (next === 5) {
-            setTimeout(() => {
-              setSignupGateOpen(true);
-              try { localStorage.setItem('guest_signup_gate_open', '1'); } catch {}
-            }, 0);
-          }
-        }
-      } catch {}
+      // Guest signup gate removed: do not track or open after N prompts
 
       // Sticky yawn detection (skip during MCQ screen)
       try {
@@ -2246,28 +2343,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         // Implement 3-1 pattern: 3 spelling prompts followed by 1 pure adventure beat
         let isSpellingPhase = false;
+        // One-time suppression right after entering adventure: ensure first message is not a question
+        if (suppressSpellingOnceRef.current) {
+          isSpellingPhase = false;
+          suppressSpellingOnceRef.current = false;
+        } else {
         const SPELLING_CYCLE_OFFSET = 1; // only the very first adventure message stays pure
         const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
         if (messageCycleCount >= SPELLING_CYCLE_OFFSET) {
           const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
           isSpellingPhase = cyclePosition < 3;
         }
+        }
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           
         const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
           
-        // console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
+        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
-        // Additional debug info
-        const savedGradeFromStorage = loadGradeSelection();
-          
-        // console.log(`💾 Grade from localStorage: ${savedGradeFromStorage?.gradeDisplayName || 'none'}`);
+        // Additional debug info removed (localStorage dropped)
         // console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
           
         // NEW: Use topic-based question selection for Spellbox progression
           
         const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds) : null;
+        console.log(`🔤 Fetched spelling question:`, { isSpellingPhase, currentGrade, question: spellingQuestion ? { id: spellingQuestion.id, topicId: spellingQuestion.topicId, word: spellingQuestion.audio } : null });
         
         // Store the original spelling question (with prefilled data) for later use
           
@@ -2892,8 +2993,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Load the adventure's messages and state
       setChatMessages(targetAdventure.messages);
       setCurrentAdventureId(targetAdventure.id);
+      const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
       const topicId = targetAdventure.topicId || getNextTopic(Object.keys(sampleMCQData.topics)) || '';
-      setSelectedTopicId(topicId);
+      // Only force 'A-' if no explicit topic was provided
+      const finalTopicId = (!targetAdventure.topicId && effectiveGrade === 'assignment') ? 'A-' : topicId;
+      setSelectedTopicId(finalTopicId);
       // Grade 1: immediately reflect the actual upcoming spell topic in the header
       if (whiteboardGradeEligible) {
         try {
@@ -2937,7 +3041,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           user.uid,
           'continue_specific',
           targetAdventure.id,
-          topicId,
+          finalTopicId,
           'continue',
           targetAdventure.name,
           targetAdventure.messages, // Pass existing messages for AI context
@@ -2970,7 +3074,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     } catch {}
     
     // If this is a fallback call with default 'food' and we already have a non-food adventure type set, ignore it
-    if (adventureType === 'food' && currentAdventureType !== 'food') {
+    const latestType = currentAdventureTypeRef.current;
+    if (adventureType === 'food' && latestType !== 'food') {
       // console.log('🚨 Index: Ignoring fallback food call - already have explicit adventure type:', currentAdventureType);
       return;
     }
@@ -2988,7 +3093,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const allTopics = getSpellingTopicIds(gradeName);
       const dueTopic = getNextSpellboxTopic(gradeName, allTopics);
       const hasLessonForDueTopic = !!(dueTopic && getLessonScript(dueTopic));
-      if (hasLessonForDueTopic) {
+      if (hasLessonForDueTopic && !isWhiteboardSuppressedByAssignment) {
         shouldTriggerWhiteboardOnFirstQuestionRef.current = true;
         suppressInitialGreetingRef.current = true;
         firstAdventureStartedRef.current = true;
@@ -2999,7 +3104,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
     }
     playClickSound();
-    setSelectedTopicId(topicId);
+    // Only force 'A-' if no explicit topic was provided
+    const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
+    const finalTopicId = (!topicId && effectiveGrade === 'assignment') ? 'A-' : topicId;
+    setSelectedTopicId(finalTopicId);
     // Grade 1: immediately reflect the actual upcoming spell topic in the header
     if (whiteboardGradeEligible) {
       try {
@@ -3010,7 +3118,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
     setAdventureMode(mode);
     // console.log('🎯 Setting currentAdventureType to:', adventureType);
+    // Set the type immediately and update the ref to beat any same-tick fallback calls
     setCurrentAdventureType(adventureType);
+    currentAdventureTypeRef.current = adventureType;
     // Reset the initial response ref when starting a new adventure
     initialResponseSentRef.current = null;
     
@@ -3024,9 +3134,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     
     if (mode === 'new') {
       // Clear chat messages for new adventures to provide clean slate (unless already set from props)
-      if (chatMessages.length === 0) {
-        setChatMessages([]);
-      }
+      try { clearUserAdventure(); } catch {}
+      setChatMessages([]);
       // Reset message cycle count for new adventure
       setMessageCycleCount(0);
       // Use existing adventure ID if already set, otherwise generate new one
@@ -3090,14 +3199,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           user.uid,
           mode === 'new' ? 'new_adventure' : 'continue_adventure',
           adventureId,
-          topicId,
+          finalTopicId,
           mode,
           undefined, // title
           undefined, // existingMessages
           { petId: currentPet, adventureType } // options with pet and adventure type
         );
         setCurrentSessionId(sessionId);
-        try { analytics.setSession(sessionId || null); } catch {}
+        try {
+          analytics.setSession(sessionId || null);
+          // Emit session_started once per session
+          sessionStartAtRef.current = Date.now();
+          analytics.capture('session_started', {
+            session_id: sessionId,
+            started_at: sessionStartAtRef.current,
+            adventure_id: adventureId,
+            topic_id: finalTopicId || null,
+          });
+        } catch {}
         sessionCreatedForAdventureIdRef.current = adventureId;
       }
     }
@@ -3106,7 +3225,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setTimeout(() => {
       setCurrentScreen(1); // Go to adventure screen
       // If first-question whiteboard is pending, immediately show the prompt and enable lesson (no AI message)
-      if (shouldTriggerWhiteboardOnFirstQuestionRef.current) {
+      if (shouldTriggerWhiteboardOnFirstQuestionRef.current && !isWhiteboardSuppressedByAssignment) {
         // Guard: proactively determine the first SpellBox question because the initial greeting
         // is suppressed (so currentSpellQuestion may not be set yet for brand new users)
         const gradeName = currentGradeDisplayName;
@@ -3119,7 +3238,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
         const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
         const canShowLesson = !!(initialSpellTopicId && getLessonScript(initialSpellTopicId || ''));
-        if (isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson) {
+        if (!isWhiteboardSuppressedByAssignment && isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson) {
           try { ttsService.stop(); } catch {}
           const name = userData?.username?.trim() || 'friend';
           const topicForLesson = initialSpellTopicId!;
@@ -3149,6 +3268,36 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       isStartingAdventureRef.current = false;
     }, 250);
   }, [currentAdventureId, reset, initialPanels, user]);
+ 
+  // Emit session end + summary on pagehide/navigation (re-added)
+  React.useEffect(() => {
+    const onPageHide = () => {
+      try {
+        const startedAt = sessionStartAtRef.current;
+        if (!startedAt) return;
+        const endedAt = Date.now();
+        const durationMs = endedAt - startedAt;
+        analytics.capture('session_ended', {
+          session_id: (currentSessionId || null),
+          ended_at: endedAt,
+          reason: 'pagehide',
+          adventure_id: currentAdventureId || null,
+          topic_id: selectedTopicId || null,
+        });
+        analytics.capture('session_summary', {
+          session_id: (currentSessionId || null),
+          started_at: startedAt,
+          ended_at: endedAt,
+          duration_ms: durationMs,
+          adventure_id: currentAdventureId || null,
+          topic_id: selectedTopicId || null,
+        });
+        sessionStartAtRef.current = null;
+      } catch {}
+    };
+    try { window.addEventListener('pagehide', onPageHide); } catch {}
+    return () => { try { window.removeEventListener('pagehide', onPageHide); } catch {} };
+  }, [currentSessionId, currentAdventureId, selectedTopicId]);
 
   // Handle initial adventure props from parent component
   React.useEffect(() => {
@@ -3278,8 +3427,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
-      // Save grade selection to localStorage for persistence
-      saveGradeSelection(gradeDisplayName);
+      // Do not save grade selection to localStorage; Firebase is source of truth
       // Track the combined grade and level selection for highlighting
       setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
     }
@@ -3288,6 +3436,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     try {
       const mapDisplayToCode = (name?: string): string => {
         if (!name) return '';
+        if (name.toLowerCase() === 'assignment') return 'assignment';
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
@@ -3295,10 +3444,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
         return '';
       };
-      const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
+      const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
+      const previousGradeDisplayName = userData?.gradeDisplayName || '';
+      const gradeCode = mapDisplayToCode(incomingGradeDisplayName);
       const levelCode = level === 'middle' ? 'mid' : level;
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
-      const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
+      const gradeName = incomingGradeDisplayName;
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -3306,6 +3457,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           level: levelCode,
           levelDisplayName
         });
+      }
+
+      // If selecting assignment, ALWAYS reset assignment progress in Firebase and start from A-
+      const isSelectingAssignment = incomingGradeDisplayName.toLowerCase() === 'assignment';
+      const changed = previousGradeDisplayName.toLowerCase() !== incomingGradeDisplayName.toLowerCase();
+      const involvesAssignment = previousGradeDisplayName.toLowerCase() === 'assignment' || incomingGradeDisplayName.toLowerCase() === 'assignment';
+      if ((isSelectingAssignment || (changed && involvesAssignment)) && user?.uid) {
+        try {
+          await clearSpellboxProgressHybrid(user.uid, 'assignment');
+          await firebaseSpellboxService.saveSpellboxProgressFirebase(user.uid, {
+            gradeDisplayName: 'assignment',
+            currentTopicId: 'A-',
+            topicProgress: {},
+            timestamp: Date.now()
+          } as any);
+          setSelectedTopicFromPreference('A-');
+        } catch (err) {
+          console.warn('Failed to reset assignment progress:', err);
+        }
       }
     } catch (e) {
       console.error('Failed to persist grade/level selection:', e);
@@ -3315,12 +3485,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const allTopicIds = Object.keys(sampleMCQData.topics);
     
     // Save preference and get the specific topic immediately
-    const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
+    const specificTopic = (gradeDisplayName && gradeDisplayName.toLowerCase() === 'assignment')
+      ? 'A-'
+      : saveTopicPreference(level, allTopicIds, gradeDisplayName);
     
     // console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
     setSelectedPreference(level);
     setSelectedTopicFromPreference(specificTopic);
+
+    // If assignment is selected, immediately start a new adventure on A-
+    if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+      try {
+        // Reset assignment session boundary so new assignment flow can form fresh continuations
+        assignmentExitAtRef.current = 0;
+        // Start assignment with the intended first adventure type (house)
+        handleStartAdventure('A-', 'new', 'house');
+      } catch {}
+    }
     
     // console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
@@ -3940,6 +4122,26 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [selectedTopicId]);
   const whiteboardSuppressionKey = `lesson-active-${WHITEBOARD_LESSON_TOPIC}`;
 
+  // Assignment whiteboard gate state to force re-evaluation when counter changes
+  const [assignmentGateVersion, setAssignmentGateVersion] = React.useState<number>(0);
+  const isWhiteboardSuppressedByAssignment = React.useMemo(() => {
+    try { return isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD); } catch { return false; }
+  }, [assignmentGateVersion]);
+
+  // For new users defaulting to assignment, ensure the gate is started
+  React.useEffect(() => {
+    const gradeName = (userData?.gradeDisplayName || '').toLowerCase();
+    if (gradeName === 'assignment') {
+      try {
+        const existing = getAssignmentGate();
+        if (!existing) {
+          startAssignmentGate();
+          setAssignmentGateVersion(v => v + 1);
+        }
+      } catch {}
+    }
+  }, [userData?.gradeDisplayName]);
+
   // Header topic progress (Spellbox) - tracked separately to ensure rerenders
   const [headerTopicProgressPct, setHeaderTopicProgressPct] = React.useState<number>(0);
 
@@ -3966,6 +4168,120 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
     playClickSound();
     
+    // If first incorrect attempt on assignment, stop realtime speech and use shared handler
+    if (!isCorrect && attemptCount === 1) {
+      try { interruptRealtimeSession?.(); } catch {}
+    }
+    // In assignment mode, handle first incorrect locally via modal (skip shared switcher)
+    const isAssignmentFlowEarly = ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment';
+    if (!isCorrect && attemptCount === 1 && isAssignmentFlowEarly) {
+      // Show level switch modal immediately and prevent further input
+      try {
+        setDisableInputForSpell(true);
+        // Mirror the mapping in assignment-switch
+          const TIERS = [
+            { gdn: 'Kindergarten', grade: 'gradeK', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 1
+            { gdn: 'Kindergarten', grade: 'gradeK', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 2
+            { gdn: '1st Grade',    grade: 'grade1', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 3
+            { gdn: '1st Grade',    grade: 'grade1', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 4
+            { gdn: '2nd Grade',    grade: 'grade2', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 5
+            { gdn: '2nd Grade',    grade: 'grade2', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 6
+            { gdn: '3rd Grade',    grade: 'grade3', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 7
+            { gdn: '3rd Grade',    grade: 'grade3', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 8
+          ];
+        const clamp = (n: number) => (n < 1 ? 1 : (n > 8 ? 8 : n));
+        const qid = typeof currentSpellQuestion?.id === 'number' ? currentSpellQuestion!.id : 1;
+        const currentTier = clamp(qid);
+        const targetTierIdx = Math.max(1, currentTier - 1);
+        const tier = TIERS[(targetTierIdx - 1) as number];
+        const allTopicIds = Object.keys(sampleMCQData.topics);
+        const nextTopic = getNextTopicByPreference(allTopicIds, tier.pref, tier.gdn) || (allTopicIds[0] || '1-H.1');
+        const payload = {
+          gradeDisplayName: tier.gdn,
+          levelDisplayName: tier.ldn,
+          nextTopicId: nextTopic,
+          gradeCode: tier.grade,
+          levelCode: tier.level,
+          // Map pairs (1-2→0, 3-4→1, 5-6→2, 7-8→3)
+          numericLevel: Math.floor((targetTierIdx - 1) / 2),
+        };
+        setLevelSwitchModal(payload);
+        try { localStorage.setItem('auth_nudge_payload', JSON.stringify(payload)); } catch {}
+        try { localStorage.setItem('auth_nudge_pending', '1'); } catch {}
+      } catch {}
+      return;
+    }
+
+    // For all other cases (non-assignment or not first incorrect), allow shared handler
+    handleFirstIncorrectAssignment(!isCorrect && attemptCount === 1, {
+      currentGradeDisplayName: selectedGradeFromDropdown || userData?.gradeDisplayName,
+      updateUserData,
+      handleStartAdventure,
+      isCorrect,
+      questionId: currentSpellQuestion?.id || 1
+    }).then((switched) => {
+      if (switched) {
+        // Optimistically set dropdown to the detected tier based on assignment logic
+        try {
+          const qid = typeof currentSpellQuestion?.id === 'number' ? currentSpellQuestion!.id : 1;
+          const clamp = (n: number) => (n < 1 ? 1 : (n > 8 ? 8 : n));
+          const currentTier = clamp(qid);
+          const targetTierIdx = Math.max(1, currentTier - 1); // 1..8
+          const TIERS = [
+            { gdn: 'Kindergarten', level: 'start' as const }, // 1
+            { gdn: 'Kindergarten', level: 'middle' as const }, // 2
+            { gdn: '1st Grade',    level: 'start' as const }, // 3
+            { gdn: '1st Grade',    level: 'middle' as const }, // 4
+            { gdn: '2nd Grade',    level: 'start' as const }, // 5
+            { gdn: '2nd Grade',    level: 'middle' as const }, // 6
+            { gdn: '3rd Grade',    level: 'start' as const }, // 7
+            { gdn: '3rd Grade',    level: 'middle' as const }, // 8
+          ];
+          const tier = TIERS[(targetTierIdx - 1) as number];
+          if (tier?.gdn) {
+            setSelectedGradeFromDropdown(tier.gdn);
+            setSelectedGradeAndLevel({ grade: tier.gdn, level: tier.level });
+          }
+        } catch {}
+      }
+    }).catch(() => {});
+
+    // Increment assignment gate on first attempt answer (either correct or incorrect)
+    try {
+      const isFirstAttempt = attemptCount === 1;
+      if (isFirstAttempt) {
+        incrementAssignmentGate(true);
+        setAssignmentGateVersion(v => v + 1);
+        const s = getAssignmentGate();
+        if (s && s.active && s.answeredCount >= ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD) {
+          completeAssignmentGate();
+          setAssignmentGateVersion(v => v + 1);
+          // Gate just lifted: if current topic has a whiteboard lesson and we haven't shown it,
+          // immediately show the pre-lesson pet message to lead into the lesson.
+          try {
+            const spellTopic = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || selectedTopicId || null;
+            const hasLesson = !!(spellTopic && getLessonScript(spellTopic));
+            const alreadySeen = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
+            if (hasLesson && !alreadySeen && !isWhiteboardPromptActive && !devWhiteboardEnabled) {
+              const topicForLesson = spellTopic as string;
+              const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
+              setWhiteboardPrompt({
+                topicId: topicForLesson,
+                text: introText,
+                shouldAutoplay: true,
+                isAcknowledged: false,
+              });
+              setWhiteboardPinnedText(introText);
+              setWhiteboardPromptLocked(false);
+              setLessonReady(false);
+              setIsWhiteboardPromptActive(true);
+              setCurrentScreen(1);
+            }
+          } catch {}
+        }
+      }
+    } catch {}
+
     if (isCorrect) {
       // Defer progression and messaging until user clicks Next
       lastSpellAttemptCountRef.current = attemptCount;
@@ -3973,23 +4289,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       setDisableInputForSpell(true);
       // Do not highlight yet; wait for user to tap the disabled input
     } else {
-      // Provide encouragement for incorrect answers
-      const encouragementMessage: ChatMessage = {
-        type: 'ai',
-        content: `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`,
-        timestamp: Date.now()
-      };
-      
-      setChatMessages(prev => {
-        playMessageSound();
-        // Auto-speak the encouragement
-        const messageId = `index-chat-${encouragementMessage.timestamp}-${prev.length}`;
-        ttsService.speakAIMessage(encouragementMessage.content, messageId)
-          .catch(error => console.error('TTS error for encouragement:', error));
-        return [...prev, encouragementMessage];
-      });
+      // Non-assignment flows: keep UI stable and avoid chat messages; no audio either
+      const encouragementText = `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`;
+      void encouragementText; // placeholder to avoid unused string if later needed
     }
-  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName]);
+  }, [currentSpellQuestion, setChatMessages, currentSessionId, chatMessages, ttsService, spellingProgressIndex, completedSpellingIds, selectedGradeFromDropdown, userData?.gradeDisplayName, selectedTopicId, isWhiteboardPromptActive, devWhiteboardEnabled]);
 
   // Proceed to next after user clicks Next in SpellBox
   const handleSpellNext = useCallback(() => {
@@ -4039,7 +4343,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const optimisticPct = Math.round((nextFirstCorrect / nextAttempted) * 100);
         setHeaderTopicProgressPct(optimisticPct);
         // If this was the final question (10th), immediately launch whiteboard for next topic
-        if (nextAttempted >= 10) {
+      if (nextAttempted >= 10 && !isWhiteboardSuppressedByAssignment) {
           try { ttsService.stop(); } catch {}
           // Persist final attempt so topic is marked completed for SpellBox progress
           try {
@@ -4066,7 +4370,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           // Switch to adventure and show whiteboard prompt (with chevron) for next topic
           setCurrentScreen(1);
           const name = userData?.username?.trim() || 'friend';
-          if (nextTopicId && getLessonScript(nextTopicId)) {
+          if (!isWhiteboardSuppressedByAssignment && nextTopicId && getLessonScript(nextTopicId)) {
             const topicForLesson = nextTopicId;
             const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
             setWhiteboardPrompt({
@@ -4102,6 +4406,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 questions_to_mastery: null,
                 mastery_threshold: '>=70% success over 10',
               });
+              // Also emit topic_mastery summary (re-added)
+              try {
+                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - (tp.firstAttemptCorrect || 0));
+                analytics.capture('topic_mastery', {
+                  topic_id: currentSpellQuestion.topicId,
+                  status: isSpellboxTopicPassingGrade(tp) ? 'mastered' : 'ongoing',
+                  questions_attempted: tp.questionsAttempted || 0,
+                  incorrect_attempts: incorrectAttempts,
+                });
+              } catch {}
             }
           } catch {}
         })
@@ -4140,11 +4454,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) {
         return prev;
       }
-      const latestWithContinuation = prev
-        .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
-        .slice(-1)[0] as any;
-
-      const continuation = latestWithContinuation?.content_after_spelling || currentSpellingSentence || "Great job! Let's continue our adventure! ✨";
+      // Prefer the most recent AI message for THIS word, and only after assignment exit (if set)
+      const nowWord = (currentSpellQuestion?.audio || currentSpellQuestion?.word || '').trim().toLowerCase();
+      const exitAt = assignmentExitAtRef.current || 0;
+      const reverse = [...prev].reverse();
+      const lastForCurrentWord = reverse.find(m => {
+        const ai = (m as any);
+        return m.type === 'ai'
+          && typeof ai?.spelling_word === 'string'
+          && ai.spelling_word.trim().toLowerCase() === nowWord
+          && (!exitAt || (typeof ai.timestamp === 'number' ? ai.timestamp > exitAt : true));
+      }) as any;
+      const latestWithContinuation = reverse.find(m => (m.type === 'ai' && (m as any).content_after_spelling)) as any;
+      const continuation = (lastForCurrentWord?.content_after_spelling
+        || lastForCurrentWord?.spelling_sentence
+        || latestWithContinuation?.content_after_spelling
+        || (nowWord ? `Great job spelling "${currentSpellQuestion?.word || currentSpellQuestion?.audio}"!` : "Great job! Let's continue our adventure! ✨"));
 
       const adventureStoryMessage: ChatMessage = {
         type: 'ai',
@@ -4273,6 +4598,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     shouldAutoplay: boolean;
     isAcknowledged: boolean;
   } | null>(null);
+  // Ensure the pet speaks the pre-lesson prompt exactly once per prompt text
+  const lastSpokenWhiteboardPromptRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (whiteboardPrompt && whiteboardPrompt.shouldAutoplay) {
+      const text = whiteboardPrompt.text?.trim();
+    if (text && lastSpokenWhiteboardPromptRef.current !== text) {
+      try { ttsService.stop(); } catch {}
+      // Use a Krafty-tagged messageId so it bypasses suppression, but force pet's voice
+      const petVoiceId = ttsService.getSelectedVoice().id;
+      ttsService.speak(text, {
+        messageId: 'krafty-whiteboard-prompt',
+        voice: petVoiceId,
+        stability: 0.7,
+        similarity_boost: 0.9,
+      }).catch(() => {});
+      lastSpokenWhiteboardPromptRef.current = text;
+    }
+    }
+  }, [whiteboardPrompt]);
   const [whiteboardSeenThisSession, setWhiteboardSeenThisSession] = React.useState<Record<string, boolean>>({});
   const [lessonReady, setLessonReady] = React.useState(false);
   const [whiteboardPromptLocked, setWhiteboardPromptLocked] = React.useState(false);
@@ -4286,17 +4630,29 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const shouldTriggerWhiteboardOnFirstQuestionRef = React.useRef<boolean>(false);
   const firstAdventureStartedRef = React.useRef<boolean>(false);
   const suppressInitialGreetingRef = React.useRef<boolean>(false);
+  // Timestamp to mark when assignment mode ended; used to ignore older AI messages
+  const assignmentExitAtRef = React.useRef<number | null>(null);
+  // Assignment → Level switch modal state
+  const [levelSwitchModal, setLevelSwitchModal] = React.useState<{
+    gradeDisplayName: string;
+    levelDisplayName: string;
+    nextTopicId: string;
+    gradeCode: string;
+    levelCode: 'start' | 'mid';
+    numericLevel?: number;
+  } | null>(null);
 
   // Consider the whiteboard lesson "active" whenever the dev toggle (or URL flag)
   // is on AND a script exists for the selected topic. We use this to
   // 1) keep the input dock disabled, and 2) avoid mutating the pet bubble.
   const isWhiteboardLessonActive = React.useMemo(() => {
+    if (isWhiteboardSuppressedByAssignment) return false;
     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
     if (!lessonEnabled) return false;
     const script = getLessonScript(selectedTopicId) || getLessonScript(WHITEBOARD_LESSON_TOPIC);
     return !!script;
-  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible]);
+  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible, isWhiteboardSuppressedByAssignment]);
 
   React.useEffect(() => {
     if (!whiteboardGradeEligible) return;
@@ -4306,6 +4662,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (shouldTriggerWhiteboardOnFirstQuestionRef.current) return;
     if (isWhiteboardPromptActive) return;
     if (devWhiteboardEnabled) return;
+    if (isWhiteboardSuppressedByAssignment) return;
     const name = userData?.username?.trim() || 'friend';
     const alreadySeen = whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
     if (alreadySeen) return;
@@ -4324,7 +4681,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setWhiteboardPromptLocked(false);
     setLessonReady(false);
     setIsWhiteboardPromptActive(true);
-  }, [selectedTopicId, whiteboardSeenThisSession, userData?.username, devWhiteboardEnabled, isWhiteboardPromptActive]);
+  }, [selectedTopicId, whiteboardSeenThisSession, userData?.username, devWhiteboardEnabled, isWhiteboardPromptActive, isWhiteboardSuppressedByAssignment]);
 
   React.useEffect(() => {
     // Intentionally do nothing here when dev whiteboard is enabled.
@@ -4355,7 +4712,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const alreadySeenLesson = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
 
     // First adventure start: if first question (id === 1) and flag set, trigger immediately with custom prompt
-    if (shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
+    if (!isWhiteboardSuppressedByAssignment && shouldTriggerWhiteboardOnFirstQuestionRef.current && isFirstQuestionId && !alreadySeenLesson) {
       shouldTriggerWhiteboardOnFirstQuestionRef.current = false; // consume flag so it doesn't re-trigger later
       whiteboardTriggeredTopicsRef.current.add(spellTopic);
       // Do not force-stop here so we don't cut off ongoing trainer voice
@@ -4401,7 +4758,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         return;
       }
       // Do not auto-trigger if we explicitly just enabled via chevron or end-of-topic
-        if (whiteboardGradeEligible && !devWhiteboardEnabled && !whiteboardTriggeredTopicsRef.current.has(spellTopic) && !alreadySeenLesson) {
+        if (!isWhiteboardSuppressedByAssignment && whiteboardGradeEligible && !devWhiteboardEnabled && !whiteboardTriggeredTopicsRef.current.has(spellTopic) && !alreadySeenLesson) {
         whiteboardTriggeredTopicsRef.current.add(spellTopic);
         try { ttsService.stop(); } catch {}
         setCurrentScreen(1);
@@ -4425,6 +4782,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const shouldShowWhiteboardPrompt = !!whiteboardPrompt;
   const dismissWhiteboardPrompt = React.useCallback(() => {
     if (!whiteboardPrompt || whiteboardPromptLocked) return;
+    // Do not enable lesson while assignment suppression is active
+    if (isWhiteboardSuppressedByAssignment) {
+      setWhiteboardPrompt(null);
+      setIsWhiteboardPromptActive(false);
+      return;
+    }
     const topicId = whiteboardPrompt.topicId;
     setWhiteboardPromptLocked(true);
     setWhiteboardSeenThisSession(prev => ({ ...prev, [topicId]: true }));
@@ -4520,41 +4883,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
-      {/* Signup Gate Modal */}
-      <Dialog open={signupGateOpen && (!!user && (user as any).isAnonymous === true)} onOpenChange={(o) => {
-        setSignupGateOpen(o);
-        try { localStorage.setItem('guest_signup_gate_open', o ? '1' : ''); } catch {}
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create your account to continue</DialogTitle>
-            <DialogDescription>
-              You've reached the free trial limit. Create an account to save progress and continue your adventure.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 mt-2">
-            <Button
-              className="w-full"
-              onClick={() => {
-                playClickSound();
-                navigate('/auth?mode=upgrade&redirect=/');
-              }}
-            >
-              Create account
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => {
-                playClickSound();
-                navigate('/auth?redirect=/');
-              }}
-            >
-              I already have an account
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Guest signup gate removed */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -4603,13 +4932,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             {selectedTopicId && (
               (() => {
                 const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
-                const scriptForChip = getLessonScript(topicForChip);
-                const resolvedTopicId = (scriptForChip?.topicId) || topicForChip;
+                // Resolve effective topic id without requiring a lesson script
+                const resolvedTopicId = topicForChip;
+                // Spelling-only guard: only show chip for spelling topics for this grade
+                const spellingTopicIds = getSpellingTopicIds(currentGradeDisplayName);
+                if (!spellingTopicIds.includes(resolvedTopicId)) return null;
+                // Match View Progress naming
                 const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
-                const lessonTitle = (scriptForChip?.title) || topicForChip;
-                const canOpen = !!scriptForChip;
+                const lessonTitle = (sampleMCQData?.topics?.[resolvedTopicId]?.topicInfo?.progressTopicName)
+                  || resolvedTopicId;
                 const handleToggle = () => {
-                  if (!canOpen) return;
                   setIsManualWhiteboardOpen(prev => !prev);
                 };
                 const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
@@ -4624,8 +4956,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     tabIndex={0}
                     onClick={handleToggle}
                     onKeyDown={handleKeyDown}
-                    title={canOpen ? 'Open whiteboard' : 'Whiteboard unavailable'}
-                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative ${canOpen ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-80'}`}
+                    title={'Lesson'}
+                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative cursor-pointer hover:bg-gray-50`}
                     style={{ minWidth: '220px' }}
                   >
                     <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
@@ -4664,6 +4996,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   className="w-64 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                   align="start"
                 >
+                  {/* Assignment (Start only) */}
+                  <DropdownMenuItem 
+                    className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'assignment' ? 'bg-green-100' : ''}`}
+                    onClick={() => handlePreferenceSelection('start', 'assignment')}
+                  >
+                    <span className="text-lg">📝</span>
+                    <div>
+                      <div className="font-semibold">Assignment</div>
+                      {/* <div className="text-sm text-gray-500">Start only</div> */}
+                    </div>
+                    {selectedGradeAndLevel?.grade === 'assignment' ? <span className="ml-auto text-green-600">✓</span> : null}
+                  </DropdownMenuItem>
                   {/* Kindergarten */}
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''}`}>
@@ -5380,12 +5724,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
-                          fullscreen={isManualWhiteboardOpen}
-                          onRequestClose={() => setIsManualWhiteboardOpen(false)}
                           onCompleted={() => {
                             setLessonReady(false);
                             setDevWhiteboardEnabled(false);
                             setWhiteboardPromptLocked(false);
+                            // Re-enable adventure input after lesson completes
+                            try { setDisableInputForSpell(false); } catch {}
+                            try { setHighlightSpellNext(false); } catch {}
                             // Mark lesson as seen so the intro prompt does not reappear
                             setWhiteboardSeenThisSession(prev => ({ ...prev, [WHITEBOARD_LESSON_TOPIC]: true }));
                             // Clear any pinned intro text from the pet bubble
@@ -5421,46 +5766,46 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               setWhiteboardPrompt(null);
                               // Lift suppression so a fresh, natural follow-up can be generated if needed
                               suppressInitialGreetingRef.current = false;
-                              // AI-generated conversational follow-up (no spelling word → no SpellBox)
-                              (async () => {
-                                try {
-                                  const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-                                  const petName = PetProgressStorage.getPetDisplayName(currentPetId);
-                                  const petType = PetProgressStorage.getPetType(currentPetId);
-                                  const postLessonUserCue = `POST_LESSON_FOLLOWUP: We just finished a quick skill lesson on the whiteboard. Write one short, friendly line as the ${petType} speaking to ${name}. Keep it conversational and inviting, ask a light next-step question, do not mention spelling or lessons, no emojis, under 18 words.`;
-                                  const resp = await aiService.generateResponse(
-                                    postLessonUserCue,
-                                    chatMessagesRef.current,
-                                    null,
-                                    userData,
-                                    undefined,
-                                    currentAdventureContext,
-                                    undefined,
-                                    currentAdventureContext?.summary,
-                                    petName,
-                                    petType,
-                                    currentAdventureType || 'food'
-                                  );
-                                  const followUp = (resp?.adventure_story || '').trim() || `Great work! What should we do next?`;
-                                  const msg: ChatMessage = {
-                                    type: 'ai',
-                                    content: followUp,
-                                    timestamp: Date.now()
-                                  };
-                                  setChatMessages(prev => {
-                                    const next = [...prev, msg];
-                                    try {
-                                      const id = bubbleMessageIdFromHtml(formatAIMessage(followUp));
-                                      ttsService.speakAIMessage(followUp, id).catch(() => {});
-                                    } catch {}
-                                    try {
-                                      if (currentSessionId) adventureSessionService.addChatMessage(currentSessionId, msg);
-                                    } catch {}
-                                    return next;
-                                  });
-                                } catch {}
-                              })();
-                            }, 3600);
+      // Post-lesson follow-up: use the normal adventure initial message pipeline for consistency.
+      // Previous custom generator is intentionally disabled above for now.
+      (async () => {
+        try {
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petName = PetProgressStorage.getPetDisplayName(currentPetId);
+          const petType = PetProgressStorage.getPetType(currentPetId);
+          const initialMessage = await aiService.generateInitialMessage(
+            adventureMode,
+            chatMessages,
+            currentAdventureContext,
+            undefined,
+            currentAdventureContext?.summary,
+            userData,
+            petName,
+            petType,
+            (currentAdventureType || 'food')
+          );
+          if (suppressInitialGreetingRef.current) return;
+          const msg: ChatMessage = {
+            type: 'ai',
+            content: initialMessage,
+            timestamp: Date.now()
+          };
+          setChatMessages(prev => {
+            const next = [...prev, msg];
+            try {
+              const messageId = `index-chat-${msg.timestamp}-${prev.length}`;
+              if (!suppressInitialGreetingRef.current) {
+                ttsService.speakAIMessage(initialMessage, messageId).catch(() => {});
+              }
+            } catch {}
+            try {
+              if (currentSessionId) adventureSessionService.addChatMessage(currentSessionId, msg);
+            } catch {}
+            return next;
+          });
+        } catch {}
+      })();
+    }, 1500);
                           }}
                           sendMessage={sendMessage}
                           interruptRealtimeSession={interruptRealtimeSession}
@@ -5540,6 +5885,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             onNext: handleSpellNext,
                             highlightNext: highlightSpellNext,
                             sendMessage,
+                            isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
                     }
                   />
@@ -5979,7 +6325,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               
               // If a specific next topic is provided, use it
               // Otherwise, determine the next topic from progress tracking
-              const topicToNavigateTo = nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics));
+              const effectiveGrade = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').toLowerCase();
+              // Only force 'A-' if no computed next topic is available
+              const topicToNavigateTo = (nextTopicId || getNextTopic(Object.keys(sampleMCQData.topics))) || (effectiveGrade === 'assignment' ? 'A-' : null);
               
               if (topicToNavigateTo) {
                 // Navigate to the next topic
@@ -5992,6 +6340,153 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             }}
             currentSessionId={currentSessionId}
           />
+        )}
+
+        {/* Level Switch Modal */}
+        {levelSwitchModal && (
+          <Dialog open onOpenChange={(o) => { if (!o) setLevelSwitchModal(null); }}>
+            <DialogContent hideClose className="max-w-md rounded-2xl border border-primary/20 shadow-xl bg-white/95 backdrop-blur-md p-6 text-center">
+              <div className="text-sm text-foreground/70">{`We found your personalized starting point`}</div>
+              <p className="mt-1 text-4xl font-extrabold tracking-tight">
+                <span className="text-primary">
+                  {`Level ${levelSwitchModal.numericLevel ?? 0}`}
+                </span>
+              </p>
+              <div className="mt-5 space-y-3">
+                {!!user && (user as any).isAnonymous === true ? (
+                  <>
+                    <Button
+                      className="w-full h-11 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={async () => {
+                        playClickSound();
+                        try {
+                          await updateUserData({
+                            grade: levelSwitchModal.gradeCode,
+                            gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                            level: levelSwitchModal.levelCode,
+                            levelDisplayName: levelSwitchModal.levelDisplayName,
+                          } as any);
+                        } catch {}
+                        try { ttsService.stop(); } catch {}
+                        try { interruptRealtimeSession?.(); } catch {}
+                        assignmentExitAtRef.current = Date.now();
+                        setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                        setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                        try { completeAssignmentGate(); } catch {}
+                        try { setShowSpellBox(false); } catch {}
+                        try { setCurrentSpellQuestion(null); } catch {}
+                        try { setOriginalSpellingQuestion(null); } catch {}
+                        try { setSpellingProgressIndex(0); } catch {}
+                        try { setCompletedSpellingIds([]); } catch {}
+                        try {
+                          const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                          clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                        } catch {}
+                        try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                        // Clear nudge; navigate to upgrade flow (link anonymous to real account)
+                        try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
+                        navigate('/auth?mode=upgrade&redirect=/');
+                      }}
+                    >
+                      Create account to continue
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full h-11 text-base font-semibold"
+                      onClick={async () => {
+                        playClickSound();
+                        try {
+                          await updateUserData({
+                            grade: levelSwitchModal.gradeCode,
+                            gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                            level: levelSwitchModal.levelCode,
+                            levelDisplayName: levelSwitchModal.levelDisplayName,
+                          } as any);
+                        } catch {}
+                        try { ttsService.stop(); } catch {}
+                        try { interruptRealtimeSession?.(); } catch {}
+                        assignmentExitAtRef.current = Date.now();
+                        setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                        setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                        try { completeAssignmentGate(); } catch {}
+                        try { setShowSpellBox(false); } catch {}
+                        try { setCurrentSpellQuestion(null); } catch {}
+                        try { setOriginalSpellingQuestion(null); } catch {}
+                        try { setSpellingProgressIndex(0); } catch {}
+                        try { setCompletedSpellingIds([]); } catch {}
+                        try {
+                          const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                          clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                        } catch {}
+                        try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                        // Clear nudge; navigate to login
+                        try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
+                        navigate('/auth?redirect=/');
+                      }}
+                    >
+                      I already have an account
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    className="w-full h-11 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground"
+                    onClick={async () => {
+                      try {
+                        await updateUserData({
+                          grade: levelSwitchModal.gradeCode,
+                          gradeDisplayName: levelSwitchModal.gradeDisplayName,
+                          level: levelSwitchModal.levelCode,
+                          levelDisplayName: levelSwitchModal.levelDisplayName,
+                        } as any);
+                      } catch {}
+                      try { ttsService.stop(); } catch {}
+                      try { interruptRealtimeSession?.(); } catch {}
+                      assignmentExitAtRef.current = Date.now();
+                      setSelectedGradeFromDropdown(levelSwitchModal.gradeDisplayName);
+                      setSelectedGradeAndLevel({ grade: levelSwitchModal.gradeDisplayName, level: levelSwitchModal.levelCode === 'mid' ? 'middle' : 'start' });
+                      try { completeAssignmentGate(); } catch {}
+                      try { setShowSpellBox(false); } catch {}
+                      try { setCurrentSpellQuestion(null); } catch {}
+                      try { setOriginalSpellingQuestion(null); } catch {}
+                      try { setSpellingProgressIndex(0); } catch {}
+                      try { setCompletedSpellingIds([]); } catch {}
+                      try {
+                        const { clearSpellboxTopicProgress } = await import('@/lib/utils');
+                        clearSpellboxTopicProgress(levelSwitchModal.gradeDisplayName);
+                      } catch {}
+                      try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
+                      try {
+                        setChatMessages(prev => {
+                          if (devWhiteboardEnabled || isWhiteboardPromptActive || whiteboardPinnedText) return prev;
+                          const latestWithContinuation = prev
+                            .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
+                            .slice(-1)[0] as any;
+                          const continuation = latestWithContinuation?.content_after_spelling || "Great job! Let's continue our adventure! ✨";
+                          const adventureStoryMessage: ChatMessage = {
+                            type: 'ai',
+                            content: continuation,
+                            timestamp: Date.now() + 1
+                          };
+                          playMessageSound();
+                          const adventureMessageId = bubbleMessageIdFromHtml(formatAIMessage(adventureStoryMessage.content));
+                          ttsService.speakAIMessage(adventureStoryMessage.content, adventureMessageId).catch(() => {});
+                          if (currentSessionId) {
+                            adventureSessionService.addChatMessage(currentSessionId, adventureStoryMessage);
+                          }
+                          return [...prev, adventureStoryMessage];
+                        });
+                      } catch {}
+                      setLevelSwitchModal(null);
+                      try { setDisableInputForSpell(false); } catch {}
+                      try { setHighlightSpellNext(false); } catch {}
+                    }}
+                  >
+                    {`Let’s begin!`}
+                  </Button>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
 
         {/* Compact input dock when sidebar is collapsed (next to user avatar)
@@ -6163,6 +6658,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 };
 
 export default Index;
+
+
 
 
 

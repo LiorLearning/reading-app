@@ -43,7 +43,7 @@ class FirebaseSpellboxService {
       const docId = `${userId}_${gradeProgress.gradeDisplayName.replace(/\s+/g, '_')}`;
       await setDoc(doc(db, this.COLLECTION_NAME, docId), firebaseProgress);
       
-      console.log(`🔥 Saved Spellbox progress to Firebase: ${gradeProgress.gradeDisplayName}`);
+      // console.log(`🔥 Saved Spellbox progress to Firebase: ${gradeProgress.gradeDisplayName}`);
     } catch (error) {
       console.error('Failed to save Spellbox progress to Firebase:', error);
       throw error; // Re-throw for fallback handling
@@ -70,15 +70,15 @@ class FirebaseSpellboxService {
           timestamp: data.lastUpdated instanceof Timestamp ? data.lastUpdated.toMillis() : Date.now()
         };
 
-        console.log(`🔥 Loaded Spellbox progress from Firebase: ${gradeDisplayName}`, {
-          topicCount: Object.keys(gradeProgress.topicProgress).length,
-          currentTopic: gradeProgress.currentTopicId
-        });
+        // console.log(`🔥 Loaded Spellbox progress from Firebase: ${gradeDisplayName}`, {
+        //   topicCount: Object.keys(gradeProgress.topicProgress).length,
+        //   currentTopic: gradeProgress.currentTopicId
+        // });
 
         return gradeProgress;
       }
 
-      console.log(`🔥 No Spellbox progress found in Firebase for: ${gradeDisplayName}`);
+      // console.log(`🔥 No Spellbox progress found in Firebase for: ${gradeDisplayName}`);
       return null;
     } catch (error) {
       console.error('Failed to load Spellbox progress from Firebase:', error);
@@ -111,10 +111,10 @@ class FirebaseSpellboxService {
         allProgress[data.gradeDisplayName] = gradeProgress;
       });
 
-      console.log(`🔥 Loaded all Spellbox progress from Firebase:`, {
-        grades: Object.keys(allProgress),
-        totalTopics: Object.values(allProgress).reduce((sum, grade) => sum + Object.keys(grade.topicProgress).length, 0)
-      });
+      // console.log(`🔥 Loaded all Spellbox progress from Firebase:`, {
+      //   grades: Object.keys(allProgress),
+      //   totalTopics: Object.values(allProgress).reduce((sum, grade) => sum + Object.keys(grade.topicProgress).length, 0)
+      // });
 
       return allProgress;
     } catch (error) {
@@ -142,7 +142,7 @@ class FirebaseSpellboxService {
         deleted: true
       });
 
-      console.log(`🔥 Deleted Spellbox progress from Firebase: ${gradeDisplayName}`);
+      // console.log(`🔥 Deleted Spellbox progress from Firebase: ${gradeDisplayName}`);
     } catch (error) {
       console.error('Failed to delete Spellbox progress from Firebase:', error);
       throw error;
@@ -170,12 +170,12 @@ class FirebaseSpellboxService {
         if (localProgress) {
           await this.saveSpellboxProgressFirebase(userId, localProgress);
           migratedCount++;
-          console.log(`🔄 Migrated Spellbox progress for ${grade}`);
+          // console.log(`🔄 Migrated Spellbox progress for ${grade}`);
         }
       }
 
       if (migratedCount > 0) {
-        console.log(`✅ Successfully migrated ${migratedCount} Spellbox grade progress to Firebase`);
+        // console.log(`✅ Successfully migrated ${migratedCount} Spellbox grade progress to Firebase`);
       }
 
       return migratedCount;

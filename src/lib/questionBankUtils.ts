@@ -93,6 +93,12 @@ export const getRandomSpellingQuestion = (gradeDisplayName?: string): SpellingQu
   
   // Filter by grade if provided
   if (gradeDisplayName) {
+    // Special-case: assignment pulls only from assignment topic(s)
+    if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+      const assignmentQuestions = allSpellingQuestions.filter(q => q.topicId === 'A-');
+      if (assignmentQuestions.length === 0) return null;
+      spellingQuestions = assignmentQuestions;
+    } else {
     // Use the existing utility function to map display name to content grade
     const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
     
@@ -109,6 +115,7 @@ export const getRandomSpellingQuestion = (gradeDisplayName?: string): SpellingQu
       spellingQuestions = gradeFilteredQuestions;
     } else {
       // console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
+    }
     }
   }
   
@@ -149,6 +156,12 @@ export const getSequentialSpellingQuestion = (
   
   // Filter by grade if provided
   if (gradeDisplayName) {
+    // Special-case: assignment pulls only from assignment topic(s)
+    if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+      const assignmentQuestions = allSpellingQuestions.filter(q => q.topicId === 'A-');
+      if (assignmentQuestions.length === 0) return null;
+      spellingQuestions = assignmentQuestions;
+    } else {
     // Use the existing utility function to map display name to content grade
     const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
     
@@ -165,6 +178,7 @@ export const getSequentialSpellingQuestion = (
       spellingQuestions = gradeFilteredQuestions;
     } else {
       // console.log('⚠️ No spelling questions found for grade, using all questions as fallback');
+    }
     }
   }
   
@@ -211,6 +225,11 @@ export const getSpellingQuestionCount = (gradeDisplayName?: string): number => {
     return allSpellingQuestions.length;
   }
   
+  // Special-case: assignment pulls only from 'A-'
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    return allSpellingQuestions.filter(q => q.topicId === 'A-').length;
+  }
+
   const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
   const gradeFilteredQuestions = allSpellingQuestions.filter(question => {
     return question.topicId.startsWith(`${contentGrade}-`);
@@ -226,6 +245,12 @@ export const getSpellingTopicIds = (gradeDisplayName?: string): string[] => {
   const allSpellingQuestions = getAllSpellingQuestions();
 
   // If a grade is provided, map to content grade (e.g. "2nd Grade" → "2")
+  // Special-case: assignment → only 'A-'
+  if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+    // Ensure A- exists in the topics ordering
+    return Object.keys(sampleMCQData.topics).includes('A-') ? ['A-'] : ['A-'];
+  }
+
   const contentGrade = gradeDisplayName
     ? mapSelectedGradeToContentGrade(gradeDisplayName)
     : null;
@@ -354,9 +379,10 @@ export const getNextSpellboxQuestion = (
   
   // Get the current topic based on progression logic
   const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds);
+  console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIds: allTopicIds.slice(0, 3) });
   
   if (!currentTopicId) {
-    // console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
+    console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
     return null;
   }
   

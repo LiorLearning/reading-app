@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Volume2, ChevronRight } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
+import analytics from '@/lib/analytics';
 
 // Types for the MCQ structure
 interface AIHook {
@@ -112,6 +113,15 @@ const MCQComponent: React.FC<MCQComponentProps> = ({ onComplete, onQuestionAnswe
     setShowFeedback(true);
     
     const isCorrect = optionIndex === currentQuestion?.correctAnswer;
+    try {
+      analytics.capture('answer_attempt', {
+        question_type: 'mcq',
+        topic_id: currentQuestion?.topicId || null,
+        correct: Boolean(isCorrect),
+        question_id: currentQuestion?.id,
+        selected_option: optionIndex,
+      });
+    } catch {}
     if (isCorrect) {
       setScore(prev => prev + 1);
     }

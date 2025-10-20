@@ -21,6 +21,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
+import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
+import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
 import EvolutionStrip from '@/components/adventure/EvolutionStrip';
 import { ensureMicPermission } from '@/lib/mic-permission';
@@ -95,6 +97,15 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return {};
     }
   });
+
+  // Update num_pets_owned user property when ownedPets changes
+  useEffect(() => {
+    try {
+      if (user?.uid) {
+        analytics.identify(user.uid, { num_pets_owned: (ownedPets || []).length });
+      }
+    } catch {}
+  }, [user?.uid, ownedPets?.length]);
   
   // Camera selfie modal state
   const [showCamera, setShowCamera] = useState(false);
@@ -349,6 +360,21 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = useState<string | null>(null);
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   const [isAdventureLoading, setIsAdventureLoading] = useState(false);
+  
+  // Normalize Firebase display grade to short label used by dropdown keys
+  const toShortGradeLabel = (name?: string | null): string => {
+    const n = (name || '').trim();
+    if (!n) return '';
+    const lower = n.toLowerCase();
+    if (lower === 'assignment') return 'assignment';
+    if (lower.startsWith('kindergarten') || lower === 'k' || lower === 'kg') return 'K';
+    if (lower.startsWith('1st')) return '1st';
+    if (lower.startsWith('2nd')) return '2nd';
+    if (lower.startsWith('3rd')) return '3rd';
+    if (lower.startsWith('4th')) return '4th';
+    if (lower.startsWith('5th')) return '5th';
+    return n;
+  };
   
   // One-time daily check intro gate and step flags
   const { completePetDailyCheckIntro, needsAdventureStep5Intro, needsAdventureStep7HomeMoreIntro, completeAdventureStep7HomeMoreIntro, startAdventureStep8, hasAdventureStep8Started, startAdventureStep9, hasAdventureStep9SleepIntroStarted, hasAdventureStep9SleepIntroCompleted, completeAdventureStep9 } = useTutorial();
@@ -992,39 +1018,29 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // Load user progress to check for current topic
       const userProgress = loadUserProgress();
       
-      // Load saved preference
-      const savedPreference = loadTopicPreference();
-      let preferenceLevel: 'start' | 'middle' | null = null;
+      // Always derive displayed selection from Firebase userData (no local dependency)
+      const preferenceLevel: 'start' | 'middle' | null = userData.level
+        ? (userData.level === 'mid' ? 'middle' : (userData.level as 'start' | 'middle'))
+        : null;
       
-      if (savedPreference && savedPreference.level) {
-        preferenceLevel = savedPreference.level;
-      } else if (userData.level) {
-        // Fallback to userData level if no saved preference
-        preferenceLevel = userData.level as 'start' | 'middle';
-      }
-      
-      // console.log('Setting selectedPreference to:', preferenceLevel);
       setSelectedPreference(preferenceLevel);
       
-      // Initialize the combined grade and level selection for proper highlighting
+      // Initialize the combined grade and level selection for proper highlighting from Firebase only
       if (preferenceLevel && userData?.gradeDisplayName) {
         setSelectedGradeAndLevel({ 
-          grade: userData.gradeDisplayName, 
+          grade: toShortGradeLabel(userData.gradeDisplayName), 
           level: preferenceLevel 
         });
-        // console.log('Initialized selectedGradeAndLevel:', { grade: userData.gradeDisplayName, level: preferenceLevel });
       }
       
-      // First, check if there's a current topic saved from previous selection
+      // Determine next topic if available (may still respect saved preference for navigation only)
+      const savedPreference = loadTopicPreference();
       if (userProgress?.currentTopicId) {
-        // console.log('Loading saved current topic from progress:', userProgress.currentTopicId);
         setSelectedTopicFromPreference(userProgress.currentTopicId);
       } else if (savedPreference) {
-        // Preference no longer stores a specific topicId; pick next topic via preference
         const allTopicIds = Object.keys(sampleMCQData.topics);
         const nextByPref = getNextTopicByPreference(allTopicIds, savedPreference.level as 'start' | 'middle', userData.gradeDisplayName);
         if (nextByPref) {
-          // console.log('Loading topic from level preference:', nextByPref);
           setSelectedTopicFromPreference(nextByPref);
         }
       }
@@ -2188,16 +2204,16 @@ const getSleepyPetImage = (clicks: number) => {
     // Update selected grade if provided
     if (gradeDisplayName) {
       setSelectedGradeFromDropdown(gradeDisplayName);
-      // Save grade selection to localStorage for persistence
-      saveGradeSelection(gradeDisplayName);
-      // Track the combined grade and level selection for highlighting
-      setSelectedGradeAndLevel({ grade: gradeDisplayName, level });
+      // Do not save grade selection to localStorage; Firebase is source of truth
+      // Track the combined grade and level selection for highlighting (normalized)
+      setSelectedGradeAndLevel({ grade: toShortGradeLabel(gradeDisplayName), level });
     }
     
     // Persist selection to Firebase (minimal write)
     try {
       const mapDisplayToCode = (name?: string): string => {
         if (!name) return '';
+        if (name.toLowerCase() === 'assignment') return 'assignment';
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
@@ -2205,10 +2221,12 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
         return '';
       };
-      const gradeCode = mapDisplayToCode(gradeDisplayName || userData?.gradeDisplayName);
+      const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
+      const previousGradeDisplayName = userData?.gradeDisplayName || '';
+      const gradeCode = mapDisplayToCode(incomingGradeDisplayName);
       const levelCode = level === 'middle' ? 'mid' : level;
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
-      const gradeName = gradeDisplayName || userData?.gradeDisplayName || '';
+      const gradeName = incomingGradeDisplayName;
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -2216,6 +2234,25 @@ const getSleepyPetImage = (clicks: number) => {
           level: levelCode,
           levelDisplayName
         });
+      }
+
+      // If selecting assignment, ALWAYS reset assignment progress in Firebase and start from A-
+      const isSelectingAssignment = incomingGradeDisplayName.toLowerCase() === 'assignment';
+      const changed = previousGradeDisplayName.toLowerCase() !== incomingGradeDisplayName.toLowerCase();
+      const involvesAssignment = previousGradeDisplayName.toLowerCase() === 'assignment' || incomingGradeDisplayName.toLowerCase() === 'assignment';
+      if ((isSelectingAssignment || (changed && involvesAssignment)) && user?.uid) {
+        try {
+          await clearSpellboxProgressHybrid(user.uid, 'assignment');
+          await firebaseSpellboxService.saveSpellboxProgressFirebase(user.uid, {
+            gradeDisplayName: 'assignment',
+            currentTopicId: 'A-',
+            topicProgress: {},
+            timestamp: Date.now()
+          } as any);
+          setSelectedTopicFromPreference('A-');
+        } catch (err) {
+          console.warn('Failed to reset assignment progress:', err);
+        }
       }
     } catch (e) {
       console.error('Failed to persist grade/level selection:', e);
@@ -2225,12 +2262,26 @@ const getSleepyPetImage = (clicks: number) => {
     const allTopicIds = Object.keys(sampleMCQData.topics);
     
     // Save preference and get the specific topic immediately
-    const specificTopic = saveTopicPreference(level, allTopicIds, gradeDisplayName);
+    const specificTopic = (gradeDisplayName && gradeDisplayName.toLowerCase() === 'assignment')
+      ? 'A-'
+      : saveTopicPreference(level, allTopicIds, gradeDisplayName);
     
     // console.log(`Preference selection - Level: ${level}, Grade: ${gradeDisplayName}, Topic: ${specificTopic}`);
     
     setSelectedPreference(level);
     setSelectedTopicFromPreference(specificTopic);
+
+    // If assignment is selected, immediately start a new adventure on A-
+    if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
+      try {
+        // Start assignment gate (whiteboard suppression until threshold)
+        try {
+          const { startAssignmentGate } = await import('@/lib/assignment-gate');
+          startAssignmentGate();
+        } catch {}
+        // Do not auto-start here; Index handles assignment default to house
+      } catch {}
+    }
     
     // console.log(`State updated - selectedPreference: ${level}, selectedTopicFromPreference: ${specificTopic}, selectedGrade: ${gradeDisplayName}`);
   }, [updateUserData, userData]);
@@ -3129,6 +3180,19 @@ const getSleepyPetImage = (clicks: number) => {
               className="w-64 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
               align="start"
             >
+              {/* Assignment (Start only) */}
+              <DropdownMenuItem 
+                className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'assignment' ? 'bg-green-100' : ''}`}
+                onClick={() => handlePreferenceSelection('start', 'assignment')}
+              >
+                <span className="text-lg">📝</span>
+                <div>
+                  <div className="font-semibold">Find Your Level</div>
+                  {/* <div className="text-sm text-gray-500">Start only</div> */}
+                </div>
+                {selectedGradeAndLevel?.grade === 'assignment' ? <span className="ml-auto text-green-600">✓</span> : null}
+              </DropdownMenuItem>
+
               {/* Kindergarten */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'K' ? 'bg-blue-100' : ''}`}>

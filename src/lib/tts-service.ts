@@ -121,7 +121,18 @@ class TextToSpeechService {
 
   // Allow callers to suppress non-Krafty speech (used during tutorial overlays)
   setSuppressNonKrafty(suppress: boolean): void {
+    const wasSuppressed = this.suppressNonKrafty;
     this.suppressNonKrafty = suppress;
+    if (wasSuppressed && !suppress && this.lastSuppressedMessage) {
+      // Replay the most recently suppressed non-Krafty message after suppression lifts
+      // Use a microtask to avoid racing with overlay teardown state updates
+      Promise.resolve().then(() => {
+        // Double-check still unsuppressed before replaying
+        if (!this.suppressNonKrafty && this.lastSuppressedMessage) {
+          this.replayLastSuppressed().catch(() => {});
+        }
+      });
+    }
   }
 
   // Expose current suppression state for UI/overlays to check
@@ -432,14 +443,40 @@ class TextToSpeechService {
           reject(new Error('Audio playback failed'));
         };
 
-        // Start playing the audio
-        this.currentAudio.play().catch((error) => {
-          this.isSpeaking = false;
-          this.currentSpeakingMessageId = null;
-          this.notifySpeakingStateChange(null);
-          URL.revokeObjectURL(audioUrl);
-          reject(error);
-        });
+        // Start playing the audio with a single automatic retry on failure
+        let retryAttempted = false;
+        const tryPlay = () => {
+          if (!this.currentAudio) {
+            reject(new Error('Audio not initialized'));
+            return;
+          }
+          this.currentAudio.play().then(() => {
+            // Playback started successfully
+          }).catch((error) => {
+            if (!retryAttempted && this.activeSpeakRequestSeq === requestSeq) {
+              retryAttempted = true;
+              // Small delay before retrying; helps when a prior sound just stopped
+              setTimeout(() => {
+                if (this.currentAudio && this.activeSpeakRequestSeq === requestSeq) {
+                  tryPlay();
+                } else {
+                  this.isSpeaking = false;
+                  this.currentSpeakingMessageId = null;
+                  this.notifySpeakingStateChange(null);
+                  URL.revokeObjectURL(audioUrl);
+                  reject(error);
+                }
+              }, 120);
+            } else {
+              this.isSpeaking = false;
+              this.currentSpeakingMessageId = null;
+              this.notifySpeakingStateChange(null);
+              URL.revokeObjectURL(audioUrl);
+              reject(error);
+            }
+          });
+        };
+        tryPlay();
       });
     } catch (error) {
       console.error('TTS error:', error);

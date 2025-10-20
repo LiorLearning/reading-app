@@ -113,12 +113,990 @@ export interface MCQData {
   topics: Record<string, Topic>;
 }
 export const sampleMCQData: MCQData = {
-  "topics": {
-    'K-P.2': {
+"topics": {
+    "A-": {
+      topicInfo: {
+        topicId: 'A-',
+        topicName: 'assignment',
+        progressTopicName: 'Find My Level',
+        questionElements: 'image + text',
+        answerElements: 'text',
+        templateType: 'fill_blank'
+      },
+      questions: [
+        {
+          id: 1,
+          topicId: 'A-',
+          topicName: 'Spell_the_short_vowel_word',
+          progressTopicName: 'Spell the short vowel word',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'spelling',
+          word: 'cat',
+          imageUrl: 'cat_image_url_here',
+          explanation: "Well done! The short vowel sound is /a/ as in 'cat'.",
+          questionText: "Listen to the word. Then, spell it.",
+          correctAnswer: 'a',
+          template: 'spelling',
+          isSpacing: false,
+          isSorting: true,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [0,2],
+          aiHook: {
+            targetWord: 'cat',
+            intent: 'spelling',
+            questionLine: "Listen to the word. Then, spell it.",
+            imagePrompt: 'A cute cat for the word cat'
+          },
+          aiTutor: {
+            target_word: 'cat',
+            question: "_ _ _",
+            student_entry: "",
+            topic_to_reinforce: 'Spell the short vowel word',
+            spelling_pattern_or_rule: "Short vowel /a/ as in 'cat'."
+          },
+          audio: "cat"
+        },
+        {
+          id: 2,
+          topicId: 'A-',
+          topicName: 'Spell_the_short_vowel_word',
+          progressTopicName: 'Spell the short vowel word',
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'spelling',
+          word: 'dog',
+          imageUrl: 'dog_image_url_here',
+          explanation: "Awesome! The short vowel sound is /o/ as in 'dog'.",
+          questionText: "Listen to the word. Then, spell it.",
+          correctAnswer: 'dog',
+          template: 'spelling',
+          isSpacing: false,
+          isSorting: true,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'dog',
+            intent: 'spelling',
+            questionLine: "Listen to the word. Then, spell it.",
+            imagePrompt: 'A brown dog for the word dog'
+          },
+          aiTutor: {
+            target_word: 'dog',
+            question: "_ _ _",
+            student_entry: "",
+            topic_to_reinforce: 'Spell the short vowel word',
+            spelling_pattern_or_rule: "Short vowel /o/ as in 'dog'."
+          },
+          audio: "dog"
+        },
+        {
+          id: 3,
+          topicId: 'A-',
+          topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+          progressTopicName: 'Fill in the missing sounds',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'blend',
+          imageUrl: null,
+          explanation: "Well done! The word is 'step'.",
+          questionText: 'Complete the word to match the picture: _ep',
+          correctAnswer: 'step',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [2,3],
+          aiHook: {
+            targetWord: 'blend',
+            intent: 'fill_blank',
+            questionLine: 'Complete the word to match the picture: _ep',
+            imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+          },
+          aiTutor: {
+            target_word: 'step',
+            question: '_ _ e p',
+            student_entry: '',
+            topic_to_reinforce: 'Initial consonant blends',
+            spelling_pattern_or_rule: "The 'st' blend joins the /s/ and /t/ sounds at the start of words like 'step' and 'stop'."
+          },
+          audio: 'step'
+        },
+        {
+          id: 4,
+          topicId: 'A-',
+          topicName: 'Complete_the_word_with_ar_or_r_controlled_vowel',
+          progressTopicName: 'Fill in the AR and OR sound words',
+          questionElements: 'image + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'bark',
+          imageUrl: null,
+          explanation: "Well done! The word is 'bark'.",
+          questionText: "Complete the word: b__k",
+          correctAnswer: 'bark',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: true,
+          prefilledIndexes: [0, 3],
+          aiHook: {
+            targetWord: 'bark',
+            intent: 'fill_blank',
+            questionLine: "Complete the word: b__k",
+            imagePrompt: 'Educational scene showing complete_the_word_with_ar_or_r_controlled_vowel concepts'
+          },
+          aiTutor: {
+            target_word: 'bark',
+            question: 'b _ _ k',
+            student_entry: '',
+            topic_to_reinforce: 'R-controlled vowel sound /ar/',
+            spelling_pattern_or_rule: "The letters 'ar' make the /ar/ sound, as in 'car', 'farm', and 'star'."
+          },
+          audio: 'bark'
+        },
+        {
+          id: 5,
+          topicId: 'A-',
+          topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+          progressTopicName: 'Spell Long A Words',
+          questionElements: 'image + audio',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "cake",
+          imageUrl: null,
+          explanation: "Great job! 'Cake' uses the silent 'e' to make the long 'a' sound.",
+          questionText: "Listen to the word for a sweet dessert. Then, spell it.",
+          correctAnswer: "cake",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
+          aiHook: {
+            targetWord: "cake",
+            intent: "fill_blank",
+            questionLine: "Listen to the word for a sweet dessert. Then, spell it.",
+            imagePrompt: "Educational scene showing spell the long a word silent e ai ay concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"cake"
+        },
+        {
+          id: 6,
+          topicId: 'A-',
+          topicName: 'Spell_the_long_u_word_silent_e_ue_oo_ew',
+          progressTopicName: 'Spelling long U sounds',
+          questionElements: 'audio + image',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "glue",
+          imageUrl: null,
+          explanation: "Well done! 'Glue' ends with 'ue'.",
+          questionText: "Spell the sticky substance using the long 'u' sound.",
+          correctAnswer: "glue",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
+          aiHook: {
+            targetWord: "glue",
+            intent: "fill_blank",
+            questionLine: "Spell the sticky substance using the long 'u' sound.",
+            imagePrompt: "Educational scene showing spell the long u word silent e ue oo ew concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"glue"
+        },
+        {
+          id: 7,
+          topicId: 'A-',
+          topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ae_eigh',
+          progressTopicName: 'Spell long A words',
+          questionElements: 'audio',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "weight",
+          imageUrl: null,
+          explanation: "Good job! The word 'weight' uses 'eigh' to make the long 'a' sound.",
+          questionText: "Listen to the word. Then, spell it: w___ht",
+          correctAnswer: "weight",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0,4,5],
+          aiHook: {
+            targetWord: "weight",
+            intent: "fill_blank",
+            questionLine: "Listen to the word. Then, spell it: w___ht",
+            imagePrompt: "Educational scene showing spell the long a word silent e ai ay ae eigh concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"weight"
+        },
+        {
+          id: 8,
+          topicId: 'A-',
+          topicName: 'Spell_consonant_le_words',
+          progressTopicName: 'Spell consonant-le words',
+          questionElements: 'audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: "noodle",
+          imageUrl: null,
+          explanation: "Great job! 'Noodle' has a consonant-le ending.",
+          questionText: "Fill in the blank: I ate a ___.",
+          correctAnswer: "noodle",
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+        isPrefilled: false,
+        prefilledIndexes: [],
+          aiHook: {
+            targetWord: "noodle",
+            intent: "fill_blank",
+            questionLine: "Fill in the blank: I ate a ___.",
+            imagePrompt: "Educational scene showing spell consonant le words concepts"
+          },
+          aiTutor: {
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
+          audio:"noodle"
+        },
+      ],
+  },
+   'K-O.3': {
+  topicInfo: {
+    topicId: 'K-O.3',
+    topicName: 'Complete_the_short_a_word',
+    progressTopicName: 'Complete the short a word',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'ran',
+      imageUrl: 'running_girl_image_url_here',
+      explanation: "Great job! Fill the first sound to make 'ran'.",
+      questionText: "_an",
+      correctAnswer: 'r',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'ran',
+        intent: 'fill_blank',
+        questionLine: "_an",
+        imagePrompt: 'A child running outdoors for the word ran'
+      },
+      aiTutor: {
+        target_word: 'ran',
+        question: "_an",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "ran"
+    },
+    {
+      id: 2,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'cat',
+      imageUrl: 'cat_image_url_here',
+      explanation: "Nice! Fill the first two letters to make 'cat'.",
+      questionText: "__t",
+      correctAnswer: 'ca',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'cat',
+        intent: 'fill_blank',
+        questionLine: "__t",
+        imagePrompt: 'A cute cat sitting for the word cat'
+      },
+      aiTutor: {
+        target_word: 'cat',
+        question: "__t",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "cat"
+    },
+    {
+      id: 3,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bag',
+      imageUrl: 'bag_image_url_here',
+      explanation: "Excellent! Fill the first sound to make 'bag'.",
+      questionText: "_ag",
+      correctAnswer: 'b',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'bag',
+        intent: 'fill_blank',
+        questionLine: "_ag",
+        imagePrompt: 'A school bag for the word bag'
+      },
+      aiTutor: {
+        target_word: 'bag',
+        question: "_ag",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "bag"
+    },
+    {
+      id: 4,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'jam',
+      imageUrl: 'jam_image_url_here',
+      explanation: "Great! Fill the first two letters to make 'jam'.",
+      questionText: "__m",
+      correctAnswer: 'ja',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'jam',
+        intent: 'fill_blank',
+        questionLine: "__m",
+        imagePrompt: 'A jar of strawberry jam for the word jam'
+      },
+      aiTutor: {
+        target_word: 'jam',
+        question: "__m",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "jam"
+    },
+    {
+      id: 5,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'map',
+      imageUrl: 'map_image_url_here',
+      explanation: "Good job! Fill the first sound to make 'map'.",
+      questionText: "_ap",
+      correctAnswer: 'm',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'map',
+        intent: 'fill_blank',
+        questionLine: "_ap",
+        imagePrompt: 'A world map for the word map'
+      },
+      aiTutor: {
+        target_word: 'map',
+        question: "_ap",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "map"
+    },
+    {
+      id: 6,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'fan',
+      imageUrl: 'fan_image_url_here',
+      explanation: "Nice work! Fill the first two letters to make 'fan'.",
+      questionText: "__n",
+      correctAnswer: 'fa',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'fan',
+        intent: 'fill_blank',
+        questionLine: "__n",
+        imagePrompt: 'A spinning ceiling fan for the word fan'
+      },
+      aiTutor: {
+        target_word: 'fan',
+        question: "__n",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "fan"
+    },
+    {
+      id: 7,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'pan',
+      imageUrl: 'pan_image_url_here',
+      explanation: "Great! Fill the first sound to make 'pan'.",
+      questionText: "_an",
+      correctAnswer: 'p',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'pan',
+        intent: 'fill_blank',
+        questionLine: "_an",
+        imagePrompt: 'A frying pan for the word pan'
+      },
+      aiTutor: {
+        target_word: 'pan',
+        question: "_an",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "pan"
+    },
+    {
+      id: 8,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'cap',
+      imageUrl: 'cap_image_url_here',
+      explanation: "Awesome! Fill the first two letters to make 'cap'.",
+      questionText: "__p",
+      correctAnswer: 'ca',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'cap',
+        intent: 'fill_blank',
+        questionLine: "__p",
+        imagePrompt: 'A baseball cap for the word cap'
+      },
+      aiTutor: {
+        target_word: 'cap',
+        question: "__p",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "cap"
+    },
+    {
+      id: 9,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'dad',
+      imageUrl: 'dad_image_url_here',
+      explanation: "Good job! Fill the first sound to make 'dad'.",
+      questionText: "_ad",
+      correctAnswer: 'd',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'dad',
+        intent: 'fill_blank',
+        questionLine: "_ad",
+        imagePrompt: 'A smiling father for the word dad'
+      },
+      aiTutor: {
+        target_word: 'dad',
+        question: "_ad",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "dad"
+    },
+    {
+      id: 10,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'man',
+      imageUrl: 'man_image_url_here',
+      explanation: "Nice! Fill the first two letters to make 'man'.",
+      questionText: "__n",
+      correctAnswer: 'ma',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'man',
+        intent: 'fill_blank',
+        questionLine: "__n",
+        imagePrompt: 'A man standing for the word man'
+      },
+      aiTutor: {
+        target_word: 'man',
+        question: "__n",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "man"
+    },
+    {
+      id: 11,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bat',
+      imageUrl: 'bat_image_url_here',
+      explanation: "Excellent! Fill the first sound to make 'bat'.",
+      questionText: "_at",
+      correctAnswer: 'b',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'bat',
+        intent: 'fill_blank',
+        questionLine: "_at",
+        imagePrompt: 'A baseball bat for the word bat'
+      },
+      aiTutor: {
+        target_word: 'bat',
+        question: "_at",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "bat"
+    },
+    {
+      id: 12,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'tag',
+      imageUrl: 'tag_image_url_here',
+      explanation: "Great! Fill the first two letters to make 'tag'.",
+      questionText: "__g",
+      correctAnswer: 'ta',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'tag',
+        intent: 'fill_blank',
+        questionLine: "__g",
+        imagePrompt: 'A name tag for the word tag'
+      },
+      aiTutor: {
+        target_word: 'tag',
+        question: "__g",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "tag"
+    },
+    {
+      id: 13,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'tap',
+      imageUrl: 'tap_image_url_here',
+      explanation: "Good! Fill the first sound to make 'tap'.",
+      questionText: "_ap",
+      correctAnswer: 't',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'tap',
+        intent: 'fill_blank',
+        questionLine: "_ap",
+        imagePrompt: 'A water tap for the word tap'
+      },
+      aiTutor: {
+        target_word: 'tap',
+        question: "_ap",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "tap"
+    },
+    {
+      id: 14,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'van',
+      imageUrl: 'van_image_url_here',
+      explanation: "Nice work! Fill the first two letters to make 'van'.",
+      questionText: "__n",
+      correctAnswer: 'va',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'van',
+        intent: 'fill_blank',
+        questionLine: "__n",
+        imagePrompt: 'A white van for the word van'
+      },
+      aiTutor: {
+        target_word: 'van',
+        question: "__n",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "van"
+    },
+    {
+      id: 15,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'jam',
+      imageUrl: 'jar_of_jam_image_url_here',
+      explanation: "You did it! Fill the first sound to make 'jam'.",
+      questionText: "_am",
+      correctAnswer: 'j',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'jam',
+        intent: 'fill_blank',
+        questionLine: "_am",
+        imagePrompt: 'A jar of jam for the word jam'
+      },
+      aiTutor: {
+        target_word: 'jam',
+        question: "_am",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "jam"
+    },
+    {
+      id: 16,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'rag',
+      imageUrl: 'rag_image_url_here',
+      explanation: "Great! Fill the first two letters to make 'rag'.",
+      questionText: "__g",
+      correctAnswer: 'ra',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'rag',
+        intent: 'fill_blank',
+        questionLine: "__g",
+        imagePrompt: 'A cleaning rag for the word rag'
+      },
+      aiTutor: {
+        target_word: 'rag',
+        question: "__g",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "rag"
+    },
+    {
+      id: 17,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'can',
+      imageUrl: 'can_image_url_here',
+      explanation: "Good job! Fill the first sound to make 'can'.",
+      questionText: "_an",
+      correctAnswer: 'c',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'can',
+        intent: 'fill_blank',
+        questionLine: "_an",
+        imagePrompt: 'A tin can for the word can'
+      },
+      aiTutor: {
+        target_word: 'can',
+        question: "_an",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "can"
+    },
+    {
+      id: 18,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'dad',
+      imageUrl: 'father_image_url_here',
+      explanation: "Excellent! Fill the first two letters to make 'dad'.",
+      questionText: "__d",
+      correctAnswer: 'da',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'dad',
+        intent: 'fill_blank',
+        questionLine: "__d",
+        imagePrompt: 'A dad smiling for the word dad'
+      },
+      aiTutor: {
+        target_word: 'dad',
+        question: "__d",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "dad"
+    },
+    {
+      id: 19,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'mad',
+      imageUrl: 'angry_face_image_url_here',
+      explanation: "Nice! Fill the first sound to make 'mad'.",
+      questionText: "_ad",
+      correctAnswer: 'm',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'mad',
+        intent: 'fill_blank',
+        questionLine: "_ad",
+        imagePrompt: 'A cartoon angry face for the word mad'
+      },
+      aiTutor: {
+        target_word: 'mad',
+        question: "_ad",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "mad"
+    },
+    {
+      id: 20,
+      topicId: 'K-O.3',
+      topicName: 'Complete_the_short_a_word',
+      progressTopicName: 'Complete the short a word',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'ham',
+      imageUrl: 'ham_image_url_here',
+      explanation: "Great! Fill the first two letters to make 'ham'.",
+      questionText: "__m",
+      correctAnswer: 'ha',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'ham',
+        intent: 'fill_blank',
+        questionLine: "__m",
+        imagePrompt: 'A piece of ham for the word ham'
+      },
+      aiTutor: {
+        target_word: 'ham',
+        question: "__m",
+        student_entry: "",
+        topic_to_reinforce: 'Complete the short a word',
+        spelling_pattern_or_rule: "In short a words, 'a' says /ă/ between two consonants (CVC). Listen for each sound and fill the missing letter (vowel or consonant) to complete the word."
+      },
+      audio: "ham"
+    }
+  ]
+}
+,
+
+'K-P.2': {
   topicInfo: {
     topicId: 'K-P.2',
     topicName: 'Complete_the_short_e_word',
-    progressTopicName: 'Complete the short e word',
+    progressTopicName: 'Consonants in short e words',
     questionElements: 'image + audio + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -132,10 +1110,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'red',
       imageUrl: 'paint_brush_red_image_url_here',
-      explanation: "Good job! The missing letter is 'r'. The word is 'red'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ed",
+      explanation: "Great job! Fill the first sound to make 'red'.",
+      questionText: "_ed",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
@@ -146,7 +1124,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'red',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
+        questionLine: "_ed",
         imagePrompt: 'An educational illustration of a paintbrush with red paint, showing the word red'
       },
       aiTutor: {
@@ -154,7 +1132,7 @@ export const sampleMCQData: MCQData = {
         question: "_ed",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'ed' is filled"
+        spelling_pattern_or_rule: "In short e CVC words, the middle 'e' says /ĕ/. Listen to the sounds and fill the missing letter(s) to match the word."
       },
       audio: "red"
     },
@@ -166,29 +1144,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'bed',
       imageUrl: 'bed_image_url_here',
-      explanation: "Nice work! The missing letter is 'b'. The word is 'bed'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ed",
-      correctAnswer: 'b',
+      explanation: "Nice! Fill the first two letters to make 'bed'.",
+      questionText: "__d",
+      correctAnswer: 'be',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bed',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ed",
+        questionLine: "__d",
         imagePrompt: 'A cozy bed for early phonics practice'
       },
       aiTutor: {
         target_word: 'bed',
-        question: "_ed",
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'ed' is filled"
+        spelling_pattern_or_rule: "In short e CVC words, the middle 'e' says /ĕ/. Fill the starting consonant or the start pair (consonant + e) to complete the word."
       },
       audio: "bed"
     },
@@ -200,10 +1178,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'pen',
       imageUrl: 'pen_image_url_here',
-      explanation: "Awesome! The missing letter is 'p'. The word is 'pen'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
+      explanation: "Awesome! Fill the first sound to make 'pen'.",
+      questionText: "_en",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -214,7 +1192,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pen',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "_en",
         imagePrompt: 'A blue pen on a notebook, kindergarten phonics style'
       },
       aiTutor: {
@@ -222,7 +1200,7 @@ export const sampleMCQData: MCQData = {
         question: "_en",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Short e in the middle says /ĕ/. Hear the first sound and fill the missing letter."
       },
       audio: "pen"
     },
@@ -234,29 +1212,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'jet',
       imageUrl: 'jet_airplane_image_url_here',
-      explanation: "Great! The missing letter is 'j'. The word is 'jet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'j',
+      explanation: "Great! Fill the first two letters to make 'jet'.",
+      questionText: "__t",
+      correctAnswer: 'je',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'jet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A toy jet flying in the sky for phonics exercise'
       },
       aiTutor: {
         target_word: 'jet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "jet"
     },
@@ -268,10 +1246,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'hen',
       imageUrl: 'hen_image_url_here',
-      explanation: "Good job! The missing letter is 'h'. The word is 'hen'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
+      explanation: "Good job! Fill the first sound to make 'hen'.",
+      questionText: "_en",
       correctAnswer: 'h',
       template: 'fill_blank',
       isSpacing: false,
@@ -282,7 +1260,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'hen',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "_en",
         imagePrompt: 'A hen standing in the farmyard for phonics learning'
       },
       aiTutor: {
@@ -290,7 +1268,7 @@ export const sampleMCQData: MCQData = {
         question: "_en",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Hear /h/ + /ĕ/ + /n/. Fill the missing first sound."
       },
       audio: "hen"
     },
@@ -302,29 +1280,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'web',
       imageUrl: 'spider_web_image_url_here',
-      explanation: "Nice! The missing letter is 'w'. The word is 'web'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _eb",
-      correctAnswer: 'w',
+      explanation: "Nice! Fill the first two letters to make 'web'.",
+      questionText: "__b",
+      correctAnswer: 'we',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'web',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _eb",
+        questionLine: "__b",
         imagePrompt: 'A spider web shining with dew, short e phonics concept'
       },
       aiTutor: {
         target_word: 'web',
-        question: "_eb",
+        question: "__b",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'eb' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "web"
     },
@@ -336,29 +1314,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'leg',
       imageUrl: 'human_leg_image_url_here',
-      explanation: "Super! The missing letter is 'l'. The word is 'leg'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _eg",
-      correctAnswer: 'l',
+      explanation: "Super! Fill the first two letters to make 'leg'.",
+      questionText: "__g",
+      correctAnswer: 'le',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'leg',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _eg",
+        questionLine: "__g",
         imagePrompt: 'A cartoon leg running, used in phonics learning'
       },
       aiTutor: {
         target_word: 'leg',
-        question: "_eg",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'eg' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "leg"
     },
@@ -370,10 +1348,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'net',
       imageUrl: 'butterfly_net_image_url_here',
-      explanation: "Great! The missing letter is 'n'. The word is 'net'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
+      explanation: "Great! Fill the first sound to make 'net'.",
+      questionText: "_et",
       correctAnswer: 'n',
       template: 'fill_blank',
       isSpacing: false,
@@ -384,7 +1362,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'net',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "_et",
         imagePrompt: 'A butterfly net for kindergarten short e learning'
       },
       aiTutor: {
@@ -392,7 +1370,7 @@ export const sampleMCQData: MCQData = {
         question: "_et",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant and fill it in."
       },
       audio: "net"
     },
@@ -404,29 +1382,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'men',
       imageUrl: 'three_men_image_url_here',
-      explanation: "Well done! The missing letter is 'm'. The word is 'men'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
-      correctAnswer: 'm',
+      explanation: "Well done! Fill the first two letters to make 'men'.",
+      questionText: "__n",
+      correctAnswer: 'me',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'men',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "__n",
         imagePrompt: 'A group of cartoon men waving, educational style'
       },
       aiTutor: {
         target_word: 'men',
-        question: "_en",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "men"
     },
@@ -438,29 +1416,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'pet',
       imageUrl: 'puppy_pet_image_url_here',
-      explanation: "Nice job! The missing letter is 'p'. The word is 'pet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'p',
+      explanation: "Nice job! Fill the first two letters to make 'pet'.",
+      questionText: "__t",
+      correctAnswer: 'pe',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A happy pet dog sitting for short e phonics'
       },
       aiTutor: {
         target_word: 'pet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "pet"
     },
@@ -472,10 +1450,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'den',
       imageUrl: 'fox_den_image_url_here',
-      explanation: "Nice work! The missing letter is 'd'. The word is 'den'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _en",
+      explanation: "Nice work! Fill the first sound to make 'den'.",
+      questionText: "_en",
       correctAnswer: 'd',
       template: 'fill_blank',
       isSpacing: false,
@@ -486,7 +1464,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'den',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _en",
+        questionLine: "_en",
         imagePrompt: 'A woodland animal near its den for the word den'
       },
       aiTutor: {
@@ -494,7 +1472,7 @@ export const sampleMCQData: MCQData = {
         question: "_en",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'en' is filled"
+        spelling_pattern_or_rule: "Hear /d/ + /ĕ/ + /n/. Fill the missing first sound."
       },
       audio: "den"
     },
@@ -506,29 +1484,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'wet',
       imageUrl: 'rainy_day_wet_puddle_image_url_here',
-      explanation: "Great job! The missing letter is 'w'. The word is 'wet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'w',
+      explanation: "Great job! Fill the first two letters to make 'wet'.",
+      questionText: "__t",
+      correctAnswer: 'we',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'wet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A puddle or soaked shirt to show the word wet'
       },
       aiTutor: {
         target_word: 'wet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "wet"
     },
@@ -540,29 +1518,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'set',
       imageUrl: 'toy_blocks_set_image_url_here',
-      explanation: "Good job! The missing letter is 's'. The word is 'set'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 's',
+      explanation: "Good job! Fill the first two letters to make 'set'.",
+      questionText: "__t",
+      correctAnswer: 'se',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'set',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A matching set of toy blocks to show the word set'
       },
       aiTutor: {
         target_word: 'set',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "set"
     },
@@ -574,29 +1552,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'let',
       imageUrl: 'child_writing_let_note_image_url_here',
-      explanation: "Nice! The missing letter is 'l'. The word is 'let'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'l',
+      explanation: "Nice! Fill the first two letters to make 'let'.",
+      questionText: "__t",
+      correctAnswer: 'le',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'let',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A child holding a note with the word let used in context'
       },
       aiTutor: {
         target_word: 'let',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the consonant + e start to complete the short e word."
       },
       audio: "let"
     },
@@ -608,29 +1586,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'met',
       imageUrl: 'friends_met_handshake_image_url_here',
-      explanation: "Super! The missing letter is 'm'. The word is 'met'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'm',
+      explanation: "Super! Fill the first two letters to make 'met'.",
+      questionText: "__t",
+      correctAnswer: 'me',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'met',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'Two friends meeting to show the word met'
       },
       aiTutor: {
         target_word: 'met',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "met"
     },
@@ -642,29 +1620,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'get',
       imageUrl: 'getting_gift_image_url_here',
-      explanation: "Excellent! The missing letter is 'g'. The word is 'get'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'g',
+      explanation: "Excellent! Fill the first two letters to make 'get'.",
+      questionText: "__t",
+      correctAnswer: 'ge',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'get',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A child getting a gift to show the word get'
       },
       aiTutor: {
         target_word: 'get',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the consonant + e start to complete the short e word."
       },
       audio: "get"
     },
@@ -676,29 +1654,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'vet',
       imageUrl: 'vet_doctor_image_url_here',
-      explanation: "Great! The missing letter is 'v'. The word is 'vet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'v',
+      explanation: "Great! Fill the first two letters to make 'vet'.",
+      questionText: "__t",
+      correctAnswer: 've',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'vet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'A veterinarian with a pet to show the word vet'
       },
       aiTutor: {
         target_word: 'vet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + e) to make the short e word."
       },
       audio: "vet"
     },
@@ -710,29 +1688,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'hem',
       imageUrl: 'sewing_hem_image_url_here',
-      explanation: "Nice! The missing letter is 'h'. The word is 'hem'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _em",
-      correctAnswer: 'h',
+      explanation: "Nice! Fill the first two letters to make 'hem'.",
+      questionText: "__m",
+      correctAnswer: 'he',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hem',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _em",
+        questionLine: "__m",
         imagePrompt: 'Hands sewing the edge (hem) of fabric to show the word hem'
       },
       aiTutor: {
         target_word: 'hem',
-        question: "_em",
+        question: "__m",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'em' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "hem"
     },
@@ -744,29 +1722,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'peg',
       imageUrl: 'clothes_peg_on_line_image_url_here',
-      explanation: "Super! The missing letter is 'p'. The word is 'peg'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _eg",
-      correctAnswer: 'p',
+      explanation: "Super! Fill the first two letters to make 'peg'.",
+      questionText: "__g",
+      correctAnswer: 'pe',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'peg',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _eg",
+        questionLine: "__g",
         imagePrompt: 'A clothes peg clipped on a line to show the word peg'
       },
       aiTutor: {
         target_word: 'peg',
-        question: "_eg",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'eg' is filled"
+        spelling_pattern_or_rule: "Fill the consonant + e start to make the short e word."
       },
       audio: "peg"
     },
@@ -778,38 +1756,39 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short e',
+      word: 'bet',
       imageUrl: 'placing_bet_coins_image_url_here',
-      explanation: "Excellent! The missing letter is 'b'. The word is 'bet'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _et",
-      correctAnswer: 'b',
+      explanation: "Excellent! Fill the first two letters to make 'bet'.",
+      questionText: "__t",
+      correctAnswer: 'be',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bet',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _et",
+        questionLine: "__t",
         imagePrompt: 'Simple illustration showing choosing between two options for the word bet'
       },
       aiTutor: {
         target_word: 'bet',
-        question: "_et",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short e word',
-        spelling_pattern_or_rule: "first letter is empty but 'et' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant + e to complete the short e word."
       },
       audio: "bet"
     }
   ]
-},'K-Q.2': {
+}
+,'K-Q.2': {
   topicInfo: {
     topicId: 'K-Q.2',
     topicName: 'Complete_the_short_i_word',
-    progressTopicName: 'Complete the short i word',
+    progressTopicName: 'Consonants in short i words',
     questionElements: 'image + audio + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -823,10 +1802,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'rip',
       imageUrl: 'ripping_paper_image_url_here',
-      explanation: "Good job! The missing letter is 'r'. The word is 'rip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
+      explanation: "Great job! Fill the first sound to make 'rip'.",
+      questionText: "_ip",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
@@ -837,7 +1816,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'rip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "_ip",
         imagePrompt: 'Educational illustration showing hands ripping paper for the word rip'
       },
       aiTutor: {
@@ -845,7 +1824,7 @@ export const sampleMCQData: MCQData = {
         question: "_ip",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Short i CVC words use /ĭ/ in the middle. Hear the first sound and fill the missing letter."
       },
       audio: "rip"
     },
@@ -857,29 +1836,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'dip',
       imageUrl: 'dipping_chip_in_sauce_image_url_here',
-      explanation: "Great work! The missing letter is 'd'. The word is 'dip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
-      correctAnswer: 'd',
+      explanation: "Nice! Fill the starting pair to make 'dip'.",
+      questionText: "__p",
+      correctAnswer: 'di',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "__p",
         imagePrompt: 'A bowl of sauce with a chip dipping in, for the word dip'
       },
       aiTutor: {
         target_word: 'dip',
-        question: "_ip",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (consonant + i) to match the sounds /d/ + /ĭ/."
       },
       audio: "dip"
     },
@@ -891,10 +1870,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'lip',
       imageUrl: 'lip_image_url_here',
-      explanation: "Nice! The missing letter is 'l'. The word is 'lip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
+      explanation: "Good! Fill the first sound to make 'lip'.",
+      questionText: "_ip",
       correctAnswer: 'l',
       template: 'fill_blank',
       isSpacing: false,
@@ -905,7 +1884,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'lip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "_ip",
         imagePrompt: 'A mouth showing lips for the word lip'
       },
       aiTutor: {
@@ -913,7 +1892,7 @@ export const sampleMCQData: MCQData = {
         question: "_ip",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant and add it to _ip."
       },
       audio: "lip"
     },
@@ -925,29 +1904,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'tip',
       imageUrl: 'tipping_cup_image_url_here',
-      explanation: "Good job! The missing letter is 't'. The word is 'tip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
-      correctAnswer: 't',
+      explanation: "Great! Fill the starting pair to make 'tip'.",
+      questionText: "__p",
+      correctAnswer: 'ti',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'tip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "__p",
         imagePrompt: 'An illustration of tipping a cup for the word tip'
       },
       aiTutor: {
         target_word: 'tip',
-        question: "_ip",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Add the start pair (t + i) for /tĭ/."
       },
       audio: "tip"
     },
@@ -959,10 +1938,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'sip',
       imageUrl: 'drinking_with_straw_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'sip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
+      explanation: "Awesome! Fill the first sound to make 'sip'.",
+      questionText: "_ip",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -973,7 +1952,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "_ip",
         imagePrompt: 'A child sipping juice with a straw for the word sip'
       },
       aiTutor: {
@@ -981,7 +1960,7 @@ export const sampleMCQData: MCQData = {
         question: "_ip",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Short i says /ĭ/. Add the first consonant you hear."
       },
       audio: "sip"
     },
@@ -993,29 +1972,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'pin',
       imageUrl: 'safety_pin_image_url_here',
-      explanation: "Nice work! The missing letter is 'p'. The word is 'pin'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _in",
-      correctAnswer: 'p',
+      explanation: "Nice! Fill the starting pair to make 'pin'.",
+      questionText: "__n",
+      correctAnswer: 'pi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pin',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _in",
+        questionLine: "__n",
         imagePrompt: 'A safety pin for the word pin'
       },
       aiTutor: {
         target_word: 'pin',
-        question: "_in",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'in' is filled"
+        spelling_pattern_or_rule: "Blend the first consonant with i: add 'pi' to finish the word."
       },
       audio: "pin"
     },
@@ -1027,10 +2006,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'fin',
       imageUrl: 'fish_fin_image_url_here',
-      explanation: "Super! The missing letter is 'f'. The word is 'fin'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _in",
+      explanation: "Super! Fill the first sound to make 'fin'.",
+      questionText: "_in",
       correctAnswer: 'f',
       template: 'fill_blank',
       isSpacing: false,
@@ -1041,7 +2020,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'fin',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _in",
+        questionLine: "_in",
         imagePrompt: 'A fish showing its fin for the word fin'
       },
       aiTutor: {
@@ -1049,7 +2028,7 @@ export const sampleMCQData: MCQData = {
         question: "_in",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'in' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant before /ĭn/."
       },
       audio: "fin"
     },
@@ -1061,29 +2040,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'win',
       imageUrl: 'boy_winning_trophy_image_url_here',
-      explanation: "Great job! The missing letter is 'w'. The word is 'win'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _in",
-      correctAnswer: 'w',
+      explanation: "Great! Fill the starting pair to make 'win'.",
+      questionText: "__n",
+      correctAnswer: 'wi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'win',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _in",
+        questionLine: "__n",
         imagePrompt: 'A boy holding a trophy for the word win'
       },
       aiTutor: {
         target_word: 'win',
-        question: "_in",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'in' is filled"
+        spelling_pattern_or_rule: "Add the start pair (w + i) to make /wĭ/."
       },
       audio: "win"
     },
@@ -1095,10 +2074,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'sit',
       imageUrl: 'child_sitting_image_url_here',
-      explanation: "Nice! The missing letter is 's'. The word is 'sit'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _it",
+      explanation: "Nice! Fill the first sound to make 'sit'.",
+      questionText: "_it",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -1109,7 +2088,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sit',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _it",
+        questionLine: "_it",
         imagePrompt: 'A child sitting on a chair for the word sit'
       },
       aiTutor: {
@@ -1117,7 +2096,7 @@ export const sampleMCQData: MCQData = {
         question: "_it",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'it' is filled"
+        spelling_pattern_or_rule: "Hear the first consonant before /ĭt/ and write it."
       },
       audio: "sit"
     },
@@ -1129,29 +2108,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'hit',
       imageUrl: 'baseball_player_hitting_ball_image_url_here',
-      explanation: "Excellent! The missing letter is 'h'. The word is 'hit'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _it",
-      correctAnswer: 'h',
+      explanation: "Excellent! Fill the starting pair to make 'hit'.",
+      questionText: "__t",
+      correctAnswer: 'hi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hit',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _it",
+        questionLine: "__t",
         imagePrompt: 'A baseball player hitting the ball for the word hit'
       },
       aiTutor: {
         target_word: 'hit',
-        question: "_it",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'it' is filled"
+        spelling_pattern_or_rule: "Add the start pair (h + i) to make /hĭ/."
       },
       audio: "hit"
     },
@@ -1163,10 +2142,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'pig',
       imageUrl: 'pig_image_url_here',
-      explanation: "Great job! The missing letter is 'p'. The word is 'pig'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
+      explanation: "Great job! Fill the first sound to make 'pig'.",
+      questionText: "_ig",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -1177,7 +2156,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pig',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "_ig",
         imagePrompt: 'A pink pig for the word pig'
       },
       aiTutor: {
@@ -1185,7 +2164,7 @@ export const sampleMCQData: MCQData = {
         question: "_ig",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Write the starting consonant before /ĭg/."
       },
       audio: "pig"
     },
@@ -1197,29 +2176,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'dig',
       imageUrl: 'man_digging_soil_image_url_here',
-      explanation: "Nice work! The missing letter is 'd'. The word is 'dig'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
-      correctAnswer: 'd',
+      explanation: "Nice work! Fill the starting pair to make 'dig'.",
+      questionText: "__g",
+      correctAnswer: 'di',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dig',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "__g",
         imagePrompt: 'A man digging soil for the word dig'
       },
       aiTutor: {
         target_word: 'dig',
-        question: "_ig",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Blend /d/ + /ĭ/ to add the start pair 'di'."
       },
       audio: "dig"
     },
@@ -1231,10 +2210,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'wig',
       imageUrl: 'girl_wearing_wig_image_url_here',
-      explanation: "Good job! The missing letter is 'w'. The word is 'wig'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
+      explanation: "Good job! Fill the first sound to make 'wig'.",
+      questionText: "_ig",
       correctAnswer: 'w',
       template: 'fill_blank',
       isSpacing: false,
@@ -1245,7 +2224,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'wig',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "_ig",
         imagePrompt: 'A girl wearing a wig for the word wig'
       },
       aiTutor: {
@@ -1253,7 +2232,7 @@ export const sampleMCQData: MCQData = {
         question: "_ig",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Add the starting consonant sound before /ĭg/."
       },
       audio: "wig"
     },
@@ -1265,29 +2244,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'fix',
       imageUrl: 'fixing_bike_image_url_here',
-      explanation: "Nice! The missing letter is 'f'. The word is 'fix'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ix",
-      correctAnswer: 'f',
+      explanation: "Nice! Fill the starting pair to make 'fix'.",
+      questionText: "__x",
+      correctAnswer: 'fi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fix',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ix",
+        questionLine: "__x",
         imagePrompt: 'A person fixing a bike for the word fix'
       },
       aiTutor: {
         target_word: 'fix',
-        question: "_ix",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ix' is filled"
+        spelling_pattern_or_rule: "Write the start pair (consonant + i) to make /fĭ/."
       },
       audio: "fix"
     },
@@ -1299,10 +2278,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'mix',
       imageUrl: 'mixing_bowl_image_url_here',
-      explanation: "Super! The missing letter is 'm'. The word is 'mix'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ix",
+      explanation: "Super! Fill the first sound to make 'mix'.",
+      questionText: "_ix",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -1313,7 +2292,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mix',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ix",
+        questionLine: "_ix",
         imagePrompt: 'A bowl with ingredients being mixed for the word mix'
       },
       aiTutor: {
@@ -1321,7 +2300,7 @@ export const sampleMCQData: MCQData = {
         question: "_ix",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ix' is filled"
+        spelling_pattern_or_rule: "Fill the missing first consonant before /ĭx/."
       },
       audio: "mix"
     },
@@ -1333,29 +2312,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'six',
       imageUrl: 'six_apples_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'six'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ix",
-      correctAnswer: 's',
+      explanation: "Excellent! Fill the starting pair to make 'six'.",
+      questionText: "__x",
+      correctAnswer: 'si',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'six',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ix",
+        questionLine: "__x",
         imagePrompt: 'A group of six apples for the word six'
       },
       aiTutor: {
         target_word: 'six',
-        question: "_ix",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ix' is filled"
+        spelling_pattern_or_rule: "Add the start pair (s + i) to spell /sĭ/."
       },
       audio: "six"
     },
@@ -1367,10 +2346,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'lid',
       imageUrl: 'jar_lid_image_url_here',
-      explanation: "Good job! The missing letter is 'l'. The word is 'lid'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _id",
+      explanation: "Good job! Fill the first sound to make 'lid'.",
+      questionText: "_id",
       correctAnswer: 'l',
       template: 'fill_blank',
       isSpacing: false,
@@ -1381,7 +2360,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'lid',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _id",
+        questionLine: "_id",
         imagePrompt: 'A jar with its lid for the word lid'
       },
       aiTutor: {
@@ -1389,7 +2368,7 @@ export const sampleMCQData: MCQData = {
         question: "_id",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'id' is filled"
+        spelling_pattern_or_rule: "Write the starting consonant you hear before /ĭd/."
       },
       audio: "lid"
     },
@@ -1401,29 +2380,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'kid',
       imageUrl: 'happy_kid_image_url_here',
-      explanation: "Nice! The missing letter is 'k'. The word is 'kid'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _id",
-      correctAnswer: 'k',
+      explanation: "Nice! Fill the starting pair to make 'kid'.",
+      questionText: "__d",
+      correctAnswer: 'ki',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'kid',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _id",
+        questionLine: "__d",
         imagePrompt: 'A smiling child for the word kid'
       },
       aiTutor: {
         target_word: 'kid',
-        question: "_id",
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'id' is filled"
+        spelling_pattern_or_rule: "Add the start pair (k + i) to make /kĭ/."
       },
       audio: "kid"
     },
@@ -1435,10 +2414,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'big',
       imageUrl: 'big_balloon_image_url_here',
-      explanation: "Excellent! The missing letter is 'b'. The word is 'big'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ig",
+      explanation: "Excellent! Fill the first sound to make 'big'.",
+      questionText: "_ig",
       correctAnswer: 'b',
       template: 'fill_blank',
       isSpacing: false,
@@ -1449,7 +2428,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'big',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ig",
+        questionLine: "_ig",
         imagePrompt: 'A big balloon for the word big'
       },
       aiTutor: {
@@ -1457,7 +2436,7 @@ export const sampleMCQData: MCQData = {
         question: "_ig",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ig' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ĭg/."
       },
       audio: "big"
     },
@@ -1469,29 +2448,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short i',
+      word: 'zip',
       imageUrl: 'zipping_jacket_image_url_here',
-      explanation: "Great work! The missing letter is 'z'. The word is 'zip'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ip",
-      correctAnswer: 'z',
+      explanation: "Great work! Fill the starting pair to make 'zip'.",
+      questionText: "__p",
+      correctAnswer: 'zi',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'zip',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ip",
+        questionLine: "__p",
         imagePrompt: 'A child zipping a jacket for the word zip'
       },
       aiTutor: {
         target_word: 'zip',
-        question: "_ip",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short i word',
-        spelling_pattern_or_rule: "first letter is empty but 'ip' is filled"
+        spelling_pattern_or_rule: "Fill the start pair (z + i) to make /zĭ/."
       },
       audio: "zip"
     }
@@ -1501,7 +2480,7 @@ export const sampleMCQData: MCQData = {
   topicInfo: {
     topicId: 'K-R.2',
     topicName: 'Complete_the_short_o_word',
-    progressTopicName: 'Complete the short o word',
+    progressTopicName: 'Consonants in short o words',
     questionElements: 'image + audio + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -1515,10 +2494,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'top',
       imageUrl: 'spinning_top_image_url_here',
-      explanation: "Good job! The missing letter is 't'. The word is 'top'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
+      explanation: "Great job! Fill the first sound to make 'top'.",
+      questionText: "_op",
       correctAnswer: 't',
       template: 'fill_blank',
       isSpacing: false,
@@ -1529,7 +2508,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'top',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "_op",
         imagePrompt: 'A colorful spinning top for the word top'
       },
       aiTutor: {
@@ -1537,7 +2516,7 @@ export const sampleMCQData: MCQData = {
         question: "_op",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Short o CVC words use /ŏ/ in the middle. Add the beginning consonant you hear."
       },
       audio: "top"
     },
@@ -1549,29 +2528,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'hop',
       imageUrl: 'bunny_hopping_image_url_here',
-      explanation: "Nice work! The missing letter is 'h'. The word is 'hop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
-      correctAnswer: 'h',
+      explanation: "Nice! Add the start pair to make 'hop'.",
+      questionText: "__p",
+      correctAnswer: 'ho',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "__p",
         imagePrompt: 'A bunny hopping for the word hop'
       },
       aiTutor: {
         target_word: 'hop',
-        question: "_op",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Two blanks at the start mean add the start pair (consonant + o) to match /hŏ/."
       },
       audio: "hop"
     },
@@ -1583,10 +2562,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'pot',
       imageUrl: 'cooking_pot_image_url_here',
-      explanation: "Great! The missing letter is 'p'. The word is 'pot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
+      explanation: "Great! Fill the first sound to make 'pot'.",
+      questionText: "_ot",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -1597,7 +2576,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "_ot",
         imagePrompt: 'A kitchen pot with steam for the word pot'
       },
       aiTutor: {
@@ -1605,7 +2584,7 @@ export const sampleMCQData: MCQData = {
         question: "_ot",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant before /ŏt/ and write it."
       },
       audio: "pot"
     },
@@ -1617,29 +2596,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'log',
       imageUrl: 'wooden_log_image_url_here',
-      explanation: "Good job! The missing letter is 'l'. The word is 'log'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _og",
-      correctAnswer: 'l',
+      explanation: "Good! Add the start pair to make 'log'.",
+      questionText: "__g",
+      correctAnswer: 'lo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'log',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _og",
+        questionLine: "__g",
         imagePrompt: 'A brown wooden log for the word log'
       },
       aiTutor: {
         target_word: 'log',
-        question: "_og",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'og' is filled"
+        spelling_pattern_or_rule: "Add the start pair (l + o) to match /lŏ/."
       },
       audio: "log"
     },
@@ -1651,10 +2630,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'dog',
       imageUrl: 'brown_dog_image_url_here',
-      explanation: "Excellent! The missing letter is 'd'. The word is 'dog'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _og",
+      explanation: "Excellent! Fill the first sound to make 'dog'.",
+      questionText: "_og",
       correctAnswer: 'd',
       template: 'fill_blank',
       isSpacing: false,
@@ -1665,7 +2644,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'dog',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _og",
+        questionLine: "_og",
         imagePrompt: 'A cute brown dog for the word dog'
       },
       aiTutor: {
@@ -1673,7 +2652,7 @@ export const sampleMCQData: MCQData = {
         question: "_og",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'og' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏg/."
       },
       audio: "dog"
     },
@@ -1685,29 +2664,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'box',
       imageUrl: 'red_box_image_url_here',
-      explanation: "Super! The missing letter is 'b'. The word is 'box'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ox",
-      correctAnswer: 'b',
+      explanation: "Super! Add the start pair to make 'box'.",
+      questionText: "__x",
+      correctAnswer: 'bo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'box',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ox",
+        questionLine: "__x",
         imagePrompt: 'A red box for the word box'
       },
       aiTutor: {
         target_word: 'box',
-        question: "_ox",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ox' is filled"
+        spelling_pattern_or_rule: "Write the start pair (b + o) to make /bŏ/."
       },
       audio: "box"
     },
@@ -1719,10 +2698,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'hot',
       imageUrl: 'hot_sun_image_url_here',
-      explanation: "Nice work! The missing letter is 'h'. The word is 'hot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
+      explanation: "Nice work! Fill the first sound to make 'hot'.",
+      questionText: "_ot",
       correctAnswer: 'h',
       template: 'fill_blank',
       isSpacing: false,
@@ -1733,7 +2712,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'hot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "_ot",
         imagePrompt: 'A bright sun to show the word hot'
       },
       aiTutor: {
@@ -1741,7 +2720,7 @@ export const sampleMCQData: MCQData = {
         question: "_ot",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Hear the first consonant before /ŏt/ and write it."
       },
       audio: "hot"
     },
@@ -1753,29 +2732,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'fog',
       imageUrl: 'foggy_morning_image_url_here',
-      explanation: "Good! The missing letter is 'f'. The word is 'fog'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _og",
-      correctAnswer: 'f',
+      explanation: "Good! Add the start pair to make 'fog'.",
+      questionText: "__g",
+      correctAnswer: 'fo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fog',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _og",
+        questionLine: "__g",
         imagePrompt: 'Morning fog in the air for the word fog'
       },
       aiTutor: {
         target_word: 'fog',
-        question: "_og",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'og' is filled"
+        spelling_pattern_or_rule: "Add the start pair (f + o) for /fŏ/."
       },
       audio: "fog"
     },
@@ -1787,21 +2766,21 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'rock',
       imageUrl: 'rock_image_url_here',
-      explanation: "Excellent! The missing letter is 'r'. The word is 'rock'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ock",
+      explanation: "Excellent! Fill the first sound to make 'rock'.",
+      questionText: "_ock",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [1, 2, 3],
       aiHook: {
         targetWord: 'rock',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ock",
+        questionLine: "_ock",
         imagePrompt: 'A gray rock for the word rock'
       },
       aiTutor: {
@@ -1809,7 +2788,7 @@ export const sampleMCQData: MCQData = {
         question: "_ock",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ock' is filled"
+        spelling_pattern_or_rule: "For -ock words the first consonant is missing; /ŏ/ is already shown."
       },
       audio: "rock"
     },
@@ -1821,29 +2800,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'sock',
       imageUrl: 'sock_pair_image_url_here',
-      explanation: "Great! The missing letter is 's'. The word is 'sock'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ock",
-      correctAnswer: 's',
+      explanation: "Great! Add the start pair to make 'sock'.",
+      questionText: "__ck",
+      correctAnswer: 'so',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2, 3],
       aiHook: {
         targetWord: 'sock',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ock",
+        questionLine: "__ck",
         imagePrompt: 'A pair of socks for the word sock'
       },
       aiTutor: {
         target_word: 'sock',
-        question: "_ock",
+        question: "__ck",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ock' is filled"
+        spelling_pattern_or_rule: "Two blanks at start: add consonant + o to make the /sŏ/ start."
       },
       audio: "sock"
     },
@@ -1855,10 +2834,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'mop',
       imageUrl: 'mop_image_url_here',
-      explanation: "Good job! The missing letter is 'm'. The word is 'mop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
+      explanation: "Good job! Fill the first sound to make 'mop'.",
+      questionText: "_op",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -1869,7 +2848,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "_op",
         imagePrompt: 'A mop cleaning the floor for the word mop'
       },
       aiTutor: {
@@ -1877,7 +2856,7 @@ export const sampleMCQData: MCQData = {
         question: "_op",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏp/."
       },
       audio: "mop"
     },
@@ -1889,29 +2868,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'pop',
       imageUrl: 'balloon_pop_image_url_here',
-      explanation: "Nice! The missing letter is 'p'. The word is 'pop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
-      correctAnswer: 'p',
+      explanation: "Nice! Add the start pair to make 'pop'.",
+      questionText: "__p",
+      correctAnswer: 'po',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "__p",
         imagePrompt: 'A balloon popping for the word pop'
       },
       aiTutor: {
         target_word: 'pop',
-        question: "_op",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Write the start pair (p + o) to make /pŏ/."
       },
       audio: "pop"
     },
@@ -1923,10 +2902,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'job',
       imageUrl: 'worker_job_image_url_here',
-      explanation: "Excellent! The missing letter is 'j'. The word is 'job'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ob",
+      explanation: "Excellent! Fill the first sound to make 'job'.",
+      questionText: "_ob",
       correctAnswer: 'j',
       template: 'fill_blank',
       isSpacing: false,
@@ -1937,7 +2916,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'job',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ob",
+        questionLine: "_ob",
         imagePrompt: 'A person working at their job for the word job'
       },
       aiTutor: {
@@ -1945,7 +2924,7 @@ export const sampleMCQData: MCQData = {
         question: "_ob",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ob' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏb/."
       },
       audio: "job"
     },
@@ -1957,29 +2936,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'cob',
       imageUrl: 'corn_cob_image_url_here',
-      explanation: "Great job! The missing letter is 'c'. The word is 'cob'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ob",
-      correctAnswer: 'c',
+      explanation: "Great job! Add the start pair to make 'cob'.",
+      questionText: "__b",
+      correctAnswer: 'co',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cob',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ob",
+        questionLine: "__b",
         imagePrompt: 'Corn on the cob for the word cob'
       },
       aiTutor: {
         target_word: 'cob',
-        question: "_ob",
+        question: "__b",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ob' is filled"
+        spelling_pattern_or_rule: "Add consonant + o to make /kŏ/ at the start."
       },
       audio: "cob"
     },
@@ -1991,10 +2970,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'pod',
       imageUrl: 'pod_peas_image_url_here',
-      explanation: "Nice work! The missing letter is 'p'. The word is 'pod'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _od",
+      explanation: "Nice work! Fill the first sound to make 'pod'.",
+      questionText: "_od",
       correctAnswer: 'p',
       template: 'fill_blank',
       isSpacing: false,
@@ -2005,7 +2984,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'pod',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _od",
+        questionLine: "_od",
         imagePrompt: 'A pea pod for the word pod'
       },
       aiTutor: {
@@ -2013,7 +2992,7 @@ export const sampleMCQData: MCQData = {
         question: "_od",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'od' is filled"
+        spelling_pattern_or_rule: "Put the starting consonant before /ŏd/."
       },
       audio: "pod"
     },
@@ -2025,29 +3004,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'dot',
       imageUrl: 'dot_on_page_image_url_here',
-      explanation: "Good job! The missing letter is 'd'. The word is 'dot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
-      correctAnswer: 'd',
+      explanation: "Good job! Add the start pair to make 'dot'.",
+      questionText: "__t",
+      correctAnswer: 'do',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "__t",
         imagePrompt: 'A single dot on a page for the word dot'
       },
       aiTutor: {
         target_word: 'dot',
-        question: "_ot",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Write the start pair (d + o) to make /dŏ/."
       },
       audio: "dot"
     },
@@ -2059,10 +3038,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'rod',
       imageUrl: 'fishing_rod_image_url_here',
-      explanation: "Great! The missing letter is 'r'. The word is 'rod'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _od",
+      explanation: "Great! Fill the first sound to make 'rod'.",
+      questionText: "_od",
       correctAnswer: 'r',
       template: 'fill_blank',
       isSpacing: false,
@@ -2073,7 +3052,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'rod',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _od",
+        questionLine: "_od",
         imagePrompt: 'A fishing rod for the word rod'
       },
       aiTutor: {
@@ -2081,7 +3060,7 @@ export const sampleMCQData: MCQData = {
         question: "_od",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'od' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŏd/."
       },
       audio: "rod"
     },
@@ -2093,29 +3072,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'cop',
       imageUrl: 'police_cop_image_url_here',
-      explanation: "Nice! The missing letter is 'c'. The word is 'cop'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _op",
-      correctAnswer: 'c',
+      explanation: "Nice! Add the start pair to make 'cop'.",
+      questionText: "__p",
+      correctAnswer: 'co',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cop',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _op",
+        questionLine: "__p",
         imagePrompt: 'A friendly police officer for the word cop'
       },
       aiTutor: {
         target_word: 'cop',
-        question: "_op",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'op' is filled"
+        spelling_pattern_or_rule: "Add consonant + o to start the word with /kŏ/."
       },
       audio: "cop"
     },
@@ -2127,10 +3106,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'lot',
       imageUrl: 'gold_coin_lot_image_url_here',
-      explanation: "Excellent! The missing letter is 'l'. The word is 'lot'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ot",
+      explanation: "Excellent! Fill the first sound to make 'lot'.",
+      questionText: "_ot",
       correctAnswer: 'l',
       template: 'fill_blank',
       isSpacing: false,
@@ -2141,7 +3120,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'lot',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ot",
+        questionLine: "_ot",
         imagePrompt: 'A lot of items (pile of coins) for the word lot'
       },
       aiTutor: {
@@ -2149,7 +3128,7 @@ export const sampleMCQData: MCQData = {
         question: "_ot",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ot' is filled"
+        spelling_pattern_or_rule: "Write the starting consonant you hear before /ŏt/."
       },
       audio: "lot"
     },
@@ -2161,29 +3140,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short o',
+      word: 'fox',
       imageUrl: 'fox_in_den_image_url_here',
-      explanation: "Great job! The missing letter is 'f'. The word is 'fox'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ox",
-      correctAnswer: 'f',
+      explanation: "Great work! Add the start pair to make 'fox'.",
+      questionText: "__x",
+      correctAnswer: 'fo',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fox',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ox",
+        questionLine: "__x",
         imagePrompt: 'A fox near a den for the word fox'
       },
       aiTutor: {
         target_word: 'fox',
-        question: "_ox",
+        question: "__x",
         student_entry: "",
         topic_to_reinforce: 'Complete the short o word',
-        spelling_pattern_or_rule: "first letter is empty but 'ox' is filled"
+        spelling_pattern_or_rule: "Two blanks at start mean add consonant + o to make /fŏ/."
       },
       audio: "fox"
     }
@@ -2206,10 +3185,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'mug',
       imageUrl: 'red_mug_image_url_here',
-      explanation: "Good job! The missing letter is 'm'. The word is 'mug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
+      explanation: "Great job! Add the first sound to make 'mug'.",
+      questionText: "_ug",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -2220,7 +3199,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "_ug",
         imagePrompt: 'A red mug for the word mug'
       },
       aiTutor: {
@@ -2228,7 +3207,7 @@ export const sampleMCQData: MCQData = {
         question: "_ug",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "CVC short-u words use /ŭ/ in the middle. If only the first letter is missing, add the beginning consonant you hear."
       },
       audio: "mug"
     },
@@ -2240,29 +3219,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'bug',
       imageUrl: 'brown_bug_image_url_here',
-      explanation: "Nice! The missing letter is 'b'. The word is 'bug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'b',
+      explanation: "Nice! Add the start pair to make 'bug'.",
+      questionText: "__g",
+      correctAnswer: 'bu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'A brown bug for the word bug'
       },
       aiTutor: {
         target_word: 'bug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "When two blanks appear at the start, add consonant + u to make the /Cŭ/ beginning."
       },
       audio: "bug"
     },
@@ -2274,10 +3253,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'sun',
       imageUrl: 'sun_in_sky_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'sun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
+      explanation: "Excellent! Add the first sound to make 'sun'.",
+      questionText: "_un",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -2288,7 +3267,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sun',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
+        questionLine: "_un",
         imagePrompt: 'A bright sun in the sky for the word sun'
       },
       aiTutor: {
@@ -2296,7 +3275,7 @@ export const sampleMCQData: MCQData = {
         question: "_un",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Listen for the beginning consonant before /ŭn/ and write it."
       },
       audio: "sun"
     },
@@ -2308,29 +3287,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'rug',
       imageUrl: 'brown_rug_image_url_here',
-      explanation: "Good job! The missing letter is 'r'. The word is 'rug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'r',
+      explanation: "Good! Add the start pair to make 'rug'.",
+      questionText: "__g",
+      correctAnswer: 'ru',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'rug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'A soft rug on the floor for the word rug'
       },
       aiTutor: {
         target_word: 'rug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /rŭ/ start."
       },
       audio: "rug"
     },
@@ -2342,10 +3321,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'tub',
       imageUrl: 'tub_bathtub_image_url_here',
-      explanation: "Nice work! The missing letter is 't'. The word is 'tub'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ub",
+      explanation: "Nice work! Add the first sound to make 'tub'.",
+      questionText: "_ub",
       correctAnswer: 't',
       template: 'fill_blank',
       isSpacing: false,
@@ -2356,7 +3335,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'tub',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
+        questionLine: "_ub",
         imagePrompt: 'A bathtub for the word tub'
       },
       aiTutor: {
@@ -2364,7 +3343,7 @@ export const sampleMCQData: MCQData = {
         question: "_ub",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ub' is filled"
+        spelling_pattern_or_rule: "Write the beginning consonant you hear before /ŭb/."
       },
       audio: "tub"
     },
@@ -2376,29 +3355,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'cup',
       imageUrl: 'cup_image_url_here',
-      explanation: "Super! The missing letter is 'c'. The word is 'cup'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _up",
-      correctAnswer: 'c',
+      explanation: "Super! Add the start pair to make 'cup'.",
+      questionText: "__p",
+      correctAnswer: 'cu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cup',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _up",
+        questionLine: "__p",
         imagePrompt: 'A red cup for the word cup'
       },
       aiTutor: {
         target_word: 'cup',
-        question: "_up",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'up' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /kŭ/ start."
       },
       audio: "cup"
     },
@@ -2410,10 +3389,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'mud',
       imageUrl: 'mud_puddle_image_url_here',
-      explanation: "Good job! The missing letter is 'm'. The word is 'mud'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ud",
+      explanation: "Good job! Add the first sound to make 'mud'.",
+      questionText: "_ud",
       correctAnswer: 'm',
       template: 'fill_blank',
       isSpacing: false,
@@ -2424,7 +3403,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'mud',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ud",
+        questionLine: "_ud",
         imagePrompt: 'A puddle of mud for the word mud'
       },
       aiTutor: {
@@ -2432,7 +3411,7 @@ export const sampleMCQData: MCQData = {
         question: "_ud",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ud' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant before /ŭd/."
       },
       audio: "mud"
     },
@@ -2444,29 +3423,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'pug',
       imageUrl: 'pug_dog_image_url_here',
-      explanation: "Excellent! The missing letter is 'p'. The word is 'pug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'p',
+      explanation: "Excellent! Add the start pair to make 'pug'.",
+      questionText: "__g",
+      correctAnswer: 'pu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'A small pug dog for the word pug'
       },
       aiTutor: {
         target_word: 'pug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Write consonant + u to start the word with /pŭ/."
       },
       audio: "pug"
     },
@@ -2478,10 +3457,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'jug',
       imageUrl: 'jug_image_url_here',
-      explanation: "Great! The missing letter is 'j'. The word is 'jug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
+      explanation: "Great! Add the first sound to make 'jug'.",
+      questionText: "_ug",
       correctAnswer: 'j',
       template: 'fill_blank',
       isSpacing: false,
@@ -2492,7 +3471,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'jug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "_ug",
         imagePrompt: 'A water jug for the word jug'
       },
       aiTutor: {
@@ -2500,7 +3479,7 @@ export const sampleMCQData: MCQData = {
         question: "_ug",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Listen for the first consonant before /ŭg/."
       },
       audio: "jug"
     },
@@ -2512,29 +3491,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'hug',
       imageUrl: 'hug_scene_image_url_here',
-      explanation: "Nice work! The missing letter is 'h'. The word is 'hug'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ug",
-      correctAnswer: 'h',
+      explanation: "Nice work! Add the start pair to make 'hug'.",
+      questionText: "__g",
+      correctAnswer: 'hu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hug',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ug",
+        questionLine: "__g",
         imagePrompt: 'Two people hugging for the word hug'
       },
       aiTutor: {
         target_word: 'hug',
-        question: "_ug",
+        question: "__g",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ug' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /hŭ/ start."
       },
       audio: "hug"
     },
@@ -2546,10 +3525,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'sub',
       imageUrl: 'submarine_image_url_here',
-      explanation: "Excellent! The missing letter is 's'. The word is 'sub'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ub",
+      explanation: "Excellent! Add the first sound to make 'sub'.",
+      questionText: "_ub",
       correctAnswer: 's',
       template: 'fill_blank',
       isSpacing: false,
@@ -2560,7 +3539,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'sub',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
+        questionLine: "_ub",
         imagePrompt: 'A yellow submarine for the word sub'
       },
       aiTutor: {
@@ -2568,7 +3547,7 @@ export const sampleMCQData: MCQData = {
         question: "_ub",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ub' is filled"
+        spelling_pattern_or_rule: "Write the beginning consonant you hear before /ŭb/."
       },
       audio: "sub"
     },
@@ -2580,29 +3559,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'cub',
       imageUrl: 'baby_cub_image_url_here',
-      explanation: "Good! The missing letter is 'c'. The word is 'cub'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ub",
-      correctAnswer: 'c',
+      explanation: "Good! Add the start pair to make 'cub'.",
+      questionText: "__b",
+      correctAnswer: 'cu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cub',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ub",
+        questionLine: "__b",
         imagePrompt: 'A baby bear cub for the word cub'
       },
       aiTutor: {
         target_word: 'cub',
-        question: "_ub",
+        question: "__b",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ub' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to begin the word with /kŭ/."
       },
       audio: "cub"
     },
@@ -2614,10 +3593,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'fun',
       imageUrl: 'kid_having_fun_image_url_here',
-      explanation: "Great job! The missing letter is 'f'. The word is 'fun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
+      explanation: "Great job! Add the first sound to make 'fun'.",
+      questionText: "_un",
       correctAnswer: 'f',
       template: 'fill_blank',
       isSpacing: false,
@@ -2628,7 +3607,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'fun',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
+        questionLine: "_un",
         imagePrompt: 'A kid smiling for the word fun'
       },
       aiTutor: {
@@ -2636,7 +3615,7 @@ export const sampleMCQData: MCQData = {
         question: "_un",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Insert the beginning consonant you hear before /ŭn/."
       },
       audio: "fun"
     },
@@ -2648,29 +3627,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'bun',
       imageUrl: 'bun_bakery_image_url_here',
-      explanation: "Nice! The missing letter is 'b'. The word is 'bun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
-      correctAnswer: 'b',
+      explanation: "Nice! Add the start pair to make 'bun'.",
+      questionText: "__n",
+      correctAnswer: 'bu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bun',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
+        questionLine: "__n",
         imagePrompt: 'A bread bun for the word bun'
       },
       aiTutor: {
         target_word: 'bun',
-        question: "_un",
+        question: "__n",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Add consonant + u to make the /bŭ/ start."
       },
       audio: "bun"
     },
@@ -2682,10 +3661,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'nut',
       imageUrl: 'nut_image_url_here',
-      explanation: "Excellent! The missing letter is 'n'. The word is 'nut'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ut",
+      explanation: "Excellent! Add the first sound to make 'nut'.",
+      questionText: "_ut",
       correctAnswer: 'n',
       template: 'fill_blank',
       isSpacing: false,
@@ -2696,7 +3675,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'nut',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ut",
+        questionLine: "_ut",
         imagePrompt: 'A nut for the word nut'
       },
       aiTutor: {
@@ -2704,7 +3683,7 @@ export const sampleMCQData: MCQData = {
         question: "_ut",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ut' is filled"
+        spelling_pattern_or_rule: "Hear and write the first consonant before /ŭt/."
       },
       audio: "nut"
     },
@@ -2716,29 +3695,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'hut',
       imageUrl: 'hut_image_url_here',
-      explanation: "Good! The missing letter is 'h'. The word is 'hut'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ut",
-      correctAnswer: 'h',
+      explanation: "Good! Add the start pair to make 'hut'.",
+      questionText: "__t",
+      correctAnswer: 'hu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hut',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ut",
+        questionLine: "__t",
         imagePrompt: 'A small hut for the word hut'
       },
       aiTutor: {
         target_word: 'hut',
-        question: "_ut",
+        question: "__t",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'ut' is filled"
+        spelling_pattern_or_rule: "Write consonant + u to start the word with /hŭ/."
       },
       audio: "hut"
     },
@@ -2750,10 +3729,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'gum',
       imageUrl: 'gum_bubble_image_url_here',
-      explanation: "Nice work! The missing letter is 'g'. The word is 'gum'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _um",
+      explanation: "Nice work! Add the first sound to make 'gum'.",
+      questionText: "_um",
       correctAnswer: 'g',
       template: 'fill_blank',
       isSpacing: false,
@@ -2764,7 +3743,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'gum',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _um",
+        questionLine: "_um",
         imagePrompt: 'Bubble gum for the word gum'
       },
       aiTutor: {
@@ -2772,7 +3751,7 @@ export const sampleMCQData: MCQData = {
         question: "_um",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'um' is filled"
+        spelling_pattern_or_rule: "Add the beginning consonant you hear before /ŭm/."
       },
       audio: "gum"
     },
@@ -2784,29 +3763,29 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'pup',
       imageUrl: 'pup_puppy_image_url_here',
-      explanation: "Super! The missing letter is 'p'. The word is 'pup'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _up",
-      correctAnswer: 'p',
+      explanation: "Super! Add the start pair to make 'pup'.",
+      questionText: "__p",
+      correctAnswer: 'pu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pup',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _up",
+        questionLine: "__p",
         imagePrompt: 'A cute puppy for the word pup'
       },
       aiTutor: {
         target_word: 'pup',
-        question: "_up",
+        question: "__p",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'up' is filled"
+        spelling_pattern_or_rule: "Start the word with consonant + u to make /pŭ/."
       },
       audio: "pup"
     },
@@ -2818,10 +3797,10 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
+      word: 'bus',
       imageUrl: 'bus_image_url_here',
-      explanation: "Great! The missing letter is 'b'. The word is 'bus'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _us",
+      explanation: "Great! Add the first sound to make 'bus'.",
+      questionText: "_us",
       correctAnswer: 'b',
       template: 'fill_blank',
       isSpacing: false,
@@ -2832,7 +3811,7 @@ export const sampleMCQData: MCQData = {
       aiHook: {
         targetWord: 'bus',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _us",
+        questionLine: "_us",
         imagePrompt: 'A school bus for the word bus'
       },
       aiTutor: {
@@ -2840,7 +3819,7 @@ export const sampleMCQData: MCQData = {
         question: "_us",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'us' is filled"
+        spelling_pattern_or_rule: "Write the beginning consonant you hear before /ŭs/."
       },
       audio: "bus"
     },
@@ -2852,39 +3831,755 @@ export const sampleMCQData: MCQData = {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: 'short u',
-      imageUrl: 'drum_image_url_here',
-      explanation: "Excellent! The missing letter is 'd'. The word is 'sun'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _un",
-      correctAnswer: 's',
+      word: 'bud',
+      imageUrl: 'plant_bud_image_url_here',
+      explanation: "Excellent! Add the start pair to make 'bud'.",
+      questionText: "__d",
+      correctAnswer: 'bu',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [1, 2],
+      prefilledIndexes: [2],
       aiHook: {
-        targetWord: 'sun',
+        targetWord: 'bud',
         intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _un",
-        imagePrompt: 'A sun for the word sun'
+        questionLine: "__d",
+        imagePrompt: 'A plant with a small bud for the word bud'
       },
       aiTutor: {
-        target_word: 'sun',
-        question: "_un",
+        target_word: 'bud',
+        question: "__d",
         student_entry: "",
         topic_to_reinforce: 'Complete the short u word',
-        spelling_pattern_or_rule: "first letter is empty but 'un' is filled"
+        spelling_pattern_or_rule: "Two blanks at the start: add consonant + u to make the /bŭ/ beginning."
       },
-      audio: "sun"
+      audio: "bud"
     }
   ]
 },
-'K-T.1': {
+'K-T.1.1': {
   topicInfo: {
-    topicId: 'K-T.1',
+    topicId: 'K-T.1.1',
+    topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+    progressTopicName: 'Complete the word with the right short vowel: a or o',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // --- Short a (1–3) ---
+    {
+      id: 1,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'cat',
+      imageUrl: 'cat_image_url_here',
+      explanation: "Good job! The missing vowel is 'a'. The word is 'cat'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: c_t",
+      correctAnswer: 'a',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'cat',
+        intent: 'fill_blank',
+        questionLine: 'c_t',
+        imagePrompt: 'A cute cat for the word cat'
+      },
+      aiTutor: {
+        target_word: 'cat',
+        question: 'c_t',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short a says /ă/ as in 'cat' and 'bag'."
+      },
+      audio: 'cat'
+    },
+    {
+      id: 2,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bag',
+      imageUrl: 'bag_image_url_here',
+      explanation: "Excellent! The missing vowel is 'a'. The word is 'bag'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: b_g",
+      correctAnswer: 'a',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'bag',
+        intent: 'fill_blank',
+        questionLine: 'b_g',
+        imagePrompt: 'A school bag for the word bag'
+      },
+      aiTutor: {
+        target_word: 'bag',
+        question: 'b_g',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short a makes the /ă/ sound in 'bag' and 'cap'."
+      },
+      audio: 'bag'
+    },
+    {
+      id: 3,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'cap',
+      imageUrl: 'cap_image_url_here',
+      explanation: "Great! The missing vowel is 'a'. The word is 'cap'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: c_p",
+      correctAnswer: 'a',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'cap',
+        intent: 'fill_blank',
+        questionLine: 'c_p',
+        imagePrompt: 'A baseball cap for the word cap'
+      },
+      aiTutor: {
+        target_word: 'cap',
+        question: 'c_p',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short a says /ă/ in words like 'cap' and 'bag'."
+      },
+      audio: 'cap'
+    },
+
+    // --- Short o (4–6) ---
+    {
+      id: 4,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'dog',
+      imageUrl: 'dog_image_url_here',
+      explanation: "Nice! The missing vowel is 'o'. The word is 'dog'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: d_g",
+      correctAnswer: 'o',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'dog',
+        intent: 'fill_blank',
+        questionLine: 'd_g',
+        imagePrompt: 'A brown dog for the word dog'
+      },
+      aiTutor: {
+        target_word: 'dog',
+        question: 'd_g',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short o says /ŏ/ as in 'dog' and 'log'."
+      },
+      audio: 'dog'
+    },
+    {
+      id: 5,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'pot',
+      imageUrl: 'pot_image_url_here',
+      explanation: "Well done! The missing vowel is 'o'. The word is 'pot'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: p_t",
+      correctAnswer: 'o',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'pot',
+        intent: 'fill_blank',
+        questionLine: 'p_t',
+        imagePrompt: 'A cooking pot for the word pot'
+      },
+      aiTutor: {
+        target_word: 'pot',
+        question: 'p_t',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short o says /ŏ/ in short words like 'pot' and 'log'."
+      },
+      audio: 'pot'
+    },
+    {
+      id: 6,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'log',
+      imageUrl: 'log_image_url_here',
+      explanation: "Excellent! The missing vowel is 'o'. The word is 'log'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: l_g",
+      correctAnswer: 'o',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'log',
+        intent: 'fill_blank',
+        questionLine: 'l_g',
+        imagePrompt: 'A wooden log for the word log'
+      },
+      aiTutor: {
+        target_word: 'log',
+        question: 'l_g',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short o makes the /ŏ/ sound like in 'log' and 'dog'."
+      },
+      audio: 'log'
+    },
+
+    // --- Mixed (7–10) ---
+    {
+      id: 7,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'jam',
+      imageUrl: 'jam_image_url_here',
+      explanation: "Great! The missing vowel is 'a'. The word is 'jam'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: j_m",
+      correctAnswer: 'a',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'jam',
+        intent: 'fill_blank',
+        questionLine: 'j_m',
+        imagePrompt: 'A jar of jam for the word jam'
+      },
+      aiTutor: {
+        target_word: 'jam',
+        question: 'j_m',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short a says /ă/ in 'jam' and 'cap'."
+      },
+      audio: 'jam'
+    },
+    {
+      id: 8,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'fox',
+      imageUrl: 'fox_image_url_here',
+      explanation: "Good job! The missing vowel is 'o'. The word is 'fox'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: f_x",
+      correctAnswer: 'o',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'fox',
+        intent: 'fill_blank',
+        questionLine: 'f_x',
+        imagePrompt: 'A red fox for the word fox'
+      },
+      aiTutor: {
+        target_word: 'fox',
+        question: 'f_x',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short o says /ŏ/ in 'fox' and 'pot'."
+      },
+      audio: 'fox'
+    },
+    {
+      id: 9,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bag',
+      imageUrl: 'bag_image_url_here',
+      explanation: "Nice! The missing vowel is 'a'. The word is 'bag'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: b_g",
+      correctAnswer: 'a',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'bag',
+        intent: 'fill_blank',
+        questionLine: 'b_g',
+        imagePrompt: 'A backpack for the word bag'
+      },
+      aiTutor: {
+        target_word: 'bag',
+        question: 'b_g',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short a says /ă/ in 'bag' and 'cap'."
+      },
+      audio: 'bag'
+    },
+    {
+      id: 10,
+      topicId: 'K-T.1.1',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_a_or_o',
+      progressTopicName: 'Complete the word with the right short vowel: a or o',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'rod',
+      imageUrl: 'rod_image_url_here',
+      explanation: "Excellent! The missing vowel is 'o'. The word is 'rod'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: r_d",
+      correctAnswer: 'o',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'rod',
+        intent: 'fill_blank',
+        questionLine: 'r_d',
+        imagePrompt: 'A fishing rod for the word rod'
+      },
+      aiTutor: {
+        target_word: 'rod',
+        question: 'r_d',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: a or o',
+        spelling_pattern_or_rule: "Short o makes the /ŏ/ sound in 'rod' and 'log'."
+      },
+      audio: 'rod'
+    }
+  ]
+}
+,
+'K-T.1.2': {
+  topicInfo: {
+    topicId: 'K-T.1.2',
+    topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+    progressTopicName: 'Complete the word with the right short vowel: e vs i',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // --- Short e (1–3) ---
+    {
+      id: 1,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'pen',
+      imageUrl: 'pen_image_url_here',
+      explanation: "Nice! The missing vowel is 'e'. The word is 'pen'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: p_n",
+      correctAnswer: 'e',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'pen',
+        intent: 'fill_blank',
+        questionLine: 'p_n',
+        imagePrompt: 'A blue ink pen for the word pen'
+      },
+      aiTutor: {
+        target_word: 'pen',
+        question: 'p_n',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short e says /ĕ/ as in 'pen' and 'bed'."
+      },
+      audio: 'pen'
+    },
+    {
+      id: 2,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bed',
+      imageUrl: 'bed_image_url_here',
+      explanation: "Great! The missing vowel is 'e'. The word is 'bed'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: b_d",
+      correctAnswer: 'e',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'bed',
+        intent: 'fill_blank',
+        questionLine: 'b_d',
+        imagePrompt: 'A cozy bed with pillows for the word bed'
+      },
+      aiTutor: {
+        target_word: 'bed',
+        question: 'b_d',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short e /ĕ/ in the middle of CVC words: b–e–d."
+      },
+      audio: 'bed'
+    },
+    {
+      id: 3,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'hen',
+      imageUrl: 'hen_image_url_here',
+      explanation: "Good job! The missing vowel is 'e'. The word is 'hen'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: h_n",
+      correctAnswer: 'e',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'hen',
+        intent: 'fill_blank',
+        questionLine: 'h_n',
+        imagePrompt: 'A farm hen for the word hen'
+      },
+      aiTutor: {
+        target_word: 'hen',
+        question: 'h_n',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short e /ĕ/ like in 'hen' and 'pen'."
+      },
+      audio: 'hen'
+    },
+
+    // --- Short i (4–6) ---
+    {
+      id: 4,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'pig',
+      imageUrl: 'pig_image_url_here',
+      explanation: "Excellent! The missing vowel is 'i'. The word is 'pig'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: p_g",
+      correctAnswer: 'i',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'pig',
+        intent: 'fill_blank',
+        questionLine: 'p_g',
+        imagePrompt: 'A pink pig for the word pig'
+      },
+      aiTutor: {
+        target_word: 'pig',
+        question: 'p_g',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short i says /ĭ/ as in 'pig' and 'lip'."
+      },
+      audio: 'pig'
+    },
+    {
+      id: 5,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'lip',
+      imageUrl: 'lip_image_url_here',
+      explanation: "Nice! The missing vowel is 'i'. The word is 'lip'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: l_p",
+      correctAnswer: 'i',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'lip',
+        intent: 'fill_blank',
+        questionLine: 'l_p',
+        imagePrompt: 'A mouth showing a lip for the word lip'
+      },
+      aiTutor: {
+        target_word: 'lip',
+        question: 'l_p',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short i /ĭ/ in CVC words: l–i–p."
+      },
+      audio: 'lip'
+    },
+    {
+      id: 6,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'fin',
+      imageUrl: 'fish_fin_image_url_here',
+      explanation: "Good! The missing vowel is 'i'. The word is 'fin'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: f_n",
+      correctAnswer: 'i',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'fin',
+        intent: 'fill_blank',
+        questionLine: 'f_n',
+        imagePrompt: 'A fish fin for the word fin'
+      },
+      aiTutor: {
+        target_word: 'fin',
+        question: 'f_n',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short i /ĭ/ like in 'fin' and 'pig'."
+      },
+      audio: 'fin'
+    },
+
+    // --- Mixed e vs i (7–10) ---
+    {
+      id: 7,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'jet',
+      imageUrl: 'jet_image_url_here',
+      explanation: "Great! The missing vowel is 'e'. The word is 'jet'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: j_t",
+      correctAnswer: 'e',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'jet',
+        intent: 'fill_blank',
+        questionLine: 'j_t',
+        imagePrompt: 'A jet airplane for the word jet'
+      },
+      aiTutor: {
+        target_word: 'jet',
+        question: 'j_t',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Hear /ĕ/? Choose 'e' as in 'jet' and 'pen'."
+      },
+      audio: 'jet'
+    },
+    {
+      id: 8,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'sit',
+      imageUrl: 'sitting_kid_image_url_here',
+      explanation: "Nice job! The missing vowel is 'i'. The word is 'sit'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: s_t",
+      correctAnswer: 'i',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'sit',
+        intent: 'fill_blank',
+        questionLine: 's_t',
+        imagePrompt: 'A child sitting on a chair for the word sit'
+      },
+      aiTutor: {
+        target_word: 'sit',
+        question: 's_t',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Hear /ĭ/? Choose 'i' as in 'sit' and 'lip'."
+      },
+      audio: 'sit'
+    },
+    {
+      id: 9,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'ten',
+      imageUrl: 'ten_blocks_image_url_here',
+      explanation: "Well done! The missing vowel is 'e'. The word is 'ten'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: t_n",
+      correctAnswer: 'e',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'ten',
+        intent: 'fill_blank',
+        questionLine: 't_n',
+        imagePrompt: 'Ten counting blocks for the word ten'
+      },
+      aiTutor: {
+        target_word: 'ten',
+        question: 't_n',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short e /ĕ/ like in 'ten' and 'bed'."
+      },
+      audio: 'ten'
+    },
+    {
+      id: 10,
+      topicId: 'K-T.1.2',
+      topicName: 'Complete_the_word_with_the_right_short_vowel_e_vs_i',
+      progressTopicName: 'Complete the word with the right short vowel: e vs i',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'pin',
+      imageUrl: 'safety_pin_image_url_here',
+      explanation: "Excellent! The missing vowel is 'i'. The word is 'pin'.",
+      questionText: "Listen to the word. Then, fill in the missing letter: p_n",
+      correctAnswer: 'i',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 2],
+      aiHook: {
+        targetWord: 'pin',
+        intent: 'fill_blank',
+        questionLine: 'p_n',
+        imagePrompt: 'A safety pin for the word pin'
+      },
+      aiTutor: {
+        target_word: 'pin',
+        question: 'p_n',
+        student_entry: '',
+        topic_to_reinforce: 'Complete the word with the right short vowel: e vs i',
+        spelling_pattern_or_rule: "Short i /ĭ/ like in 'pin' and 'sit'."
+      },
+      audio: 'pin'
+    }
+  ]
+}
+,
+'K-T.1.3': {
+  topicInfo: {
+    topicId: 'K-T.1.3',
     topicName: 'Complete_the_word_with_the_right_short_vowel',
-    progressTopicName: 'Complete the word with the right short vowel',
+    progressTopicName: 'Revision: Complete the word with the right short vowel',
     questionElements: 'image + audio + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -2892,9 +4587,9 @@ export const sampleMCQData: MCQData = {
   questions: [
     {
       id: 1,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
-      progressTopicName: 'Complete the word with the right short vowel',
+      progressTopicName: 'Revision: Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -2926,9 +4621,9 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 2,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
-      progressTopicName: 'Complete the word with the right short vowel',
+      progressTopicName: 'Revision: Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -2960,9 +4655,9 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 3,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
-      progressTopicName: 'Complete the word with the right short vowel',
+      progressTopicName: 'Revision: Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -2994,9 +4689,9 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 4,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
-      progressTopicName: 'Complete the word with the right short vowel',
+      progressTopicName: 'Revision: Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -3028,9 +4723,9 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 5,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
-      progressTopicName: 'Complete the word with the right short vowel',
+      progressTopicName: 'Revision: Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -3062,9 +4757,9 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 6,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
-      progressTopicName: 'Complete the word with the right short vowel',
+      progressTopicName: 'Revision: Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -3096,7 +4791,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 7,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3130,7 +4825,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 8,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3164,7 +4859,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 9,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3198,7 +4893,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 10,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3232,7 +4927,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 11,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3266,7 +4961,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 12,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3300,7 +4995,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 13,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3334,7 +5029,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 14,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3368,7 +5063,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 15,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3402,7 +5097,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 16,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3436,7 +5131,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 17,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3470,7 +5165,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 18,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3504,7 +5199,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 19,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -3538,7 +5233,7 @@ export const sampleMCQData: MCQData = {
     },
     {
       id: 20,
-      topicId: 'K-T.1',
+      topicId: 'K-T.1.3',
       topicName: 'Complete_the_word_with_the_right_short_vowel',
       progressTopicName: 'Complete the word with the right short vowel',
       questionElements: 'image + audio + text',
@@ -4263,699 +5958,7 @@ export const sampleMCQData: MCQData = {
       audio: "fin"
     }
   ]
-},'K-O.3': {
-  topicInfo: {
-    topicId: 'K-O.3',
-    topicName: 'Complete_the_short_a_word',
-    progressTopicName: 'Complete the short a word',
-    questionElements: 'image + audio + text',
-    answerElements: 'text',
-    templateType: 'fill_blank'
-  },
-  questions: [
-    {
-      id: 1,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'ran',
-      imageUrl: 'running_girl_image_url_here',
-      explanation: "Great job! The word is 'ran'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'ran',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'ran',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
-        imagePrompt: 'A child running outdoors for the word ran'
-      },
-      aiTutor: {
-        target_word: 'ran',
-        question: "_an",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
-      },
-      audio: "ran"
-    },
-    {
-      id: 2,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'cat',
-      imageUrl: 'cat_image_url_here',
-      explanation: "Nice! The word is 'cat'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _at",
-      correctAnswer: 'cat',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'cat',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _at",
-        imagePrompt: 'A cute cat sitting for the word cat'
-      },
-      aiTutor: {
-        target_word: 'cat',
-        question: "_at",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'at' is filled"
-      },
-      audio: "cat"
-    },
-    {
-      id: 3,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'bag',
-      imageUrl: 'bag_image_url_here',
-      explanation: "Excellent! The word is 'bag'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ag",
-      correctAnswer: 'bag',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'bag',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ag",
-        imagePrompt: 'A school bag for the word bag'
-      },
-      aiTutor: {
-        target_word: 'bag',
-        question: "_ag",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ag' is filled"
-      },
-      audio: "bag"
-    },
-    {
-      id: 4,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'jam',
-      imageUrl: 'jam_image_url_here',
-      explanation: "Great! The word is 'jam'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _am",
-      correctAnswer: 'jam',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'jam',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _am",
-        imagePrompt: 'A jar of strawberry jam for the word jam'
-      },
-      aiTutor: {
-        target_word: 'jam',
-        question: "_am",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'am' is filled"
-      },
-      audio: "jam"
-    },
-    {
-      id: 5,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'map',
-      imageUrl: 'map_image_url_here',
-      explanation: "Good job! The word is 'map'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ap",
-      correctAnswer: 'map',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'map',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ap",
-        imagePrompt: 'A world map for the word map'
-      },
-      aiTutor: {
-        target_word: 'map',
-        question: "_ap",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ap' is filled"
-      },
-      audio: "map"
-    },
-    {
-      id: 6,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'fan',
-      imageUrl: 'fan_image_url_here',
-      explanation: "Nice work! The word is 'fan'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'fan',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'fan',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
-        imagePrompt: 'A spinning ceiling fan for the word fan'
-      },
-      aiTutor: {
-        target_word: 'fan',
-        question: "_an",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
-      },
-      audio: "fan"
-    },
-    {
-      id: 7,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'pan',
-      imageUrl: 'pan_image_url_here',
-      explanation: "Great! The word is 'pan'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'pan',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'pan',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
-        imagePrompt: 'A frying pan for the word pan'
-      },
-      aiTutor: {
-        target_word: 'pan',
-        question: "_an",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
-      },
-      audio: "pan"
-    },
-    {
-      id: 8,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'cap',
-      imageUrl: 'cap_image_url_here',
-      explanation: "Awesome! The word is 'cap'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ap",
-      correctAnswer: 'cap',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'cap',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ap",
-        imagePrompt: 'A baseball cap for the word cap'
-      },
-      aiTutor: {
-        target_word: 'cap',
-        question: "_ap",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ap' is filled"
-      },
-      audio: "cap"
-    },
-    {
-      id: 9,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'dad',
-      imageUrl: 'dad_image_url_here',
-      explanation: "Good job! The word is 'dad'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ad",
-      correctAnswer: 'dad',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'dad',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ad",
-        imagePrompt: 'A smiling father for the word dad'
-      },
-      aiTutor: {
-        target_word: 'dad',
-        question: "_ad",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ad' is filled"
-      },
-      audio: "dad"
-    },
-    {
-      id: 10,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'man',
-      imageUrl: 'man_image_url_here',
-      explanation: "Nice! The word is 'man'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'man',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'man',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
-        imagePrompt: 'A man standing for the word man'
-      },
-      aiTutor: {
-        target_word: 'man',
-        question: "_an",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-          spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
-      },
-      audio: "man"
-    },
-    {
-      id: 11,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'bat',
-      imageUrl: 'bat_image_url_here',
-      explanation: "Excellent! The word is 'bat'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _at",
-      correctAnswer: 'bat',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'bat',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _at",
-        imagePrompt: 'A baseball bat for the word bat'
-      },
-      aiTutor: {
-        target_word: 'bat',
-        question: "_at",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'at' is filled"
-      },
-      audio: "bat"
-    },
-    {
-      id: 12,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'tag',
-      imageUrl: 'tag_image_url_here',
-      explanation: "Great! The word is 'tag'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ag",
-      correctAnswer: 'tag',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'tag',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ag",
-        imagePrompt: 'A name tag for the word tag'
-      },
-      aiTutor: {
-        target_word: 'tag',
-        question: "_ag",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ag' is filled"
-      },
-      audio: "tag"
-    },
-    {
-      id: 13,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'tap',
-      imageUrl: 'tap_image_url_here',
-      explanation: "Good! The word is 'tap'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ap",
-      correctAnswer: 'tap',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'tap',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ap",
-        imagePrompt: 'A water tap for the word tap'
-      },
-      aiTutor: {
-        target_word: 'tap',
-        question: "_ap",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ap' is filled"
-      },
-      audio: "tap"
-    },
-    {
-      id: 14,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'van',
-      imageUrl: 'van_image_url_here',
-      explanation: "Nice work! The word is 'van'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'van',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'van',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
-        imagePrompt: 'A white van for the word van'
-      },
-      aiTutor: {
-        target_word: 'van',
-        question: "_an",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
-      },
-      audio: "van"
-    },
-    {
-      id: 15,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'jam',
-      imageUrl: 'jar_of_jam_image_url_here',
-      explanation: "You did it! The word is 'jam'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _am",
-      correctAnswer: 'jam',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'jam',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _am",
-        imagePrompt: 'A jar of jam for the word jam'
-      },
-      aiTutor: {
-        target_word: 'jam',
-        question: "_am",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'am' is filled"
-      },
-      audio: "jam"
-    },
-    {
-      id: 16,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'rag',
-      imageUrl: 'rag_image_url_here',
-      explanation: "Great! The word is 'rag'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ag",
-      correctAnswer: 'rag',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'rag',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ag",
-        imagePrompt: 'A cleaning rag for the word rag'
-      },
-      aiTutor: {
-        target_word: 'rag',
-        question: "_ag",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ag' is filled"
-      },
-      audio: "rag"
-    },
-    {
-      id: 17,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'can',
-      imageUrl: 'can_image_url_here',
-      explanation: "Good job! The word is 'can'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _an",
-      correctAnswer: 'can',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'can',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _an",
-        imagePrompt: 'A tin can for the word can'
-      },
-      aiTutor: {
-        target_word: 'can',
-        question: "_an",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'an' is filled"
-      },
-      audio: "can"
-    },
-    {
-      id: 18,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'dad',
-      imageUrl: 'father_image_url_here',
-      explanation: "Excellent! The word is 'dad'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ad",
-      correctAnswer: 'dad',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'dad',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ad",
-        imagePrompt: 'A dad smiling for the word dad'
-      },
-      aiTutor: {
-        target_word: 'dad',
-        question: "_ad",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-          spelling_pattern_or_rule: "first letter is empty but 'ad' is filled"
-      },
-      audio: "dad"
-    },
-    {
-      id: 19,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'mad',
-      imageUrl: 'angry_face_image_url_here',
-      explanation: "Nice! The word is 'mad'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _ad",
-      correctAnswer: 'mad',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'mad',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _ad",
-        imagePrompt: 'A cartoon angry face for the word mad'
-      },
-      aiTutor: {
-        target_word: 'mad',
-        question: "_ad",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'ad' is filled"
-      },
-      audio: "mad"
-    },
-    {
-      id: 20,
-      topicId: 'K-O.3',
-      topicName: 'Complete_the_short_a_word',
-      progressTopicName: 'Complete the short a word',
-      questionElements: 'image + audio + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: 'ham',
-      imageUrl: 'ham_image_url_here',
-      explanation: "Great! The word is 'ham'.",
-      questionText: "Listen to the word. Then, fill in the missing letter: _am",
-      correctAnswer: 'ham',
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2,3],
-      aiHook: {
-        targetWord: 'ham',
-        intent: 'fill_blank',
-        questionLine: "Listen to the word. Then, fill in the missing letter: _am",
-        imagePrompt: 'A piece of ham for the word ham'
-      },
-      aiTutor: {
-        target_word: 'ham',
-        question: "_am",
-        student_entry: "",
-        topic_to_reinforce: 'Complete the short a word',
-        spelling_pattern_or_rule: "first letter is empty but 'am' is filled"
-      },
-      audio: "ham"
-    }
-  ]
-}
-,
+},
     'K-F.2': {
       topicInfo: {
         topicId: 'K-F.2',
@@ -29209,7 +30212,7 @@ aiTutor: {
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0,4],
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "paint",
         intent: "fill_blank",
@@ -32823,21 +33826,405 @@ aiTutor: {
       audio: "rescue"
     }
   ]
-},
-    '2-M.2': {
+}
+,
+'2-M.2.1': {
   topicInfo: {
-    topicId: '2-M.2',
-    topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-    progressTopicName: 'Fill in the missing diphthong',
+    topicId: '2-M.2.1',
+    topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+    progressTopicName: 'Spell diphthongs: oi and oy',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
   },
   questions: [
+    // --- 1. oi ---
     {
       id: 1,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'coin',
+      imageUrl: null,
+      explanation: "Nice! The missing diphthong is 'oi'. The word is 'coin'.",
+      questionText: "Complete the word: c__n",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'coin',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: c__n',
+        imagePrompt: 'A shiny gold coin on a table'
+      },
+      aiTutor: {
+        target_word: 'coin',
+        question: 'c__n',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'coin'
+    },
+
+    // --- 2. oy ---
+    {
+      id: 2,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'boy',
+      imageUrl: null,
+      explanation: "Good! The missing diphthong is 'oy'. The word is 'boy'.",
+      questionText: "Complete the word: b__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'boy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: b__',
+        imagePrompt: 'A smiling boy waving his hand'
+      },
+      aiTutor: {
+        target_word: 'boy',
+        question: 'b__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'boy'
+    },
+
+    // --- 3. oi ---
+    {
+      id: 3,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'boil',
+      imageUrl: null,
+      explanation: "Nice job! The missing diphthong is 'oi'. The word is 'boil'.",
+      questionText: "Complete the word: b__l",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'boil',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: b__l',
+        imagePrompt: 'A pot of water boiling on a stove'
+      },
+      aiTutor: {
+        target_word: 'boil',
+        question: 'b__l',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'boil'
+    },
+
+    // --- 4. oy ---
+    {
+      id: 4,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'toy',
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'oy'. The word is 'toy'.",
+      questionText: "Complete the word: t__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'toy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: t__',
+        imagePrompt: 'A colorful toy car'
+      },
+      aiTutor: {
+        target_word: 'toy',
+        question: 't__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'toy'
+    },
+
+    // --- 5. oi ---
+    {
+      id: 5,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'soil',
+      imageUrl: null,
+      explanation: "Well done! The missing diphthong is 'oi'. The word is 'soil'.",
+      questionText: "Complete the word: s__l",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'soil',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: s__l',
+        imagePrompt: 'Dark brown soil in a garden'
+      },
+      aiTutor: {
+        target_word: 'soil',
+        question: 's__l',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'soil'
+    },
+
+    // --- 6. oy ---
+    {
+      id: 6,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'enjoy',
+      imageUrl: null,
+      explanation: "Great! The missing diphthong is 'oy'. The word is 'enjoy'.",
+      questionText: "Complete the word: enj__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'enjoy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: enj__',
+        imagePrompt: 'Children enjoy playing outside'
+      },
+      aiTutor: {
+        target_word: 'enjoy',
+        question: 'enj__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'enjoy'
+    },
+
+    // --- 7. oi ---
+    {
+      id: 7,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'join',
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'oi'. The word is 'join'.",
+      questionText: "Complete the word: j__n",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'join',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: j__n',
+        imagePrompt: 'Two puzzle pieces joining together'
+      },
+      aiTutor: {
+        target_word: 'join',
+        question: 'j__n',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'join'
+    },
+
+    // --- 8. oy ---
+    {
+      id: 8,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'toy',
+      imageUrl: null,
+      explanation: "Nice! The missing diphthong is 'oy'. The word is 'toy'.",
+      questionText: "Complete the word: t__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'toy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: t__',
+        imagePrompt: 'A toy robot with colorful buttons'
+      },
+      aiTutor: {
+        target_word: 'toy',
+        question: 't__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'toy'
+    },
+
+    // --- 9. oi ---
+    {
+      id: 9,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'spoil',
+      imageUrl: null,
+      explanation: "Good job! The missing diphthong is 'oi'. The word is 'spoil'.",
+      questionText: "Complete the word: sp__l",
+      correctAnswer: 'oi',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: 'spoil',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: sp__l',
+        imagePrompt: 'Food starting to spoil on a counter'
+      },
+      aiTutor: {
+        target_word: 'spoil',
+        question: 'sp__l',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'spoil'
+    },
+
+    // --- 10. oy ---
+    {
+      id: 10,
+      topicId: '2-M.2.1',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy',
+      progressTopicName: 'Fill in the missing diphthong: oi and oy',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'joy',
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'oy'. The word is 'joy'.",
+      questionText: "Complete the word: j__",
+      correctAnswer: 'oy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'joy',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word: j__',
+        imagePrompt: 'A child jumping with joy'
+      },
+      aiTutor: {
+        target_word: 'joy',
+        question: 'j__',
+        student_entry: '',
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'oi' in the middle of words (coin, boil, soil). Use 'oy' at the end (toy, boy, enjoy). Both make the /oi/ sound."
+      },
+      audio: 'joy'
+    },
+  ],
+},
+
+'2-M.2.2': {
+  topicInfo: {
+    topicId: '2-M.2.2',
+    topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+    progressTopicName: 'Spell diphthongs: ou and ow',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // 1–2: OU first
+    {
+      id: 1,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
@@ -32848,113 +34235,72 @@ aiTutor: {
       questionText: "Complete the word: sh__t",
       correctAnswer: "ou",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shout",
         intent: "fill_blank",
         questionLine: "Complete the word: sh__t",
-        imagePrompt: "A girl shouting loudly with her hands near her mouth"
+        imagePrompt: "A kid shouting with hands cupped around mouth"
       },
       aiTutor: {
         target_word: 'shout',
         question: "sh__t",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'shout'."
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle of words (shout, cloud, house). Use 'ow' at the end or before n/l (cow, down, owl)."
       },
       audio: "shout"
     },
     {
       id: 2,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "coin",
+      word: "cloud",
       imageUrl: null,
-      explanation: "Nice! The missing diphthong is 'oi'. The word is 'coin'.",
-      questionText: "Complete the word: c__n",
-      correctAnswer: "oi",
+      explanation: "Nicely done! The missing diphthong is 'ou'. The word is 'cloud'.",
+      questionText: "Complete the word: cl__d",
+      correctAnswer: "ou",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
-        targetWord: "coin",
+        targetWord: "cloud",
         intent: "fill_blank",
-        questionLine: "Complete the word: c__n",
-        imagePrompt: "A shiny gold coin on a white background"
+        questionLine: "Complete the word: cl__d",
+        imagePrompt: "A fluffy white cloud in a blue sky"
       },
       aiTutor: {
-        target_word: 'coin',
-        question: "c__n",
+        target_word: 'cloud',
+        question: "cl__d",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'coin'."
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle of words (shout, cloud, house). Use 'ow' at the end or before n/l (cow, down, owl)."
       },
-      audio: "coin"
-    },
+      audio: "cloud"
+    },    // 3–4: OW next
     {
       id: 3,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "boy",
-      imageUrl: null,
-      explanation: "Good! The missing diphthong is 'oy'. The word is 'boy'.",
-      questionText: "Complete the word: b__",
-      correctAnswer: "oy",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
-      aiHook: {
-        targetWord: "boy",
-        intent: "fill_blank",
-        questionLine: "Complete the word: b__",
-        imagePrompt: "A smiling young boy waving his hand"
-      },
-      aiTutor: {
-        target_word: 'boy',
-        question: "b__",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oy' makes the /oi/ sound in 'boy'."
-      },
-      audio: "boy"
-    },
-    {
-      id: 4,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "cow",
       imageUrl: null,
-      explanation: "Nice work! The missing diphthong is 'ow'. The word is 'cow'.",
+      explanation: "Good! The missing diphthong is 'ow'. The word is 'cow'.",
       questionText: "Complete the word: c__",
       correctAnswer: "ow",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0],
       aiHook: {
         targetWord: "cow",
         intent: "fill_blank",
@@ -32966,14 +34312,177 @@ aiTutor: {
         question: "c__",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'cow'."
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (cow, down, owl). Use 'ou' in the middle (cloud, house)."
       },
       audio: "cow"
     },
     {
+      id: 4,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "owl",
+      imageUrl: null,
+      explanation: "Great! The missing diphthong is 'ow'. The word is 'owl'.",
+      questionText: "Complete the word: __l",
+      correctAnswer: "ow",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [2],
+      aiHook: {
+        targetWord: "owl",
+        intent: "fill_blank",
+        questionLine: "Complete the word: __l",
+        imagePrompt: "A wise owl perched on a branch"
+      },
+      aiTutor: {
+        target_word: 'owl',
+        question: "__l",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (cow, down, owl). Use 'ou' in the middle (cloud, house)."
+      },
+      audio: "owl"
+    },
+
+    // 5–10: Randomly mixed (not alternating in strict order)
+    {
       id: 5,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "house",
+      imageUrl: null,
+      explanation: "Excellent! The missing diphthong is 'ou'. The word is 'house'.",
+      questionText: "Complete the word: h__se",
+      correctAnswer: "ou",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "house",
+        intent: "fill_blank",
+        questionLine: "Complete the word: h__se",
+        imagePrompt: "A small house with a yard"
+      },
+      aiTutor: {
+        target_word: 'house',
+        question: "h__se",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle (house, mouse). Use 'ow' at the end or before n/l (cow, down, owl)."
+      },
+      audio: "house"
+    },
+    {
+      id: 6,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "brown",
+      imageUrl: null,
+      explanation: "Nice! The missing diphthong is 'ow'. The word is 'brown'.",
+      questionText: "Complete the word: br__n",
+      correctAnswer: "ow",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "brown",
+        intent: "fill_blank",
+        questionLine: "Complete the word: br__n",
+        imagePrompt: "A brown crayon drawing a line"
+      },
+      aiTutor: {
+        target_word: 'brown',
+        question: "br__n",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (brown, owl). Use 'ou' in the middle (cloud, house)."
+      },
+      audio: "brown"
+    },
+    {
+      id: 7,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "mouse",
+      imageUrl: null,
+      explanation: "Good work! The missing diphthong is 'ou'. The word is 'mouse'.",
+      questionText: "Complete the word: m__se",
+      correctAnswer: "ou",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "mouse",
+        intent: "fill_blank",
+        questionLine: "Complete the word: m__se",
+        imagePrompt: "A small gray mouse"
+      },
+      aiTutor: {
+        target_word: 'mouse',
+        question: "m__se",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle (mouse, house). Use 'ow' at the end or before n/l (cow, crown, owl)."
+      },
+      audio: "mouse"
+    },
+    {
+      id: 8,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
+      progressTopicName: 'Fill in the missing diphthong',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "crown",
+      imageUrl: null,
+      explanation: "Great! The missing diphthong is 'ow'. The word is 'crown'.",
+      questionText: "Complete the word: cr__n",
+      correctAnswer: "ow",
+      template: 'fill_blank',
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "crown",
+        intent: "fill_blank",
+        questionLine: "Complete the word: cr__n",
+        imagePrompt: "A golden crown with jewels"
+      },
+      aiTutor: {
+        target_word: 'crown',
+        question: "cr__n",
+        student_entry: "",
+        topic_to_reinforce: 'Fill in the missing diphthong',
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (crown, owl). Use 'ou' in the middle (cloud, house)."
+      },
+      audio: "crown"
+    },
+    {
+      id: 9,
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
@@ -32984,11 +34493,8 @@ aiTutor: {
       questionText: "Complete the word: l__d",
       correctAnswer: "ou",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "loud",
         intent: "fill_blank",
@@ -33000,527 +34506,51 @@ aiTutor: {
         question: "l__d",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'loud'."
+        spelling_pattern_or_rule:
+          "Use 'ou' for the /ow/ sound in the middle (loud, mouse). Use 'ow' at the end or before n/l (cow, brown, owl)."
       },
       audio: "loud"
     },
     {
-      id: 6,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "toy",
-      imageUrl: null,
-      explanation: "Great! The missing diphthong is 'oy'. The word is 'toy'.",
-      questionText: "t__",
-      correctAnswer: "oy",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0],
-      aiHook: {
-        targetWord: "toy",
-        intent: "fill_blank",
-        questionLine: "t__",
-        imagePrompt: "A small toy car"
-      },
-      aiTutor: {
-        target_word: 'toy',
-        question: "t__",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oy' makes the /oi/ sound at the end of 'toy'."
-      },
-      audio: "toy"
-    },
-    {
-      id: 7,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "soil",
-      imageUrl: null,
-      explanation: "Nice job! The missing diphthong is 'oi'. The word is 'soil'.",
-      questionText: "s__l",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "soil",
-        intent: "fill_blank",
-        questionLine: "s__l",
-        imagePrompt: "Brown soil in a garden bed"
-      },
-      aiTutor: {
-        target_word: 'soil',
-        question: "s__l",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'soil'."
-      },
-      audio: "soil"
-    },
-    {
-      id: 8,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "mouse",
-      imageUrl: null,
-      explanation: "Good! The missing diphthong is 'ou'. The word is 'mouse'.",
-      questionText: "m__se",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "mouse",
-        intent: "fill_blank",
-        questionLine: "m__se",
-        imagePrompt: "A small gray mouse"
-      },
-      aiTutor: {
-        target_word: 'mouse',
-        question: "m__se",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'mouse'."
-      },
-      audio: "mouse"
-    },
-    {
-      id: 9,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "cloud",
-      imageUrl: null,
-      explanation: "Great work! The missing diphthong is 'ou'. The word is 'cloud'.",
-      questionText: "cl__d",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
-      aiHook: {
-        targetWord: "cloud",
-        intent: "fill_blank",
-        questionLine: "cl__d",
-        imagePrompt: "A fluffy white cloud in the sky"
-      },
-      aiTutor: {
-        target_word: 'cloud',
-        question: "cl__d",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'cloud'."
-      },
-      audio: "cloud"
-    },
-    {
       id: 10,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
+      topicId: '2-M.2.2',
+      topicName: 'Complete_the_word_with_the_correct_diphthong_ou_ow',
       progressTopicName: 'Fill in the missing diphthong',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "crown",
+      word: "down",
       imageUrl: null,
-      explanation: "Excellent! The missing diphthong is 'ow'. The word is 'crown'.",
-      questionText: "cr__n",
+      explanation: "Nice work! The missing diphthong is 'ow'. The word is 'down'.",
+      questionText: "Complete the word: d__n",
       correctAnswer: "ow",
       template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
+      isSpacing: false, isSorting: false, isSpelling: true,
+      isPrefilled: true, prefilledIndexes: [0,3],
       aiHook: {
-        targetWord: "crown",
+        targetWord: "down",
         intent: "fill_blank",
-        questionLine: "cr__n",
-        imagePrompt: "A golden crown with jewels"
+        questionLine: "Complete the word: d__n",
+        imagePrompt: "An arrow pointing down or someone going down stairs"
       },
       aiTutor: {
-        target_word: 'crown',
-        question: "cr__n",
+        target_word: 'down',
+        question: "d__n",
         student_entry: "",
         topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'crown'."
+        spelling_pattern_or_rule:
+          "Use 'ow' for the /ow/ sound at the end or before n/l (down, owl). Use 'ou' in the middle (cloud, shout)."
       },
-      audio: "crown"
-    },
-    {
-      id: 11,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "boil",
-      imageUrl: null,
-      explanation: "Nice! The missing diphthong is 'oi'. The word is 'boil'.",
-      questionText: "b__l",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "boil",
-        intent: "fill_blank",
-        questionLine: "b__l",
-        imagePrompt: "A pot of water starting to boil"
-      },
-      aiTutor: {
-        target_word: 'boil',
-        question: "b__l",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'boil'."
-      },
-      audio: "boil"
-    },
-    {
-      id: 12,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "sound",
-      imageUrl: null,
-      explanation: "Good! The missing diphthong is 'ou'. The word is 'sound'.",
-      questionText: "s__nd",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "sound",
-        intent: "fill_blank",
-        questionLine: "s__nd",
-        imagePrompt: "Sound waves coming from a speaker"
-      },
-      aiTutor: {
-        target_word: 'sound',
-        question: "s__nd",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'sound'."
-      },
-      audio: "sound"
-    },
-    {
-      id: 13,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "owl",
-      imageUrl: null,
-      explanation: "Great job! The missing diphthong is 'ow'. The word is 'owl'.",
-      questionText: "__l",
-      correctAnswer: "ow",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [2],
-      aiHook: {
-        targetWord: "owl",
-        intent: "fill_blank",
-        questionLine: "__l",
-        imagePrompt: "A wise owl sitting on a branch"
-      },
-      aiTutor: {
-        target_word: 'owl',
-        question: "__l",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound at the start of 'owl'."
-      },
-      audio: "owl"
-    },
-    {
-      id: 14,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "join",
-      imageUrl: null,
-      explanation: "Nice work! The missing diphthong is 'oi'. The word is 'join'.",
-      questionText: "j__n",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "join",
-        intent: "fill_blank",
-        questionLine: "j__n",
-        imagePrompt: "Two puzzle pieces joining together"
-      },
-      aiTutor: {
-        target_word: 'join',
-        question: "j__n",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'join'."
-      },
-      audio: "join"
-    },
-    {
-      id: 15,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "town",
-      imageUrl: null,
-      explanation: "Excellent! The missing diphthong is 'ow'. The word is 'town'.",
-      questionText: "t__n",
-      correctAnswer: "ow",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3],
-      aiHook: {
-        targetWord: "town",
-        intent: "fill_blank",
-        questionLine: "t__n",
-        imagePrompt: "A small town with houses and a clock tower"
-      },
-      aiTutor: {
-        target_word: 'town',
-        question: "t__n",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'town'."
-      },
-      audio: "town"
-    },
-    {
-      id: 16,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "noise",
-      imageUrl: null,
-      explanation: "Great! The missing diphthong is 'oi'. The word is 'noise'.",
-      questionText: "n__se",
-      correctAnswer: "oi",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "noise",
-        intent: "fill_blank",
-        questionLine: "n__se",
-        imagePrompt: "Loud noise shown with sound lines from speakers"
-      },
-      aiTutor: {
-        target_word: 'noise',
-        question: "n__se",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oi' makes the /oi/ sound in 'noise'."
-      },
-      audio: "noise"
-    },
-    {
-      id: 17,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "enjoy",
-      imageUrl: null,
-      explanation: "Nice! The missing diphthong is 'oy'. The word is 'enjoy'.",
-      questionText: "enj__",
-      correctAnswer: "oy",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,2],
-      aiHook: {
-        targetWord: "enjoy",
-        intent: "fill_blank",
-        questionLine: "enj__",
-        imagePrompt: "Kids enjoy playing outside"
-      },
-      aiTutor: {
-        target_word: 'enjoy',
-        question: "enj__",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'oy' makes the /oi/ sound at the end of 'enjoy'."
-      },
-      audio: "enjoy"
-    },
-    {
-      id: 18,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "house",
-      imageUrl: null,
-      explanation: "Good work! The missing diphthong is 'ou'. The word is 'house'.",
-      questionText: "h__se",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "house",
-        intent: "fill_blank",
-        questionLine: "h__se",
-        imagePrompt: "A small house with a yard"
-      },
-      aiTutor: {
-        target_word: 'house',
-        question: "h__se",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'house'."
-      },
-      audio: "house"
-    },
-    {
-      id: 19,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "brown",
-      imageUrl: null,
-      explanation: "Excellent! The missing diphthong is 'ow'. The word is 'brown'.",
-      questionText: "br__n",
-      correctAnswer: "ow",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,1,4],
-      aiHook: {
-        targetWord: "brown",
-        intent: "fill_blank",
-        questionLine: "br__n",
-        imagePrompt: "A brown crayon drawing a line"
-      },
-      aiTutor: {
-        target_word: 'brown',
-        question: "br__n",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ow' makes the /ow/ sound in 'brown'."
-      },
-      audio: "brown"
-    },
-    {
-      id: 20,
-      topicId: '2-M.2',
-      topicName: 'Complete_the_word_with_the_correct_diphthong_oi_oy_ou_ow',
-      progressTopicName: 'Fill in the missing diphthong',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "couch",
-      imageUrl: null,
-      explanation: "Great job! The missing diphthong is 'ou'. The word is 'couch'.",
-      questionText: "c__ch",
-      correctAnswer: "ou",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: true,
-      prefilledIndexes: [0,3,4],
-      aiHook: {
-        targetWord: "couch",
-        intent: "fill_blank",
-        questionLine: "c__ch",
-        imagePrompt: "A comfy couch in a living room"
-      },
-      aiTutor: {
-        target_word: 'couch',
-        question: "c__ch",
-        student_entry: "",
-        topic_to_reinforce: 'Fill in the missing diphthong',
-        spelling_pattern_or_rule: "The diphthong 'ou' makes the /ow/ sound in 'couch'."
-      },
-      audio: "couch"
+      audio: "down"
     }
-  ]}
+  ]
+}
 ,
     '2-N.1': {
   topicInfo: {
     topicId: '2-N.1',
     topicName: 'Complete_words_with_variant_vowels',
-    progressTopicName: 'Fill in the missing variant vowels',
+    progressTopicName: 'Revision: common vowel teams',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -51838,11 +52868,364 @@ aiTutor: {
 
       ]
     },
-    '3-A.3': {
+
+    '3-A.3.1': {
   topicInfo: {
-    topicId: '3-A.3',
-    topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-    progressTopicName: 'Spell the long a word',
+    topicId: '3-A.3.1',
+    topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+    progressTopicName: 'Spell the long A word: ai, ay and silent e',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "hay",
+      imageUrl: null,
+      explanation: "Great job! The word is 'hay' (long a spelled with 'ay').",
+      questionText: "h__",
+      correctAnswer: "hay",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: "hay",
+        intent: "fill_blank",
+        questionLine: "h__",
+        imagePrompt: "A pile of hay"
+      },
+      aiTutor: {
+        target_word: 'hay',
+        question: "h__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "hay"
+    },
+    {
+      id: 2,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "cake",
+      imageUrl: null,
+      explanation: "Yum! The word is 'cake' (long a spelled with silent e).",
+      questionText: "c_k_",
+      correctAnswer: "cake",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "cake",
+        intent: "fill_blank",
+        questionLine: "c_k_",
+        imagePrompt: "A birthday cake with candles"
+      },
+      aiTutor: {
+        target_word: 'cake',
+        question: "c_k_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "cake"
+    },
+    {
+      id: 3,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "rain",
+      imageUrl: null,
+      explanation: "Nice! The word is 'rain' (long a spelled with 'ai').",
+      questionText: "r__n",
+      correctAnswer: "rain",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: "rain",
+        intent: "fill_blank",
+        questionLine: "r__n",
+        imagePrompt: "Rain falling from clouds"
+      },
+      aiTutor: {
+        target_word: 'rain',
+        question: "r__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "rain"
+    },
+    {
+      id: 4,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "play",
+      imageUrl: null,
+      explanation: "Good job! The word is 'play' (long a spelled with 'ay').",
+      questionText: "pl__",
+      correctAnswer: "play",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "play",
+        intent: "fill_blank",
+        questionLine: "pl__",
+        imagePrompt: "Kids playing outside"
+      },
+      aiTutor: {
+        target_word: 'play',
+        question: "pl__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "play"
+    },
+    {
+      id: 5,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "gate",
+      imageUrl: null,
+      explanation: "Great! The word is 'gate' (long a with silent e).",
+      questionText: "g_t_",
+      correctAnswer: "gate",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "gate",
+        intent: "fill_blank",
+        questionLine: "g_t_",
+        imagePrompt: "A wooden garden gate"
+      },
+      aiTutor: {
+        target_word: 'gate',
+        question: "g_t_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "gate"
+    },
+    {
+      id: 6,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "mail",
+      imageUrl: null,
+      explanation: "Nice work! The word is 'mail' (long a with 'ai').",
+      questionText: "m__l",
+      correctAnswer: "mail",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: "mail",
+        intent: "fill_blank",
+        questionLine: "m__l",
+        imagePrompt: "Letters in a mailbox"
+      },
+      aiTutor: {
+        target_word: 'mail',
+        question: "m__l",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "mail"
+    },
+    {
+      id: 7,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "day",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'day' (long a with 'ay').",
+      questionText: "d__",
+      correctAnswer: "day",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: "day",
+        intent: "fill_blank",
+        questionLine: "d__",
+        imagePrompt: "A bright sunny day"
+      },
+      aiTutor: {
+        target_word: 'day',
+        question: "d__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "day"
+    },
+    {
+      id: 8,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "game",
+      imageUrl: null,
+      explanation: "Well done! The word is 'game' (long a with silent e).",
+      questionText: "g_m_",
+      correctAnswer: "game",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "game",
+        intent: "fill_blank",
+        questionLine: "g_m_",
+        imagePrompt: "Children playing a board game"
+      },
+      aiTutor: {
+        target_word: 'game',
+        question: "g_m_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "game"
+    },
+    {
+      id: 9,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "rainbow",
+      imageUrl: null,
+      explanation: "Beautiful! The word is 'rainbow' (long a in 'rain').",
+      questionText: "r__nbow",
+      correctAnswer: "rainbow",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4],
+      aiHook: {
+        targetWord: "rainbow",
+        intent: "fill_blank",
+        questionLine: "r__nbow",
+        imagePrompt: "A colorful rainbow in the sky"
+      },
+      aiTutor: {
+        target_word: 'rainbow',
+        question: "r__nbow",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "rainbow"
+    },
+    {
+      id: 10,
+      topicId: '3-A.3.1',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay',
+      progressTopicName: 'Spelling patterns for long A: ai, ay and silent e',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "bake",
+      imageUrl: null,
+      explanation: "Great! The word is 'bake' (long a with silent e).",
+      questionText: "b_k_",
+      correctAnswer: "bake",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: "bake",
+        intent: "fill_blank",
+        questionLine: "b_k_",
+        imagePrompt: "A baker putting cookies into an oven"
+      },
+      aiTutor: {
+        target_word: 'bake',
+        question: "b_k_",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+      },
+      audio: "bake"
+    }],
+  },
+
+  '3-A.3.2': {
+  topicInfo: {
+    topicId: '3-A.3.2',
+    topicName: 'Spell_the_long_a_word_ea_ey',
+    progressTopicName: 'Spell the long A word: ea and ey',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -51850,7 +53233,705 @@ aiTutor: {
   questions: [
     {
       id: 1,
-      topicId: '3-A.3',
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "steak",
+      imageUrl: null,
+      explanation: "Nice job! The vowel team 'ea' makes the long a sound in 'steak'.",
+      questionText: "Complete the word: st__k",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "steak",
+        intent: "fill_blank",
+        questionLine: "Complete the word: st__k",
+        imagePrompt: "A juicy grilled steak on a plate"
+      },
+      aiTutor: {
+        target_word: 'steak',
+        question: "st__k",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "steak"
+    },
+    {
+      id: 2,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "they",
+      imageUrl: null,
+      explanation: "Good work! The 'ey' makes the long a sound in 'they'.",
+      questionText: "Complete the word: th__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: "they",
+        intent: "fill_blank",
+        questionLine: "Complete the word: th__",
+        imagePrompt: "Two friends waving at each other"
+      },
+      aiTutor: {
+        target_word: 'they',
+        question: "th__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "they"
+    },
+    {
+      id: 3,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "break",
+      imageUrl: null,
+      explanation: "Well done! The vowel team 'ea' makes the long a sound in 'break'.",
+      questionText: "Complete the word: br__k",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "break",
+        intent: "fill_blank",
+        questionLine: "Complete the word: br__k",
+        imagePrompt: "A person taking a short break from work"
+      },
+      aiTutor: {
+        target_word: 'break',
+        question: "br__k",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "break"
+    },
+    {
+      id: 4,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "prey",
+      imageUrl: null,
+      explanation: "Great job! The 'ey' makes the long a sound in 'prey'.",
+      questionText: "Complete the word: pr__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: "prey",
+        intent: "fill_blank",
+        questionLine: "Complete the word: pr__",
+        imagePrompt: "A hawk swooping down to catch its prey"
+      },
+      aiTutor: {
+        target_word: 'prey',
+        question: "pr__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "prey"
+    },
+    {
+      id: 5,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "great",
+      imageUrl: null,
+      explanation: "Excellent! The 'ea' makes the long a sound in 'great'.",
+      questionText: "Complete the word: gr__t",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "great",
+        intent: "fill_blank",
+        questionLine: "Complete the word: gr__t",
+        imagePrompt: "A child giving a thumbs-up showing something great"
+      },
+      aiTutor: {
+        target_word: 'great',
+        question: "gr__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "great"
+    },
+    {
+      id: 6,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "obey",
+      imageUrl: null,
+      explanation: "Good work! The 'ey' makes the long a sound in 'obey'.",
+      questionText: "Complete the word: ob__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: "obey",
+        intent: "fill_blank",
+        questionLine: "Complete the word: ob__",
+        imagePrompt: "A child following a parent’s instruction"
+      },
+      aiTutor: {
+        target_word: 'obey',
+        question: "ob__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "obey"
+    },
+    {
+      id: 7,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "breakfast",
+      imageUrl: null,
+      explanation: "You’re right! The 'ea' in 'breakfast' doesn’t say long a — but in 'break' it does!",
+      questionText: "Which word has 'ea' saying /ā/? (choose) break / breakfast",
+      correctAnswer: "break",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "break",
+        intent: "fill_blank",
+        questionLine: "Which word has 'ea' saying /ā/? break / breakfast",
+        imagePrompt: "A plate of breakfast food beside the word break"
+      },
+      aiTutor: {
+        target_word: 'break',
+        question: "br_ _ k",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "break"
+    },
+    {
+      id: 8,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "survey",
+      imageUrl: null,
+      explanation: "Excellent! The 'ey' makes the long a sound at the end of 'survey'.",
+      questionText: "Complete the word: surv__",
+      correctAnswer: "ey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: "survey",
+        intent: "fill_blank",
+        questionLine: "Complete the word: surv__",
+        imagePrompt: "A person answering questions in a survey form"
+      },
+      aiTutor: {
+        target_word: 'survey',
+        question: "surv__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "survey"
+    },
+    {
+      id: 9,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "gray",
+      imageUrl: null,
+      explanation: "Great! The 'ay' makes the long a sound in 'gray', while 'ey' can too, like in 'they'.",
+      questionText: "Compare the endings: Which word uses 'ey'? gray / they",
+      correctAnswer: "they",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: "they",
+        intent: "fill_blank",
+        questionLine: "Which word uses 'ey'? gray / they",
+        imagePrompt: "Two words compared: gray and they"
+      },
+      aiTutor: {
+        target_word: 'they',
+        question: "th__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "they"
+    },
+    {
+      id: 10,
+      topicId: '3-A.3.2',
+      topicName: 'Spell_the_long_a_word_ea_ey',
+      progressTopicName: 'Spell the long a word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "great",
+      imageUrl: null,
+      explanation: "Well done! The 'ea' in 'great' makes the long a sound.",
+      questionText: "Complete the word: gr__t",
+      correctAnswer: "ea",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 4],
+      aiHook: {
+        targetWord: "great",
+        intent: "fill_blank",
+        questionLine: "Complete the word: gr__t",
+        imagePrompt: "A gold star for doing something great"
+      },
+      aiTutor: {
+        target_word: 'great',
+        question: "gr__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule:
+          "The long a sound can be spelled in many ways. ‘ai’ and ‘ea’ usually appear in the middle of words (like rain, break), while ‘ay’ and ‘ey’ come at the end — ‘ay’ is more common (day, play), and ‘ey’ appears in a few words like they, prey, and obey."
+      },
+      audio: "great"
+    }
+  ]
+}
+,
+'3-A.3.3': {
+topicInfo: {
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell the long A word: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank'
+},
+questions: [
+// --- First 3: EIGH (student fills "eigh") ---
+{
+id: 1,
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell long A: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'eight',
+imageUrl: null,
+explanation: "Great! The missing pattern is 'eigh'. The word is 'eight' (/ā/).",
+questionText: "Complete the word: t",
+correctAnswer: 'eigh',
+template: 'fill_blank',
+isSpacing: false, isSorting: false, isSpelling: true,
+isPrefilled: true, prefilledIndexes: [4],
+aiHook: {
+targetWord: 'eight',
+intent: 'fill_blank',
+questionLine: 'Complete the word: ____t',
+imagePrompt: 'A large blue number 8 with sparkles'
+},
+aiTutor: {
+target_word: 'eight',
+question: '____t',
+student_entry: '',
+topic_to_reinforce: 'Spell the long A word',
+spelling_pattern_or_rule:
+"The letters 'eigh' can spell the long A sound in a small set of words (eight, weigh, neighbor). It’s rarer than a_e, ai, ay, ea, or ey—so remember these!"
+},
+audio: 'eight'
+},
+{
+id: 2,
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell long A: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'weigh',
+imageUrl: null,
+explanation: "Nice! The missing pattern is 'eigh'. The word is 'weigh' (/ā/).",
+questionText: "Complete the word: w",
+correctAnswer: 'eigh',
+template: 'fill_blank',
+isSpacing: false, isSorting: false, isSpelling: true,
+isPrefilled: true, prefilledIndexes: [0],
+aiHook: {
+targetWord: 'weigh',
+intent: 'fill_blank',
+questionLine: 'Complete the word: w____',
+imagePrompt: 'A scale weighing fruit in a grocery store'
+},
+aiTutor: {
+target_word: 'weigh',
+question: 'w____',
+student_entry: '',
+topic_to_reinforce: 'Spell the long A word',
+spelling_pattern_or_rule:
+"Remember: 'eigh' can say /ā/ (weigh, eight). It’s a less common pattern compared to a_e (cake), ai (train), ay (day), ea (break), or ey (they)."
+},
+audio: 'weigh'
+},
+{
+id: 3,
+topicId: '3-A.3.3',
+topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+progressTopicName: 'Spell long A: eigh, ey, ea',
+questionElements: 'image + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'sleigh',
+imageUrl: null,
+explanation: "Well done! The missing pattern is 'eigh'. The word is 'sleigh' (/ā/).",
+questionText: "Complete the word: sl____",
+correctAnswer: 'eigh',
+template: 'fill_blank',
+isSpacing: false, isSorting: false, isSpelling: true,
+isPrefilled: true, prefilledIndexes: [0,1],
+aiHook: {
+targetWord: 'sleigh',
+intent: 'fill_blank',
+questionLine: 'Complete the word: sl____',
+imagePrompt: 'A red sleigh gliding over snow'
+},
+aiTutor: {
+target_word: 'sleigh',
+question: 'sl____',
+student_entry: '',
+topic_to_reinforce: 'Spell the long A word',
+spelling_pattern_or_rule:
+"'eigh' can make /ā/ in a few words (sleigh, eight, weigh). It’s rare—memorize these special spellings."
+},
+audio: 'sleigh'
+},
+// --- Mixed (EIGH, EY, EA) ---
+{
+  id: 4,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'they',
+  imageUrl: null,
+  explanation: "Good! The missing ending is 'ey'. The word is 'they' (/ā/).",
+  questionText: "Complete the word: th__",
+  correctAnswer: 'ey',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1],
+  aiHook: {
+    targetWord: 'they',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: th__',
+    imagePrompt: 'Two friends waving to each other'
+  },
+  aiTutor: {
+    target_word: 'they',
+    question: 'th__',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "At word ends, long A is usually 'ay' (day), but sometimes 'ey' (they, prey, obey). Listen for /ā/ at the end and remember these common 'ey' words."
+  },
+  audio: 'they'
+},
+{
+  id: 5,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'break',
+  imageUrl: null,
+  explanation: "Great! The missing team is 'ea'. The word is 'break' (/ā/).",
+  questionText: "Complete the word: br__k",
+  correctAnswer: 'ea',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1,4],
+  aiHook: {
+    targetWord: 'break',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: br__k',
+    imagePrompt: 'A student taking a short break on a bench'
+  },
+  aiTutor: {
+    target_word: 'break',
+    question: 'br__k',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "'ea' can sometimes spell long A in common exception words (break, steak, great). More often, long A is spelled a_e, ai, or ay."
+  },
+  audio: 'break'
+},
+{
+  id: 6,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'neighbor',
+  imageUrl: null,
+  explanation: "Excellent! The missing pattern is 'eigh'. The word is 'neighbor' (/ā/).",
+  questionText: "Complete the word: n____bor",
+  correctAnswer: 'eigh',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,5,6,7],
+  aiHook: {
+    targetWord: 'neighbor',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: n____bor',
+    imagePrompt: 'Two neighbors waving across their yards'
+  },
+  aiTutor: {
+    target_word: 'neighbor',
+    question: 'n____bor',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "'eigh' can spell /ā/ in a few words (neighbor, eight, weigh). It’s a rare pattern—compare with a_e, ai, ay, ea, and ey."
+  },
+  audio: 'neighbor'
+},
+{
+  id: 7,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'prey',
+  imageUrl: null,
+  explanation: "Nice! The missing ending is 'ey'. The word is 'prey' (/ā/).",
+  questionText: "Complete the word: pr__",
+  correctAnswer: 'ey',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1],
+  aiHook: {
+    targetWord: 'prey',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: pr__',
+    imagePrompt: 'A hawk searching for prey in a field'
+  },
+  aiTutor: {
+    target_word: 'prey',
+    question: 'pr__',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "Long A at the end is usually 'ay' (day), but sometimes 'ey' (prey, they, obey). Listen for /ā/ at the word’s end."
+  },
+  audio: 'prey'
+},
+{
+  id: 8,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'great',
+  imageUrl: null,
+  explanation: "Good! The missing team is 'ea'. The word is 'great' (/ā/).",
+  questionText: "Complete the word: gr__t",
+  correctAnswer: 'ea',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1,4],
+  aiHook: {
+    targetWord: 'great',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: gr__t',
+    imagePrompt: 'A gold star with the word GREAT!'
+  },
+  aiTutor: {
+    target_word: 'great',
+    question: 'gr__t',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "'ea' sometimes spells /ā/ in exception words (great, steak, break). Often, long A is a_e, ai, or ay instead."
+  },
+  audio: 'great'
+},
+{
+  id: 9,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'weight',
+  imageUrl: null,
+  explanation: "Great work! The missing pattern is 'eigh'. The word is 'weight' (/ā/).",
+  questionText: "Complete the word: w____t",
+  correctAnswer: 'eigh',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,5],
+  aiHook: {
+    targetWord: 'weight',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: w____t',
+    imagePrompt: 'A kettlebell or dumbbell showing weight'
+  },
+  aiTutor: {
+    target_word: 'weight',
+    question: 'w____t',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "‘eigh’ spells /ā/ in a few words (weight, eight). It’s uncommon—compare with a_e, ai, ay, ea, ey."
+  },
+  audio: 'weight'
+},
+{
+  id: 10,
+  topicId: '3-A.3.3',
+  topicName: 'Complete_the_word_with_the_correct_long_a_spelling_eigh_ey_ea',
+  progressTopicName: 'Spell long A: eigh, ey, ea',
+  questionElements: 'image + text',
+  answerElements: 'text',
+  templateType: 'fill_blank',
+  word: 'obey',
+  imageUrl: null,
+  explanation: "Excellent! The missing ending is 'ey'. The word is 'obey' (/ā/).",
+  questionText: "Complete the word: ob__",
+  correctAnswer: 'ey',
+  template: 'fill_blank',
+  isSpacing: false, isSorting: false, isSpelling: true,
+  isPrefilled: true, prefilledIndexes: [0,1],
+  aiHook: {
+    targetWord: 'obey',
+    intent: 'fill_blank',
+    questionLine: 'Complete the word: ob__',
+    imagePrompt: 'A child following a sign that says OBEY RULES'
+  },
+  aiTutor: {
+    target_word: 'obey',
+    question: 'ob__',
+    student_entry: '',
+    topic_to_reinforce: 'Spell the long A word',
+    spelling_pattern_or_rule:
+      "At word ends, long A is usually 'ay' (day), but some words use 'ey' (obey, they, prey). Choose based on position and the word you know."
+  },
+  audio: 'obey'
+}
+]
+},
+
+  '3-A.3.4': {
+  topicInfo: {
+    topicId: '3-A.3.4',
+    topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+    progressTopicName: 'Revision: Spell the long A word',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
       progressTopicName: 'Spell the long a word',
       questionElements: 'image + text',
@@ -51878,15 +53959,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e makes the a long in 'shake'."
+        spelling_pattern_or_rule: "Use a_e (silent e) to make 'a' long in CVCe: sh–a–k–e."
       },
       audio: "shake"
     },
     {
       id: 2,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -51912,15 +53993,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ai' makes the long a sound in 'train'."
+        spelling_pattern_or_rule: "In the middle of a word, use 'ai' for long a: tr–ai–n."
       },
       audio: "train"
     },
     {
       id: 3,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -51946,15 +54027,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ay' at the end makes the long a sound in 'day'."
+        spelling_pattern_or_rule: "At the end of a word, use 'ay' for long a: d–ay."
       },
       audio: "day"
     },
     {
       id: 4,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -51980,15 +54061,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e at the end makes the a long in 'plate'."
+        spelling_pattern_or_rule: "CVCe frame: final 'e' makes 'a' long—pl–a–t–e."
       },
       audio: "plate"
     },
     {
       id: 5,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52014,15 +54095,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ai' vowel team makes the long a sound in 'rain'."
+        spelling_pattern_or_rule: "Middle long a—use 'ai': r–ai–n (sometimes 'ea' in rare words)."
       },
       audio: "rain"
     },
     {
       id: 6,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52048,15 +54129,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'eigh' spelling makes the long a sound in 'eight'."
+        spelling_pattern_or_rule: "‘eigh’ chunk says long a—memorize this club pattern."
       },
       audio: "eight"
     },
     {
       id: 7,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52082,15 +54163,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ay' makes the long a sound in 'gray'."
+        spelling_pattern_or_rule: "End of word—use 'ay' for long a: gr–ay."
       },
       audio: "gray"
     },
     {
       id: 8,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52116,15 +54197,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ea' vowel team can make the long a sound in words like 'break'."
+        spelling_pattern_or_rule: "‘ea’ sometimes says long a—learn break/steak/great by heart."
       },
       audio: "break"
     },
     {
       id: 9,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52150,15 +54231,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ey' spelling can make the long a sound in 'they'."
+        spelling_pattern_or_rule: "‘ey’ is a rare long a—remember ‘they’, ‘prey’, ‘obey’."
       },
       audio: "they"
     },
     {
       id: 10,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52184,15 +54265,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ai' makes the long a sound in 'paint'."
+        spelling_pattern_or_rule: "Middle long a—use 'ai': p–ai–nt (not 'ay')."
       },
       audio: "paint"
     },
     {
       id: 11,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52218,15 +54299,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ay' at the end makes the long a sound in 'play'."
+        spelling_pattern_or_rule: "End with long a—use 'ay': pl–ay."
       },
       audio: "play"
     },
     {
       id: 12,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52252,15 +54333,15 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The vowel team 'ai' makes the long a sound in 'chain'."
+        spelling_pattern_or_rule: "Inside the word, long a is 'ai': ch–ai–n."
       },
       audio: "chain"
     },
     {
       id: 13,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
@@ -52286,21 +54367,21 @@ aiTutor: {
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e at the end makes the a long in 'parade'."
+        spelling_pattern_or_rule: "In open syllables with silent e, 'a' stays long: par–a(de)."
       },
       audio: "parade"
     },
     {
       id: 14,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "steak",
       imageUrl: null,
-      explanation: "Nice work! The vowel team 'ea' makes the long a sound in 'steak'.",
+      explanation: "Good job! The vowel team 'ea' makes the long a sound in 'steak'.",
       questionText: "Spell the word: _____",
       correctAnswer: "steak",
       template: 'fill_blank',
@@ -52313,62 +54394,28 @@ aiTutor: {
         targetWord: "steak",
         intent: "fill_blank",
         questionLine: "Spell the word: _____",
-        imagePrompt: "A grilled steak on a plate for the word steak"
+        imagePrompt: "A juicy grilled steak on a plate for the word steak"
       },
       aiTutor: {
         target_word: 'steak',
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "In some words like 'steak', 'ea' makes the long a sound."
+        spelling_pattern_or_rule: "‘ea’ can say long a in rare words: break/steak/great."
       },
       audio: "steak"
     },
     {
       id: 15,
-      topicId: '3-A.3',
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "whale",
-      imageUrl: null,
-      explanation: "Fantastic! The silent e makes the a long in 'whale'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "whale",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "whale",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A giant blue whale swimming in the ocean for the word whale"
-      },
-      aiTutor: {
-        target_word: 'whale',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The silent e at the end makes the a long in 'whale'."
-      },
-      audio: "whale"
-    },
-    {
-      id: 16,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "relay",
       imageUrl: null,
-      explanation: "Good job! The 'ay' at the end makes the long a sound in 'relay'.",
+      explanation: "Nice work! The word 'relay' ends with 'ay' for long a.",
       questionText: "Spell the word: _____",
       correctAnswer: "relay",
       template: 'fill_blank',
@@ -52381,130 +54428,28 @@ aiTutor: {
         targetWord: "relay",
         intent: "fill_blank",
         questionLine: "Spell the word: _____",
-        imagePrompt: "Athletes passing a baton in a relay race for the word relay"
+        imagePrompt: "A relay race with runners passing a baton for the word relay"
       },
       aiTutor: {
         target_word: 'relay',
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ay' ending makes the long a sound in 'relay'."
+        spelling_pattern_or_rule: "End syllable uses 'ay' for long a: re–lay."
       },
       audio: "relay"
     },
     {
-      id: 17,
-      topicId: '3-A.3',
+      id: 16,
+      topicId: '3-A.3.4',
       topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "weigh",
-      imageUrl: null,
-      explanation: "Excellent! The 'eigh' makes the long a sound in 'weigh'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "weigh",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "weigh",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A weighing scale with fruits for the word weigh"
-      },
-      aiTutor: {
-        target_word: 'weigh',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'eigh' vowel team makes the long a sound in 'weigh'."
-      },
-      audio: "weigh"
-    },
-    {
-      id: 18,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "display",
-      imageUrl: null,
-      explanation: "Nice! The 'ay' at the end makes the long a sound in 'display'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "display",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "display",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A store display with colorful products for the word display"
-      },
-      aiTutor: {
-        target_word: 'display',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ay' at the end makes the long a sound in 'display'."
-      },
-      audio: "display"
-    },
-    {
-      id: 19,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "faint",
-      imageUrl: null,
-      explanation: "Great work! The 'ai' vowel team makes the long a sound in 'faint'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "faint",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "faint",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A person feeling dizzy and about to faint for the word faint"
-      },
-      aiTutor: {
-        target_word: 'faint',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'ai' vowel team makes the long a sound in 'faint'."
-      },
-      audio: "faint"
-    },
-    {
-      id: 20,
-      topicId: '3-A.3',
-      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
-      progressTopicName: 'Spell the long a word',
+      progressTopicName: 'Revision: Spell the long A word',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "neighbor",
       imageUrl: null,
-      explanation: "Fantastic! The 'eigh' makes the long a sound in 'neighbor'.",
+      explanation: "Well done! The 'eigh' in 'neighbor' makes the long a sound.",
       questionText: "Spell the word: _____",
       correctAnswer: "neighbor",
       template: 'fill_blank',
@@ -52517,27 +54462,1212 @@ aiTutor: {
         targetWord: "neighbor",
         intent: "fill_blank",
         questionLine: "Spell the word: _____",
-        imagePrompt: "Two neighbors waving across their yards for the word neighbor"
+        imagePrompt: "Two friendly neighbors waving from their houses for the word neighbor"
       },
       aiTutor: {
         target_word: 'neighbor',
         question: "_____",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "The 'eigh' spelling makes the long a sound in 'neighbor'."
+        spelling_pattern_or_rule: "‘eigh’ is a rare long a pattern: eight/weigh/neighbor."
       },
       audio: "neighbor"
     },
-    
-    
+    {
+      id: 17,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "whale",
+      imageUrl: null,
+      explanation: "Great job! The silent e makes the a long in 'whale'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "whale",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "whale",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A large blue whale swimming in the ocean for the word whale"
+      },
+      aiTutor: {
+        target_word: 'whale',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Silent e makes 'a' long: wh–a–l–e."
+      },
+      audio: "whale"
+    },
+    {
+      id: 18,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "display",
+      imageUrl: null,
+      explanation: "Nice! The ending 'ay' makes the long a sound in 'display'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "display",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "display",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A colorful art display on a wall for the word display"
+      },
+      aiTutor: {
+        target_word: 'display',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "End syllable long a—use 'ay': dis–play."
+      },
+      audio: "display"
+    },
+    {
+      id: 19,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "obey",
+      imageUrl: null,
+      explanation: "Well done! The ending 'ey' makes the long a sound in 'obey'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "obey",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "obey",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A child following directions for the word obey"
+      },
+      aiTutor: {
+        target_word: 'obey',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "‘ey’ says long a in rare words like they/prey/obey."
+      },
+      audio: "obey"
+    },
+    {
+      id: 20,
+      topicId: '3-A.3.4',
+      topicName: 'Spell_the_long_a_word_silent_e_ai_ay_ea_ey_eigh',
+      progressTopicName: 'Revision: Spell the long A word',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "faint",
+      imageUrl: null,
+      explanation: "Excellent! The vowel team 'ai' makes the long a sound in 'faint'.",
+      questionText: "Spell the word: _____",
+      correctAnswer: "faint",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: "faint",
+        intent: "fill_blank",
+        questionLine: "Spell the word: _____",
+        imagePrompt: "A person feeling faint and dizzy for the word faint"
+      },
+      aiTutor: {
+        target_word: 'faint',
+        question: "_____",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long a word',
+        spelling_pattern_or_rule: "Inside the word, use 'ai' for long a: f–ai–nt."
+      },
+      audio: "faint"
+    }
   ]
 }
 ,
-    '3-A.4': {
+'3-A.4.1': {
   topicInfo: {
-    topicId: '3-A.4',
+    topicId: '3-A.4.1',
+    topicName: 'Spell_the_long_e_word_ee_ea',
+    progressTopicName: 'Spell the long e word: ee and ea',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "see",
+      imageUrl: null,
+      explanation: "Good job! The word is 'see' (long e with 'ee').",
+      questionText: "__ __ __",
+      correctAnswer: "see",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0], // s shown; student types 'ee'
+      aiHook: {
+        targetWord: "see",
+        intent: "fill_blank",
+        questionLine: "__ __ __",
+        imagePrompt: "A child looking through binoculars"
+      },
+      aiTutor: {
+        target_word: 'see',
+        question: "s __ __",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "see"
+    },
+    {
+      id: 2,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "tree",
+      imageUrl: null,
+      explanation: "Great! The word is 'tree' (long e with 'ee').",
+      questionText: "t r __ __",
+      correctAnswer: "tree",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1], // t,r shown; student types 'ee'
+      aiHook: {
+        targetWord: "tree",
+        intent: "fill_blank",
+        questionLine: "t r __ __",
+        imagePrompt: "A tall green tree"
+      },
+      aiTutor: {
+        target_word: 'tree',
+        question: "t r __ __",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "tree"
+    },
+    {
+      id: 3,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "bee",
+      imageUrl: null,
+      explanation: "Buzz! The word is 'bee' (long e with 'ee').",
+      questionText: "b __ __",
+      correctAnswer: "bee",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0], // b shown; student types 'ee'
+      aiHook: {
+        targetWord: "bee",
+        intent: "fill_blank",
+        questionLine: "b __ __",
+        imagePrompt: "A buzzing bee near a flower"
+      },
+      aiTutor: {
+        target_word: 'bee',
+        question: "b __ __",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "bee"
+    },
+    {
+      id: 4,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "green",
+      imageUrl: null,
+      explanation: "Nice! The word is 'green' (long e with 'ee').",
+      questionText: "gr__n",
+      correctAnswer: "green",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // g,r,n shown; student types 'ee'
+      aiHook: {
+        targetWord: "green",
+        intent: "fill_blank",
+        questionLine: "gr__n",
+        imagePrompt: "A green leaf"
+      },
+      aiTutor: {
+        target_word: 'green',
+        question: "gr__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "green"
+    },
+    {
+      id: 5,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "leaf",
+      imageUrl: null,
+      explanation: "Great! The word is 'leaf' (long e with 'ea').",
+      questionText: "l__f",
+      correctAnswer: "leaf",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // l,f shown; student types 'ea'
+      aiHook: {
+        targetWord: "leaf",
+        intent: "fill_blank",
+        questionLine: "l__f",
+        imagePrompt: "A single green leaf"
+      },
+      aiTutor: {
+        target_word: '3-A.4.1',
+        question: "l__f",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "leaf"
+    },
+    {
+      id: 6,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "beach",
+      imageUrl: null,
+      explanation: "Awesome! The word is 'beach' (long e with 'ea').",
+      questionText: "b__ch",
+      correctAnswer: "beach",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4], // b,c,h shown; student types 'ea'
+      aiHook: {
+        targetWord: "beach",
+        intent: "fill_blank",
+        questionLine: "b__ch",
+        imagePrompt: "A sandy beach with waves"
+      },
+      aiTutor: {
+        target_word: 'beach',
+        question: "b__ch",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "beach"
+    },
+    {
+      id: 7,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "sleep",
+      imageUrl: null,
+      explanation: "Nice! The word is 'sleep' (long e with 'ee').",
+      questionText: "sl__p",
+      correctAnswer: "sleep",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // s,l,p shown; student types 'ee'
+      aiHook: {
+        targetWord: "sleep",
+        intent: "fill_blank",
+        questionLine: "sl__p",
+        imagePrompt: "A child sleeping peacefully in bed"
+      },
+      aiTutor: {
+        target_word: 'sleep',
+        question: "sl__p",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "sleep"
+    },
+    {
+      id: 8,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "meat",
+      imageUrl: null,
+      explanation: "Good job! The word is 'meat' (long e with 'ea').",
+      questionText: "m__t",
+      correctAnswer: "meat",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // m,t shown; student types 'ea'
+      aiHook: {
+        targetWord: "meat",
+        intent: "fill_blank",
+        questionLine: "m__t",
+        imagePrompt: "Slices of cooked meat on a plate"
+      },
+      aiTutor: {
+        target_word: 'meat',
+        question: "m__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "meat"
+    },
+    {
+      id: 9,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "feet",
+      imageUrl: null,
+      explanation: "Well done! The word is 'feet' (long e with 'ee').",
+      questionText: "f__t",
+      correctAnswer: "feet",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // f,t shown; student types 'ee'
+      aiHook: {
+        targetWord: "feet",
+        intent: "fill_blank",
+        questionLine: "f__t",
+        imagePrompt: "Two bare feet on the sand"
+      },
+      aiTutor: {
+        target_word: 'feet',
+        question: "f__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "feet"
+    },
+    {
+      id: 10,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "clean",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'clean' (long e with 'ea').",
+      questionText: "cl__n",
+      correctAnswer: "clean",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // c,l,n shown; student types 'ea'
+      aiHook: {
+        targetWord: "clean",
+        intent: "fill_blank",
+        questionLine: "cl__n",
+        imagePrompt: "A person cleaning with a mop"
+      },
+      aiTutor: {
+        target_word: 'clean',
+        question: "cl__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "clean"
+    },
+    {
+      id: 11,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "read",
+      imageUrl: null,
+      explanation: "Great! The word is 'read' (long e with 'ea').",
+      questionText: "r__d",
+      correctAnswer: "read",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // r,d shown; student types 'ea'
+      aiHook: {
+        targetWord: "read",
+        intent: "fill_blank",
+        questionLine: "r__d",
+        imagePrompt: "A boy reading a book under a lamp"
+      },
+      aiTutor: {
+        target_word: 'read',
+        question: "r__d",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "read"
+    },
+    {
+      id: 12,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "street",
+      imageUrl: null,
+      explanation: "Well done! The word is 'street' (long e with 'ee').",
+      questionText: "str__t",
+      correctAnswer: "street",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5], // s,t,r,t shown; student types 'ee'
+      aiHook: {
+        targetWord: "street",
+        intent: "fill_blank",
+        questionLine: "str__t",
+        imagePrompt: "A quiet street with houses on both sides"
+      },
+      aiTutor: {
+        target_word: 'street',
+        question: "str__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "street"
+    },
+    {
+      id: 13,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "peach",
+      imageUrl: null,
+      explanation: "Yum! The word is 'peach' (long e with 'ea').",
+      questionText: "p__ch",
+      correctAnswer: "peach",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4], // p,c,h shown; student types 'ea'
+      aiHook: {
+        targetWord: "peach",
+        intent: "fill_blank",
+        questionLine: "p__ch",
+        imagePrompt: "A ripe peach fruit"
+      },
+      aiTutor: {
+        target_word: 'peach',
+        question: "p__ch",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "peach"
+    },
+    {
+      id: 14,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "sheep",
+      imageUrl: null,
+      explanation: "Nice work! The word is 'sheep' (long e with 'ee').",
+      questionText: "sh__p",
+      correctAnswer: "sheep",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // s,h,p shown; student types 'ee'
+      aiHook: {
+        targetWord: "sheep",
+        intent: "fill_blank",
+        questionLine: "sh__p",
+        imagePrompt: "A fluffy white sheep"
+      },
+      aiTutor: {
+        target_word: 'sheep',
+        question: "sh__p",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "sheep"
+    },
+    {
+      id: 15,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "team",
+      imageUrl: null,
+      explanation: "Great! The word is 'team' (long e with 'ea').",
+      questionText: "t__m",
+      correctAnswer: "team",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // t,m shown; student types 'ea'
+      aiHook: {
+        targetWord: "team",
+        intent: "fill_blank",
+        questionLine: "t__m",
+        imagePrompt: "A soccer team posing together"
+      },
+      aiTutor: {
+        target_word: 'team',
+        question: "t__m",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "team"
+    },
+    {
+      id: 16,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "teach",
+      imageUrl: null,
+      explanation: "Awesome! The word is 'teach' (long e with 'ea').",
+      questionText: "t__ch",
+      correctAnswer: "teach",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4], // t,c,h shown; student types 'ea'
+      aiHook: {
+        targetWord: "teach",
+        intent: "fill_blank",
+        questionLine: "t__ch",
+        imagePrompt: "A teacher writing on the board"
+      },
+      aiTutor: {
+        target_word: 'teach',
+        question: "t__ch",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "teach"
+    },
+    {
+      id: 17,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "seat",
+      imageUrl: null,
+      explanation: "Well done! The word is 'seat' (long e with 'ea').",
+      questionText: "s__t",
+      correctAnswer: "seat",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3], // s,t shown; student types 'ea'
+      aiHook: {
+        targetWord: "seat",
+        intent: "fill_blank",
+        questionLine: "s__t",
+        imagePrompt: "A chair or seat to sit on"
+      },
+      aiTutor: {
+        target_word: 'seat',
+        question: "s__t",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "seat"
+    },
+    {
+      id: 18,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "knee",
+      imageUrl: null,
+      explanation: "Good! The word is 'knee' (long e with 'ee').",
+      questionText: "kn__",
+      correctAnswer: "knee",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1], // k,n shown; student types 'ee'
+      aiHook: {
+        targetWord: "knee",
+        intent: "fill_blank",
+        questionLine: "kn__",
+        imagePrompt: "A bent knee of a person"
+      },
+      aiTutor: {
+        target_word: 'knee',
+        question: "kn__",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "knee"
+    },
+    {
+      id: 19,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "dream",
+      imageUrl: null,
+      explanation: "Nice! The word is 'dream' (long e with 'ea').",
+      questionText: "dr__m",
+      correctAnswer: "dream",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // d,r,m shown; student types 'ea'
+      aiHook: {
+        targetWord: "dream",
+        intent: "fill_blank",
+        questionLine: "dr__m",
+        imagePrompt: "A child dreaming while asleep"
+      },
+      aiTutor: {
+        target_word: 'dream',
+        question: "dr__m",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "dream"
+    },
+    {
+      id: 20,
+      topicId: '3-A.4.1',
+      topicName: 'Spell_the_long_e_word_ee_ea',
+      progressTopicName: 'Spell the long e word: ee and ea',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "queen",
+      imageUrl: null,
+      explanation: "Excellent! The word is 'queen' (long e with 'ee').",
+      questionText: "qu__n",
+      correctAnswer: "queen",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4], // q,u,n shown; student types 'ee'
+      aiHook: {
+        targetWord: "queen",
+        intent: "fill_blank",
+        questionLine: "qu__n",
+        imagePrompt: "A royal queen wearing a crown"
+      },
+      aiTutor: {
+        target_word: 'queen',
+        question: "qu__n",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Long E spelling rule (pedagogical): Both 'ee' and 'ea' make the long e sound in the middle or end of words. 'ee' is more common in short words or at the end (see, tree, feet)."
+      },
+      audio: "queen"
+    }
+  ]
+}
+,
+'3-A.4.2': {
+  topicInfo: {
+    topicId: '3-A.4.2',
+    topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+    progressTopicName: 'Spell the long E word: e_e and ie',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // --- Silent e (e_e) ---
+    {
+      id: 1,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (silent e)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "these",
+      imageUrl: null,
+      explanation: "The silent e makes the first e long in 'these'.",
+      questionText: "Complete the word: th _ s _",
+      correctAnswer: "these",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "these",
+        intent: "fill_blank",
+        questionLine: "Complete the word: th _ s _",
+        imagePrompt: "A person pointing to several objects saying 'these'"
+      },
+      aiTutor: {
+        target_word: 'these',
+        question: "th _ s _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long, as in 'these' and 'scene'. Magic e stretches the vowel sound across one consonant, while 'ee' or 'ea' are used for long e in the middle of words."
+      },
+      audio: "these"
+    },
+    {
+      id: 2,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (silent e)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "scene",
+      imageUrl: null,
+      explanation: "The silent e makes the first e long in 'scene'.",
+      questionText: "Complete the word: sc _ n _",
+      correctAnswer: "scene",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "scene",
+        intent: "fill_blank",
+        questionLine: "Complete the word: sc _ n _",
+        imagePrompt: "Actors performing on a stage for the word scene"
+      },
+      aiTutor: {
+        target_word: 'scene',
+        question: "sc _ n _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long in 'scene'. Use 'ee' or 'ea' for long e in the middle of words like 'green' or 'leaf'. Magic e often appears at the end to stretch the vowel."
+      },
+      audio: "scene"
+    },
+
+    // --- ie ---
+    {
+      id: 3,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (ie)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "field",
+      imageUrl: null,
+      explanation: "The 'ie' makes the long e sound in 'field'.",
+      questionText: "Complete the word: f _ _ l d",
+      correctAnswer: "field",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "field",
+        intent: "fill_blank",
+        questionLine: "Complete the word: f _ _ l d",
+        imagePrompt: "A green grassy field under blue sky"
+      },
+      aiTutor: {
+        target_word: 'field',
+        question: "f _ _ l d",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "The 'ie' pattern spells long e before letters like f, l, or d, as in 'field' or 'chief'. Use 'ee' or 'ea' for long e in the middle of other words like 'green' or 'beach'."
+      },
+      audio: "field"
+    },
+    {
+      id: 4,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (ie)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "chief",
+      imageUrl: null,
+      explanation: "The 'ie' makes the long e sound in 'chief'.",
+      questionText: "Complete the word: ch _ _ f",
+      correctAnswer: "chief",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: "chief",
+        intent: "fill_blank",
+        questionLine: "Complete the word: ch _ _ f",
+        imagePrompt: "A leader wearing a feathered headdress for the word chief"
+      },
+      aiTutor: {
+        target_word: 'chief',
+        question: "ch _ _ f",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "The 'ie' pattern makes long e before f, l, or d, as in 'chief' and 'field'. After c, switch to 'ei'—like 'ceiling' or 'receive'."
+      },
+      audio: "chief"
+    },
+
+    // --- Mixed ---
+    {
+      id: 5,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "niece",
+      imageUrl: null,
+      explanation: "‘ie’ spells long e in 'niece'.",
+      questionText: "Complete the word: n _ _ c e",
+      correctAnswer: "niece",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "niece",
+        intent: "fill_blank",
+        questionLine: "Complete the word: n _ _ c e",
+        imagePrompt: "An aunt hugging her young niece"
+      },
+      aiTutor: {
+        target_word: 'niece',
+        question: "n _ _ c e",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Use 'ie' for long e before c, f, or l, like 'niece' or 'chief'. After c, it changes to 'ei', as in 'ceiling' and 'receive'."
+      },
+      audio: "niece"
+    },
+    {
+      id: 6,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "believe",
+      imageUrl: null,
+      explanation: "‘ie’ makes the long e sound in 'believe'.",
+      questionText: "Complete the word: bel _ _ v e",
+      correctAnswer: "believe",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5,6],
+      aiHook: {
+        targetWord: "believe",
+        intent: "fill_blank",
+        questionLine: "Complete the word: bel _ _ v e",
+        imagePrompt: "A person closing eyes with a hopeful smile for the word believe"
+      },
+      aiTutor: {
+        target_word: 'believe',
+        question: "bel _ _ v e",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "The 'ie' pattern shows long e in the middle of longer words like 'believe' or 'relieve'. After c, switch to 'ei'."
+      },
+      audio: "believe"
+    },
+    {
+      id: 7,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "complete",
+      imageUrl: null,
+      explanation: "Silent e makes the long e in 'complete'.",
+      questionText: "Complete the word: compl _ t _",
+      correctAnswer: "complete",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,6],
+      aiHook: {
+        targetWord: "complete",
+        intent: "fill_blank",
+        questionLine: "Complete the word: compl _ t _",
+        imagePrompt: "A finished checklist with all boxes ticked"
+      },
+      aiTutor: {
+        target_word: 'complete',
+        question: "compl _ t _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long in words like 'complete' and 'scene'. Use 'ee' or 'ea' for long e in middle syllables."
+      },
+      audio: "complete"
+    },
+    {
+      id: 8,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "athlete",
+      imageUrl: null,
+      explanation: "Silent e makes the long e across the final consonant in 'athlete'.",
+      questionText: "Complete the word: athl _ t _",
+      correctAnswer: "athlete",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,5],
+      aiHook: {
+        targetWord: "athlete",
+        intent: "fill_blank",
+        questionLine: "Complete the word: athl _ t _",
+        imagePrompt: "A runner at the starting line for the word athlete"
+      },
+      aiTutor: {
+        target_word: 'athlete',
+        question: "athl _ t _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the first e long in 'athlete'. It’s common at the end, while 'ee' and 'ea' appear inside words."
+      },
+      audio: "athlete"
+    },
+    {
+      id: 9,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "piece",
+      imageUrl: null,
+      explanation: "‘ie’ makes the long e in 'piece'.",
+      questionText: "Complete the word: p _ _ c e",
+      correctAnswer: "piece",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: "piece",
+        intent: "fill_blank",
+        questionLine: "Complete the word: p _ _ c e",
+        imagePrompt: "A jigsaw puzzle piece held in a hand"
+      },
+      aiTutor: {
+        target_word: 'piece',
+        question: "p _ _ c e",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Use 'ie' for long e before c, f, or l, as in 'piece', 'chief', and 'field'. After c, use 'ei'—like 'ceiling'."
+      },
+      audio: "piece"
+    },
+    {
+      id: 10,
+      topicId: '3-A.4.2',
+      topicName: 'Spell_the_long_e_word_silent_e_and_ie',
+      progressTopicName: 'Spell the long e word (mixed)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "theme",
+      imageUrl: null,
+      explanation: "Silent e makes the long e in 'theme'.",
+      questionText: "Complete the word: th _ m _",
+      correctAnswer: "theme",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "theme",
+        intent: "fill_blank",
+        questionLine: "Complete the word: th _ m _",
+        imagePrompt: "A title card that says THEME with decorative elements"
+      },
+      aiTutor: {
+        target_word: 'theme',
+        question: "th _ m _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Silent e (e_e) makes the vowel long in 'theme'. Use 'ee' or 'ea' for long e in middle positions (tree, beach), and 'ie' before letters like f or l."
+      },
+      audio: "theme"
+    }
+  ]
+}
+,
+ '3-A.4.3': {
+  topicInfo: {
+    topicId: '3-A.4.3',
     topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-    progressTopicName: 'Spell the long e word',
+    progressTopicName: 'Spell the long E word: Revision',
     questionElements: 'image + text',
     answerElements: 'text',
     templateType: 'fill_blank'
@@ -52545,7 +55675,7 @@ aiTutor: {
   questions: [
     {
       id: 1,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52553,33 +55683,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "tree",
       imageUrl: null,
-      explanation: "Great job! The 'ee' vowel team makes the long e sound in 'tree'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ee' vowel team makes the long e sound in 'tree'.",
+      questionText: "Complete the word: tr _ _",
       correctAnswer: "tree",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "tree",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: tr _ _",
         imagePrompt: "A tall green tree with leaves for the word tree"
       },
       aiTutor: {
         target_word: 'tree',
-        question: "_____",
+        question: "tr _ _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The vowel team 'ee' makes the long e sound in 'tree'."
+        spelling_pattern_or_rule: "Use 'ee' for long e in the middle: tr–ee."
       },
       audio: "tree"
     },
     {
       id: 2,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52587,33 +55717,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "beach",
       imageUrl: null,
-      explanation: "Nice work! The 'ea' vowel team makes the long e sound in 'beach'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'beach'.",
+      questionText: "Complete the word: b _ _ ch",
       correctAnswer: "beach",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "beach",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: b _ _ ch",
         imagePrompt: "A sunny beach with sand and ocean waves for the word beach"
       },
       aiTutor: {
         target_word: 'beach',
-        question: "_____",
+        question: "b _ _ ch",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The vowel team 'ea' makes the long e sound in 'beach'."
+        spelling_pattern_or_rule: "In the middle, 'ea' often spells long e: b–ea–ch."
       },
       audio: "beach"
     },
     {
       id: 3,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52621,33 +55751,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "sweet",
       imageUrl: null,
-      explanation: "Excellent! The 'ee' vowel team makes the long e sound in 'sweet'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'sweet'.",
+      questionText: "Complete the word: sw _ _ t",
       correctAnswer: "sweet",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "sweet",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: sw _ _ t",
         imagePrompt: "A piece of candy or dessert for the word sweet"
       },
       aiTutor: {
         target_word: 'sweet',
-        question: "_____",
+        question: "sw _ _ t",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The double 'ee' makes the long e sound in 'sweet'."
+        spelling_pattern_or_rule: "Use 'ee' to show long e: sw–ee–t."
       },
       audio: "sweet"
     },
     {
       id: 4,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52655,67 +55785,101 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "field",
       imageUrl: null,
-      explanation: "Good job! The 'ie' makes the long e sound in 'field'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ie' spelling makes the long e sound in 'field'.",
+      questionText: "Complete the word: f _ _ ld",
       correctAnswer: "field",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "field",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: f _ _ ld",
         imagePrompt: "A green grassy field under blue sky for the word field"
       },
       aiTutor: {
         target_word: 'field',
-        question: "_____",
+        question: "f _ _ ld",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ie' spelling makes the long e sound in 'field'."
+        spelling_pattern_or_rule: "Use 'ie' for long e before l/d/f: f–ie–ld."
       },
       audio: "field"
     },
     {
       id: 5,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "these",
       imageUrl: null,
-      explanation: "Great! The silent e makes the e long in 'these'.",
-      questionText: "Spell the word: _____",
+      explanation: "Silent e makes the first e long in 'these'.",
+      questionText: "Complete the word: th _ s _",
       correctAnswer: "these",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "these",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A person pointing to several objects saying 'these' for the word these"
+        questionLine: "Complete the word: th _ s _",
+        imagePrompt: "A person pointing to several objects saying 'these'"
       },
       aiTutor: {
         target_word: 'these',
-        question: "_____",
+        question: "th _ s _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The silent e makes the first e long in 'these'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e: th–e–s–e."
       },
       audio: "these"
     },
     {
       id: 6,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
+      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "scene",
+      imageUrl: null,
+      explanation: "Silent e makes the first e long in 'scene'.",
+      questionText: "Complete the word: sc _ n _",
+      correctAnswer: "scene",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
+      aiHook: {
+        targetWord: "scene",
+        intent: "fill_blank",
+        questionLine: "Complete the word: sc _ n _",
+        imagePrompt: "Actors performing on a stage for the word scene"
+      },
+      aiTutor: {
+        target_word: 'scene',
+        question: "sc _ n _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Fill both e’s in e_e: sc–e–n–e."
+      },
+      audio: "scene"
+    },
+    {
+      id: 7,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52723,33 +55887,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "leaf",
       imageUrl: null,
-      explanation: "Well done! The 'ea' vowel team makes the long e sound in 'leaf'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'leaf'.",
+      questionText: "Complete the word: l _ _ f",
       correctAnswer: "leaf",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "leaf",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: l _ _ f",
         imagePrompt: "A green leaf from a tree for the word leaf"
       },
       aiTutor: {
         target_word: 'leaf',
-        question: "_____",
+        question: "l _ _ f",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ea' vowel team makes the long e sound in 'leaf'."
+        spelling_pattern_or_rule: "Use 'ea' to show long e: l–ea–f."
       },
       audio: "leaf"
     },
     {
-      id: 7,
-      topicId: '3-A.4',
+      id: 8,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52757,33 +55921,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "sleep",
       imageUrl: null,
-      explanation: "Fantastic! The 'ee' vowel team makes the long e sound in 'sleep'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'sleep'.",
+      questionText: "Complete the word: sl _ _ p",
       correctAnswer: "sleep",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "sleep",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: sl _ _ p",
         imagePrompt: "A child sleeping peacefully in bed for the word sleep"
       },
       aiTutor: {
         target_word: 'sleep',
-        question: "_____",
+        question: "sl _ _ p",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The double 'ee' makes the long e sound in 'sleep'."
+        spelling_pattern_or_rule: "Use 'ee' for the long e: sl–ee–p."
       },
       audio: "sleep"
     },
     {
-      id: 8,
-      topicId: '3-A.4',
+      id: 9,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52791,33 +55955,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "peace",
       imageUrl: null,
-      explanation: "Excellent! The 'ea' vowel team makes the long e sound in 'peace'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'peace'.",
+      questionText: "Complete the word: p _ _ ce",
       correctAnswer: "peace",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "peace",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: p _ _ ce",
         imagePrompt: "A peace symbol or people shaking hands for the word peace"
       },
       aiTutor: {
         target_word: 'peace',
-        question: "_____",
+        question: "p _ _ ce",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ea' vowel team makes the long e sound in 'peace'."
+        spelling_pattern_or_rule: "In the middle, 'ea' can spell long e: p–ea–ce."
       },
       audio: "peace"
     },
     {
-      id: 9,
-      topicId: '3-A.4',
+      id: 10,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52825,67 +55989,101 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "chief",
       imageUrl: null,
-      explanation: "Great! The 'ie' spelling makes the long e sound in 'chief'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ie' spelling makes the long e sound in 'chief'.",
+      questionText: "Complete the word: ch _ _ f",
       correctAnswer: "chief",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "chief",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A leader or chief wearing a feathered headdress for the word chief"
+        questionLine: "Complete the word: ch _ _ f",
+        imagePrompt: "A leader wearing a feathered headdress for the word chief"
       },
       aiTutor: {
         target_word: 'chief',
-        question: "_____",
+        question: "ch _ _ f",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ie' spelling makes the long e sound in 'chief'."
+        spelling_pattern_or_rule: "Use 'ie' for long e before f, l, or d: ch–ie–f."
       },
       audio: "chief"
     },
     {
-      id: 10,
-      topicId: '3-A.4',
+      id: 11,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "scene",
+      word: "theme",
       imageUrl: null,
-      explanation: "Well done! The silent e makes the e long in 'scene'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "scene",
+      explanation: "Silent e makes the vowel long in 'theme'.",
+      questionText: "Complete the word: th _ m _",
+      correctAnswer: "theme",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
       aiHook: {
-        targetWord: "scene",
+        targetWord: "theme",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A movie or theater scene with actors performing for the word scene"
+        questionLine: "Complete the word: th _ m _",
+        imagePrompt: "A title card that says THEME with decorative elements"
       },
       aiTutor: {
-        target_word: 'scene',
-        question: "_____",
+        target_word: 'theme',
+        question: "th _ m _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The silent e at the end makes the first e long in 'scene'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e: th–e–m–e."
       },
-      audio: "scene"
+      audio: "theme"
     },
     {
-      id: 11,
-      topicId: '3-A.4',
+      id: 12,
+      topicId: '3-A.4.3',
+      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: "complete",
+      imageUrl: null,
+      explanation: "Silent e makes the first e long in 'complete'.",
+      questionText: "Complete the word: compl _ t _",
+      correctAnswer: "complete",
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,6],
+      aiHook: {
+        targetWord: "complete",
+        intent: "fill_blank",
+        questionLine: "Complete the word: compl _ t _",
+        imagePrompt: "A finished checklist with all boxes marked for the word complete"
+      },
+      aiTutor: {
+        target_word: 'complete',
+        question: "compl _ t _",
+        student_entry: "",
+        topic_to_reinforce: 'Spell the long e word',
+        spelling_pattern_or_rule: "Fill both e’s in e_e across syllables: com–pl–e–t–e."
+      },
+      audio: "complete"
+    },
+    {
+      id: 13,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52893,33 +56091,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "green",
       imageUrl: null,
-      explanation: "Great job! The double 'ee' makes the long e sound in 'green'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'green'.",
+      questionText: "Complete the word: gr _ _ n",
       correctAnswer: "green",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "green",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: gr _ _ n",
         imagePrompt: "A bright green leaf and grass to show the color green"
       },
       aiTutor: {
         target_word: 'green',
-        question: "_____",
+        question: "gr _ _ n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'green'."
+        spelling_pattern_or_rule: "Put 'ee' in the middle to say /ē/: gr–ee–n."
       },
       audio: "green"
     },
     {
-      id: 12,
-      topicId: '3-A.4',
+      id: 14,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52927,33 +56125,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "speak",
       imageUrl: null,
-      explanation: "Nice work! The vowel team 'ea' makes the long e sound in 'speak'.",
-      questionText: "Spell the word: _____",
+      explanation: "The 'ea' vowel team makes the long e sound in 'speak'.",
+      questionText: "Complete the word: sp _ _ k",
       correctAnswer: "speak",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "speak",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: sp _ _ k",
         imagePrompt: "A person talking with sound waves coming from the mouth for the word speak"
       },
       aiTutor: {
         target_word: 'speak',
-        question: "_____",
+        question: "sp _ _ k",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The vowel team 'ea' makes the long e sound in 'speak'."
+        spelling_pattern_or_rule: "Choose 'ea' to show long e in the middle: sp–ea–k."
       },
       audio: "speak"
     },
     {
-      id: 13,
-      topicId: '3-A.4',
+      id: 15,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52961,33 +56159,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "thief",
       imageUrl: null,
-      explanation: "Excellent! The spelling 'ie' makes the long e sound in 'thief'.",
-      questionText: "Spell the word: _____",
+      explanation: "The letters 'ie' make the long e sound in 'thief'.",
+      questionText: "Complete the word: th _ _ f",
       correctAnswer: "thief",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "thief",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: th _ _ f",
         imagePrompt: "A sneaky cartoon thief tiptoeing with a small bag"
       },
       aiTutor: {
         target_word: 'thief',
-        question: "_____",
+        question: "th _ _ f",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The letters 'ie' make the long e sound in 'thief'."
+        spelling_pattern_or_rule: "Use 'ie' to say /ē/ before f/l/d: th–ie–f."
       },
       audio: "thief"
     },
     {
-      id: 14,
-      topicId: '3-A.4',
+      id: 16,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -52995,33 +56193,33 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "cheese",
       imageUrl: null,
-      explanation: "Great! Double 'ee' makes the long e sound in 'cheese'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'cheese'.",
+      questionText: "Complete the word: ch _ _ se",
       correctAnswer: "cheese",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5],
       aiHook: {
         targetWord: "cheese",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: ch _ _ se",
         imagePrompt: "A wedge of yellow cheese with holes for the word cheese"
       },
       aiTutor: {
         target_word: 'cheese',
-        question: "_____",
+        question: "ch _ _ se",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'cheese'."
+        spelling_pattern_or_rule: "Choose 'ee' for long e: ch–ee–se."
       },
       audio: "cheese"
     },
     {
-      id: 15,
-      topicId: '3-A.4',
+      id: 17,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -53029,67 +56227,67 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "breeze",
       imageUrl: null,
-      explanation: "Nice job! Double 'ee' makes the long e sound in 'breeze'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'breeze'.",
+      questionText: "Complete the word: br _ _ ze",
       correctAnswer: "breeze",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5],
       aiHook: {
         targetWord: "breeze",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: br _ _ ze",
         imagePrompt: "Leaves gently blowing in a light wind for the word breeze"
       },
       aiTutor: {
         target_word: 'breeze',
-        question: "_____",
+        question: "br _ _ ze",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'breeze'."
+        spelling_pattern_or_rule: "Use 'ee' for the long e: br–ee–ze."
       },
       audio: "breeze"
     },
     {
-      id: 16,
-      topicId: '3-A.4',
+      id: 18,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
       word: "athlete",
       imageUrl: null,
-      explanation: "Well done! The silent-e pattern (e_e) makes the long e sound in 'athlete'.",
-      questionText: "Spell the word: _____",
+      explanation: "Silent e makes the first e long in 'athlete'.",
+      questionText: "Complete the word: athl _ t _",
       correctAnswer: "athlete",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,5],
       aiHook: {
         targetWord: "athlete",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: athl _ t _",
         imagePrompt: "A runner at a starting line for the word athlete"
       },
       aiTutor: {
         target_word: 'athlete',
-        question: "_____",
+        question: "athl _ t _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The e_e pattern makes the long e sound in the second syllable of 'athlete'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e across syllables: athl–e–t–e."
       },
       audio: "athlete"
     },
     {
-      id: 17,
-      topicId: '3-A.4',
+      id: 19,
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
       progressTopicName: 'Spell the long e word',
       questionElements: 'image + text',
@@ -53097,132 +56295,64 @@ aiTutor: {
       templateType: 'fill_blank',
       word: "queen",
       imageUrl: null,
-      explanation: "Excellent! Double 'ee' makes the long e sound in 'queen'.",
-      questionText: "Spell the word: _____",
+      explanation: "Double 'ee' makes the long e sound in 'queen'.",
+      questionText: "Complete the word: qu _ _ n",
       correctAnswer: "queen",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "queen",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
+        questionLine: "Complete the word: qu _ _ n",
         imagePrompt: "A queen wearing a crown and robe for the word queen"
       },
       aiTutor: {
         target_word: 'queen',
-        question: "_____",
+        question: "qu _ _ n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "Double 'ee' makes the long e sound in 'queen'."
+        spelling_pattern_or_rule: "Middle long e? Try 'ee': qu–ee–n."
       },
       audio: "queen"
     },
     {
-      id: 18,
-      topicId: '3-A.4',
-      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "reach",
-      imageUrl: null,
-      explanation: "Great! The vowel team 'ea' makes the long e sound in 'reach'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "reach",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "reach",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A child stretching arms up high to reach a shelf for the word reach"
-      },
-      aiTutor: {
-        target_word: 'reach',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The 'ea' vowel team makes the long e sound in 'reach'."
-      },
-      audio: "reach"
-    },
-    {
-      id: 19,
-      topicId: '3-A.4',
-      topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
-      questionElements: 'image + text',
-      answerElements: 'text',
-      templateType: 'fill_blank',
-      word: "niece",
-      imageUrl: null,
-      explanation: "Nice work! The spelling 'ie' makes the long e sound in 'niece'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "niece",
-      template: 'fill_blank',
-      isSpacing: false,
-      isSorting: false,
-      isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
-      aiHook: {
-        targetWord: "niece",
-        intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "An aunt hugging her young niece for the word niece"
-      },
-      aiTutor: {
-        target_word: 'niece',
-        question: "_____",
-        student_entry: "",
-        topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The letters 'ie' make the long e sound in 'niece'."
-      },
-      audio: "niece"
-    },
-    {
       id: 20,
-      topicId: '3-A.4',
+      topicId: '3-A.4.3',
       topicName: 'Spell_the_long_e_word_silent_e_ee_ea_ie',
-      progressTopicName: 'Spell the long e word',
+      progressTopicName: 'Spell the long e word (silent e — fill both e’s)',
       questionElements: 'image + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "complete",
+      word: "theme",
       imageUrl: null,
-      explanation: "Fantastic! The silent-e pattern (e_e) makes the long e sound in 'complete'.",
-      questionText: "Spell the word: _____",
-      correctAnswer: "complete",
+      explanation: "Silent e makes the vowel long in 'theme'.",
+      questionText: "Complete the word: th _ m _",
+      correctAnswer: "theme",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
-      prefilledIndexes: [],
+      isPrefilled: true,
+      prefilledIndexes: [0,1,3],
       aiHook: {
-        targetWord: "complete",
+        targetWord: "theme",
         intent: "fill_blank",
-        questionLine: "Spell the word: _____",
-        imagePrompt: "A finished checklist with all boxes marked for the word complete"
+        questionLine: "Complete the word: th _ m _",
+        imagePrompt: "A title card that says THEME with decorative elements"
       },
       aiTutor: {
-        target_word: 'complete',
-        question: "_____",
+        target_word: 'theme',
+        question: "th _ m _",
         student_entry: "",
         topic_to_reinforce: 'Spell the long e word',
-        spelling_pattern_or_rule: "The e_e pattern makes the long e sound in the second syllable of 'complete'."
+        spelling_pattern_or_rule: "Fill both e’s in e_e: th–e–m–e."
       },
-      audio: "complete"
-    }    
+      audio: "theme"
+    }
   ]
 }
 ,
