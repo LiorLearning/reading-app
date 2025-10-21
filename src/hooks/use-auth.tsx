@@ -312,7 +312,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Live listeners (real-time updates)
         try {
-          const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'story'];
+          const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
           const target = 5;
           let ownedPets: string[] = [];
 
