@@ -12,7 +12,8 @@ import {
   signInAnonymously,
   linkWithCredential,
   EmailAuthProvider,
-  linkWithPopup
+  linkWithPopup,
+  reload
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -548,7 +549,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const current = auth.currentUser;
       if (current && current.isAnonymous && isUpgradeMode) {
         // Link Google to the current anonymous user to preserve UID
-        await linkWithPopup(current, provider);
+        const linkedCred = await linkWithPopup(current, provider);
+        // Ensure email is persisted to Firestore immediately on upgrade
+        try {
+          await reload(linkedCred.user);
+        } catch {}
+        try {
+          const userDocRef = doc(db, 'users', linkedCred.user.uid);
+          const emailNow = (linkedCred.user.email || '').trim();
+          if (emailNow) {
+            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+          }
+        } catch (e) {
+          console.warn('Failed to persist email after Google link:', e);
+        }
       } else {
         await signInWithPopup(auth, provider);
       }
@@ -574,6 +588,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Upgrade anonymous user to email/password while preserving UID
         const credential = EmailAuthProvider.credential(email, password);
         const linkedUser = await linkWithCredential(current, credential);
+        // Immediately reflect email on the user's Firestore document
+        try {
+          await reload(linkedUser.user);
+        } catch {}
+        try {
+          const userDocRef = doc(db, 'users', linkedUser.user.uid);
+          const emailNow = (linkedUser.user.email || email || '').trim();
+          if (emailNow) {
+            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+          }
+        } catch (e) {
+          console.warn('Failed to persist email after linkWithCredential:', e);
+        }
         // Clear guest gating flags after successful upgrade
         try {
           localStorage.removeItem('guest_signup_gate_open');
