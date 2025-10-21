@@ -1444,6 +1444,22 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
     return allTopicIds[0] || null;
   }
   
+  // SAFETY: If stored currentTopicId is no longer present (e.g., schema changed from 3-A.3 → 3-A.3.1),
+  // remap it to a valid topic to avoid selecting an empty topic with no questions.
+  if (gradeProgress.currentTopicId) {
+    const topicIdSet = new Set(allTopicIds);
+    if (!topicIdSet.has(gradeProgress.currentTopicId)) {
+      // Try mapping base ID to first matching subtopic (e.g., '3-A.3' → '3-A.3.1')
+      const prefix = `${gradeProgress.currentTopicId}.`;
+      const fallback = allTopicIds.find(id => id.startsWith(prefix)) || allTopicIds[0] || null;
+      gradeProgress.currentTopicId = fallback;
+      gradeProgress.timestamp = Date.now();
+      if (fallback) {
+        saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+      }
+    }
+  }
+  
   // If current topic exists and is not completed or not passing, continue with it
   if (gradeProgress.currentTopicId) {
     const currentTopicProgress = gradeProgress.topicProgress[gradeProgress.currentTopicId];
