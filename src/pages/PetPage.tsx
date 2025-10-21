@@ -1054,7 +1054,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     ];
     
     // Determine current item to display with 8-hour hold behavior (story excluded)
-    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams'];
+    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care'];
     const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
     
     const statusFor = (type: string): ActionStatus => {
@@ -1064,8 +1064,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     };
     
     // Only show the current sad item in the bottom bar
-    baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'story' ? '📚' : '🌙', status: statusFor(sadType), label: (
-      sadType === 'plant-dreams' ? 'Plant Dreams' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
+    baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'pet-school' ? '🏫' : sadType === 'pet-theme-park' ? '🎢' : sadType === 'pet-mall' ? '🏬' : sadType === 'pet-care' ? '🧼' : sadType === 'story' ? '📚' : '🌙', status: statusFor(sadType), label: (
+      sadType === 'plant-dreams' ? 'Plant Dreams' : sadType === 'pet-school' ? 'Pet School' : sadType === 'pet-theme-park' ? 'Pet Theme Park' : sadType === 'pet-mall' ? 'Pet Mall' : sadType === 'pet-care' ? 'Pet Care' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
     ) });
     
     // Add sleep button - per-pet gating using hydrated daily quest progress
@@ -1474,6 +1474,17 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return;
     }
 
+    // Handle pet-school action - starts new pet school adventure
+    if (actionId === 'pet-school') {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+      handleAdventureClick('pet-school');
+      return;
+    }
+
     // Handle story action - starts new story adventure
     if (actionId === 'story') {
       // console.log('🎯 PetPage: Story button clicked, calling handleAdventureClick with "story"');
@@ -1495,6 +1506,39 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
       handleAdventureClick('plant-dreams');
+      return;
+    }
+
+    // Handle pet theme park action
+    if (actionId === 'pet-theme-park') {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+      handleAdventureClick('pet-theme-park');
+      return;
+    }
+
+    // Handle pet mall action
+    if (actionId === 'pet-mall') {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+      handleAdventureClick('pet-mall');
+      return;
+    }
+
+    // Handle pet care action
+    if (actionId === 'pet-care') {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+      handleAdventureClick('pet-care');
       return;
     }
 
@@ -2597,6 +2641,11 @@ const getSleepyPetImage = (clicks: number) => {
                 `I feel sparkly inside! 🌟 Shall we grow peaceful, cozy dreams?`,
                 `Let's whisper wishes and plant them into the night 🌙`
               ],
+              'pet-school': [
+                `School day, ${userName}! 🏫 What class should we try first—art, flying, or something else?`,
+                `I packed snacks for pet school! 🍪 Where is our school—clouds, forest, or somewhere else?`,
+                `Ring-ring! The bell! 🛎️ Who teaches us today—the wise owl, sleepy panda, or someone else?`
+              ],
               story: [
                 `Let's curl up with a story, ${userName}! 📖 Which tale should we read?`,
                 `Story time! 🌟 I'm ready for an epic adventure in words!`,
@@ -2635,7 +2684,7 @@ const getSleepyPetImage = (clicks: number) => {
     // Before other generic care-based thoughts, align the thought with the current Daily Quest.
     // Primary source: Firestore `dailyQuests` (hydrated into localStorage by auth listener).
     // Fallback: local PetProgressStorage sequencing so the bubble never goes blank.
-    const todoSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'story'];
+    const todoSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
     let activityFromFirestore: string | null = null;
     let doneFromFirestore = false;
     try {
@@ -2655,9 +2704,9 @@ const getSleepyPetImage = (clicks: number) => {
     if (!isTodoCompleted) {
       const byType: Record<string, string[]> = {
         house: [
-          `I'm feeling a bit sad in this empty space, ${userName}... 😢 Let's build our dream house together! 🏠 What kind of rooms should we create?`,
-          `This bare room makes me sad... 🥺 But I can't wait to design our perfect home with you! 🏡 Where should we put the furniture?`, 
-          `Everything feels so empty and cold right now... 😔 But we can make it cozy together! 🛋️ Which room should we work on first?`
+          `Let's create the most wonderful home, ${userName}! 🏠 What kind of rooms should we design?`,
+          `This space is like a blank canvas! 🏡 Where should we put the furniture together?`,
+          `I can't wait to make this place cozy and fun! 🛋️ Which room should we start with?`
         ],
         travel: [
           `I'm tired of being stuck inside, ${userName}! ✈️ Want to go explore somewhere new?`,
@@ -2688,6 +2737,26 @@ const getSleepyPetImage = (clicks: number) => {
           `Hold my paw and plant a gentle dream with me 🌙✨`,
           `I feel sparkly inside! 🌟 Shall we grow peaceful, cozy dreams?`,
           `Let's whisper wishes and plant them into the night 🌙`
+        ],
+        'pet-theme-park': [
+          `Oh, I can't wait for the roller coaster! 🎢 Can we go have fun at the pet-theme park?`,
+          `Yay! Let's make cotton candy memories! 🍭 Can we visit the pet-theme park today?`,
+          `Zoom! I love the rides! 🌬️ Can we explore the pet-theme park together?`
+        ],
+        'pet-mall': [
+          `I’m still jingling from that store! 🛍️ Where next—toy shop, snack shop, or something else?`,
+          `My paws are glittery! ✨ What should we try—magic shop, pet spa, or something else?`,
+          `So many shiny signs! 🏬 How should we explore—fashion, gadgets, or something else?`
+        ],
+        'pet-care': [
+          `I’m still fluffy from brushing! 🪮 What next—snack corner, walk outside, or something else?`,
+          `I smell like bubbles! 🫧 How should we care next—towel cuddle, snack, or something else?`,
+          `My paws feel sleepy! 🐾 What should we do—soft nap spot, gentle walk, or something else?`
+        ],
+        'pet-school': [
+          `I'm so excited for pet school! 🏫 Can we start our first class?`,
+          `Ding-dong! The school bell's ringing! 🔔 Let's find our pet school!`,
+          `Yay, school time! 😋 What fun shall we have at pet school today?`
         ],
         story: [
           `Let's curl up with a story, ${userName}! 📖 Which tale should we read?`,
@@ -3893,7 +3962,7 @@ const getSleepyPetImage = (clicks: number) => {
                 } catch {}
 
                 // Fallbacks when Firestore hasn't hydrated yet
-                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams'];
+                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall'];
                 const currentQuestType = activityFromFirestore || PetProgressStorage.getCurrentTodoDisplayType(currentPet, questSequence, 50);
                 const doneLocal = PetProgressStorage.isAdventureTypeCompleted(currentPet, currentQuestType, 50);
                 const progress = fracFromFirestore !== null ? fracFromFirestore : (doneLocal ? 1 : 0);
@@ -4022,7 +4091,7 @@ const getSleepyPetImage = (clicks: number) => {
       {/* More Overlay */}
       {showMoreOverlay && (() => {
         // Canonical sequence aligned with backend ACTIVITY_SEQUENCE (story handled separately):
-        const coreSeq = ['house','friend','dressing-competition','who-made-the-pets-sick','travel','food','plant-dreams'];
+        const coreSeq = ['house','friend','dressing-competition','who-made-the-pets-sick','travel','food','plant-dreams','pet-school','pet-theme-park','pet-mall','pet-care'];
         // Prefer Firestore daily quest assignment (hydrated into localStorage by auth listener)
         let assignedDailyType: string | null = null;
         let assignedDailyDone: boolean = false;
@@ -4047,25 +4116,11 @@ const getSleepyPetImage = (clicks: number) => {
         // Completion info still used for badges/emojis
         const doneSet = new Set(coreSeq.filter(t => PetProgressStorage.isAdventureTypeCompleted(currentPet, t, 50)));
 
-        // Unlock rules:
-        // - Always unlock Story
-        // - Unlock today's assigned daily quest
-        // - Unlock all activities that come BEFORE today's assigned quest in the canonical order
-        // - If today's assigned quest is completed, also unlock the NEXT quest immediately
-        const unlocked = new Set<string>(['story']);
+        // Unlock rules (temporarily unlock all activities):
+        // Keep Story always unlocked and unlock all items in the canonical sequence.
+        // This simplifies the UX for now by removing any lock states.
+        const unlocked = new Set<string>(['story', ...coreSeq]);
         const assignedIndexOriginal = assignedDailyType ? coreSeq.indexOf(assignedDailyType) : -1;
-        if (assignedDailyType) {
-          unlocked.add(assignedDailyType);
-          if (assignedIndexOriginal >= 0) {
-            for (let i = 0; i < assignedIndexOriginal; i++) {
-              unlocked.add(coreSeq[i]);
-            }
-            if (assignedDailyDone) {
-              const nextIndex = Math.min(coreSeq.length - 1, assignedIndexOriginal + 1);
-              unlocked.add(coreSeq[nextIndex]);
-            }
-          }
-        }
 
         // If today's quest is completed, advance the overlay highlight to the next quest for display
         const assignedDailyTypeForDisplay = (() => {
@@ -4090,8 +4145,28 @@ const getSleepyPetImage = (clicks: number) => {
             || doneSet.has(type) // persistent completion threshold met
           );
           const isUnlocked = unlocked.has(type);
-          const icon = type === 'house' ? '🏠' : type === 'travel' ? '✈️' : type === 'friend' ? '👫' : type === 'dressing-competition' ? '👗' : type === 'who-made-the-pets-sick' ? '🕵️' : type === 'food' ? '🍪' : type === 'story' ? '📚' : '🌙';
-          const label = type === 'plant-dreams' ? 'Plant Dreams' : type === 'dressing-competition' ? 'Dressing Competition' : type === 'who-made-the-pets-sick' ? 'Who Made The Pets Sick' : type.charAt(0).toUpperCase() + type.slice(1);
+          const icon =
+            type === 'house' ? '🏠' :
+            type === 'travel' ? '✈️' :
+            type === 'friend' ? '👫' :
+            type === 'dressing-competition' ? '👗' :
+            type === 'who-made-the-pets-sick' ? '🕵️' :
+            type === 'food' ? '🍪' :
+            type === 'plant-dreams' ? '🌙' :
+            type === 'pet-school' ? '🏫' :
+            type === 'pet-theme-park' ? '🎢' :
+            type === 'pet-mall' ? '🏬' :
+            type === 'pet-care' ? '🧼' :
+            type === 'story' ? '📚' : '🌙';
+          const label =
+            type === 'plant-dreams' ? 'Plant Dreams' :
+            type === 'dressing-competition' ? 'Dressing Competition' :
+            type === 'who-made-the-pets-sick' ? 'Who Made The Pets Sick' :
+            type === 'pet-school' ? 'Pet School' :
+            type === 'pet-theme-park' ? 'Theme Park' :
+            type === 'pet-mall' ? 'Pet Mall' :
+            type === 'pet-care' ? 'Pet Care' :
+            type.charAt(0).toUpperCase() + type.slice(1);
           const statusEmoji = !isUnlocked ? '🔒' : (typeDoneVisual ? '✅' : (type === assignedDailyTypeForDisplay ? '⭐' : '😐'));
           return (
             <button
@@ -4131,7 +4206,7 @@ const getSleepyPetImage = (clicks: number) => {
                 ×
               </button>
               <div className="text-xl font-bold mb-4">Do next</div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto kid-scrollbar">
                 {renderOrder.map(renderRow)}
               </div>
             </div>

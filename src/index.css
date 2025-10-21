@@ -864,4 +864,25 @@ All colors MUST be HSL.
       max-width: 120rem; /* 1920px equivalent */
     }
   }
+
+  /* Kid-friendly visible scrollbars for scrollable containers */
+  .kid-scrollbar {
+    scrollbar-width: auto; /* Firefox */
+    scrollbar-gutter: stable both-edges; /* Reserve space so bar is always visible */
+  }
+  .kid-scrollbar::-webkit-scrollbar {
+    width: 12px; /* Always-visible width */
+  }
+  .kid-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9; /* slate-100 */
+    border-radius: 9999px;
+  }
+  .kid-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #94a3b8; /* slate-400 */
+    border-radius: 9999px;
+    border: 3px solid #f1f5f9; /* creates padding around thumb */
+  }
+  .kid-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #64748b; /* slate-500 */
+  }
 }
