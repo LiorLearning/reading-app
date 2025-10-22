@@ -1733,8 +1733,7 @@ export const lessonScripts: Record<string, LessonScript> = {
   topicId: '3-A.3.3',
   title: "Long A /ā/: 'eigh' (weight)",
   intro: [
-    "The spelling 'eigh' is an unusual way to make the long A /ā/ sound.",
-    "You’ll see it in just a few special words like 'eight', 'weigh', and 'neighbor'."
+    "The spelling 'eigh' is an unusual way to make the long A sound in words like 'eight', 'weigh', and 'neighbor'."
   ],
   segments: [
     // --- Single Segment: EIGH — model/practice: weight ---
