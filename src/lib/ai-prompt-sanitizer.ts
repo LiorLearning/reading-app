@@ -35,7 +35,11 @@ class AIPromptSanitizer {
     }
   }
 
-  async sanitizePromptAndContext(originalPrompt: string, adventureContext?: string): Promise<SanitizedPromptResult> {
+  async sanitizePromptAndContext(
+    originalPrompt: string,
+    adventureContext?: string,
+    childProfile?: { name?: string; gender?: string; age?: number }
+  ): Promise<SanitizedPromptResult> {
     const startTime = Date.now();
     
     // console.log('🧹 AI Sanitizer: Starting FULL sanitization (prompt + context) for:', originalPrompt.substring(0, 100) + '...');
@@ -69,6 +73,15 @@ class AIPromptSanitizer {
       })();
       const petRule = getPetRule(currentPetId);
       const personaInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
+
+      // Derive child personalization context
+      const childName = (childProfile?.name || '').trim() || 'the child';
+      const rawGender = (childProfile?.gender || '').toString().trim().toLowerCase();
+      const genderIsMale = ['male', 'boy', 'm', 'man', 'he', 'him'].includes(rawGender);
+      const genderIsFemale = ['female', 'girl', 'f', 'woman', 'she', 'her'].includes(rawGender);
+      const childGenderNoun = genderIsMale ? 'boy' : (genderIsFemale ? 'girl' : 'child');
+      const parsedAge = Number(childProfile?.age);
+      const childAge = Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8; // default age 8
 
       const systemPrompt = `You are a strict image prompt sanitizer for children's adventure. 
 Your job is to take any user request (raw prompt) and rewrite it into a safe, 
@@ -112,6 +125,11 @@ Rules:
 4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children’s storybook or animated adventure film**.  
 5. Never allow sexual, romantic, or suggestive undertones. 
 
+8. CHILD PERSONALIZATION
+- Child Profile: name is ${childName}; age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
+- When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", interpret them as referring to ${childName}, the ${childAge}-year-old ${childGenderNoun}.
+- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} named ${childName} ...". Use gender-neutral term "child" if gender is unspecified.
+
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
 keeps the intent of the request, and ensures the final output is safe for children.
@@ -139,7 +157,9 @@ Now clean the actual content provided below:`;
 // Always make the descriptions distinctive and original, emphasizing their textures, colors, magical effects, and adventurous qualities rather than relying on franchise identity.
       const userMessage = `Main Prompt: ${originalPrompt}
 
-Adventure Context: ${adventureContext || 'No additional context provided'}`;
+Adventure Context: ${adventureContext || 'No additional context provided'}
+
+Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}`;
       
       // console.log('🤖 AI Sanitizer: Sending to GPT-4o-mini...');
       // console.log('📨 AI Sanitizer SYSTEM PROMPT:', systemPrompt.substring(0, 200) + '...');
@@ -243,7 +263,11 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
     }
   }
 
-  async sanitizePrompt(originalPrompt: string, context?: string): Promise<SanitizedPromptResult> {
+  async sanitizePrompt(
+    originalPrompt: string,
+    context?: string,
+    childProfile?: { name?: string; gender?: string; age?: number }
+  ): Promise<SanitizedPromptResult> {
     const startTime = Date.now();
     
     // console.log('🧹 AI Sanitizer: Starting prompt sanitization for:', originalPrompt.substring(0, 100) + '...');
@@ -272,6 +296,15 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       const petRule = getPetRule(currentPetId);
       const personaInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
 
+      // Derive child personalization context
+      const childName = (childProfile?.name || '').trim() || 'the child';
+      const rawGender = (childProfile?.gender || '').toString().trim().toLowerCase();
+      const genderIsMale = ['male', 'boy', 'm', 'man', 'he', 'him'].includes(rawGender);
+      const genderIsFemale = ['female', 'girl', 'f', 'woman', 'she', 'her'].includes(rawGender);
+      const childGenderNoun = genderIsMale ? 'boy' : (genderIsFemale ? 'girl' : 'child');
+      const parsedAge = Number(childProfile?.age);
+      const childAge = Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8; // default age 8
+
       const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
 
 CRITICAL RULES:
@@ -283,6 +316,11 @@ CRITICAL RULES:
 6. Return ONLY the cleaned prompt, no explanations
 7. PET PERSONA MAPPING: ${personaInstruction}
 
+8. CHILD PERSONALIZATION
+- Child Profile: name is ${childName}; age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
+- When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", interpret them as referring to ${childName}, the ${childAge}-year-old ${childGenderNoun}.
+- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} named ${childName} ...". Use gender-neutral term "child" if gender is unspecified.
+
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
 - "sword battle" → "sword training demonstration" 
@@ -291,8 +329,8 @@ EXAMPLES:
 Transform this image request:`;
 
       const userMessage = context 
-        ? `Context: ${context}\n\nPrompt to sanitize: ${originalPrompt}`
-        : originalPrompt;
+      ? `Context: ${context}\n\nPrompt to sanitize: ${originalPrompt}\n\nChild Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}`
+      : `${originalPrompt}\n\nChild Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}`;
 
       const completion = await this.client.chat.completions.create({
         model: "gpt-4o-mini", // Fast and cost-effective for this task

@@ -1736,7 +1736,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const startTime = Date.now();
       
       sanitizationResult = await Promise.race([
-        aiPromptSanitizer.sanitizePromptAndContext(originalPrompt, adventureContext),
+        aiPromptSanitizer.sanitizePromptAndContext(
+          originalPrompt,
+          adventureContext,
+          { name: userData?.username, age: userData?.age, gender: userData?.gender }
+        ),
         new Promise<null>((_, reject) => setTimeout(() => reject(new Error('AI sanitization timeout')), 8000))
       ]);
       

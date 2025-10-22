@@ -1520,7 +1520,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     
     let sanitizedUserText = userText;
     try {
-      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userText);
+      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userText, undefined, { name: userData?.username, age: userData?.age, gender: userData?.gender });
       if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
         sanitizedUserText = sanitizationResult.sanitizedPrompt;
         // console.log('✅ Legacy AI Service: Prompt sanitized successfully');

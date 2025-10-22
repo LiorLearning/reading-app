@@ -44,6 +44,7 @@ export interface UserData {
   username: string;
   email: string;
   age?: number;
+  gender?: 'male' | 'female';
   grade: string;
   gradeDisplayName: string;
   level: string;
