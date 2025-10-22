@@ -205,60 +205,6 @@ export const lessonScripts: Record<string, LessonScript> = {
   ],
   rewards: { coins: 1 }
 },
-'K-Q.2': {
-  topicId: 'K-Q.2',
-  title: "Short i /ĭ/: CVC (kit)",
-  intro: [
-    "You will practice the short i sound in words like kit."
-  ],
-  segments: [
-    // --- Single Segment — model/practice: kit ---
-    {
-      modelWord: 'kit',
-      emoji: '🧰',
-      modelSteps: [
-        { highlights: [],       say: "In short i words, the vowel 'i' says /ĭ/." },
-        { highlights: [[0,1]],  say: '"k" says /k/.' },
-        { highlights: [[1,2]],  say: '"i" says /ĭ/.' },
-        { highlights: [[2,3]],  say: '"t" says /t/.' },
-        { highlights: [[0,3]],  say: "/k/ /ĭ/ /t/ — 'kit'." }
-      ],
-      practice: {
-        word: 'kit',
-        prompt: "Let’s spell 'kit'.",
-        hints: [
-          "Listen for /k/ /ĭ/ /t/.",
-          "Fill the missing middle vowel with 'i'."
-        ],
-        reinforce: "Nice! /k/ /ĭ/ /t/ — 'kit'.",
-        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
-        meta: {
-          explanation: "Great! The middle short i /ĭ/ completes the CVC word 'kit'.",
-          aiHook: {
-            targetWord: 'kit',
-            intent: 'fill_blank',
-            questionLine: 'k_t',
-            imagePrompt: 'A small toolkit with simple tools arranged neatly'
-          },
-          aiTutor: {
-            target_word: 'kit',
-            question: 'k_t',
-            student_entry: '',
-            topic_to_reinforce: 'Complete the short i word',
-            spelling_pattern_or_rule:
-              "In CVC short i words, the middle 'i' says /ĭ/. Blend the sounds to spell the word."
-          },
-          audio: 'kit'
-        }
-      }
-    }
-  ],
-  completion: [
-    "Pattern check: In CVC words like 'kit', the middle 'i' says short /ĭ/.",
-    "Awesome! You’re getting strong at hearing and spelling short vowels."
-  ],
-  rewards: { coins: 1 }
-},
   '1-H.1': {
     topicId: '1-H.1',
     title: 'Consonant blends',
@@ -1787,8 +1733,7 @@ export const lessonScripts: Record<string, LessonScript> = {
   topicId: '3-A.3.3',
   title: "Long A /ā/: 'eigh' (weight)",
   intro: [
-    "The spelling 'eigh' is an unusual way to make the long A /ā/ sound.",
-    "You’ll see it in just a few special words like 'eight', 'weigh', and 'neighbor'."
+    "The spelling 'eigh' is an unusual way to make the long A sound in words like 'eight', 'weigh', and 'neighbor'."
   ],
   segments: [
     // --- Single Segment: EIGH — model/practice: weight ---

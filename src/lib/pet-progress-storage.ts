@@ -131,6 +131,10 @@ export class PetProgressStorage {
         'travel': 0,
         'food': 0,
         'plant-dreams': 0,
+        'pet-school': 0,
+        'pet-theme-park': 0,
+        'pet-mall': 0,
+        'pet-care': 0,
         'story': 0,
       },
       todoData: {
@@ -258,6 +262,10 @@ export class PetProgressStorage {
         'travel': data.adventureCoinsByType?.['travel'] || 0,
         'food': data.adventureCoinsByType?.['food'] || 0,
         'plant-dreams': data.adventureCoinsByType?.['plant-dreams'] || 0,
+        'pet-school': data.adventureCoinsByType?.['pet-school'] || 0,
+        'pet-theme-park': data.adventureCoinsByType?.['pet-theme-park'] || 0,
+        'pet-mall': data.adventureCoinsByType?.['pet-mall'] || 0,
+        'pet-care': data.adventureCoinsByType?.['pet-care'] || 0,
         'story': data.adventureCoinsByType?.['story'] || 0,
       },
       todoData: {

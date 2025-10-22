@@ -55,7 +55,7 @@ export function useAdventurePersistentProgress(): AdventureProgressState {
     } catch {}
 
     // Fallback: derive from local per-adventure coins using canonical sequence
-    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams'];
+    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care'];
     const type = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
     const coinsForType = PetProgressStorage.getAdventureCoinsForType(currentPet, type) || 0;
     const target = 50;

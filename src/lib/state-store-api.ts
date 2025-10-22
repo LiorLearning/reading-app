@@ -44,7 +44,7 @@ import {
   // ==========================
   
   export type PetName = 'hamster' | 'dog' | string;
-  export type QuestTask = 'house' | 'friend' | 'dressing-competition' | 'who-made-the-pets-sick' | 'travel' | 'food' | 'plant-dreams' | 'story' | string;
+  export type QuestTask = 'house' | 'friend' | 'dressing-competition' | 'who-made-the-pets-sick' | 'travel' | 'food' | 'plant-dreams' | 'pet-school' | 'pet-theme-park' | 'pet-mall' | 'pet-care' | 'story' | string;
   
   export interface UserState {
     pets: Record<PetName, number>;
@@ -91,7 +91,7 @@ import {
   const COINS_PER_QUESTION = 10;
   const QUEST_TARGET = 5;
   const QUEST_COOLDOWN_HOURS = 8; // wait 8 hours before advancing after completion
-  const ACTIVITY_SEQUENCE: QuestTask[] = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'story'];
+  const ACTIVITY_SEQUENCE: QuestTask[] = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
   const SADNESS_CAP_PER_DAY = 2;
   
   // Default generators

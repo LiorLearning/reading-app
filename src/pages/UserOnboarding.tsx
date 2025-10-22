@@ -144,6 +144,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
       }}
       role="main"
     >
+      
       {/* Glass blur overlay */}
       <div className="absolute inset-0 backdrop-blur-sm bg-primary/10"></div>
       

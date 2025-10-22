@@ -5420,6 +5420,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 </div>
               </PopoverContent>
             </Popover>
+            {showOnboarding && (
+              <a
+                href="https://dashboard.readkraft.com/teacher/login"
+                className="inline-block bg-white text-black px-4 py-2 rounded-full shadow-solid hover:bg-white btn-animate"
+              >
+                Track Progress
+              </a>
+            )}
             
             {!showOnboarding && (
               <>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -42,11 +42,6 @@ export function ProgressTracking(): JSX.Element {
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [whiteboardTopicId, setWhiteboardTopicId] = useState<string | null>(null);
-
-  const isGrade1 = useMemo(() => {
-    const g = (gradeDisplayName || '').toLowerCase();
-    return g.includes('1st') || g.includes('grade 1');
-  }, [gradeDisplayName]);
 
   // Fresh grade detection function - inspired by spellbox approach
   const getCurrentGrade = useCallback(() => {
@@ -250,7 +245,7 @@ export function ProgressTracking(): JSX.Element {
       <div className="p-4">
         {/* Header */}
         <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-2">
           <Button 
             onClick={handleBackClick}
             variant="ghost" 
@@ -271,6 +266,9 @@ export function ProgressTracking(): JSX.Element {
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
+        </div>
+        <div className="flex items-center justify-end mb-6">
+          <a href="https://dashboard.readkraft.com/teacher/login" className="inline-block bg-white text-gray-800 px-4 py-2 rounded shadow hover:bg-gray-100">Track Progress</a>
         </div>
 
         <div className="text-center mb-8">
@@ -415,8 +413,8 @@ export function ProgressTracking(): JSX.Element {
                   </div>
                 )}
 
-                {/* View Whiteboard - Grade 1 only */}
-                {isGrade1 && !!getLessonScript(card.topicId) && (
+                {/* View Whiteboard */}
+                {!!getLessonScript(card.topicId) && (
                   <button
                     aria-label="View whiteboard"
                     title="View whiteboard"
@@ -456,7 +454,7 @@ export function ProgressTracking(): JSX.Element {
         </div>
       </div>
       {/* Floating Whiteboard Overlay */}
-      {isGrade1 && whiteboardTopicId && !!getLessonScript(whiteboardTopicId) && (
+      {whiteboardTopicId && !!getLessonScript(whiteboardTopicId) && (
         <WhiteboardLesson
           topicId={whiteboardTopicId}
           fullscreen
