@@ -31,6 +31,13 @@ interface LeftPetOverlayProps {
       explanation: string;
       isPrefilled?: boolean;
       prefilledIndexes?: number[];
+      aiTutor?: {
+        target_word?: string;
+        question?: string;
+        student_entry?: string;
+        topic_to_reinforce?: string;
+        spelling_pattern_or_rule?: string;
+      };
     } | null;
     show?: boolean;
     showHints?: boolean;
