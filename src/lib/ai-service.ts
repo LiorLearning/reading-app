@@ -4135,7 +4135,8 @@ Generate a hint at level ${hintLevel}:`;
     spellingQuestion: SpellingQuestion,
     userId: string,
     sessionId: string = crypto.randomUUID(),
-    adventureId?: string
+    adventureId?: string,
+    userData?: { username?: string; age?: number; gender?: string }
   ): Promise<UnifiedAIResponse> {
     // console.log('🚀 Using NEW unified AI response generation system');
     
@@ -4145,7 +4146,8 @@ Generate a hint at level ${hintLevel}:`;
       spellingQuestion,
       userId,
       sessionId,
-      adventureId
+      adventureId,
+      userData
     );
   }
   
