@@ -69,7 +69,7 @@ import { testFirebaseStorage } from "@/lib/firebase-test";
 import { debugFirebaseAdventures, debugSaveTestAdventure, debugFirebaseConnection } from "@/lib/firebase-debug-adventures";
 import { autoMigrateOnLogin, forceMigrateUserData } from "@/lib/firebase-data-migration";
 
-import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion, getGlobalSpellingLessonNumber } from "@/lib/questionBankUtils";
+import { getRandomSpellingQuestion, getSequentialSpellingQuestion, getSpellingQuestionCount, getSpellingTopicIds, getSpellingQuestionsByTopic, getNextSpellboxQuestion, SpellingQuestion, getGlobalSpellingLessonNumber, getSpellingQuestionByWord } from "@/lib/questionBankUtils";
 import { ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD } from '@/lib/constants';
 import { getAssignmentGate, isAssignmentGateActive, startAssignmentGate, incrementAssignmentGate, completeAssignmentGate } from '@/lib/assignment-gate';
 import FeedbackModal from "@/components/FeedbackModal";
@@ -398,8 +398,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
   }, [status]);
   
-  // Show onboarding if user is authenticated but hasn't completed setup
-  const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
+  // Show onboarding only for non-anonymous users missing required profile fields
+  const showOnboarding =
+    user && !user.isAnonymous &&
+    userData &&
+    (userData.isFirstTime || !userData.username || !userData.age || !userData.grade);
 
   // If user is authenticated but we're still loading userData, we should wait
   const isLoadingUserData = user && !userData;
@@ -752,6 +755,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         //   originalQuestionAudio: originalSpellingQuestion?.audio,
         //   actualSpellingWord: originalSpellingQuestion?.audio
         // });
+        // Lookup the word in the bank to get aiTutor and prefilledIndexes
+        const bankQuestion = getSpellingQuestionByWord(currentSpellingWord);
         const spellQuestion: SpellingQuestion = {
           id: Date.now(),
           topicId: selectedTopicId,
@@ -761,7 +766,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           questionText: currentSpellingSentence,
           correctAnswer: currentSpellingWord.toUpperCase(),
           audio: currentSpellingWord,
-          explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`
+          explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`,
+          // Only attach metadata when we found a matching spelling question in the bank
+          prefilledIndexes: bankQuestion?.prefilledIndexes,
+          aiTutor: bankQuestion?.aiTutor
         };
         
         setCurrentSpellQuestion(spellQuestion);
@@ -5890,6 +5898,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               explanation: currentSpellQuestion.explanation,
                               isPrefilled: currentSpellQuestion.isPrefilled,
                               prefilledIndexes: currentSpellQuestion.prefilledIndexes,
+                              aiTutor: (currentSpellQuestion as any)?.aiTutor,
                             } : null,
                             showHints: true,
                             showExplanation: true,
@@ -6398,7 +6407,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
                         // Clear nudge; navigate to upgrade flow (link anonymous to real account)
                         try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
-                        navigate('/auth?mode=upgrade&redirect=/');
+                        navigate('/auth?mode=upgrade&redirect=/app');
                       }}
                     >
                       Create account to continue
@@ -6434,7 +6443,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
                         // Clear nudge; navigate to login
                         try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
-                        navigate('/auth?redirect=/');
+                        navigate('/auth?redirect=/app');
                       }}
                     >
                       I already have an account
