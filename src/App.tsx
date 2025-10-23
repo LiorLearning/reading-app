@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import Index from "./pages/Index";
+import Welcome from "./pages/Welcome";
 import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
 // Import PetPage and Index for seamless adventure functionality
@@ -154,8 +155,8 @@ const UnifiedPetAdventureApp = () => {
     );
   }
 
-  // If user needs onboarding (first time or missing grade), route to Index for proper onboarding flow
-  if (userData && (userData.isFirstTime || !userData.grade)) {
+  // If user needs onboarding (after signup), route to Index. Skip for anonymous users.
+  if (user && !user.isAnonymous && userData && (userData.isFirstTime || !userData.username || !userData.age || !userData.grade)) {
     return (
       <Index 
         initialAdventureProps={null}
@@ -205,13 +206,15 @@ const App = () => (
             <Routes>
               {/* Dedicated auth route for signup/login and upgrade linking */}
               <Route path="/auth" element={<AuthScreen />} />
-              {/* Unified pet page and adventure experience */}
-              <Route path="/" element={
+              {/* Welcome is now default */}
+              <Route path="/" element={<Welcome />} />
+              {/* Unified pet page and adventure experience moved under /app */}
+              <Route path="/app" element={
                 <AuthGuard>
                   <UnifiedPetAdventureApp />
                 </AuthGuard>
               } />
-              {/* Keep adventure route for backward compatibility (redirects to home) */}
+              {/* Keep adventure route for backward compatibility (redirects to /app) */}
               <Route path="/adventure" element={
                 <AuthGuard>
                   <UnifiedPetAdventureApp />

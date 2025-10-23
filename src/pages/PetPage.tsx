@@ -958,14 +958,14 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     };
   }, []);
   
-  // Check if user needs pet selection flow (only for users who have completed onboarding)
+  // Check if user needs pet selection flow (allow for guests and first-time users as well)
   useEffect(() => {
     const checkPetSelection = async () => {
       // Only proceed if auth loading is complete and user data is available
       if (loading || !userData || !user) return;
       
-      // Only show pet selection if user has completed onboarding
-      if (!userData.isFirstTime && userData.grade) {
+      // Show pet selection whenever there are no pets yet (regardless of onboarding status)
+      if (true) {
         try {
           // First check local storage for owned pets
           const localOwnedPets = PetProgressStorage.getAllOwnedPets();
