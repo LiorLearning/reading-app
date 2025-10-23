@@ -7,7 +7,7 @@ import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
-import { Volume2, Square, ChevronRight } from 'lucide-react';
+import { Volume2, Square, ChevronRight, Lightbulb } from 'lucide-react';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -43,6 +43,13 @@ interface SpellBoxProps {
     explanation: string;
     isPrefilled?: boolean;
     prefilledIndexes?: number[];
+    aiTutor?: {
+      target_word?: string;
+      question?: string; // mask like "_ _ p"
+      student_entry?: string; // not used from bank; computed at runtime
+      topic_to_reinforce?: string;
+      spelling_pattern_or_rule?: string;
+    };
   };
   
   // UI options
@@ -510,6 +517,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [targetWord]);
 
+  // Compute mistake indices comparing student entry vs target word, excluding prefilled indices
+  const computeMistakes = useCallback((studentEntry: string, target: string): number[] => {
+    const mistakes: number[] = [];
+    const maxIndex = Math.min(studentEntry.length, target.length);
+    const prefilledSet = new Set<number>(question?.prefilledIndexes || []);
+    for (let i = 0; i < maxIndex; i++) {
+      if (prefilledSet.has(i)) continue;
+      const s = (studentEntry[i] || '').toUpperCase();
+      const t = (target[i] || '').toUpperCase();
+      if (s && t && s !== t) {
+        mistakes.push(i);
+      }
+    }
+    return mistakes;
+  }, [question?.prefilledIndexes]);
+
   // Confetti celebration function
   const triggerConfetti = useCallback(() => {
     // Create a burst of confetti
@@ -726,7 +749,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         // Trigger realtime pronunciation coach prompt (non-assignment flows)
         if (sendMessage && targetWord) {
           try {
-            sendMessage(`correct answer is ${targetWord}, student response is ${completeWord}`);
+            const aiTutor = (question as any)?.aiTutor || {};
+            const studentEntry = completeWord;
+            const mistakes = computeMistakes(studentEntry, targetWord);
+            const payload = {
+              target_word: targetWord,
+              question: aiTutor?.question,
+              student_entry: studentEntry,
+              mistakes,
+              attempt_number: attempts + 1,
+              topic_to_reinforce: aiTutor?.topic_to_reinforce,
+              spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule,
+            };
+            sendMessage(JSON.stringify(payload));
           } catch {}
         }
       }
@@ -1185,71 +1220,36 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
           
 
-          {/* AI-powered hints for incorrect words */}
-                  {false && isComplete && !isCorrect && showHints && (
-            <div style={{
-              padding: '12px 0',
-              marginBottom: '20px',
-              position: 'relative',
-              animation: 'fadeSlideIn 0.3s ease-out'
-            }}>
-               <div style={{
-                 display: 'flex',
-                 alignItems: 'center',
-                 justifyContent: 'center',
-                 gap: '12px'
-               }}>
-                 <div style={{ 
-                   fontSize: '14px', 
-                   fontWeight: 400, 
-                   color: '#6B7280', 
-                   fontFamily: 'system-ui, -apple-system, sans-serif',
-                   letterSpacing: '0.5px'
-                 }}>
-                   Need help? Try listening again
-                 </div>
-                 
-                 {/* Hint button */}
-                 <button
-                   onClick={() => {
-                     playClickSound();
-                     if (sendMessage && targetWord) {
-                       sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`)
-                     }
-                   }}
-                   style={{
-                     width: '32px',
-                     height: '32px',
-                     borderRadius: '50%',
-                     border: '2px solid #4B5563',
-                     background: 'transparent',
-                     color: '#6B7280',
-                     cursor: 'pointer',
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     fontSize: '14px',
-                     transition: 'all 0.2s ease-out',
-                     flexShrink: 0,
-                     filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
-                   }}
-                   title="Get pronunciation help"
-                   onMouseEnter={(e) => {
-                     e.currentTarget.style.borderColor = '#374151';
-                     e.currentTarget.style.color = '#374151';
-                     e.currentTarget.style.transform = 'scale(1.05)';
-                     e.currentTarget.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))';
-                   }}
-                   onMouseLeave={(e) => {
-                     e.currentTarget.style.borderColor = '#4B5563';
-                     e.currentTarget.style.color = '#6B7280';
-                     e.currentTarget.style.transform = 'scale(1)';
-                     e.currentTarget.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
-                   }}
-                 >
-                   🎤
-                 </button>
-               </div>
+          {/* Hint button (incorrect response) positioned at top-right of SpellBox */}
+          {isComplete && !isCorrect && showHints && (
+            <div className="absolute top-2 right-2 z-20">
+              <Button
+                variant="comic"
+                size="icon"
+                onClick={() => {
+                  playClickSound();
+                  if (sendMessage && targetWord) {
+                    const aiTutor = (question as any)?.aiTutor || {};
+                    const studentEntry = reconstructCompleteWord(userAnswer);
+                    const mistakes = computeMistakes(studentEntry, targetWord);
+                       const payload = {
+                         target_word: targetWord,
+                      question: aiTutor?.question,
+                      student_entry: studentEntry,
+                      mistakes,
+                      attempt_number: attempts,
+                      topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                      spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule,
+                    };
+                    sendMessage(JSON.stringify(payload));
+                  }
+                }}
+                className={cn('h-9 w-9 rounded-full border-2 border-black bg-yellow-300 text-yellow-900 shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 hover:bg-yellow-400')}
+                title="Hint: listen again"
+                aria-label="Hint: listen again"
+              >
+                <Lightbulb className="h-5 w-5" />
+              </Button>
             </div>
           )}
 
@@ -1444,8 +1444,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             {/* Inline hints */}
             {isComplete && !isCorrect && showHints && (
               <div style={{ padding: '8px 0' }}>
-                <button onClick={() => { playClickSound(); if (sendMessage && targetWord) { sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`) } }} title="Get pronunciation help" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid #4B5563', background: 'transparent', color: '#6B7280' }}>🎤</button>
-          </div>
+                <Button
+                  variant="comic"
+                  size="icon"
+                  onClick={() => { playClickSound(); if (sendMessage && targetWord) { const aiTutor = (question as any)?.aiTutor || {}; const studentEntry = reconstructCompleteWord(userAnswer); const mistakes = computeMistakes(studentEntry, targetWord); const payload = { target_word: targetWord, question: aiTutor?.question, student_entry: studentEntry, mistakes, attempt_number: attempts, topic_to_reinforce: aiTutor?.topic_to_reinforce, spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule }; sendMessage(JSON.stringify(payload)); } }}
+                  className={cn('h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 bg-yellow-300 text-yellow-900 hover:bg-yellow-400')}
+                  title="Hint: listen again"
+                  aria-label="Hint: listen again"
+                >
+                  <Lightbulb className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             )}
 
              {isCorrect && onNext && (

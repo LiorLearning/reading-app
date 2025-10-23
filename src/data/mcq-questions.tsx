@@ -9512,9 +9512,9 @@ aiTutor: {
       templateType: 'fill_blank',
       word: 'blend',
       imageUrl: null,
-      explanation: "Great job! The word is 'whack'.",
+      explanation: "Great job! The word is 'black'.",
       questionText: 'Complete the word to match the picture: _ack',
-      correctAnswer: 'whack',
+      correctAnswer: 'black',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
@@ -9528,13 +9528,13 @@ aiTutor: {
         imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
       },
       aiTutor: {
-        target_word: 'whack',
+        target_word: 'black',
         question: '_ _ a c k',
         student_entry: '',
-        topic_to_reinforce: 'Initial consonant digraphs',
-        spelling_pattern_or_rule: "The 'wh' digraph shows the /w/ sound at the start of words like 'whack' and 'what'."
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'bl' blend combines the /b/ and /l/ sounds, said together quickly without a vowel between them."
       },
-      audio: 'whack'
+      audio: 'black'
     },
     {
       id: 2,

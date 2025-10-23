@@ -15,6 +15,14 @@ export interface SpellingQuestion {
   templateType: string;
   isPrefilled?: boolean;
   prefilledIndexes?: number[];
+  /** Optional: metadata for the realtime spelling tutor prompt */
+  aiTutor?: {
+    target_word?: string;
+    question?: string; // mask like "_ _ p"
+    student_entry?: string;
+    topic_to_reinforce?: string;
+    spelling_pattern_or_rule?: string;
+  };
 }
 
 // Interface for generated story context message
@@ -53,7 +61,9 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
           explanation: question.explanation,
           templateType: question.templateType,
           isPrefilled: question.isPrefilled,
-          prefilledIndexes: question.prefilledIndexes
+          prefilledIndexes: question.prefilledIndexes,
+          // Pass through any aiTutor metadata from the MCQ source so SpellBox can enrich the realtime prompt
+          aiTutor: question.aiTutor
         };
         
         // Debug: Log prefilled questions
@@ -282,6 +292,15 @@ export const getSpellingTopicIds = (gradeDisplayName?: string): string[] => {
 export const getSpellingQuestionsByTopic = (topicId: string): SpellingQuestion[] => {
   const allSpellingQuestions = getAllSpellingQuestions();
   return allSpellingQuestions.filter(question => question.topicId === topicId);
+};
+
+/**
+ * Lookup a spelling question by word (case-insensitive match on audio field)
+ */
+export const getSpellingQuestionByWord = (word: string): SpellingQuestion | null => {
+  const allSpellingQuestions = getAllSpellingQuestions();
+  const normalized = word.trim().toLowerCase();
+  return allSpellingQuestions.find(q => q.audio.toLowerCase() === normalized) || null;
 };
 
 /**
