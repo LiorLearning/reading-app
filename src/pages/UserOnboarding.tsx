@@ -263,7 +263,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                       <Button
                         onClick={() => {
                           playClickSound();
-                          navigate(`/auth?redirect=/`);
+                          navigate(`/auth?redirect=/app`);
                         }}
                         className={cn(
                           "w-full h-14 text-lg font-normal rounded-xl border-3 btn-animate flex items-center justify-center gap-3",
