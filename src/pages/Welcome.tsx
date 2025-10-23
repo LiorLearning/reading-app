@@ -74,7 +74,7 @@ const Welcome: React.FC = () => {
               Teacher Dashboard
             </a>
           </div>
-          <p className="text-center text-sm text-gray-600 mt-6">Let's start your pet's adventures.</p>
+          <p className="text-center text-sm text-gray-600 mt-6">Join your pet on their next big quest!</p>
         </CardContent>
       </Card>
     </main>
