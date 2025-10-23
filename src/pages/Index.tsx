@@ -398,8 +398,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
   }, [status]);
   
-  // Show onboarding if user is authenticated but hasn't completed setup
-  const showOnboarding = user && userData && (userData.isFirstTime || !userData.grade);
+  // Show onboarding only for non-anonymous users missing required profile fields
+  const showOnboarding =
+    user && !user.isAnonymous &&
+    userData &&
+    (userData.isFirstTime || !userData.username || !userData.age || !userData.grade);
 
   // If user is authenticated but we're still loading userData, we should wait
   const isLoadingUserData = user && !userData;
@@ -6393,7 +6396,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
                         // Clear nudge; navigate to upgrade flow (link anonymous to real account)
                         try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
-                        navigate('/auth?mode=upgrade&redirect=/');
+                        navigate('/auth?mode=upgrade&redirect=/app');
                       }}
                     >
                       Create account to continue
@@ -6429,7 +6432,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         try { setSelectedTopicId(levelSwitchModal.nextTopicId); } catch {}
                         // Clear nudge; navigate to login
                         try { localStorage.setItem('auth_nudge_pending', ''); } catch {}
-                        navigate('/auth?redirect=/');
+                        navigate('/auth?redirect=/app');
                       }}
                     >
                       I already have an account
