@@ -1615,3 +1615,54 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
   
   return formatted;
 };
+
+// Profanity moderation utility
+import profanityListRaw from "@/lib/profanity.txt?raw";
+
+// Build a Set of profane words on first import for O(1) lookups
+const PROFANITY_SET: Set<string> = (() => {
+  // Normalize lines: trim, lowercase, drop blanks
+  const lines = profanityListRaw
+    .split(/\r?\n/)
+    .map(l => l.trim().toLowerCase())
+    .filter(l => l.length > 0);
+  return new Set(lines);
+})();
+
+/**
+ * Check if the given text contains any profane word.
+ * - Case-insensitive
+ * - Ignores punctuation and special characters
+ * - Treats dots/slashes/hyphens as separators
+ * Returns true if any word matches; otherwise false.
+ */
+export function moderation(text: string | null | undefined): boolean {
+  if (!text) return false;
+
+  // Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
+  const normalized = text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
+  if (!normalized) return false;
+
+  const tokens = normalized.split(/\s+/);
+
+  // Early exit on direct token matches
+  for (const token of tokens) {
+    if (PROFANITY_SET.has(token)) {
+      return true;
+    }
+  }
+
+  // Additionally check common adjacent joins that appear in list (e.g., "shithead")
+  // for (let i = 0; i < tokens.length - 1; i++) {
+  //   const joined = tokens[i] + tokens[i + 1];
+  //   if (PROFANITY_SET.has(joined)) {
+  //     return true;
+  //   }
+  // }
+
+  return false;
+}
