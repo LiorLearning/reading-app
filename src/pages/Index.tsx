@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation } from "@/lib/utils";
 import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
@@ -76,6 +76,7 @@ import FeedbackModal from "@/components/FeedbackModal";
 import { aiPromptSanitizer, SanitizedPromptResult } from "@/lib/ai-prompt-sanitizer";
 import { useTutorial } from "@/hooks/use-tutorial";
 import { useRealtimeSession } from "@/hooks/useRealtimeSession";
+import { useGeminiRealtimeSession } from "@/hooks/useGeminiRealtimeSession";
 import { stateStoreApi } from "@/lib/state-store-api";
 
 
@@ -361,17 +362,32 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Ensure the first generated message after opening adventure is never a question
   const suppressSpellingOnceRef = React.useRef<boolean>(false);
 
-  const {
-    status,
-    sendMessage,
-    onToggleConnection,
-    downloadRecording,
-    interruptRealtimeSession,
-  } = useRealtimeSession({
+  // Realtime provider selector: 'openai' or 'gemini'
+  const REALTIME_PROVIDER: 'openai' | 'gemini' = ((import.meta as any)?.env?.VITE_REALTIME_AUDIO_PROVIDER === 'gemini' ? 'gemini' : 'openai');
+
+  // OpenAI realtime
+  const openaiRT = useRealtimeSession({
     isAudioPlaybackEnabled: true,
-    enabled: true,
+    enabled: REALTIME_PROVIDER === 'openai',
     sessionId: currentSessionId,
   });
+
+  // Gemini realtime
+  const geminiRT = useGeminiRealtimeSession({
+    enabled: REALTIME_PROVIDER === 'gemini',
+  });
+  const [geminiEnabled, setGeminiEnabled] = useState<boolean>(REALTIME_PROVIDER === 'gemini');
+  useEffect(() => {
+    if (REALTIME_PROVIDER === 'gemini') {
+      geminiRT.setEnabled(geminiEnabled);
+    }
+  }, [geminiEnabled]);
+
+  const status = REALTIME_PROVIDER === 'openai' ? openaiRT.status : (geminiEnabled ? 'CONNECTED' : 'DISCONNECTED');
+  const sendMessage = REALTIME_PROVIDER === 'openai' ? openaiRT.sendMessage : geminiRT.sendMessage;
+  //const onToggleConnection = REALTIME_PROVIDER === 'openai' ? openaiRT.onToggleConnection : (() => setGeminiEnabled(v => !v));
+  //const downloadRecording = REALTIME_PROVIDER === 'openai' ? openaiRT.downloadRecording : (() => {});
+  const interruptRealtimeSession = REALTIME_PROVIDER === 'openai' ? openaiRT.interruptRealtimeSession : geminiRT.interrupt;
 
   // Centralized function to increment message cycle count for all user interactions
   const incrementMessageCycle = useCallback(() => {
@@ -2061,7 +2077,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Handle text messages and detect image generation requests
   const onGenerate = useCallback(
     async (text: string) => {
-      // If an auth nudge is pending for anonymous user after assignment completion, re-open Level Up modal
+      // Check if the last message is "transcribing..." and replace it with actual transcription
+      const lastMessage = chatMessages[chatMessages.length - 1];
+      const shouldReplaceTranscribingMessage = lastMessage &&
+        lastMessage.type === 'user' &&
+        lastMessage.content === 'transcribing...';
+      const verdict = moderation(text);
+      if (verdict) {
+        toast.warning('Inappropriate message, Please try again.');
+        if (shouldReplaceTranscribingMessage) {
+          setChatMessages(prev => {
+            setLastMessageCount(prev.length - 1);
+            return prev.slice(0, -1)
+          });
+        }
+        return false;
+      }
       try {
         const isAnon = !!user && (user as any).isAnonymous === true;
         const nudge = typeof window !== 'undefined' ? (localStorage.getItem('auth_nudge_pending') === '1') : false;
@@ -2075,12 +2106,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
       } catch {}
       // Guest signup gate removed: do not block on prompt count
-      
-      // Check if the last message is "transcribing..." and replace it with actual transcription
-      const lastMessage = chatMessages[chatMessages.length - 1];
-      const shouldReplaceTranscribingMessage = lastMessage && 
-        lastMessage.type === 'user' && 
-        lastMessage.content === 'transcribing...';
       
       // NEW: Try unified AI system first (if available and ready)
       // console.log('🔧 Unified system check:', {
