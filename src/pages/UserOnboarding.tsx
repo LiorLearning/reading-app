@@ -77,16 +77,21 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
       setAgeError("");
 
       try {
-        await updateUserData({
+        // Do not overwrite grade/level if already decided (e.g., via assignment flow)
+        const payload: any = {
           username: username.trim(),
           age: parsedAge,
-          // Persist default grade/level to mark onboarding complete elsewhere
-          grade: selectedGrade || "assignment",
-          gradeDisplayName: selectedGrade || "assignment",
-          level: selectedLevel || "start",
-          levelDisplayName: "Start Level",
-          isFirstTime: false
-        });
+          isFirstTime: false,
+        };
+        if (!userData?.grade) {
+          payload.grade = selectedGrade || "assignment";
+          payload.gradeDisplayName = selectedGrade || "assignment";
+        }
+        if (!userData?.level) {
+          payload.level = selectedLevel || "start";
+          payload.levelDisplayName = "Start Level";
+        }
+        await updateUserData(payload);
         try {
           analytics.capture('user_name_entered', {
             user_name: username.trim(),
