@@ -10,6 +10,9 @@ import {
   saveAdventureHybrid,
   loadAdventureSummariesHybrid 
 } from './firebase-adventure-cache';
+import { PetAdventureTracker } from './pet-adventure-tracker';
+import { PetProgressStorage } from './pet-progress-storage';
+import type { SavedAdventure } from './utils';
 
 /**
  * Migrate all localStorage data to Firebase for authenticated users
@@ -83,6 +86,13 @@ export const migrateLocalStorageToFirebase = async (userId: string): Promise<voi
     const firebaseAdventures = await loadAdventureSummariesHybrid(userId);
 
     console.log(`✅ Migration completed: ${migratedCount} items migrated to Firebase`);
+
+    // Reconcile PetAdventureTracker mapping from migrated adventures
+    try {
+      await reconcilePetAdventureTrackerOnLogin(userId);
+    } catch (error) {
+      console.warn('Tracker reconciliation after migration failed:', error);
+    }
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;
@@ -162,4 +172,62 @@ declare global {
 if (typeof window !== 'undefined') {
   window.migrateToFirebase = forceMigrateUserData;
   window.checkMigrationNeeded = checkMigrationNeeded;
+}
+
+/**
+ * Reconcile PetAdventureTracker so that pet/type → adventureId points to the latest
+ * migrated adventure for the current pet. This aligns resume flow after login.
+ */
+async function reconcilePetAdventureTrackerOnLogin(userId: string): Promise<void> {
+  try {
+    // Load full adventures (prefer Firebase for signed-in user)
+    const { loadAdventuresHybrid } = await import('./firebase-adventure-cache');
+    const adventures: SavedAdventure[] = await loadAdventuresHybrid(userId);
+    if (!adventures || adventures.length === 0) return;
+
+    // Determine current pet; default to 'dog' if unavailable
+    const petId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+
+    // Pick the most recent adventure per adventureType
+    const latestByType: Record<string, SavedAdventure> = {};
+    for (const adv of adventures) {
+      const type = (adv as any).adventureType as string | undefined;
+      if (!type) continue;
+      const current = latestByType[type];
+      if (!current || (adv.lastPlayedAt || 0) > (current.lastPlayedAt || 0)) {
+        latestByType[type] = adv;
+      }
+    }
+
+    const types = Object.keys(latestByType);
+    if (types.length === 0) return;
+
+    // Load existing tracker state and update mappings
+    const state = await PetAdventureTracker.loadPetAdventureState(userId, petId);
+    let changed = false;
+
+    for (const type of types) {
+      const adv = latestByType[type];
+      const msgCount = Array.isArray(adv.messages) ? adv.messages.length : 0;
+      const existing = state.adventures[type];
+      const needsUpdate = !existing || existing.adventureId !== adv.id || (existing.messageCount || 0) < msgCount;
+      if (needsUpdate) {
+        state.adventures[type] = {
+          adventureId: adv.id,
+          topicId: adv.topicId || existing?.topicId || 'K-F.2',
+          createdAt: adv.createdAt || existing?.createdAt || Date.now(),
+          lastPlayedAt: adv.lastPlayedAt || Date.now(),
+          messageCount: msgCount,
+          isCompleted: false,
+        } as any;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      await PetAdventureTracker.savePetAdventureState(state);
+    }
+  } catch (error) {
+    console.warn('reconcilePetAdventureTrackerOnLogin failed:', error);
+  }
 }
