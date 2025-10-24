@@ -95,6 +95,20 @@ export interface GlobalPetSettings {
   currentSelectedPet: string;
   globalAudioEnabled: boolean;
   lastGlobalUpdate: number;
+  // Global 8-hour mood period state (per user/device)
+  moodPeriod?: {
+    periodId: string; // unique id per period
+    anchorMs: number; // when current period started
+    nextResetMs: number; // when current period should end (>= anchorMs + 8h)
+    sadPetIds: string[]; // pets that start as sad in this period (<=3, or all if <=3 pets)
+    engagementBaseline: Record<string, number>; // petId -> totalAdventureCoins at period start
+    lastAssignmentReason?: 'sleep_anchor' | 'elapsed_no_sleep' | 'init';
+  };
+  // User-scoped todo pointer (shared across all pets for adventure rotation)
+  userTodoData?: {
+    currentType: string;
+    lastSwitchTime: number;
+  };
 }
 
 export class PetProgressStorage {
@@ -461,6 +475,13 @@ export class PetProgressStorage {
       petData.todoData = petData.todoData || { currentType: adventureType, lastSwitchTime: now };
       petData.todoData.currentType = adventureType;
       petData.todoData.lastSwitchTime = now; // Start 8-hour window showing the completed item
+      // Optimistically ADVANCE user-scoped pointer to the next activity immediately
+      try {
+        const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
+        const idx = Math.max(0, seq.indexOf(adventureType));
+        const nextType = seq[(idx + 1) < seq.length ? (idx + 1) : idx];
+        this.setUserTodoData({ currentType: nextType, lastSwitchTime: now });
+      } catch {}
     }
     
     // Update achievement data
@@ -539,55 +560,51 @@ export class PetProgressStorage {
     return sequence[sequence.length - 1];
   }
 
-  // Determine which item to show in the bottom bar respecting 8-hour hold after completion
+  // Determine which item to show in the bottom bar using USER-scoped pointer
   static getCurrentTodoDisplayType(petId: string, sequence: string[], threshold: number = 50): string {
-    const petData = this.getPetProgress(petId);
     const now = Date.now();
-    const todo = petData.todoData || { currentType: sequence[0], lastSwitchTime: now };
+    let userTodo = this.getUserTodoData();
+    if (!userTodo || !userTodo.currentType) {
+      userTodo = { currentType: sequence[0], lastSwitchTime: now };
+      this.setUserTodoData(userTodo);
+    }
 
-    // Rollover rules:
-    // - If calendar day changed since lastSwitchTime, update today's activity:
-    //   - If currentType is completed, advance to the next in order
-    //   - If not completed, keep the same
-    // - If an 8-hour sleep just ended (wake-up event happened after lastSwitchTime), do the same rollover
+    // Day-based rollover at user scope
     try {
-      const lastDate = new Date(todo.lastSwitchTime).toISOString().slice(0, 10);
+      const lastDate = new Date(userTodo.lastSwitchTime).toISOString().slice(0, 10);
       const today = new Date().toISOString().slice(0, 10);
-
-      const { sleepData } = petData;
-      const sleepEndedAfterLastSwitch =
-        !!sleepData && !sleepData.isAsleep && sleepData.sleepEndTime > 0 && sleepData.sleepEndTime <= now && todo.lastSwitchTime < sleepData.sleepEndTime;
-
-      const dayChanged = lastDate !== today;
-      const shouldRollover = dayChanged || sleepEndedAfterLastSwitch;
-
-      if (shouldRollover) {
-        const currentIsDone = this.isAdventureTypeCompleted(petId, todo.currentType, threshold);
-        let nextType = todo.currentType;
+      if (lastDate !== today) {
+        const currentIsDone = this.isAdventureTypeCompletedByUser(userTodo.currentType, threshold);
+        let nextType = userTodo.currentType;
         if (currentIsDone) {
-          const idx = Math.max(0, sequence.indexOf(todo.currentType));
+          const idx = Math.max(0, sequence.indexOf(userTodo.currentType));
           nextType = sequence[(idx + 1) < sequence.length ? (idx + 1) : idx];
         }
-        petData.todoData = { currentType: nextType, lastSwitchTime: now };
-        this.setPetProgress(petData);
+        this.setUserTodoData({ currentType: nextType, lastSwitchTime: now });
         return nextType;
       }
     } catch {}
 
-    // Removed 8-hour pin: allow immediate advance when current is completed
-
-    // Immediate advance rule (no 8h pin):
-    // - If currentType is completed, move to the next in order
-    // - If not completed, keep the same
-    const currentIsDone = this.isAdventureTypeCompleted(petId, todo.currentType, threshold);
-    const idx = Math.max(0, sequence.indexOf(todo.currentType));
-    const nextType = currentIsDone ? (sequence[(idx + 1) < sequence.length ? (idx + 1) : idx]) : todo.currentType;
-    // Only persist if the currentType actually changes to avoid writes during render
-    if (!petData.todoData || petData.todoData.currentType !== nextType) {
-      petData.todoData = { currentType: nextType, lastSwitchTime: now };
-      this.setPetProgress(petData);
+    // Immediate advance when the current user activity is completed by ANY owned pet
+    const currentIsDone = this.isAdventureTypeCompletedByUser(userTodo.currentType, threshold);
+    const idx = Math.max(0, sequence.indexOf(userTodo.currentType));
+    const nextType = currentIsDone ? (sequence[(idx + 1) < sequence.length ? (idx + 1) : idx]) : userTodo.currentType;
+    if (nextType !== userTodo.currentType) {
+      this.setUserTodoData({ currentType: nextType, lastSwitchTime: now });
     }
     return nextType;
+  }
+
+  // Check if any owned pet has completed the activity type
+  static isAdventureTypeCompletedByUser(adventureType: string, threshold: number = 50): boolean {
+    try {
+      const pets = this.getAllOwnedPets();
+      for (const p of pets) {
+        const coins = (p.adventureCoinsByType || {})[adventureType] || 0;
+        if (coins >= threshold) return true;
+      }
+    } catch {}
+    return false;
   }
 
   // Put pet to sleep
@@ -758,6 +775,7 @@ export class PetProgressStorage {
       currentSelectedPet: '', // No pet selected by default
       globalAudioEnabled: true,
       lastGlobalUpdate: Date.now(),
+      moodPeriod: undefined,
     };
   }
 
@@ -777,6 +795,174 @@ export class PetProgressStorage {
     } catch (error) {
       console.warn('Failed to save global pet settings:', error);
     }
+  }
+
+  // ============================
+  // User-scoped todo pointer
+  // ============================
+  static getUserTodoData(): { currentType: string; lastSwitchTime: number } | null {
+    try {
+      const gs = this.getGlobalSettings();
+      if (gs && gs.userTodoData && typeof gs.userTodoData.currentType === 'string') {
+        return gs.userTodoData;
+      }
+    } catch {}
+    return null;
+  }
+
+  static setUserTodoData(data: { currentType: string; lastSwitchTime: number }): void {
+    const gs = this.getGlobalSettings();
+    const payload = { currentType: data.currentType, lastSwitchTime: data.lastSwitchTime || Date.now() };
+    this.setGlobalSettings({ ...gs, userTodoData: payload });
+    // Mirror to localStorage for UI readers and emit event
+    try {
+      localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: payload.currentType, lastSwitchTime: payload.lastSwitchTime }));
+      window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: payload.currentType, lastSwitchTime: payload.lastSwitchTime } }));
+    } catch {}
+  }
+
+  // ============================
+  // Mood Period Management (8h)
+  // ============================
+
+  private static computeOwnedPetIds(): string[] {
+    try {
+      return this.getAllOwnedPets().map((p) => p.petId);
+    } catch { return []; }
+  }
+
+  private static buildDefaultMoodPeriod(ownedPetIds?: string[], reason: 'init' | 'sleep_anchor' | 'elapsed_no_sleep' = 'init') {
+    const now = Date.now();
+    const ids = (ownedPetIds && ownedPetIds.length > 0) ? ownedPetIds : this.computeOwnedPetIds();
+    // Baseline coins snapshot
+    const baseline: Record<string, number> = {};
+    ids.forEach((id) => {
+      try {
+        const d = this.getPetProgress(id);
+        baseline[id] = Number(d?.levelData?.totalAdventureCoinsEarned || 0);
+      } catch { baseline[id] = 0; }
+    });
+    // Initial sad assignment: if <=3 pets, all sad; else pick first 3 deterministically
+    const sadSet = ids.length <= 3 ? ids.slice() : ids.slice(0, 3);
+    const period = {
+      periodId: `${now}:${Math.random().toString(36).slice(2, 8)}`,
+      anchorMs: now,
+      nextResetMs: now + this.EIGHT_HOURS_MS,
+      sadPetIds: sadSet,
+      engagementBaseline: baseline,
+      lastAssignmentReason: reason,
+    } as NonNullable<GlobalPetSettings['moodPeriod']>;
+    this.setGlobalSettings({ moodPeriod: period });
+    try {
+      window.dispatchEvent(new CustomEvent('moodPeriodAssigned', { detail: period }));
+      // Analytics (best-effort)
+      try { (window as any)?.analytics?.capture?.('mood_period_assigned', { reason, sad_pet_ids: sadSet, period_id: period.periodId }); } catch {}
+    } catch {}
+    return period;
+  }
+
+  private static rankLeastEngaged(ownedPetIds: string[], baseline: Record<string, number>): string[] {
+    const items = ownedPetIds.map((id) => {
+      let total = 0;
+      let createdAt = 0;
+      try {
+        const d = this.getPetProgress(id);
+        total = Number(d?.levelData?.totalAdventureCoinsEarned || 0);
+        // Use firstAdventureDate or firstFeedingDate as creation proxy
+        createdAt = Number(d?.achievementData?.firstAdventureDate || d?.achievementData?.firstFeedingDate || 0);
+      } catch {}
+      const base = Number(baseline?.[id] || 0);
+      const delta = Math.max(0, total - base);
+      return { id, delta, createdAt };
+    });
+    items.sort((a, b) => {
+      if (a.delta !== b.delta) return a.delta - b.delta; // least engaged first
+      // tie-breaker: older created first
+      return a.createdAt - b.createdAt;
+    });
+    return items.map((i) => i.id);
+  }
+
+  static ensureMoodPeriodUpToDate(explicitOwnedPetIds?: string[]): NonNullable<GlobalPetSettings['moodPeriod']> {
+    const settings = this.getGlobalSettings();
+    const ownedIds = (explicitOwnedPetIds && explicitOwnedPetIds.length > 0) ? explicitOwnedPetIds : this.computeOwnedPetIds();
+    const current = settings.moodPeriod;
+    if (!current) {
+      return this.buildDefaultMoodPeriod(ownedIds, 'init');
+    }
+    const now = Date.now();
+    if (now < current.nextResetMs) {
+      return current;
+    }
+    // Period elapsed without sleep anchor: rotate based on engagement deltas
+    const baseline = current.engagementBaseline || {};
+    const ranked = this.rankLeastEngaged(ownedIds, baseline);
+    const sadPetIds = ownedIds.length <= 3 ? ownedIds.slice() : ranked.slice(0, 3);
+    // New baseline from current totals
+    const newBaseline: Record<string, number> = {};
+    ownedIds.forEach((id) => {
+      try {
+        const d = this.getPetProgress(id);
+        newBaseline[id] = Number(d?.levelData?.totalAdventureCoinsEarned || 0);
+      } catch { newBaseline[id] = 0; }
+    });
+    const next = {
+      periodId: `${now}:${Math.random().toString(36).slice(2, 8)}`,
+      anchorMs: now,
+      nextResetMs: now + this.EIGHT_HOURS_MS,
+      sadPetIds,
+      engagementBaseline: newBaseline,
+      lastAssignmentReason: 'elapsed_no_sleep' as const,
+    };
+    this.setGlobalSettings({ moodPeriod: next });
+    try {
+      window.dispatchEvent(new CustomEvent('moodPeriodAssigned', { detail: next }));
+      try { (window as any)?.analytics?.capture?.('mood_period_assigned', { reason: 'elapsed_no_sleep', sad_pet_ids: sadPetIds, period_id: next.periodId }); } catch {}
+    } catch {}
+    return next;
+  }
+
+  static startNewMoodPeriodOnSleepAnchor(explicitOwnedPetIds?: string[]): NonNullable<GlobalPetSettings['moodPeriod']> {
+    const settings = this.getGlobalSettings();
+    const ownedIds = (explicitOwnedPetIds && explicitOwnedPetIds.length > 0) ? explicitOwnedPetIds : this.computeOwnedPetIds();
+    const current = settings.moodPeriod;
+    const now = Date.now();
+    // Only allow anchoring a new period if current period has elapsed or doesn't exist
+    if (current && now < current.nextResetMs) {
+      return current;
+    }
+    // Use current baseline to compute least engaged for the period that just ended
+    const baseline = current?.engagementBaseline || {};
+    const ranked = this.rankLeastEngaged(ownedIds, baseline);
+    const sadPetIds = ownedIds.length <= 3 ? ownedIds.slice() : ranked.slice(0, 3);
+    // New baseline snapshot for the new period
+    const newBaseline: Record<string, number> = {};
+    ownedIds.forEach((id) => {
+      try {
+        const d = this.getPetProgress(id);
+        newBaseline[id] = Number(d?.levelData?.totalAdventureCoinsEarned || 0);
+      } catch { newBaseline[id] = 0; }
+    });
+    const next = {
+      periodId: `${now}:${Math.random().toString(36).slice(2, 8)}`,
+      anchorMs: now,
+      nextResetMs: now + this.EIGHT_HOURS_MS,
+      sadPetIds,
+      engagementBaseline: newBaseline,
+      lastAssignmentReason: 'sleep_anchor' as const,
+    };
+    this.setGlobalSettings({ moodPeriod: next });
+    try {
+      window.dispatchEvent(new CustomEvent('moodPeriodAssigned', { detail: next }));
+      try { (window as any)?.analytics?.capture?.('mood_period_assigned', { reason: 'sleep_anchor', sad_pet_ids: sadPetIds, period_id: next.periodId }); } catch {}
+    } catch {}
+    return next;
+  }
+
+  static getCurrentSadPetIds(): string[] {
+    try {
+      return this.getGlobalSettings()?.moodPeriod?.sadPetIds || [];
+    } catch { return []; }
   }
 
   // Get currently selected pet

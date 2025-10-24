@@ -120,6 +120,10 @@ import {
       const task = ACTIVITY_SEQUENCE[0];
       result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null };
     }
+    // Initialize user-scoped activity pointer (shared across pets)
+    result._userCurrentActivity = ACTIVITY_SEQUENCE[0];
+    result._userLastSwitchAt = nowServerTimestamp();
+    result._userCooldownUntil = null;
     result.createdAt = nowServerTimestamp();
     result.updatedAt = nowServerTimestamp();
     return result;
@@ -249,6 +253,14 @@ import {
       batch.set(
         questsRef,
         { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: cooldownUntil }, updatedAt: nowServerTimestamp() } as any,
+        { merge: true }
+      );
+      // Immediately ADVANCE the USER-scoped pointer to the next activity (shared across pets)
+      const nextIndex = (index + 1) % ACTIVITY_SEQUENCE.length;
+      const nextKey = ACTIVITY_SEQUENCE[nextIndex];
+      batch.set(
+        questsRef,
+        { _userCurrentActivity: nextKey, _userLastSwitchAt: nowServerTimestamp(), _userCooldownUntil: null, updatedAt: nowServerTimestamp() } as any,
         { merge: true }
       );
     }
@@ -383,6 +395,20 @@ import {
       }
     }
   
+    // Advance USER-scoped pointer if cooldown passed
+    try {
+      const userCooldown = (data as any)?._userCooldownUntil as Timestamp | null;
+      const userActivity = (data as any)?._userCurrentActivity as string | undefined;
+      const idx = Math.max(0, ACTIVITY_SEQUENCE.indexOf(userActivity || ACTIVITY_SEQUENCE[0]));
+      const cuMs = userCooldown?.toMillis?.() || (userCooldown ? new Date(userCooldown as any).getTime() : null);
+      if (!cuMs || nowMs >= cuMs) {
+        const nextIndex = (idx + 1) % ACTIVITY_SEQUENCE.length;
+        updates._userCurrentActivity = ACTIVITY_SEQUENCE[nextIndex];
+        updates._userLastSwitchAt = nowServerTimestamp();
+        updates._userCooldownUntil = null;
+      }
+    } catch {}
+
     batch.set(questsRef, updates, { merge: true });
     await batch.commit();
 

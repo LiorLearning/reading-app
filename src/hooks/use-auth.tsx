@@ -396,6 +396,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
             try {
               localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
+              // Hydrate user-scoped todo pointer for shared rotation
+              try {
+                let userAct = (d?._userCurrentActivity || seq[0]) as string;
+                const userCooldownAny = d?._userCooldownUntil as any;
+                const lastSwitchAny = d?._userLastSwitchAt as any;
+                const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : (lastSwitchAny ? new Date(lastSwitchAny).getTime() : Date.now());
+                // Optimistic local advance: if any pet has completed the current pointer activity, advance immediately
+                try {
+                  const needsAdvance = Array.isArray(states) && states.some((s: any) => (s?.completed && s?.activity === userAct));
+                  if (needsAdvance) {
+                    const idx = Math.max(0, seq.indexOf(userAct));
+                    const nextIdx = (idx + 1) % seq.length;
+                    userAct = seq[nextIdx];
+                  }
+                } catch {}
+                localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: userAct, lastSwitchTime: lastSwitchMs }));
+                // Mirror into PetProgressStorage global settings if available
+                try { PetProgressStorage.setGlobalSettings({ userTodoData: { currentType: userAct, lastSwitchTime: lastSwitchMs } } as any); } catch {}
+                window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: userAct, lastSwitchTime: lastSwitchMs } }));
+              } catch {}
               // Also expose sadness assignment if present
               try {
                 const sad = (d?._sadness || null);
