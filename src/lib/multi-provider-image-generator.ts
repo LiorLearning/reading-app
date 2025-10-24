@@ -251,7 +251,7 @@ class FluxSchnellProvider implements ImageProvider {
     // console.log(`👤 [FluxSchnellProvider.generate()] User ID: ${userId}`);
     // console.log(`⚙️ [FluxSchnellProvider.generate()] Options:`, options);
 
-    const apiUrl = 'https://api.readkraft.com/api/replicate/v1/models/black-forest-labs/flux-schnell/predictions';
+    const apiUrl = 'https://api.readkraft.com/api/replicate/v1/models/black-forest-labs/flux-1.1-pro/predictions';
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -266,6 +266,8 @@ class FluxSchnellProvider implements ImageProvider {
           output_quality: 80,
           num_inference_steps: 4,
           aspect_ratio: '5:4',
+          safety_tolerance: 1,
+          prompt_upsampling: false
         },
       }),
     });
@@ -277,7 +279,7 @@ class FluxSchnellProvider implements ImageProvider {
 
     const result = await response.json();
 
-    const firstOutputUrl = result?.output?.[0];
+    const firstOutputUrl = result?.output;
     if (!firstOutputUrl || typeof firstOutputUrl !== 'string') {
       throw new Error('Flux Schnell Replicate API did not return an output URL');
     }
