@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,7 +9,18 @@ import { playClickSound } from '@/lib/sounds';
 // Simple landing screen that matches the app's playful theme
 const Welcome: React.FC = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const previouslySignedIn = typeof window !== 'undefined' ? (localStorage.getItem('previouslysignedin') === '1') : false;
+  const isAuthenticated = !!user && !user.isAnonymous;
+  const showSplash = (loading && previouslySignedIn) || isAuthenticated;
+
+  // If already authenticated (non-anonymous), skip selection and go to the app directly
+  useEffect(() => {
+    if (loading) return;
+    if (user && !user.isAnonymous) {
+      navigate('/app', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const handleNewUser = async () => {
     playClickSound();
@@ -31,6 +42,17 @@ const Welcome: React.FC = () => {
   };
 
   const teacherDashboardUrl = 'https://dashboard.readkraft.com/teacher/login';
+
+  if (showSplash) {
+    return (
+      <main className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+        <div className="flex items-center gap-3 text-white text-xl animate-pulse">
+          <img src="/avatars/krafty.png" alt="Krafty" className="h-10 w-10 object-contain" />
+          Getting your pet ready...
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
