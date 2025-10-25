@@ -157,6 +157,49 @@ export class PetAdventureTracker {
             name: adv.name,
             adventureType: (adv as any).adventureType 
           })));
+
+          // Fallback: choose most recent saved adventure, preferring same adventureType
+          try {
+            const sorted = [...savedAdventures].sort((a: any, b: any) => (b.lastPlayedAt || 0) - (a.lastPlayedAt || 0));
+            const sameType = sorted.filter((adv: any) => (adv as any).adventureType === adventureType);
+            const fallbackAdv: any | undefined = (sameType.length > 0 ? sameType[0] : sorted[0]);
+
+            if (fallbackAdv) {
+              console.log(`🔁 Fallback to latest ${(fallbackAdv as any).adventureType || 'unknown'} adventure:`, fallbackAdv.id);
+              chatHistory = fallbackAdv.messages || [];
+              adventureName = fallbackAdv.name || `${adventureType} adventure`;
+              comicPanels = fallbackAdv.comicPanels || [];
+
+              // Update tracker mapping to self-heal
+              try {
+                const stateForUpdate = await this.loadPetAdventureState(userId, petId);
+                stateForUpdate.adventures[adventureType] = {
+                  adventureId: fallbackAdv.id,
+                  topicId: fallbackAdv.topicId || stateForUpdate.adventures[adventureType]?.topicId || 'K-F.2',
+                  createdAt: fallbackAdv.createdAt || Date.now(),
+                  lastPlayedAt: fallbackAdv.lastPlayedAt || Date.now(),
+                  messageCount: Array.isArray(fallbackAdv.messages) ? fallbackAdv.messages.length : 0,
+                  isCompleted: false
+                } as any;
+                await this.savePetAdventureState(stateForUpdate);
+                // Use fallback adventure for return values
+                return {
+                  exists: true,
+                  adventureId: fallbackAdv.id,
+                  topicId: stateForUpdate.adventures[adventureType].topicId,
+                  messageCount: stateForUpdate.adventures[adventureType].messageCount,
+                  chatHistory,
+                  adventureName,
+                  comicPanels,
+                  cachedImages: [] // will be loaded below if possible
+                };
+              } catch (healError) {
+                console.warn('Failed to update tracker during fallback:', healError);
+              }
+            }
+          } catch (fallbackError) {
+            console.warn('Fallback selection failed:', fallbackError);
+          }
         }
         
         // Load cached images for this adventure

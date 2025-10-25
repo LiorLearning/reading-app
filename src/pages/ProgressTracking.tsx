@@ -217,7 +217,7 @@ export function ProgressTracking(): JSX.Element {
 
   const handleBackClick = () => {
     playClickSound();
-    navigate('/');
+    navigate('/app');
   };
 
   return (
