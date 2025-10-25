@@ -52887,11 +52887,11 @@ aiTutor: {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "hay",
+      word: "pay",
       imageUrl: null,
-      explanation: "Great job! The word is 'hay' (long a spelled with 'ay').",
-      questionText: "h__",
-      correctAnswer: "hay",
+      explanation: "Great job! The word is 'pay' (long a spelled with 'ay').",
+      questionText: "p__",
+      correctAnswer: "pay",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
@@ -52899,19 +52899,19 @@ aiTutor: {
       isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
-        targetWord: "hay",
+        targetWord: "pay",
         intent: "fill_blank",
-        questionLine: "h__",
-        imagePrompt: "A pile of hay"
+        questionLine: "p__",
+        imagePrompt: "Someone paying with money"
       },
       aiTutor: {
-        target_word: 'hay',
-        question: "h__",
+        target_word: 'pay',
+        question: "p__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it's at the end (day, play), and 'a_e' when there's one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
       },
-      audio: "hay"
+      audio: "pay"
     },
     {
       id: 2,
@@ -60877,8 +60877,1962 @@ audio: 'sleigh'
           audio:"every"
         }
       ]
+    },
+    '4-A.1': {
+  topicInfo: {
+    topicId: '4-A.1',
+    topicName: 'Spell_the_/ch/_sound_TCH_rule',
+    progressTopicName: "The 'TCH' spelling rule",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'catch',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'catch' — /ch/ comes right after a short vowel, so we spell it with 'tch'.",
+      questionText: 'ca__',
+      correctAnswer: 'catch',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'catch',
+        intent: 'fill_blank',
+        questionLine: 'ca__',
+        imagePrompt: 'A person catching a ball'
+      },
+      aiTutor: {
+        target_word: 'catch',
+        question: 'ca__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'catch', the /ch/ sound comes right after the short vowel 'a', so we use TCH. Remember: Use TCH when /ch/ follows a short vowel (match, witch), but use CH at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, beach)."
+      },
+      audio: 'catch'
+    },
+    {
+      id: 2,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'match',
+      imageUrl: null,
+      explanation: "Great! The word is 'match' — /ch/ comes right after a short vowel, so we spell it with 'tch'.",
+      questionText: 'ma__',
+      correctAnswer: 'match',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'match',
+        intent: 'fill_blank',
+        questionLine: 'ma__',
+        imagePrompt: 'A matchstick or two matching items'
+      },
+      aiTutor: {
+        target_word: 'match',
+        question: 'ma__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'match', the /ch/ sound comes right after the short vowel 'a', so we use TCH. Remember: Use TCH when /ch/ follows a short vowel (catch, witch), but use CH at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, beach)."
+      },
+      audio: 'match'
+    },
+    {
+      id: 3,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'witch',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'witch' — /ch/ comes right after a short vowel, so we spell it with 'tch'.",
+      questionText: 'wi__',
+      correctAnswer: 'witch',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'witch',
+        intent: 'fill_blank',
+        questionLine: 'wi__',
+        imagePrompt: 'A friendly witch with a hat and broomstick'
+      },
+      aiTutor: {
+        target_word: 'witch',
+        question: 'wi__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'witch', the /ch/ sound comes right after the short vowel 'i', so we use TCH. Remember: Use TCH when /ch/ follows a short vowel (catch, match), but use CH at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, beach)."
+      },
+      audio: 'witch'
+    },
+    {
+      id: 4,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'peach',
+      imageUrl: null,
+      explanation: "Perfect! The word is 'peach' — /ch/ comes after a long vowel sound, so we spell it with 'ch'.",
+      questionText: 'pea__',
+      correctAnswer: 'peach',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'peach',
+        intent: 'fill_blank',
+        questionLine: 'pea__',
+        imagePrompt: 'A juicy peach fruit'
+      },
+      aiTutor: {
+        target_word: 'peach',
+        question: 'pea__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'peach', the /ch/ sound comes after the long vowel sound 'ea', so we use CH. Remember: Use CH when /ch/ comes at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, beach), but use TCH when it follows a short vowel (catch, match, witch)."
+      },
+      audio: 'peach'
+    },
+    {
+      id: 5,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bench',
+      imageUrl: null,
+      explanation: "Well done! The word is 'bench' — /ch/ comes after a consonant, so we spell it with 'ch'.",
+      questionText: 'ben__',
+      correctAnswer: 'bench',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'bench',
+        intent: 'fill_blank',
+        questionLine: 'ben__',
+        imagePrompt: 'A park bench or wooden bench'
+      },
+      aiTutor: {
+        target_word: 'bench',
+        question: 'ben__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'bench', the /ch/ sound comes after the consonant 'n', so we use CH. Remember: Use CH when /ch/ comes at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, peach), but use TCH when it follows a short vowel (catch, match, witch)."
+      },
+      audio: 'bench'
+    },
+    {
+      id: 6,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'fetch',
+      imageUrl: null,
+      explanation: "Awesome! The word is 'fetch' — /ch/ comes right after a short vowel, so we spell it with 'tch'.",
+      questionText: 'fe__',
+      correctAnswer: 'fetch',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'fetch',
+        intent: 'fill_blank',
+        questionLine: 'fe__',
+        imagePrompt: 'A dog fetching a stick or ball'
+      },
+      aiTutor: {
+        target_word: 'fetch',
+        question: 'fe__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'fetch', the /ch/ sound comes right after the short vowel 'e', so we use TCH. Remember: Use TCH when /ch/ follows a short vowel (catch, match, witch), but use CH at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, peach)."
+      },
+      audio: 'fetch'
+    },
+    {
+      id: 7,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'chip',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'chip' — /ch/ comes at the beginning of the word, so we spell it with 'ch'.",
+      questionText: '__ip',
+      correctAnswer: 'chip',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2, 3],
+      aiHook: {
+        targetWord: 'chip',
+        intent: 'fill_blank',
+        questionLine: '__ip',
+        imagePrompt: 'A potato chip or computer chip'
+      },
+      aiTutor: {
+        target_word: 'chip',
+        question: '__ip',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'chip', the /ch/ sound comes at the beginning of the word, so we use CH. Remember: Use CH when /ch/ comes at the beginning of words or after consonants, r-controlled vowels, or long vowels (bench, rich, peach), but use TCH when it follows a short vowel (catch, match, witch)."
+      },
+      audio: 'chip'
+    },
+    {
+      id: 8,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'patch',
+      imageUrl: null,
+      explanation: "Terrific! The word is 'patch' — /ch/ comes right after a short vowel, so we spell it with 'tch'.",
+      questionText: 'pa__',
+      correctAnswer: 'patch',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'patch',
+        intent: 'fill_blank',
+        questionLine: 'pa__',
+        imagePrompt: 'A patch on clothing or a garden patch'
+      },
+      aiTutor: {
+        target_word: 'patch',
+        question: 'pa__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'patch', the /ch/ sound comes right after the short vowel 'a', so we use TCH. Remember: Use TCH when /ch/ follows a short vowel (catch, match, witch), but use CH at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, rich, peach)."
+      },
+      audio: 'patch'
+    },
+    {
+      id: 9,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'rich',
+      imageUrl: null,
+      explanation: "Brilliant! The word is 'rich' — /ch/ comes after an r-controlled vowel, so we spell it with 'ch'.",
+      questionText: 'ri__',
+      correctAnswer: 'rich',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'rich',
+        intent: 'fill_blank',
+        questionLine: 'ri__',
+        imagePrompt: 'Someone wealthy or rich chocolate cake'
+      },
+      aiTutor: {
+        target_word: 'rich',
+        question: 'ri__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "In 'rich', the /ch/ sound comes after the r-controlled vowel 'i', so we use CH. Remember: Use CH when /ch/ comes at the beginning of words or after consonants, r-controlled vowels, or long vowels (chip, bench, peach), but use TCH when it follows a short vowel (catch, match, witch)."
+      },
+      audio: 'rich'
+    },
+    {
+      id: 10,
+      topicId: '4-A.1',
+      topicName: 'Spell_the_/ch/_sound_TCH_rule',
+      progressTopicName: "The 'TCH' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'march',
+      imageUrl: null,
+      explanation: "Outstanding! The word is 'march' — /ch/ comes after an r-controlled vowel, so we spell it with 'ch'.",
+      questionText: 'mar__',
+      correctAnswer: 'march',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'march',
+        intent: 'fill_blank',
+        questionLine: 'mar__',
+        imagePrompt: 'People marching or the month of March'
+      },
+      aiTutor: {
+        target_word: 'march',
+        question: 'mar__',
+        student_entry: '',
+        topic_to_reinforce: "TCH rule for /ch/",
+        spelling_pattern_or_rule: "TCH Rule: Use TCH to spell /ch/ right after a short vowel (match, witch). Use CH at the beginning of a word or after a consonant, r-controlled, or long vowel (chip, rich, beach). In 'march', /ch/ comes after the r-controlled vowel 'ar', so we use CH!"
+      },
+      audio: 'march'
     }
-  
+  ]
+},
+'4-A.2': {
+  topicInfo: {
+    topicId: '4-A.2',
+    topicName: 'Spell_the_/j/_sound_DGE_rule',
+    progressTopicName: "The 'DGE' spelling rule",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'badge',
+      imageUrl: null,
+      explanation: "Great job! The word is 'badge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'ba__',
+      correctAnswer: 'badge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'badge',
+        intent: 'fill_blank',
+        questionLine: 'ba__',
+        imagePrompt: 'A name badge on a shirt'
+      },
+      aiTutor: {
+        target_word: 'badge',
+        question: 'ba__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'badge', /j/ comes right after a short vowel, so we use DGE. DGE Rule: Use DGE to spell /j/ right after a short vowel (badge, fudge). Use GE after a long vowel or r-controlled vowel (page, large)"
+      },
+      audio: 'badge'
+    },
+    {
+      id: 2,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'fudge',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'fudge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'fu__',
+      correctAnswer: 'fudge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'fudge',
+        intent: 'fill_blank',
+        questionLine: 'fu__',
+        imagePrompt: 'A piece of chocolate fudge'
+      },
+      aiTutor: {
+        target_word: 'fudge',
+        question: 'fu__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'fudge', the /j/ sound comes right after the short vowel 'u', so we use DGE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'fudge'
+    },
+    {
+      id: 3,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bridge',
+      imageUrl: null,
+      explanation: "Perfect! The word is 'bridge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'bri__',
+      correctAnswer: 'bridge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'bridge',
+        intent: 'fill_blank',
+        questionLine: 'bri__',
+        imagePrompt: 'A bridge over water'
+      },
+      aiTutor: {
+        target_word: 'bridge',
+        question: 'bri__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'bridge', the /j/ sound comes right after the short vowel 'i', so we use DGE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge, bridge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'bridge'
+    },
+    {
+      id: 4,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'edge',
+      imageUrl: null,
+      explanation: "Well done! The word is 'edge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'e__',
+      correctAnswer: 'edge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'edge',
+        intent: 'fill_blank',
+        questionLine: 'e__',
+        imagePrompt: 'The edge of a cliff or table'
+      },
+      aiTutor: {
+        target_word: 'edge',
+        question: 'e__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'edge', the /j/ sound comes right after the short vowel 'e', so we use DGE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge, edge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'edge'
+    },
+    {
+      id: 5,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'judge',
+      imageUrl: null,
+      explanation: "Great! The word is 'judge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'ju__',
+      correctAnswer: 'judge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'judge',
+        intent: 'fill_blank',
+        questionLine: 'ju__',
+        imagePrompt: 'A judge in a courtroom with a gavel'
+      },
+      aiTutor: {
+        target_word: 'judge',
+        question: 'ju__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'judge', the /j/ sound comes right after the short vowel 'u', so we use DGE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge, judge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'judge'
+    },
+    {
+      id: 6,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'page',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'page' — /j/ comes after a long vowel, so we spell it with 'ge'.",
+      questionText: 'pa__',
+      correctAnswer: 'page',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'page',
+        intent: 'fill_blank',
+        questionLine: 'pa__',
+        imagePrompt: 'A page from a book'
+      },
+      aiTutor: {
+        target_word: 'page',
+        question: 'pa__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'page', the /j/ sound comes after the long vowel 'a', so we use GE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'page'
+    },
+    {
+      id: 7,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'large',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'large' — /j/ comes after an r-controlled vowel, so we spell it with 'ge'.",
+      questionText: 'lar__',
+      correctAnswer: 'large',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'large',
+        intent: 'fill_blank',
+        questionLine: 'lar__',
+        imagePrompt: 'A large elephant or big object'
+      },
+      aiTutor: {
+        target_word: 'large',
+        question: 'lar__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'large', the /j/ sound comes after the r-controlled vowel 'ar', so we use GE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'large'
+    },
+    {
+      id: 8,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'lodge',
+      imageUrl: null,
+      explanation: "Perfect! The word is 'lodge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'lo__',
+      correctAnswer: 'lodge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'lodge',
+        intent: 'fill_blank',
+        questionLine: 'lo__',
+        imagePrompt: 'A wooden lodge or cabin in the woods'
+      },
+      aiTutor: {
+        target_word: 'lodge',
+        question: 'lo__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'lodge', the /j/ sound comes right after the short vowel 'o', so we use DGE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge, lodge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'lodge'
+    },
+    {
+      id: 9,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'ridge',
+      imageUrl: null,
+      explanation: "Outstanding! The word is 'ridge' — /j/ comes right after a short vowel, so we spell it with 'dge'.",
+      questionText: 'ri__',
+      correctAnswer: 'ridge',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'ridge',
+        intent: 'fill_blank',
+        questionLine: 'ri__',
+        imagePrompt: 'A mountain ridge or raised edge'
+      },
+      aiTutor: {
+        target_word: 'ridge',
+        question: 'ri__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'ridge', the /j/ sound comes right after the short vowel 'i', so we use DGE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge, ridge), but use GE after long vowels or r-controlled vowels (page, large)."
+      },
+      audio: 'ridge'
+    },
+    {
+      id: 10,
+      topicId: '4-A.2',
+      topicName: 'Spell_the_/j/_sound_DGE_rule',
+      progressTopicName: "The 'DGE' spelling rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'stage',
+      imageUrl: null,
+      explanation: "Wonderful! The word is 'stage' — /j/ comes after a long vowel, so we spell it with 'ge'.",
+      questionText: 'sta__',
+      correctAnswer: 'stage',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'stage',
+        intent: 'fill_blank',
+        questionLine: 'sta__',
+        imagePrompt: 'A theater stage with curtains'
+      },
+      aiTutor: {
+        target_word: 'stage',
+        question: 'sta__',
+        student_entry: '',
+        topic_to_reinforce: "DGE rule for /j/",
+        spelling_pattern_or_rule: "In 'stage', the /j/ sound comes after the long vowel 'a', so we use GE. Remember: Use DGE when /j/ follows a short vowel (badge, fudge), but use GE after long vowels or r-controlled vowels (page, stage, large)."
+      },
+      audio: 'stage'
+    }
+  ]
+},
+'4-A.3': {
+  topicInfo: {
+    topicId: '4-A.3',
+    topicName: 'Ways_to_spell_/j/',
+    progressTopicName: "Ways to spell the /j/ sound",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.3',
+      topicName: 'Ways_to_spell_/j/',
+      progressTopicName: "Ways to spell the /j/ sound",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'gentle',
+      imageUrl: null,
+      explanation: "Well done! The word is 'gentle' — the /j/ sound is spelled with 'g' before e, i, or y.",
+      questionText: '__ntle',
+      correctAnswer: 'gentle',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [1, 2],
+      aiHook: {
+        targetWord: 'gentle',
+        intent: 'fill_blank',
+        questionLine: '__ntle',
+        imagePrompt: 'A gentle person helping a small animal'
+      },
+      aiTutor: {
+        target_word: 'gentle',
+        question: '__ntle',
+        student_entry: '',
+        topic_to_reinforce: "Ways to spell /j/",
+        spelling_pattern_or_rule: "In 'gentle', the /j/ sound is spelled with G because it comes before E, I, or Y. Rule: Use G before E, I, or Y (gentle, giant, gym). Use DGE after a short vowel (badge), GE after a long vowel (page), and J at the beginning of a word (jump)."
+      },
+      audio: 'gentle'
+    }
+  ]
+}
+,
+'4-A.4': {
+  topicInfo: {
+    topicId: '4-A.4',
+    topicName: 'Syllable_division_with_prefixes',
+    progressTopicName: "The prefix division rule",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.4',
+      topicName: 'Syllable_division_with_prefixes',
+      progressTopicName: "The prefix division rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'unhappy',
+      imageUrl: null,
+      explanation: "Good work! The word is 'unhappy' — divide it between the prefix 'un' and the base word 'happy'.",
+      questionText: '_______',
+      correctAnswer: 'unhappy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'unhappy',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: 'A person looking unhappy or sad'
+      },
+      aiTutor: {
+        target_word: 'unhappy',
+        question: '_______',
+        student_entry: '',
+        topic_to_reinforce: "Syllable division with prefixes",
+        spelling_pattern_or_rule: "In 'unhappy', divide between the prefix 'un' and the base 'happy'. Rule: When a prefix is added, divide between the prefix and the base (re-do, un-do, pre-view). Don’t change spelling — just join them."
+      },
+      audio: 'unhappy'
+    }
+  ]
+}
+,
+'4-A.5': {
+  topicInfo: {
+    topicId: '4-A.5',
+    topicName: 'Four_sounds_of_Y',
+    progressTopicName: "The four sounds of Y",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.5',
+      topicName: 'Four_sounds_of_Y',
+      progressTopicName: "The four sounds of Y",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'happy',
+      imageUrl: null,
+      explanation: "Nice! The word is 'happy' — the Y at the end says /ē/ because it ends a two-syllable word.",
+      questionText: '_______',
+      correctAnswer: 'happy',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'happy',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: 'A smiling or happy child'
+      },
+      aiTutor: {
+        target_word: 'happy',
+        question: '_______',
+        student_entry: '',
+        topic_to_reinforce: "Four sounds of Y",
+        spelling_pattern_or_rule: "In 'happy', Y says /ē/ because it ends a two-syllable word. Rule: Y says /y/ at the start (yes), /ī/ at the end of a one-syllable word (my), /ē/ at the end of a multisyllable word (happy), and /ĭ/ inside a syllable (gym)."
+      },
+      audio: 'happy'
+    }
+  ]
+}
+,
+'4-A.6': {
+  topicInfo: {
+    topicId: '4-A.6',
+    topicName: 'OR_in_Work',
+    progressTopicName: "The 'OR' in 'work' rule",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.6',
+      topicName: 'OR_in_Work',
+      progressTopicName: "The 'OR' in 'work' rule",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'word',
+      imageUrl: null,
+      explanation: "Well done! The word is 'word' — after W, OR says /er/, not /or/.",
+      questionText: '_______',
+      correctAnswer: 'word',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'word',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: 'A page with the word WORD printed on it'
+      },
+      aiTutor: {
+        target_word: 'word',
+        question: '_______',
+        student_entry: '',
+        topic_to_reinforce: "The 'OR' in 'work' rule",
+        spelling_pattern_or_rule: "In 'word', OR comes after W, so it says /er/. Rule: When OR follows W, it changes to /er/ (word, work, worm). After other letters, OR says /or/ (fork, corn). Tip: W changes OR to ER!"
+      },
+      audio: 'word'
+    }
+  ]
+}
+,
+'4-A.7': {
+  topicInfo: {
+    topicId: '4-A.7',
+    topicName: 'Months_of_the_Year',
+    progressTopicName: "Months of the year",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.7',
+      topicName: 'Months_of_the_Year',
+      progressTopicName: "Months of the year",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'January',
+      imageUrl: null,
+      explanation: "Nice! The word is 'January' — months are proper nouns and always start with a capital letter.",
+      questionText: '_______',
+      correctAnswer: 'January',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'January',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: 'A snowy January calendar page'
+      },
+      aiTutor: {
+        target_word: 'January',
+        question: '_______',
+        student_entry: '',
+        topic_to_reinforce: "Months of the year",
+        spelling_pattern_or_rule: "Try saying the months in order or use a mnemonic to remember spellings (January, February…)."
+      },
+      audio: 'January'
+    }
+  ]
+},
+'4-A.8': {
+  topicInfo: {
+    topicId: '4-A.8',
+    topicName: 'EW_sound_/oo/',
+    progressTopicName: "EW as /oo/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.8',
+      topicName: 'EW_sound_/oo/',
+      progressTopicName: "EW as /oo/",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'flew',
+      imageUrl: null,
+      explanation: "Great — the word is 'flew' — here 'ew' says the /oo/ sound (like 'flū').",
+      questionText: '____',
+      correctAnswer: 'flew',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'flew',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A bird flying, showing it flew across the sky'
+      },
+      aiTutor: {
+        target_word: 'flew',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "EW as /oo/",
+        spelling_pattern_or_rule: "EW often says /oo/ (flew, stew, chew). Tip: When you see EW after l, r, or n, try /oo/ first (flew, grew, new)."
+      },
+      audio: 'flew'
+    }
+  ]
+}
+,
+'4-A.9': {
+  topicInfo: {
+    topicId: '4-A.9',
+    topicName: 'EW_sound_/yoo_or_ū/',
+    progressTopicName: "EW as /yoo/ or /ū/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.9',
+      topicName: 'EW_sound_/yoo_or_ū/',
+      progressTopicName: "EW as /yoo/ or /ū/",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'few',
+      imageUrl: null,
+      explanation: "Nice! The word is 'few' — here 'ew' sounds like /yoo/ (few).",
+      questionText: '___',
+      correctAnswer: 'few',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'few',
+        intent: 'fill_blank',
+        questionLine: '___',
+        imagePrompt: 'A small group of objects to show a few'
+      },
+      aiTutor: {
+        target_word: 'few',
+        question: '___',
+        student_entry: '',
+        topic_to_reinforce: "EW as /yoo/ or /ū/",
+        spelling_pattern_or_rule: "In 'few', EW says /yoo/ because it follows a soft sound (the /f/). Rule: EW says /yoo/ after soft sounds like f, n, or p (few, new, pew) or at the end of a word. EW says /oo/ after hard sounds like l, r, or g (blew, grew, threw). Tip: Soft sounds flow gently, so EW sounds like 'you'!"
+      },
+      audio: 'few'
+    }
+  ]
+}
+,
+'4-A.10': {
+  topicInfo: {
+    topicId: '4-A.10',
+    topicName: 'Ways_to_spell_long_U',
+    progressTopicName: "Ways to spell long U (/yoo/)",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.10',
+      topicName: 'Ways_to_spell_long_U',
+      progressTopicName: "Ways to spell long U (/yoo/)",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'cube',
+      imageUrl: null,
+      explanation: "Nice! The word is 'cube' — the long U sound /yoo/ is spelled with U-E (magic e).",
+      questionText: '____',
+      correctAnswer: 'cube',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'cube',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A blue 3D cube'
+      },
+      aiTutor: {
+        target_word: 'cube',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "Ways to spell long U (/yoo/)",
+        spelling_pattern_or_rule: "In 'cube', the long U sound /yoo/ is spelled with U-E (magic e). Rule: The /yoo/ sound can be spelled U, U-E, EW, or UE. Use U in an open syllable (unit, uniform), U-E in the middle (cube, fuse), and EW or UE at the end (few, cue, rescue). Tip: If it sounds like 'you,' look for U, U-E, EW, or UE!"
+      },
+      audio: 'cube'
+    }
+  ]
+}
+,
+'4-A.11': {
+  topicInfo: {
+    topicId: '4-A.11',
+    topicName: 'EA_sound_/ĕ/',
+    progressTopicName: "EA and the sound of /ĕ/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.11',
+      topicName: 'EA_sound_/ĕ/',
+      progressTopicName: "EA and the sound of /ĕ/",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'head',
+      imageUrl: null,
+      explanation: "Nice! The word is 'head' — here EA says the short /ĕ/ sound.",
+      questionText: '____',
+      correctAnswer: 'head',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'head',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A child pointing to their head'
+      },
+      aiTutor: {
+        target_word: 'head',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "EA and the sound of /ĕ/",
+        spelling_pattern_or_rule: "In 'head', EA says the short /ĕ/ sound. Rule: EA usually says /ē/ (eat), sometimes says short /ĕ/ in words like head and bread, and rarely says /ā/ (great). Tip: “Bread and head are short and said” — try /ĕ/ when the word sounds short."
+      },
+      audio: 'head'
+    }
+  ]
+}
+,
+'4-A.12': {
+  topicInfo: {
+    topicId: '4-A.12',
+    topicName: 'Ways_to_spell_short_E',
+    progressTopicName: "Ways to spell the short E sound",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.12',
+      topicName: 'Ways_to_spell_short_E',
+      progressTopicName: "Ways to spell the short E sound",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bread',
+      imageUrl: null,
+      explanation: "Nice! The word is 'bread' — here EA says the short /ĕ/ sound.",
+      questionText: '____',
+      correctAnswer: 'bread',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'bread',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A loaf of bread on a wooden board'
+      },
+      aiTutor: {
+        target_word: 'bread',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "Ways to spell short E (/ĕ/)",
+        spelling_pattern_or_rule: "Short /ĕ/ is usually spelled E (bed, pen). It can also be spelled EA in words like bread and head. A few sight-word exceptions use other letters (said, many, friend). Tip: Try E first, then EA; if it’s a tricky sight word, use the remembered spelling."
+      },
+      audio: 'bread'
+    }
+  ]
+}
+,
+'4-A.13': {
+  topicInfo: {
+    topicId: '4-A.13',
+    topicName: 'WR_at_the_beginning',
+    progressTopicName: "The silent W in WR words",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.13',
+      topicName: 'WR_at_the_beginning',
+      progressTopicName: "The silent W in WR words",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'write',
+      imageUrl: null,
+      explanation: "Great! The word is 'write' — the W is silent, only the R makes a sound.",
+      questionText: '_____',
+      correctAnswer: 'write',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'write',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: 'A hand writing with a pencil on paper'
+      },
+      aiTutor: {
+        target_word: 'write',
+        question: '_____',
+        student_entry: '',
+        topic_to_reinforce: "The silent W in WR words",
+        spelling_pattern_or_rule: "In 'write', the W is silent — only the R is pronounced. Rule: In WR words, W is silent at the beginning (write, wrong, wrap, wrench). Tip: WR comes from old English where both sounds were once spoken — now, just say the R!"
+      },
+      audio: 'write'
+    }
+  ]
+}
+,
+'4-A.14': {
+  topicInfo: {
+    topicId: '4-A.14',
+    topicName: 'KN_at_the_beginning',
+    progressTopicName: "The silent K in KN words",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.14',
+      topicName: 'KN_at_the_beginning',
+      progressTopicName: "The silent K in KN words",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'knee',
+      imageUrl: null,
+      explanation: "Nice! The word is 'knee' — the K is silent, only the N makes a sound.",
+      questionText: '____',
+      correctAnswer: 'knee',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'knee',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A bent knee showing the joint'
+      },
+      aiTutor: {
+        target_word: 'knee',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "The silent K in KN words",
+        spelling_pattern_or_rule: "In 'knee', the K is silent — only the N is pronounced. Rule: In KN words, K is silent at the beginning (knee, knife, know, knock). Tip: Long ago, people said both sounds — now, the K stays quiet and kind!"
+      },
+      audio: 'knee'
+    }
+  ]
+}
+,
+'4-A.15': {
+  topicInfo: {
+    topicId: '4-A.15',
+    topicName: 'More_ER_words',
+    progressTopicName: "More ways to spell the /er/ sound",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.15',
+      topicName: 'More_ER_words',
+      progressTopicName: "More ways to spell the /er/ sound",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bird',
+      imageUrl: null,
+      explanation: "Great! The word is 'bird' — the /er/ sound is spelled with IR.",
+      questionText: '____',
+      correctAnswer: 'bird',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'bird',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A small bird sitting on a branch'
+      },
+      aiTutor: {
+        target_word: 'bird',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "More ways to spell the /er/ sound",
+        spelling_pattern_or_rule: "The /er/ sound can be spelled er, ir, ur, ear, or or. Use er most often (her, fern). Try ir or ur if it doesn’t look right (bird, burn). Use ear in a few words (earth, learn) and or after w (word, work). Tip: ER is the most common — start there!"
+      },
+      audio: 'bird'
+    }
+  ]
+}
+,
+'4-A.16': {
+  topicInfo: {
+    topicId: '4-A.16',
+    topicName: 'O_and_the_sound_of_/ŭ/',
+    progressTopicName: "O and the sound of /ŭ/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.16',
+      topicName: 'O_and_the_sound_of_/ŭ/',
+      progressTopicName: "O and the sound of /ŭ/",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'love',
+      imageUrl: null,
+      explanation: "Nice! The word is 'love' — here the O says the short /ŭ/ sound.",
+      questionText: '____',
+      correctAnswer: 'love',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'love',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A heart symbol representing love'
+      },
+      aiTutor: {
+        target_word: 'love',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "O and the sound of /ŭ/",
+        spelling_pattern_or_rule: "In 'love', the letter O says the short /ŭ/ sound. Rule: O can say /ŭ/ before n, m, v, or th (love, son, come, mother). Tip: When U wouldn’t fit the look or sound of the word, O takes its place!"
+      },
+      audio: 'love'
+    }
+  ]
+}
+,
+'4-A.17': {
+  topicInfo: {
+    topicId: '4-A.17',
+    topicName: 'Tricky_patterns_review',
+    progressTopicName: "Revision: Tricky patterns review",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'love',
+      imageUrl: null,
+      explanation: "Nice! The word is 'love' — the O says the short /ŭ/ sound.",
+      questionText: '____',
+      correctAnswer: 'love',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'love',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A heart symbol representing love'
+      },
+      aiTutor: {
+        target_word: 'love',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "O and the sound of /ŭ/",
+        spelling_pattern_or_rule: "In 'love', the letter O says the short /ŭ/ sound. Rule: O can say /ŭ/ before n, m, v, or th (love, son, come, mother). Tip: When U wouldn’t fit the look or sound, O takes its place!"
+      },
+      audio: 'love'
+    },
+    {
+      id: 2,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'come',
+      imageUrl: null,
+      explanation: "Good work! The word is 'come' — here the O says the short /ŭ/ sound.",
+      questionText: '____',
+      correctAnswer: 'come',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'come',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A person coming home'
+      },
+      aiTutor: {
+        target_word: 'come',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "O and the sound of /ŭ/",
+        spelling_pattern_or_rule: "In 'come', O says /ŭ/ before m. Rule: O can make the short u sound before n, m, v, or th (love, son, mother)."
+      },
+      audio: 'come'
+    },
+    {
+      id: 3,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'mother',
+      imageUrl: null,
+      explanation: "Great! The word is 'mother' — the O in the first syllable says /ŭ/.",
+      questionText: '_______',
+      correctAnswer: 'mother',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'mother',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: 'A mother holding a child'
+      },
+      aiTutor: {
+        target_word: 'mother',
+        question: '_______',
+        student_entry: '',
+        topic_to_reinforce: "O and the sound of /ŭ/",
+        spelling_pattern_or_rule: "In 'mother', O says /ŭ/ before th. Rule: O can say /ŭ/ before n, m, v, or th (love, come, mother)."
+      },
+      audio: 'mother'
+    },
+    {
+      id: 4,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'write',
+      imageUrl: null,
+      explanation: "Nice! The word is 'write' — the W is silent; only the R makes a sound.",
+      questionText: '_____',
+      correctAnswer: 'write',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'write',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: 'A hand writing with a pencil'
+      },
+      aiTutor: {
+        target_word: 'write',
+        question: '_____',
+        student_entry: '',
+        topic_to_reinforce: "The silent W in WR words",
+        spelling_pattern_or_rule: "In 'write', the W is silent. Rule: In WR words, the W is not pronounced at the beginning (write, wrong, wrap). Say only the R."
+      },
+      audio: 'write'
+    },
+    {
+      id: 5,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'wrong',
+      imageUrl: null,
+      explanation: "Good job! The word is 'wrong' — the W is silent at the start.",
+      questionText: '_____',
+      correctAnswer: 'wrong',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'wrong',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: 'A red X or incorrect mark symbol'
+      },
+      aiTutor: {
+        target_word: 'wrong',
+        question: '_____',
+        student_entry: '',
+        topic_to_reinforce: "The silent W in WR words",
+        spelling_pattern_or_rule: "In 'wrong', W is silent at the beginning. Rule: In WR words, say only the R (write, wrong, wrench)."
+      },
+      audio: 'wrong'
+    },
+    {
+      id: 6,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'knee',
+      imageUrl: null,
+      explanation: "Great! The word is 'knee' — the K is silent; only the N is pronounced.",
+      questionText: '____',
+      correctAnswer: 'knee',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'knee',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A bent knee showing the joint'
+      },
+      aiTutor: {
+        target_word: 'knee',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "The silent K in KN words",
+        spelling_pattern_or_rule: "In 'knee', the K is silent. Rule: In KN words, K is silent at the beginning (knee, knife, know)."
+      },
+      audio: 'knee'
+    },
+    {
+      id: 7,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'her',
+      imageUrl: null,
+      explanation: "Good work! The word is 'her' — the /er/ sound is spelled with ER.",
+      questionText: '___',
+      correctAnswer: 'her',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'her',
+        intent: 'fill_blank',
+        questionLine: '___',
+        imagePrompt: 'A woman being referred to as her'
+      },
+      aiTutor: {
+        target_word: 'her',
+        question: '___',
+        student_entry: '',
+        topic_to_reinforce: "More ways to spell the /er/ sound",
+        spelling_pattern_or_rule: "In 'her', /er/ is spelled with ER. Rule: The /er/ sound can be spelled er, ir, ur, ear, or or. ER is the most common — try it first."
+      },
+      audio: 'her'
+    },
+    {
+      id: 8,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'bird',
+      imageUrl: null,
+      explanation: "Nice! The word is 'bird' — the /er/ sound is spelled with IR.",
+      questionText: '____',
+      correctAnswer: 'bird',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'bird',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A small bird sitting on a branch'
+      },
+      aiTutor: {
+        target_word: 'bird',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "More ways to spell the /er/ sound",
+        spelling_pattern_or_rule: "In 'bird', /er/ is spelled with IR. Rule: The /er/ sound can be spelled er, ir, ur, ear, or or. Try ER first, then IR or UR if it doesn’t look right."
+      },
+      audio: 'bird'
+    },
+    {
+      id: 9,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'burn',
+      imageUrl: null,
+      explanation: "Good! The word is 'burn' — the /er/ sound is spelled with UR.",
+      questionText: '____',
+      correctAnswer: 'burn',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'burn',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A small campfire or something burning'
+      },
+      aiTutor: {
+        target_word: 'burn',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "More ways to spell the /er/ sound",
+        spelling_pattern_or_rule: "In 'burn', /er/ is spelled with UR. Rule: The /er/ sound can be spelled er, ir, ur, ear, or or. UR often appears after b, f, or p (burn, fur, curl)."
+      },
+      audio: 'burn'
+    },
+    {
+      id: 10,
+      topicId: '4-A.17',
+      topicName: 'Tricky_patterns_review',
+      progressTopicName: "Revision: Tricky patterns review",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'earth',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'earth' — the /er/ sound is spelled with EAR.",
+      questionText: '_____',
+      correctAnswer: 'earth',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'earth',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: 'A picture of the planet Earth'
+      },
+      aiTutor: {
+        target_word: 'earth',
+        question: '_____',
+        student_entry: '',
+        topic_to_reinforce: "More ways to spell the /er/ sound",
+        spelling_pattern_or_rule: "In 'earth', /er/ is spelled with EAR. Rule: EAR says /er/ in a few words like earth, learn, and search."
+      },
+      audio: 'earth'
+    }
+  ]
+}
+,
+'4-A.18': {
+  topicInfo: {
+    topicId: '4-A.18',
+    topicName: 'EIGH_and_Numbers',
+    progressTopicName: "EIGH and numbers",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.18',
+      topicName: 'EIGH_and_Numbers',
+      progressTopicName: "EIGH and numbers",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'eight',
+      imageUrl: null,
+      explanation: "Nice! The word is 'eight' — EIGH here says the long A sound /ā/.",
+      questionText: '_____',
+      correctAnswer: 'eight',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'eight',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: 'The number eight or 8 objects'
+      },
+      aiTutor: {
+        target_word: 'eight',
+        question: '_____',
+        student_entry: '',
+        topic_to_reinforce: "EIGH spelling pattern",
+        spelling_pattern_or_rule: "In 'eight', EIGH says the long A sound /ā/. Rule: EIGH usually says /ā/ in number and weight words (eight, weight, neighbor). Tip: EIGH usually says A — except in 'height,' which says /ī/!"
+      },
+      audio: 'eight'
+    },
+    {
+      id: 2,
+      topicId: '4-A.18',
+      topicName: 'EIGH_and_Numbers',
+      progressTopicName: "EIGH and numbers",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'height',
+      imageUrl: null,
+      explanation: "Great! The word is 'height' — this is the one EIGH word that says /ī/, not /ā/.",
+      questionText: '______',
+      correctAnswer: 'height',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'height',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: 'A chart showing a person’s height'
+      },
+      aiTutor: {
+        target_word: 'height',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "EIGH spelling pattern",
+        spelling_pattern_or_rule: "In 'height', EIGH says /ī/, which is an exception. Rule: EIGH usually says /ā/ (eight, weight, neighbor), but in 'height' it says /ī/ — remember, height is high!"
+      },
+      audio: 'height'
+    }
+  ]
+}
+,
+'4-A.19': {
+  topicInfo: {
+    topicId: '4-A.19',
+    topicName: 'Long_U_spelled_U_E',
+    progressTopicName: "Long U spelled with U and E",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.19',
+      topicName: 'Long_U_spelled_U_E',
+      progressTopicName: "Long U spelled U-E",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'tune',
+      imageUrl: null,
+      explanation: "Nice! The word is 'tune' — the final E makes the U say its name /yoo/.",
+      questionText: '____',
+      correctAnswer: 'tune',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'tune',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'A music note or person playing an instrument'
+      },
+      aiTutor: {
+        target_word: 'tune',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "Long U spelled U-E",
+        spelling_pattern_or_rule: "In 'tune', the U-E pattern makes the long U sound /yoo/. Rule: Magic E makes U say its name. Use U-E when you hear /yoo/ or /oo/ near the end of a word (cube, tune, flute)."
+      },
+      audio: 'tune'
+    },
+    {
+      id: 2,
+      topicId: '4-A.19',
+      topicName: 'Long_U_spelled_U_E',
+      progressTopicName: "Long U spelled U-E",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'Tuesday',
+      imageUrl: null,
+      explanation: "Great! The word is 'Tuesday' — it says /yoo/ but doesn’t follow the U-E rule. It’s an exception to remember.",
+      questionText: '_______',
+      correctAnswer: 'Tuesday',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'Tuesday',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: 'A calendar showing Tuesday highlighted'
+      },
+      aiTutor: {
+        target_word: 'Tuesday',
+        question: '_______',
+        student_entry: '',
+        topic_to_reinforce: "Long U spelled U-E (and exceptions)",
+        spelling_pattern_or_rule: "In 'Tuesday', the /yoo/ sound is spelled with U+E together. Rule: Most long U words use U-E (cube, tune), but a few like 'Tuesday' and 'music' are exceptions to remember."
+      },
+      audio: 'Tuesday'
+    }
+  ]
+},
+'4-A.20': {
+  topicInfo: {
+    topicId: '4-A.20',
+    topicName: 'EAR_multiple_sounds',
+    progressTopicName: "EAR and its three sounds",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '4-A.20',
+      topicName: 'EAR_multiple_sounds',
+      progressTopicName: "EAR and its three sounds",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'hear',
+      imageUrl: null,
+      explanation: "Nice! The word is 'hear' — EAR says the long E sound /ear/.",
+      questionText: '____',
+      correctAnswer: 'hear',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'hear',
+        intent: 'fill_blank',
+        questionLine: '____',
+        imagePrompt: 'An ear listening to sound or music'
+      },
+      aiTutor: {
+        target_word: 'hear',
+        question: '____',
+        student_entry: '',
+        topic_to_reinforce: "EAR phonogram",
+        spelling_pattern_or_rule: "In 'hear', EAR says the long E sound /ear/. Rule: EAR can say /ear/ (hear, near), /air/ (bear, pear), or /er/ (earth, learn). Try /ear/ first — it’s the most common!"
+      },
+      audio: 'hear'
+    },
+    {
+      id: 2,
+      topicId: '4-A.20',
+      topicName: 'EAR_multiple_sounds',
+      progressTopicName: "EAR and its three sounds",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'earth',
+      imageUrl: null,
+      explanation: "Great! The word is 'earth' — here EAR says the /er/ sound.",
+      questionText: '_____',
+      correctAnswer: 'earth',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'earth',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: 'A picture of planet Earth'
+      },
+      aiTutor: {
+        target_word: 'earth',
+        question: '_____',
+        student_entry: '',
+        topic_to_reinforce: "EAR phonogram",
+        spelling_pattern_or_rule: "In 'earth', EAR says /er/. Rule: EAR can spell /ear/ (hear), /air/ (bear), or /er/ (earth). Listen carefully — EAR changes its sound depending on the word."
+      },
+      audio: 'earth'
+    }
+  ]
+}
   }
 }
 export type {
