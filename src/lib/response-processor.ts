@@ -118,7 +118,8 @@ export class ResponseProcessor {
     userId: string,
     adventureContext: ChatMessage[],
     imageGenerator: any, // MultiProviderImageGenerator will be defined next
-    originalUserMessage?: string // Add original user message to use for image generation
+    originalUserMessage?: string, // Add original user message to use for image generation
+    userData?: { username?: string; age?: number; gender?: string }
   ): AsyncGenerator<StreamChunk, void, unknown> {
     
     const imagePrompts = this.extractImagePrompts(response);
@@ -134,7 +135,11 @@ export class ResponseProcessor {
       
       let sanitizedFallbackPrompt = rawFallbackPrompt;
       try {
-        const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(rawFallbackPrompt);
+        const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(
+          rawFallbackPrompt, 
+          undefined, 
+          { name: userData?.username, age: userData?.age, gender: userData?.gender }
+        );
         if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
           sanitizedFallbackPrompt = sanitizationResult.sanitizedPrompt;
           // console.log('✅ ResponseProcessor: Fallback prompt sanitized successfully');
@@ -276,7 +281,11 @@ export class ResponseProcessor {
         
         try {
           // Sanitize both prompt and context together for better coherence
-          const sanitizationResult = await aiPromptSanitizer.sanitizePromptAndContext(rawPrompt, originalConversationContext);
+          const sanitizationResult = await aiPromptSanitizer.sanitizePromptAndContext(
+            rawPrompt,
+            originalConversationContext,
+            { name: userData?.username, age: userData?.age, gender: userData?.gender }
+          );
           if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
             sanitizedRawPrompt = sanitizationResult.sanitizedPrompt;
             sanitizedConversationContext = sanitizationResult.sanitizedContext || originalConversationContext;

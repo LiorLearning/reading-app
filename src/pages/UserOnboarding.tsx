@@ -8,6 +8,7 @@ import { ChevronRight, User, GraduationCap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import analytics from '@/lib/analytics';
 import { useAuth } from "@/hooks/use-auth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface UserOnboardingProps {
   onComplete: () => void;
@@ -25,6 +26,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   const [selectedLevel, setSelectedLevel] = useState("start");
   const [age, setAge] = useState<string>("");
   const [ageError, setAgeError] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
   const [loading, setLoading] = useState(false);
 
@@ -62,6 +64,15 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     }
   }, [userData?.age]);
 
+  // Prefill gender from existing user data if present
+  React.useEffect(() => {
+    const anyUser: any = userData as any;
+    const raw = (anyUser && typeof anyUser.gender === 'string') ? anyUser.gender.toLowerCase().trim() : '';
+    if (raw === 'male' || raw === 'female') {
+      setGender(raw);
+    }
+  }, [userData]);
+
   const handleComplete = async () => {
     const parsedAge = Number(age);
     const isValidAge = Number.isFinite(parsedAge) && parsedAge > 3 && parsedAge < 15;
@@ -83,6 +94,9 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
           age: parsedAge,
           isFirstTime: false,
         };
+        if (gender === 'male' || gender === 'female') {
+          payload.gender = gender;
+        }
         if (!userData?.grade) {
           payload.grade = selectedGrade || "assignment";
           payload.gradeDisplayName = selectedGrade || "assignment";
@@ -219,7 +233,7 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
               <CardDescription className="text-base text-gray-600">
                 {step === 1 
                   ? "Let's start by getting to know you better. What should we call you?"
-                  : "Tell us your age so personalised learning can begin!"
+                  : "Tell us your age and gender so personalised learning can begin!"
                 }
               </CardDescription>
             </CardHeader>
@@ -313,6 +327,21 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                     {ageError && (
                       <p className="mt-2 text-sm text-red-600 font-semibold" aria-live="polite">{ageError}</p>
                     )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="gender" className="block text-lg font-semibold text-gray-700 mb-3">
+                      Gender
+                    </label>
+                    <Select value={gender} onValueChange={setGender}>
+                      <SelectTrigger id="gender" className="h-14 text-lg border-3 border-black rounded-xl bg-white focus:bg-gray-50" style={{ boxShadow: '0 4px 0 black' }}>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <Button

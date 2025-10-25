@@ -381,7 +381,19 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     <section aria-label="Create next panel" className="bg-transparent relative">
       <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
         {isMicActive ? (
-          // Recording state: Show only Cancel button
+          <WaveformVisualizer />
+        ) : (
+          <Input
+            aria-label="What happens next?"
+            placeholder="What happens next?"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="rounded-xl flex-1 bg-white/90 border-0 shadow-sm focus:shadow-md transition-shadow backdrop-blur-sm"
+            disabled={disabled}
+          />
+        )}
+        {isMicActive ? (
+          // Recording state: Show only Cancel button (now placed near Send on the right)
           <Button
             type="button"
             variant="comic"
@@ -394,7 +406,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
             <X className="h-5 w-5" />
           </Button>
         ) : (
-          // Normal state: Show Mic button
+          // Normal state: Show Mic button (moved to the right near Send)
           <Button
             type="button"
             variant="comic"
@@ -406,18 +418,6 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           >
             <Mic className="h-5 w-5" />
           </Button>
-        )}
-        {isMicActive ? (
-          <WaveformVisualizer />
-        ) : (
-          <Input
-            aria-label="What happens next?"
-            placeholder="What happens next?"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="rounded-xl flex-1 bg-white/90 border-0 shadow-sm focus:shadow-md transition-shadow backdrop-blur-sm"
-            disabled={disabled}
-          />
         )}
         {/* Image button removed */}
         <Button 

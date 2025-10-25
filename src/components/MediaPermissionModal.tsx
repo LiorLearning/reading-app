@@ -21,7 +21,7 @@ export const MediaPermissionModal: React.FC<MediaPermissionModalProps> = ({ open
       onEnabled?.(result);
       onClose();
     } catch (e) {
-      setError("Something went wrong requesting microphone and camera.");
+      setError("Something went wrong requesting microphone.");
     } finally {
       setIsRequesting(false);
     }
@@ -31,9 +31,9 @@ export const MediaPermissionModal: React.FC<MediaPermissionModalProps> = ({ open
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
       <DialogContent className="w-full max-w-md mx-auto bg-card border-2 border-primary/30 shadow-2xl rounded-3xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Enable microphone and camera</DialogTitle>
+          <DialogTitle className="text-2xl">Enable microphone</DialogTitle>
           <DialogDescription>
-            We use your microphone for speaking with your pet and the camera for selfies.
+            We use your microphone for speaking with your pet.
           </DialogDescription>
         </DialogHeader>
 
@@ -44,7 +44,7 @@ export const MediaPermissionModal: React.FC<MediaPermissionModalProps> = ({ open
             Continue without
           </Button>
           <Button onClick={handleEnableClick} disabled={isRequesting}>
-            {isRequesting ? "Requesting…" : "Use microphone and camera"}
+            {isRequesting ? "Requesting…" : "Use microphone"}
           </Button>
         </div>
       </DialogContent>
