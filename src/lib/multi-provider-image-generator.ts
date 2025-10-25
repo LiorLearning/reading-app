@@ -161,7 +161,8 @@ export class MultiProviderImageGenerator {
         break;
         
       case 'flux-schnell':
-        refinedPrompt = `${refinedPrompt}, , realistic and vibrant style, cozy and friendly atmosphere, bright natural lighting, warm sunlight streaming in, cheerful and safe mood, soft highlights and vivid colors`;
+        refinedPrompt = `${refinedPrompt}, , realistic and vibrant style, cozy and friendly atmosphere, bright natural lighting, warm sunlight streaming in, cheerful and safe mood, make it aspirational like avengers style art and vivid colors`;
+        console.info("flux-schnell refinedPrompt: ", refinedPrompt)
         break;
 
       case 'google-imagen':
