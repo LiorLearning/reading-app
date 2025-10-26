@@ -271,6 +271,10 @@ class FluxSchnellProvider implements ImageProvider {
           prompt_upsampling: false,
           output_format: 'png'
         },
+        webhook: "https://api.readkraft.com/api/discord",
+        webhook_events_filter: [
+            "completed"
+        ]
       }),
     });
 
