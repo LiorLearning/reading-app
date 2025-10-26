@@ -81,7 +81,7 @@ class AIPromptSanitizer {
       const genderIsFemale = ['female', 'girl', 'f', 'woman', 'she', 'her'].includes(rawGender);
       const childGenderNoun = genderIsMale ? 'boy' : (genderIsFemale ? 'girl' : 'child');
       const parsedAge = Number(childProfile?.age);
-      const childAge = Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8; // default age 8
+      const childAge = (Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8) + 5; // default age 8
 
       const systemPrompt = `You are a strict image prompt sanitizer for children's adventure. 
 Your job is to take any user request (raw prompt) and rewrite it into a safe, 
@@ -126,9 +126,9 @@ Rules:
 5. Never allow sexual, romantic, or suggestive undertones. 
 
 8. CHILD PERSONALIZATION
-- Child Profile: name is ${childName}; age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", interpret them as referring to ${childName}, the ${childAge}-year-old ${childGenderNoun}.
-- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} named ${childName} ...". Use gender-neutral term "child" if gender is unspecified.
+- Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
+- Add child to the picture. When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
+- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
@@ -303,7 +303,7 @@ Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${ch
       const genderIsFemale = ['female', 'girl', 'f', 'woman', 'she', 'her'].includes(rawGender);
       const childGenderNoun = genderIsMale ? 'boy' : (genderIsFemale ? 'girl' : 'child');
       const parsedAge = Number(childProfile?.age);
-      const childAge = Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8; // default age 8
+      const childAge = (Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8) + 5; // default age 8
 
       const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
 
@@ -317,9 +317,9 @@ CRITICAL RULES:
 7. PET PERSONA MAPPING: ${personaInstruction}
 
 8. CHILD PERSONALIZATION
-- Child Profile: name is ${childName}; age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", interpret them as referring to ${childName}, the ${childAge}-year-old ${childGenderNoun}.
-- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} named ${childName} ...". Use gender-neutral term "child" if gender is unspecified.
+- Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
+- Add child to the picture. When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
+- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"

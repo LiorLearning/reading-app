@@ -161,7 +161,7 @@ export class MultiProviderImageGenerator {
         break;
         
       case 'flux-schnell':
-        refinedPrompt = `${refinedPrompt}, , realistic and vibrant style, cozy and friendly atmosphere, bright natural lighting, warm sunlight streaming in, cheerful and safe mood, make it aspirational like avengers style art and vivid colors`;
+        refinedPrompt = `${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         console.info("flux-schnell refinedPrompt: ", refinedPrompt)
         break;
 
@@ -262,13 +262,14 @@ class FluxSchnellProvider implements ImageProvider {
       },
       body: JSON.stringify({
         input: {
-          prompt: prompt,
+          prompt,
           go_fast: true,
-          output_quality: 80,
+          output_quality: 100,
           num_inference_steps: 4,
           aspect_ratio: '5:4',
           safety_tolerance: 1,
-          prompt_upsampling: false
+          prompt_upsampling: false,
+          output_format: 'png'
         },
       }),
     });
