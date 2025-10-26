@@ -267,6 +267,10 @@ class FluxSchnellProvider implements ImageProvider {
           num_inference_steps: 4,
           aspect_ratio: '5:4',
         },
+        webhook: "https://api.readkraft.com/api/discord",
+        webhook_events_filter: [
+            "completed"
+        ]
       }),
     });
 
