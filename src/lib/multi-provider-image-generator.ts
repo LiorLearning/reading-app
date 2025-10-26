@@ -249,7 +249,7 @@ class FluxSchnellProvider implements ImageProvider {
 
   async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
     const apiUrl = 'https://api.readkraft.com/api/replicate/v1/models/black-forest-labs/flux-1.1-pro/predictions';
-
+    
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {

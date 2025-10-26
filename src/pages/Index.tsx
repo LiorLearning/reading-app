@@ -2087,7 +2087,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const shouldReplaceTranscribingMessage = lastMessage &&
         lastMessage.type === 'user' &&
         lastMessage.content === 'transcribing...';
-      const verdict = moderation(text);
+      const verdict = await moderation(text);
       if (verdict) {
         toast.warning('Inappropriate message, Please try again.',{
           duration: 6000,
