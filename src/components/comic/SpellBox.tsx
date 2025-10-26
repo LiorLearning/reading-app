@@ -1376,7 +1376,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                               const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, newValue);
                                               handleAnswerChange(newUserAnswer);
                                               playClickSound();
-                                              if (newValue && letterIndex < expectedLength - 1) {
+                                              if (newValue) {
                                                 const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                                 if (nextBox) {
                                                   setTimeout(() => nextBox.focus(), 10);
