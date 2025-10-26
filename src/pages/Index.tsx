@@ -2089,7 +2089,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         lastMessage.content === 'transcribing...';
       const verdict = moderation(text);
       if (verdict) {
-        toast.warning('Inappropriate message, Please try again.');
+        toast.warning('Inappropriate message, Please try again.',{
+          duration: 6000,
+        });
         if (shouldReplaceTranscribingMessage) {
           setChatMessages(prev => {
             setLastMessageCount(prev.length - 1);

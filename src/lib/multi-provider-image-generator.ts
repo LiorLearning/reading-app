@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { GoogleGenAI, PersonGeneration } from '@google/genai';
 import { ChatMessage } from './utils';
+import {toast} from 'sonner'
 
 export interface ImageGenerationResult {
   success: boolean;
@@ -247,11 +248,6 @@ class FluxSchnellProvider implements ImageProvider {
   }
 
   async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
-    // console.log(`🎯 [FluxSchnellProvider.generate()] Starting Flux Schnell image generation via Replicate proxy`);
-    // console.log(`📝 [FluxSchnellProvider.generate()] Prompt: "${prompt}"`);
-    // console.log(`👤 [FluxSchnellProvider.generate()] User ID: ${userId}`);
-    // console.log(`⚙️ [FluxSchnellProvider.generate()] Options:`, options);
-
     const apiUrl = 'https://api.readkraft.com/api/replicate/v1/models/black-forest-labs/flux-1.1-pro/predictions';
 
     const response = await fetch(apiUrl, {
@@ -287,7 +283,11 @@ class FluxSchnellProvider implements ImageProvider {
 
     const firstOutputUrl = result?.output;
     if (!firstOutputUrl || typeof firstOutputUrl !== 'string') {
-      throw new Error('Flux Schnell Replicate API did not return an output URL');
+      toast.warning('Inappropriate image.',{
+        duration: 3000,
+      });
+      return
+      //throw new Error('Flux Schnell Replicate API did not return an output URL');
     }
 
     // console.log(`✅ [FluxSchnellProvider.generate()] Successfully generated Flux Schnell image via Replicate: ${firstOutputUrl}`);
