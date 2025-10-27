@@ -679,9 +679,9 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   const isGrade = (n: string, targets: Array<string | number>) =>
     targets.some(t => (typeof t === 'number' ? n.includes(`${t}`) : n.includes(t.toLowerCase())));
 
-  // 4th/5th behave like grade 3 content
-  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '3';
-  if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '3';
+  // 4th/5th behave like grade 4 content
+  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '4';
+  if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '4';
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
   if (isGrade(name, ['2nd', 'second', 'grade 2', 'grade2', '2'])) return '2';
   if (isGrade(name, ['1st', 'first', 'grade 1', 'grade1', '1'])) return '1';
@@ -810,12 +810,13 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
   // console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
   // console.log(`📚 Available topic IDs (first 10):`, allTopicIds.slice(0, 10));
   
-  // Filter topics by grade first to see what's available
+  // Filter topics by grade first to see what's available (kept for future logic; not used below directly)
   const gradeTopics = allTopicIds.filter(id => {
     if (contentGrade === 'K') return id.startsWith('K-');
     if (contentGrade === '1') return id.startsWith('1-');
     if (contentGrade === '2') return id.startsWith('2-');
     if (contentGrade === '3') return id.startsWith('3-');
+    if (contentGrade === '4') return id.startsWith('4-');
     return false;
   });
   
@@ -865,6 +866,20 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
         // console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
         startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
         if (startIndex === -1) startIndex = 0;
+      }
+    }
+  } else if (contentGrade === '4') {
+    // Grade 4 content - find first 4- topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('4-'));
+    if (startIndex === -1) {
+      // Fallback to grade 3 → grade 2 → grade 1
+      startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
+        if (startIndex === -1) {
+          startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+          if (startIndex === -1) startIndex = 0;
+        }
       }
     }
   }
@@ -1227,6 +1242,8 @@ export interface SpellboxTopicProgress {
   isCompleted: boolean;
   completedAt?: number;
   successRate: number; // Calculated field for convenience
+  // Mark that the whiteboard lesson for this topic has been completed at least once
+  whiteboardSeen?: boolean;
 }
 
 export interface SpellboxGradeProgress {
@@ -1417,6 +1434,67 @@ export const updateSpellboxTopicProgress = async (
   // console.log(`📊 Spellbox Topic Progress Updated: ${topicId} - ${topicProgress.questionsAttempted}/10 questions, ${topicProgress.firstAttemptCorrect} first-attempt correct (${topicProgress.successRate.toFixed(1)}%)`);
   
   return topicProgress;
+};
+
+/**
+ * Check if the whiteboard lesson for a topic has been seen (completed) at least once.
+ * Reads from locally cached grade progress (kept in sync with Firebase via hybrid loader).
+ */
+export const hasSeenWhiteboard = (gradeDisplayName: string, topicId: string): boolean => {
+  if (!gradeDisplayName || !topicId) return false;
+  const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) return false;
+  const topic = gradeProgress.topicProgress[topicId];
+  return !!topic?.whiteboardSeen;
+};
+
+/**
+ * Mark the whiteboard lesson for a topic as seen (on completion only).
+ * Persists via Firebase when userId is provided, otherwise local only.
+ */
+export const markWhiteboardSeen = async (
+  gradeDisplayName: string,
+  topicId: string,
+  userId?: string
+): Promise<void> => {
+  if (!gradeDisplayName || !topicId) return;
+  let gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) {
+    gradeProgress = {
+      gradeDisplayName,
+      currentTopicId: topicId,
+      topicProgress: {},
+      timestamp: Date.now()
+    };
+  }
+
+  if (!gradeProgress.topicProgress[topicId]) {
+    gradeProgress.topicProgress[topicId] = {
+      topicId,
+      questionsAttempted: 0,
+      firstAttemptCorrect: 0,
+      totalQuestions: 10,
+      isCompleted: false,
+      successRate: 0,
+      whiteboardSeen: true
+    };
+  } else {
+    gradeProgress.topicProgress[topicId].whiteboardSeen = true;
+  }
+
+  gradeProgress.timestamp = Date.now();
+
+  if (userId) {
+    try {
+      const { saveSpellboxProgressHybrid } = await import('./firebase-spellbox-cache');
+      await saveSpellboxProgressHybrid(userId, gradeProgress);
+    } catch (error) {
+      console.warn('Failed to sync whiteboardSeen to Firebase; saving locally:', error);
+      saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+    }
+  } else {
+    saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+  }
 };
 
 /**

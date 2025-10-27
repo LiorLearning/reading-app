@@ -2261,16 +2261,22 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
-        // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
-        if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+        // 3rd should store as grade3, 4th/5th as grade4
+        if (name === '3rd Grade') return 'grade3';
+        if (name === '4th Grade' || name === '5th Grade') return 'grade4';
         return '';
       };
       const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
       const previousGradeDisplayName = userData?.gradeDisplayName || '';
-      const gradeCode = mapDisplayToCode(incomingGradeDisplayName);
+      let gradeCode = mapDisplayToCode(incomingGradeDisplayName);
       const levelCode = level === 'middle' ? 'mid' : level;
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = incomingGradeDisplayName;
+      // Lightweight migration: if selecting 4th/5th but previously stored as grade3, upgrade to grade4
+      if ((incomingGradeDisplayName === '4th Grade' || incomingGradeDisplayName === '5th Grade') && gradeCode === 'grade3') {
+        gradeCode = 'grade4';
+      }
+
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
