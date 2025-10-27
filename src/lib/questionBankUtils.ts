@@ -381,7 +381,8 @@ export const getGlobalSpellingLessonNumber = (topicId: string): number | null =>
  */
 export const getNextSpellboxQuestion = (
   gradeDisplayName?: string,
-  completedQuestionIds: number[] = []
+  completedQuestionIds: number[] = [],
+  preferredLevel?: 'start' | 'middle'
 ): SpellingQuestion | null => {
   if (!gradeDisplayName) {
     console.warn('🚫 getNextSpellboxQuestion: No grade provided');
@@ -399,7 +400,7 @@ export const getNextSpellboxQuestion = (
   }
   
   // Get the current topic based on progression logic
-  const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds);
+  const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds, preferredLevel);
   console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIds: allTopicIds.slice(0, 3) });
   
   if (!currentTopicId) {

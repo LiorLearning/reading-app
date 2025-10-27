@@ -2176,7 +2176,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       if (!skipUnifiedBackground) {
         try {
           const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
-          const bgSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds);
+        const bgPreferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
+        const bgSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds, bgPreferredLevel);
           if (bgSpellingQuestion) {
             setOriginalSpellingQuestion(bgSpellingQuestion);
           }
@@ -2423,7 +2424,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         // NEW: Use topic-based question selection for Spellbox progression
           
-        const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds) : null;
+        const preferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
+        const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds, preferredLevel) : null;
         console.log(`🔤 Fetched spelling question:`, { isSpellingPhase, currentGrade, question: spellingQuestion ? { id: spellingQuestion.id, topicId: spellingQuestion.topicId, word: spellingQuestion.audio } : null });
         
         // Store the original spelling question (with prefilled data) for later use
@@ -3057,7 +3059,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Grade 1: immediately reflect the actual upcoming spell topic in the header
       if (whiteboardGradeEligible) {
         try {
-          const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName);
+          const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName, [], (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined));
           const initialTopicId = nextSpell ? (nextSpell.topicId || (nextSpell as any).topicName) : null;
           if (initialTopicId) setGrade1DisplayedTopicId(initialTopicId);
         } catch {}
@@ -3167,7 +3169,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Grade 1: immediately reflect the actual upcoming spell topic in the header
     if (whiteboardGradeEligible) {
       try {
-        const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName);
+        const nextSpell = getNextSpellboxQuestion(currentGradeDisplayName, [], (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined));
         const initialTopicId = nextSpell ? (nextSpell.topicId || (nextSpell as any).topicName) : null;
         if (initialTopicId) setGrade1DisplayedTopicId(initialTopicId);
       } catch {}
@@ -3285,7 +3287,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Guard: proactively determine the first SpellBox question because the initial greeting
         // is suppressed (so currentSpellQuestion may not be set yet for brand new users)
         const gradeName = currentGradeDisplayName;
-        const initialSpellQuestion = gradeName ? getNextSpellboxQuestion(gradeName) : null;
+        const initialSpellQuestion = gradeName ? getNextSpellboxQuestion(gradeName, [], (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined)) : null;
         const initialSpellTopicId = initialSpellQuestion ? (initialSpellQuestion.topicId || initialSpellQuestion.topicName) : null;
         if (initialSpellTopicId) {
           try { setGrade1DisplayedTopicId(initialSpellTopicId); } catch {}
@@ -4910,7 +4912,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // Grade 1 only: set the displayed topic at the moment whiteboard flow is confirmed via chevron
     if (whiteboardGradeEligible) {
       try {
-        const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName);
+        const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName, [], (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined));
         const nextSpellTopicId = (nextSpellQuestion && nextSpellQuestion.id === 1)
           ? (nextSpellQuestion.topicId || (nextSpellQuestion as any).topicName)
           : (lastSpellTopicRef.current || null);
@@ -5833,7 +5835,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     let script = selectedScript;
                     if (!script && lessonEnabled) {
                       // Fallback: resolve from next Spellbox topic
-                      const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName);
+                      const nextSpellQuestion = getNextSpellboxQuestion(currentGradeDisplayName, [], (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined));
                       const nextSpellTopicId = nextSpellQuestion
                         ? (nextSpellQuestion.topicId || nextSpellQuestion.topicName)
                         : null;
