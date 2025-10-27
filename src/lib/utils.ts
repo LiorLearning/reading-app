@@ -1242,6 +1242,8 @@ export interface SpellboxTopicProgress {
   isCompleted: boolean;
   completedAt?: number;
   successRate: number; // Calculated field for convenience
+  // Mark that the whiteboard lesson for this topic has been completed at least once
+  whiteboardSeen?: boolean;
 }
 
 export interface SpellboxGradeProgress {
@@ -1432,6 +1434,67 @@ export const updateSpellboxTopicProgress = async (
   // console.log(`📊 Spellbox Topic Progress Updated: ${topicId} - ${topicProgress.questionsAttempted}/10 questions, ${topicProgress.firstAttemptCorrect} first-attempt correct (${topicProgress.successRate.toFixed(1)}%)`);
   
   return topicProgress;
+};
+
+/**
+ * Check if the whiteboard lesson for a topic has been seen (completed) at least once.
+ * Reads from locally cached grade progress (kept in sync with Firebase via hybrid loader).
+ */
+export const hasSeenWhiteboard = (gradeDisplayName: string, topicId: string): boolean => {
+  if (!gradeDisplayName || !topicId) return false;
+  const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) return false;
+  const topic = gradeProgress.topicProgress[topicId];
+  return !!topic?.whiteboardSeen;
+};
+
+/**
+ * Mark the whiteboard lesson for a topic as seen (on completion only).
+ * Persists via Firebase when userId is provided, otherwise local only.
+ */
+export const markWhiteboardSeen = async (
+  gradeDisplayName: string,
+  topicId: string,
+  userId?: string
+): Promise<void> => {
+  if (!gradeDisplayName || !topicId) return;
+  let gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) {
+    gradeProgress = {
+      gradeDisplayName,
+      currentTopicId: topicId,
+      topicProgress: {},
+      timestamp: Date.now()
+    };
+  }
+
+  if (!gradeProgress.topicProgress[topicId]) {
+    gradeProgress.topicProgress[topicId] = {
+      topicId,
+      questionsAttempted: 0,
+      firstAttemptCorrect: 0,
+      totalQuestions: 10,
+      isCompleted: false,
+      successRate: 0,
+      whiteboardSeen: true
+    };
+  } else {
+    gradeProgress.topicProgress[topicId].whiteboardSeen = true;
+  }
+
+  gradeProgress.timestamp = Date.now();
+
+  if (userId) {
+    try {
+      const { saveSpellboxProgressHybrid } = await import('./firebase-spellbox-cache');
+      await saveSpellboxProgressHybrid(userId, gradeProgress);
+    } catch (error) {
+      console.warn('Failed to sync whiteboardSeen to Firebase; saving locally:', error);
+      saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+    }
+  } else {
+    saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+  }
 };
 
 /**

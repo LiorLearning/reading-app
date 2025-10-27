@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation, hasSeenWhiteboard, markWhiteboardSeen, loadSpellboxTopicProgressAsync } from "@/lib/utils";
 import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
@@ -1637,6 +1637,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Token to trigger left overlay auto-hide when a new image is actually displayed
   const [leftOverlayAutoHideToken, setLeftOverlayAutoHideToken] = React.useState(0);
   const [isLeftBubbleVisible, setIsLeftBubbleVisible] = React.useState(false);
+  // Ensure we don't decide whiteboard visibility until progress is hydrated
+  const [whiteboardProgressLoaded, setWhiteboardProgressLoaded] = React.useState(false);
   // Dev-only: toggle Whiteboard Lesson overlay without URL param (persist last state)
   const [devWhiteboardEnabled, setDevWhiteboardEnabled] = React.useState(() => {
     try {
@@ -1645,6 +1647,26 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       return false;
     }
   });
+
+  // Hydrate whiteboard progress (whiteboardSeen) before any gating
+  React.useEffect(() => {
+    const gradeName = (selectedGradeFromDropdown || userData?.gradeDisplayName || '').trim();
+    if (!gradeName) {
+      setWhiteboardProgressLoaded(true);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        await loadSpellboxTopicProgressAsync(gradeName, user?.uid || undefined);
+      } catch {}
+      if (!cancelled) setWhiteboardProgressLoaded(true);
+    })();
+    return () => { cancelled = true; };
+  }, [selectedGradeFromDropdown, userData?.gradeDisplayName, user?.uid]);
+
+  // Helper guard to avoid whiteboard until progress is ready
+  const canEvaluateWhiteboard = whiteboardProgressLoaded;
 
   // Mute pet audio and hide pet dialogue while whiteboard is active
   React.useEffect(() => {
@@ -3271,7 +3293,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const tp = (initialSpellTopicId && gradeName) ? getSpellboxTopicProgress(gradeName, initialSpellTopicId) : null;
         const hasMidTopicProgress = !!tp && (tp.questionsAttempted || 0) >= 1;
         const canShowLesson = !!(initialSpellTopicId && getLessonScript(initialSpellTopicId || ''));
-        if (!isWhiteboardSuppressedByAssignment && isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson) {
+        if (!isWhiteboardSuppressedByAssignment && isFirstSpellQuestion && !hasMidTopicProgress && canShowLesson && !hasSeenWhiteboard(currentGradeDisplayName, initialSpellTopicId || '')) {
           try { ttsService.stop(); } catch {}
           const name = userData?.username?.trim() || 'friend';
           const topicForLesson = initialSpellTopicId!;
@@ -3292,6 +3314,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         } else {
           // Leave the flag as true to allow the later effect (that watches currentSpellQuestion)
           // to trigger once the first question materializes.
+          // However, if the topic's whiteboard was already seen, consume and clear suppression now
+          if (initialSpellTopicId && hasSeenWhiteboard(currentGradeDisplayName, initialSpellTopicId)) {
+            shouldTriggerWhiteboardOnFirstQuestionRef.current = false;
+            suppressInitialGreetingRef.current = false;
+            setWhiteboardPinnedText(null);
+          }
         }
       }
     }, 0);
@@ -4300,7 +4328,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             const spellTopic = currentSpellQuestion?.topicId || currentSpellQuestion?.topicName || selectedTopicId || null;
             const hasLesson = !!(spellTopic && getLessonScript(spellTopic));
             const alreadySeen = !!whiteboardSeenThisSession[WHITEBOARD_LESSON_TOPIC];
-            if (hasLesson && !alreadySeen && !isWhiteboardPromptActive && !devWhiteboardEnabled) {
+            if (hasLesson && !alreadySeen && !isWhiteboardPromptActive && !devWhiteboardEnabled && canEvaluateWhiteboard) {
+              if (hasSeenWhiteboard(currentGradeDisplayName, spellTopic as string)) {
+                return;
+              }
               const topicForLesson = spellTopic as string;
               const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
               setWhiteboardPrompt({
@@ -4408,7 +4439,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           // Switch to adventure and show whiteboard prompt (with chevron) for next topic
           setCurrentScreen(1);
           const name = userData?.username?.trim() || 'friend';
-          if (!isWhiteboardSuppressedByAssignment && nextTopicId && getLessonScript(nextTopicId)) {
+          if (!isWhiteboardSuppressedByAssignment && nextTopicId && getLessonScript(nextTopicId) && canEvaluateWhiteboard) {
+            if (hasSeenWhiteboard(currentGradeDisplayName, nextTopicId)) {
+              // Skip showing prompt if already seen for this next topic
+              isAdvancingSpellRef.current = false;
+              return;
+            }
             const topicForLesson = nextTopicId;
             const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
             setWhiteboardPrompt({
@@ -4689,8 +4725,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
     if (!lessonEnabled) return false;
     const script = getLessonScript(selectedTopicId) || getLessonScript(WHITEBOARD_LESSON_TOPIC);
-    return !!script;
-  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible, isWhiteboardSuppressedByAssignment]);
+    if (!script) return false;
+    // If the topic's lesson has already been seen, treat whiteboard as inactive
+    try {
+      if (hasSeenWhiteboard(currentGradeDisplayName, script.topicId)) return false;
+    } catch {}
+    return true;
+  }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible, isWhiteboardSuppressedByAssignment, currentGradeDisplayName]);
 
   React.useEffect(() => {
     if (!whiteboardGradeEligible) return;
@@ -4708,6 +4749,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // otherwise their voices will clash for new users.
     if (showStep5Intro) return;
     const topicForLesson = (WHITEBOARD_LESSON_TOPIC && getLessonScript(WHITEBOARD_LESSON_TOPIC)) ? WHITEBOARD_LESSON_TOPIC : selectedTopicId;
+    if (!canEvaluateWhiteboard) return;
+    if (topicForLesson && hasSeenWhiteboard(currentGradeDisplayName, topicForLesson)) return;
     const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
     setWhiteboardPrompt({
       topicId: topicForLesson,
@@ -4755,6 +4798,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       whiteboardTriggeredTopicsRef.current.add(spellTopic);
       // Do not force-stop here so we don't cut off ongoing trainer voice
       const topicForLesson = spellTopic;
+      if (!canEvaluateWhiteboard) return;
+      if (hasSeenWhiteboard(currentGradeDisplayName, topicForLesson)) return;
       const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
       setWhiteboardPrompt({
         topicId: topicForLesson,
@@ -4803,6 +4848,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         setDevWhiteboardEnabled(true);
         // Ensure the pet bubble shows the whiteboard intro instead of any prior continuation
         const topicForLesson = (spellTopic && getLessonScript(spellTopic)) ? spellTopic : WHITEBOARD_LESSON_TOPIC;
+        if (topicForLesson && hasSeenWhiteboard(currentGradeDisplayName, topicForLesson)) return;
         const introText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
         setWhiteboardPinnedText(introText);
         // Grade 1 only: update displayed topic at the moment whiteboard is triggered
@@ -4830,11 +4876,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     setWhiteboardPromptLocked(true);
     setWhiteboardSeenThisSession(prev => ({ ...prev, [topicId]: true }));
     setWhiteboardPrompt(null);
+    setIsWhiteboardPromptActive(false);
+
+    // If this topic's whiteboard has already been seen, skip enabling the lesson entirely
+    if (hasSeenWhiteboard(currentGradeDisplayName, topicId)) {
+      setWhiteboardPinnedText(null);
+      setLessonReady(false);
+      setDevWhiteboardEnabled(false);
+      try { ttsService.stop(); } catch {}
+      // Resume normal flow: unsuppress pet and allow input
+      try { ttsService.setSuppressNonKrafty(false); } catch {}
+      try { setDisableInputForSpell(false); } catch {}
+      try { setHighlightSpellNext(false); } catch {}
+      return;
+    }
+
     // Ensure the selected topic matches the lesson topic so eligibility and script resolution align
     try { setSelectedTopicId(topicId); } catch {}
     setLessonReady(true);
     setDevWhiteboardEnabled(true);
-    setIsWhiteboardPromptActive(false);
     // Grade 1 only: set the displayed topic at the moment whiteboard flow is confirmed via chevron
     if (whiteboardGradeEligible) {
       try {
@@ -4864,6 +4924,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     });
     if (whiteboardGradeEligible) {
       const topicForLesson = (WHITEBOARD_LESSON_TOPIC && getLessonScript(WHITEBOARD_LESSON_TOPIC)) ? WHITEBOARD_LESSON_TOPIC : (selectedTopicId || WHITEBOARD_LESSON_TOPIC);
+      if (!canEvaluateWhiteboard) return;
       const nextText = `Alright, let's skill up so I can keep growing!\nReady? 🌱`;
       setWhiteboardPrompt({
         topicId: topicForLesson,
@@ -5767,6 +5828,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       script = nextSpellTopicId ? getLessonScript(nextSpellTopicId) : null;
                     }
                     if (lessonEnabled && script && !shouldShowWhiteboardPrompt) {
+                      // Persist seen on completion only, and also gate mount if already seen
+                      const alreadySeen = (() => {
+                        try { return hasSeenWhiteboard(currentGradeDisplayName, script.topicId); } catch { return false; }
+                      })();
+                      if (alreadySeen) return null;
                       return (
                         <WhiteboardLesson
                           topicId={script.topicId}
@@ -5778,13 +5844,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             try { setDisableInputForSpell(false); } catch {}
                             try { setHighlightSpellNext(false); } catch {}
                             // Mark lesson as seen so the intro prompt does not reappear
-                            setWhiteboardSeenThisSession(prev => ({ ...prev, [WHITEBOARD_LESSON_TOPIC]: true }));
+                            setWhiteboardSeenThisSession(prev => ({ ...prev, [script.topicId]: true }));
+                            try { markWhiteboardSeen(currentGradeDisplayName, script.topicId, user?.uid).catch(() => {}); } catch {}
                             // Clear any pinned intro text from the pet bubble
                             setWhiteboardPinnedText(null);
                             const name = userData?.username?.trim() || 'friend';
                             const celebration = `Great job!`;
                             setWhiteboardPrompt({
-                              topicId: WHITEBOARD_LESSON_TOPIC,
+                              topicId: script.topicId,
                               text: celebration,
                               shouldAutoplay: true,
                               isAcknowledged: true,
