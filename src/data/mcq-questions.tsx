@@ -10592,9 +10592,9 @@ aiTutor: {
       templateType: 'fill_blank',
       word: 'blend',
       imageUrl: null,
-      explanation: "Well done! The word is 'hump'.",
-      questionText: 'Complete the word: hu__',
-      correctAnswer: 'hump',
+      explanation: "Well done! The word is 'jump'.",
+      questionText: 'Complete the word: ju__',
+      correctAnswer: 'jump',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
@@ -10604,17 +10604,17 @@ aiTutor: {
       aiHook: {
         targetWord: 'blend',
         intent: 'fill_blank',
-        questionLine: 'Complete the word: hu__',
+        questionLine: 'Complete the word: ju__',
         imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
       },
       aiTutor: {
-        target_word: 'hump',
-        question: 'h u _ _',
+        target_word: 'jump',
+        question: 'j u _ _',
         student_entry: '',
         topic_to_reinforce: 'Final consonant blends',
-        spelling_pattern_or_rule: "The 'mp' blend joins the /m/ and /p/ sounds at the end of words like 'hump' and 'lamp'."
+        spelling_pattern_or_rule: "The 'mp' blend joins the /m/ and /p/ sounds at the end of words like 'jump' and 'lamp'."
       },
-      audio: 'hump'
+      audio: 'jump'
     },
     {
       id: 3,
