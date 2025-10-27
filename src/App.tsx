@@ -197,7 +197,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <div className="h-full w-full overflow-hidden">
+        <div className="h-full w-full overflow-y-auto">
           <Toaster />
           <Sonner position="top-left" />
           <DevCoinHotspot />
