@@ -127,7 +127,7 @@ Rules:
 
 8. CHILD PERSONALIZATION
 - Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture. When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
+- Add child to the picture only when the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
 - Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
 Task:
@@ -318,7 +318,7 @@ CRITICAL RULES:
 
 8. CHILD PERSONALIZATION
 - Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture. When the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
+- Add child to the picture only when the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
 - Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
 EXAMPLES:

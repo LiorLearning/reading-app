@@ -163,7 +163,6 @@ export class MultiProviderImageGenerator {
         
       case 'flux-schnell':
         refinedPrompt = `${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
-        console.info("flux-schnell refinedPrompt: ", refinedPrompt)
         break;
 
       case 'google-imagen':

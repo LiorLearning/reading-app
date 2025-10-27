@@ -373,13 +373,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   });
 
   // Gemini realtime
-  const geminiRT = useGeminiRealtimeSession({
-    enabled: REALTIME_PROVIDER === 'gemini',
-  });
+  const geminiRT = useGeminiRealtimeSession();
   const [geminiEnabled, setGeminiEnabled] = useState<boolean>(REALTIME_PROVIDER === 'gemini');
   useEffect(() => {
     if (REALTIME_PROVIDER === 'gemini') {
-      geminiRT.setEnabled(geminiEnabled);
+      geminiRT.start();
     }
   }, [geminiEnabled]);
 
