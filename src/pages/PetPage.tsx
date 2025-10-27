@@ -24,6 +24,7 @@ import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
 import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
+import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 import EvolutionStrip from '@/components/adventure/EvolutionStrip';
 import { ensureMicPermission } from '@/lib/mic-permission';
 import { toast } from 'sonner';
@@ -2297,6 +2298,15 @@ const getSleepyPetImage = (clicks: number) => {
         } catch (err) {
           console.warn('Failed to reset assignment progress:', err);
         }
+      }
+      // Immediately reposition SpellBox to the grade/level anchor and reset only that topic
+      try {
+        const effectiveGrade = incomingGradeDisplayName || gradeDisplayName || userData?.gradeDisplayName || '';
+        if (effectiveGrade) {
+          await setSpellboxAnchorForLevel(effectiveGrade, level, user?.uid || undefined);
+        }
+      } catch (anchorErr) {
+        console.warn('Failed to set SpellBox anchor for level change:', anchorErr);
       }
     } catch (e) {
       console.error('Failed to persist grade/level selection:', e);

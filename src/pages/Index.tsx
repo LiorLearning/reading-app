@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation, hasSeenWhiteboard, markWhiteboardSeen, loadSpellboxTopicProgressAsync } from "@/lib/utils";
+import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
 import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid, getAdventureHybrid, updateLastPlayedHybrid } from "@/lib/firebase-adventure-cache";
 import { sampleMCQData } from "../data/mcq-questions";
@@ -3537,6 +3538,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         } catch (err) {
           console.warn('Failed to reset assignment progress:', err);
         }
+      }
+      // Immediately reposition SpellBox to the grade/level anchor and reset only that topic
+      try {
+        const effectiveGrade = incomingGradeDisplayName || gradeDisplayName || userData?.gradeDisplayName || '';
+        if (effectiveGrade) {
+          const anchor = await setSpellboxAnchorForLevel(effectiveGrade, level, user?.uid || undefined);
+          // If the anchor has a lesson script and assignment whiteboard is not suppressed,
+          // set the selected topic to the anchor so eligibility is satisfied for auto-trigger.
+          try {
+            if (anchor && !isWhiteboardSuppressedByAssignment && getLessonScript(anchor)) {
+              setSelectedTopicId(anchor);
+            }
+          } catch {}
+        }
+      } catch (anchorErr) {
+        console.warn('Failed to set SpellBox anchor for level change:', anchorErr);
       }
     } catch (e) {
       console.error('Failed to persist grade/level selection:', e);
