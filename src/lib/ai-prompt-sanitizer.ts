@@ -81,7 +81,7 @@ class AIPromptSanitizer {
       const genderIsFemale = ['female', 'girl', 'f', 'woman', 'she', 'her'].includes(rawGender);
       const childGenderNoun = genderIsMale ? 'boy' : (genderIsFemale ? 'girl' : 'child');
       const parsedAge = Number(childProfile?.age);
-      const childAge = (Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8) + 5; // default age 8
+      const childAge = 14 //(Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8); // default age 8
 
       const systemPrompt = `You are a strict image prompt sanitizer for children's adventure. 
 Your job is to take any user request (raw prompt) and rewrite it into a safe, 
@@ -303,7 +303,7 @@ Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${ch
       const genderIsFemale = ['female', 'girl', 'f', 'woman', 'she', 'her'].includes(rawGender);
       const childGenderNoun = genderIsMale ? 'boy' : (genderIsFemale ? 'girl' : 'child');
       const parsedAge = Number(childProfile?.age);
-      const childAge = (Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8) + 5; // default age 8
+      const childAge = 14 //(Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8); // default age 8
 
       const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
 
