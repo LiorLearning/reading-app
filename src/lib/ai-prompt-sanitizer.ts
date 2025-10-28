@@ -125,6 +125,10 @@ Rules:
 - Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
 - Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
+9. People
+- Couples are not allowed in the picture.
+- Wife and husband references should be removed.
+
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
 keeps the intent of the request, and ensures the final output is safe for children.
@@ -316,6 +320,9 @@ CRITICAL RULES:
 - Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
 - Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
+9. People
+- Couples are not allowed in the picture.
+- Wife and husband references should be removed.
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
 - "sword battle" → "sword training demonstration" 
