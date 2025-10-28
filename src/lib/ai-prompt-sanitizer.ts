@@ -42,11 +42,6 @@ class AIPromptSanitizer {
   ): Promise<SanitizedPromptResult> {
     const startTime = Date.now();
     
-    // console.log('🧹 AI Sanitizer: Starting FULL sanitization (prompt + context) for:', originalPrompt.substring(0, 100) + '...');
-    // console.log('📥 AI Sanitizer INPUT - Original Prompt (FULL):', originalPrompt);
-    // console.log('📥 AI Sanitizer INPUT - Adventure Context (FULL):', adventureContext || 'No context provided');
-    // console.log('🔧 AI Sanitizer: Cache key:', `full_${originalPrompt.substring(0, 30)}_${(adventureContext || '').substring(0, 30)}`);
-
     // Check cache first
     const cacheKey = `full_${originalPrompt}_${adventureContext || ''}`;
     if (this.sanitizationCache.has(cacheKey)) {
@@ -127,7 +122,7 @@ Rules:
 
 8. CHILD PERSONALIZATION
 - Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture only when the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
+- Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
 - Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
 Task:
@@ -318,7 +313,7 @@ CRITICAL RULES:
 
 8. CHILD PERSONALIZATION
 - Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture only when the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
+- Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
 - Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
 EXAMPLES:
