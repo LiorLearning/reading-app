@@ -99,7 +99,7 @@ Rules you must always follow:
 - No cartoonish or kiddish styles unless explicitly requested.
 
 4. REPLACEMENT MAPPING
-- lingerie, bikini, short skirt, low-cut dress, tight outfit, sheer/see-through, lacey, fishnet, seductive gown, provocative outfit, sexy uniform, exotic dancer outfit, revealing clothes → long-sleeved full-body attire (robes, gowns, armor, casual outfits, all covering chest to feet).
+- lingerie, bikini, short skirt, low-cut dress, tight outfit, sheer/see-through, lacey, fishnet, seductive gown, provocative outfit, sexy uniform, exotic dancer outfit, revealing clothes → long-sleeved full-body attire (armor, casual outfits, all covering chest to feet).
 - silky → smooth, shining, wool fabric (still modest).
 - leather (suggestive) → sturdy protective armor or enchanted hide.
 
