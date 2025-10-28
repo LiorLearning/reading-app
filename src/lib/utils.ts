@@ -1729,8 +1729,7 @@ export async function moderation(text: string | null | undefined): Promise<boole
 
   const response = await openaiClient().responses.create({
     prompt: {
-      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3",
-      version: "7"
+      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
     },
     store: false,
     input: [
