@@ -1730,7 +1730,7 @@ export async function moderation(text: string | null | undefined): Promise<boole
   const response = await openaiClient().responses.create({
     prompt: {
       id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3",
-      version: "6"
+      version: "7"
     },
     store: false,
     input: [
@@ -1747,25 +1747,27 @@ export async function moderation(text: string | null | undefined): Promise<boole
   if (response.output_text.includes("true")) {
     return true;
   }
+  
+
+
+  //Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
+  const normalized = text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
+  if (!normalized) return false;
+
+  const tokens = normalized.split(/\s+/);
+
+  // Early exit on direct token matches
+  for (const token of tokens) {
+    if (PROFANITY_SET.has(token)) {
+      return true;
+    }
+  }
+  
   return false;
-
-
-  // Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
-  // const normalized = text
-  //   .toLowerCase()
-  //   .replace(/[^\p{L}\p{N}]+/gu, " ")
-  //   .trim();
-
-  // if (!normalized) return false;
-
-  // const tokens = normalized.split(/\s+/);
-
-  // // Early exit on direct token matches
-  // for (const token of tokens) {
-  //   if (PROFANITY_SET.has(token)) {
-  //     return true;
-  //   }
-  // }
 
   // Additionally check common adjacent joins that appear in list (e.g., "shithead")
   // for (let i = 0; i < tokens.length - 1; i++) {
