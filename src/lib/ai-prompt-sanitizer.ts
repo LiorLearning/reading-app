@@ -113,7 +113,7 @@ Rules you must always follow:
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  
    - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, robes, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
-   - Female characters should always be depicted in **elegant gowns, full-body armor, or flowing robes**.  
+   - Female characters should always be depicted in **full-body clothes**.  
    - Male characters should always wear **full-body armor, suits, tunics, or robes**.  
 2. No cleavage, no bare thighs, no exposed stomach, no revealing cuts.  
 3. Replace “sexy, tight, skimpy, sheer, lingerie, bikini, low-cut” or similar terms with **modest, noble, and adventurous clothing**.  
@@ -128,7 +128,7 @@ Rules:
 9. People
 - Couples are not allowed in the picture.
 - Wife and husband references should be removed.
-- Strictly prefix all characters with "an ${childAge}-year-old ...".
+- Strictly prefix all characters like princess, women, queen with "an ${childAge}-year-old ...".
 
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
