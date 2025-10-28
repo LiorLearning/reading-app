@@ -2109,7 +2109,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         lastMessage.content === 'transcribing...';
       const verdict = await moderation(text);
       if (verdict) {
-        toast.warning('Inappropriate message, Please try again.',{
+        toast.warning('Message is not safe, Please try again.',{
           duration: 6000,
         });
         if (shouldReplaceTranscribingMessage) {
