@@ -128,7 +128,7 @@ Rules:
 9. People
 - Couples are not allowed in the picture.
 - Wife and husband references should be removed.
-- All characters must be strictly 11 years old.
+- Strictly prefix all characters with "an ${childAge}-year-old ...".
 
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
@@ -324,7 +324,7 @@ CRITICAL RULES:
 9. People
 - Couples are not allowed in the picture.
 - Wife and husband references should be removed.
-- All characters must be strictly 11 years old.
+- Strictly prefix all characters with "an ${childAge}-year-old ...".
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
