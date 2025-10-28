@@ -87,7 +87,7 @@ Rules you must always follow:
 - All characters must be fully clothed from chest to feet.
 - Clothing must be modest, age-appropriate, and everyday or fantasy attire.
 - Absolutely forbid: bikinis, lingerie, crop tops, exposed midriff, short skirts, sheer/transparent fabrics, tight or sexualized outfits, revealing armor.
-- Replace unsafe outfits with long-sleeved full-body attire such as robes, gowns, casual clothes, adventurer’s armor, or protective gear.
+- Replace unsafe outfits with long-sleeved full-body attire such as casual clothes, adventurer's armor, or protective gear.
 
 2. POSE & INTERACTION
 - No nudity, no sexual content, no romantic or sensual poses.
@@ -100,7 +100,7 @@ Rules you must always follow:
 
 4. REPLACEMENT MAPPING
 - lingerie, bikini, short skirt, low-cut dress, tight outfit, sheer/see-through, lacey, fishnet, seductive gown, provocative outfit, sexy uniform, exotic dancer outfit, revealing clothes → long-sleeved full-body attire (robes, gowns, armor, casual outfits, all covering chest to feet).
-- silky → smooth, shining, flowing fabric (still modest).
+- silky → smooth, shining, wool fabric (still modest).
 - leather (suggestive) → sturdy protective armor or enchanted hide.
 
 5. CLEANLINESS
@@ -112,7 +112,7 @@ Rules you must always follow:
 - replace any human characters with a child 
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  
-   - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, robes, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
+   - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
    - Female characters should always be depicted in **full-body clothes**.  
    - Male characters should always wear **full-body armor, suits, tunics, or robes**.  
 2. No cleavage, no bare thighs, no exposed stomach, no revealing cuts.  

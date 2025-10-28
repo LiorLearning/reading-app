@@ -311,7 +311,7 @@ Before creating the image, carefully and strictly apply these rules:
    - Remove or replace any sexual, sensual, or adult elements.  
    - Characters must always wear **modest, age-appropriate, everyday or fantasy attire** that fully covers chest to feet.  
    - Absolutely forbid: bikinis, lingerie, crop tops, exposed midriff, short skirts, sheer/transparent fabrics, revealing armor, or tight/sexualized outfits.  
-   - Replace unsafe outfits with long-sleeved, fully covered clothing (robes, gowns, everyday casual wear, adventurer's armor, etc).  
+   - Replace unsafe outfits with long-sleeved, fully covered clothing (everyday casual wear, adventurer's armor, etc).  
 
 2. **Pose & Interaction**  
    - No kissing, flirting, sensual, or romantic poses.  
@@ -324,8 +324,8 @@ Before creating the image, carefully and strictly apply these rules:
 
 4. **Content Substitution Rules**  
    - lingerie, bikini, short skirt, low-cut dress, tight outfit, sheer/see-through, lacey, fishnet, seductive gown, provocative outfit, sexy uniform, exotic dancer outfit, revealing clothes →  
-     **long-sleeved full body dress / casual modest outfit / protective armor / elegant gown (all covering chest to feet)**.  
-   - silky → smooth, shining, flowing fabric (still modest).  
+     **long-sleeved full body dress / casual modest outfit / protective armor**.  
+   - silky → smooth, shining, wool fabric (still modest).  
    - leather (if suggestive) → sturdy protective gear or enchanted armor.  
 
 5. **Image Cleanliness**  
