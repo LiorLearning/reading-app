@@ -847,6 +847,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // In inline mode, respect isVisible but default is true
   if (!isVisible || !targetWord) return null;
 
+  // Derived UI states for chevron transparency/disabled behavior
+  const hasAnyInput = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+  const isSameAsLastSubmission = hasSubmitted && reconstructCompleteWord(userAnswer) === lastSubmittedAnswer;
+  const submitDisabledUnattempted = !isCorrect && (!hasAnyInput || isSameAsLastSubmission);
+  const nextGateDisabled = isCorrect && !canClickNext;
+
   return (
     <>
       {/* Tutorial overlay for first-time users (overlay mode only) */}
@@ -1236,8 +1242,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
-          {/* Persistent chevron - acts as Submit until correct, then Next */}
-          {question && (
+          {/* Persistent chevron - acts as Submit until correct, then Next
+              If a delay is configured for next unlock, hide chevron until gate opens */}
+          {question && !(isCorrect && nextUnlockDelayMs > 0 && !canClickNext) && (
             <div className="absolute top-1/2 -translate-y-1/2 -right-[24px] z-20">
               <Button
                 variant="comic"
@@ -1251,10 +1258,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     handleSubmitAttempt();
                   }
                 }}
-                disabled={isCorrect ? !canClickNext : !((userAnswer || '').split('').some(ch => ch && ch !== ' '))}
-                className={cn('h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:saturate-100 disabled:brightness-100 disabled:contrast-100 disabled:hover:scale-100', highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300')}
+                disabled={nextGateDisabled || submitDisabledUnattempted}
+                className={cn(
+                  'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
+                  // Keep fully opaque when delay-gated next
+                  nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
+                  // Make slightly transparent when unattempted/unchanged
+                  submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
+                  highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
+                )}
               >
-                <ChevronRight className="h-6 w-6" />
+                <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
               </Button>
               {highlightNext && isCorrect && (
                 <div className="ml-2 text-2xl select-none" aria-hidden="true">👉</div>
@@ -1455,7 +1469,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             )}
 
             {/* Persistent chevron (inline) - acts as Submit until correct, then Next */}
-            {question && (
+            {question && !(isCorrect && nextUnlockDelayMs > 0 && !canClickNext) && (
               <div className="absolute top-1/2 -translate-y-1/2 -right-[18px] z-20">
                 <Button
                   variant="comic"
@@ -1469,10 +1483,14 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                       handleSubmitAttempt();
                     }
                   }}
-                  disabled={isCorrect ? false : !((userAnswer || '').split('').some(ch => ch && ch !== ' '))}
-                  className={cn('h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:saturate-100 disabled:brightness-100 disabled:contrast-100 disabled:hover:scale-100')}
+                  disabled={nextGateDisabled || submitDisabledUnattempted}
+                  className={cn(
+                    'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
+                    nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
+                    submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
+                  )}
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
                 </Button>
               </div>
             )}
