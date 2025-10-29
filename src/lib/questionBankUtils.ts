@@ -401,7 +401,7 @@ export const getNextSpellboxQuestion = (
   
   // Get the current topic based on progression logic
   const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds, preferredLevel);
-  console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIds: allTopicIds.slice(0, 3) });
+  console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIdsPreview: allTopicIds.slice(0, 3), preferredLevel });
   
   if (!currentTopicId) {
     console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
@@ -418,34 +418,48 @@ export const getNextSpellboxQuestion = (
   
   // Get topic progress
   const topicProgress = getSpellboxTopicProgress(gradeDisplayName, currentTopicId);
-  const questionsAttempted = topicProgress?.questionsAttempted || 0;
+  const masteredCount = topicProgress?.masteredQuestionIds?.length || 0;
   const masteredIds = new Set<number>(topicProgress?.masteredQuestionIds || []);
 
-  // New selection logic:
-  // - First pass: serve first 10 in sequence
-  // - After 10 attempts if not mastered all 10 yet: serve only unmastered words
-  if (questionsAttempted < 10) {
-    const questionIndex = Math.min(questionsAttempted, 9);
-    const selectedQuestion = topicQuestions[questionIndex] || topicQuestions[0];
-    return selectedQuestion;
+  // Mastery done: selection is irrelevant; return first for safety
+  if (masteredCount >= 10) {
+    console.log('[Spellbox][Select] Mastery already reached, returning first question as fallback', { currentTopicId });
+    return topicQuestions[0];
   }
 
-  // After first pass: pick the first unmastered question
-  const unmastered = topicQuestions.find(q => !masteredIds.has(q.id));
-  if (unmastered) return unmastered;
-  
-  // Fallback: if somehow all appear mastered, return first (caller will advance topic)
-  const selectedQuestion = topicQuestions[0];
-  
-  // console.log(`🎯 getNextSpellboxQuestion: Selected question ${questionIndex + 1}/10 for topic ${currentTopicId}:`, {
-  //   id: selectedQuestion.id,
-  //   word: selectedQuestion.word,
-  //   topicName: selectedQuestion.topicName,
-  //   questionsAttempted,
-  //   topicProgress: `${(topicProgress?.masteredQuestionIds || []).length}/10 mastered`
-  // });
-  
-  return selectedQuestion;
+  // First pass: serve next by how many first-pass IDs we recorded
+  const firstPassLen = topicProgress?.firstPassQuestionIds?.length || 0;
+  if (firstPassLen < 10) {
+    const idx = Math.min(firstPassLen, 9);
+    const q = topicQuestions[idx] || topicQuestions[0];
+    console.log('[Spellbox][Select] First pass selection', { currentTopicId, firstPassLen, selectedIndex: idx, questionId: q?.id, word: q?.audio });
+    return q;
+  }
+
+  // Rounds: use the round pool and cursor
+  const pool = topicProgress?.roundPoolQuestionIds || [];
+  const cursor = typeof topicProgress?.roundPoolCursor === 'number' ? (topicProgress!.roundPoolCursor as number) : 0;
+  if (pool.length > 0 && cursor < pool.length) {
+    const qid = pool[cursor];
+    const selected = topicQuestions.find(q => q.id === qid) || topicQuestions[0];
+    console.log('[Spellbox][Select] Round pool selection', { currentTopicId, poolSize: pool.length, cursor, questionId: selected?.id, word: selected?.audio });
+    return selected;
+  }
+
+  // If next round has items, serve the first of that list
+  const nextPool = topicProgress?.nextRoundQuestionIds || [];
+  if (nextPool.length > 0) {
+    const qid = nextPool[0];
+    const selected = topicQuestions.find(q => q.id === qid) || topicQuestions[0];
+    console.log('[Spellbox][Select] Next-round-first selection (cursor at end)', { currentTopicId, nextPoolSize: nextPool.length, questionId: selected?.id, word: selected?.audio });
+    return selected;
+  }
+
+  // Final fallback: pick the first unmastered among the first 10
+  const firstPassIds = topicProgress?.firstPassQuestionIds || [];
+  const fallback = topicQuestions.find(q => firstPassIds.includes(q.id) && !masteredIds.has(q.id)) || topicQuestions[0];
+  console.log('[Spellbox][Select] Fallback selection among first-pass unmastered', { currentTopicId, questionId: fallback?.id, word: fallback?.audio });
+  return fallback;
 };
 
 /**

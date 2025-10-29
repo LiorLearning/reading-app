@@ -438,6 +438,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
 
       const visibleSentence = extractVisibleSentence(sentenceText, wordToSpeak);
       const textToSpeak = (visibleSentence || '').trim() || wordToSpeak;
+      try { console.log('[Overlay][Speak] Inline SpellBox speak', { textToSpeak, wordToSpeak, sentenceText, hasInlineQuestion }); } catch {}
       if (textToSpeak) {
         // Check suppression again just before speaking
         try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
@@ -464,6 +465,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
     const temp = document.createElement("div");
     temp.innerHTML = toSpeak;
     const text = temp.textContent || temp.innerText || "";
+    try { console.log('[Overlay][Speak] Bubble speak', { text }); } catch {}
     // Guard suppression before speaking bubble HTML
     try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
     isSpeakingRef.current = true;

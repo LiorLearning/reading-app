@@ -1246,6 +1246,14 @@ export interface SpellboxTopicProgress {
   whiteboardSeen?: boolean;
   // IDs of questions mastered with a first-try correct on their latest showing (persisted across sessions)
   masteredQuestionIds?: number[];
+  // The exact 10 questions presented in the first pass (locked order)
+  firstPassQuestionIds?: number[];
+  // Current round's pool (subset of the 10), iterated in order
+  roundPoolQuestionIds?: number[];
+  // Cursor within the current round pool
+  roundPoolCursor?: number;
+  // The next round's pool being built from current round's first-try incorrects
+  nextRoundQuestionIds?: number[];
 }
 
 export interface SpellboxGradeProgress {
@@ -1392,10 +1400,18 @@ export const updateSpellboxTopicProgress = async (
       totalQuestions: 10, // Fixed at 10 questions per topic
       isCompleted: false,
       successRate: 0,
-      masteredQuestionIds: []
+      masteredQuestionIds: [],
+      firstPassQuestionIds: [],
+      roundPoolQuestionIds: [],
+      roundPoolCursor: 0,
+      nextRoundQuestionIds: []
     };
   } else if (!Array.isArray(existingProgress.masteredQuestionIds)) {
     existingProgress.masteredQuestionIds = [];
+    if (!Array.isArray(existingProgress.firstPassQuestionIds)) existingProgress.firstPassQuestionIds = [];
+    if (!Array.isArray(existingProgress.roundPoolQuestionIds)) existingProgress.roundPoolQuestionIds = [];
+    if (typeof existingProgress.roundPoolCursor !== 'number') existingProgress.roundPoolCursor = 0;
+    if (!Array.isArray(existingProgress.nextRoundQuestionIds)) existingProgress.nextRoundQuestionIds = [];
   }
   
   const topicProgress = gradeProgress.topicProgress[topicId];
@@ -1416,11 +1432,96 @@ export const updateSpellboxTopicProgress = async (
     topicProgress.masteredQuestionIds = Array.from(set);
   }
   
+  // Seed first pass (lock first 10 shown) incrementally as questions are attempted
+  if (typeof questionId === 'number') {
+    const fp = topicProgress.firstPassQuestionIds || [];
+    if (fp.length < 10 && !fp.includes(questionId)) {
+      fp.push(questionId);
+      topicProgress.firstPassQuestionIds = fp;
+      try { console.log('[Spellbox][FirstPass] Added question to first pass', { gradeDisplayName, topicId, questionId, firstPassCount: fp.length }); } catch {}
+    }
+  }
+
+  // Build next round list incrementally whenever a word is NOT first-try correct
+  if (typeof questionId === 'number' && !isFirstAttemptCorrect) {
+    const nextPool = topicProgress.nextRoundQuestionIds || [];
+    if (!nextPool.includes(questionId)) {
+      nextPool.push(questionId);
+      topicProgress.nextRoundQuestionIds = nextPool;
+      try { console.log('[Spellbox][RoundBuild] Added to next round (not first-try correct)', { gradeDisplayName, topicId, questionId, nextRoundCount: nextPool.length }); } catch {}
+    }
+  }
+
+  // If first pass just finished (10 collected) and round pool is not seeded yet, seed it now
+  if ((topicProgress.firstPassQuestionIds?.length || 0) >= 10) {
+    if ((topicProgress.roundPoolQuestionIds?.length || 0) === 0) {
+      topicProgress.roundPoolQuestionIds = [...(topicProgress.nextRoundQuestionIds || [])];
+      topicProgress.roundPoolCursor = 0;
+      topicProgress.nextRoundQuestionIds = [];
+      try { console.log('[Spellbox][Rounds] Seeded round pool from first pass incorrects', { gradeDisplayName, topicId, pool: topicProgress.roundPoolQuestionIds }); } catch {}
+    }
+  }
+
+  // During rounds, update cursor and pools based on correctness
+  const masteredCountForRound = (topicProgress.masteredQuestionIds || []).length;
+  const inRounds = (topicProgress.firstPassQuestionIds?.length || 0) >= 10 && masteredCountForRound < 10;
+  if (inRounds && typeof questionId === 'number') {
+    const pool = topicProgress.roundPoolQuestionIds || [];
+    let cursor = typeof topicProgress.roundPoolCursor === 'number' ? topicProgress.roundPoolCursor : 0;
+    // Ensure cursor targets current question; if mismatch, try to locate
+    if (cursor < 0) cursor = 0;
+    if (cursor >= pool.length) cursor = pool.length; // will trigger rotation below if at end
+
+    const idxAtCursor = pool[cursor];
+    const actualIndex = pool.indexOf(questionId);
+    try { console.log('[Spellbox][Rounds] Before update', { gradeDisplayName, topicId, questionId, isFirstAttemptCorrect, pool: [...pool], cursor, idxAtCursor, actualIndex, nextRoundCount: (topicProgress.nextRoundQuestionIds || []).length }); } catch {}
+
+    if (isFirstAttemptCorrect) {
+      // Remove from current pool if present
+      const removeIndex = actualIndex >= 0 ? actualIndex : -1;
+      if (removeIndex >= 0) {
+        pool.splice(removeIndex, 1);
+        // If we removed an item before the cursor, adjust cursor back by one to keep position stable
+        if (removeIndex < cursor) {
+          cursor = Math.max(0, cursor - 1);
+        }
+      }
+      // Do not add to nextRound
+    } else {
+      // Append to next round if not already there (done above too, but ensure order)
+      const nextPool = topicProgress.nextRoundQuestionIds || [];
+      if (!nextPool.includes(questionId)) nextPool.push(questionId);
+      topicProgress.nextRoundQuestionIds = nextPool;
+      // Advance cursor to next item in the current pool
+      if (cursor < pool.length) cursor = cursor + 1;
+    }
+
+    // If we reached end of current pool and still not mastered, rotate pools
+    if (cursor >= pool.length) {
+      if ((topicProgress.masteredQuestionIds?.length || 0) >= 10) {
+        // mastery reached; nothing to rotate
+      } else {
+        const nextPool = topicProgress.nextRoundQuestionIds || [];
+        topicProgress.roundPoolQuestionIds = [...nextPool];
+        topicProgress.roundPoolCursor = 0;
+        topicProgress.nextRoundQuestionIds = [];
+        // Reset local vars for clarity (not strictly necessary)
+        cursor = 0;
+        try { console.log('[Spellbox][Rounds] Rotated to next round pool', { gradeDisplayName, topicId, newPool: topicProgress.roundPoolQuestionIds }); } catch {}
+      }
+    }
+
+    topicProgress.roundPoolQuestionIds = pool;
+    topicProgress.roundPoolCursor = cursor;
+    try { console.log('[Spellbox][Rounds] After update', { gradeDisplayName, topicId, pool: [...(topicProgress.roundPoolQuestionIds || [])], cursor: topicProgress.roundPoolCursor, nextRoundCount: (topicProgress.nextRoundQuestionIds || []).length }); } catch {}
+  }
+
   // New completion criteria: 10 unique words mastered first-try (aggregate over time)
   const masteredCount = (topicProgress.masteredQuestionIds || []).length;
   if (masteredCount >= 10 && !topicProgress.isCompleted) {
     topicProgress.isCompleted = true;
     topicProgress.completedAt = Date.now();
+    try { console.log('[Spellbox][Mastery] Topic mastered', { gradeDisplayName, topicId, masteredCount }); } catch {}
   }
   
   // Update current topic
