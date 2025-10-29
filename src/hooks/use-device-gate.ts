@@ -16,8 +16,26 @@ export interface DeviceGateState {
 const SUPPRESS_KEY = "device-gate-suppress-until"
 const DEFAULT_MIN_DIMENSION_THRESHOLD = 500 // px
 
+function isIpadLike(): boolean {
+  // Detects iPad, including iPadOS 13+ which reports a desktop UA
+  try {
+    const nav: any = typeof navigator !== "undefined" ? navigator : undefined
+    if (!nav) return false
+    const ua = String(nav.userAgent || "")
+    const platform = String(nav.platform || "")
+    const maxTouchPoints = Number(nav.maxTouchPoints || 0)
+    // Classic iPad UA OR iPadOS reporting as Mac with touch
+    return /iPad/i.test(ua) || (platform === "MacIntel" && maxTouchPoints > 1)
+  } catch {
+    return false
+  }
+}
+
 function isPhoneLike(threshold = DEFAULT_MIN_DIMENSION_THRESHOLD): boolean {
   if (typeof window === "undefined") return false
+
+  // Never gate iPad devices (product copy explicitly allows iPad)
+  if (isIpadLike()) return false
 
   const minDimension = Math.min(window.innerWidth, window.innerHeight)
   const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false

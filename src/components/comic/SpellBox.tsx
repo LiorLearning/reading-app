@@ -7,7 +7,7 @@ import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
-import { Volume2, Square, ChevronRight } from 'lucide-react';
+import { Volume2, Square, ChevronRight, Lightbulb } from 'lucide-react';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -43,6 +43,13 @@ interface SpellBoxProps {
     explanation: string;
     isPrefilled?: boolean;
     prefilledIndexes?: number[];
+    aiTutor?: {
+      target_word?: string;
+      question?: string; // mask like "_ _ p"
+      student_entry?: string; // not used from bank; computed at runtime
+      topic_to_reinforce?: string;
+      spelling_pattern_or_rule?: string;
+    };
   };
   
   // UI options
@@ -99,6 +106,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [aiHint, setAiHint] = useState<string>('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
   const [canClickNext, setCanClickNext] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<string>('');
   
   // Tutorial system integration
   const {
@@ -510,6 +519,22 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [targetWord]);
 
+  // Compute mistake indices comparing student entry vs target word, excluding prefilled indices
+  const computeMistakes = useCallback((studentEntry: string, target: string): number[] => {
+    const mistakes: number[] = [];
+    const maxIndex = Math.min(studentEntry.length, target.length);
+    const prefilledSet = new Set<number>(question?.prefilledIndexes || []);
+    for (let i = 0; i < maxIndex; i++) {
+      if (prefilledSet.has(i)) continue;
+      const s = (studentEntry[i] || '').toUpperCase();
+      const t = (target[i] || '').toUpperCase();
+      if (s && t && s !== t) {
+        mistakes.push(i);
+      }
+    }
+    return mistakes;
+  }, [question?.prefilledIndexes]);
+
   // Confetti celebration function
   const triggerConfetti = useCallback(() => {
     // Create a burst of confetti
@@ -657,7 +682,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return () => { if (timer) window.clearTimeout(timer); };
   }, [isCorrect, nextUnlockDelayMs]);
 
-  // Handle answer change
+  // Handle answer change (no auto-evaluation; feedback only after submit)
   const handleAnswerChange = useCallback((newAnswer: string) => {
     // console.log('🔤 SPELLBOX handleAnswerChange called:', {
     //   newAnswer,
@@ -666,76 +691,72 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     // });
     
     setUserAnswer(newAnswer);
-    
-    if (isUserInputComplete(newAnswer)) {
-      const completeWord = reconstructCompleteWord(newAnswer);
-      const correct = isWordCorrect(completeWord, targetWord);
-      
-      // console.log('🔤 SPELLBOX: User input complete!', {
-      //   userInput: newAnswer,
-      //   reconstructedWord: completeWord,
-      //   targetWord,
-      //   isCorrect: correct
-      // });
-      
-      setIsCorrect(correct);
-      setIsComplete(true);
-      
-      if (correct) {
-        // console.log('🎉 SPELLBOX: CORRECT ANSWER! Triggering celebration');
-        
-        // Stop any ongoing realtime session speech since it's no longer relevant
-        if (interruptRealtimeSession) {
-          interruptRealtimeSession();
-        }
-        
-        // Trigger confetti celebration for correct answer
-        triggerConfetti();
-        
-        // Complete tutorial if this is the first time
-        if (showTutorial) {
-          nextTutorialStep();
-        }
-        
-        if (onComplete) {
-          // Delay advancing slightly to ensure confetti is visible on screen
-          const ADVANCE_DELAY_MS = 500;
-          setTimeout(() => {
-            // Enhanced callback includes complete word and attempt count
-            onComplete(true, completeWord, attempts + 1);
-          }, ADVANCE_DELAY_MS);
-        }
-      } else {
-        // console.log('❌ SPELLBOX: Incorrect answer, generating hint');
-        // Increment attempts for incorrect answer
-        setAttempts(prev => prev + 1);
-        // Notify parent on first incorrect attempt so callers can react (e.g., assignment switch)
-        try {
-          if (onComplete && attempts === 0) {
-            // attempts is current count before increment; first incorrect means attempts === 0
-            onComplete(false, completeWord, 1);
-          }
-        } catch {}
-        // In assignment mode, the adventure restarts and grade changes on first incorrect.
-        // Do not generate hints or send realtime messages; the context will reset.
-        if (isAssignmentFlow) {
-          return;
-        }
-        // Generate AI hint for incorrect answer (non-assignment flows only)
-        generateAIHint(completeWord);
-        // Trigger realtime pronunciation coach prompt (non-assignment flows)
-        if (sendMessage && targetWord) {
-          try {
-            sendMessage(`correct answer is ${targetWord}, student response is ${completeWord}`);
-          } catch {}
-        }
+    setHasSubmitted(false);
+    setIsComplete(isUserInputComplete(newAnswer));
+    setIsCorrect(false);
+  }, [isUserInputComplete]);
+
+  // Submit current attempt via chevron/Enter
+  const handleSubmitAttempt = useCallback(() => {
+    // Enable submit once any letter is entered (non-space)
+    const canSubmit = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+    if (!canSubmit) return;
+    const completeWord = reconstructCompleteWord(userAnswer);
+    const correct = isWordCorrect(completeWord, targetWord);
+    setHasSubmitted(true);
+    setIsCorrect(correct);
+    // Record submitted answer for change detection on subsequent submits
+    const changedSinceLast = completeWord !== lastSubmittedAnswer;
+    setLastSubmittedAnswer(completeWord);
+    if (correct) {
+      if (interruptRealtimeSession) {
+        try { interruptRealtimeSession(); } catch {}
+      }
+      triggerConfetti();
+      if (showTutorial) {
+        try { nextTutorialStep(); } catch {}
+      }
+      if (onComplete) {
+        const ADVANCE_DELAY_MS = 500;
+        setTimeout(() => {
+          onComplete(true, completeWord, attempts + 1);
+        }, ADVANCE_DELAY_MS);
       }
     } else {
-      // console.log('🔤 SPELLBOX: User input not complete yet');
-      setIsComplete(false);
-      setIsCorrect(false);
+      // Only count as a new attempt if the answer changed
+      if (!changedSinceLast) {
+        return;
+      }
+      const nextAttempt = attempts + 1;
+      setAttempts(nextAttempt);
+      try {
+        if (onComplete && attempts === 0) {
+          onComplete(false, completeWord, 1);
+        }
+      } catch {}
+      if (isAssignmentFlow) {
+        return;
+      }
+      generateAIHint(completeWord);
+      if (sendMessage && targetWord) {
+        try {
+          const aiTutor = (question as any)?.aiTutor || {};
+          const studentEntry = completeWord;
+          const mistakes = computeMistakes(studentEntry, targetWord);
+          const payload = {
+            target_word: targetWord,
+            question: aiTutor?.question,
+            student_entry: studentEntry,
+            mistakes,
+            attempt_number: nextAttempt,
+            topic_to_reinforce: aiTutor?.topic_to_reinforce,
+            spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule,
+          };
+          sendMessage(JSON.stringify(payload));
+        } catch {}
+      }
     }
-  }, [targetWord, onComplete, isUserInputComplete, reconstructCompleteWord, isWordCorrect, triggerConfetti, generateAIHint, userAnswer, sendMessage, isAssignmentFlow]);
+  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer]);
 
   // Focus next empty box (scoped to this component)
   const focusNextEmptyBox = useCallback(() => {
@@ -767,6 +788,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setUserAnswer('');
       setIsCorrect(false);
       setIsComplete(false);
+      setHasSubmitted(false);
+      setLastSubmittedAnswer('');
       setShowHint(false);
       setAttempts(0);
       setAiHint('');
@@ -823,6 +846,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Don't render if we don't have the basic requirements, but be more lenient about sentence
   // In inline mode, respect isVisible but default is true
   if (!isVisible || !targetWord) return null;
+
+  // Derived UI states for chevron transparency/disabled behavior
+  const hasAnyInput = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+  const isSameAsLastSubmission = hasSubmitted && reconstructCompleteWord(userAnswer) === lastSubmittedAnswer;
+  const submitDisabledUnattempted = !isCorrect && (!hasAnyInput || isSameAsLastSubmission);
+  const nextGateDisabled = isCorrect && !canClickNext;
 
   return (
     <>
@@ -955,9 +984,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   const globalIndex = baseIndex + letterIndex;
                                   const letterValue = getUserInputAtBlankIndex(globalIndex);
                                   const completeWord = reconstructCompleteWord(userAnswer);
-                                  const isWordCompleteNow = isUserInputComplete(userAnswer);
-                                  const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
-                                  const isWordIncorrectNow = isWordCompleteNow && !isWordCorrectNow;
+                                  const showEvaluation = hasSubmitted;
+                                  const isWordCorrectNow = showEvaluation && isCorrect;
+                                  const isWordIncorrectNow = showEvaluation && !isCorrect;
                                   
                                   // Check if this specific letter is correct in its position
                                   const correctLetter = part.answer?.[letterIndex]?.toUpperCase() || '';
@@ -989,7 +1018,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       cursor: 'not-allowed',
                                       transform: 'translateY(-2px)'
                                     };
-                                  } else if (isWordCompleteNow && isLetterCorrect) {
+                                  } else if (showEvaluation && isLetterCorrect) {
                                     // Word is complete and this letter is in correct position - green
                                     boxStyle = {
                                       ...boxStyle,
@@ -1033,7 +1062,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       type="text"
                                         value={letterValue}
                                       maxLength={1}
-                                      disabled={isWordCorrectNow}
+                                      disabled={isCorrect}
                                       onCompositionStart={() => {
                                         // During IME composition, defer validation until compositionend
                                       }}
@@ -1086,6 +1115,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                         } else if (e.key === 'ArrowRight') {
                                           const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                           if (nextBox) nextBox.focus();
+                                        } else if (e.key === 'Enter') {
+                                          const canSubmitNow = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+                                          if (!isCorrect && canSubmitNow) {
+                                            e.preventDefault();
+                                            handleSubmitAttempt();
+                                          }
                                         }
                                       }}
                                       style={boxStyle}
@@ -1103,35 +1138,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       }}
                                       onBlur={(e) => {
                                         const hasValue = e.target.value.trim() !== '';
-                                        const completeWordNow = reconstructCompleteWord(userAnswer);
-                                        const isCorrectNow = isUserInputComplete(userAnswer) && isWordCorrect(completeWordNow, targetWord);
-                                        const isIncorrectNow = isUserInputComplete(userAnswer) && !isCorrectNow;
-                                        
-                                        // Check if this specific letter is correct in its position
+                                        const showEvaluation = hasSubmitted;
                                         const correctLetterBlur = part.answer?.[letterIndex]?.toUpperCase() || '';
                                         const isLetterCorrectBlur = hasValue && e.target.value.toUpperCase() === correctLetterBlur;
-                                        
                                         e.target.style.transform = 'scale(1)';
                                         e.target.style.borderStyle = hasValue ? 'solid' : 'dashed';
-                                        
-                                        if (isCorrectNow) {
-                                          // Entire word is correct
+                                        if (showEvaluation && isCorrect) {
                                           e.target.style.borderColor = '#22C55E';
                                           e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
-                                        } else if (isWordCompleteNow && isLetterCorrectBlur) {
-                                          // Word is complete and this letter is in correct position
+                                        } else if (showEvaluation && isLetterCorrectBlur) {
                                           e.target.style.borderColor = '#22C55E';
                                           e.target.style.boxShadow = '0 2px 4px rgba(34, 197, 94, 0.2)';
-                                        } else if (isIncorrectNow && hasValue) {
-                                          // Word is complete but this letter is incorrect
+                                        } else if (showEvaluation && hasValue) {
                                           e.target.style.borderColor = '#EF4444';
                                           e.target.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.2)';
                                         } else if (hasValue) {
-                                          // Letter has value but word not complete yet
                                           e.target.style.borderColor = '#0EA5E9';
                                           e.target.style.boxShadow = '0 2px 4px rgba(14, 165, 233, 0.2)';
                                         } else {
-                                          // Empty letter
                                           e.target.style.borderColor = '#94A3B8';
                                           e.target.style.boxShadow = '0 1px 2px rgba(148, 163, 184, 0.1)';
                                         }
@@ -1185,87 +1209,68 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
           
 
-          {/* AI-powered hints for incorrect words */}
-                  {false && isComplete && !isCorrect && showHints && (
-            <div style={{
-              padding: '12px 0',
-              marginBottom: '20px',
-              position: 'relative',
-              animation: 'fadeSlideIn 0.3s ease-out'
-            }}>
-               <div style={{
-                 display: 'flex',
-                 alignItems: 'center',
-                 justifyContent: 'center',
-                 gap: '12px'
-               }}>
-                 <div style={{ 
-                   fontSize: '14px', 
-                   fontWeight: 400, 
-                   color: '#6B7280', 
-                   fontFamily: 'system-ui, -apple-system, sans-serif',
-                   letterSpacing: '0.5px'
-                 }}>
-                   Need help? Try listening again
-                 </div>
-                 
-                 {/* Hint button */}
-                 <button
-                   onClick={() => {
-                     playClickSound();
-                     if (sendMessage && targetWord) {
-                       sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`)
-                     }
-                   }}
-                   style={{
-                     width: '32px',
-                     height: '32px',
-                     borderRadius: '50%',
-                     border: '2px solid #4B5563',
-                     background: 'transparent',
-                     color: '#6B7280',
-                     cursor: 'pointer',
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center',
-                     fontSize: '14px',
-                     transition: 'all 0.2s ease-out',
-                     flexShrink: 0,
-                     filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))'
-                   }}
-                   title="Get pronunciation help"
-                   onMouseEnter={(e) => {
-                     e.currentTarget.style.borderColor = '#374151';
-                     e.currentTarget.style.color = '#374151';
-                     e.currentTarget.style.transform = 'scale(1.05)';
-                     e.currentTarget.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15))';
-                   }}
-                   onMouseLeave={(e) => {
-                     e.currentTarget.style.borderColor = '#4B5563';
-                     e.currentTarget.style.color = '#6B7280';
-                     e.currentTarget.style.transform = 'scale(1)';
-                     e.currentTarget.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
-                   }}
-                 >
-                   🎤
-                 </button>
-               </div>
+          {/* Hint button (incorrect response) positioned at top-right of SpellBox */}
+          {hasSubmitted && !isCorrect && showHints && (
+            <div className="absolute top-2 right-2 z-20">
+              <Button
+                variant="comic"
+                size="icon"
+                onClick={() => {
+                  playClickSound();
+                  if (sendMessage && targetWord) {
+                    const aiTutor = (question as any)?.aiTutor || {};
+                    const studentEntry = reconstructCompleteWord(userAnswer);
+                    const mistakes = computeMistakes(studentEntry, targetWord);
+                       const payload = {
+                         target_word: targetWord,
+                      question: aiTutor?.question,
+                      student_entry: studentEntry,
+                      mistakes,
+                      attempt_number: attempts,
+                      topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                      spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule,
+                    };
+                    sendMessage(JSON.stringify(payload));
+                  }
+                }}
+                className={cn('h-9 w-9 rounded-full border-2 border-black bg-yellow-300 text-yellow-900 shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 hover:bg-yellow-400')}
+                title="Hint: listen again"
+                aria-label="Hint: listen again"
+              >
+                <Lightbulb className="h-5 w-5" />
+              </Button>
             </div>
           )}
 
-          {/* Next chevron - circular, positioned on the right of the spellbox */}
-          {isCorrect && onNext && canClickNext && (
+          {/* Persistent chevron - acts as Submit until correct, then Next
+              If a delay is configured for next unlock, hide chevron until gate opens */}
+          {question && !(isCorrect && nextUnlockDelayMs > 0 && !canClickNext) && (
             <div className="absolute top-1/2 -translate-y-1/2 -right-[24px] z-20">
               <Button
                 variant="comic"
                 size="icon"
-                aria-label="Next question"
-                onClick={() => { playClickSound(); onNext(); }}
-                className={cn('h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105', highlightNext && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300')}
+                aria-label={isCorrect ? 'Next question' : 'Check answer'}
+                onClick={() => {
+                  playClickSound();
+                  if (isCorrect) {
+                    if (canClickNext && onNext) onNext();
+                  } else {
+                    handleSubmitAttempt();
+                  }
+                }}
+                disabled={nextGateDisabled || submitDisabledUnattempted}
+                className={cn(
+                  'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
+                  // Keep fully opaque when delay-gated next
+                  nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
+                  // Make slightly transparent when unattempted/unchanged
+                  submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
+                  highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
+                )}
               >
-                <ChevronRight className="h-6 w-6" />
+                <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
               </Button>
-              {highlightNext && (
+              {highlightNext && isCorrect && (
                 <div className="ml-2 text-2xl select-none" aria-hidden="true">👉</div>
               )}
             </div>
@@ -1345,15 +1350,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       const globalIndex = baseIndex + letterIndex;
                                       const letterValue = getUserInputAtBlankIndex(globalIndex);
                                       const completeWord = reconstructCompleteWord(userAnswer);
-                                      const isWordCompleteNow = isUserInputComplete(userAnswer);
-                                      const isWordCorrectNow = isWordCompleteNow && isWordCorrect(completeWord, targetWord);
-                                      const isWordIncorrectNow = isWordCompleteNow && !isWordCorrectNow;
+                                      const showEvaluation = hasSubmitted;
+                                      const isWordCorrectNow = showEvaluation && isCorrect;
+                                      const isWordIncorrectNow = showEvaluation && !isCorrect;
                                       const correctLetter = part.answer?.[letterIndex]?.toUpperCase() || '';
                                       const isLetterCorrect = letterValue && letterValue.toUpperCase() === correctLetter;
                                       let boxStyle: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 600, textAlign: 'center', outline: 'none', textTransform: 'uppercase', cursor: 'pointer' };
                                       if (isWordCorrectNow) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E', color: '#15803D', cursor: 'not-allowed' };
-                                      } else if (isWordCompleteNow && isLetterCorrect) {
+                                      } else if (showEvaluation && isLetterCorrect) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E', color: '#15803D' };
                                       } else if (isWordIncorrectNow && letterValue) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444', color: '#B91C1C' };
@@ -1368,7 +1373,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                           type="text"
                                           value={letterValue}
                                           maxLength={1}
-                                          disabled={isWordCorrectNow}
+                                          disabled={isCorrect}
                                           onChange={(e) => {
                                             if (isWordCorrectNow) return;
                                             const newValue = e.target.value.toUpperCase();
@@ -1376,7 +1381,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                               const newUserAnswer = updateUserInputAtBlankIndex(globalIndex, newValue);
                                               handleAnswerChange(newUserAnswer);
                                               playClickSound();
-                                              if (newValue && letterIndex < expectedLength - 1) {
+                                              if (newValue) {
                                                 const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                                 if (nextBox) {
                                                   setTimeout(() => nextBox.focus(), 10);
@@ -1400,6 +1405,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                             } else if (e.key === 'ArrowRight') {
                                               const nextBox = containerRef.current?.querySelector(`input[data-letter="${globalIndex + 1}"]`) as HTMLInputElement | null;
                                               if (nextBox) nextBox.focus();
+                                            } else if (e.key === 'Enter') {
+                                              const canSubmitNow = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+                                              if (!isCorrect && canSubmitNow) {
+                                                e.preventDefault();
+                                                handleSubmitAttempt();
+                                              }
                                             }
                                           }}
                                           style={boxStyle}
@@ -1442,22 +1453,44 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             )}
 
             {/* Inline hints */}
-            {isComplete && !isCorrect && showHints && (
+            {hasSubmitted && !isCorrect && showHints && (
               <div style={{ padding: '8px 0' }}>
-                <button onClick={() => { playClickSound(); if (sendMessage && targetWord) { sendMessage(`correct answer is ${targetWord} , student response is ${reconstructCompleteWord(userAnswer)}`) } }} title="Get pronunciation help" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px solid #4B5563', background: 'transparent', color: '#6B7280' }}>🎤</button>
-          </div>
-            )}
-
-             {isCorrect && onNext && (
-               <div className="absolute top-1/2 -translate-y-1/2 -right-[18px] z-20">
                 <Button
                   variant="comic"
                   size="icon"
-                  aria-label="Next question"
-                  onClick={() => { playClickSound(); onNext(); }}
-                  className={cn('h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105')}
+                  onClick={() => { playClickSound(); if (sendMessage && targetWord) { const aiTutor = (question as any)?.aiTutor || {}; const studentEntry = reconstructCompleteWord(userAnswer); const mistakes = computeMistakes(studentEntry, targetWord); const payload = { target_word: targetWord, question: aiTutor?.question, student_entry: studentEntry, mistakes, attempt_number: attempts, topic_to_reinforce: aiTutor?.topic_to_reinforce, spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule }; sendMessage(JSON.stringify(payload)); } }}
+                  className={cn('h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 bg-yellow-300 text-yellow-900 hover:bg-yellow-400')}
+                  title="Hint: listen again"
+                  aria-label="Hint: listen again"
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <Lightbulb className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            )}
+
+            {/* Persistent chevron (inline) - acts as Submit until correct, then Next */}
+            {question && !(isCorrect && nextUnlockDelayMs > 0 && !canClickNext) && (
+              <div className="absolute top-1/2 -translate-y-1/2 -right-[18px] z-20">
+                <Button
+                  variant="comic"
+                  size="icon"
+                  aria-label={isCorrect ? 'Next question' : 'Check answer'}
+                  onClick={() => {
+                    playClickSound();
+                    if (isCorrect) {
+                      if (onNext) onNext();
+                    } else {
+                      handleSubmitAttempt();
+                    }
+                  }}
+                  disabled={nextGateDisabled || submitDisabledUnattempted}
+                  className={cn(
+                    'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
+                    nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
+                    submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
+                  )}
+                >
+                  <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
                 </Button>
               </div>
             )}

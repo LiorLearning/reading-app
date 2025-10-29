@@ -24,6 +24,7 @@ import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
 import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
 import { loadUserProgress, saveTopicPreference, loadTopicPreference, saveGradeSelection, getNextTopicByPreference } from '@/lib/utils';
+import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 import EvolutionStrip from '@/components/adventure/EvolutionStrip';
 import { ensureMicPermission } from '@/lib/mic-permission';
 import { toast } from 'sonner';
@@ -977,8 +978,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // Only proceed if auth loading is complete and user data is available
       if (loading || !userData || !user) return;
       
-      // Only show pet selection if user has completed onboarding
-      if (!userData.isFirstTime && userData.grade) {
+      // Show pet selection whenever there are no pets yet (regardless of onboarding status)
+      if (true) {
         try {
           // First check local storage for owned pets
           const localOwnedPets = PetProgressStorage.getAllOwnedPets();
@@ -2441,16 +2442,22 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
-        // 3rd, 4th and 5th should store as grade3 in Firebase per requirement
-        if (name === '3rd Grade' || name === '4th Grade' || name === '5th Grade') return 'grade3';
+        // 3rd should store as grade3, 4th/5th as grade4
+        if (name === '3rd Grade') return 'grade3';
+        if (name === '4th Grade' || name === '5th Grade') return 'grade4';
         return '';
       };
       const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
       const previousGradeDisplayName = userData?.gradeDisplayName || '';
-      const gradeCode = mapDisplayToCode(incomingGradeDisplayName);
+      let gradeCode = mapDisplayToCode(incomingGradeDisplayName);
       const levelCode = level === 'middle' ? 'mid' : level;
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = incomingGradeDisplayName;
+      // Lightweight migration: if selecting 4th/5th but previously stored as grade3, upgrade to grade4
+      if ((incomingGradeDisplayName === '4th Grade' || incomingGradeDisplayName === '5th Grade') && gradeCode === 'grade3') {
+        gradeCode = 'grade4';
+      }
+
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -2477,6 +2484,15 @@ const getSleepyPetImage = (clicks: number) => {
         } catch (err) {
           console.warn('Failed to reset assignment progress:', err);
         }
+      }
+      // Immediately reposition SpellBox to the grade/level anchor and reset only that topic
+      try {
+        const effectiveGrade = incomingGradeDisplayName || gradeDisplayName || userData?.gradeDisplayName || '';
+        if (effectiveGrade) {
+          await setSpellboxAnchorForLevel(effectiveGrade, level, user?.uid || undefined);
+        }
+      } catch (anchorErr) {
+        console.warn('Failed to set SpellBox anchor for level change:', anchorErr);
       }
     } catch (e) {
       console.error('Failed to persist grade/level selection:', e);

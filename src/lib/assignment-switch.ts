@@ -1,5 +1,6 @@
 import { sampleMCQData } from '@/data/mcq-questions';
 import { getNextTopicByPreference } from '@/lib/utils';
+import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 
 export interface AssignmentSwitchDeps {
   currentGradeDisplayName?: string | null;
@@ -76,6 +77,14 @@ export async function handleFirstIncorrectAssignment(
       } as any);
     } catch (e) {
       console.warn('Failed to persist grade switch', e);
+    }
+
+    // Reposition SpellBox to the corresponding Start/Middle anchor and reset ONLY that topic
+    try {
+      // Note: we do not have userId here; the hybrid saver in setSpellboxAnchorForLevel will persist locally
+      await setSpellboxAnchorForLevel(tier.gdn, tier.pref);
+    } catch (anchorErr) {
+      console.warn('Failed to set SpellBox anchor after assignment switch:', anchorErr);
     }
 
     const allTopicIds = Object.keys(sampleMCQData.topics);

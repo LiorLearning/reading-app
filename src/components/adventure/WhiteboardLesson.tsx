@@ -57,6 +57,16 @@ Never initiate conversation; only speak the text you receive.`,
     return v?.id || 'cgSgspJ2msm6clMCkdW9';
   }, []);
 
+  // Local spelling tutor session for fullscreen overlay (eye flow) only.
+  // In adventure page usage, we do NOT enable this; adventure retains existing behavior.
+  const enableLocalTutor = !!(fullscreen && !parentSendMessage);
+  const { sendMessage: localTutorSend, interruptRealtimeSession: localTutorInterrupt } = useRealtimeSession({
+    isAudioPlaybackEnabled: true,
+    enabled: enableLocalTutor,
+    agentName: 'spellingTutor',
+    agentVoice: 'sage',
+  });
+
   // Deterministic numeric id from a string (to keep compatibility with SpellBox's numeric id)
   const computeNumericId = (str: string): number => {
     let hash = 0;
@@ -464,8 +474,8 @@ Never initiate conversation; only speak the text you receive.`,
                     trackEvent('lesson_completed', { topicId });
                     onCompleted();
                   }}
-                  sendMessage={parentSendMessage}
-                  interruptRealtimeSession={interruptRealtimeSession}
+                  sendMessage={parentSendMessage || (enableLocalTutor ? localTutorSend : undefined)}
+                 interruptRealtimeSession={interruptRealtimeSession || (enableLocalTutor ? localTutorInterrupt : undefined)}
                   />
                 {/* Continue CTA aligned to bottom via outer layout; here as a fallback */}
               </div>

@@ -679,9 +679,9 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   const isGrade = (n: string, targets: Array<string | number>) =>
     targets.some(t => (typeof t === 'number' ? n.includes(`${t}`) : n.includes(t.toLowerCase())));
 
-  // 4th/5th behave like grade 3 content
-  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '3';
-  if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '3';
+  // 4th/5th behave like grade 4 content
+  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '4';
+  if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '4';
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
   if (isGrade(name, ['2nd', 'second', 'grade 2', 'grade2', '2'])) return '2';
   if (isGrade(name, ['1st', 'first', 'grade 1', 'grade1', '1'])) return '1';
@@ -810,12 +810,13 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
   // console.log(`🎯 Grade mapping - Selected: ${gradeDisplayName} → Content Grade: ${contentGrade}, Level: ${level}`);
   // console.log(`📚 Available topic IDs (first 10):`, allTopicIds.slice(0, 10));
   
-  // Filter topics by grade first to see what's available
+  // Filter topics by grade first to see what's available (kept for future logic; not used below directly)
   const gradeTopics = allTopicIds.filter(id => {
     if (contentGrade === 'K') return id.startsWith('K-');
     if (contentGrade === '1') return id.startsWith('1-');
     if (contentGrade === '2') return id.startsWith('2-');
     if (contentGrade === '3') return id.startsWith('3-');
+    if (contentGrade === '4') return id.startsWith('4-');
     return false;
   });
   
@@ -865,6 +866,20 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
         // console.log(`⚠️ No Grade 2 topics found, falling back to Grade 1`);
         startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
         if (startIndex === -1) startIndex = 0;
+      }
+    }
+  } else if (contentGrade === '4') {
+    // Grade 4 content - find first 4- topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('4-'));
+    if (startIndex === -1) {
+      // Fallback to grade 3 → grade 2 → grade 1
+      startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
+        if (startIndex === -1) {
+          startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+          if (startIndex === -1) startIndex = 0;
+        }
       }
     }
   }
@@ -1227,6 +1242,8 @@ export interface SpellboxTopicProgress {
   isCompleted: boolean;
   completedAt?: number;
   successRate: number; // Calculated field for convenience
+  // Mark that the whiteboard lesson for this topic has been completed at least once
+  whiteboardSeen?: boolean;
 }
 
 export interface SpellboxGradeProgress {
@@ -1420,6 +1437,67 @@ export const updateSpellboxTopicProgress = async (
 };
 
 /**
+ * Check if the whiteboard lesson for a topic has been seen (completed) at least once.
+ * Reads from locally cached grade progress (kept in sync with Firebase via hybrid loader).
+ */
+export const hasSeenWhiteboard = (gradeDisplayName: string, topicId: string): boolean => {
+  if (!gradeDisplayName || !topicId) return false;
+  const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) return false;
+  const topic = gradeProgress.topicProgress[topicId];
+  return !!topic?.whiteboardSeen;
+};
+
+/**
+ * Mark the whiteboard lesson for a topic as seen (on completion only).
+ * Persists via Firebase when userId is provided, otherwise local only.
+ */
+export const markWhiteboardSeen = async (
+  gradeDisplayName: string,
+  topicId: string,
+  userId?: string
+): Promise<void> => {
+  if (!gradeDisplayName || !topicId) return;
+  let gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
+  if (!gradeProgress) {
+    gradeProgress = {
+      gradeDisplayName,
+      currentTopicId: topicId,
+      topicProgress: {},
+      timestamp: Date.now()
+    };
+  }
+
+  if (!gradeProgress.topicProgress[topicId]) {
+    gradeProgress.topicProgress[topicId] = {
+      topicId,
+      questionsAttempted: 0,
+      firstAttemptCorrect: 0,
+      totalQuestions: 10,
+      isCompleted: false,
+      successRate: 0,
+      whiteboardSeen: true
+    };
+  } else {
+    gradeProgress.topicProgress[topicId].whiteboardSeen = true;
+  }
+
+  gradeProgress.timestamp = Date.now();
+
+  if (userId) {
+    try {
+      const { saveSpellboxProgressHybrid } = await import('./firebase-spellbox-cache');
+      await saveSpellboxProgressHybrid(userId, gradeProgress);
+    } catch (error) {
+      console.warn('Failed to sync whiteboardSeen to Firebase; saving locally:', error);
+      saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+    }
+  } else {
+    saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+  }
+};
+
+/**
  * Check if a Spellbox topic meets the 70% success criteria
  */
 export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress): boolean => {
@@ -1429,7 +1507,7 @@ export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress
 /**
  * Get the next Spellbox topic for a grade
  */
-export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[]): string | null => {
+export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[], preferredLevel?: 'start' | 'middle'): string | null => {
   // Special-case: assignment always stays on assignment topic list (e.g., 'A-')
   if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
     // Prefer 'A-' if available in the provided list; fallback to first
@@ -1440,7 +1518,16 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
   const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
   
   if (!gradeProgress) {
-    // First time, return first topic
+    // Respect current level anchor when no progress exists
+    if (preferredLevel === 'middle') {
+      const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const desired = middleAnchors[contentGrade];
+      if (desired && allTopicIds.includes(desired)) {
+        return desired;
+      }
+    }
+    // Fallback to first in-grade topic
     return allTopicIds[0] || null;
   }
   
@@ -1615,3 +1702,97 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
   
   return formatted;
 };
+
+// Profanity moderation utility
+import profanityListRaw from "@/lib/profanity.txt?raw";
+import OpenAI from 'openai';
+
+// Build a Set of profane words on first import for O(1) lookups
+const PROFANITY_SET: Set<string> = (() => {
+  // Normalize lines: trim, lowercase, drop blanks
+  const lines = profanityListRaw
+    .split(/\r?\n/)
+    .map(l => l.trim().toLowerCase())
+    .filter(l => l.length > 0);
+  return new Set(lines);
+})();
+
+/**
+ * Check if the given text contains any profane word.
+ * - Case-insensitive
+ * - Ignores punctuation and special characters
+ * - Treats dots/slashes/hyphens as separators
+ * Returns true if any word matches; otherwise false.
+ */
+
+export function openaiClient() {
+  return new OpenAI({
+    dangerouslyAllowBrowser: true,
+    apiKey: null,
+    baseURL: 'https://api.readkraft.com/api/v1'
+  });
+}
+
+export async function moderation(text: string | null | undefined): Promise<boolean> {
+  if (!text) return false;
+
+  const response = await openaiClient().responses.create({
+    prompt: {
+      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
+    },
+    store: false,
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text
+          }
+        ]
+      }]
+  });
+  if (response.output_text.includes("true")) {
+    return true;
+  }
+  
+
+
+  //Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
+  const normalized = text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
+  if (!normalized) return false;
+
+  const tokens = normalized.split(/\s+/);
+
+  // Early exit on direct token matches
+  for (const token of tokens) {
+    if (PROFANITY_SET.has(token)) {
+      return true;
+    }
+  }
+
+  fetch('https://api.readkraft.com/api/discord', {
+    method: 'POST',
+    body: JSON.stringify({
+      content: text,
+      "type": "user_input",
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  return false;
+
+  // Additionally check common adjacent joins that appear in list (e.g., "shithead")
+  // for (let i = 0; i < tokens.length - 1; i++) {
+  //   const joined = tokens[i] + tokens[i + 1];
+  //   if (PROFANITY_SET.has(joined)) {
+  //     return true;
+  //   }
+  // }
+}

@@ -17,6 +17,7 @@ import {
 import { getSpellingTopicIds, getAllSpellingQuestions } from '@/lib/questionBankUtils';
 import { sampleMCQData } from '@/data/mcq-questions';
 import WhiteboardLesson from '@/components/adventure/WhiteboardLesson';
+import { markWhiteboardSeen } from '@/lib/utils';
 import { getLessonScript } from '@/data/lesson-scripts';
 
 interface TopicProgressCard {
@@ -217,7 +218,7 @@ export function ProgressTracking(): JSX.Element {
 
   const handleBackClick = () => {
     playClickSound();
-    navigate('/');
+    navigate('/app');
   };
 
   return (
@@ -459,7 +460,10 @@ export function ProgressTracking(): JSX.Element {
           topicId={whiteboardTopicId}
           fullscreen
           onRequestClose={() => setWhiteboardTopicId(null)}
-          onCompleted={() => setWhiteboardTopicId(null)}
+          onCompleted={() => {
+            try { markWhiteboardSeen((userData?.gradeDisplayName || '').trim(), whiteboardTopicId, user?.uid).catch(() => {}); } catch {}
+            setWhiteboardTopicId(null);
+          }}
         />
       )}
     </div>
