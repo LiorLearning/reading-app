@@ -4412,11 +4412,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const optimisticPct = Math.round((nextFirstCorrect / nextAttempted) * 100);
         setHeaderTopicProgressPct(optimisticPct);
         // If this was the final question (10th), immediately launch whiteboard for next topic
-      if (nextAttempted >= 10 && !isWhiteboardSuppressedByAssignment) {
+      const masteredNow = (prev?.masteredQuestionIds || []).length + (isFirstAttempt ? (prev?.masteredQuestionIds?.includes(currentSpellQuestion.id) ? 0 : 1) : 0);
+      const hasMasteredAll = masteredNow >= 10;
+      if (hasMasteredAll && !isWhiteboardSuppressedByAssignment) {
           try { ttsService.stop(); } catch {}
           // Persist final attempt so topic is marked completed for SpellBox progress
           try {
-            updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid).catch(() => {});
+            updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid, currentSpellQuestion.id).catch(() => {});
           } catch {}
           // Hide SpellBox immediately
           setShowSpellBox(false);
@@ -4464,7 +4466,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           return;
         }
       } catch {}
-      updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
+      updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid, currentSpellQuestion.id)
         .then(() => {
           // Recompute header progress after persistence
           recomputeHeaderTopicProgress();
@@ -4475,14 +4477,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               analytics.capture('topic_progress_snapshot', {
                 topic_id: currentSpellQuestion.topicId,
                 questions_attempted: tp.questionsAttempted || 0,
-                questions_correct_first_try: tp.firstAttemptCorrect || 0,
+                questions_correct_first_try: (tp.masteredQuestionIds || []).length || 0,
                 avg_attempts_per_question: null,
                 questions_to_mastery: null,
-                mastery_threshold: '>=70% success over 10',
+                mastery_threshold: '10 first-try correct',
               });
               // Also emit topic_mastery summary (re-added)
               try {
-                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - (tp.firstAttemptCorrect || 0));
+                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - ((tp.masteredQuestionIds || []).length || 0));
                 analytics.capture('topic_mastery', {
                   topic_id: currentSpellQuestion.topicId,
                   status: isSpellboxTopicPassingGrade(tp) ? 'mastered' : 'ongoing',

@@ -413,34 +413,33 @@ export const getNextSpellboxQuestion = (
     return null;
   }
   
-  // Get topic progress to see how many questions have been attempted
+  // Get topic progress
   const topicProgress = getSpellboxTopicProgress(gradeDisplayName, currentTopicId);
   const questionsAttempted = topicProgress?.questionsAttempted || 0;
-  
-  // If topic is completed but didn't pass, we'll let the progress system handle the restart
-  // The topic will be restarted when updateSpellboxTopicProgress detects a failed topic
-  if (topicProgress?.isCompleted && topicProgress.successRate < 70) {
-    // console.log(`🔄 getNextSpellboxQuestion: Topic ${currentTopicId} needs restart (${topicProgress.successRate.toFixed(1)}% < 70%)`);
-    // Return first question of this topic - the progress will be reset when the next question is answered
-    const firstQuestion = topicQuestions[0];
-    // console.log(`🎯 getNextSpellboxQuestion: Selected first question for restart of topic ${currentTopicId}:`, {
-    //   id: firstQuestion.id,
-    //   word: firstQuestion.word,
-    //   topicName: firstQuestion.topicName
-    // });
-    return firstQuestion;
+  const masteredIds = new Set<number>(topicProgress?.masteredQuestionIds || []);
+
+  // New selection logic:
+  // - First pass: serve first 10 in sequence
+  // - After 10 attempts if not mastered all 10 yet: serve only unmastered words
+  if (questionsAttempted < 10) {
+    const questionIndex = Math.min(questionsAttempted, 9);
+    const selectedQuestion = topicQuestions[questionIndex] || topicQuestions[0];
+    return selectedQuestion;
   }
+
+  // After first pass: pick the first unmastered question
+  const unmastered = topicQuestions.find(q => !masteredIds.has(q.id));
+  if (unmastered) return unmastered;
   
-  // For ongoing topics, select the next question in sequence (up to 10 questions max)
-  const questionIndex = Math.min(questionsAttempted, 9); // Max 10 questions (0-9 index)
-  const selectedQuestion = topicQuestions[questionIndex] || topicQuestions[0];
+  // Fallback: if somehow all appear mastered, return first (caller will advance topic)
+  const selectedQuestion = topicQuestions[0];
   
   // console.log(`🎯 getNextSpellboxQuestion: Selected question ${questionIndex + 1}/10 for topic ${currentTopicId}:`, {
   //   id: selectedQuestion.id,
   //   word: selectedQuestion.word,
   //   topicName: selectedQuestion.topicName,
   //   questionsAttempted,
-  //   topicProgress: topicProgress?.successRate?.toFixed(1) + '%' || 'New topic'
+  //   topicProgress: `${(topicProgress?.masteredQuestionIds || []).length}/10 mastered`
   // });
   
   return selectedQuestion;

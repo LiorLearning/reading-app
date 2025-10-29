@@ -1244,6 +1244,8 @@ export interface SpellboxTopicProgress {
   successRate: number; // Calculated field for convenience
   // Mark that the whiteboard lesson for this topic has been completed at least once
   whiteboardSeen?: boolean;
+  // IDs of questions mastered with a first-try correct on their latest showing (persisted across sessions)
+  masteredQuestionIds?: number[];
 }
 
 export interface SpellboxGradeProgress {
@@ -1365,7 +1367,8 @@ export const updateSpellboxTopicProgress = async (
   gradeDisplayName: string, 
   topicId: string, 
   isFirstAttemptCorrect: boolean,
-  userId?: string
+  userId?: string,
+  questionId?: number
 ): Promise<SpellboxTopicProgress> => {
   let gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
   
@@ -1379,21 +1382,20 @@ export const updateSpellboxTopicProgress = async (
     };
   }
   
-  // Initialize topic progress if it doesn't exist OR reset if topic was completed but failed
+  // Initialize topic progress if it doesn't exist (no reset on fail; we persist mastery across repeats)
   const existingProgress = gradeProgress.topicProgress[topicId];
-  if (!existingProgress || (existingProgress.isCompleted && existingProgress.successRate < 70)) {
-    if (existingProgress?.isCompleted && existingProgress.successRate < 70) {
-      // console.log(`🔄 Resetting failed topic ${topicId} (${existingProgress.successRate.toFixed(1)}% < 70%)`);
-    }
-    
+  if (!existingProgress) {
     gradeProgress.topicProgress[topicId] = {
       topicId,
       questionsAttempted: 0,
       firstAttemptCorrect: 0,
       totalQuestions: 10, // Fixed at 10 questions per topic
       isCompleted: false,
-      successRate: 0
+      successRate: 0,
+      masteredQuestionIds: []
     };
+  } else if (!Array.isArray(existingProgress.masteredQuestionIds)) {
+    existingProgress.masteredQuestionIds = [];
   }
   
   const topicProgress = gradeProgress.topicProgress[topicId];
@@ -1407,8 +1409,16 @@ export const updateSpellboxTopicProgress = async (
   // Calculate success rate
   topicProgress.successRate = (topicProgress.firstAttemptCorrect / topicProgress.questionsAttempted) * 100;
   
-  // Check if topic is completed (10 questions attempted)
-  if (topicProgress.questionsAttempted >= 10) {
+  // Track mastery by question ID when provided
+  if (typeof questionId === 'number' && isFirstAttemptCorrect) {
+    const set = new Set<number>(topicProgress.masteredQuestionIds || []);
+    set.add(questionId);
+    topicProgress.masteredQuestionIds = Array.from(set);
+  }
+  
+  // New completion criteria: 10 unique words mastered first-try (aggregate over time)
+  const masteredCount = (topicProgress.masteredQuestionIds || []).length;
+  if (masteredCount >= 10 && !topicProgress.isCompleted) {
     topicProgress.isCompleted = true;
     topicProgress.completedAt = Date.now();
   }
@@ -1501,7 +1511,10 @@ export const markWhiteboardSeen = async (
  * Check if a Spellbox topic meets the 70% success criteria
  */
 export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress): boolean => {
-  return topicProgress.isCompleted && topicProgress.successRate >= 70;
+  const masteredCount = Array.isArray(topicProgress.masteredQuestionIds)
+    ? topicProgress.masteredQuestionIds.length
+    : 0;
+  return masteredCount >= 10;
 };
 
 /**
