@@ -8,6 +8,7 @@ import { UnifiedAIResponse, StreamEvent } from '@/lib/unified-ai-streaming-servi
 export interface UseUnifiedAIStreamingOptions {
   userId: string;
   adventureId?: string;
+  userData?: { username?: string; age?: number; gender?: string };
   onNewImage?: (imageUrl: string, prompt: string) => void;
   onResponseComplete?: (response: UnifiedAIResponse) => void;
 }
@@ -27,7 +28,7 @@ export interface UnifiedStreamingState {
  * This is the new system that lets AI decide when to generate images
  */
 export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
-  const { userId, adventureId, onNewImage, onResponseComplete } = options;
+  const { userId, adventureId, userData, onNewImage, onResponseComplete } = options;
   
   // State management
   const [streamingState, setStreamingState] = useState<UnifiedStreamingState>({
@@ -254,7 +255,8 @@ export function useUnifiedAIStreaming(options: UseUnifiedAIStreamingOptions) {
         spellingQuestion,
         userId,
         sessionId,
-        adventureId
+        adventureId,
+        userData
       );
       
       // Clear the timeout since request completed successfully

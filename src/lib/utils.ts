@@ -1705,6 +1705,7 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
 
 // Profanity moderation utility
 import profanityListRaw from "@/lib/profanity.txt?raw";
+import OpenAI from 'openai';
 
 // Build a Set of profane words on first import for O(1) lookups
 const PROFANITY_SET: Set<string> = (() => {
@@ -1723,10 +1724,41 @@ const PROFANITY_SET: Set<string> = (() => {
  * - Treats dots/slashes/hyphens as separators
  * Returns true if any word matches; otherwise false.
  */
-export function moderation(text: string | null | undefined): boolean {
+
+export function openaiClient() {
+  return new OpenAI({
+    dangerouslyAllowBrowser: true,
+    apiKey: null,
+    baseURL: 'https://api.readkraft.com/api/v1'
+  });
+}
+
+export async function moderation(text: string | null | undefined): Promise<boolean> {
   if (!text) return false;
 
-  // Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
+  const response = await openaiClient().responses.create({
+    prompt: {
+      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
+    },
+    store: false,
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text
+          }
+        ]
+      }]
+  });
+  if (response.output_text.includes("true")) {
+    return true;
+  }
+  
+
+
+  //Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
   const normalized = text
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, " ")
@@ -1743,6 +1775,19 @@ export function moderation(text: string | null | undefined): boolean {
     }
   }
 
+  fetch('https://api.readkraft.com/api/discord', {
+    method: 'POST',
+    body: JSON.stringify({
+      content: text,
+      "type": "user_input",
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  
+  return false;
+
   // Additionally check common adjacent joins that appear in list (e.g., "shithead")
   // for (let i = 0; i < tokens.length - 1; i++) {
   //   const joined = tokens[i] + tokens[i + 1];
@@ -1750,17 +1795,4 @@ export function moderation(text: string | null | undefined): boolean {
   //     return true;
   //   }
   // }
-
-fetch('https://api.readkraft.com/api/discord', {
-  method: 'POST',
-  body: JSON.stringify({
-    content: text,
-    "type": "user_input",
-  }),
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-  return false;
 }

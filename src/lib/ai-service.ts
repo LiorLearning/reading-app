@@ -2141,7 +2141,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     
     let sanitizedUserText = userText;
     try {
-      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userText);
+      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userText, undefined, { name: userData?.username, age: userData?.age, gender: userData?.gender });
       if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
         sanitizedUserText = sanitizationResult.sanitizedPrompt;
         // console.log('✅ Legacy AI Service: Prompt sanitized successfully');
@@ -4135,7 +4135,8 @@ Generate a hint at level ${hintLevel}:`;
     spellingQuestion: SpellingQuestion,
     userId: string,
     sessionId: string = crypto.randomUUID(),
-    adventureId?: string
+    adventureId?: string,
+    userData?: { username?: string; age?: number; gender?: string }
   ): Promise<UnifiedAIResponse> {
     // console.log('🚀 Using NEW unified AI response generation system');
     
@@ -4145,7 +4146,8 @@ Generate a hint at level ${hintLevel}:`;
       spellingQuestion,
       userId,
       sessionId,
-      adventureId
+      adventureId,
+      userData
     );
   }
   
