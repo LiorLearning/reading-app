@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import { GoogleGenAI, PersonGeneration } from '@google/genai';
 import { ChatMessage } from './utils';
 import { toast } from 'sonner'
+import analytics from '@/lib/analytics';
 
 export interface ImageGenerationResult {
   success: boolean;
@@ -283,6 +284,10 @@ class FluxSchnellProvider implements ImageProvider {
 
     const firstOutputUrl = result?.output;
     if (!firstOutputUrl || typeof firstOutputUrl !== 'string') {
+      analytics.capture('image_creation_failed', {
+        provider: 'flux',
+        prompt,
+      });
       toast.warning('Inappropriate image.', {
         duration: 3000,
       });
