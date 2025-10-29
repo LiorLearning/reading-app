@@ -94,7 +94,8 @@ export class UnifiedAIStreamingService {
     spellingQuestion: SpellingQuestion,
     userId: string,
     sessionId: string,
-    adventureId?: string
+    adventureId?: string,
+    userData?: { username?: string; age?: number; gender?: string }
   ): Promise<UnifiedAIResponse> {
     
     if (!this.isInitialized || !this.client) {
@@ -131,7 +132,8 @@ export class UnifiedAIStreamingService {
         userMessage, 
         chatHistory, 
         spellingQuestion,
-        abortController.signal
+        abortController.signal,
+        userData
       );
       
       if (abortController.signal.aborted) {
@@ -165,7 +167,8 @@ export class UnifiedAIStreamingService {
           userId,
           chatHistory,
           this.imageGenerator,
-          userMessage
+          userMessage,
+          userData
         )) {
           const streamEvent = this.convertChunkToStreamEvent(chunk);
           streamEvents.push(streamEvent);
@@ -204,7 +207,8 @@ export class UnifiedAIStreamingService {
         userId,
         chatHistory,
         this.imageGenerator,
-        userMessage // Pass original user message for image generation
+        userMessage, // Pass original user message for image generation
+        userData
       )) {
         
         if (abortController.signal.aborted) {
@@ -304,7 +308,8 @@ export class UnifiedAIStreamingService {
     userMessage: string,
     chatHistory: ChatMessage[],
     spellingQuestion: SpellingQuestion,
-    signal: AbortSignal
+    signal: AbortSignal,
+    userData?: { username?: string; age?: number; gender?: string }
   ): Promise<string> {
     
     if (!this.client) {
@@ -317,7 +322,11 @@ export class UnifiedAIStreamingService {
     
     let sanitizedUserMessage = userMessage;
     try {
-      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userMessage);
+      const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(
+        userMessage, 
+        undefined, 
+        { name: userData?.username, age: userData?.age, gender: userData?.gender }
+      );
       if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
         sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
         // console.log('✅ Prompt sanitized successfully');
@@ -516,7 +525,8 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
     spellingQuestion: SpellingQuestion,
     userId: string,
     aiResponse: string,
-    adventureId?: string
+    adventureId?: string,
+    userData?: { username?: string; age?: number; gender?: string }
   ): Promise<UnifiedAIResponse> {
     try {
       // console.log('🔄 Calling legacy AI service as fallback...');
@@ -528,7 +538,11 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       
       let sanitizedUserMessage = userMessage;
       try {
-        const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(userMessage);
+        const sanitizationResult = await aiPromptSanitizer.sanitizePrompt(
+          userMessage, 
+          undefined, 
+          { name: userData?.username, age: userData?.age, gender: userData?.gender }
+        );
         if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
           sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
           // console.log('✅ Legacy fallback: Prompt sanitized successfully');

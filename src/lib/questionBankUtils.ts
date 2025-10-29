@@ -1,6 +1,8 @@
 import { sampleMCQData } from '@/data/mcq-questions';
 import { lessonScripts } from '@/data/lesson-scripts';
-import { mapSelectedGradeToContentGrade, getNextSpellboxTopic, getSpellboxTopicProgress } from './utils';
+import { mapSelectedGradeToContentGrade, getNextSpellboxTopic, getSpellboxTopicProgress, loadSpellboxTopicProgress, saveSpellboxTopicProgress } from './utils';
+import type { SpellboxGradeProgress, SpellboxTopicProgress } from './utils';
+import { firebaseSpellboxService } from './firebase-spellbox-service';
 
 // Interface for spelling question data
 export interface SpellingQuestion {
@@ -379,7 +381,8 @@ export const getGlobalSpellingLessonNumber = (topicId: string): number | null =>
  */
 export const getNextSpellboxQuestion = (
   gradeDisplayName?: string,
-  completedQuestionIds: number[] = []
+  completedQuestionIds: number[] = [],
+  preferredLevel?: 'start' | 'middle'
 ): SpellingQuestion | null => {
   if (!gradeDisplayName) {
     console.warn('🚫 getNextSpellboxQuestion: No grade provided');
@@ -397,7 +400,7 @@ export const getNextSpellboxQuestion = (
   }
   
   // Get the current topic based on progression logic
-  const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds);
+  const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds, preferredLevel);
   console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIds: allTopicIds.slice(0, 3) });
   
   if (!currentTopicId) {
@@ -444,3 +447,156 @@ export const getNextSpellboxQuestion = (
   
   return selectedQuestion;
 };
+
+/**
+ * Set SpellBox anchor for the selected grade/level and reset ONLY that topic's progress.
+ * - Immediate effect: next SpellBox question will be from the anchor topic
+ * - Persists to local storage and Firebase (if userId provided)
+ * - Assignment always anchors to 'A-'
+ * - For Middle, uses explicit anchors per grade when provided
+ * - Falls forward to the next in-grade topic that has spelling questions if the anchor is absent
+ *
+ * Returns the final anchor topicId applied (or null if none found)
+ */
+export async function setSpellboxAnchorForLevel(
+  gradeDisplayName: string,
+  level: 'start' | 'middle',
+  userId?: string
+): Promise<string | null> {
+  try {
+    const isAssignment = (gradeDisplayName || '').toLowerCase() === 'assignment';
+    // Build the in-grade ordered topic list (spelling-only)
+    const inGradeTopicIds = getSpellingTopicIds(gradeDisplayName);
+
+    // Short-circuit: Assignment → always 'A-'
+    const targetAnchorIfAssignment = 'A-';
+    if (isAssignment) {
+      const finalAnchor = inGradeTopicIds.includes(targetAnchorIfAssignment)
+        ? targetAnchorIfAssignment
+        : (inGradeTopicIds[0] || targetAnchorIfAssignment);
+
+      // Load or initialize grade progress
+      let gradeProgress: SpellboxGradeProgress | null = loadSpellboxTopicProgress(gradeDisplayName);
+      if (!gradeProgress) {
+        gradeProgress = {
+          gradeDisplayName,
+          currentTopicId: null,
+          topicProgress: {},
+          timestamp: Date.now()
+        };
+      }
+
+      // Reset only the anchor topic
+      gradeProgress.currentTopicId = finalAnchor;
+      gradeProgress.topicProgress[finalAnchor] = {
+        topicId: finalAnchor,
+        questionsAttempted: 0,
+        firstAttemptCorrect: 0,
+        totalQuestions: 10,
+        isCompleted: false,
+        successRate: 0
+      } as SpellboxTopicProgress;
+      gradeProgress.timestamp = Date.now();
+
+      saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+      if (userId) {
+        await firebaseSpellboxService.saveSpellboxProgressFirebase(userId, gradeProgress);
+      }
+      return finalAnchor;
+    }
+
+    // Non-assignment: compute anchors
+    const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+
+    // Middle anchors mapping provided by product
+    const middleAnchors: Record<string, string> = {
+      K: 'K-T.1.2',
+      '1': '1-T.2.1',
+      '2': '2-P.2',
+      '3': '3-A.5',
+    };
+
+    // Desired anchor by level
+    let desiredAnchor: string | null = null;
+    if (level === 'start') {
+      // Start level → first in-grade topic with spelling questions
+      desiredAnchor = inGradeTopicIds[0] || null;
+    } else {
+      desiredAnchor = middleAnchors[contentGrade] || null;
+    }
+
+    // If no topics for grade, bail
+    if (!inGradeTopicIds.length) {
+      return null;
+    }
+
+    // If desired anchor is not available, fall forward in canonical order
+    let finalAnchor = desiredAnchor;
+    const inGradeSet = new Set(inGradeTopicIds);
+    if (!finalAnchor || !inGradeSet.has(finalAnchor)) {
+      const canonicalIds = Object.keys(sampleMCQData.topics);
+      const contentPrefix = `${contentGrade}-`;
+      let anchorIndex = finalAnchor ? canonicalIds.indexOf(finalAnchor) : -1;
+
+      if (anchorIndex === -1) {
+        // If unknown anchor, start at first topic for this grade prefix
+        anchorIndex = canonicalIds.findIndex(id => id.startsWith(contentPrefix));
+        if (anchorIndex === -1) anchorIndex = 0;
+      }
+
+      // Scan forward to the next in-grade topic that has spelling questions
+      finalAnchor = null;
+      for (let i = anchorIndex; i < canonicalIds.length; i++) {
+        const id = canonicalIds[i];
+        if (!id.startsWith(contentPrefix)) {
+          // Stop once we leave this grade's prefix
+          if (finalAnchor) break;
+          if (contentGrade === '3') continue; // Grade 3 is the last mapped grade; allow scanning until list end
+          break;
+        }
+        if (inGradeSet.has(id)) {
+          finalAnchor = id;
+          break;
+        }
+      }
+
+      // Fallback: use first available in-grade topic if still not found
+      if (!finalAnchor) {
+        finalAnchor = inGradeTopicIds[0];
+      }
+    }
+
+    // Load or initialize grade progress
+    let gradeProgress: SpellboxGradeProgress | null = loadSpellboxTopicProgress(gradeDisplayName);
+    if (!gradeProgress) {
+      gradeProgress = {
+        gradeDisplayName,
+        currentTopicId: null,
+        topicProgress: {},
+        timestamp: Date.now()
+      };
+    }
+
+    // Reset only the anchor topic
+    gradeProgress.currentTopicId = finalAnchor!;
+    gradeProgress.topicProgress[finalAnchor!] = {
+      topicId: finalAnchor!,
+      questionsAttempted: 0,
+      firstAttemptCorrect: 0,
+      totalQuestions: 10,
+      isCompleted: false,
+      successRate: 0
+    } as SpellboxTopicProgress;
+    gradeProgress.timestamp = Date.now();
+
+    saveSpellboxTopicProgress(gradeDisplayName, gradeProgress);
+    if (userId) {
+      await firebaseSpellboxService.saveSpellboxProgressFirebase(userId, gradeProgress);
+    }
+
+    return finalAnchor;
+  } catch (err) {
+    console.warn('setSpellboxAnchorForLevel failed:', err);
+    return null;
+  }
+}
