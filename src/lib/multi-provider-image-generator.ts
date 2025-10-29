@@ -163,7 +163,7 @@ export class MultiProviderImageGenerator {
         break;
 
       case 'flux-schnell':
-        refinedPrompt = `Strict Rules: shoulders should be completely covered with clothes. All characters are strictly of 11 years old age.
+        refinedPrompt = `Strict Rules: shoulders should be completely covered with clothes. All characters are strictly of 9 years old age.
         ${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         break;
 
