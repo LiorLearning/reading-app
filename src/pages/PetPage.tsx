@@ -3980,25 +3980,20 @@ const getSleepyPetImage = (clicks: number) => {
           {/* Compact emoji-only bubble closer to the pet */}
           {!showPetShop && (
             <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2" style={{ top: bubbleTopPx }}>
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => {
                   const msg = frozenThought ?? currentPetThought;
                   setTimeout(() => { speakText(msg, true); }, 0);
                 }}
                 title="Tap to hear what I'm thinking"
-                className={`relative inline-flex items-center justify-center rounded-full border-3 shadow-xl transition-transform transition-shadow cursor-pointer focus:outline-none focus-visible:ring-4 hover:translate-y-[1px] active:translate-y-[2px] hover:scale-[1.01] ${
-                sleepClicks > 0 
-                    ? 'bg-gradient-to-br from-[#F3EDFF] to-[#E5DBFF] border-[#D4C8FF] focus-visible:ring-[#D4C8FF]/40 hover:border-[#BFAEF9] hover:shadow-[0_8px_16px_rgba(191,174,249,0.22)]'
-                    : 'bg-gradient-to-br from-[#EEF4FF] to-[#E5F0FF] border-[#BBD7FF] focus-visible:ring-[#BBD7FF]/40 hover:border-[#9EC3FF] hover:shadow-[0_8px_16px_rgba(158,195,255,0.22)]'
-                }`}
-                style={{ width: '58px', height: '58px', boxShadow: '0 10px 20px rgba(0,0,0,0.12)' }}
+                className="h-[58px] w-[58px] rounded-full border-2 border-foreground bg-white shadow-solid btn-animate"
                 aria-label={bubbleVisual.label}
               >
-                <div className="absolute inset-0 rounded-full bg-white/40 blur-md pointer-events-none"></div>
-                <div className="text-[30px]" aria-hidden="true">{bubbleVisual.emoji}</div>
+                <span className="text-[30px]" aria-hidden="true">{bubbleVisual.emoji}</span>
                 <span className="sr-only">{frozenThought ?? currentPetThought}</span>
-              </button>
+              </Button>
               {/* Tail dots to imply thought/speech, kept minimal */}
               <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 flex flex-col items-center gap-0.5 pointer-events-none">
                 <div className={`${sleepClicks > 0 ? 'bg-[#D4C8FF]' : 'bg-[#BBD7FF]'} w-2 h-2 rounded-full`}></div>
