@@ -344,6 +344,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
   const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
   
+  // Placeholder (actual computation is defined after getPetStoreData)
+  
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
   // Dev-only: force specific PetSelectionFlow step from PetPage testing overlay
@@ -397,7 +399,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       }
     } catch {}
   }, [needsAdventureStep7HomeMoreIntro]);
-  
   // Auto-speak when Step 7 overlay becomes visible (covers cases without pending flag)
   useEffect(() => {
     if (showStep7 && !hasSpokenStep7Ref.current) {
@@ -598,7 +599,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       console.warn('Failed to save streak data:', error);
     }
   };
-
   // Update streak based on feeding date
   const updateStreak = () => {
     const currentDate = getCurrentUSDate();
@@ -608,6 +608,15 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     if (streakData.lastFeedDate === currentDate) {
       return streakData.streak;
     }
+
+    // Weekday-only streaks: ignore Saturdays and Sundays entirely
+    try {
+      const todayObj = new Date(currentDate);
+      const day = todayObj.getDay(); // 0=Sun,6=Sat
+      if (day === 0 || day === 6) {
+        return streakData.streak;
+      }
+    } catch {}
 
     let newStreak = streakData.streak;
     const feedDates = [...(streakData.feedDates || [])];
@@ -619,18 +628,23 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
     // Check if this continues a streak
     if (streakData.lastFeedDate) {
-      const lastDate = new Date(streakData.lastFeedDate);
-      const today = new Date(currentDate);
-      const daysDifference = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysDifference === 1) {
-        // Consecutive day - increment streak
+      const prevWeekday = (() => {
+        try {
+          const dt = new Date(currentDate);
+          do {
+            dt.setDate(dt.getDate() - 1);
+          } while (dt.getDay() === 0 || dt.getDay() === 6);
+          return dt.toDateString();
+        } catch {
+          return currentDate;
+        }
+      })();
+
+      if (streakData.lastFeedDate === prevWeekday) {
         newStreak = streakData.streak + 1;
-      } else if (daysDifference > 1) {
-        // Gap in feeding - reset streak to 1
+      } else if (streakData.lastFeedDate !== currentDate) {
         newStreak = 1;
       }
-      // If daysDifference === 0, it means same day (already handled above)
     } else {
       // First time feeding
       newStreak = 1;
@@ -767,7 +781,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       return () => clearInterval(interval);
     }
   }, [sleepClicks]);
-
   // Show loading overlay when switching to a sleeping pet until sleeping GIF loads
   useEffect(() => {
     // Only consider when current pet changes OR sleep state indicates sleeping
@@ -958,7 +971,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       }
     };
   }, []);
-  
   // Check if user needs pet selection flow (only for users who have completed onboarding)
   useEffect(() => {
     const checkPetSelection = async () => {
@@ -1047,6 +1059,35 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       }
     }
   }, [userData]);
+
+  // Sync server moodPeriod to local PetProgressStorage on load/when auth ready
+  useEffect(() => {
+    (async () => {
+      try {
+        const { auth } = await import('@/lib/firebase');
+        const { stateStoreApi } = await import('@/lib/state-store-api');
+        const u = auth.currentUser;
+        if (!u) return;
+        const serverMp = await stateStoreApi.fetchMoodPeriod(u.uid);
+        if (serverMp && typeof serverMp.anchorMs === 'number') {
+          const local = PetProgressStorage.getGlobalSettings().moodPeriod as any;
+          const shouldApply = !local || Number(serverMp.anchorMs) > Number(local.anchorMs || 0);
+          if (shouldApply) {
+            PetProgressStorage.setGlobalSettings({
+              moodPeriod: {
+                periodId: String(serverMp.periodId || ''),
+                anchorMs: Number(serverMp.anchorMs),
+                nextResetMs: Number(serverMp.nextResetMs),
+                sadPetIds: serverMp.sadPetIds || [],
+                engagementBaseline: serverMp.engagementBaseline || {},
+                lastAssignmentReason: serverMp.lastAssignmentReason || 'init',
+              } as any,
+            });
+          }
+        }
+      } catch {}
+    })();
+  }, [user?.uid]);
   
   // Pet action states - dynamically updated based on den ownership and sleep state
   const getActionStates = () => {
@@ -1073,18 +1114,15 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     const moodPeriod = PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
     const sadPetIds = (moodPeriod?.sadPetIds || []);
     const isCurrentPetSadStart = sadPetIds.includes(currentPet) || (ownedPets.length <= 3 && ownedPets.includes(currentPet));
-
-    // Determine if the CURRENT pet has completed today's daily quest (>= target, default 5)
+    
+    // Period-relative quest completion for gating: coins delta since anchor >= 50
     let questDoneForCurrentPet = false;
     try {
-      const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
-      if (questStatesRaw) {
-        const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; progress: number; target?: number }>;
-        const item = arr?.find((x) => x.pet === currentPet);
-        const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
-        const prog = Number(item?.progress || 0);
-        questDoneForCurrentPet = prog >= target;
-      }
+      const mp: any = moodPeriod as any;
+      const baseline = Number((mp?.engagementBaseline?.[currentPet]) ?? 0);
+      const pt = PetProgressStorage.getPetType(currentPet) || currentPet;
+      const total = Number(PetProgressStorage.getPetProgress(currentPet, pt)?.levelData?.totalAdventureCoinsEarned || 0);
+      questDoneForCurrentPet = (total - baseline) >= 50;
     } catch {}
 
     // Sleep display logic:
@@ -1117,7 +1155,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   };
 
   const [actionStates, setActionStates] = useState<ActionButton[]>(getActionStates());
-
   // Handle adventure button click
   const handleAdventureClick = async (adventureType: string = 'food') => {
     // console.log('🎯 PetPage handleAdventureClick called with adventureType:', adventureType);
@@ -1238,6 +1275,115 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     navigate('/progress');
   };
 
+  const [moodPeriodTick, setMoodPeriodTick] = useState(0);
+
+  // Order pets for display: sad pets first at period start, then others (stable within groups)
+  const displayOwnedPets = React.useMemo(() => {
+    try {
+      const mp = PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
+      const sadSet = new Set((mp?.sadPetIds || []) as string[]);
+      const originalIndex: Record<string, number> = {};
+      ownedPets.forEach((p, i) => { originalIndex[p] = i; });
+      const arr = [...ownedPets];
+      if (ownedPets.length <= 3) return arr;
+      arr.sort((a, b) => {
+        const aSad = sadSet.has(a) ? 1 : 0;
+        const bSad = sadSet.has(b) ? 1 : 0;
+        if (aSad !== bSad) return bSad - aSad; // sad first
+        return originalIndex[a] - originalIndex[b];
+      });
+      return arr;
+    } catch {
+      return ownedPets;
+    }
+  }, [ownedPets, moodPeriodTick]);
+
+  // DEV: advance time by 8 hours equivalent (simulate elapsed_no_sleep period and end sleeps)
+  const devAdvanceEightHours = React.useCallback(() => {
+    try {
+      // Force current mood period to be elapsed, then recompute (elapsed_no_sleep)
+      try {
+        const settings = PetProgressStorage.getGlobalSettings();
+        let mp = settings?.moodPeriod;
+        if (!mp) {
+          mp = PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
+        }
+        if (mp) {
+          PetProgressStorage.setGlobalSettings({ moodPeriod: { ...mp, nextResetMs: Date.now() - 1 } as any });
+          PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
+        }
+      } catch {}
+
+      // For each owned pet: simulate heart reset pending and end sleep window, and zero sleep clicks
+      try {
+        ownedPets.forEach((pid) => {
+          try {
+            const pt = PetProgressStorage.getPetType(pid) || pid;
+            const pd = PetProgressStorage.getPetProgress(pid, pt);
+            pd.heartData.nextHeartResetTime = Date.now() - 1;
+            // reset sleep state like a true rollover
+            pd.sleepData.isAsleep = false;
+            pd.sleepData.sleepClicks = 0;
+            PetProgressStorage.setPetProgress(pd);
+          } catch {}
+          try {
+            const key = `pet_sleep_data_${pid}`;
+            const raw = localStorage.getItem(key);
+            const now = Date.now();
+            const prev = raw ? JSON.parse(raw) : {};
+            const updated = { ...prev, clicks: 0, sleepEndTime: now - 1, timestamp: now - 1 };
+            localStorage.setItem(key, JSON.stringify(updated));
+          } catch {}
+        });
+      } catch {}
+
+      // Nudge any listeners
+      try { window.dispatchEvent(new Event('storage')); } catch {}
+      try { setSleepClicks(0); } catch {}
+      try { setPetStartIndex(0); } catch {}
+
+      // Best-effort: write updated moodPeriod to Firestore and clear server sleep for current pet
+      (async () => {
+        try {
+          const { auth } = await import('@/lib/firebase');
+          const { stateStoreApi } = await import('@/lib/state-store-api');
+          const u = auth.currentUser;
+          if (u) {
+            const mp: any = PetProgressStorage.getGlobalSettings().moodPeriod;
+            if (mp) {
+              await stateStoreApi.setMoodPeriod(u.uid, {
+                periodId: String(mp.periodId || ''),
+                anchorMs: Number(mp.anchorMs || Date.now()),
+                nextResetMs: Number(mp.nextResetMs || (Date.now() + 8 * 60 * 60 * 1000)),
+                sadPetIds: mp.sadPetIds || [],
+                engagementBaseline: mp.engagementBaseline || {},
+                lastAssignmentReason: mp.lastAssignmentReason || 'elapsed_no_sleep',
+              });
+            }
+            try {
+              for (const pid of ownedPets) {
+                try { await stateStoreApi.clearPetSleep({ userId: u.uid, pet: pid }); } catch {}
+              }
+            } catch {}
+            // Force quest cooldown expiry and rollover so quest card advances like real server time
+            try { await stateStoreApi.forceExpireCooldownsAndRollover({ userId: u.uid, ownedPets }); } catch {}
+          }
+        } catch {}
+      })();
+      try { setMoodPeriodTick((x) => x + 1); } catch {}
+    } catch {}
+  }, [ownedPets]);
+
+  // When a new mood period is assigned (rollover or sleep anchor), reset the pet list scroll so grouped sad pets are visible at the top
+  useEffect(() => {
+    const onAssigned = () => {
+      try { setPetStartIndex(0); } catch {}
+      try { setMoodPeriodTick((x) => x + 1); } catch {}
+    };
+    window.addEventListener('moodPeriodAssigned', onAssigned as any);
+    return () => window.removeEventListener('moodPeriodAssigned', onAssigned as any);
+  }, []);
+
   const handleActionClick = async (actionId: string) => {
     // console.log('🎯 PetPage: handleActionClick called with actionId:', actionId);
     // Handle sleep action
@@ -1275,14 +1421,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
 
-      // Check if sleep is available by coins since last sleep
-      if (!isSleepAvailable()) {
-        const cumulativeCare = getCumulativeCareLevel();
-        const coinsSinceLastSleep = cumulativeCare.adventureCoins - cumulativeCare.adventureCoinsAtLastSleep;
-        const coinsNeeded = 50 - coinsSinceLastSleep;
-        alert(`Sleep is not available yet! You need ${coinsNeeded} more adventure coins. Go on adventures to earn more coins! 🚀`);
-        return;
-      }
+      // New rule: sleep is allowed from start for neutral-start pets and after quest for sad-start pets.
+      // Do NOT enforce coin gating here anymore.
       
       // Increment sleep clicks (max 3) - no den required
       if (sleepClicks < 3) {
@@ -1416,6 +1556,26 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
 
           // Start a new 8-hour mood period anchored at this sleep if current period elapsed
           try { PetProgressStorage.startNewMoodPeriodOnSleepAnchor(ownedPets); } catch {}
+
+          // Best-effort: upsert server mood period to mirror local
+          try {
+            const { auth } = await import('@/lib/firebase');
+            const { stateStoreApi } = await import('@/lib/state-store-api');
+            const u = auth.currentUser;
+            if (u) {
+              const mp: any = PetProgressStorage.getGlobalSettings().moodPeriod;
+              if (mp) {
+                await stateStoreApi.setMoodPeriod(u.uid, {
+                  periodId: String(mp.periodId || ''),
+                  anchorMs: Number(mp.anchorMs || Date.now()),
+                  nextResetMs: Number(mp.nextResetMs || (Date.now() + eightHours)),
+                  sadPetIds: mp.sadPetIds || [],
+                  engagementBaseline: mp.engagementBaseline || {},
+                  lastAssignmentReason: 'sleep_anchor',
+                });
+              }
+            }
+          } catch {}
         } else {
           updateSleepClicks(newSleepClicks);
         }
@@ -1613,7 +1773,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     
     // Feeding should not change streak anymore; streak is updated on sleep completion
     const newStreak = getStreakData().streak;
-
     // Trigger heart animation
     setShowHeartAnimation(true);
     setTimeout(() => setShowHeartAnimation(false), 1000);
@@ -1789,7 +1948,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       default: return '';
     }
   };
-
   // Sound effect functions
   const playFeedingSound = () => {
     try {
@@ -1848,19 +2006,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       // console.log('Audio not supported');
     }
   };
-
-  // // Get Bobo images based on coins spent
-  // const getBoboImage = (coinsSpent: number) => {
-  //   if (coinsSpent >= 50) {
-  //     return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011137_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
-  //   } else if (coinsSpent >= 30) {
-  //     return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011115_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
-  //   } else if (coinsSpent >= 10) {
-  //     return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011058_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
-  //   } else {
-  //     return "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250906_011043_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN";
-  //   }
-  // };
 
   // Get Feather images based on coins spent
   const getFeatherImage = (coinsSpent: number) => {
@@ -2190,7 +2335,6 @@ const getSleepyPetImage = (clicks: number) => {
       }
     }
   };
-
   // Handle logout
   const handleLogout = async () => {
     try {
@@ -2452,6 +2596,23 @@ const getSleepyPetImage = (clicks: number) => {
     } catch {}
   };
 
+  // Helper: compute user level for shop unlocks (placed before usage to avoid TDZ)
+  function computeUserLevelForShop() {
+    const totalCoins = CoinSystem.getCumulativeCoinsEarned?.() ?? 0;
+    const coinsForLevel = (n: number): number => {
+      if (n === 1) return 0;
+      if (n === 2) return 50;
+      if (n === 3) return 120;
+      if (n === 4) return 200;
+      return 200 + 150 * (n - 4);
+    };
+    let currentLevel = 1;
+    for (let n = 2; n <= 50; n++) {
+      if (totalCoins >= coinsForLevel(n)) currentLevel = n; else break;
+    }
+    return currentLevel;
+  }
+
   // Pet store data structure - dynamically updated with current ownership status
   const getPetStoreData = () => {
     // Use storeRefreshTrigger and ownedPets to force re-evaluation when pets are purchased
@@ -2459,7 +2620,7 @@ const getSleepyPetImage = (clicks: number) => {
     storeRefreshTrigger; // This ensures the function re-runs when trigger changes
     
     // Get USER level (cumulative coins) for unlock requirements in shop
-    const { currentLevel: userLevel } = getUserLevelInfo();
+    const userLevel = computeUserLevelForShop();
     
     return {
       dog: {
@@ -2536,7 +2697,7 @@ const getSleepyPetImage = (clicks: number) => {
         id: 'pikachu',
         emoji: '🦅',
         name: 'Pikachu',
-        owned: isPetOwned('Pikachu'),
+        owned: isPetOwned('pikachu'),
         cost: 1000,
         requiredLevel: 10,
         isLocked: userLevel < 10,
@@ -2544,10 +2705,33 @@ const getSleepyPetImage = (clicks: number) => {
       }
     };
   };
-
+  
+  // Now that getPetStoreData is defined, compute purchasable count safely
+  // Include cumulative coins so the memo recomputes when level unlocks change
+  const cumulativeCoinsForShop = CoinSystem.getCumulativeCoinsEarned?.() ?? 0;
+  const shopPurchasableCount = useMemo(() => {
+    try {
+      const items = Object.values(getPetStoreData() as any) as any[];
+      const purchasable = items.filter((p) => !p?.owned && !p?.isLocked && hasEnoughCoins(Number(p?.cost || 0)));
+      console.log('Shop Debug:', {
+        totalItems: items.length,
+        coins: coins,
+        purchasableCount: purchasable.length,
+        purchasableItems: purchasable.map(p => ({ id: p.id, cost: p.cost, owned: p.owned, isLocked: p.isLocked })),
+        allItems: items.map(p => ({ id: p.id, cost: p.cost, owned: p.owned, isLocked: p.isLocked }))
+      });
+      return purchasable.length;
+    } catch (error) {
+      console.error('Shop count error:', error);
+      return 0;
+    }
+  }, [coins, ownedPets?.length, storeRefreshTrigger, cumulativeCoinsForShop]);
   // ElevenLabs Text-to-Speech function using the proper TTS service
-  const speakText = async (text: string) => {
-    if (!audioEnabled || text === lastSpokenMessage || isSpeaking) return;
+  const speakText = async (text: string, force: boolean = false) => {
+    if (!audioEnabled) return;
+    // By default, avoid repeating the exact same line while it's already playing.
+    // When force=true (e.g., explicit tap on emoji bubble), always replay.
+    if (!force && (text === lastSpokenMessage || isSpeaking)) return;
     
     try {
       // Stop any currently playing audio
@@ -2711,12 +2895,12 @@ const getSleepyPetImage = (clicks: number) => {
           `Zoom! I love the rides! 🌬️ Can we explore the pet-theme park together?`
         ],
         'pet-mall': [
-          `I’m still jingling from that store! 🛍️ Where next—toy shop, snack shop, or something else?`,
+          `I'm still jingling from that store! 🛍️ Where next—toy shop, snack shop, or something else?`,
           `My paws are glittery! ✨ What should we try—magic shop, pet spa, or something else?`,
           `So many shiny signs! 🏬 How should we explore—fashion, gadgets, or something else?`
         ],
         'pet-care': [
-          `I’m still fluffy from brushing! 🪮 What next—snack corner, walk outside, or something else?`,
+          `I'm still fluffy from brushing! 🪮 What next—snack corner, walk outside, or something else?`,
           `I smell like bubbles! 🫧 How should we care next—towel cuddle, snack, or something else?`,
           `My paws feel sleepy! 🐾 What should we do—soft nap spot, gentle walk, or something else?`
         ],
@@ -2736,7 +2920,6 @@ const getSleepyPetImage = (clicks: number) => {
         return getRandomThought(choices);
       }
     }
-
     // Default pet thoughts based on cumulative care level (for pets without specific thoughts)
     
     // Pet thoughts based on cumulative care progress
@@ -3002,7 +3185,7 @@ const getSleepyPetImage = (clicks: number) => {
 
   // Disable auto TTS on PetPage. Speech plays only when emoji bubble is clicked.
   useEffect(() => {
-    try { ttsService.stop(); } catch {}
+      try { ttsService.stop(); } catch {}
   }, [currentPetThought, showPetShop, frozenThought, sleepClicks]);
 
   // Step 4 hint controller: when pet speech starts or after 5s, show hint once
@@ -3123,7 +3306,6 @@ const getSleepyPetImage = (clicks: number) => {
       console.warn('Dev time advance failed:', e);
     }
   }, []);
-
   return (
     <div className="h-screen flex flex-col overflow-y-auto overflow-x-hidden pt-4 sm:pt-6" style={{
       backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
@@ -3318,7 +3500,6 @@ const getSleepyPetImage = (clicks: number) => {
                   </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-
               {/* 2nd Grade */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd' ? 'bg-blue-100' : ''}`}>
@@ -3501,7 +3682,6 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Step 10 overlay visuals disabled */}
       {/* Step 8 overlay visuals (deduplicated; see later block with !showPetShop) */}
-
       {/* Top UI - Heart Progress Bar (horizontal) - hidden when vertical is enabled */}
       {false && (
         <div className="absolute top-5 left-1/2 -translate-x-1/2 z-30">
@@ -3541,16 +3721,17 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       )}
 
-      {/* Top Center UI - User Level Bar (cumulative coins across pets) */}
+      {/* Top Center UI - User Level Bar (cumulative coins across pets) with circular badges */}
       <div className="fixed top-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
         {(() => {
           const levelInfo = getUserLevelInfo();
           const pct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
+          const nextLevel = levelInfo.currentLevel + 1;
           return (
             <div className="rounded-xl px-2 py-1 pointer-events-auto">
-              <div className="flex items-center gap-2">
-                <div className="text-white font-bold text-lg drop-shadow-md">L{levelInfo.currentLevel}</div>
-                <div className="relative h-7 w-60 bg-white/30 rounded-full border border-white/40 overflow-hidden">
+              <div className="relative h-9 w-72">
+                {/* Track positioned between badges, keeps existing colors */}
+                <div className="absolute inset-y-0 left-0 right-0 bg-white/30 rounded-full border border-white/40 overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-500 ease-out"
                     style={{ width: `${pct}%` }}
@@ -3558,6 +3739,16 @@ const getSleepyPetImage = (clicks: number) => {
                   <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-extrabold drop-shadow-md">
                     {pct}%
                   </div>
+                </div>
+
+                {/* Left circular badge: current level */}
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-teal-500 text-white border border-white/40 shadow-md flex items-center justify-center text-sm font-extrabold select-none">
+                  {levelInfo.currentLevel}
+                </div>
+
+                {/* Right circular badge: next level */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/70 text-gray-800 border border-white/60 shadow-md flex items-center justify-center text-sm font-extrabold select-none">
+                  {nextLevel}
                 </div>
               </div>
             </div>
@@ -3574,7 +3765,7 @@ const getSleepyPetImage = (clicks: number) => {
               const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
               const activity = PetProgressStorage.getCurrentTodoDisplayType(currentPet, seq, 50);
               const newCoins = CoinSystem.addAdventureCoins(10, activity);
-              setCoins(newCoins);
+            setCoins(newCoins);
             } catch {
               const newCoins = CoinSystem.addAdventureCoins(10, 'food');
               setCoins(newCoins);
@@ -3615,7 +3806,7 @@ const getSleepyPetImage = (clicks: number) => {
               const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
               const activity = PetProgressStorage.getCurrentTodoDisplayType(currentPet, seq, 50);
               const newCoins = CoinSystem.addAdventureCoins(10, activity);
-              setCoins(newCoins);
+            setCoins(newCoins);
             } catch {
               const newCoins = CoinSystem.addAdventureCoins(10, 'food');
               setCoins(newCoins);
@@ -3630,9 +3821,15 @@ const getSleepyPetImage = (clicks: number) => {
         
         {/* Testing Button - 8 Hour Reset (Development Only) */}
         <button
-          onClick={() => {
+          onClick={async () => {
             localStorage.removeItem('pet_last_reset_time'); // Force reset
             const wasReset = checkAndPerform8HourReset();
+            // Also trigger server-side simulated 8h elapsed + rollover so Today reflects next activity
+            try {
+              if (user?.uid) {
+                await stateStoreApi.devSimulateEightHoursAndRollover({ userId: user.uid });
+              }
+            } catch {}
             // console.log('🧪 Forced 8-hour reset:', wasReset);
             window.location.reload(); // Reload to see changes
           }}
@@ -3651,7 +3848,6 @@ const getSleepyPetImage = (clicks: number) => {
           <Clock size={16} />
         </button>
       </div>
-
       {/* Top Right UI - Streak and Coins (fixed, enlarged) */}
       <div className="fixed top-6 right-6 z-30 flex items-center gap-5">
         {/* Streak */}
@@ -3772,11 +3968,11 @@ const getSleepyPetImage = (clicks: number) => {
                 type="button"
                 onClick={() => {
                   const msg = frozenThought ?? currentPetThought;
-                  setTimeout(() => { speakText(msg); }, 0);
+                  setTimeout(() => { speakText(msg, true); }, 0);
                 }}
                 title="Tap to hear what I'm thinking"
                 className={`relative inline-flex items-center justify-center rounded-full border-3 shadow-xl transition-transform transition-shadow cursor-pointer focus:outline-none focus-visible:ring-4 hover:translate-y-[1px] active:translate-y-[2px] hover:scale-[1.01] ${
-                  sleepClicks > 0
+                sleepClicks > 0 
                     ? 'bg-gradient-to-br from-[#F3EDFF] to-[#E5DBFF] border-[#D4C8FF] focus-visible:ring-[#D4C8FF]/40 hover:border-[#BFAEF9] hover:shadow-[0_8px_16px_rgba(191,174,249,0.22)]'
                     : 'bg-gradient-to-br from-[#EEF4FF] to-[#E5F0FF] border-[#BBD7FF] focus-visible:ring-[#BBD7FF]/40 hover:border-[#9EC3FF] hover:shadow-[0_8px_16px_rgba(158,195,255,0.22)]'
                 }`}
@@ -3792,12 +3988,12 @@ const getSleepyPetImage = (clicks: number) => {
                 <div className={`${sleepClicks > 0 ? 'bg-[#D4C8FF]' : 'bg-[#BBD7FF]'} w-2 h-2 rounded-full`}></div>
                 <div className={`${sleepClicks > 0 ? 'bg-[#D4C8FF]' : 'bg-[#BBD7FF]'} w-[6px] h-[6px] rounded-full`}></div>
                 <div className={`${sleepClicks > 0 ? 'bg-[#D4C8FF]' : 'bg-[#BBD7FF]'} w-[4px] h-[4px] rounded-full`}></div>
-              </div>
+                </div>
               {sleepClicks >= 3 && (
                 <div className="mt-1 text-[12px] sm:text-[13px] text-center font-semibold" style={{ color: '#6C5CE7' }}>
-                  {formatTimeRemaining(sleepTimeRemaining || getSleepTimeRemaining())}
-                </div>
-              )}
+                        {formatTimeRemaining(sleepTimeRemaining || getSleepTimeRemaining())}
+                      </div>
+                  )}
             </div>
           )}
           {/* Pet pinned to bottom */}
@@ -3810,7 +4006,6 @@ const getSleepyPetImage = (clicks: number) => {
                 </div>
               </div>
             )}
-
             <div className="relative">
               <img 
                 src={getPetImage()}
@@ -3929,7 +4124,7 @@ const getSleepyPetImage = (clicks: number) => {
           <div className="rounded-[24px] shadow-xl p-4 w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
             <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
-            <div className="mt-1 flex flex-col gap-4">
+            <div className="mt-1 flex flex-col gap-4" style={{ minHeight: '160px' }}>
               {(() => {
                 // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
                 const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
@@ -3947,14 +4142,20 @@ const getSleepyPetImage = (clicks: number) => {
                 // Per-pet assigned activity and progress
                 let assignedActivity: string | null = null;
                 let fracFromFirestore: number | null = null;
-                let parsedStates: Array<{ pet: string; activity: string; progress: number; target: number; }> | null = null;
+                let parsedStates: Array<any> | null = null;
+                let completedAtMs: number | null = null;
+                let cooldownUntilMs: number | null = null;
+                let lastCompletedActivity: string | null = null;
                 try {
                   if (questStatesRaw) {
-                    parsedStates = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target: number; }>;
-                    const item = parsedStates?.find(x => x.pet === currentPet);
+                    parsedStates = JSON.parse(questStatesRaw) as Array<any>;
+                    const item = parsedStates?.find((x: any) => x.pet === currentPet);
                     if (item && item.target > 0) {
                       assignedActivity = item.activity;
                       fracFromFirestore = Math.max(0, Math.min(1, item.progress / item.target));
+                      completedAtMs = (typeof item.completedAtMs === 'number') ? item.completedAtMs : null;
+                      cooldownUntilMs = (typeof item.cooldownUntilMs === 'number') ? item.cooldownUntilMs : null;
+                      lastCompletedActivity = (typeof item.lastCompletedActivity === 'string') ? item.lastCompletedActivity : null;
                     }
                   }
                 } catch {}
@@ -3962,40 +4163,37 @@ const getSleepyPetImage = (clicks: number) => {
                 // Choose display behavior:
                 // - If this pet finished its assigned quest today, KEEP showing that activity as completed
                 // - Otherwise compute from user-scoped rotation (shared pointer), falling back to local logic
-                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall'];
-                const petHasCompletedFs = (fracFromFirestore !== null && fracFromFirestore >= 1);
-                // Also treat locally-completed assigned activity as complete (before Firestore hydrates)
-                const petHasCompletedLocalAssigned = assignedActivity ? PetProgressStorage.isAdventureTypeCompleted(currentPet, assignedActivity, 50) : false;
-                // Resolve shared user pointer strictly from Firestore-hydrated value; fallback to this pet's assigned
-                let userPointer = userActivity || assignedActivity || null;
+                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
+                // If pet starts neutral in this period, hide the quest card and show only Sleep
                 try {
-                  if (userPointer) {
-                    const arr = parsedStates as any[] | null;
-                    const anyCompletedForPointer = Array.isArray(arr) && arr.some((s: any) => {
-                      const tgt = Number((s?.target || 5));
-                      return (s?.activity === userPointer) && Number(s?.progress || 0) >= tgt;
-                    });
-                    if (anyCompletedForPointer) {
-                      const idx = Math.max(0, questSequence.indexOf(userPointer));
-                      userPointer = questSequence[(idx + 1) < questSequence.length ? (idx + 1) : idx];
-                    }
-                  }
+                  const mp = PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
+                  const sadSet = new Set((mp?.sadPetIds || []) as string[]);
+                  const isNeutralStart = !sadSet.has(currentPet) && !(ownedPets.length <= 3 && ownedPets.includes(currentPet));
+                  if (isNeutralStart) return null;
                 } catch {}
-                const displayQuestType = (assignedActivity && (petHasCompletedFs || petHasCompletedLocalAssigned))
-                  ? assignedActivity
+                // Only treat as completed today when server marked done today (ignore local adventure coins)
+                const petHasActiveCooldown = (() => {
+                  if (!cooldownUntilMs) return false;
+                  return Date.now() < cooldownUntilMs;
+                })();
+                
+                // Resolve shared user pointer strictly from Firestore-hydrated value; fallback to this pet's assigned
+                const userPointer = userActivity || assignedActivity || null;
+                const displayQuestType = (petHasActiveCooldown && (lastCompletedActivity || assignedActivity))
+                  ? (lastCompletedActivity || assignedActivity as string)
                   : (userPointer || assignedActivity || questSequence[0]);
 
                 // Compute done/progress for the displayed type
                 let progress = 0;
                 let done = false;
-                if ((petHasCompletedFs || petHasCompletedLocalAssigned) && assignedActivity && displayQuestType === assignedActivity) {
+                if (petHasActiveCooldown && (lastCompletedActivity || assignedActivity) && displayQuestType === (lastCompletedActivity || assignedActivity)) {
                   progress = 1;
                   done = true;
                 } else {
-                  const doneLocal = PetProgressStorage.isAdventureTypeCompleted(currentPet, displayQuestType, 50);
-                  progress = (fracFromFirestore !== null && !petHasCompletedFs && assignedActivity === displayQuestType)
+                  // Rely on Firestore progress only
+                  progress = (fracFromFirestore !== null && assignedActivity === displayQuestType)
                     ? Math.max(0, Math.min(1, fracFromFirestore))
-                    : (doneLocal ? 1 : 0);
+                    : 0;
                   done = progress >= 1;
                 }
                 
@@ -4012,7 +4210,6 @@ const getSleepyPetImage = (clicks: number) => {
                     default: return '✨';
                   }
                 };
-                
                 const getQuestLabel = (type: string) => {
                   if (type === 'plant-dreams') return 'Plant Dreams';
                   if (type === 'who-made-the-pets-sick') return 'Who Made The Pets Sick';
@@ -4061,8 +4258,14 @@ const getSleepyPetImage = (clicks: number) => {
               {(() => {
                 const clicks = sleepClicks;
                 const asleep = clicks >= 3;
-                // Per-pet gating: sleep only available when CURRENT pet's daily quest is done
-                let canSleepForCurrentPet = false;
+                // Mood-based gating: neutral-start pets can sleep immediately; sad-start require quest done
+                let isSadStart = false;
+                try {
+                  const mp = PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
+                  const sadSet = new Set((mp?.sadPetIds || []) as string[]);
+                  isSadStart = sadSet.has(currentPet) || (ownedPets.length <= 3 && ownedPets.includes(currentPet));
+                } catch {}
+                let questDoneForCurrentPet = false;
                 try {
                   const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
                   if (questStatesRaw) {
@@ -4070,12 +4273,12 @@ const getSleepyPetImage = (clicks: number) => {
                     const item = arr?.find((x) => x.pet === currentPet);
                     const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
                     const prog = Number(item?.progress || 0);
-                    canSleepForCurrentPet = prog >= target;
+                    questDoneForCurrentPet = prog >= target;
                   }
                 } catch {}
                 const progress = Math.min(clicks / 3, 1);
                 const label = asleep ? 'Sleeping' : 'Sleep';
-                const disabled = asleep || (!canSleepForCurrentPet && clicks < 3);
+                const disabled = asleep || (isSadStart && !questDoneForCurrentPet);
                 return (
                   <button
                     type="button"
@@ -4163,7 +4366,6 @@ const getSleepyPetImage = (clicks: number) => {
           return coreSeq[nextIndex];
         })();
         const assignedIndex = assignedDailyTypeForDisplay ? coreSeq.indexOf(assignedDailyTypeForDisplay) : -1;
-
         // Render order: Daily Quest → Story → remaining
         const remaining = coreSeq.filter(t => t !== assignedDailyTypeForDisplay);
         const renderOrder = assignedDailyTypeForDisplay ? [assignedDailyTypeForDisplay, 'story', ...remaining] : ['story', ...coreSeq];
@@ -4315,7 +4517,6 @@ const getSleepyPetImage = (clicks: number) => {
       >
         <Camera />
       </Button>
-
       {/* Camera Modal */}
       {showCamera && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center" role="dialog" aria-modal="true" onClick={() => {
@@ -4499,7 +4700,6 @@ const getSleepyPetImage = (clicks: number) => {
                 Close
               </button>
             </div>
-
             {/* Filter selector */}
             {!capturedUrl && (
               <div className="absolute left-0 right-0 bottom-24 px-4 flex gap-2 justify-center">
@@ -4530,13 +4730,13 @@ const getSleepyPetImage = (clicks: number) => {
       )}
 
       {/* Pet Switcher - Show if user owns at least one pet */}
-      {ownedPets.length > 0 && (
+      {displayOwnedPets.length > 0 && (
         <div className="fixed top-24 left-6 z-20 flex flex-col gap-3 items-center">
           <div className="text-lg font-semibold text-white drop-shadow-md mb-1">
-          Pets: {ownedPets.length} 
+          Pets: {displayOwnedPets.length} 
           </div>
           {/* Up arrow for sliding up */}
-          {ownedPets.length > 4 && (
+          {displayOwnedPets.length > 4 && (
             <button
               onClick={() => setPetStartIndex((idx) => Math.max(0, idx - 1))}
               className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shadow-md transition-colors ${
@@ -4549,7 +4749,7 @@ const getSleepyPetImage = (clicks: number) => {
             </button>
           )}
 
-          {ownedPets.slice(petStartIndex, petStartIndex + 4).map((petId) => {
+          {displayOwnedPets.slice(petStartIndex, petStartIndex + 4).map((petId) => {
             const isActive = currentPet === petId;
             const petType = PetProgressStorage.getPetType(petId) || petId;
             const levelForPet = (() => {
@@ -4585,42 +4785,41 @@ const getSleepyPetImage = (clicks: number) => {
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
               >
                 <div className="relative w-full h-full">
-                  {petHasImages ? (
-                    <img
-                      src={petImageUrl}
-                      alt={PetProgressStorage.getPetDisplayName(petId)}
-                      className="w-full h-full object-contain p-1 drop-shadow-sm"
-                      loading="lazy"
-                    />
-                  ) : (
+                {petHasImages ? (
+                  <img
+                    src={petImageUrl}
+                    alt={PetProgressStorage.getPetDisplayName(petId)}
+                    className="w-full h-full object-contain p-1 drop-shadow-sm"
+                    loading="lazy"
+                  />
+                ) : (
                     <span className="absolute inset-0 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
                   )}
                   {/* Mood badge top-right */}
                   {(() => {
                     try {
-                      const moodPeriod = PetProgressStorage.ensureMoodPeriodUpToDate(ownedPets);
+                      const moodPeriod = PetProgressStorage.ensureMoodPeriodUpToDate(displayOwnedPets);
                       const sadSet = new Set(moodPeriod?.sadPetIds || []);
-                      const isSadStart = sadSet.has(petId) || (ownedPets.length <= 3 && ownedPets.includes(petId));
-                      // Compute within-period mood:
-                      // sad start: before quest -> sad; after quest, before sleep -> happy; after both -> very happy
-                      // neutral start: none -> neutral; after one of quest/sleep -> happy; after both -> very happy
+                      const isSadStart = sadSet.has(petId) || (displayOwnedPets.length <= 3 && displayOwnedPets.includes(petId));
+                      // Compute within-period mood using period-relative quest and sleep
                       let questDone = false;
                       try {
-                        const raw = localStorage.getItem('litkraft_daily_quests_state');
-                        if (raw) {
-                          const arr = JSON.parse(raw) as Array<{ pet: string; progress: number; target?: number }>;
-                          const item = arr?.find((x) => x.pet === petId);
-                          const target = (item && typeof item.target === 'number' && item.target > 0) ? item.target : 5;
-                          const prog = Number(item?.progress || 0);
-                          questDone = prog >= target;
-                        }
+                        const mp: any = moodPeriod as any;
+                        const baseline = Number((mp?.engagementBaseline?.[petId]) ?? 0);
+                        const pt = PetProgressStorage.getPetType(petId) || petId;
+                        const total = Number(PetProgressStorage.getPetProgress(petId, pt)?.levelData?.totalAdventureCoinsEarned || 0);
+                        questDone = (total - baseline) >= 50;
                       } catch {}
                       let sleptDone = false;
                       try {
+                        const mp: any = moodPeriod as any;
+                        const anchor = Number(mp?.anchorMs ?? 0);
                         const sleepRaw = localStorage.getItem(`pet_sleep_data_${petId}`) || localStorage.getItem('pet_sleep_data');
                         if (sleepRaw) {
                           const s = JSON.parse(sleepRaw);
-                          sleptDone = Number(s?.clicks || 0) >= 3;
+                          const clicks = Number(s?.clicks || 0);
+                          const start = Number(s?.sleepStartTime || 0);
+                          sleptDone = clicks >= 3 && start >= anchor;
                         }
                       } catch {}
                       let mood: 'sad' | 'neutral' | 'happy' | 'veryhappy' = 'neutral';
@@ -4630,11 +4829,11 @@ const getSleepyPetImage = (clicks: number) => {
                         else if (questDone && sleptDone) mood = 'veryhappy';
                         else mood = 'sad';
                       } else {
-                        if (!questDone && !sleptDone) mood = 'neutral';
-                        else if ((questDone && !sleptDone) || (!questDone && sleptDone)) mood = 'happy';
-                        else if (questDone && sleptDone) mood = 'veryhappy';
+                        if (sleptDone) mood = 'veryhappy';
+                        else if (questDone) mood = 'happy';
+                        else mood = 'neutral';
                       }
-                      const badge = mood === 'sad' ? '😢' : mood === 'neutral' ? '😐' : mood === 'happy' ? '😊' : '🥰';
+                      const badge = mood === 'sad' ? '😢' : mood === 'neutral' ? '😐' : mood === 'happy' ? '😊' : '❤️';
                       const bg = mood === 'veryhappy' ? 'bg-green-500' : mood === 'happy' ? 'bg-green-400' : mood === 'sad' ? 'bg-red-500' : 'bg-slate-500';
                       return (
                         <div className={`pointer-events-none absolute -top-3 -right-3 ${bg} text-white rounded-full w-9 h-9 text-[18px] leading-[36px] text-center shadow-lg border-2 border-white`} aria-label={`mood-${mood}`} title={`Mood: ${mood}`}>
@@ -4648,14 +4847,14 @@ const getSleepyPetImage = (clicks: number) => {
             );
           })}
           {/* Down arrow for sliding down */}
-          {ownedPets.length > 4 && (
+          {displayOwnedPets.length > 4 && (
             <button
-              onClick={() => setPetStartIndex((idx) => Math.min(Math.max(0, ownedPets.length - 4), idx + 1))}
+              onClick={() => setPetStartIndex((idx) => Math.min(Math.max(0, displayOwnedPets.length - 4), idx + 1))}
               className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shadow-md transition-colors ${
-                petStartIndex < Math.max(0, ownedPets.length - 4) ? 'bg-white/30 border-white/50 hover:bg-white/40' : 'bg-white/10 border-white/20 opacity-50 cursor-not-allowed'
+                petStartIndex < Math.max(0, displayOwnedPets.length - 4) ? 'bg-white/30 border-white/50 hover:bg-white/40' : 'bg-white/10 border-white/20 opacity-50 cursor-not-allowed'
               }`}
               aria-label="Scroll down"
-              disabled={petStartIndex >= Math.max(0, ownedPets.length - 4)}
+              disabled={petStartIndex >= Math.max(0, displayOwnedPets.length - 4)}
             >
               <ChevronDown className="text-white" />
             </button>
@@ -4674,19 +4873,49 @@ const getSleepyPetImage = (clicks: number) => {
     >
       <Rocket />
     </Button>
-    <Button
-      aria-label="Shop"
-      onClick={() => handleActionClick('shop')}
-      variant="outline"
-      size="icon"
-      className="w-12 h-12 rounded-[12px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] [&_svg]:!size-6"
-    >
-      <ShoppingCart />
-    </Button>
+    <div className="relative">
+      <Button
+        aria-label="Shop"
+        onClick={() => handleActionClick('shop')}
+        variant="outline"
+        size="icon"
+        className="w-12 h-12 rounded-[12px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] [&_svg]:!size-6"
+      >
+        <ShoppingCart />
+      </Button>
+      {shopPurchasableCount > 0 && (
+        <span
+          className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-lg z-[100]"
+          aria-label={`${shopPurchasableCount} items can be bought`}
+          style={{ minWidth: '24px', minHeight: '24px' }}
+        >
+          {shopPurchasableCount > 9 ? '9+' : shopPurchasableCount}
+        </span>
+      )}
+      {/* Force render badge for testing */}
+      {/* <span
+        className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center border-2 border-white shadow-lg z-[100]"
+        style={{ minWidth: '24px', minHeight: '24px' }}
+      >
+        T
+      </span> */}
+    </div>
   </div>
 
-
-
+  {/* DEV controls (only in development) */}
+  {(import.meta as any)?.env?.DEV && (
+    <div className="fixed bottom-6 left-6 z-30 flex flex-col gap-2 items-start">
+      <Button
+        aria-label="Advance 8 hours"
+        onClick={devAdvanceEightHours}
+        variant="outline"
+        size="icon"
+        className="w-12 h-12 rounded-[12px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B]"
+      >
+        +8h
+      </Button>
+    </div>
+  )}
       {/* Pet Shop Overlay */}
       {showPetShop && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -4872,7 +5101,6 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         </>
       )}
-
       {/* Step 8 overlay visuals */}
       {hasAdventureStep8Started && !showStep7 && !showStep9 && !showPetShop && (
         <>

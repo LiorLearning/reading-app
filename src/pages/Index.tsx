@@ -4425,7 +4425,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
     
     // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
-    addAdventureCoins(10, currentAdventureType);
+    addAdventureCoins(10, currentAdventureTypeRef.current);
     
     // Update progress in Firestore user state
     try {
@@ -4436,7 +4436,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           userId: user.uid,
           pet: petType,
           questionsSolved: 1,
-          adventureKey: currentAdventureType || undefined,
+          adventureKey: currentAdventureTypeRef.current || undefined,
         }).catch((e)=>console.warn('updateProgressOnQuestionSolved failed:', e));
       }
     } catch (e) {

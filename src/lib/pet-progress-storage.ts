@@ -474,14 +474,7 @@ export class PetProgressStorage {
     if (prev < COMPLETION_THRESHOLD && updated >= COMPLETION_THRESHOLD) {
       petData.todoData = petData.todoData || { currentType: adventureType, lastSwitchTime: now };
       petData.todoData.currentType = adventureType;
-      petData.todoData.lastSwitchTime = now; // Start 8-hour window showing the completed item
-      // Optimistically ADVANCE user-scoped pointer to the next activity immediately
-      try {
-        const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
-        const idx = Math.max(0, seq.indexOf(adventureType));
-        const nextType = seq[(idx + 1) < seq.length ? (idx + 1) : idx];
-        this.setUserTodoData({ currentType: nextType, lastSwitchTime: now });
-      } catch {}
+      petData.todoData.lastSwitchTime = now; // Pin per-pet state only; user-scoped pointer is advanced by server
     }
     
     // Update achievement data
