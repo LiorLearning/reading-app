@@ -4477,7 +4477,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           setCurrentSpellQuestion(null);
           // Determine next SpellBox topic based on grade progression
           const allSpellTopics = getSpellingTopicIds(currentGrade);
-          let nextTopicId = getNextSpellboxTopic(currentGrade, allSpellTopics) || null;
+          let nextTopicId = getNextSpellboxTopic(
+            currentGrade,
+            allSpellTopics,
+            (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined)
+          ) || null;
           // If progression returns the same topic (e.g., not passing), move to the next in list
           if (!nextTopicId || nextTopicId === currentSpellQuestion.topicId) {
             const idx = allSpellTopics.indexOf(currentSpellQuestion.topicId);
@@ -6841,6 +6845,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 };
 
 export default Index;
+
 
 
 

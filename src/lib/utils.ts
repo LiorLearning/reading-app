@@ -1669,8 +1669,22 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
     }
   }
   
+  // Determine scan order: for 'middle' level, rotate so the middle anchor is first
+  let scanTopicIds = allTopicIds;
+  if (preferredLevel === 'middle') {
+    try {
+      const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const anchor = middleAnchors[contentGrade];
+      const anchorIdx = anchor ? scanTopicIds.indexOf(anchor) : -1;
+      if (anchorIdx >= 0) {
+        scanTopicIds = [...scanTopicIds.slice(anchorIdx), ...scanTopicIds.slice(0, anchorIdx)];
+      }
+    } catch {}
+  }
+
   // Find first topic that hasn't passed the 70% criteria
-  for (const topicId of allTopicIds) {
+  for (const topicId of scanTopicIds) {
     const topicProgress = gradeProgress.topicProgress[topicId];
     
     // Topic is available if:
@@ -1682,7 +1696,7 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
   }
   
   // All topics passed, return first topic for replay
-  return allTopicIds[0] || null;
+  return scanTopicIds[0] || null;
 };
 
 /**
