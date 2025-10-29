@@ -26,6 +26,7 @@ interface TopicProgressCard {
   status: 'completed-pass' | 'completed-fail' | 'in-progress' | 'not-started';
   accuracy: number;
   questionsAttempted: number;
+  firstAttemptCorrect: number;
   totalQuestions: number;
   completedAt?: number;
 }
@@ -88,10 +89,12 @@ export function ProgressTracking(): JSX.Element {
         let status: TopicProgressCard['status'] = 'not-started';
         let accuracy = 0;
         let questionsAttempted = 0;
+        let firstAttemptCorrect = 0;
 
         if (topicProgress) {
           accuracy = topicProgress.successRate;
           questionsAttempted = topicProgress.questionsAttempted;
+          firstAttemptCorrect = topicProgress.firstAttemptCorrect || 0;
 
           if (topicProgress.isCompleted) {
             status = topicProgress.successRate >= 70 ? 'completed-pass' : 'completed-fail';
@@ -106,6 +109,7 @@ export function ProgressTracking(): JSX.Element {
           status,
           accuracy: Math.round(accuracy),
           questionsAttempted,
+          firstAttemptCorrect,
           totalQuestions: 10, // Fixed at 10 questions per topic
           completedAt: topicProgress?.completedAt
         };
@@ -346,7 +350,9 @@ export function ProgressTracking(): JSX.Element {
           {topicCards.map((card) => {
             const config = getStatusConfig(card.status);
             const StatusIcon = config.icon;
-            const progressPercentage = card.totalQuestions > 0 ? (card.questionsAttempted / card.totalQuestions) * 100 : 0;
+            const progressPercentage = card.totalQuestions > 0 
+              ? (Math.min(card.firstAttemptCorrect, card.totalQuestions) / card.totalQuestions) * 100 
+              : 0;
 
             return (
               <Card 
@@ -379,7 +385,7 @@ export function ProgressTracking(): JSX.Element {
                       Progress
                     </span>
                     <span className="text-xs font-medium text-gray-600">
-                      {card.questionsAttempted}/{card.totalQuestions}
+                      {Math.round(progressPercentage)}%
                     </span>
                   </div>
                   <Progress 
