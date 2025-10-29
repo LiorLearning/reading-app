@@ -1507,7 +1507,7 @@ export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress
 /**
  * Get the next Spellbox topic for a grade
  */
-export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[]): string | null => {
+export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: string[], preferredLevel?: 'start' | 'middle'): string | null => {
   // Special-case: assignment always stays on assignment topic list (e.g., 'A-')
   if ((gradeDisplayName || '').toLowerCase() === 'assignment') {
     // Prefer 'A-' if available in the provided list; fallback to first
@@ -1518,7 +1518,16 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
   const gradeProgress = loadSpellboxTopicProgress(gradeDisplayName);
   
   if (!gradeProgress) {
-    // First time, return first topic
+    // Respect current level anchor when no progress exists
+    if (preferredLevel === 'middle') {
+      const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const desired = middleAnchors[contentGrade];
+      if (desired && allTopicIds.includes(desired)) {
+        return desired;
+      }
+    }
+    // Fallback to first in-grade topic
     return allTopicIds[0] || null;
   }
   
