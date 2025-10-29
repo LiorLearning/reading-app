@@ -707,7 +707,28 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   // Auto-trigger SpellBox when there's a spelling word
   React.useEffect(() => {
-    if (currentSpellingWord && currentScreen === 1 && currentSpellingWord !== lastResolvedWordRef.current) {
+    try {
+      const lastAi = chatMessages.filter(m => m.type === 'ai').slice(-1)[0] as any;
+      const debugCtx = {
+        hook: 'SpellBoxAutoOpen',
+        currentSpellingWord,
+        currentSpellingSentence,
+        currentScreen,
+        lastResolvedWord: lastResolvedWordRef.current,
+        lastAiSpellingWord: lastAi?.spelling_word,
+        lastAiSpellingSentence: lastAi?.spelling_sentence,
+        lastAiContentAfter: lastAi?.content_after_spelling,
+        lastAiContent: lastAi?.content,
+        lastAiTs: lastAi?.timestamp,
+        enteredAdventureAt: enteredAdventureAtRef.current,
+        entryMessageCycle: entryMessageCycleCountRef.current,
+        messageCycleCount,
+      };
+      console.log('[SpellBox][AutoEffect][Enter]', debugCtx);
+    } catch {}
+    // Allow reopening even if the word matches lastResolvedWord (needed for multi-round repeats).
+    // Freshness/cycle gates below prevent stale re-opens.
+    if (currentSpellingWord && currentScreen === 1) {
       // Ignore any AI spelling message generated before assignment exit
       try {
         const lastAi = chatMessages.filter(m => m.type === 'ai').slice(-1)[0] as any;
@@ -723,6 +744,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const hasNewCycleSinceEntry = messageCycleCount > (entryMessageCycleCountRef.current || 0);
         if (!isFreshForEntry && !hasNewCycleSinceEntry) {
           // Stale spelling message from a previous session/navigation; suppress SpellBox.
+          console.log('🛑 SpellBox opener: suppressed by freshness/cycle gate', { isFreshForEntry, hasNewCycleSinceEntry, lastTs, enteredAdventureAt: enteredAdventureAtRef.current, messageCycleCount, entryMessageCycle: entryMessageCycleCountRef.current });
           setShowSpellBox(false);
           setCurrentSpellQuestion(null);
           return;
@@ -761,6 +783,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           questionText: currentSpellingSentence || originalSpellingQuestion.questionText
         };
         
+        console.log('[SpellBox][AutoEffect] setCurrentSpellQuestion (enhanced)', { id: enhancedQuestion.id, audio: enhancedQuestion.audio, word: enhancedQuestion.word });
         setCurrentSpellQuestion(enhancedQuestion);
       } else {
         // Fallback: Convert the spelling word to a SpellingQuestion format (no prefilled data)
@@ -788,13 +811,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           aiTutor: bankQuestion?.aiTutor
         };
         
+        console.log('[SpellBox][AutoEffect] setCurrentSpellQuestion (fallback)', { id: spellQuestion.id, audio: spellQuestion.audio, word: spellQuestion.word });
         setCurrentSpellQuestion(spellQuestion);
       }
       
       // Show SpellBox and temporarily disable mic/text input below
+      console.log('[SpellBox][AutoEffect] setShowSpellBox(true)');
       setShowSpellBox(true);
       try { setDisableInputForSpell(true); } catch {}
     } else {
+      console.log('[SpellBox][AutoEffect] setShowSpellBox(false) path', { currentSpellingWord, currentScreen, lastResolvedWord: lastResolvedWordRef.current });
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
       // Re-enable input when SpellBox is not active
@@ -4437,18 +4463,25 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const optimisticPct = Math.round((nextFirstCorrect / nextAttempted) * 100);
         setHeaderTopicProgressPct(optimisticPct);
         // If this was the final question (10th), immediately launch whiteboard for next topic
-      if (nextAttempted >= 10 && !isWhiteboardSuppressedByAssignment) {
+      const masteredNow = (prev?.masteredQuestionIds || []).length + (isFirstAttempt ? (prev?.masteredQuestionIds?.includes(currentSpellQuestion.id) ? 0 : 1) : 0);
+      const hasMasteredAll = masteredNow >= 10;
+      if (hasMasteredAll && !isWhiteboardSuppressedByAssignment) {
           try { ttsService.stop(); } catch {}
           // Persist final attempt so topic is marked completed for SpellBox progress
           try {
-            updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid).catch(() => {});
+            updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid, currentSpellQuestion.id).catch(() => {});
           } catch {}
           // Hide SpellBox immediately
+          console.log('[SpellBox][Next] Hiding SpellBox due to mastery/advance branch', { nextAttempted, hasMasteredAll, topicId: currentSpellQuestion.topicId });
           setShowSpellBox(false);
           setCurrentSpellQuestion(null);
           // Determine next SpellBox topic based on grade progression
           const allSpellTopics = getSpellingTopicIds(currentGrade);
-          let nextTopicId = getNextSpellboxTopic(currentGrade, allSpellTopics) || null;
+          let nextTopicId = getNextSpellboxTopic(
+            currentGrade,
+            allSpellTopics,
+            (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined)
+          ) || null;
           // If progression returns the same topic (e.g., not passing), move to the next in list
           if (!nextTopicId || nextTopicId === currentSpellQuestion.topicId) {
             const idx = allSpellTopics.indexOf(currentSpellQuestion.topicId);
@@ -4489,7 +4522,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           return;
         }
       } catch {}
-      updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid)
+      updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid, currentSpellQuestion.id)
         .then(() => {
           // Recompute header progress after persistence
           recomputeHeaderTopicProgress();
@@ -4500,14 +4533,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               analytics.capture('topic_progress_snapshot', {
                 topic_id: currentSpellQuestion.topicId,
                 questions_attempted: tp.questionsAttempted || 0,
-                questions_correct_first_try: tp.firstAttemptCorrect || 0,
+                questions_correct_first_try: (tp.masteredQuestionIds || []).length || 0,
                 avg_attempts_per_question: null,
                 questions_to_mastery: null,
-                mastery_threshold: '>=70% success over 10',
+                mastery_threshold: '10 first-try correct',
               });
               // Also emit topic_mastery summary (re-added)
               try {
-                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - (tp.firstAttemptCorrect || 0));
+                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - ((tp.masteredQuestionIds || []).length || 0));
                 analytics.capture('topic_mastery', {
                   topic_id: currentSpellQuestion.topicId,
                   status: isSpellboxTopicPassingGrade(tp) ? 'mastered' : 'ongoing',
@@ -4591,6 +4624,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     lastResolvedWordRef.current = currentSpellQuestion?.audio || currentSpellQuestion?.word || null;
     
     // Hide spell box after success
+    console.log('[SpellBox][Next] Hiding SpellBox after success (normal flow)');
     setShowSpellBox(false);
     setCurrentSpellQuestion(null);
 
@@ -5956,7 +5990,28 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   {(() => {
                     const urlEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).get('whiteboard') === '1';
                     const lessonEnabled = whiteboardGradeEligible && (urlEnabled || devWhiteboardEnabled);
-                    return (
+                // Derive overlay word/sentence once to avoid mismatches and add debug logs
+                const lastAi = chatMessages.filter(m => m.type === 'ai').slice(-1)[0] as any;
+                const overlayWord = currentSpellQuestion?.word || currentSpellingWord || null;
+                const overlaySentence = (!lessonEnabled && (showSpellBox && currentSpellQuestion))
+                  ? (lastAi?.spelling_sentence || null)
+                  : (
+                      lastAi?.content_after_spelling ||
+                      lastAi?.content ||
+                      lastAi?.spelling_sentence || null
+                    );
+                try {
+                  console.log('[Overlay][Props]', {
+                    showSpellBox,
+                    currentSpellQuestionId: currentSpellQuestion?.id,
+                    overlayWord,
+                    overlaySentence,
+                    lastAiSpellingSentence: lastAi?.spelling_sentence,
+                    lastAiContentAfter: lastAi?.content_after_spelling,
+                    lastAiContent: lastAi?.content,
+                  });
+                } catch {}
+                return (
                   <LeftPetOverlay 
                     petImageUrl={currentPetAvatarImage}
                     overridePetMediaUrl={overridePetMediaUrl}
@@ -5997,15 +6052,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                           }
                         : {
                             show: !lessonEnabled && (showSpellBox && !!currentSpellQuestion),
-                            word: currentSpellQuestion?.word || currentSpellingWord || null,
-                            sentence:
-                              (!lessonEnabled && (showSpellBox && currentSpellQuestion))
-                                ? (chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence || null)
-                                : (
-                                  chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content_after_spelling ||
-                                  chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.content ||
-                                  chatMessages.filter(message => message.type === 'ai').slice(-1)[0]?.spelling_sentence || null
-                                ),
+                            word: overlayWord,
+                            sentence: overlaySentence,
                             question: currentSpellQuestion ? {
                               id: currentSpellQuestion.id,
                               word: currentSpellQuestion.word,
@@ -6797,6 +6845,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 };
 
 export default Index;
+
 
 
 

@@ -401,7 +401,7 @@ export const getNextSpellboxQuestion = (
   
   // Get the current topic based on progression logic
   const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds, preferredLevel);
-  console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIds: allTopicIds.slice(0, 3) });
+  console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIdsPreview: allTopicIds.slice(0, 3), preferredLevel });
   
   if (!currentTopicId) {
     console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
@@ -416,37 +416,50 @@ export const getNextSpellboxQuestion = (
     return null;
   }
   
-  // Get topic progress to see how many questions have been attempted
+  // Get topic progress
   const topicProgress = getSpellboxTopicProgress(gradeDisplayName, currentTopicId);
-  const questionsAttempted = topicProgress?.questionsAttempted || 0;
-  
-  // If topic is completed but didn't pass, we'll let the progress system handle the restart
-  // The topic will be restarted when updateSpellboxTopicProgress detects a failed topic
-  if (topicProgress?.isCompleted && topicProgress.successRate < 70) {
-    // console.log(`🔄 getNextSpellboxQuestion: Topic ${currentTopicId} needs restart (${topicProgress.successRate.toFixed(1)}% < 70%)`);
-    // Return first question of this topic - the progress will be reset when the next question is answered
-    const firstQuestion = topicQuestions[0];
-    // console.log(`🎯 getNextSpellboxQuestion: Selected first question for restart of topic ${currentTopicId}:`, {
-    //   id: firstQuestion.id,
-    //   word: firstQuestion.word,
-    //   topicName: firstQuestion.topicName
-    // });
-    return firstQuestion;
+  const masteredCount = topicProgress?.masteredQuestionIds?.length || 0;
+  const masteredIds = new Set<number>(topicProgress?.masteredQuestionIds || []);
+
+  // Mastery done: selection is irrelevant; return first for safety
+  if (masteredCount >= 10) {
+    console.log('[Spellbox][Select] Mastery already reached, returning first question as fallback', { currentTopicId });
+    return topicQuestions[0];
   }
-  
-  // For ongoing topics, select the next question in sequence (up to 10 questions max)
-  const questionIndex = Math.min(questionsAttempted, 9); // Max 10 questions (0-9 index)
-  const selectedQuestion = topicQuestions[questionIndex] || topicQuestions[0];
-  
-  // console.log(`🎯 getNextSpellboxQuestion: Selected question ${questionIndex + 1}/10 for topic ${currentTopicId}:`, {
-  //   id: selectedQuestion.id,
-  //   word: selectedQuestion.word,
-  //   topicName: selectedQuestion.topicName,
-  //   questionsAttempted,
-  //   topicProgress: topicProgress?.successRate?.toFixed(1) + '%' || 'New topic'
-  // });
-  
-  return selectedQuestion;
+
+  // First pass: serve next by how many first-pass IDs we recorded
+  const firstPassLen = topicProgress?.firstPassQuestionIds?.length || 0;
+  if (firstPassLen < 10) {
+    const idx = Math.min(firstPassLen, 9);
+    const q = topicQuestions[idx] || topicQuestions[0];
+    console.log('[Spellbox][Select] First pass selection', { currentTopicId, firstPassLen, selectedIndex: idx, questionId: q?.id, word: q?.audio });
+    return q;
+  }
+
+  // Rounds: use the round pool and cursor
+  const pool = topicProgress?.roundPoolQuestionIds || [];
+  const cursor = typeof topicProgress?.roundPoolCursor === 'number' ? (topicProgress!.roundPoolCursor as number) : 0;
+  if (pool.length > 0 && cursor < pool.length) {
+    const qid = pool[cursor];
+    const selected = topicQuestions.find(q => q.id === qid) || topicQuestions[0];
+    console.log('[Spellbox][Select] Round pool selection', { currentTopicId, poolSize: pool.length, cursor, questionId: selected?.id, word: selected?.audio });
+    return selected;
+  }
+
+  // If next round has items, serve the first of that list
+  const nextPool = topicProgress?.nextRoundQuestionIds || [];
+  if (nextPool.length > 0) {
+    const qid = nextPool[0];
+    const selected = topicQuestions.find(q => q.id === qid) || topicQuestions[0];
+    console.log('[Spellbox][Select] Next-round-first selection (cursor at end)', { currentTopicId, nextPoolSize: nextPool.length, questionId: selected?.id, word: selected?.audio });
+    return selected;
+  }
+
+  // Final fallback: pick the first unmastered among the first 10
+  const firstPassIds = topicProgress?.firstPassQuestionIds || [];
+  const fallback = topicQuestions.find(q => firstPassIds.includes(q.id) && !masteredIds.has(q.id)) || topicQuestions[0];
+  console.log('[Spellbox][Select] Fallback selection among first-pass unmastered', { currentTopicId, questionId: fallback?.id, word: fallback?.audio });
+  return fallback;
 };
 
 /**
