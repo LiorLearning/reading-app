@@ -47,6 +47,7 @@ import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
 import WhiteboardLesson from "@/components/adventure/WhiteboardLesson";
 import { getLessonScript, lessonScripts } from "@/data/lesson-scripts";
 import RightUserOverlay from "@/components/adventure/RightUserOverlay";
+import SpellReviewModal, { SpellReviewItem } from "@/components/adventure/SpellReviewModal";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -4281,6 +4282,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recomputeHeaderTopicProgress, spellingProgressIndex, completedSpellingIds]);
 
+  // Session SpellBox review items and modal
+  const [spellReviewItems, setSpellReviewItems] = React.useState<SpellReviewItem[]>([]);
+  const [isSpellReviewOpen, setIsSpellReviewOpen] = React.useState<boolean>(false);
+
   // SpellBox event handlers
   const handleSpellComplete = useCallback((isCorrect: boolean, userAnswer?: string, attemptCount: number = 1) => {
     playClickSound();
@@ -4444,6 +4449,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Update SpellBox topic progress with Firebase sync
     if (currentGrade && currentSpellQuestion) {
       const isFirstAttempt = effectiveAttemptCount === 1;
+      // Capture this resolved word for the session review (first-try correctness)
+      try {
+        const resolvedWord = (currentSpellQuestion.word || currentSpellQuestion.audio || '').toString().trim();
+        if (resolvedWord) {
+          setSpellReviewItems(prev => ([...prev, { word: resolvedWord, firstTryCorrect: isFirstAttempt }]));
+        }
+      } catch {}
       try {
         // Emit spell_resolved when the learner gets the word correct
         analytics.capture('spell_resolved', {
@@ -5073,6 +5085,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   playClickSound();
                   await handleCloseSession(); // Save current adventure before going home
                   
+                  // If this session has enough completed SpellBox items, show review modal before navigating
+                  const completedCount = spellReviewItems.length;
+                  const firstTryCorrectCount = spellReviewItems.filter(i => i.firstTryCorrect).length;
+                  if (completedCount > 0 && firstTryCorrectCount >= 5) {
+                    setIsSpellReviewOpen(true);
+                    return;
+                  }
+
                   // Navigate back to pet page (home)
                   if (onBackToPetPage) {
                     onBackToPetPage();
@@ -6833,6 +6853,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           </div>
         )}
 
+        {/* Spell review modal shown before navigating Home */}
+        <SpellReviewModal
+          open={isSpellReviewOpen}
+          items={spellReviewItems}
+          onCompleted={() => {
+            setIsSpellReviewOpen(false);
+            setSpellReviewItems([]);
+            if (onBackToPetPage) {
+              onBackToPetPage();
+            } else {
+              navigate('/');
+            }
+          }}
+        />
+
         {/* Feedback Modal */}
         <FeedbackModal
           isOpen={showFeedbackModal}
@@ -6845,6 +6880,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 };
 
 export default Index;
+
 
 
 

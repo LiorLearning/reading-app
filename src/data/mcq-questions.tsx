@@ -29658,31 +29658,31 @@ aiTutor: {
       questionElements: 'image + audio + text',
       answerElements: 'text',
       templateType: 'fill_blank',
-      word: "hay",
+      word: "clay",
       imageUrl: null,
-      explanation: "Great job! The word is 'hay' (long a spelled with 'ay').",
-      questionText: "h__",
-      correctAnswer: "hay",
+      explanation: "Great job! The word is 'clay' (long a spelled with 'ay').",
+      questionText: "cl__",
+      correctAnswer: "clay",
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0],
+      prefilledIndexes: [0,1],
       aiHook: {
-        targetWord: "hay",
+        targetWord: "clay",
         intent: "fill_blank",
-        questionLine: "h__",
-        imagePrompt: "A pile of hay"
+        questionLine: "cl__",
+        imagePrompt: "A lump of clay for pottery making"
       },
       aiTutor: {
-        target_word: 'hay',
-        question: "h__",
+        target_word: 'clay',
+        question: "cl__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it's at the end (day, play), and 'a_e' when there's one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
       },
-      audio: "hay"
+      audio: "clay"
     },
     {
       id: 2,
