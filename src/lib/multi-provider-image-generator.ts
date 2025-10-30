@@ -288,7 +288,7 @@ class FluxSchnellProvider implements ImageProvider {
         provider: 'flux',
         prompt,
       });
-      toast.warning('Inappropriate image.', {
+      toast.warning('Oops! Please try again.', {
         duration: 3000,
       });
       return

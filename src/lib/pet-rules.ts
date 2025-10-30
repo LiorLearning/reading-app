@@ -51,6 +51,14 @@ export const PET_RULES: Record<string, PetRule> = {
 		description: 'a cheerful electric creature with bright yellow fur and rosy cheeks',
 		instruction: 'Replace any second-person references ("you") with the pet persona: "a cheerful electric creature with bright yellow fur and rosy cheeks" in image prompts.'
 	},
+	panda: {
+		description: 'a cute panda pet who is cute, cuddly, and playful',
+		instruction: 'Replace any second-person references ("you") with the pet persona: "a cute panda pet who is cute, cuddly, and playful" in image prompts.'
+	},
+	deer: {
+		description: 'a cute deer pet who is cute, cuddly, and playful',
+		instruction: 'Replace any second-person references ("you") with the pet persona: "a cute deer pet who is cute, cuddly, and playful" in image prompts.'
+	},
 };
 
 export function getPetRule(petId: string | undefined | null): PetRule | undefined {

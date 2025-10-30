@@ -198,7 +198,7 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
   // Infer pet from celebrationUrl for voice override
   function inferPetIdFromGifUrl(url?: string): string | undefined {
     if (!url) return undefined;
-    const candidates = ['dog', 'cat', 'hamster', 'parrot', 'monkey', 'dragon', 'unicorn', 'bobo', 'feather'];
+    const candidates = ['dog', 'cat', 'hamster', 'parrot', 'monkey', 'dragon', 'unicorn', 'bobo', 'feather','pikachu','panda','deer'];
     const lower = url.toLowerCase();
     for (const id of candidates) {
       if (lower.includes(id)) return id;
