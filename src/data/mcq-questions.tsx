@@ -286,11 +286,11 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell the long a word silent e ai ay concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'cake',
+            question: "_ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long A word',
+            spelling_pattern_or_rule: "The silent 'e' makes the 'a' say its name in 'cake'."
           },
           audio:"cake"
         },
@@ -320,11 +320,11 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell the long u word silent e ue oo ew concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'glue',
+            question: "_ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long U word',
+            spelling_pattern_or_rule: "The silent 'e' makes the 'u' say its name in 'glue'."
           },
           audio:"glue"
         },
@@ -354,12 +354,13 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell the long a word silent e ai ay ae eigh concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'weight',
+            question: 'w _ _ _ h t',
+            student_entry: '',
+            topic_to_reinforce: 'Spell the long A word',
+            spelling_pattern_or_rule: "The letters ‘eigh’ make the long /eɪ/ sound in 'weight', as in 'eight' and 'neighbor'."
+          }
+          ,
           audio:"weight"
         },
         {
@@ -388,12 +389,14 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell consonant le words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'noodle',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Spell vowel team words with long vowel sounds',
+            spelling_pattern_or_rule: "The word 'noodle' has the vowel team ‘oo’ that makes the long /uː/ sound, as in 'moon' and 'food', followed by the final syllable ‘-le’."
+          }
+          
+          ,
           audio:"noodle"
         },
       ],
@@ -29253,11 +29256,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+            target_word: 'cake',
+            question: "_ _ k _",
+            student_entry: "",
+            topic_to_reinforce: 'Long A with silent e (CVCe pattern) — how the silent e changes a short vowel to a long vowel sound',
+            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘a’ becomes /eɪ/"
           },
           audio:"cake"
         },
@@ -29287,11 +29290,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+            target_word: 'cat',
+            question: "_ _ t",
+            student_entry: "",
+            topic_to_reinforce: 'Short A vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
+  spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘a’ makes the short /æ/ sound as in cat, hat, and bag."
           },
           audio:"cat"
         },
@@ -29321,11 +29324,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+            target_word: 'bike',
+            question: '_ _ k _',
+            student_entry: '',
+            topic_to_reinforce: 'Long I with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
+            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘i’ becomes /aɪ/ as in bike, like, and hike."
           },
           audio:"bike"
         },
@@ -29355,11 +29358,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+            target_word: 'sit',
+            question: '_ _ t',
+            student_entry: '',
+            topic_to_reinforce: 'Short I vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
+            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘i’ makes the short /ɪ/ sound as in sit, pin, and lip."
           },
           audio:"sit"
         },
@@ -29389,11 +29392,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+            target_word: 'rope',
+            question: '_ _ p _',
+            student_entry: '',
+            topic_to_reinforce: 'Long O with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
+            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘o’ becomes /oʊ/ as in rope, hope, and nose."
           },
           audio:"rope"
         },
@@ -29423,11 +29426,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+            target_word: 'dog',
+            question: '_ _ g',
+            student_entry: '',
+            topic_to_reinforce: 'Short O vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
+            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘o’ makes the short /ɒ/ sound as in dog, log, and hop."
           },
           audio:"dog"
         },
@@ -29457,12 +29460,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
-          },
+            target_word: 'fame',
+            question: '_ _ m _',
+            student_entry: '',
+            topic_to_reinforce: 'Long A with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
+            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘a’ becomes /eɪ/ as in fame, game, and name."
+          }
+          ,
           audio:"fame"
         },
         {
@@ -29491,12 +29495,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
-          },
+            target_word: 'bed',
+            question: '_ _ d',
+            student_entry: '',
+            topic_to_reinforce: 'Short E vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
+            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘e’ makes the short /ɛ/ sound as in bed, red, and net."
+          }
+          ,
           audio:"bed"
         },
         {
@@ -29525,12 +29530,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
-          },
+            target_word: 'note',
+            question: '_ _ t _',
+            student_entry: '',
+            topic_to_reinforce: 'Long O with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
+            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘o’ becomes /oʊ/ as in note, rope, and home."
+          }
+          ,
           audio:"note"
         },
         {
@@ -29559,16 +29565,18 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
-          },
+            target_word: 'cup',
+            question: '_ _ p',
+            student_entry: '',
+            topic_to_reinforce: 'Short U vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
+            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘u’ makes the short /ʌ/ sound as in cup, sun, and bus."
+          }
+          
+          ,
           audio:"cup"
         },
         {
-          id: 12,
+          id: 11,
           topicId: '2-J.1',
           topicName: 'Sort_short_and_long_vowel_words',
           progressTopicName: 'Sneaky Silent E: Short and Long Vowels',
@@ -29594,16 +29602,17 @@ aiTutor: {
           },
           aiTutor: {
             target_word: 'kite',
-            question: "Listen carefully to the word 'kite'. Does the vowel say its name or make a short sound?",
-            student_entry: "",
-            topic_to_reinforce: 'Sort short and long vowel sounds',
-            spelling_pattern_or_rule:
-              "When you add a silent e to the end of a word, it makes the vowel say its name. 'Kit' becomes 'kite' — short i turns into long i."
-          },
+            question: '_ _ t _',
+            student_entry: '',
+            topic_to_reinforce: 'Long I with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
+            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘i’ becomes /aɪ/ as in kite, ride, and time."
+          }
+          
+          ,
           audio: "kite"
         },
         {
-          id: 11,
+          id: 12,
           topicId: '2-J.1',
           topicName: 'Sort_short_and_long_vowel_words',
           progressTopicName: 'Sneaky Silent E: Short and Long Vowels',
@@ -29629,11 +29638,10 @@ aiTutor: {
           },
           aiTutor: {
             target_word: 'kit',
-            question: "Listen carefully to the word 'kit'. Does the vowel say its name or make a short sound?",
-            student_entry: "",
-            topic_to_reinforce: 'Sort short and long vowel sounds',
-            spelling_pattern_or_rule:
-              "The vowel i is short in 'kit' because there’s no silent e at the end. Short vowels say their quick sounds — /ĭ/ in 'kit'."
+            question: '_ _ t',
+            student_entry: '',
+            topic_to_reinforce: 'Short I vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
+            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘i’ makes the short /ɪ/ sound as in kit, sit, and pin."
           },
           audio: "kit"
         }
@@ -35275,12 +35283,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'basket',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
+            spelling_pattern_or_rule: "The word 'basket' has two closed syllables: 'bas' and 'ket'. In closed syllables, the vowel is followed by a consonant, making the vowel short — /bæs/ + /kɪt/ → basket."
+          },          
           audio:"basket"
         },
         {
@@ -35309,12 +35317,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'minus',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on whether a syllable is open or closed',
+            spelling_pattern_or_rule: "The word 'minus' has two syllables: 'mi' and 'nus'. The first syllable 'mi' is open, so the vowel says its name (/aɪ/). The second syllable 'nus' is closed, so the vowel is short (/ʌ/)."
+          }
+          ,
           audio:"minus"
         },
         {
@@ -35343,12 +35352,14 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'shiny',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on whether a syllable is open or closed',
+            spelling_pattern_or_rule: "The word 'shiny' has two syllables: 'shi' and 'ny'. The first syllable 'shi' is open, so the vowel says its name (/aɪ/). The second syllable 'ny' is also open, ending with a vowel sound (/i/)."
+          }
+          
+          ,
           audio:"shiny"
         },
         {
@@ -35377,12 +35388,14 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'rocket',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
+            spelling_pattern_or_rule: "The word 'rocket' has two closed syllables: 'roc' and 'ket'. In both syllables, the vowels are followed by consonants, making the vowel sounds short — /rɒk/ + /ɪt/ → rocket."
+          }
+          
+          ,
           audio:"rocket"
         },
         {
@@ -35411,12 +35424,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'open',
+            question: '_ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open syllables — how vowels make long sounds when the syllable ends in a vowel',
+            spelling_pattern_or_rule: "The word 'open' has two syllables: 'o' and 'pen'. The first syllable 'o' is open, so the vowel says its name (/oʊ/). The second syllable 'pen' is closed, so the vowel is short (/ɛ/)."
+          }
+          ,
           audio:"open"
         },
         {
@@ -35445,12 +35459,14 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'music',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'music' has two syllables: 'mu' and 'sic'. The first syllable 'mu' is open, so the vowel says its name (/uː/). The second syllable 'sic' is closed, so the vowel is short (/ɪ/)."
+          }
+          
+          ,
           audio:"music"
         },
         {
@@ -35479,12 +35495,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'hotel',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'hotel' has two syllables: 'ho' and 'tel'. The first syllable 'ho' is open, so the vowel says its name (/oʊ/). The second syllable 'tel' is closed, so the vowel is short (/ɛ/)."
+          }          ,
           audio:"hotel"
         },
         {
@@ -35513,11 +35529,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'tablet',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
+            spelling_pattern_or_rule: "The word 'tablet' has two closed syllables: 'tab' and 'let'. In both syllables, the vowels are followed by consonants, making the vowel sounds short — /tæb/ + /lɛt/ → tablet."
           },
           audio:"tablet"
         },
@@ -35547,12 +35563,14 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'pilot',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'pilot' has two syllables: 'pi' and 'lot'. The first syllable 'pi' is open, so the vowel says its name (/aɪ/). The second syllable 'lot' is closed, so the vowel is short (/ʌ/)."
+          }
+          
+          ,
           audio:"pilot"
         },
         {
@@ -35581,12 +35599,14 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'cabin',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
+            spelling_pattern_or_rule: "The word 'cabin' has two closed syllables: 'cab' and 'in'. In both syllables, the vowels are followed by consonants, making the vowel sounds short — /kæb/ + /ɪn/ → cabin."
+          }
+          
+          ,
           audio:"cabin"
         }
       ]
@@ -36321,12 +36341,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'laptop',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'laptop' has two closed syllables: 'lap' and 'top'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /ɒ/). When combined, they form a two-syllable word: lap + top → laptop."
+          }          ,
           audio:"laptop"
         },
         {
@@ -36355,12 +36375,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'sunset',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'sunset' has two closed syllables: 'sun' and 'set'. In each syllable, the vowel is followed by a consonant, making the vowel sound short (/ʌ/ and /ɛ/). When combined, they form a two-syllable word: sun + set → sunset."
+          }         
+          ,
           audio:"sunset"
         },
         {
@@ -36389,12 +36410,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'bathtub',
+            question: '_ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'bathtub' has two closed syllables: 'bath' and 'tub'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /ʌ/). When combined, they form a two-syllable word: bath + tub → bathtub."
+          }          
+          ,
           audio:"bathtub"
         },
         {
@@ -36423,12 +36445,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'backpack',
+            question: '_ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'backpack' has two closed syllables: 'back' and 'pack'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /pæk/). When combined, they form a two-syllable word: back + pack → backpack."
+          }          
+          ,
           audio:"backpack"
         },
         {
@@ -36457,12 +36480,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'basket',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'basket' has two closed syllables: 'bas' and 'ket'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /kɛt/). When combined, they form a two-syllable word: bas + ket → basket."
+          }          
+          ,
           audio:"basket"
         },
         {
@@ -36491,12 +36515,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'bedroom',
+            question: '_ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'bedroom' has two closed syllables: 'bed' and 'room'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /ʊm/). When combined, they form a two-syllable word: bed + room → bedroom."
+          }          
+          ,
           audio:"bedroom"
         },
         {
@@ -36525,12 +36550,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'sunflower',
+            question: '_ _ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'sunflower' has two closed syllables: 'sun' and 'flower'. Each syllable ends with a consonant, giving both vowels short sounds (/sʌn/ and /flaʊər/). When combined, they form a two-syllable word: sun + flower → sunflower."
+          }          
+          ,
           audio:"sunflower"
         },
         {
@@ -36559,12 +36585,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'football',
+            question: '_ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'football' has two closed syllables: 'foot' and 'ball'. Each syllable ends with a consonant, giving both vowels short sounds (/fʊt/ and /bæl/). When combined, they form a two-syllable word: foot + ball → football."
+          }          
+          ,
           audio:"football"
         },
         {
@@ -36593,12 +36620,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'notebook',
+            question: '_ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'notebook' has two closed syllables: 'note' and 'book'. Each syllable ends with a consonant, giving both vowels short sounds (/nəʊt/ and /bʊk/). When combined, they form a two-syllable word: note + book → notebook."
+          }          
+          ,
           audio:"notebook"
         },
         {
@@ -36627,7 +36655,7 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
+            target_word: 'bookmark',
             question: "Listen to the word. Then, fill in the missing digraph: _eel",
             student_entry: "My name is John.",
             topic_to_reinforce: 'Fill in the missing sounds',
@@ -36673,12 +36701,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'sunrise',
+            question: '_ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'sunrise' has two closed syllables: 'sun' and 'rise'. Each syllable ends with a consonant, giving both vowels short sounds (/sʌn/ and /raɪz/). When combined, they form a two-syllable word: sun + rise → sunrise."
+          }          
+          ,
           audio:"sunrise"
         },
         {
@@ -36707,12 +36736,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'mailbox',
+            question: '_ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'mailbox' has two closed syllables: 'mail' and 'box'. Each syllable ends with a consonant, giving both vowels short sounds (/mɑɪl/ and /bɒks/). When combined, they form a two-syllable word: mail + box → mailbox."
+          }          
+          ,
           audio:"mailbox"
         },
         {
@@ -36741,12 +36771,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'puppet',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'puppet' has two closed syllables: 'pup' and 'pet'. Each syllable ends with a consonant, giving both vowels short sounds (/pʌp/ and /pɛt/). When combined, they form a two-syllable word: pup + pet → puppet."
+          }          
+          ,
           audio:"puppet"
         },
         {
@@ -36775,12 +36806,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'backpack',
+            question: '_ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'backpack' has two closed syllables: 'back' and 'pack'. Each syllable ends with a consonant, giving both vowels short sounds (/bæk/ and /pæk/). When combined, they form a two-syllable word: back + pack → backpack."
+          }          
+          ,
           audio:"backpack"
         },
         {
@@ -36809,12 +36841,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'baseball',
+            question: '_ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'baseball' has two closed syllables: 'base' and 'ball'. Each syllable ends with a consonant, giving both vowels short sounds (/beɪs/ and /bæl/). When combined, they form a two-syllable word: base + ball → baseball."
+          }          
+          ,
           audio:"baseball"
         },
         {
@@ -36843,12 +36876,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'footprint',
+            question: '_ _ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'footprint' has two closed syllables: 'foot' and 'print'. Each syllable ends with a consonant, giving both vowels short sounds (/fʊt/ and /prɪnt/). When combined, they form a two-syllable word: foot + print → footprint."
+          }          
+          ,
           audio:"footprint"
         },
         {
@@ -36877,11 +36911,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'notebook',
+            question: '_ _ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'notebook' has two closed syllables: 'note' and 'book'. Each syllable ends with a consonant, giving both vowels short sounds (/nəʊt/ and /bʊk/). When combined, they form a two-syllable word: note + book → notebook."
           },
           audio:"notebook"
         },
@@ -36911,12 +36945,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'raincoat',
+            question: "_ _ _ _ _ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'raincoat' has two closed syllables: 'rain' and 'coat'. Each syllable ends with a consonant, giving both vowels short sounds (/reɪn/ and /kəʊt/). When combined, they form a two-syllable word: rain + coat → raincoat."
+          }          
+          ,
           audio:"raincoat"
         },
         {
@@ -36945,11 +36980,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'sandbox',
+            question: "_ _ _ _ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'sandbox' has two closed syllables: 'sand' and 'box'. Each syllable ends with a consonant, giving both vowels short sounds (/sænd/ and /bɒks/). When combined, they form a two-syllable word: sand + box → sandbox."
           },
           audio:"sandbox"
         },
@@ -36979,11 +37014,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'starfish',
+            question: "_ _ _ _ _ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
+            spelling_pattern_or_rule: "The word 'starfish' has two closed syllables: 'star' and 'fish'. Each syllable ends with a consonant, giving both vowels short sounds (/stɑːr/ and /fɪʃ/). When combined, they form a two-syllable word: star + fish → starfish."
           },
           audio:"starfish"
         }
@@ -37025,12 +37060,13 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'cabin',
+            question: 'c a b _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when a syllable ends with a consonant, the vowel before it is usually short. Both syllables in 'cabin' follow this closed-syllable pattern."
+          }
+,          
           audio:"cabin"
         },
         {
@@ -37059,12 +37095,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'traffic',
+            question: 't r a f _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In multisyllabic words, when each syllable ends with a consonant, the vowels usually make short sounds. Both syllables in 'traffic' follow the closed-syllable pattern."
+          },          
           audio:"traffic"
         },
         {
@@ -37093,12 +37129,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'helmet',
+            question: 'h e l _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'helmet' follow this closed-syllable pattern."
+          },          
           audio:"helmet"
         },
         {
@@ -37127,11 +37163,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'drumstick',
+            question: 'd r u m _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when a syllable ends with a consonant, the vowel before it is usually short. Both syllables in 'drumstick' follow this closed-syllable pattern."
           },
           audio:"drumstick"
         },
@@ -37161,11 +37197,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'planet',
+            question: "p l a n _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'planet' follow this closed-syllable pattern."
           },
           audio:"planet"
         },
@@ -37195,11 +37231,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'hundred',
+            question: "h u n _ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'hundred' follow this closed-syllable pattern."
           },
           audio:"hundred"
         },
@@ -37229,11 +37265,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'insect',
+            question: "i n _ _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'insect' follow this closed-syllable pattern."
           },
           audio:"insect"
         },
@@ -37263,11 +37299,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'rocket',
+            question: "r o c _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'rocket' follow this closed-syllable pattern."
           },
           audio:"rocket"
         },
@@ -37297,11 +37333,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'basket',
+            question: "b a s _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'basket' follow this closed-syllable pattern."
           },
           audio:"basket"
         },
@@ -37331,11 +37367,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'picnic',
+            question: "p i c _ _ _",
+            student_entry: '',
+            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
+            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'picnic' follow this closed-syllable pattern."
           },
           audio:"picnic"
         }
@@ -58472,12 +58508,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'pilot',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'pilot' has two syllables: 'pi' and 'lot'. The first syllable 'pi' is open, so the vowel says its name (/aɪ/). The second syllable 'lot' is closed, so the vowel is short (/ɒ/)."
+          },          
           audio:"pilot"
         },
         {
@@ -58506,11 +58542,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'music',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'music' has two syllables: 'mu' and 'sic'. The first syllable 'mu' is open, so the vowel says its name (/mju/). The second syllable 'sic' is closed, so the vowel is short (/ɪ/)."
           },
           audio:"music"
         },
@@ -58540,11 +58576,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'robot',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'robot' has two syllables: 'ro' and 'bot'. The first syllable 'ro' is open, so the vowel says its name (/rəʊ/). The second syllable 'bot' is closed, so the vowel is short (/ɒ/)."
           },
           audio:"robot"
         },
@@ -58574,11 +58610,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'silent',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'silent' has two syllables: 'si' and 'lent'. The first syllable 'si' is open, so the vowel says its name (/sɪ/). The second syllable 'lent' is closed, so the vowel is short (/ɪ/)."
           },
           audio:"silent"
         },
@@ -58608,11 +58644,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'lemon',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'lemon' has two syllables: 'le' and 'mon'. The first syllable 'le' is open, so the vowel says its name (/lɪ/). The second syllable 'mon' is closed, so the vowel is short (/ɒ/)."
           },
           audio:"lemon"
         },
@@ -58642,11 +58678,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'tiger',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'tiger' has two syllables: 'ti' and 'ger'. The first syllable 'ti' is open, so the vowel says its name (/tɪ/). The second syllable 'ger' is closed, so the vowel is short (/ɒ/)."
           },
           audio:"tiger"
         },
@@ -58676,11 +58712,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'camel',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'camel' has two syllables: 'ca' and 'mel'. The first syllable 'ca' is open, so the vowel says its name (/kæ/). The second syllable 'mel' is closed, so the vowel is short (/ɒ/)."
           },
           audio:"camel"
         },
@@ -58710,11 +58746,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'focus',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'focus' has two syllables: 'fo' and 'cus'. The first syllable 'fo' is open, so the vowel says its name (/foʊ/). The second syllable 'cus' is closed, so the vowel is short (/ɪ/)."
           },
           audio:"focus"
         },
@@ -58744,11 +58780,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'melon',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'melon' has two syllables: 'me' and 'lon'. The first syllable 'me' is open, so the vowel says its name (/mɪ/). The second syllable 'lon' is closed, so the vowel is short (/ɒ/)."
           },
           audio:"melon"
         },
@@ -58778,11 +58814,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
+            target_word: 'cabin',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
+            spelling_pattern_or_rule: "The word 'cabin' has two syllables: 'ca' and 'bin'. The first syllable 'ca' is open, so the vowel says its name (/kæ/). The second syllable 'bin' is closed, so the vowel is short (/ɪ/)."
           },
           audio:"cabin"
         }
@@ -60210,12 +60246,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'said',
+            question: 's _ _ d',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'said' is a sight word because it doesn’t follow normal vowel sound rules. The letters ‘ai’ make the short /ɛ/ sound instead of a long vowel sound."
+          },          
           audio:"said"
         },
         {
@@ -60244,12 +60280,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'because',
+            question: 'b e c _ _ s e',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'because' is a sight word because it doesn’t follow typical sound–letter patterns. The vowel sounds and spelling don’t match regular phonics rules, so it’s best learned by sight."
+          }
+          ,
           audio:"because"
         },
         {
@@ -60278,12 +60315,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'could',
+            question: 'c _ _ l d',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'could' is a sight word because it doesn’t follow normal vowel sound rules. The letters ‘ou’ make the short /ʊ/ sound, as in 'book' and 'should', instead of a long vowel sound."
+          }
+          ,
           audio:"could"
         },
         {
@@ -60312,12 +60350,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'people',
+            question: 'p e o _ _ e',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'people' is a sight word because the letters ‘eo’ make the long /iː/ sound, which is irregular. Since it doesn’t follow normal phonics rules, it’s best learned by sight."
+          }
+          ,
           audio:"people"
         },
         {
@@ -60346,12 +60385,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'their',
+            question: 't h _ _ r',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'their' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ei’ make the long /eɪ/ sound instead of the expected /ɪ/ or /ɛ/, so it’s best learned by sight."
+          }
+          ,
           audio:"their"
         },
         {
@@ -60380,12 +60420,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'friend',
+            question: 'f r i _ _ d',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'friend' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ie’ make the short /ɛ/ sound, as in 'red', instead of the usual /aɪ/ sound, so it’s best learned by sight."
+          }
+          ,
           audio:"friend"
         },
         {
@@ -60414,12 +60455,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'other',
+            question: 'o t h _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'other' is a sight word because it doesn’t follow typical sound–letter patterns. The letter ‘o’ makes the short /ʌ/ sound (like in 'mother' and 'brother') instead of the usual long /oʊ/ sound."
+          }
+          ,
           audio:"other"
         },
         {
@@ -60448,12 +60490,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'which',
+            question: 'w h _ _ h',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'which' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘wh’ make the /w/ sound, and the word’s spelling doesn’t match its pronunciation exactly, so it’s best learned by sight."
+          }
+          ,
           audio:"which"
         },
         {
@@ -60482,12 +60525,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'know',
+            question: 'k n _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'know' is a sight word because it doesn’t follow typical sound–letter patterns. The letter ‘k’ is silent, and the letters ‘ow’ make the long /oʊ/ sound, so it’s best learned by sight."
+          }
+          ,
           audio:"know"
         },
         {
@@ -60516,12 +60560,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'through',
+            question: 't h r o _ _ h',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'through' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ough’ make the long /uː/ sound, which is unusual and doesn’t follow normal phonics rules."
+          }
+          ,
           audio:"through"
         }
       ]
@@ -60562,12 +60607,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'through',
+            question: '_ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'through' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ough’ make the long /uː/ sound, which is unusual and doesn’t follow normal phonics rules."
+          }
+          ,
           audio:"through"
         },
         {
@@ -60596,12 +60642,14 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'their',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'their' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ei’ make the long /ɛər/ sound, as in 'hair' and 'pair', instead of the usual /iː/ or /aɪ/, so it’s best learned by sight."
+          }
+          
+          ,
           audio:"their"
         },
         {
@@ -60630,12 +60678,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'because',
+            question: '_ _ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'because' is a sight word because it doesn’t follow typical sound–letter patterns. The vowel sounds don’t match regular phonics rules — 'e' sounds like /ɪ/ and 'au' sounds like /ɔː/ — so it’s best learned by sight."
+          }
+          ,
           audio:"because"
         },
         {
@@ -60664,12 +60713,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'friend',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'friend' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ie’ make the short /ɛ/ sound, as in 'red', instead of the usual /aɪ/ sound, so it’s best learned by sight."
+          }
+          ,
           audio:"friend"
         },
         {
@@ -60698,12 +60748,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'people',
+            question: '_ _ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'people' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘eo’ make the long /iː/ sound, as in 'peel' and 'deep', which is irregular, so it’s best learned by sight."
+          }
+          ,
           audio:"people"
         },
         {
@@ -60732,12 +60783,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'where',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'where' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ere’ make the /ɛər/ sound, as in 'there' and 'wear', instead of the usual long /iː/ sound, so it’s best learned by sight."
+          }
+          ,
           audio:"where"
         },
         {
@@ -60766,12 +60818,13 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'again',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'again' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ai’ make the short /ɪ/ sound, as in 'pin' and 'begin', instead of the usual /eɪ/ sound, so it’s best learned by sight."
+          }
+          ,
           audio:"again"
         },
         {
@@ -60800,12 +60853,14 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'know',
+            question: '_ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'know' is a sight word because it doesn’t follow typical sound–letter patterns. The letter ‘k’ is silent, and the letters ‘ow’ make the long /oʊ/ sound, which is unusual and doesn’t follow normal phonics rules."
+          }
+          
+          ,
           audio:"know"
         },
         {
@@ -60834,12 +60889,14 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'could',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'could' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ou’ make the short /ʊ/ sound, as in 'book' and 'should', instead of a long vowel sound."
+          }
+          
+          ,
           audio:"could"
         },
         {
@@ -60868,12 +60925,14 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'blend',
-            question: "Listen to the word. Then, fill in the missing digraph: _eel",
-            student_entry: "My name is John.",
-            topic_to_reinforce: 'Fill in the missing sounds',
-            spelling_pattern_or_rule: ''
-          },
+            target_word: 'every',
+            question: '_ _ _ _ _',
+            student_entry: '',
+            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
+            spelling_pattern_or_rule: "The word 'every' is a sight word because it doesn’t follow typical sound–letter patterns. The vowels are reduced — the first ‘e’ makes the short /ɛ/ sound, and the second syllable sounds like /ri/ — so it’s best learned by sight."
+          }
+          
+          ,
           audio:"every"
         }
       ]
