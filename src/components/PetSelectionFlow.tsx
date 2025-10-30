@@ -347,6 +347,12 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
                 onClick={() => {
                   try { ttsService.stop(); } catch {}
                   onPetSelected(selectedPet.id, petName.trim());
+                  // Ensure mood period baseline includes the new pet right away
+                  try {
+                    const { PetProgressStorage } = require('@/lib/pet-progress-storage');
+                    const owned = PetProgressStorage.getAllOwnedPets().map((p: any) => p.petId);
+                    PetProgressStorage.ensureMoodPeriodUpToDate(owned);
+                  } catch {}
                 }}
               >
                 Next

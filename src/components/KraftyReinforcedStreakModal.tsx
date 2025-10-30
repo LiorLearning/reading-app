@@ -82,7 +82,8 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
   const { userData } = useAuth();
 
   const monday = useMemo(() => getMondayOfCurrentWeek(), []);
-  const labels = useMemo(() => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], []);
+  // Show only weekdays in the modal per new streak UX
+  const labels = useMemo(() => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], []);
   const [weekly, setWeekly] = useState<WeeklyHearts>(() => loadWeeklyHearts(monday));
   const hasSpokenRef = React.useRef<boolean>(false);
 
@@ -135,58 +136,64 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
     }
   }, [currentStreak, weekly]);
 
-  // Thoughts buckets
-  const oneDayThoughts = useMemo(() => [
-    `Thanks for taking care of me today, ${userName}! 💕 You just started our love streak—see you tomorrow?`,
-    `You showed up for me, ${userName}! 🐾 Day 1 of our adventure together—will you come back tomorrow?`,
-    `I loved our adventure today, ${userName}! 📚❤️ Our streak begins now—can't wait for Day 2, will you be there?`,
-    `First pawprint on our calendar! 🐾 Thanks for starting this journey with me, ${userName}! Same time tomorrow?`,
-    `You made my tail wag all day long, ${userName}! 🐶 Day 1 done—shall we continue our adventure tomorrow?`
-  ], [userName]);
+  // Thoughts buckets as templates; store only the selected index, not the rendered text
+  type ThoughtTemplate = (s: number, name: string) => string;
 
-  const underSevenThoughts = useMemo(() => {
-    const s = Math.max(2, displayStreak);
-    return [
-      `You're on a ${s}-day love streak, ${userName}! 💖 Let's keep the adventures going tomorrow?`,
-      `${s} days in a row with me? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
-      `Our adventures are adding up—${s} days strong! ✨ See you tomorrow, ${userName}?`,
-      `I'm purring with pride, ${userName}! 😺 ${s}-day streak and growing—ready for tomorrow?`,
-      `High paws! 🐾 ${s} days of care and cuddles—shall we make it ${s + 1} tomorrow?`
-    ];
-  }, [displayStreak, userName]);
+  const oneDayTemplates = useMemo<ThoughtTemplate[]>(() => [
+    (s, name) => `Thanks for taking care of me today, ${name}! 💕 You just started our love streak—see you tomorrow?`,
+    (s, name) => `You showed up for me, ${name}! 🐾 Day 1 of our adventure together—will you come back tomorrow?`,
+    (s, name) => `I loved our adventure today, ${name}! 📚❤️ Our streak begins now—can't wait for Day 2, will you be there?`,
+    (s, name) => `First pawprint on our calendar! 🐾 Thanks for starting this journey with me, ${name}! Same time tomorrow?`,
+    (s, name) => `You made my tail wag all day long, ${name}! 🐶 Day 1 done—shall we continue our adventure tomorrow?`
+  ], []);
 
-  const sevenPlusThoughts = useMemo(() => {
-    const s = Math.max(7, displayStreak);
-    return [
-      `A whole ${s} days with you, ${userName}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
-      `${s} days strong, ${userName}! 💫 I feel so loved—shall we make it even bigger tomorrow?`,
-      `We did it—${s}-day streak! ❤️ Thanks for taking such good care of me, ${userName}! See you tomorrow?`,
-      `Woof-wow! 🐶 ${s} days of cuddles and adventures—my heart is full, ${userName}! Ready for day ${displayStreak + 1}?`,
-      `One week and beyond! 🌟 ${s} happy days together—same time tomorrow, ${userName}?`
-    ];
-  }, [displayStreak, userName]);
+  const underSevenTemplates = useMemo<ThoughtTemplate[]>(() => [
+    (s, name) => `You're on a ${Math.max(2, s)}-day love streak, ${name}! 💖 Let's keep the adventures going tomorrow?`,
+    (s, name) => `${Math.max(2, s)} days in a row with me? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
+    (s, name) => `Our adventures are adding up—${Math.max(2, s)} days strong! ✨ See you tomorrow, ${name}?`,
+    (s, name) => `I'm purring with pride, ${name}! 😺 ${Math.max(2, s)}-day streak and growing—ready for tomorrow?`,
+    (s, name) => `High paws! 🐾 ${Math.max(2, s)} days of care and cuddles—shall we make it ${Math.max(2, s) + 1} tomorrow?`
+  ], []);
+
+  const sevenPlusTemplates = useMemo<ThoughtTemplate[]>(() => [
+    (s, name) => `A whole ${Math.max(7, s)} days with you, ${name}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
+    (s, name) => `${Math.max(7, s)} days strong, ${name}! 💫 I feel so loved—shall we make it even bigger tomorrow?`,
+    (s, name) => `We did it—${Math.max(7, s)}-day streak! ❤️ Thanks for taking such good care of me, ${name}! See you tomorrow?`,
+    (s, name) => `Woof-wow! 🐶 ${Math.max(7, s)} days of cuddles and adventures—my heart is full, ${name}! Ready for day ${Math.max(7, s) + 1}?`,
+    (s, name) => `One week and beyond! 🌟 ${Math.max(7, s)} happy days together—same time tomorrow, ${name}?`
+  ], []);
 
   // Daily random selection with persistence (once per calendar day)
   const thoughtText = useMemo(() => {
     try {
-      const key = `litkraft_streak_thought_${todayStr}`;
-      const saved = localStorage.getItem(key);
-      if (saved) return saved;
-      let pool: string[] = [];
-      if (displayStreak === 1) pool = oneDayThoughts;
-      else if (displayStreak > 1 && displayStreak < 7) pool = underSevenThoughts;
-      else pool = sevenPlusThoughts;
-      const idx = Math.floor(Math.random() * pool.length);
-      const chosen = pool[idx];
-      localStorage.setItem(key, chosen);
-      return chosen;
+      const bucket = (displayStreak === 1) ? 'd1' : (displayStreak > 1 && displayStreak < 7) ? 'u7' : '7p';
+      const key = `litkraft_streak_thought_${todayStr}_${bucket}_idx`;
+
+      let pool: ThoughtTemplate[];
+      if (displayStreak === 1) pool = oneDayTemplates;
+      else if (displayStreak > 1 && displayStreak < 7) pool = underSevenTemplates;
+      else pool = sevenPlusTemplates;
+
+      // Read or assign a persistent index for the pool
+      let idx = -1;
+      try {
+        const savedIdxStr = localStorage.getItem(key);
+        const parsed = Number(savedIdxStr);
+        if (!Number.isNaN(parsed) && parsed >= 0 && parsed < pool.length) idx = parsed;
+      } catch {}
+      if (idx === -1) {
+        idx = Math.floor(Math.random() * pool.length);
+        try { localStorage.setItem(key, String(idx)); } catch {}
+      }
+
+      const tpl = pool[idx] || pool[0];
+      return tpl(Math.max(1, Number(displayStreak || 0)), userName);
     } catch {
       // Fallback without persistence
-      if (displayStreak === 1) return oneDayThoughts[0];
-      if (displayStreak > 1 && displayStreak < 7) return underSevenThoughts[0];
-      return sevenPlusThoughts[0];
+      const tpl = (displayStreak === 1 ? oneDayTemplates[0] : (displayStreak > 1 && displayStreak < 7) ? underSevenTemplates[0] : sevenPlusTemplates[0]);
+      return tpl(Math.max(1, Number(displayStreak || 0)), userName);
     }
-  }, [todayStr, displayStreak, oneDayThoughts, underSevenThoughts, sevenPlusThoughts]);
+  }, [todayStr, displayStreak, userName, oneDayTemplates, underSevenTemplates, sevenPlusTemplates]);
 
   // Infer pet from celebrationUrl for voice override
   function inferPetIdFromGifUrl(url?: string): string | undefined {
@@ -259,7 +266,7 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
     };
   }, [open]);
   const days: { date: string; label: string; isFilled: boolean; isToday: boolean }[] = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 5; i++) { // Monday..Friday only
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     const dateStr = ymd(d);
@@ -307,7 +314,7 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
 
             {/* Week hearts */}
             <div className="mt-8 sm:mt-10">
-              <div className="grid grid-cols-7 gap-3 sm:gap-3 px-6 sm:px-10">
+              <div className="grid grid-cols-5 gap-3 sm:gap-3 px-6 sm:px-10">
                 {days.map((d) => (
                   <div key={d.date} className="relative flex flex-col items-center">
                     {/* Dev toggle button above each heart */}

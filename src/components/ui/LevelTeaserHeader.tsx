@@ -1,4 +1,5 @@
 import React from 'react';
+import CircularLevelBadge from '@/components/ui/CircularLevelBadge';
 
 type LevelTeaserHeaderProps = {
   currentLevel: number;
@@ -63,14 +64,14 @@ export const LevelTeaserHeader: React.FC<LevelTeaserHeaderProps> = ({
           <SideBubble n={prev} variant="prev" completed={prev < currentLevel} />
         </div>
 
-        {/* <div className="relative z-10 -mt-1">
+        <div className="relative z-10 -mt-1">
           <CircularLevelBadge
             level={currentLevel}
             progressPercent={pct}
             bottomText={bottomText || `${pct}%`}
             size="md"
           />
-        </div> */}
+        </div>
 
         <div className="-translate-x-3 -ml-0">
           <SideBubble n={next} variant="next" completed={false} />

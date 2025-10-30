@@ -120,6 +120,10 @@ import {
       const task = ACTIVITY_SEQUENCE[0];
       result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null };
     }
+    // Initialize user-scoped activity pointer (shared across pets)
+    result._userCurrentActivity = ACTIVITY_SEQUENCE[0];
+    result._userLastSwitchAt = nowServerTimestamp();
+    result._userCooldownUntil = null;
     result.createdAt = nowServerTimestamp();
     result.updatedAt = nowServerTimestamp();
     return result;
@@ -180,80 +184,88 @@ import {
   export async function updateProgressOnQuestionSolved(input: ProgressUpdateInput): Promise<void> {
     const { userId, pet, questionsSolved, adventureKey } = input;
     if (questionsSolved <= 0) return;
-  
-    // Use read + batched writes with atomic increments (no transactions)
+
     const userRef = userStateDocRef(userId);
     const questsRef = dailyQuestsDocRef(userId);
-  
-    const [userSnap, questsSnap] = await Promise.all([getDoc(userRef), getDoc(questsRef)]);
-  
-    const batch = writeBatch(db);
-  
-    if (!userSnap.exists()) {
-      batch.set(userRef, createDefaultUserState());
-    }
-  
-    if (!questsSnap.exists()) {
-      batch.set(questsRef, createInitialDailyQuests([pet]));
-    }
-  
-    // Determine active activity for the pet
-    const questsData = (questsSnap.exists() ? (questsSnap.data() as any) : createInitialDailyQuests([pet])) as any;
-    const petObj = questsData?.[pet] ?? {};
-    const index = Number(petObj?._activityIndex ?? 0) % ACTIVITY_SEQUENCE.length;
-    const activeKey = ACTIVITY_SEQUENCE[index]; // always use fixed sequence, starting at 'house'
-    const perAdventureKey = (adventureKey && typeof adventureKey === 'string' && adventureKey.trim()) ? adventureKey : activeKey;
-  
-    // Ensure pet object exists with meta
-    if (!questsData?.[pet]) {
-      batch.set(
+
+    await runTransaction(db, async (txn) => {
+      const [userSnap, questsSnap] = await Promise.all([txn.get(userRef), txn.get(questsRef)]);
+
+      if (!userSnap.exists()) {
+        txn.set(userRef, createDefaultUserState());
+      }
+      if (!questsSnap.exists()) {
+        txn.set(questsRef, createInitialDailyQuests([pet]));
+      }
+
+      const questsData = (questsSnap.exists() ? (questsSnap.data() as any) : {}) as any;
+      const petObj = questsData?.[pet] ?? {};
+      const index = Number(petObj?._activityIndex ?? 0) % ACTIVITY_SEQUENCE.length;
+      const activeKey = ACTIVITY_SEQUENCE[index];
+      const perAdventureKey = (adventureKey && typeof adventureKey === 'string' && adventureKey.trim()) ? adventureKey : activeKey;
+
+      // Ensure pet container exists
+      if (!questsData?.[pet]) {
+        txn.set(questsRef, { [pet]: { [activeKey]: 0, _activityIndex: index || 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null } } as any, { merge: true });
+      }
+
+      // Increment quest progress for active activity
+      txn.set(
         questsRef,
-        { [pet]: { [activeKey]: 0, _activityIndex: index || 0, _completedAt: null, _cooldownUntil: null } },
+        { [pet]: { [activeKey]: increment(questionsSolved) }, updatedAt: nowServerTimestamp() } as any,
         { merge: true }
       );
-    }
-  
-    // Increment quest progress for active activity
-    batch.set(
-      questsRef,
-      {
-        [pet]: {
-          [activeKey]: increment(questionsSolved),
-        },
-        updatedAt: nowServerTimestamp(),
-      } as any,
-      { merge: true }
-    );
-  
-    // Increment user pet counter and coins atomically
-    batch.set(
-      userRef,
-      {
-        pets: { [pet]: increment(questionsSolved) },
-        coins: increment(questionsSolved * COINS_PER_QUESTION),
-        // Increment per-adventure question count nested under petquestions
-        petquestions: { [pet]: { [perAdventureKey]: increment(questionsSolved) } },
-        updatedAt: nowServerTimestamp(),
-      } as any,
-      { merge: true }
-    );
-  
-    // If we can determine completion pre-increment, annotate cooldown timestamps (best-effort)
-    const currentProgress = Number(petObj?.[activeKey] ?? 0);
-    const predicted = currentProgress + questionsSolved;
-  if (predicted >= QUEST_TARGET) {
-      // Mark completion and set a cooldown window to prevent immediate rollover
-      const now = Date.now();
-      const cooldownMs = QUEST_COOLDOWN_HOURS * 60 * 60 * 1000;
-      const cooldownUntil = Timestamp.fromMillis(now + cooldownMs);
-      batch.set(
-        questsRef,
-        { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: cooldownUntil }, updatedAt: nowServerTimestamp() } as any,
+
+      // Increment user counters and coins
+      txn.set(
+        userRef,
+        {
+          pets: { [pet]: increment(questionsSolved) },
+          coins: increment(questionsSolved * COINS_PER_QUESTION),
+          petquestions: { [pet]: { [perAdventureKey]: increment(questionsSolved) } },
+          updatedAt: nowServerTimestamp(),
+        } as any,
         { merge: true }
       );
-    }
-  
-    await batch.commit();
+
+      // Completion: advance exactly once
+      const currentProgress = Number(petObj?.[activeKey] ?? 0);
+      const predicted = currentProgress + questionsSolved;
+      const alreadyCompleted = Boolean(petObj?._completedAt);
+      if (predicted >= QUEST_TARGET && !alreadyCompleted) {
+        const now = Date.now();
+        const cooldownMs = QUEST_COOLDOWN_HOURS * 60 * 60 * 1000;
+        const cooldownUntil = Timestamp.fromMillis(now + cooldownMs);
+
+        // Mark per-pet completion and remember which activity finished
+        txn.set(
+          questsRef,
+          { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: cooldownUntil, _lastCompletedActivity: perAdventureKey }, updatedAt: nowServerTimestamp() } as any,
+          { merge: true }
+        );
+
+        // Advance user-scoped pointer once, based on current pointer value in the same txn
+        const currUserAct = (questsData?._userCurrentActivity || ACTIVITY_SEQUENCE[0]) as string;
+        const uIdx = Math.max(0, ACTIVITY_SEQUENCE.indexOf(currUserAct));
+        const nextKey = ACTIVITY_SEQUENCE[(uIdx + 1) % ACTIVITY_SEQUENCE.length];
+        txn.set(
+          questsRef,
+          { _userCurrentActivity: nextKey, _userLastSwitchAt: nowServerTimestamp(), _userCooldownUntil: null, updatedAt: nowServerTimestamp() } as any,
+          { merge: true }
+        );
+      } else if (alreadyCompleted) {
+        // If already completed today, keep the label accurate: always set lastCompletedActivity
+        try {
+          const completedAtAny = petObj?._completedAt as any;
+          const completedMs = completedAtAny?.toMillis ? completedAtAny.toMillis() : (completedAtAny ? new Date(completedAtAny).getTime() : 0);
+          const completedDay = completedMs ? new Date(completedMs).toISOString().slice(0, 10) : '';
+          const today = new Date().toISOString().slice(0, 10);
+          if (completedDay === today) {
+            txn.set(questsRef, { [pet]: { _lastCompletedActivity: perAdventureKey }, updatedAt: nowServerTimestamp() } as any, { merge: true });
+          }
+        } catch {}
+      }
+    });
   }
   
   // ==========================
@@ -308,13 +320,13 @@ import {
     return (currentIndex + 1) % ACTIVITY_SEQUENCE.length;
   }
   
-  // Normalize per-pet object and return current active key
+  // Normalize per-pet object and return current active key (STRICT to sequence)
   function getActiveActivityForPet(petObj: any): { key: string; index: number } {
     if (!petObj) return { key: ACTIVITY_SEQUENCE[0], index: 0 };
     const index = Number(petObj._activityIndex ?? 0) % ACTIVITY_SEQUENCE.length;
     const expectedKey = ACTIVITY_SEQUENCE[index];
-    const activeKey = Object.keys(petObj).find((k) => !k.startsWith('_') && k !== 'createdAt' && k !== 'updatedAt') || expectedKey;
-    return { key: activeKey, index };
+    // Always use expectedKey; ignore stray historical keys
+    return { key: expectedKey, index };
   }
   
   export async function handleDailyQuestRollover(input: QuestRolloverInput): Promise<void> {
@@ -377,17 +389,109 @@ import {
             [nextKey]: 0,
             _activityIndex: nextIndex,
             _completedAt: null,
+            _lastCompletedActivity: null,
             _cooldownUntil: null,
           };
         }
       }
     }
   
+    // Advance USER-scoped pointer if cooldown passed
+    try {
+      const userCooldown = (data as any)?._userCooldownUntil as Timestamp | null;
+      const userActivity = (data as any)?._userCurrentActivity as string | undefined;
+      const idx = Math.max(0, ACTIVITY_SEQUENCE.indexOf(userActivity || ACTIVITY_SEQUENCE[0]));
+      const cuMs = userCooldown?.toMillis?.() || (userCooldown ? new Date(userCooldown as any).getTime() : null);
+      if (!cuMs || nowMs >= cuMs) {
+        const nextIndex = (idx + 1) % ACTIVITY_SEQUENCE.length;
+        updates._userCurrentActivity = ACTIVITY_SEQUENCE[nextIndex];
+        updates._userLastSwitchAt = nowServerTimestamp();
+        updates._userCooldownUntil = null;
+      }
+    } catch {}
+
     batch.set(questsRef, updates, { merge: true });
     await batch.commit();
 
     // Ensure sadness assignment exists for the day (idempotent)
     try { await ensureDailySadnessAssigned(userId); } catch {}
+  }
+
+  // ==========================
+  // DEV: Simulate 8 hours elapsed and advance
+  // ==========================
+
+  export interface DevSimulateEightHoursInput {
+    userId: string;
+  }
+
+  export async function devSimulateEightHoursAndRollover(input: DevSimulateEightHoursInput): Promise<void> {
+    const { userId } = input;
+    const questsRef = dailyQuestsDocRef(userId);
+    const snap = await getDoc(questsRef);
+    if (!snap.exists()) return;
+    const data = (snap.data() as any) || {};
+    const batch = writeBatch(db);
+    const pastTs = Timestamp.fromMillis(Date.now() - 1000);
+
+    const petKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+    for (const pet of petKeys) {
+      const petObj = (data?.[pet] ?? {}) as any;
+      const updates: Record<string, any> = {};
+      // If cooldown exists or pet completed, push cooldown to past to allow next rollover
+      if (petObj?._cooldownUntil) updates._cooldownUntil = pastTs; else if (typeof petObj?.[Object.keys(petObj).find((k: string) => !k.startsWith('_')) || ''] === 'number') updates._cooldownUntil = pastTs;
+      // Also end any sleep immediately
+      if (petObj?._sleepEndAt) updates._sleepEndAt = pastTs;
+      // Cleanup stray progress keys: retain only current active key
+      try {
+        const { key: activeKey } = getActiveActivityForPet(petObj);
+        const keys = Object.keys(petObj).filter((k) => !k.startsWith('_') && k !== 'createdAt' && k !== 'updatedAt');
+        keys.forEach((k) => { if (k !== activeKey) (updates as any)[k] = deleteField(); });
+      } catch {}
+      if (Object.keys(updates).length > 0) {
+        batch.set(questsRef, { [pet]: updates } as any, { merge: true });
+      }
+    }
+    batch.set(questsRef, { updatedAt: nowServerTimestamp() } as any, { merge: true });
+    await batch.commit();
+
+    // Now run normal rollover to advance
+    await handleDailyQuestRollover({ userId });
+  }
+
+  export interface ForceQuestAdvanceInput {
+    userId: string;
+    ownedPets?: PetName[];
+  }
+
+  // Dev/utility: force-expire cooldowns for completed quests and advance immediately
+  export async function forceExpireCooldownsAndRollover(input: ForceQuestAdvanceInput): Promise<void> {
+    const { userId, ownedPets } = input;
+    const questsRef = dailyQuestsDocRef(userId);
+    const questsSnap = await getDoc(questsRef);
+    const batch = writeBatch(db);
+    if (!questsSnap.exists()) return;
+    const data = (questsSnap.data() as any) || {};
+    const updates: Record<string, any> = { updatedAt: nowServerTimestamp() };
+    const existingPetKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
+    const keys = (ownedPets && ownedPets.length > 0) ? ownedPets : existingPetKeys;
+    for (const pet of keys) {
+      const petObj = (data?.[pet] ?? {}) as any;
+      const { key: activeKey } = getActiveActivityForPet(petObj);
+      const progress = Number(petObj?.[activeKey] ?? 0);
+      if (progress >= QUEST_TARGET) {
+        updates[pet] = {
+          ...(updates[pet] || {}),
+          _completedAt: nowServerTimestamp(),
+          _cooldownUntil: Timestamp.fromMillis(Date.now() - 1),
+        };
+      }
+    }
+    // Also expire user-scoped cooldown so the pointer can advance
+    updates._userCooldownUntil = Timestamp.fromMillis(Date.now() - 1);
+    batch.set(questsRef, updates, { merge: true });
+    await batch.commit();
+    await handleDailyQuestRollover({ userId, ownedPets });
   }
   
   // ==========================
@@ -675,6 +779,7 @@ import {
     updateProgressOnQuestionSolved,
     deductCoinsOnPurchase,
     handleDailyQuestRollover,
+    devSimulateEightHoursAndRollover,
     ensureDailySadnessAssigned,
     ensurePetSadToday,
     getUserState,
@@ -684,6 +789,9 @@ import {
     setPetName,
     setWeeklyHeart,
     incrementStreakIfEligible,
+    fetchMoodPeriod,
+    setMoodPeriod,
+    forceExpireCooldownsAndRollover,
   };
   
   // ==========================
@@ -743,6 +851,8 @@ import {
     completed: boolean;
     activityIndex: number;
     cooldownUntil?: Timestamp | null;
+  completedAt?: Timestamp | null;
+  lastCompletedActivity?: QuestTask | null;
     sleepStartAt?: Timestamp | null;
     sleepEndAt?: Timestamp | null;
   }
@@ -771,6 +881,9 @@ import {
         completed,
         activityIndex: index,
         cooldownUntil: petObj?._cooldownUntil ?? null,
+        completedAt: petObj?._completedAt ?? null,
+        // expose last completed activity for accurate Today label pinning
+        lastCompletedActivity: (typeof petObj?._lastCompletedActivity === 'string') ? petObj._lastCompletedActivity : null,
         sleepStartAt: petObj?._sleepStartAt ?? null,
         sleepEndAt: petObj?._sleepEndAt ?? null,
       });
@@ -876,15 +989,56 @@ import {
     }
   }
 
-  function isPreviousDay(prevYmd: string | null | undefined, currYmd: string): boolean {
-    if (!prevYmd) return false;
+  function isWeekendYmd(ymd: string): boolean {
+    try {
+      const [y, m, d] = ymd.split('-').map((s) => Number(s));
+      const dt = new Date(y, (m || 1) - 1, d || 1);
+      const day = dt.getDay(); // 0=Sun, 6=Sat
+      return day === 0 || day === 6;
+    } catch {
+      return false;
+    }
+  }
+
+  function daysBetweenYmd(prevYmd: string, currYmd: string): number {
     try {
       const [py, pm, pd] = prevYmd.split('-').map((s) => Number(s));
       const [cy, cm, cd] = currYmd.split('-').map((s) => Number(s));
       const prev = new Date(py, (pm || 1) - 1, pd || 1);
       const curr = new Date(cy, (cm || 1) - 1, cd || 1);
-      const diffDays = Math.floor((curr.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000));
-      return diffDays === 1;
+      return Math.floor((curr.getTime() - prev.getTime()) / (24 * 60 * 60 * 1000));
+    } catch {
+      return Number.POSITIVE_INFINITY;
+    }
+  }
+
+  // Weekend bonus continuity rules:
+  // - Weekend usage (Sat/Sun) increments like normal
+  // - Skipping weekend days doesn't break streak
+  // - Skipping a weekday breaks streak
+  function isContinuousWithWeekendBonus(prevYmd: string | null | undefined, currYmd: string): boolean {
+    if (!prevYmd) return false;
+    try {
+      const [cy, cm, cd] = currYmd.split('-').map((s) => Number(s));
+      const curr = new Date(cy, (cm || 1) - 1, cd || 1);
+      const currDow = curr.getDay(); // 0=Sun..6=Sat
+      const diff = daysBetweenYmd(prevYmd, currYmd);
+      if (diff <= 0) return false;
+
+      // Weekend days increment with previous calendar day continuity
+      if (currDow === 6) { // Saturday
+        return diff === 1; // must be Friday
+      }
+      if (currDow === 0) { // Sunday
+        return diff === 1 || diff === 2; // Sat or Fri
+      }
+
+      // Weekdays (Mon..Fri)
+      if (currDow === 1) { // Monday
+        return diff === 1 || diff === 2 || diff === 3; // Sun, Sat, or Fri
+      }
+      // Tue..Fri
+      return diff === 1; // strict previous day
     } catch {
       return false;
     }
@@ -938,8 +1092,8 @@ import {
         return currentStreak;
       }
 
-      // Compute next streak based on previous local day
-      const nextStreak = isPreviousDay(lastLocal, localDate) ? currentStreak + 1 : 1;
+      // Compute next streak with weekend-bonus continuity
+      const nextStreak = isContinuousWithWeekendBonus(lastLocal, localDate) ? currentStreak + 1 : 1;
 
       txn.set(
         userRef,
@@ -954,6 +1108,66 @@ import {
 
       return nextStreak;
     });
+  }
+
+  // ==========================
+  // API: Mood Period (8-hour rotation) - server source of truth
+  // Stored under dailyQuests/{userId}._moodPeriod
+  // ==========================
+
+  export interface ServerMoodPeriod {
+    periodId: string;
+    anchorAt: Timestamp;
+    nextResetAt: Timestamp;
+    sadPetIds: string[];
+    baselineCoinsByPet: Record<string, number>;
+    lastAssignmentReason: 'sleep_anchor' | 'elapsed_no_sleep' | 'init' | string;
+  }
+
+  export interface ClientMoodPeriod {
+    periodId: string;
+    anchorMs: number;
+    nextResetMs: number;
+    sadPetIds: string[];
+    engagementBaseline: Record<string, number>;
+    lastAssignmentReason: 'sleep_anchor' | 'elapsed_no_sleep' | 'init' | string;
+  }
+
+  export async function fetchMoodPeriod(userId: string): Promise<ClientMoodPeriod | null> {
+    if (!userId) return null;
+    const ref = dailyQuestsDocRef(userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    const data = snap.data() as any;
+    const mp = data?._moodPeriod as ServerMoodPeriod | undefined;
+    if (!mp || !mp.anchorAt || !mp.nextResetAt) return null;
+    return {
+      periodId: String(mp.periodId || ''),
+      anchorMs: (mp.anchorAt as Timestamp).toMillis(),
+      nextResetMs: (mp.nextResetAt as Timestamp).toMillis(),
+      sadPetIds: Array.isArray(mp.sadPetIds) ? mp.sadPetIds as string[] : [],
+      engagementBaseline: (mp.baselineCoinsByPet || {}) as Record<string, number>,
+      lastAssignmentReason: String(mp.lastAssignmentReason || 'init'),
+    };
+  }
+
+  export async function setMoodPeriod(userId: string, period: ClientMoodPeriod): Promise<void> {
+    if (!userId || !period) return;
+    const ref = dailyQuestsDocRef(userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      // initialize with defaults so write succeeds
+      await setDoc(ref, createInitialDailyQuests());
+    }
+    const payload: ServerMoodPeriod = {
+      periodId: period.periodId,
+      anchorAt: Timestamp.fromMillis(Number(period.anchorMs || Date.now())),
+      nextResetAt: Timestamp.fromMillis(Number(period.nextResetMs || Date.now() + 8 * 60 * 60 * 1000)),
+      sadPetIds: Array.isArray(period.sadPetIds) ? period.sadPetIds : [],
+      baselineCoinsByPet: period.engagementBaseline || {},
+      lastAssignmentReason: (period.lastAssignmentReason as any) || 'init',
+    };
+    await setDoc(ref, { _moodPeriod: payload, updatedAt: nowServerTimestamp() } as any, { merge: true });
   }
 
   

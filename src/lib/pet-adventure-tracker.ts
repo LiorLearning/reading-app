@@ -119,7 +119,8 @@ export class PetAdventureTracker {
     const state = await this.loadPetAdventureState(userId, petId);
     const adventure = state.adventures[adventureType];
     
-    if (adventure && !adventure.isCompleted && adventure.messageCount > 0) {
+    // Treat any existing mapped adventure as resumable (no completion concept, perpetual session)
+    if (adventure && !adventure.isCompleted) {
       // Try to load the chat history and comic panels from saved adventures
       let chatHistory: any[] = [];
       let adventureName = '';

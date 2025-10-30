@@ -29688,7 +29688,7 @@ aiTutor: {
         question: "h__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "hay"
     },
@@ -29722,7 +29722,7 @@ aiTutor: {
         question: "c_k_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "cake"
     },
@@ -29756,7 +29756,7 @@ aiTutor: {
         question: "r__n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "rain"
     },
@@ -29790,7 +29790,7 @@ aiTutor: {
         question: "pl__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "play"
     },
@@ -29824,7 +29824,7 @@ aiTutor: {
         question: "g_t_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "gate"
     },
@@ -29858,7 +29858,7 @@ aiTutor: {
         question: "m__l",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "mail"
     },
@@ -29892,7 +29892,7 @@ aiTutor: {
         question: "d__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "day"
     },
@@ -29926,7 +29926,7 @@ aiTutor: {
         question: "g_m_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "game"
     },
@@ -29960,7 +29960,7 @@ aiTutor: {
         question: "r__nbow",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "rainbow"
     },
@@ -29994,7 +29994,7 @@ aiTutor: {
         question: "b_k_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "bake"
     },
@@ -30028,7 +30028,7 @@ aiTutor: {
         question: "tr__n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "train"
     },
@@ -30062,7 +30062,7 @@ aiTutor: {
         question: "gr__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "gray"
     },
@@ -30096,7 +30096,7 @@ aiTutor: {
         question: "n_m_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "name"
     },
@@ -30130,7 +30130,7 @@ aiTutor: {
         question: "ch__n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "chain"
     },
@@ -30164,7 +30164,7 @@ aiTutor: {
         question: "l_k_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "lake"
     },
@@ -30198,7 +30198,7 @@ aiTutor: {
         question: "st__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "stay"
     },
@@ -30232,7 +30232,7 @@ aiTutor: {
         question: "p__nt",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "paint"
     },
@@ -30266,7 +30266,7 @@ aiTutor: {
         question: "pl_t_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "plate"
     },
@@ -30300,7 +30300,7 @@ aiTutor: {
         question: "tr__l",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "trail"
     },
@@ -30334,7 +30334,7 @@ aiTutor: {
         question: "gr_p_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "grape"
     }
@@ -52945,7 +52945,7 @@ aiTutor: {
         question: "p__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it's at the end (day, play), and 'a_e' when there's one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "pay"
     },
@@ -52979,7 +52979,7 @@ aiTutor: {
         question: "c_k_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "cake"
     },
@@ -53013,7 +53013,7 @@ aiTutor: {
         question: "r__n",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "rain"
     },
@@ -53047,7 +53047,7 @@ aiTutor: {
         question: "pl__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "play"
     },
@@ -53081,7 +53081,7 @@ aiTutor: {
         question: "g_t_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "gate"
     },
@@ -53115,7 +53115,7 @@ aiTutor: {
         question: "m__l",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "mail"
     },
@@ -53149,7 +53149,7 @@ aiTutor: {
         question: "d__",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "day"
     },
@@ -53183,7 +53183,7 @@ aiTutor: {
         question: "g_m_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "game"
     },
@@ -53217,7 +53217,7 @@ aiTutor: {
         question: "r__nbow",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "rainbow"
     },
@@ -53251,7 +53251,7 @@ aiTutor: {
         question: "b_k_",
         student_entry: "",
         topic_to_reinforce: 'Spell the long a word',
-        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name). Trick: 'AI stays together inside, A_E reaches far for silent e, AY says goodbye!'"
+        spelling_pattern_or_rule: "Long A spelling rule (pedagogical): Use 'ai' when the /ā/ sound is in the middle (rain, train), 'ay' when it’s at the end (day, play), and 'a_e' when there’s one consonant and a silent e (cake, name)."
       },
       audio: "bake"
     }],
