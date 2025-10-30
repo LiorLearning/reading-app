@@ -3150,7 +3150,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [reset, initialPanels, user]);
 
   // Handle start adventure from progress tracking
-  const handleStartAdventure = React.useCallback(async (topicId: string, mode: 'new' | 'continue' = 'new', adventureType: string = 'food') => {
+  const handleStartAdventure = React.useCallback(async (
+    topicId: string,
+    mode: 'new' | 'continue' = 'new',
+    adventureType: string = 'food',
+    continuationContext?: {
+      adventureId: string;
+      chatHistory?: any[];
+      adventureName?: string;
+      comicPanels?: any[];
+      cachedImages?: any[];
+    }
+  ) => {
     const callId = `index-${Date.now()}`;
     // console.log('🎯 Index handleStartAdventure called with adventureType:', adventureType, 'callId:', callId);
     // console.log('🎯 Index Current currentAdventureType before update:', currentAdventureType, 'callId:', callId);
@@ -3260,10 +3271,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       
       // console.log('🚀 Started new adventure with default rocket image and reset all flow states');
     } else {
-      // For continuing, keep existing adventure ID or create new one
-      adventureId = currentAdventureId || crypto.randomUUID();
-      if (!currentAdventureId) {
+      // For continuing, prefer the provided context adventureId; otherwise keep existing or create new one
+      if (continuationContext?.adventureId) {
+        adventureId = continuationContext.adventureId;
         setCurrentAdventureId(adventureId);
+        // If we have prior chat history or panels, restore them now
+        if (Array.isArray(continuationContext.chatHistory)) {
+          setChatMessages(continuationContext.chatHistory);
+        }
+        if (Array.isArray(continuationContext.comicPanels) && continuationContext.comicPanels.length > 0) {
+          reset(continuationContext.comicPanels as any);
+        }
+      } else {
+        adventureId = currentAdventureId || crypto.randomUUID();
+        if (!currentAdventureId) {
+          setCurrentAdventureId(adventureId);
+        }
       }
     }
     
@@ -3293,7 +3316,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           finalTopicId,
           mode,
           undefined, // title
-          undefined, // existingMessages
+          continuationContext?.chatHistory, // existingMessages for context if resuming
           { petId: currentPet, adventureType } // options with pet and adventure type
         );
         setCurrentSessionId(sessionId);
@@ -4569,7 +4592,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     }
     
     // Award 10 coins for correct spelling answer (adventure coins for pet care tracking)
-    addAdventureCoins(10, currentAdventureType);
+    addAdventureCoins(10, currentAdventureTypeRef.current);
     
     // Update progress in Firestore user state
     try {
@@ -4580,7 +4603,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           userId: user.uid,
           pet: petType,
           questionsSolved: 1,
-          adventureKey: currentAdventureType || undefined,
+          adventureKey: currentAdventureTypeRef.current || undefined,
         }).catch((e)=>console.warn('updateProgressOnQuestionSolved failed:', e));
       }
     } catch (e) {
@@ -4727,9 +4750,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         
         
         <PetPage 
-          onStartAdventure={(topicId: string, mode: 'new' | 'continue', adventureType?: string) => {
+          onStartAdventure={(topicId: string, mode: 'new' | 'continue', adventureType?: string, continuationContext?: { adventureId: string; chatHistory?: any[]; adventureName?: string; comicPanels?: any[]; cachedImages?: any[] }) => {
             // console.log('🎯 Index: PetPage onStartAdventure wrapper called with:', { topicId, mode, adventureType });
-            handleStartAdventure(topicId, mode, adventureType || 'food');
+            handleStartAdventure(topicId, mode, adventureType || 'food', continuationContext);
           }}
           onContinueSpecificAdventure={handleContinueSpecificAdventure}
         />
@@ -5512,7 +5535,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               ) : (
                 <h1 className="text-xl lg:text-2xl font-bold text-white drop-shadow-lg font-kids tracking-wide">
                   {devToolsVisible ? `YOUR ADVENTURE - Screen ${currentScreen}` : 
-                   userData && currentScreen === -1 ? `Welcome back ${userData.username}!` :
+                   userData && currentScreen === -1 ? `Welcome back${userData.username}!` :
                    currentScreen === 0 ? 'CHOOSE YOUR ADVENTURE' :
                    'QUIZ TIME'}
                 </h1>
