@@ -1983,13 +1983,37 @@ const getSleepyPetImage = (clicks: number) => {
       pikachu: {
         1: {
           // Level 1 Parrot images - coin-based progression
-          coins_0: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154712_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_10: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_155301_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250908_154733_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          coins_50: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_063222_ChatGPT_Image_Oct_3__2025__12_01_53_PM-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
-          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
-          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1",
-          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-sad.png?alt=media&token=b9f157d0-b0fe-4267-b5e1-27579e397f85",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-normal.png?alt=media&token=361a5bf1-ebec-4dbf-8dcc-f3093e225997",
+          coins_30: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251003_063222_ChatGPT_Image_Oct_3__2025__12_01_53_PM-removebg-preview.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-superhappy.png?alt=media&token=0fdc0459-dc94-45fe-99ea-fc8559ad8c31",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-sleeping.gif?alt=media&token=dce77916-7387-4729-ac39-f2fb6bd866c8",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-sleeping.gif?alt=media&token=dce77916-7387-4729-ac39-f2fb6bd866c8",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-sleeping.gif?alt=media&token=dce77916-7387-4729-ac39-f2fb6bd866c8"
+        }
+      },
+      panda: {
+        1: {
+          // Level 1 Parrot images - coin-based progression
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-sad.png?alt=media&token=c258762d-843c-403f-9f26-d935834d7bb7",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-normal.png?alt=media&token=81e0aec6-7ff7-40b9-8218-c04174c0d521",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-happy.png?alt=media&token=9a8c8c22-8d37-471e-bfc7-8942be27d078",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-superhappy.png?alt=media&token=ad21befc-3e99-4ce3-b9b3-2310ee6912dc",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-sleeping.gif?alt=media&token=032b803d-fff6-41b4-adf9-6e5d8a6ccd11",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-sleeping.gif?alt=media&token=032b803d-fff6-41b4-adf9-6e5d8a6ccd11",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-sleeping.gif?alt=media&token=032b803d-fff6-41b4-adf9-6e5d8a6ccd11"
+        }
+      },
+      deer: {
+        1: {
+          // Level 1 Parrot images - coin-based progression
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sad.png?alt=media&token=29b831bc-6b60-4c85-b878-06191a7c96d3",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-normal.png?alt=media&token=686092c7-3377-4ddf-b918-350943ee3531",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-happy.png?alt=media&token=78c5a4d1-ffe4-4813-9051-3bbf4a1cac06",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-superhappy.png?alt=media&token=3c28b355-d3fb-4396-a1b3-3df703d5f466",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b"
         }
       }
     };
@@ -2511,17 +2535,37 @@ const getSleepyPetImage = (clicks: number) => {
         requiredLevel: 10,
         isLocked: userLevel < 10,
         category: 'rare'
+      },  panda: {
+        id: 'panda',
+        emoji: '🐼',
+        name: 'Bamboo',
+        owned: isPetOwned('panda'),
+        cost: 1000,
+        requiredLevel: 15,
+        isLocked: userLevel < 15,
+        category: 'legendary'
+      },
+      deer: {
+        id: 'deer',
+        emoji: '🦌',
+        name: 'Antler',
+        owned: isPetOwned('deer'),
+        cost: 1000,
+        requiredLevel: 15,
+        isLocked: userLevel < 15,
+        category: 'legendary'
       },
       pikachu: {
         id: 'pikachu',
         emoji: '🦅',
         name: 'Pikachu',
         owned: isPetOwned('Pikachu'),
-        cost: 1000,
-        requiredLevel: 10,
-        isLocked: userLevel < 10,
+        cost: 2000,
+        requiredLevel: 20,
+        isLocked: userLevel < 20,
         category: 'legendary'
-      }
+      },
+    
     };
   };
 
@@ -4540,9 +4584,9 @@ const getSleepyPetImage = (clicks: number) => {
             const levelForPet = (() => {
               try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
             })();
-            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'].includes(petType);
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'].includes(petType);
             const petImageUrl = petHasImages ? getLevelBasedPetImage(petType, levelForPet, 'coins_30') : '';
-            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : '🐾';
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
 
             return (
               <button
@@ -4702,7 +4746,7 @@ const getSleepyPetImage = (clicks: number) => {
                     {/* Pet Image or Emoji */}
                     {pet.isLocked && !pet.owned ? (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={`${pet.name} (locked)`}
@@ -4715,7 +4759,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     ) : (
                       <div className="mb-4 flex items-center justify-center">
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu'] as string[]).includes(pet.id) ? (
+                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'] as string[]).includes(pet.id) ? (
                           <img
                             src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                             alt={pet.name}
