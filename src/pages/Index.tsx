@@ -5548,7 +5548,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 <div className="flex items-center justify-center gap-2">
                   {/* Adventure Feeding Progress (persistent) */}
                   <PersistentAdventureProgressBar />
-                  <Button
+                  {/* <Button
                     variant="outline"
                     size="icon"
                     className="w-6 h-6 p-0 rounded-full border-2 border-foreground shadow-solid bg-white text-black btn-animate text-[10px] leading-none"
@@ -5572,7 +5572,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                     }}
                   >
                     R
-                  </Button>
+                  </Button> */}
                 </div>
               ) : (
                 <h1 className="text-xl lg:text-2xl font-bold text-white drop-shadow-lg font-kids tracking-wide">
