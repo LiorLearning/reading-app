@@ -1864,25 +1864,25 @@ export function openaiClient() {
 export async function moderation(text: string | null | undefined): Promise<boolean> {
   if (!text) return false;
 
-  const response = await openaiClient().responses.create({
-    prompt: {
-      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
-    },
-    store: false,
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text
-          }
-        ]
-      }]
-  });
-  if (response.output_text.includes("true")) {
-    return true;
-  }
+  // const response = await openaiClient().responses.create({
+  //   prompt: {
+  //     id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
+  //   },
+  //   store: false,
+  //   input: [
+  //     {
+  //       role: "user",
+  //       content: [
+  //         {
+  //           type: "input_text",
+  //           text
+  //         }
+  //       ]
+  //     }]
+  // });
+  // if (response.output_text.includes("true")) {
+  //   return true;
+  // }
   
 
 
