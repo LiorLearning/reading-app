@@ -2182,56 +2182,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       //   }
       // });
       
-      // 🛠️ IMPROVED: Better handling of stuck streaming state
-      let skipUnifiedBackground = false;
-      if (unifiedAIStreaming.isStreaming) {
-        // console.log('⚠️ Unified system appears to be streaming');
-        
-        // 🔧 Check if this is a stuck state by looking for suspicious conditions
-        const streamingTimeout = 30000; // 30 seconds max streaming time
-        const lastMessageTime = chatMessages.length > 0 ? chatMessages[chatMessages.length - 1].timestamp : Date.now();
-        const timeSinceLastMessage = Date.now() - lastMessageTime;
-        
-        if (timeSinceLastMessage > streamingTimeout) {
-          // console.log('🚨 STUCK STATE DETECTED: Streaming for too long, forcing reset');
-          
-          // Force abort the stuck stream
-          try {
-            unifiedAIStreaming.abortStream();
-          } catch (abortError) {
-            console.warn('Failed to abort stuck stream:', abortError);
-          }
-          
-          // Small delay to let abort complete, then continue with new request
-          await new Promise(resolve => setTimeout(resolve, 200));
-          
-          // console.log('✅ Stuck state cleared, proceeding with new request');
-        } else {
-          // Normal case - actually streaming. Do NOT block user text submission;
-          // just skip triggering another unified background task this turn.
-          // console.log('⚠️ Valid streaming in progress - skipping unified background call but continuing text flow');
-          skipUnifiedBackground = true;
-        }
-      }
-      
-      // 🎨 Trigger unified background task only when not already streaming
-      if (!skipUnifiedBackground) {
-        try {
-          const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+      // Always trigger unified background image generation on every user prompt
+      try {
+        const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
         const bgPreferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
         const bgSpellingQuestion = getNextSpellboxQuestion(currentGrade, completedSpellingIds, bgPreferredLevel);
-          if (bgSpellingQuestion) {
-            setOriginalSpellingQuestion(bgSpellingQuestion);
-          }
-          // Fire-and-forget: generate image via unified system; ignore any caption text
-          void unifiedAIStreaming.sendMessage(
-            text,
-            chatMessages,
-            bgSpellingQuestion
-          );
-        } catch (bgErr) {
-          console.warn('⚠️ Unified background image generation failed:', bgErr);
+        if (bgSpellingQuestion) {
+          setOriginalSpellingQuestion(bgSpellingQuestion);
         }
+        // Fire-and-forget: generate image via unified system; ignore any caption text.
+        // The hook will abort any in-flight stream safely before starting a new one.
+        void unifiedAIStreaming.sendMessage(
+          text,
+          chatMessages,
+          bgSpellingQuestion
+        );
+      } catch (bgErr) {
+        console.warn('⚠️ Unified background image generation failed:', bgErr);
       }
 
       // Check if user is asking for image generation using intent-based detection
