@@ -59,6 +59,18 @@ export const analytics = {
     } catch {}
   },
 
+  reset(): void {
+    // Clear cached ids and reset PostHog identity so a fresh anonymous id is issued
+    currentUserId = null;
+    currentSessionId = null;
+    try {
+      const ph: any = (typeof window !== 'undefined' && (window as any).posthog) || posthog;
+      if (ph && typeof ph.reset === 'function') {
+        ph.reset();
+      }
+    } catch {}
+  },
+
   setSession(sessionId: string | null): void {
     currentSessionId = sessionId;
     // Increment per-user session number when a new non-null session starts
