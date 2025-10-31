@@ -164,10 +164,9 @@ export class MultiProviderImageGenerator {
         break;
 
       case 'flux-schnell':
-        refinedPrompt = `Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
-        ${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
+        refinedPrompt = `${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         break;
-
+        // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
       case 'google-imagen':
         refinedPrompt = `${refinedPrompt}, high quality art, richly detailed, photorealistic lighting`;
         break;
