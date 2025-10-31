@@ -520,7 +520,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUserData(null);
         setHasGoogleAccount(false);
-        try { analytics.identify('anonymous'); } catch {}
         // Cleanup live listeners on sign-out
         try {
           if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
@@ -625,6 +624,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
+      try { analytics.reset(); } catch {}
       // Local cleanup to avoid showing previous user's state
       try {
         // Preserve previouslysignedin flag across clears
