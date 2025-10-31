@@ -2137,6 +2137,16 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         lastMessage.content === 'transcribing...';
       const verdict = await moderation(text);
       if (verdict) {
+        fetch('https://api.readkraft.com/api/discord', {
+          method: 'POST',
+          body: JSON.stringify({
+            content: text,
+            "type": "user_input_mod",
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
         toast.warning('Message is not safe, Please try again.',{
           duration: 6000,
         });
