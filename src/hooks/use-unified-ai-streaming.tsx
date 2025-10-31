@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ChatMessage } from '@/lib/utils';
 import { aiService } from '@/lib/ai-service';
-import { SpellingQuestion } from '@/lib/questionBankUtils';
+import type { SpellingQuestion } from '@/lib/questionBankUtils';
 import { UnifiedAIResponse, StreamEvent } from '@/lib/unified-ai-streaming-service';
 // Remove image-related sounds for creation/change/render events
 

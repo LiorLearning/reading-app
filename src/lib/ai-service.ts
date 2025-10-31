@@ -1,5 +1,5 @@
-import OpenAI from 'openai';
-import { SpellingQuestion } from './questionBankUtils';
+import type OpenAI from 'openai';
+import type { SpellingQuestion } from './questionBankUtils';
 import { UnifiedAIStreamingService, UnifiedAIResponse } from './unified-ai-streaming-service';
 
 interface ChatMessage {
@@ -15,6 +15,7 @@ export interface AdventureResponse {
 
 class AIService {
   private client: OpenAI | null = null;
+  private clientPromise: Promise<OpenAI | null> | null = null;
   private isInitialized = false;
   private isGeneratingImage = false; // Track image generation to prevent simultaneous calls
   private unifiedStreamingService: UnifiedAIStreamingService; // NEW: Unified AI + Image system
@@ -1961,17 +1962,34 @@ Generate responses that make the child feel like their ${petTypeDescription} com
   };
 
   constructor() {
-    this.initialize();
     this.unifiedStreamingService = new UnifiedAIStreamingService(); // Initialize unified system
   }
 
-  private initialize() {
-      this.client = new OpenAI({
-        dangerouslyAllowBrowser: true,
-        apiKey: null,
-        baseURL: 'https://api.readkraft.com/api/v1',
+  private async ensureClient(): Promise<OpenAI | null> {
+    if (this.client) return this.client;
+    if (this.clientPromise) return this.clientPromise;
+
+    this.clientPromise = import('openai')
+      .then((mod) => {
+        const OpenAIConstructor = (mod?.default ?? mod) as new (options: any) => OpenAI;
+        const instance = new OpenAIConstructor({
+          dangerouslyAllowBrowser: true,
+          apiKey: null,
+          baseURL: 'https://api.readkraft.com/api/v1',
+        });
+        this.client = instance;
+        this.isInitialized = true;
+        return instance;
+      })
+      .catch((error) => {
+        console.warn('[ai-service] Failed to load OpenAI SDK', error);
+        this.clientPromise = null;
+        this.client = null;
+        this.isInitialized = false;
+        return null;
       });
-      this.isInitialized = true;
+
+    return this.clientPromise;
   }
 
   // Fallback responses when API is not available
@@ -2129,10 +2147,13 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     //   hasClient: !!this.client 
     // });
     
-    // If not initialized or no API key, use fallback
-    if (!this.isInitialized || !this.client) {
-      console.warn('⚠️ AI Service not initialized, using fallback');
-      return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+    // If client not ready, attempt to load lazily; fall back on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        console.warn('⚠️ AI Service not initialized, using fallback');
+        return this.getFallbackResponse(userText, userData, !!spellingQuestion);
+      }
     }
 
     // 🧹 NEW: Sanitize the user prompt upfront for legacy AI service too
@@ -2373,9 +2394,12 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     petType?: string,
     adventureType: string = 'food'
   ): Promise<string> {
-    // If not initialized or no API key, use fallback
-    if (!this.isInitialized || !this.client) {
-      return this.getFallbackInitialMessage(adventureMode, chatHistory, userData, currentAdventure);
+    // If client not ready, attempt to load lazily; fall back on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return this.getFallbackInitialMessage(adventureMode, chatHistory, userData, currentAdventure);
+      }
     }
 
     try {
@@ -2642,10 +2666,13 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     correctAnswer: number,
     userAdventure: ChatMessage[]
   ): Promise<string> {
-    // If not initialized or no API key, return original question
-    if (!this.isInitialized || !this.client) {
-      // console.log('AI service not initialized, returning original question');
-      return originalQuestion;
+    // If client not ready, attempt lazy load; fallback to original question on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        // console.log('AI service not initialized, returning original question');
+        return originalQuestion;
+      }
     }
 
     try {
@@ -2739,10 +2766,13 @@ Return ONLY the new question text, nothing else.`;
     topic: string,
     userAdventure: ChatMessage[]
   ): Promise<string> {
-    // If not initialized or no API key, return original passage
-    if (!this.isInitialized || !this.client) {
-      // console.log('AI service not initialized, returning original passage');
-      return originalPassage;
+    // If client not ready, attempt lazy load; fallback to original passage on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        // console.log('AI service not initialized, returning original passage');
+        return originalPassage;
+      }
     }
 
     try {
@@ -2989,9 +3019,12 @@ Return ONLY the new reading passage, nothing else.`;
     userAdventure: ChatMessage[],
     imagePrompt: string = ""
   ): Promise<string | null> {
-    // If not initialized or no API key, return null (will show placeholder)
-    if (!this.isInitialized || !this.client) {
-      return null;
+    // If client not ready, attempt lazy load; fallback to null on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return null;
+      }
     }
 
     try {
@@ -3107,9 +3140,12 @@ Return ONLY the new reading passage, nothing else.`;
     aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string },
     adventureId?: string // Add adventure ID parameter for race condition prevention
   ): Promise<{ imageUrl: string; usedPrompt: string; adventureId?: string } | null> {
-    // If not initialized or no API key, return null (will show placeholder)
-    if (!this.isInitialized || !this.client) {
-      return null;
+    // If client not ready, attempt lazy load; fallback to null on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return null;
+      }
     }
 
     // Prevent multiple simultaneous image generation calls
@@ -3270,9 +3306,12 @@ Return ONLY the new reading passage, nothing else.`;
     imagePrompt: string = "",
     topicName: string = ""
   ): Promise<string | null> {
-    // If not initialized or no API key, return null (will show placeholder)
-    if (!this.isInitialized || !this.client) {
-      return null;
+    // If client not ready, attempt lazy load; fallback to null on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return null;
+      }
     }
 
     try {
@@ -3561,9 +3600,12 @@ ${conversationContext}`;
     generatedImagePrompt: string,
     userAdventure: ChatMessage[]
   ): Promise<string> {
-    // If not initialized or no API key, use fallback responses
-    if (!this.isInitialized || !this.client) {
-      return this.getFallbackImageResponse(originalPrompt);
+    // If client not ready, attempt lazy load; fallback to safe response on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return this.getFallbackImageResponse(originalPrompt);
+      }
     }
 
     try {
@@ -3665,20 +3707,23 @@ Return ONLY your enthusiastic response, nothing else.`;
     gradeLevel: string,
     questionType: 'mcq' | 'fill_blank' | 'drag_drop' | 'reading_comprehension' = 'mcq'
   ): Promise<string> {
-    // If not initialized or no API key, return fallback
-    if (!this.isInitialized || !this.client) {
-      if (questionType === 'mcq' && options && Array.isArray(options)) {
-        const selectedOption = options[selectedAnswer as number];
-        const correctOption = options[correctAnswer as number];
-        return `🤔 Great effort on this ${topicName.replace(/_/g, ' ').toLowerCase()} question! You chose "${selectedOption}", but the correct answer is "${correctOption}". Let me explain why that's the right choice!`;
-      } else if (questionType === 'fill_blank') {
-        return `🌟 Nice try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! The correct answer is "${correctAnswer}". Let me help you understand why this word fits perfectly here!`;
-      } else if (questionType === 'drag_drop') {
-        return `🤔 Good effort with your ${topicName.replace(/_/g, ' ').toLowerCase()} sorting! Let me show you the correct pattern and explain why it works this way.`;
-      } else if (questionType === 'reading_comprehension') {
-        return `🌟 Great effort reading! The correct answer is "${correctAnswer}". Let me explain why this is the best choice based on what we read.`;
-      } else {
-        return `🤔 Great try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Let me explain the correct answer and help you understand why it's right.`;
+    // If client not ready, attempt lazy load; fallback to canned messaging on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        if (questionType === 'mcq' && options && Array.isArray(options)) {
+          const selectedOption = options[selectedAnswer as number];
+          const correctOption = options[correctAnswer as number];
+          return `🤔 Great effort on this ${topicName.replace(/_/g, ' ').toLowerCase()} question! You chose "${selectedOption}", but the correct answer is "${correctOption}". Let me explain why that's the right choice!`;
+        } else if (questionType === 'fill_blank') {
+          return `🌟 Nice try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! The correct answer is "${correctAnswer}". Let me help you understand why this word fits perfectly here!`;
+        } else if (questionType === 'drag_drop') {
+          return `🤔 Good effort with your ${topicName.replace(/_/g, ' ').toLowerCase()} sorting! Let me show you the correct pattern and explain why it works this way.`;
+        } else if (questionType === 'reading_comprehension') {
+          return `🌟 Great effort reading! The correct answer is "${correctAnswer}". Let me explain why this is the best choice based on what we read.`;
+        } else {
+          return `🤔 Great try with your ${topicName.replace(/_/g, ' ').toLowerCase()} work! Let me explain the correct answer and help you understand why it's right.`;
+        }
       }
     }
 
@@ -3885,14 +3930,17 @@ Return ONLY your enthusiastic response, nothing else.`;
 
   // Generate concise one-liner summaries from panel text
   async generateOneLiner(panelText: string): Promise<string> {
-    // If not initialized or no API key, use simple truncation fallback
-    if (!this.isInitialized || !this.client) {
-      const firstSentence = panelText.match(/^[^.!?]*[.!?]/);
-      if (firstSentence && firstSentence[0].length <= 60) {
-        return firstSentence[0].trim();
+    // If client not ready, attempt lazy load; fallback to truncation on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        const firstSentence = panelText.match(/^[^.!?]*[.!?]/);
+        if (firstSentence && firstSentence[0].length <= 60) {
+          return firstSentence[0].trim();
+        }
+        const truncated = panelText.substring(0, 50).trim();
+        return truncated + (panelText.length > 50 ? "..." : "");
       }
-      const truncated = panelText.substring(0, 50).trim();
-      return truncated + (panelText.length > 50 ? "..." : "");
     }
 
     try {
@@ -3953,9 +4001,12 @@ Return ONLY the one-liner text:`;
 
   // Generate educational hints for MCQ questions without giving away the answer
   async generateSpellingHint(word: string, userAttempt: string): Promise<string> {
-    // If not initialized or no API key, use fallback
-    if (!this.isInitialized || !this.client) {
-      return this.getFallbackSpellingHint(word, userAttempt);
+    // If client not ready, attempt lazy load; fallback to canned hint on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return this.getFallbackSpellingHint(word, userAttempt);
+      }
     }
 
     try {
@@ -4020,9 +4071,12 @@ Strictly keep it within 20 words. Keep it encouraging and focus on the learning 
     hintLevel: number = 1, // 1 = general, 2 = specific, 3 = very specific
     userAdventure: ChatMessage[] = []
   ): Promise<string> {
-    // If not initialized or no API key, use fallback
-    if (!this.isInitialized || !this.client) {
-      return this.getFallbackHint(question, options, hintLevel);
+    // If client not ready, attempt lazy load; fallback to canned hint on failure
+    if (!this.client) {
+      const client = await this.ensureClient();
+      if (!client) {
+        return this.getFallbackHint(question, options, hintLevel);
+      }
     }
 
     try {

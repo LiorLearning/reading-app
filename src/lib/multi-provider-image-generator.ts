@@ -1,5 +1,5 @@
-import OpenAI from 'openai';
-import { GoogleGenAI, PersonGeneration } from '@google/genai';
+import type OpenAI from 'openai';
+import type { GoogleGenAI } from '@google/genai';
 import { ChatMessage } from './utils';
 import { toast } from 'sonner'
 import analytics from '@/lib/analytics';
@@ -303,32 +303,57 @@ class FluxSchnellProvider implements ImageProvider {
 class GoogleImagenProvider implements ImageProvider {
   name = 'google-imagen' as const;
   private client: GoogleGenAI | null = null;
-  private static blobUrlCache: Map<string, string> = new Map();
+  private clientPromise: Promise<GoogleGenAI | null> | null = null;
+  private personGeneration: any = null;
+  private readonly apiKey: string | undefined;
 
   constructor() {
-    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
-    if (apiKey) {
-      this.client = new GoogleGenAI({ apiKey });
-    } else {
+    this.apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    if (!this.apiKey) {
       console.warn('⚠️ [GoogleImagenProvider] VITE_GOOGLE_API_KEY not configured. Provider disabled.');
     }
   }
 
+  private async ensureClient(): Promise<GoogleGenAI | null> {
+    if (this.client) return this.client;
+    if (!this.apiKey) return null;
+    if (this.clientPromise) return this.clientPromise;
+
+    this.clientPromise = import('@google/genai')
+      .then((mod) => {
+        const GoogleGenAIConstructor = mod.GoogleGenAI as unknown as new (config: any) => GoogleGenAI;
+        const instance = new GoogleGenAIConstructor({ apiKey: this.apiKey });
+        this.client = instance;
+        this.personGeneration = mod.PersonGeneration;
+        return instance;
+      })
+      .catch((error) => {
+        console.warn('⚠️ [GoogleImagenProvider] Failed to load @google/genai SDK', error);
+        this.clientPromise = null;
+        this.client = null;
+        this.personGeneration = null;
+        return null;
+      });
+
+    return this.clientPromise;
+  }
+
   isConfigured(): boolean {
-    return this.client !== null;
+    return Boolean(this.apiKey);
   }
 
   async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
-    if (!this.client) {
+    const client = await this.ensureClient();
+    if (!client || !this.personGeneration) {
       throw new Error('Google Imagen client not configured');
     }
 
-    const response = await this.client.models.generateImages({
+    const response = await client.models.generateImages({
       model: 'imagen-4.0-fast-generate-001',
       prompt,
       config: {
         numberOfImages: 1,
-        personGeneration: PersonGeneration.ALLOW_ALL,
+        personGeneration: this.personGeneration.ALLOW_ALL,
         includeRaiReason: true,
         outputMimeType: 'image/png',
       },
@@ -363,24 +388,47 @@ class GoogleImagenProvider implements ImageProvider {
 class OpenAIProvider implements ImageProvider {
   name = 'openai' as const;
   private client: OpenAI | null = null;
+  private clientPromise: Promise<OpenAI | null> | null = null;
 
   constructor() {
-    this.client = new OpenAI({
-      dangerouslyAllowBrowser: true,
-      apiKey: null,
-      baseURL: 'https://api.readkraft.com/api/v1'
-    });
+    // Lazy-load OpenAI SDK on demand to keep main bundle lighter
   }
 
   isConfigured(): boolean {
-    return this.client !== null;
+    return true;
+  }
+
+  private async ensureClient(): Promise<OpenAI | null> {
+    if (this.client) return this.client;
+    if (this.clientPromise) return this.clientPromise;
+
+    this.clientPromise = import('openai')
+      .then((mod) => {
+        const OpenAIConstructor = (mod?.default ?? mod) as new (config: any) => OpenAI;
+        const instance = new OpenAIConstructor({
+          dangerouslyAllowBrowser: true,
+          apiKey: null,
+          baseURL: 'https://api.readkraft.com/api/v1'
+        });
+        this.client = instance;
+        return instance;
+      })
+      .catch((error) => {
+        console.warn('⚠️ [OpenAIProvider] Failed to load OpenAI SDK', error);
+        this.clientPromise = null;
+        this.client = null;
+        return null;
+      });
+
+    return this.clientPromise;
   }
 
   async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
-    if (!this.client) {
+    const client = await this.ensureClient();
+    if (!client) {
       throw new Error('OpenAI client not configured');
     }
-    const response = await this.client.images.generate({
+    const response = await client.images.generate({
       model: "dall-e-3",
       prompt: prompt,
       size: options.size || "1024x1024",
@@ -406,33 +454,57 @@ class OpenAIProvider implements ImageProvider {
 class AzureOpenAIProvider implements ImageProvider {
   name = 'azure' as const;
   private client: OpenAI | null = null;
+  private clientPromise: Promise<OpenAI | null> | null = null;
+  private readonly apiKey: string | undefined;
+  private readonly endpoint: string | undefined;
 
   constructor() {
-    const apiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY;
-    const endpoint = import.meta.env.VITE_AZURE_OPENAI_ENDPOINT;
-
-    if (apiKey && endpoint) {
-      this.client = new OpenAI({
-        apiKey: apiKey,
-        baseURL: `https://${endpoint}.openai.azure.com/openai/deployments/dall-e-3`,
-        defaultQuery: { 'api-version': '2024-02-01' },
-        defaultHeaders: {
-          'api-key': apiKey,
-        },
-      });
-    }
+    this.apiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY;
+    this.endpoint = import.meta.env.VITE_AZURE_OPENAI_ENDPOINT;
   }
 
   isConfigured(): boolean {
-    return this.client !== null;
+    return Boolean(this.apiKey && this.endpoint);
+  }
+
+  private async ensureClient(): Promise<OpenAI | null> {
+    if (this.client) return this.client;
+    if (this.clientPromise) return this.clientPromise;
+    if (!this.apiKey || !this.endpoint) {
+      return null;
+    }
+
+    this.clientPromise = import('openai')
+      .then((mod) => {
+        const OpenAIConstructor = (mod?.default ?? mod) as new (config: any) => OpenAI;
+        const instance = new OpenAIConstructor({
+          apiKey: this.apiKey,
+          baseURL: `https://${this.endpoint}.openai.azure.com/openai/deployments/dall-e-3`,
+          defaultQuery: { 'api-version': '2024-02-01' },
+          defaultHeaders: {
+            'api-key': this.apiKey,
+          },
+        });
+        this.client = instance;
+        return instance;
+      })
+      .catch((error) => {
+        console.warn('⚠️ [AzureOpenAIProvider] Failed to load OpenAI SDK', error);
+        this.clientPromise = null;
+        this.client = null;
+        return null;
+      });
+
+    return this.clientPromise;
   }
 
   async generate(prompt: string, userId: string, options: GenerationOptions = {}): Promise<string> {
-    if (!this.client) {
+    const client = await this.ensureClient();
+    if (!client) {
       throw new Error('Azure OpenAI client not configured');
     }
 
-    const response = await this.client.images.generate({
+    const response = await client.images.generate({
       model: "dall-e-3",
       prompt: prompt,
       size: options.size || "1024x1024",

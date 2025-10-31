@@ -4,22 +4,28 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
-import { AuthScreen } from "@/components/auth/AuthScreen";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import Index from "./pages/Index";
-import Welcome from "./pages/Welcome";
-import NotFound from "./pages/NotFound";
-import { ProgressTracking } from "./pages/ProgressTracking";
-// Import PetPage and Index for seamless adventure functionality
-import { PetPage } from "./pages/PetPage";
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useCoins } from "@/pages/coinSystem";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { stateStoreApi } from "@/lib/state-store-api";
 import { useDeviceGate } from "@/hooks/use-device-gate";
 import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
+import analytics from "@/lib/analytics";
+
+const AuthScreen = lazy(() => import("@/components/auth/AuthScreen"));
+const Index = lazy(() => import("./pages/Index"));
+const Welcome = lazy(() => import("./pages/Welcome"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const ProgressTracking = lazy(() => import("./pages/ProgressTracking"));
+const PetPage = lazy(() => import("./pages/PetPage"));
+
+const PageFallback: React.FC = () => (
+  <div className="flex h-full min-h-screen items-center justify-center bg-neutral-950 text-white">
+    <span className="animate-pulse text-sm tracking-wide opacity-80">Loading experience…</span>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -158,19 +164,23 @@ const UnifiedPetAdventureApp = () => {
   // If user needs onboarding (after signup), route to Index. Skip for anonymous users.
   if (user && !user.isAnonymous && userData && (userData.isFirstTime || !userData.username || !userData.age || !userData.grade)) {
     return (
-      <Index 
-        initialAdventureProps={null}
-        onBackToPetPage={handleBackToPetPage}
-      />
+      <Suspense fallback={<PageFallback />}>
+        <Index 
+          initialAdventureProps={null}
+          onBackToPetPage={handleBackToPetPage}
+        />
+      </Suspense>
     );
   }
 
   if (isInAdventure) {
     return (
-      <Index 
-        initialAdventureProps={adventureProps}
-        onBackToPetPage={handleBackToPetPage}
-      />
+      <Suspense fallback={<PageFallback />}>
+        <Index 
+          initialAdventureProps={adventureProps}
+          onBackToPetPage={handleBackToPetPage}
+        />
+      </Suspense>
     );
   }
 
@@ -185,55 +195,65 @@ const UnifiedPetAdventureApp = () => {
         open={showMediaPrompt}
         onClose={handleMediaPromptClose}
       />
-      <PetPage 
-        onStartAdventure={handleStartAdventure}
-        onContinueSpecificAdventure={handleContinueSpecificAdventure}
-      />
+      <Suspense fallback={<PageFallback />}>
+        <PetPage 
+          onStartAdventure={handleStartAdventure}
+          onContinueSpecificAdventure={handleContinueSpecificAdventure}
+        />
+      </Suspense>
     </>
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <div className="h-full w-full overflow-y-auto">
-          <Toaster />
-          <Sonner position="top-left" />
-          <DevCoinHotspot />
-          <DevQuestionHotspot />
-          <BrowserRouter>
-            <Routes>
-              {/* Dedicated auth route for signup/login and upgrade linking */}
-              <Route path="/auth" element={<AuthScreen />} />
-              {/* Welcome is now default */}
-              <Route path="/" element={<Welcome />} />
-              {/* Unified pet page and adventure experience moved under /app */}
-              <Route path="/app" element={
-                <AuthGuard>
-                  <UnifiedPetAdventureApp />
-                </AuthGuard>
-              } />
-              {/* Keep adventure route for backward compatibility (redirects to /app) */}
-              <Route path="/adventure" element={
-                <AuthGuard>
-                  <UnifiedPetAdventureApp />
-                </AuthGuard>
-              } />
-              {/* Progress Tracking Page */}
-              <Route path="/progress" element={
-                <AuthGuard>
-                  <ProgressTracking />
-                </AuthGuard>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    analytics.init();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <div className="h-full w-full overflow-y-auto">
+            <Toaster />
+            <Sonner position="top-left" />
+            <DevCoinHotspot />
+            <DevQuestionHotspot />
+            <BrowserRouter>
+              <Suspense fallback={<PageFallback />}>
+                <Routes>
+                  {/* Dedicated auth route for signup/login and upgrade linking */}
+                  <Route path="/auth" element={<AuthScreen />} />
+                  {/* Welcome is now default */}
+                  <Route path="/" element={<Welcome />} />
+                  {/* Unified pet page and adventure experience moved under /app */}
+                  <Route path="/app" element={
+                    <AuthGuard>
+                      <UnifiedPetAdventureApp />
+                    </AuthGuard>
+                  } />
+                  {/* Keep adventure route for backward compatibility (redirects to /app) */}
+                  <Route path="/adventure" element={
+                    <AuthGuard>
+                      <UnifiedPetAdventureApp />
+                    </AuthGuard>
+                  } />
+                  {/* Progress Tracking Page */}
+                  <Route path="/progress" element={
+                    <AuthGuard>
+                      <ProgressTracking />
+                    </AuthGuard>
+                  } />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </div>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

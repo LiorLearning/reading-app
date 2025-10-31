@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
+import { useCallback, useEffect, useRef, useState } from "react";
+import type {
     GoogleGenAI,
     GoogleGenAIOptions,
     LiveCallbacks,
     LiveConnectConfig,
     LiveServerMessage,
-    Modality,
     MediaResolution,
+    Modality,
     Part,
     Session,
 } from "@google/genai";
@@ -37,6 +37,9 @@ export type UseGemini = {
     lastMessage?: string;
 };
 
+const DEFAULT_RESPONSE_MODALITY = "AUDIO" as Modality;
+const DEFAULT_MEDIA_RESOLUTION = "MEDIA_RESOLUTION_MEDIUM" as MediaResolution;
+
 export function useGeminiRealtimeSession(options: UseGeminiOptions = {}): UseGemini {
     const {
         defaultModel = "models/gemini-2.5-flash-native-audio-preview-09-2025",
@@ -49,7 +52,38 @@ export function useGeminiRealtimeSession(options: UseGeminiOptions = {}): UseGem
         throw new Error("set REACT_APP_GEMINI_API_KEY in .env");
     }
 
-    const client = useMemo(() => new GoogleGenAI({ apiKey: API_KEY, ...rest }), [API_KEY, rest]);
+    const restOptionsRef = useRef(rest);
+    useEffect(() => {
+        restOptionsRef.current = rest;
+    }, [rest]);
+
+    const clientRef = useRef<GoogleGenAI | null>(null);
+    const clientPromiseRef = useRef<Promise<GoogleGenAI | null> | null>(null);
+
+    const ensureClient = useCallback(async (): Promise<GoogleGenAI | null> => {
+        if (clientRef.current) return clientRef.current;
+        if (clientPromiseRef.current) return clientPromiseRef.current;
+
+        const loadPromise = import("@google/genai")
+            .then((mod) => {
+                const GoogleGenAIConstructor = mod.GoogleGenAI as unknown as new (config: any) => GoogleGenAI;
+                const instance = new GoogleGenAIConstructor({ apiKey: API_KEY, ...restOptionsRef.current });
+                clientRef.current = instance;
+                return instance;
+            })
+            .catch((error) => {
+                console.error("Failed to load @google/genai SDK", error);
+                throw error;
+            });
+
+        clientPromiseRef.current = loadPromise;
+        try {
+            const instance = await loadPromise;
+            return instance;
+        } finally {
+            clientPromiseRef.current = null;
+        }
+    }, [API_KEY]);
 
     const sessionRef = useRef<Session | null>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
@@ -62,8 +96,8 @@ export function useGeminiRealtimeSession(options: UseGeminiOptions = {}): UseGem
     const [config, setConfig] = useState<LiveConnectConfig>(
         // Default to AUDIO output with a prebuilt voice; no mic input handled here
         defaultConfig ?? {
-            responseModalities: [Modality.AUDIO],
-            mediaResolution: MediaResolution.MEDIA_RESOLUTION_MEDIUM,
+            responseModalities: [DEFAULT_RESPONSE_MODALITY],
+            mediaResolution: DEFAULT_MEDIA_RESOLUTION,
             speechConfig: {
                 voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
             },
@@ -358,7 +392,11 @@ Strictly avoid spelling pattern reinforcement if already correct done by student
             };
 
             try {
-                const sess = await client.live.connect({
+                const sdkClient = await ensureClient();
+                if (!sdkClient) {
+                    throw new Error("Google GenAI client not available");
+                }
+                const sess = await sdkClient.live.connect({
                     model: useModel,
                     config: useConfig,
                     callbacks,
@@ -375,7 +413,7 @@ Strictly avoid spelling pattern reinforcement if already correct done by student
                 return false;
             }
         },
-        [client, config, model, onClose, onError, onMessage, onOpen, status]
+        [config, ensureClient, model, onClose, onError, onMessage, onOpen, status]
     );
 
     const sendMessage = useCallback((text: string) => {

@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { ChatMessage } from './utils';
 import { ResponseProcessor, StreamChunk } from './response-processor';
 import { MultiProviderImageGenerator } from './multi-provider-image-generator';
-import { SpellingQuestion } from './questionBankUtils';
+import type { SpellingQuestion } from './questionBankUtils';
 
 export interface StreamEvent {
   type: 'text' | 'image_start' | 'image_complete' | 'error' | 'complete';

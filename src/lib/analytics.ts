@@ -1,11 +1,48 @@
-import posthog from 'posthog-js';
-
 type Primitive = string | number | boolean | null | undefined;
 type Props = Record<string, Primitive>;
 
 const SESSION_NUM_KEY_PREFIX = 'lk_session_number_';
 let currentUserId: string | null = null;
 let currentSessionId: string | null = null;
+let isInitialized = false;
+let posthogClient: any | null = null;
+let posthogPromise: Promise<any> | null = null;
+
+async function loadPosthog(): Promise<any> {
+  if (typeof window !== 'undefined' && (window as any).posthog) {
+    return (window as any).posthog;
+  }
+  if (posthogClient) return posthogClient;
+  if (!posthogPromise) {
+    posthogPromise = import('posthog-js')
+      .then((mod) => {
+        posthogClient = mod?.default ?? mod;
+        return posthogClient;
+      })
+      .catch((error) => {
+        posthogPromise = null;
+        throw error;
+      });
+  }
+  return posthogPromise;
+}
+
+function withPosthog(callback: (client: any) => void): void {
+  try {
+    const inlineClient = typeof window !== 'undefined' ? (window as any).posthog : null;
+    if (inlineClient) {
+      callback(inlineClient);
+      return;
+    }
+    if (posthogClient) {
+      callback(posthogClient);
+      return;
+    }
+    loadPosthog().then((client) => {
+      try { callback(client); } catch {}
+    }).catch(() => {});
+  } catch {}
+}
 
 function getSessionNumberKey(userId: string): string {
   return `${SESSION_NUM_KEY_PREFIX}${userId}`;
@@ -29,14 +66,18 @@ function setSessionNumber(num: number, userId?: string | null): void {
 }
 
 export const analytics = {
-  init(): void {
+  async init(): Promise<void> {
+    if (isInitialized) return;
     try {
       const key = import.meta.env.VITE_POSTHOG_KEY;
       const host = import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com';
       // If no env key is provided, assume snippet-based init is being used; silently no-op
-      if (!key) return;
-      // Env-based init (used when snippet is not present)
-      posthog.init(key, {
+      if (!key) {
+        isInitialized = true;
+        return;
+      }
+      const client = await loadPosthog();
+      client.init(key, {
         api_host: host,
         autocapture: true,
         capture_pageview: true,
@@ -45,7 +86,8 @@ export const analytics = {
         mask_all_text: false,
         mask_all_element_attributes: false,
       });
-      try { posthog.startSessionRecording(); } catch {}
+      try { client.startSessionRecording(); } catch {}
+      isInitialized = true;
     } catch (e) {
       console.warn('[analytics] init failed:', e);
     }
@@ -53,10 +95,9 @@ export const analytics = {
 
   identify(userId: string, properties?: Props): void {
     currentUserId = userId;
-    try {
-      const ph: any = (typeof window !== 'undefined' && (window as any).posthog) || posthog;
-      ph.identify(userId, properties);
-    } catch {}
+    withPosthog((client) => {
+      try { client.identify(userId, properties); } catch {}
+    });
   },
 
   setSession(sessionId: string | null): void {
@@ -73,10 +114,9 @@ export const analytics = {
     if (currentSessionId) base.session_id = currentSessionId;
     const sn = getSessionNumber(currentUserId);
     if (sn !== null) base.session_number = sn;
-    try {
-      const ph: any = (typeof window !== 'undefined' && (window as any).posthog) || posthog;
-      ph.capture(event, { ...base, ...(props || {}) });
-    } catch {}
+    withPosthog((client) => {
+      try { client.capture(event, { ...base, ...(props || {}) }); } catch {}
+    });
   },
 };
 
