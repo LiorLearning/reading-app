@@ -108,8 +108,10 @@ Rules you must always follow:
 - Do not add explanations — only output the cleaned prompt.
 6. PET PERSONA MAPPING
 - ${personaInstruction}
-7. Person
-- replace any human characters with a child 
+
+7. People
+- Remove all people or humans. Animals or pets are allowed.
+
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  
    - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
@@ -120,15 +122,7 @@ Rules:
 4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children’s storybook or animated adventure film**.  
 5. Never allow sexual, romantic, or suggestive undertones. 
 
-8. CHILD PERSONALIZATION
-- Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
-- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
-9. People
-- Couples are not allowed in the picture.
-- Wife and husband references should be removed.
-- Strictly prefix all characters like princess, women, queen with "an ${childAge}-year-old ...".
 
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
@@ -316,15 +310,8 @@ CRITICAL RULES:
 6. Return ONLY the cleaned prompt, no explanations
 7. PET PERSONA MAPPING: ${personaInstruction}
 
-8. CHILD PERSONALIZATION
-- Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
-- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
-
-9. People
-- Couples are not allowed in the picture.
-- Wife and husband references should be removed.
-- Strictly prefix all characters with "an ${childAge}-year-old ...".
+8. People
+- Remove all people or humans. Animals or pets are allowed.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
