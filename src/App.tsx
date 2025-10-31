@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Welcome from "./pages/Welcome";
 import NotFound from "./pages/NotFound";
 import { ProgressTracking } from "./pages/ProgressTracking";
+import WorksheetTopic1H1 from "./pages/worksheets/WorksheetTopic1H1";
 // Import PetPage and Index for seamless adventure functionality
 import { PetPage } from "./pages/PetPage";
 import React, { useMemo, useState } from "react";
@@ -224,6 +225,12 @@ const App = () => (
               <Route path="/progress" element={
                 <AuthGuard>
                   <ProgressTracking />
+                </AuthGuard>
+              } />
+              {/* Spelling Worksheet - Topic 1-h.1 */}
+              <Route path="/worksheet/1-h.1" element={
+                <AuthGuard>
+                  <WorksheetTopic1H1 />
                 </AuthGuard>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

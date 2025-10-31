@@ -18,7 +18,7 @@ import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, Book } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
@@ -4556,6 +4556,17 @@ const getSleepyPetImage = (clicks: number) => {
       >
         dev
       </button>
+
+      {/* Worksheet Button (above Camera FAB) */}
+      <Button
+        onClick={() => navigate('/worksheet/1-h.1')}
+        variant="outline"
+        aria-label="Open worksheet"
+        className="fixed bottom-24 right-6 h-12 px-4 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] z-40 gap-2"
+      >
+        <Book className="h-5 w-5" />
+        Worksheet
+      </Button>
 
       {/* Camera FAB (replaces audio toggle) */}
       <Button
