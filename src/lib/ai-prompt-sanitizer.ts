@@ -66,9 +66,10 @@ class AIPromptSanitizer {
           return 'dog';
         }
       })();
+      const petName = PetProgressStorage.getPetDisplayName(currentPetId);
       const petRule = getPetRule(currentPetId);
-      const personaInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
-
+      let petInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
+      petInstruction += ` The pet is named ${petName} for reference.`;
       // Derive child personalization context
       const childName = (childProfile?.name || '').trim() || 'the child';
       const rawGender = (childProfile?.gender || '').toString().trim().toLowerCase();
@@ -107,9 +108,12 @@ Rules you must always follow:
 - Do not include any text, signs, or labels in the rewritten prompt.
 - Do not add explanations — only output the cleaned prompt.
 6. PET PERSONA MAPPING
-- ${personaInstruction}
-7. Person
-- replace any human characters with a child 
+
+- ${petInstruction}
+
+7. People
+- Remove all people or humans. Animals or pets are allowed.
+
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  
    - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
@@ -120,15 +124,7 @@ Rules:
 4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children’s storybook or animated adventure film**.  
 5. Never allow sexual, romantic, or suggestive undertones. 
 
-8. CHILD PERSONALIZATION
-- Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
-- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
 
-9. People
-- Couples are not allowed in the picture.
-- Wife and husband references should be removed.
-- Strictly prefix all characters like princess, women, queen with "an ${childAge}-year-old ...".
 
 Task:
 Rewrite the following user input into a sanitized version that follows the above rules,
@@ -293,9 +289,10 @@ Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${ch
           return 'dog';
         }
       })();
+      const petName = PetProgressStorage.getPetDisplayName(currentPetId);
       const petRule = getPetRule(currentPetId);
-      const personaInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
-
+      let petInstruction = petRule?.instruction || 'Replace second-person references ("you") in image prompts with a third-person description of the current pet.';
+      petInstruction += ` The pet is named ${petName} for reference.`;
       // Derive child personalization context
       const childName = (childProfile?.name || '').trim() || 'the child';
       const rawGender = (childProfile?.gender || '').toString().trim().toLowerCase();
@@ -314,17 +311,10 @@ CRITICAL RULES:
 4. Preserve character names and main visual elements
 5. Use heroic, adventurous, and magical language instead
 6. Return ONLY the cleaned prompt, no explanations
-7. PET PERSONA MAPPING: ${personaInstruction}
+7. PET PERSONA MAPPING: ${petInstruction}
 
-8. CHILD PERSONALIZATION
-- Child Profile: age ${childAge}${rawGender ? `; gender ${rawGender}` : ''}.
-- Add child to the picture only when the location is not the beach or pool and the input uses first-person words ("I", "me", "my", "myself") or mentions "self", the ${childAge}-year-old ${childGenderNoun}.
-- Take the child's age and gender into account when describing the character. Prefer phrasing like: "an ${childAge}-year-old ${childGenderNoun} ...". Use gender-neutral term "child" if gender is unspecified. Place the child's description at the beginning of the prompt always.
-
-9. People
-- Couples are not allowed in the picture.
-- Wife and husband references should be removed.
-- Strictly prefix all characters with "an ${childAge}-year-old ...".
+8. People
+- Remove all people or humans. Animals or pets are allowed.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
@@ -384,10 +374,6 @@ Transform this image request:`;
   }
 
   private fallbackFullSanitization(originalPrompt: string, adventureContext: string | undefined, startTime: number): SanitizedPromptResult {
-    // console.log('🔧 AI Sanitizer: Using rule-based fallback FULL sanitization');
-    // console.log('📥 AI Sanitizer FALLBACK INPUT - Original Prompt:', originalPrompt);
-    // console.log('📥 AI Sanitizer FALLBACK INPUT - Adventure Context:', adventureContext || 'No context');
-    
     // Rule-based sanitization as fallback
     const currentPetId = ((): string => {
       try {
