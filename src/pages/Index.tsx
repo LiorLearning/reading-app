@@ -48,6 +48,7 @@ import WhiteboardLesson from "@/components/adventure/WhiteboardLesson";
 import { getLessonScript, lessonScripts } from "@/data/lesson-scripts";
 import RightUserOverlay from "@/components/adventure/RightUserOverlay";
 import SpellReviewModal, { SpellReviewItem } from "@/components/adventure/SpellReviewModal";
+import { addSpellReviewEntry } from "@/lib/spell-review-log";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
@@ -4476,7 +4477,14 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       try {
         const resolvedWord = (currentSpellQuestion.word || currentSpellQuestion.audio || '').toString().trim();
         if (resolvedWord) {
-          setSpellReviewItems(prev => ([...prev, { word: resolvedWord, firstTryCorrect: isFirstAttempt }]));
+          const prefilled = Array.isArray(currentSpellQuestion.prefilledIndexes)
+            ? (currentSpellQuestion.prefilledIndexes as number[])
+            : undefined;
+          setSpellReviewItems(prev => ([
+            ...prev,
+            { word: resolvedWord, firstTryCorrect: isFirstAttempt, prefilledIndexes: prefilled }
+          ]));
+          try { addSpellReviewEntry({ word: resolvedWord, firstTryCorrect: isFirstAttempt, prefilledIndexes: prefilled }); } catch {}
         }
       } catch {}
       try {
@@ -5108,10 +5116,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   playClickSound();
                   await handleCloseSession(); // Save current adventure before going home
                   
-                  // If this session has enough completed SpellBox items, show review modal before navigating
-                  const completedCount = spellReviewItems.length;
-                  const firstTryCorrectCount = spellReviewItems.filter(i => i.firstTryCorrect).length;
-                  if (completedCount > 0 && firstTryCorrectCount >= 5) {
+                  // If this session earned at least 50 coins (adventure completed), show review before navigating
+                  const hasReviewable = spellReviewItems.length > 0;
+                  if (hasReviewable && sessionCoins >= 50) {
                     setIsSpellReviewOpen(true);
                     return;
                   }
@@ -5528,9 +5535,34 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             
             <div className="text-center">
               {currentScreen === 1 ? (
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center gap-2">
                   {/* Adventure Feeding Progress (persistent) */}
                   <PersistentAdventureProgressBar />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="w-6 h-6 p-0 rounded-full border-2 border-foreground shadow-solid bg-white text-black btn-animate text-[10px] leading-none"
+                    aria-label="Open review"
+                    title="Open review"
+                    onClick={() => {
+                      playClickSound();
+                      // If no session items yet, seed sample data for quick test
+                      setSpellReviewItems(prev => {
+                        if (prev.length > 0) return prev;
+                        return [
+                          { word: 'cat', emoji: '🐱', firstTryCorrect: false },
+                          { word: 'dog', emoji: '🐶', firstTryCorrect: false },
+                          { word: 'sun', emoji: '☀️', firstTryCorrect: true },
+                          { word: 'moon', emoji: '🌙', firstTryCorrect: true },
+                          { word: 'star', emoji: '⭐️', firstTryCorrect: true },
+                          { word: 'tree', emoji: '🌳', firstTryCorrect: true },
+                        ] as SpellReviewItem[];
+                      });
+                      setIsSpellReviewOpen(true);
+                    }}
+                  >
+                    R
+                  </Button>
                 </div>
               ) : (
                 <h1 className="text-xl lg:text-2xl font-bold text-white drop-shadow-lg font-kids tracking-wide">

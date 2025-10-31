@@ -18,7 +18,7 @@ import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
@@ -31,6 +31,8 @@ import { toast } from 'sonner';
 import KraftyReinforcedStreakModal, { markTodayHeartFilled } from '@/components/KraftyReinforcedStreakModal';
 import { getPetEmotionActionMedia } from '@/lib/pet-avatar-service';
 // import CircularLevelBadge from '@/components/ui/CircularLevelBadge';
+import DailySpellReviewModal from '@/components/adventure/DailySpellReviewModal';
+import { getLocalDateKey, getUniqueFirstTryCountForDate } from '@/lib/spell-review-log';
 
 
 type Props = {
@@ -121,6 +123,19 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Reinforced streak modal state
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [streakForModal, setStreakForModal] = useState(0);
+
+  // Daily word list modal and count (local timezone)
+  const [isDailyReviewOpen, setIsDailyReviewOpen] = useState(false);
+  const [todayWordCount, setTodayWordCount] = useState<number>(0);
+  useEffect(() => {
+    const update = () => setTodayWordCount(getUniqueFirstTryCountForDate(getLocalDateKey(new Date())));
+    update();
+    const onStorage = (e: StorageEvent) => {
+      if (!e || e.key === null || e.key === 'readingapp_spell_review_log_v1') update();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   // Weekly hearts count for current week (from Firestore-broadcasted userStates.weeklyHearts, fallback to local)
   const getMondayOfCurrentWeek = () => {
@@ -3445,7 +3460,7 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* ADDED FOR HOME PAGE FUNCTIONALITY: Grade Selection Button - Top Left */}
       {userData && (
-        <div className="absolute top-5 left-5 z-30">
+        <div className="absolute top-5 left-5 z-30 flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -3463,7 +3478,7 @@ const getSleepyPetImage = (clicks: number) => {
                     const match = currentGrade.match(/\d+/);
                     return match ? match[0] : currentGrade;
                   })();
-                  const buttonText = `${userName.charAt(0).toUpperCase()}${userName.slice(1)}'s Progress`;
+                  const buttonText = `${userName.charAt(0).toUpperCase()}${userName.slice(1)}`;
                   return buttonText;
                 })()}
                 <ChevronDown className="h-4 w-4" />
@@ -3732,6 +3747,22 @@ const getSleepyPetImage = (clicks: number) => {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+          {/* Word list quick access with count */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="border-[3px] border-[#111827] bg-white text-[#111827] rounded-[22px] px-5 py-3 font-semibold shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center gap-2"
+              aria-label="Open word list"
+              title="Word list"
+              onClick={() => {
+                playClickSound();
+                setIsDailyReviewOpen(true);
+              }}
+            >
+              <BookOpen className="h-5 w-5" />
+              <span className="text-base leading-none">{todayWordCount}</span>
+            </Button>
+          </div>
         </div>
       )}
 
@@ -4520,6 +4551,12 @@ const getSleepyPetImage = (clicks: number) => {
           />
         );
       })()}
+
+      {/* Daily Spell Review Modal with in-modal date selector */}
+      <DailySpellReviewModal
+        open={isDailyReviewOpen}
+        onOpenChange={setIsDailyReviewOpen}
+      />
 
       {/* Invisible dev-only buttons */}
       {/* Top-center: increment streak */}
