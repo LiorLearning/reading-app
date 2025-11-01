@@ -71,11 +71,11 @@ export class MultiProviderImageGenerator {
       try {
         // console.log(`🔄 [MultiProviderImageGenerator.generateWithFallback()] Attempting image generation with ${provider.name}... (attempt ${attempt + 1}/${this.providers.length})`);
 
-        // Refine prompt for this specific provider
-        const promptForProvider = provider.name === 'flux-schnell' && sanitizedFallbackPrompt
-          ? sanitizedFallbackPrompt
-          : prompt;
-        const refinedPrompt = await this.refinePromptForProvider(promptForProvider, provider.name, options);
+        // Use raw prompt for Flux with no sanitization/rephrasing; otherwise allow provider-specific refinement
+        const useRawPrompt = provider.name === 'flux-schnell';
+        const refinedPrompt = useRawPrompt
+          ? prompt
+          : await this.refinePromptForProvider(prompt, provider.name, options);
         // console.log(`🎯 [MultiProviderImageGenerator.generateWithFallback()] Refined prompt for ${provider.name}: "${refinedPrompt}"`);
 
         // Generate image with current provider
@@ -143,8 +143,12 @@ export class MultiProviderImageGenerator {
     providerName: ImageProvider['name'],
     options: GenerationOptions
   ): Promise<string> {
+    // For Flux, do not modify or sanitize the prompt at all
+    if (providerName === 'flux-schnell') {
+      return originalPrompt;
+    }
 
-    // Basic content filtering for child-friendly content
+    // Basic content filtering for other providers
     let refinedPrompt = originalPrompt
       .replace(/scary|frightening|terrifying|horror/gi, 'mysterious')
       .replace(/dark|gloomy|sinister/gi, 'shadowy')
@@ -164,8 +168,7 @@ export class MultiProviderImageGenerator {
         break;
 
       case 'flux-schnell':
-        refinedPrompt = `Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
-        ${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
+        // No rephrasing or additions for Flux
         break;
 
       case 'google-imagen':
@@ -259,13 +262,12 @@ class FluxSchnellProvider implements ImageProvider {
       },
       body: JSON.stringify({
         input: {
+          // Raw prompt, and creativity-forward settings
           prompt,
-          go_fast: true,
+          go_fast: false,
           output_quality: 100,
-          num_inference_steps: 4,
-          aspect_ratio: '5:4',
-          safety_tolerance: 1,
-          prompt_upsampling: false,
+          num_inference_steps: 28,
+          aspect_ratio: '1:1',
           output_format: 'png'
         },
         webhook: "https://api.readkraft.com/api/discord",
