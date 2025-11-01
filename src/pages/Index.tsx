@@ -726,7 +726,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         entryMessageCycle: entryMessageCycleCountRef.current,
         messageCycleCount,
       };
-      console.log('[SpellBox][AutoEffect][Enter]', debugCtx);
     } catch {}
     // Allow reopening even if the word matches lastResolvedWord (needed for multi-round repeats).
     // Freshness/cycle gates below prevent stale re-opens.
@@ -737,7 +736,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const lastTs = lastAi?.timestamp || 0;
         const exitAt = assignmentExitAtRef.current || 0;
         if (exitAt && lastTs && lastTs < exitAt) {
-          console.log('🛑 SpellBox opener: ignoring pre-diagnosis AI message', { lastTs, exitAt, currentSpellingWord });
           return;
         }
         // Freshness/session gate: only open if the last AI message is fresh for this entry,
@@ -746,13 +744,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const hasNewCycleSinceEntry = messageCycleCount > (entryMessageCycleCountRef.current || 0);
         if (!isFreshForEntry && !hasNewCycleSinceEntry) {
           // Stale spelling message from a previous session/navigation; suppress SpellBox.
-          console.log('🛑 SpellBox opener: suppressed by freshness/cycle gate', { isFreshForEntry, hasNewCycleSinceEntry, lastTs, enteredAdventureAt: enteredAdventureAtRef.current, messageCycleCount, entryMessageCycle: entryMessageCycleCountRef.current });
           setShowSpellBox(false);
           setCurrentSpellQuestion(null);
           return;
         }
       } catch {}
-      console.log('✅ SpellBox opener: proceeding with currentSpellingWord', { currentSpellingWord, topicId: selectedTopicId });
       // console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
       //   currentSpellingWord,
       //   hasOriginalQuestion: !!originalSpellingQuestion,
@@ -785,7 +781,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           questionText: currentSpellingSentence || originalSpellingQuestion.questionText
         };
         
-        console.log('[SpellBox][AutoEffect] setCurrentSpellQuestion (enhanced)', { id: enhancedQuestion.id, audio: enhancedQuestion.audio, word: enhancedQuestion.word });
         setCurrentSpellQuestion(enhancedQuestion);
       } else {
         // Fallback: Convert the spelling word to a SpellingQuestion format (no prefilled data)
@@ -813,16 +808,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           aiTutor: bankQuestion?.aiTutor
         };
         
-        console.log('[SpellBox][AutoEffect] setCurrentSpellQuestion (fallback)', { id: spellQuestion.id, audio: spellQuestion.audio, word: spellQuestion.word });
         setCurrentSpellQuestion(spellQuestion);
       }
       
       // Show SpellBox and temporarily disable mic/text input below
-      console.log('[SpellBox][AutoEffect] setShowSpellBox(true)');
       setShowSpellBox(true);
       try { setDisableInputForSpell(true); } catch {}
     } else {
-      console.log('[SpellBox][AutoEffect] setShowSpellBox(false) path', { currentSpellingWord, currentScreen, lastResolvedWord: lastResolvedWordRef.current });
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
       // Re-enable input when SpellBox is not active
@@ -2428,7 +2420,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
           
-        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
         // Additional debug info removed (localStorage dropped)
         // console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
@@ -2437,7 +2428,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         const preferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
         const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds, preferredLevel) : null;
-        console.log(`🔤 Fetched spelling question:`, { isSpellingPhase, currentGrade, question: spellingQuestion ? { id: spellingQuestion.id, topicId: spellingQuestion.topicId, word: spellingQuestion.audio } : null });
         
         // Store the original spelling question (with prefilled data) for later use
           
@@ -6052,17 +6042,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       lastAi?.content ||
                       lastAi?.spelling_sentence || null
                     );
-                try {
-                  console.log('[Overlay][Props]', {
-                    showSpellBox,
-                    currentSpellQuestionId: currentSpellQuestion?.id,
-                    overlayWord,
-                    overlaySentence,
-                    lastAiSpellingSentence: lastAi?.spelling_sentence,
-                    lastAiContentAfter: lastAi?.content_after_spelling,
-                    lastAiContent: lastAi?.content,
-                  });
-                } catch {}
                 return (
                   <LeftPetOverlay 
                     petImageUrl={currentPetAvatarImage}
@@ -6115,6 +6094,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               explanation: currentSpellQuestion.explanation,
                               isPrefilled: currentSpellQuestion.isPrefilled,
                               prefilledIndexes: currentSpellQuestion.prefilledIndexes,
+                              topicId: currentSpellQuestion.topicId || selectedTopicId,
                               aiTutor: (currentSpellQuestion as any)?.aiTutor,
                             } : null,
                             showHints: true,
@@ -6123,6 +6103,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             onSkip: handleSpellSkip,
                             onNext: handleSpellNext,
                             highlightNext: highlightSpellNext,
+                            // Pass logging props
+                            userId: user?.uid,
+                            topicId: currentSpellQuestion?.topicId || selectedTopicId,
+                            grade: selectedGradeFromDropdown || userData?.gradeDisplayName,
                             sendMessage,
                             isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
