@@ -8,6 +8,8 @@ import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Volume2, Square, ChevronRight, Lightbulb } from 'lucide-react';
+import { firebaseSpellboxLogsService } from '@/lib/firebase-spellbox-logs-service';
+import { useAuth } from '@/hooks/use-auth';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -43,6 +45,7 @@ interface SpellBoxProps {
     explanation: string;
     isPrefilled?: boolean;
     prefilledIndexes?: number[];
+    topicId?: string; // Added for logging
     aiTutor?: {
       target_word?: string;
       question?: string; // mask like "_ _ p"
@@ -51,6 +54,11 @@ interface SpellBoxProps {
       spelling_pattern_or_rule?: string;
     };
   };
+  
+  // Logging props (optional - will use auth hook if not provided)
+  userId?: string;
+  topicId?: string;
+  grade?: string;
   
   // UI options
   showProgress?: boolean;
@@ -95,7 +103,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   sendMessage,
   interruptRealtimeSession,
   nextUnlockDelayMs = 0
-  , isAssignmentFlow = false
+  , isAssignmentFlow = false,
+  
+  // Logging props
+  userId: propUserId,
+  topicId: propTopicId,
+  grade: propGrade
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -108,6 +121,14 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [canClickNext, setCanClickNext] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<string>('');
+  
+  // Get auth context for logging
+  const { user, userData } = useAuth();
+  
+  // Determine effective userId, topicId, and grade for logging
+  const effectiveUserId = propUserId || user?.uid || '';
+  const effectiveTopicId = propTopicId || question?.topicId || '';
+  const effectiveGrade = propGrade || userData?.gradeDisplayName || '';
   
   // Tutorial system integration
   const {
@@ -700,7 +721,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const handleSubmitAttempt = useCallback(() => {
     // Enable submit once any letter is entered (non-space)
     const canSubmit = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      return;
+    }
     const completeWord = reconstructCompleteWord(userAnswer);
     const correct = isWordCorrect(completeWord, targetWord);
     setHasSubmitted(true);
@@ -708,6 +731,41 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     // Record submitted answer for change detection on subsequent submits
     const changedSinceLast = completeWord !== lastSubmittedAnswer;
     setLastSubmittedAnswer(completeWord);
+    
+    // Log attempt to Firestore
+    if (effectiveUserId && effectiveTopicId && question) {
+      
+      // Only log if answer changed (to avoid duplicate logs for same attempt)
+      if (changedSinceLast || correct) {
+        // Always use targetWord (full word) as primary source, fallback to question.correctAnswer if targetWord is empty
+        // targetWord is more reliable as it contains the full word (e.g., "BAG"), not just a single letter
+        const fullCorrectAnswer = (targetWord || question.correctAnswer || '').toUpperCase();
+        
+        firebaseSpellboxLogsService.logSpellboxAttempt(
+          effectiveUserId,
+          effectiveTopicId,
+          effectiveGrade,
+          question.id,
+          fullCorrectAnswer, // Always use full word string (e.g., "BAG", not "B")
+          completeWord,
+          correct
+        ).catch((error) => {
+          console.error('[SpellboxLogs] Failed to log attempt:', error);
+        });
+      } else {
+        console.log('[SpellboxLogs] Skipping log - answer unchanged since last submission');
+      }
+    } else {
+      console.warn('[SpellboxLogs] Cannot log attempt - missing required data:', {
+        hasUserId: !!effectiveUserId,
+        hasTopicId: !!effectiveTopicId,
+        hasQuestion: !!question,
+        userId: effectiveUserId,
+        topicId: effectiveTopicId,
+        questionId: question?.id
+      });
+    }
+    
     if (correct) {
       if (interruptRealtimeSession) {
         try { interruptRealtimeSession(); } catch {}
@@ -756,7 +814,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         } catch {}
       }
     }
-  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer]);
+  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer, effectiveUserId, effectiveTopicId, effectiveGrade]);
 
   // Focus next empty box (scoped to this component)
   const focusNextEmptyBox = useCallback(() => {
