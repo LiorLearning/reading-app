@@ -2873,17 +2873,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Update adventure tracker when messages are sent
   React.useEffect(() => {
     if (chatMessages.length > 0 && currentAdventureId && currentAdventureType && user) {
-      // Get current pet from localStorage
-      let currentPet = 'bobo'; // default fallback
+      // Get current pet consistently with PetProgressStorage
+      let currentPet = 'dog';
       try {
-        const petData = localStorage.getItem('litkraft_pet_data');
-        if (petData) {
-          const parsed = JSON.parse(petData);
-          const ownedPets = parsed.ownedPets || [];
-          if (ownedPets.length > 0) {
-            currentPet = ownedPets[0]; // Use first owned pet
-          }
-        }
+        currentPet = PetProgressStorage.getCurrentSelectedPet() || 'dog';
       } catch (error) {
         console.warn('Could not determine current pet for adventure tracking:', error);
       }
