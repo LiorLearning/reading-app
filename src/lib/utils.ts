@@ -1897,7 +1897,7 @@ export async function moderation(userName: string, text: string | null | undefin
         ]
       }]
   });
-  if (response.output_text.includes("true")) {
+  if (response.output_text?.toLowerCase().includes("true")) {
     return true;
   }
 
