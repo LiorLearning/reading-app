@@ -4934,7 +4934,7 @@ const getSleepyPetImage = (clicks: number) => {
                   }
                 }
               } catch {}
-              // 3) Daily sadness cap gate: show sadness only if assigned OR forced-sad; else neutral baseline
+              // 3) Daily sadness cap gate: assigned/forced → sad baseline; else neutral
               try {
                 const raw = localStorage.getItem('litkraft_daily_sadness');
                 const today = new Date().toISOString().slice(0, 10);
@@ -4953,9 +4953,10 @@ const getSleepyPetImage = (clicks: number) => {
                     isForcedToday = (f?.date === today) && pets.includes(petId);
                   }
                 } catch {}
-                if (!isAssignedToday && !isForcedToday) return 'coins_10';
+                if (isAssignedToday || isForcedToday) return 'coins_0';
+                return 'coins_10';
               } catch {}
-              // 4) Heart empty or willBeSadOnWakeup → sad
+              // 4) Legacy fallback (kept for safety but normally not reached due to returns above)
               try {
                 const petProgress = PetProgressStorage.getPetProgress(petId);
                 const { heartData, sleepData } = petProgress;
