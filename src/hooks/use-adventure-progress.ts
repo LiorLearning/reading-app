@@ -72,3 +72,69 @@ export function useAdventurePersistentProgress(): AdventureProgressState {
 }
 
 
+
+// Per-adventure, per-day progress for the currently selected pet.
+// When an adventure type is provided, progress is computed as the delta of
+// that type's coins earned today (resets at local calendar day boundary) over
+// a fixed target (default 50). If type is undefined, returns 0 progress.
+export function useAdventureProgressForType(adventureType?: string, targetCoins: number = 50): AdventureProgressState {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setTick((t) => t + 1);
+    window.addEventListener('petProgressChanged', bump as EventListener);
+    window.addEventListener('adventureCoinsAdded', bump as EventListener);
+    return () => {
+      window.removeEventListener('petProgressChanged', bump as EventListener);
+      window.removeEventListener('adventureCoinsAdded', bump as EventListener);
+    };
+  }, []);
+
+  const state = useMemo<AdventureProgressState>(() => {
+    // If type not yet resolved, show 0% as requested
+    if (!adventureType) {
+      return { activity: null, coinsSoFar: 0, targetCoins, progressFraction: 0 };
+    }
+
+    const currentPet = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+
+    // Baseline storage to compute per-day deltas per adventure type
+    const TODAY = new Date().toISOString().slice(0, 10);
+    const BASELINE_KEY = `litkraft_daily_type_baseline_${currentPet}`;
+
+    type Baseline = { date: string; coinsByType: Record<string, number> };
+    let baseline: Baseline = { date: TODAY, coinsByType: {} };
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(BASELINE_KEY) : null;
+      if (raw) baseline = JSON.parse(raw) as Baseline;
+    } catch {}
+
+    // If the stored baseline is for a previous day, roll it forward to today
+    if (baseline.date !== TODAY) {
+      baseline = { date: TODAY, coinsByType: {} };
+      try { localStorage.setItem(BASELINE_KEY, JSON.stringify(baseline)); } catch {}
+    }
+
+    // Current cumulative coins for this type
+    const cumulative = PetProgressStorage.getAdventureCoinsForType(currentPet, adventureType) || 0;
+
+    // Ensure we have a baseline for this type; set lazily to current cumulative on first access today
+    if (baseline.coinsByType[adventureType] === undefined) {
+      baseline.coinsByType[adventureType] = cumulative;
+      try { localStorage.setItem(BASELINE_KEY, JSON.stringify(baseline)); } catch {}
+    }
+
+    const coinsToday = Math.max(0, cumulative - (baseline.coinsByType[adventureType] || 0));
+    const fraction = Math.max(0, Math.min(1, targetCoins > 0 ? coinsToday / targetCoins : 0));
+
+    return {
+      activity: adventureType,
+      coinsSoFar: Math.max(0, Math.min(targetCoins, coinsToday)),
+      targetCoins,
+      progressFraction: fraction,
+    };
+  }, [adventureType, targetCoins, tick]);
+
+  return state;
+}
+
