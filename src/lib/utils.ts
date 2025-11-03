@@ -1861,7 +1861,7 @@ export function openaiClient() {
   });
 }
 
-export async function moderation(text: string | null | undefined): Promise<boolean> {
+export async function moderation(userName: string, text: string | null | undefined): Promise<boolean> {
   if (!text) return false;
 
   // const response = await openaiClient().responses.create({
@@ -1907,6 +1907,7 @@ export async function moderation(text: string | null | undefined): Promise<boole
     method: 'POST',
     body: JSON.stringify({
       content: text,
+      username: userName,
       "type": "user_input",
     }),
     headers: {

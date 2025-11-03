@@ -2138,7 +2138,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const shouldReplaceTranscribingMessage = lastMessage &&
         lastMessage.type === 'user' &&
         lastMessage.content === 'transcribing...';
-      const verdict = await moderation(text);
+        const userName = userData?.username || '';
+        const verdict = await moderation(userName, text);
       if (verdict) {
         fetch('https://api.readkraft.com/api/discord', {
           method: 'POST',
