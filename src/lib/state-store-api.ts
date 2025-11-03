@@ -92,7 +92,7 @@ import {
   const QUEST_TARGET = 5;
   const QUEST_COOLDOWN_HOURS = 8; // wait 8 hours before advancing after completion
   const ACTIVITY_SEQUENCE: QuestTask[] = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
-  const SADNESS_CAP_PER_DAY = 2;
+  const SADNESS_CAP_PER_DAY = 3;
   
   // Default generators
   function createDefaultUserState(): Omit<UserState, 'createdAt' | 'updatedAt'> & {
@@ -118,8 +118,11 @@ import {
     const result: Record<string, any> = {};
     for (const pet of pets) {
       const task = ACTIVITY_SEQUENCE[0];
-      result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null };
+      result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null };
     }
+    // Initialize shared user pointer so it's always present and drives quest selection
+    result._userCurrentActivity = ACTIVITY_SEQUENCE[0];
+    result._userLastSwitchAt = nowServerTimestamp();
     result.createdAt = nowServerTimestamp();
     result.updatedAt = nowServerTimestamp();
     return result;
@@ -150,10 +153,10 @@ import {
     if (!questsSnap.exists()) {
       batch.set(questsRef, createInitialDailyQuests(petsToInit));
     } else {
-      // Ensure only owned pets exist in dailyQuests
+      // Ensure only owned pets exist in dailyQuests (do not touch meta keys prefixed with '_')
       const qData = questsSnap.data() as any;
       const updates: Record<string, any> = { updatedAt: nowServerTimestamp() };
-      const existingPetKeys = Object.keys(qData).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
+      const existingPetKeys = Object.keys(qData).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
       for (const key of existingPetKeys) {
         if (!petsToInit.includes(key)) updates[key] = deleteField();
       }
@@ -197,28 +200,50 @@ import {
       batch.set(questsRef, createInitialDailyQuests([pet]));
     }
   
-    // Determine active activity for the pet
+    // Determine effective activity for the pet
     const questsData = (questsSnap.exists() ? (questsSnap.data() as any) : createInitialDailyQuests([pet])) as any;
     const petObj = questsData?.[pet] ?? {};
     const index = Number(petObj?._activityIndex ?? 0) % ACTIVITY_SEQUENCE.length;
-    const activeKey = ACTIVITY_SEQUENCE[index]; // always use fixed sequence, starting at 'house'
-    const perAdventureKey = (adventureKey && typeof adventureKey === 'string' && adventureKey.trim()) ? adventureKey : activeKey;
+    const indexKey = ACTIVITY_SEQUENCE[index];
+    // Cooldown detection in diverse shapes
+    const cuAny: any = petObj?._cooldownUntil || null;
+    const cuMs = cuAny?.toMillis
+      ? cuAny.toMillis()
+      : (typeof cuAny?.seconds === 'number')
+        ? (cuAny.seconds * 1000)
+        : (typeof cuAny === 'number')
+          ? cuAny
+          : (typeof cuAny === 'string')
+            ? (isNaN(Date.parse(cuAny)) ? null : Date.parse(cuAny))
+            : (cuAny ? new Date(cuAny).getTime() : null);
+    const petHasActiveCooldown = Boolean(cuMs && Date.now() < cuMs);
+    const userPointer = (questsData?._userCurrentActivity || ACTIVITY_SEQUENCE[0]) as string;
+    const pointerKey = (typeof userPointer === 'string' && userPointer.trim()) ? userPointer : indexKey;
+    // Effective: pin to last completed during cooldown; else prefer user pointer; fallback to index
+    const lastCompleted = (typeof petObj?._lastCompletedActivity === 'string' && petObj._lastCompletedActivity) ? petObj._lastCompletedActivity : indexKey;
+    const effectiveKey = petHasActiveCooldown ? lastCompleted : pointerKey;
+    const perAdventureKey = (adventureKey && typeof adventureKey === 'string' && adventureKey.trim()) ? adventureKey : effectiveKey;
   
     // Ensure pet object exists with meta
     if (!questsData?.[pet]) {
       batch.set(
         questsRef,
-        { [pet]: { [activeKey]: 0, _activityIndex: index || 0, _completedAt: null, _cooldownUntil: null } },
+        { [pet]: { [effectiveKey]: 0, _activityIndex: index || 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null } },
         { merge: true }
       );
     }
   
-    // Increment quest progress for active activity
+    // Ensure field exists for effective key
+    if (typeof (petObj?.[effectiveKey]) !== 'number') {
+      batch.set(questsRef, { [pet]: { [effectiveKey]: 0 } } as any, { merge: true });
+    }
+
+    // Increment quest progress for effective activity
     batch.set(
       questsRef,
       {
         [pet]: {
-          [activeKey]: increment(questionsSolved),
+          [effectiveKey]: increment(questionsSolved),
         },
         updatedAt: nowServerTimestamp(),
       } as any,
@@ -239,18 +264,31 @@ import {
     );
   
     // If we can determine completion pre-increment, annotate cooldown timestamps (best-effort)
-    const currentProgress = Number(petObj?.[activeKey] ?? 0);
+    const currentProgress = Number(petObj?.[effectiveKey] ?? 0);
     const predicted = currentProgress + questionsSolved;
-  if (predicted >= QUEST_TARGET) {
+    const alreadyCompleted = Boolean(petObj?._completedAt);
+    if (predicted >= QUEST_TARGET && !alreadyCompleted) {
       // Mark completion and set a cooldown window to prevent immediate rollover
       const now = Date.now();
       const cooldownMs = QUEST_COOLDOWN_HOURS * 60 * 60 * 1000;
       const cooldownUntil = Timestamp.fromMillis(now + cooldownMs);
       batch.set(
         questsRef,
-        { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: cooldownUntil }, updatedAt: nowServerTimestamp() } as any,
+        { [pet]: { _completedAt: nowServerTimestamp(), _cooldownUntil: cooldownUntil, _lastCompletedActivity: perAdventureKey }, updatedAt: nowServerTimestamp() } as any,
         { merge: true }
       );
+
+      // Advance a user-scoped pointer so other pets see the next assignment immediately (best-effort, non-transactional)
+      try {
+        const currUserAct = (questsData?._userCurrentActivity || ACTIVITY_SEQUENCE[0]) as string;
+        const uIdx = Math.max(0, ACTIVITY_SEQUENCE.indexOf(currUserAct));
+        const nextKey = ACTIVITY_SEQUENCE[(uIdx + 1) % ACTIVITY_SEQUENCE.length];
+        batch.set(
+          questsRef,
+          { _userCurrentActivity: nextKey, _userLastSwitchAt: nowServerTimestamp(), updatedAt: nowServerTimestamp() } as any,
+          { merge: true }
+        );
+      } catch {}
     }
   
     await batch.commit();
@@ -336,7 +374,7 @@ import {
     const updates: Record<string, any> = { updatedAt: nowServerTimestamp() };
   
     // Filter only owned pets if provided
-    const existingPetKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
+    const existingPetKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
     if (ownedPets && ownedPets.length > 0) {
       for (const key of existingPetKeys) {
         if (!ownedPets.includes(key)) {
@@ -550,6 +588,61 @@ import {
     await batch.commit();
   }
   
+  // Ephemeral sadness on purchase: do NOT include in assignedPets. Also align pet's
+  // activity to the user's shared pointer (_userCurrentActivity). This is intended
+  // to make a newly bought pet appear sad immediately without consuming the daily
+  // sadness cap or rotation fairness.
+  export interface ForcePetSadOnPurchaseInput {
+    userId: string;
+    pet: PetName;
+  }
+
+  export async function forcePetSadOnPurchase(input: ForcePetSadOnPurchaseInput): Promise<void> {
+    const { userId, pet } = input;
+    const today = getTodayDateString();
+    const questsRef = dailyQuestsDocRef(userId);
+    const userRef = userStateDocRef(userId);
+    const snap = await getDoc(questsRef);
+
+    const data = (snap.exists() ? (snap.data() as any) : {}) as any;
+    const userPointer = (data?._userCurrentActivity || ACTIVITY_SEQUENCE[0]) as string;
+    const ptrIndex = Math.max(0, ACTIVITY_SEQUENCE.indexOf(userPointer));
+    const activeKey = ACTIVITY_SEQUENCE[ptrIndex] || ACTIVITY_SEQUENCE[0];
+
+    const batch = writeBatch(db);
+
+    // Ensure pet entry exists and is aligned to shared pointer
+    if (!snap.exists() || !data[pet]) {
+      batch.set(
+        questsRef,
+        { [pet]: { [activeKey]: 0, _activityIndex: ptrIndex, _completedAt: null, _cooldownUntil: null }, updatedAt: nowServerTimestamp() } as any,
+        { merge: true }
+      );
+    } else {
+      batch.set(
+        questsRef,
+        { [pet]: { _activityIndex: ptrIndex, [activeKey]: Number((data?.[pet] || {})[activeKey] || 0) }, updatedAt: nowServerTimestamp() } as any,
+        { merge: true }
+      );
+    }
+
+    // Publish a separate forced-sad list that the client can use without touching
+    // the assignedPets category or rotation.
+    const existingForce = (data?._sadForce || {}) as any;
+    const forcePets = (existingForce && existingForce.date === today && typeof existingForce.pets === 'object') ? { ...existingForce.pets } : {};
+    forcePets[pet] = true;
+    batch.set(
+      questsRef,
+      { _sadForce: { date: today, pets: forcePets }, updatedAt: nowServerTimestamp() } as any,
+      { merge: true }
+    );
+
+    // Touch user doc for updatedAt (no rotation change)
+    batch.set(userRef, { updatedAt: nowServerTimestamp() } as any, { merge: true });
+
+    await batch.commit();
+  }
+  
   export interface GetDailyQuestResultPet {
     pet: string;
     activity: string;
@@ -677,6 +770,7 @@ import {
     handleDailyQuestRollover,
     ensureDailySadnessAssigned,
     ensurePetSadToday,
+    forcePetSadOnPurchase,
     getUserState,
     getDailyQuests,
     startPetSleep,
@@ -684,6 +778,7 @@ import {
     setPetName,
     setWeeklyHeart,
     incrementStreakIfEligible,
+    devShiftDailyQuestsTime,
   };
   
   // ==========================
@@ -820,6 +915,71 @@ import {
       { merge: true }
     );
     await batch.commit();
+  }
+
+  // ==========================
+  // Dev: Shift dailyQuests time fields by hours
+  // ==========================
+
+  export async function devShiftDailyQuestsTime(userId: string, hours: number): Promise<void> {
+    if (!userId || !Number.isFinite(hours)) return;
+    const questsRef = dailyQuestsDocRef(userId);
+    const snap = await getDoc(questsRef);
+    if (!snap.exists()) return;
+
+    const data = (snap.data() as any) || {};
+    const msDelta = Math.trunc(hours * 60 * 60 * 1000);
+
+    // Helper to convert Timestamp-like to ms
+    const toMs = (anyTs: any): number | null => {
+      try {
+        if (!anyTs) return null;
+        if (typeof anyTs.toMillis === 'function') return Number(anyTs.toMillis());
+        const t = new Date(anyTs as any).getTime();
+        return Number.isFinite(t) ? t : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const updates: Record<string, any> = {};
+
+    // Adjust per-pet windows
+    const petKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+    for (const pet of petKeys) {
+      const petObj = (data?.[pet] ?? {}) as any;
+      const sleepStartMs = toMs(petObj?._sleepStartAt);
+      const sleepEndMs = toMs(petObj?._sleepEndAt);
+      const cooldownMs = toMs(petObj?._cooldownUntil);
+
+      const petUpdate: Record<string, any> = {};
+
+      // Move windows earlier to simulate time moving forward
+      if (sleepStartMs && Number.isFinite(sleepStartMs)) {
+        petUpdate._sleepStartAt = Timestamp.fromMillis(sleepStartMs - msDelta);
+      }
+      if (sleepEndMs && Number.isFinite(sleepEndMs)) {
+        petUpdate._sleepEndAt = Timestamp.fromMillis(sleepEndMs - msDelta);
+      }
+      if (cooldownMs && Number.isFinite(cooldownMs)) {
+        petUpdate._cooldownUntil = Timestamp.fromMillis(cooldownMs - msDelta);
+      }
+
+      if (Object.keys(petUpdate).length > 0) {
+        updates[pet] = { ...(updates[pet] || {}), ...petUpdate };
+      }
+    }
+
+    // Adjust a few top-level timestamp-like fields if present
+    const userLastSwitchMs = toMs((data as any)?._userLastSwitchAt);
+    if (userLastSwitchMs && Number.isFinite(userLastSwitchMs)) {
+      updates._userLastSwitchAt = Timestamp.fromMillis(userLastSwitchMs - msDelta);
+    }
+
+    if (Object.keys(updates).length === 0) return;
+
+    updates.updatedAt = nowServerTimestamp();
+    await setDoc(questsRef, updates as any, { merge: true });
   }
   
   // Re-export in API surface

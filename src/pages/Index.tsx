@@ -2873,17 +2873,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Update adventure tracker when messages are sent
   React.useEffect(() => {
     if (chatMessages.length > 0 && currentAdventureId && currentAdventureType && user) {
-      // Get current pet from localStorage
-      let currentPet = 'bobo'; // default fallback
+      // Get current pet consistently with PetProgressStorage
+      let currentPet = 'dog';
       try {
-        const petData = localStorage.getItem('litkraft_pet_data');
-        if (petData) {
-          const parsed = JSON.parse(petData);
-          const ownedPets = parsed.ownedPets || [];
-          if (ownedPets.length > 0) {
-            currentPet = ownedPets[0]; // Use first owned pet
-          }
-        }
+        currentPet = PetProgressStorage.getCurrentSelectedPet() || 'dog';
       } catch (error) {
         console.warn('Could not determine current pet for adventure tracking:', error);
       }
@@ -4789,6 +4782,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     return true;
   }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible, isWhiteboardSuppressedByAssignment, currentGradeDisplayName]);
 
+  // Auto-clear: if SpellBox is not visible anymore, ensure input is re-enabled
+  React.useEffect(() => {
+    try {
+      if (!showSpellBox && disableInputForSpell) {
+        setDisableInputForSpell(false);
+      }
+    } catch {}
+  }, [showSpellBox, disableInputForSpell]);
+
+  // Auto-clear: when whiteboard prompt/lesson becomes active, do not keep SpellBox gating the input
+  React.useEffect(() => {
+    try {
+      if ((isWhiteboardPromptActive || isWhiteboardLessonActive) && disableInputForSpell) {
+        setDisableInputForSpell(false);
+      }
+    } catch {}
+  }, [isWhiteboardPromptActive, isWhiteboardLessonActive, disableInputForSpell]);
+
   React.useEffect(() => {
     if (!whiteboardGradeEligible) return;
     if (!selectedTopicId || selectedTopicId !== WHITEBOARD_LESSON_TOPIC) return;
@@ -5035,6 +5046,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [whiteboardGradeEligible, grade1DisplayedTopicId, currentSpellQuestion?.topicId]);
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
+  const adventureInputDisabledReason = isAdventureInputDisabled
+    ? (disableInputForSpell
+        ? 'SpellBox awaiting Next'
+        : (isWhiteboardPromptActive
+            ? 'Whiteboard prompt'
+            : (isWhiteboardLessonActive ? 'Whiteboard lesson' : 'Disabled')))
+    : undefined;
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
@@ -6323,6 +6341,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               onGenerate={onGenerate}
                               onAddMessage={onAddMessage}
                               disabled={isAdventureInputDisabled}
+                              disabledReason={adventureInputDisabledReason}
                               onDisabledClick={() => setHighlightSpellNext(true)}
                             />
                           </div>
@@ -6712,6 +6731,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             onGenerate={onGenerate}
             onAddMessage={onAddMessage}
             disabled={isAdventureInputDisabled}
+            disabledReason={adventureInputDisabledReason}
             onDisabledClick={() => setHighlightSpellNext(true)}
           />
         )}
