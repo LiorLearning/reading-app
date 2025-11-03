@@ -127,7 +127,7 @@ export class ResponseProcessor {
     // If no explicit image prompts found, still generate a fallback image (start immediately on message)
     if (!imagePrompts.length) {
       // Use original user message for fallback generation if available
-      const rawFallbackPrompt = originalUserMessage || this.generateFallbackImagePrompt(response, '');
+      const rawFallbackPrompt = this.generateFallbackImagePrompt(response, '') || originalUserMessage;
       
       // 🧹 Sanitize fallback prompt
       // console.log('🧹 ResponseProcessor: Sanitizing fallback prompt...');
@@ -153,7 +153,6 @@ export class ResponseProcessor {
       // Apply enhanced safety prompt to fallback as well
       const enhancedFallbackPrompt = `No text in image. Remove parts that make it moderated. Reduce intensity of violence or eliminate sexual parts if any. Then proceed to create image. Create a very realistic, high-quality image: ${sanitizedFallbackPrompt}. Style: Realistic with vivid details. It should NOT be cartoonish or kiddish. Keep all content completely family friendly with no nudity, no sexual content, and no sensual or romantic posing. Absolutely avoid sexualized bodies, ensure no sensual poses or clothing (no cleavage, lingerie, swimwear, exposed midriff, or tight/transparent outfits); characters are depicted in fully modest attire suitable for kids. No kissing, flirting, or adult themes. Strictly avoid text on the images.`;
       
-      // console.log(`🎨 [ResponseProcessor.processResponseWithImages()] Using ${originalUserMessage ? 'ORIGINAL USER MESSAGE' : 'generated fallback'} with ENHANCED PROMPT for fallback image`);
       
       // Yield text first
       yield { 
@@ -267,7 +266,7 @@ export class ResponseProcessor {
       
       try {
         // Use original user message for image generation instead of AI-generated description
-        const rawPrompt = originalUserMessage || prompt;
+        const rawPrompt = prompt || originalUserMessage;
         
         // 🧹 NEW: Sanitize both the raw prompt and conversation context
         // console.log('🧹 ResponseProcessor: Sanitizing prompt and context for image generation...');
@@ -342,16 +341,7 @@ Make sure all the above rules are applied **strictly** before generating the ima
 The final output must look like a **natural, realistic photograph** while keeping ${sanitizedRawPrompt} intact in a safe, modest, child-friendly form.  
 
 ${sanitizedConversationContext}`;
-        
-        const startTime = Date.now();
-        // console.log(`🎯 [ResponseProcessor.processResponseWithImages()] Generating image ${index + 1}/${imagePrompts.length} using ENHANCED PROMPT as PRIMARY attempt`);
-        // console.log(`📝 [ResponseProcessor.processResponseWithImages()] Original user input: ${rawPrompt}`);
-        // console.log(`🧹 [ResponseProcessor.processResponseWithImages()] Sanitized user input: ${sanitizedRawPrompt}`);
-        // console.log(`🗣️ [ResponseProcessor.processResponseWithImages()] Original context: ${originalConversationContext.substring(0, 200)}${originalConversationContext.length > 200 ? '...' : ''}`);
-        // console.log(`🧹 [ResponseProcessor.processResponseWithImages()] Sanitized context: ${sanitizedConversationContext.substring(0, 200)}${sanitizedConversationContext.length > 200 ? '...' : ''}`);
-        // console.log(`🛡️ [ResponseProcessor.processResponseWithImages()] Enhanced prompt: ${enhancedPrompt}`);
-        // console.log(`🎯 dall-e prompt primary final: ${enhancedPrompt}`);
-        
+        const startTime = Date.now(); 
         const result = await imageGenerator.generateWithFallback(sanitizedRawPrompt, userId, {
           sanitizedConversationContext,
           size: '1024x1024',

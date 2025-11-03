@@ -112,7 +112,7 @@ Rules you must always follow:
 - ${petInstruction}
 
 7. People
-- Remove all people or humans. Animals or pets are allowed.
+- Remove all people, humans, boys, girls, men and women strictly. Animals or pets are allowed.
 
 Rules:  
 1. Clothing must always be **fully modest and family-friendly**:  

@@ -3152,11 +3152,6 @@ Return ONLY the new reading passage, nothing else.`;
           ? primaryPrompt.substring(0, 3990) + "..." 
           : primaryPrompt;
         
-        // console.log(`🎨 [AIService.generateAdventureImage()] Generating with primary prompt using DALL-E 3`);
-        // console.log(`📝 [AIService.generateAdventureImage()] Final prompt length: ${finalPrompt.length} characters`);
-        // console.log(`📝 [AIService.generateAdventureImage()] Final prompt: ${finalPrompt}`);
-        // console.log(`🎯 dall-e prompt primary final: ${finalPrompt}`);
-
         const response = await this.client.images.generate({
           model: "dall-e-3",
           prompt: finalPrompt,
@@ -3422,17 +3417,6 @@ ${conversationContext}`;
 
   // Helper: Generate fallback adventure prompts (only used if primary fails)
   private generateFallbackAdventurePrompts(prompt: string, userAdventure: ChatMessage[], fallbackPrompt: string, aiSanitizedResult?: { sanitizedPrompt: string; sanitizedContext?: string }): string[] {
-    // console.log('=== FALLBACK ADVENTURE PROMPTS GENERATION ===');
-    // console.log('Function: AIService.generateFallbackAdventurePrompts');
-    // console.log('Current input prompt:', prompt);
-    // console.log('🧹 AI Sanitized Result:', aiSanitizedResult ? 'PRESENT' : 'MISSING');
-    if (aiSanitizedResult) {
-      // console.log('🧹 Sanitized prompt preview:', aiSanitizedResult.sanitizedPrompt?.substring(0, 80) + '...');
-      // console.log('🧹 Sanitized context preview:', aiSanitizedResult.sanitizedContext?.substring(0, 80) + '...');
-      // console.log('🧹 Has valid sanitized prompt:', !!aiSanitizedResult.sanitizedPrompt);
-      // console.log('🧹 Has valid sanitized context:', !!aiSanitizedResult.sanitizedContext);
-    }
-
     // Get conversation history for weighted prompt generation
     const conversationHistory = this.getLastConversationMessages(userAdventure);
     const weightedContent = this.generateWeightedPrompt(prompt, conversationHistory);

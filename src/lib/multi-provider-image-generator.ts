@@ -51,12 +51,6 @@ export class MultiProviderImageGenerator {
     let lastError: Error | null = null;
     const startTime = Date.now();
 
-    // console.log(`🚀 [MultiProviderImageGenerator.generateWithFallback()] Starting image generation`);
-    // console.log(`📝 [MultiProviderImageGenerator.generateWithFallback()] Full prompt: "${prompt}"`);
-    // console.log(`👤 [MultiProviderImageGenerator.generateWithFallback()] User ID: ${userId}`);
-    // console.log(`⚙️ [MultiProviderImageGenerator.generateWithFallback()] Options:`, options);
-    // console.log(`🔄 [MultiProviderImageGenerator.generateWithFallback()] Available providers: ${this.providers.map(p => p.name).join(', ')}`);
-
     // Try each provider in order
     for (let attempt = 0; attempt < this.providers.length; attempt++) {
       const provider = this.providers[attempt];
