@@ -334,6 +334,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const totalBlanks = parts.filter(part => part.type === 'blank').length;
   const correctlySpelledWords = isCorrect ? totalBlanks : 0;
   
+  // Generate question_blank format like "_ _ T" from parts array
+  const generateQuestionBlank = useCallback((parts: WordPart[]): string => {
+    return parts.map(part => {
+      if (part.type === 'blank') {
+        // Replace each blank character with an underscore
+        return '_'.repeat(part.answer?.length || 0);
+      } else {
+        // Show the text content as-is
+        return part.content || '';
+      }
+    }).join(' '); // Join with spaces for readability
+  }, []);
+  
   // console.log('🧩 SpellBox Parts Debug:', {
   //   targetWord,
   //   parts,
@@ -741,12 +754,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         // targetWord is more reliable as it contains the full word (e.g., "BAG"), not just a single letter
         const fullCorrectAnswer = (targetWord || question.correctAnswer || '').toUpperCase();
         
+        // Generate question_blank format from current parts
+        const currentQuestionBlank = generateQuestionBlank(parts);
+        
         firebaseSpellboxLogsService.logSpellboxAttempt(
           effectiveUserId,
           effectiveTopicId,
           effectiveGrade,
           question.id,
           fullCorrectAnswer, // Always use full word string (e.g., "BAG", not "B")
+          currentQuestionBlank, // Format like "_ _ T" where _ represents blanks
           completeWord,
           correct
         ).catch((error) => {
@@ -814,7 +831,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         } catch {}
       }
     }
-  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer, effectiveUserId, effectiveTopicId, effectiveGrade]);
+  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer, effectiveUserId, effectiveTopicId, effectiveGrade, parts, generateQuestionBlank]);
 
   // Focus next empty box (scoped to this component)
   const focusNextEmptyBox = useCallback(() => {

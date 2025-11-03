@@ -9,10 +9,15 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+export interface SpellboxAttempt {
+  value: string;
+}
+
 export interface SpellboxQuestionAttempt {
   created_at: Timestamp | number;
   correctAnswer: string;
-  attempts: string[];
+  question_blank: string; // Format like "_ _ T" where _ represents blanks
+  attempts: SpellboxAttempt[];
 }
 
 export interface SpellboxLogDocument {
@@ -37,6 +42,7 @@ class FirebaseSpellboxLogsService {
     grade: string,
     questionId: number,
     correctAnswer: string,
+    questionBlank: string,
     userAttempt: string,
     isCorrect: boolean
   ): Promise<void> {
@@ -89,14 +95,17 @@ class FirebaseSpellboxLogsService {
           const lastAttempt = attempts.length > 0 ? attempts[attempts.length - 1] : null;
           
           // Only skip if this attempt is the same as the last one
-          if (lastAttempt !== userAttempt) {
-            attempts.push(userAttempt);
+          // Handle both old format (string) and new format (object with value property)
+          const lastAttemptValue = lastAttempt && typeof lastAttempt === 'object' ? lastAttempt.value : lastAttempt;
+          if (lastAttemptValue !== userAttempt) {
+            attempts.push({ value: userAttempt });
           } 
           
           // Update the question in the array
           questions[questionIndex] = {
             ...existingQuestion,
             attempts: attempts,
+            question_blank: existingQuestion.question_blank || questionBlank, // Preserve existing or use new
             // Preserve existing created_at timestamp, don't overwrite it
             // Use number (milliseconds) since serverTimestamp() can't be used in arrays
             created_at: existingQuestion.created_at || nowMillis
@@ -106,7 +115,8 @@ class FirebaseSpellboxLogsService {
           const newQuestion: SpellboxQuestionAttempt = {
             created_at: nowMillis, // Use milliseconds since serverTimestamp() can't be used in arrays
             correctAnswer: correctAnswer, // Full word string
-            attempts: [userAttempt]
+            question_blank: questionBlank, // Format like "_ _ T"
+            attempts: [{ value: userAttempt }]
           };
           
           questions.push(newQuestion);
@@ -128,7 +138,8 @@ class FirebaseSpellboxLogsService {
           questions: [{
             created_at: nowMillis, // Use milliseconds since serverTimestamp() can't be used in arrays
             correctAnswer: correctAnswer, // Full word string
-            attempts: [userAttempt]
+            question_blank: questionBlank, // Format like "_ _ T"
+            attempts: [{ value: userAttempt }]
           }]
         };
         await setDoc(docRef, docData);
@@ -142,6 +153,7 @@ class FirebaseSpellboxLogsService {
         grade,
         questionId,
         correctAnswer,
+        questionBlank,
         userAttempt,
         stack: error.stack
       });
