@@ -17,9 +17,11 @@ interface InputBarProps {
   disabled?: boolean;
   /** Called when user taps/clicks while disabled (to nudge elsewhere) */
   onDisabledClick?: () => void;
+  /** Optional small debug label explaining why input is disabled */
+  disabledReason?: string;
 }
 
-const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled = false, onDisabledClick }) => {
+const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled = false, onDisabledClick, disabledReason }) => {
   const [text, setText] = useState("");
   const [isMicActive, setIsMicActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -449,6 +451,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           <Send className="h-4 w-4" />
         </Button>
       </form>
+      {disabled && disabledReason && (import.meta as any)?.env?.DEV && (
+        <div
+          className="absolute -top-5 right-0 z-30 text-[10px] px-2 py-0.5 rounded-full bg-yellow-200 text-yellow-900 border border-yellow-400 shadow-sm select-none"
+          aria-label={`Input disabled: ${disabledReason}`}
+        >
+          {disabledReason}
+        </div>
+      )}
       {disabled && (
         <div
           className="absolute inset-0 z-20 rounded-xl cursor-not-allowed"
@@ -458,6 +468,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           }}
           role="button"
           aria-label="Please tap Next to continue"
+          title={((import.meta as any)?.env?.DEV && disabledReason) || 'Input disabled'}
         />
       )}
     </section>
