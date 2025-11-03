@@ -2145,7 +2145,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           method: 'POST',
           body: JSON.stringify({
             content: text,
-            "type": "user_input_mod",
+            type: "user_input_mod",
+            username: userName
           }),
           headers: {
             'Content-Type': 'application/json'

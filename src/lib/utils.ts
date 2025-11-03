@@ -1906,7 +1906,7 @@ export async function moderation(userName: string, text: string | null | undefin
     body: JSON.stringify({
       content: text,
       username: userName,
-      "type": "user_input",
+      type: "user_input",
     }),
     headers: {
       'Content-Type': 'application/json'
