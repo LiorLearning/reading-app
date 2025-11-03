@@ -6006,11 +6006,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petName = PetProgressStorage.getPetDisplayName(currentPetId);
           const petType = PetProgressStorage.getPetType(currentPetId);
+          // Capture a brief snippet from the most recent chat to ensure continuity post-whiteboard
+          const recentSnippet = (() => {
+            try {
+              const last = [...chatMessages].reverse().find(m => m && (m.type === 'ai' || m.type === 'user')) as any;
+              const text = (last?.content || '').trim();
+              if (!text) return '';
+              return text.length > 400 ? (text.slice(0, 400) + '…') : text;
+            } catch {
+              return '';
+            }
+          })();
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
             chatMessages,
             currentAdventureContext,
-            undefined,
+            recentSnippet || undefined,
             currentAdventureContext?.summary,
             userData,
             petName,

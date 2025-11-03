@@ -2429,6 +2429,13 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
           userMessageContent = "Hi! I'm ready to continue our adventure!";
         }
       }
+
+      // If a continuity snippet was provided (e.g., post-whiteboard), prefer to explicitly tie back to it
+      if (storyEventsContext && typeof storyEventsContext === 'string' && storyEventsContext.trim().length > 0) {
+        const snippet = storyEventsContext.trim();
+        const clipped = snippet.length > 400 ? (snippet.slice(0, 400) + '…') : snippet;
+        userMessageContent = `Let's pick up exactly where we left off: "${clipped}"`;
+      }
       
       const userMessage = {
         role: "user" as const,
