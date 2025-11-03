@@ -1319,36 +1319,38 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
       
-      // Check if sleep is available (50 adventure coins since last sleep) only when pet is assigned today
-      let shouldApplyCoinsGate = true;
-      try {
-        const rawSad = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_sadness') : null;
-        if (rawSad) {
-          const sad = JSON.parse(rawSad) as { date?: string; assignedPets?: string[] };
-          const today = new Date().toISOString().slice(0, 10);
-          const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
-          const isAssigned = (sad?.date === today) && assigned.includes(currentPet);
-          shouldApplyCoinsGate = isAssigned;
-        }
-      } catch {}
-      // Also apply gate if pet is in forced-sad list for today
-      try {
-        const forceRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_forced_sad_pets') : null;
-        if (forceRaw) {
-          const f = JSON.parse(forceRaw) as { date?: string; pets?: string[] | Record<string, boolean> };
-          const today = new Date().toISOString().slice(0, 10);
-          const petsList = Array.isArray(f?.pets) ? f.pets : Object.keys((f?.pets as any) || {});
-          const isForced = (f?.date === today) && petsList.includes(currentPet);
-          if (isForced) shouldApplyCoinsGate = true;
-        }
-      } catch {}
-      if (shouldApplyCoinsGate && !isSleepAvailable()) {
-        const cumulativeCare = getCumulativeCareLevel();
-        const coinsSinceLastSleep = cumulativeCare.adventureCoins - cumulativeCare.adventureCoinsAtLastSleep;
-        const coinsNeeded = 50 - coinsSinceLastSleep;
-        alert(`Sleep is not available yet! You need ${coinsNeeded} more adventure coins. Go on adventures to earn more coins! 🚀`);
-        return;
-      }
+// // Check if sleep is available (50 adventure coins since last sleep) only when pet is assigned today
+// let shouldApplyCoinsGate = true;
+// try {
+//   const rawSad = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_sadness') : null;
+//   if (rawSad) {
+//     const sad = JSON.parse(rawSad) as { date?: string; assignedPets?: string[] };
+//     const today = new Date().toISOString().slice(0, 10);
+//     const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
+//     const isAssigned = (sad?.date === today) && assigned.includes(currentPet);
+//     shouldApplyCoinsGate = isAssigned;
+//   }
+// } catch {}
+// // Also apply gate if pet is in forced-sad list for today
+// try {
+//   const forceRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_forced_sad_pets') : null;
+//   if (forceRaw) {
+//     const f = JSON.parse(forceRaw) as { date?: string; pets?: string[] | Record<string, boolean> };
+//     const today = new Date().toISOString().slice(0, 10);
+//     const petsList = Array.isArray(f?.pets) ? f.pets : Object.keys((f?.pets as any) || {});
+//     const isForced = (f?.date === today) && petsList.includes(currentPet);
+//     if (isForced) shouldApplyCoinsGate = true;
+//   }
+// } catch {}
+// if (shouldApplyCoinsGate && !isSleepAvailable()) {
+//   const cumulativeCare = getCumulativeCareLevel();
+//   const coinsSinceLastSleep = cumulativeCare.adventureCoins - cumulativeCare.adventureCoinsAtLastSleep;
+//   const coinsNeeded = 50 - coinsSinceLastSleep;
+//   alert(`Sleep is not available yet! You need ${coinsNeeded} more adventure coins. Go on adventures to earn more coins! 🚀`);
+//   return;
+// }
+      // Note: We intentionally do NOT check the coin gate here. Sleep unlock follows the same
+      // progress rule as the button state to avoid desync with local coin hydration.
       
       // Increment sleep clicks (max 3) - no den required
       if (sleepClicks < 3) {
@@ -4934,7 +4936,7 @@ const getSleepyPetImage = (clicks: number) => {
                   }
                 }
               } catch {}
-              // 3) Daily sadness cap gate: show sadness only if assigned OR forced-sad; else neutral baseline
+              // 3) Daily sadness cap gate: assigned/forced → sad baseline; else neutral
               try {
                 const raw = localStorage.getItem('litkraft_daily_sadness');
                 const today = new Date().toISOString().slice(0, 10);
@@ -4953,9 +4955,10 @@ const getSleepyPetImage = (clicks: number) => {
                     isForcedToday = (f?.date === today) && pets.includes(petId);
                   }
                 } catch {}
-                if (!isAssignedToday && !isForcedToday) return 'coins_10';
+                if (isAssignedToday || isForcedToday) return 'coins_0';
+                return 'coins_10';
               } catch {}
-              // 4) Heart empty or willBeSadOnWakeup → sad
+              // 4) Legacy fallback (kept for safety but normally not reached due to returns above)
               try {
                 const petProgress = PetProgressStorage.getPetProgress(petId);
                 const { heartData, sleepData } = petProgress;
@@ -4967,10 +4970,25 @@ const getSleepyPetImage = (clicks: number) => {
             const petImageUrl = petHasImages ? getLevelBasedPetImage(petType, levelForPet, careStateForTile as any) : '';
             const isSleepingTile = (careStateForTile === 'sleep1' || careStateForTile === 'sleep2' || careStateForTile === 'sleep3');
             const isCoins50Tile = careStateForTile === 'coins_50';
+            const isCoins30Tile = careStateForTile === 'coins_30';
             const isCoins10Tile = careStateForTile === 'coins_10';
-            const mood = isSleepingTile ? 'sleep' : (isCoins50Tile ? 'happy' : (careStateForTile === 'coins_0' ? 'sad' : 'neutral'));
-            const badge = isSleepingTile ? '❤️' : (careStateForTile === 'coins_50' ? '😊' : (careStateForTile === 'coins_0' ? '😢' : '😐'));
-            const bg = isSleepingTile ? 'bg-green-500' : (isCoins50Tile ? 'bg-green-400' : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-500'));
+            const mood = isSleepingTile
+              ? 'sleep'
+              : ((isCoins50Tile || isCoins30Tile) ? 'happy' : (careStateForTile === 'coins_0' ? 'sad' : 'neutral'));
+            const badge = isSleepingTile
+              ? '❤️'
+              : (isCoins50Tile
+                ? '😊'
+                : (isCoins30Tile
+                  ? '🙂'
+                  : (careStateForTile === 'coins_0' ? '😢' : '😐')));
+            const bg = isSleepingTile
+              ? 'bg-green-500'
+              : (isCoins50Tile
+                ? 'bg-green-400'
+                : (isCoins30Tile
+                  ? 'bg-green-500'
+                  : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-500')));
             const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
 
             return (
