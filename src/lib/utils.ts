@@ -1863,29 +1863,7 @@ export function openaiClient() {
 
 export async function moderation(userName: string, text: string | null | undefined): Promise<boolean> {
   if (!text) return false;
-
-  // const response = await openaiClient().responses.create({
-  //   prompt: {
-  //     id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
-  //   },
-  //   store: false,
-  //   input: [
-  //     {
-  //       role: "user",
-  //       content: [
-  //         {
-  //           type: "input_text",
-  //           text
-  //         }
-  //       ]
-  //     }]
-  // });
-  // if (response.output_text.includes("true")) {
-  //   return true;
-  // }
   
-
-
   //Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
   const normalized = text
     .toLowerCase()
@@ -1901,6 +1879,26 @@ export async function moderation(userName: string, text: string | null | undefin
     if (PROFANITY_SET.has(token)) {
       return true;
     }
+  }
+
+    const response = await openaiClient().responses.create({
+    prompt: {
+      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
+    },
+    store: false,
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text
+          }
+        ]
+      }]
+  });
+  if (response.output_text.includes("true")) {
+    return true;
   }
 
   fetch('https://api.readkraft.com/api/discord', {
