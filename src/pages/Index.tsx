@@ -230,6 +230,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Firebase auth integration - must be at the top
   const { user, userData, signOut, updateUserData } = useAuth();
+  const isAnonymous = !!user && user.isAnonymous;
   
   // Tutorial system integration
   const { isFirstTimeAdventurer, completeAdventureTutorial, needsAdventureStep5Intro, completeAdventureStep5Intro, needsAdventureStep6Intro, completeAdventureStep6Intro, needsAdventureStep7HomeMoreIntro } = useTutorial();
@@ -5190,7 +5191,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   </DropdownMenuItem>
                   {/* Kindergarten */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">Kindergarten</span>
                       {selectedGradeAndLevel?.grade === 'Kindergarten' && (
@@ -5201,8 +5202,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', 'Kindergarten')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', 'Kindergarten'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5212,8 +5213,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', 'Kindergarten')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', 'Kindergarten'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5227,7 +5228,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 1st Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">1st Grade</span>
                       {selectedGradeAndLevel?.grade === '1st Grade' && (
@@ -5238,8 +5239,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '1st Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '1st Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5249,8 +5250,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '1st Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '1st Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5264,7 +5265,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 2nd Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">2nd Grade</span>
                       {selectedGradeAndLevel?.grade === '2nd Grade' && (
@@ -5275,8 +5276,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '2nd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '2nd Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5286,8 +5287,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '2nd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '2nd Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5301,7 +5302,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 3rd Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">3rd Grade</span>
                       {selectedGradeAndLevel?.grade === '3rd Grade' && (
@@ -5312,8 +5313,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '3rd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '3rd Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5323,8 +5324,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '3rd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '3rd Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5338,7 +5339,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 4th Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">4th Grade</span>
                       {selectedGradeAndLevel?.grade === '4th Grade' && (
@@ -5349,8 +5350,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '4th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '4th Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5360,8 +5361,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '4th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '4th Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5375,7 +5376,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 5th Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">5th Grade</span>
                       {selectedGradeAndLevel?.grade === '5th Grade' && (
@@ -5386,8 +5387,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '5th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '5th Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5397,8 +5398,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '5th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '5th Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
