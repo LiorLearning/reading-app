@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut, UserPlus, LogIn } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation, hasSeenWhiteboard, markWhiteboardSeen, loadSpellboxTopicProgressAsync } from "@/lib/utils";
 import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 
@@ -5426,24 +5426,37 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         </div>
                       </DropdownMenuItem>
 
-                  {/* Sign Out Option */}
-                  <DropdownMenuItem 
-                    className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg border-t"
-                    onClick={async () => {
-                      playClickSound();
-                      try {
-                        await signOut();
-                      } catch (error) {
-                        console.error('Error signing out:', error);
-                      }
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 text-red-600" />
-                    <div>
-                      <div className="font-semibold text-red-600">Sign Out</div>
-                      <div className="text-sm text-gray-500">Return to login</div>
-                    </div>
-                  </DropdownMenuItem>
+                  {/* Auth CTA / Sign Out */}
+                  {isAnonymous ? (
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg border-t"
+                      onClick={() => { playClickSound(); navigate('/auth?redirect=/app'); }}
+                    >
+                      <UserPlus className="h-4 w-4 text-green-600" />
+                      <div>
+                        <div className="font-semibold text-green-600">Sign up / Sign in</div>
+                        <div className="text-sm text-gray-500">Create your account</div>
+                      </div>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg border-t"
+                      onClick={async () => {
+                        playClickSound();
+                        try {
+                          await signOut();
+                        } catch (error) {
+                          console.error('Error signing out:', error);
+                        }
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 text-red-600" />
+                      <div>
+                        <div className="font-semibold text-red-600">Sign Out</div>
+                        <div className="text-sm text-gray-500">Return to login</div>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

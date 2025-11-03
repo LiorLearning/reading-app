@@ -18,7 +18,7 @@ import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
@@ -3839,15 +3839,25 @@ const getSleepyPetImage = (clicks: number) => {
                 </div>
               </DropdownMenuItem>
               
-              {/* Logout Button */}
+              {/* Auth CTA / Logout */}
               <div className="border-t border-gray-200 mt-2 pt-2">
-                <DropdownMenuItem 
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg text-red-600"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="font-semibold">Log Out</span>
-                </DropdownMenuItem>
+                {isAnonymous ? (
+                  <DropdownMenuItem 
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg text-green-700"
+                    onClick={() => { playClickSound(); navigate('/auth?redirect=/app'); }}
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    <span className="font-semibold">Sign up / Sign in</span>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem 
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg text-red-600"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="font-semibold">Log Out</span>
+                  </DropdownMenuItem>
+                )}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
