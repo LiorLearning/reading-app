@@ -1058,13 +1058,19 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [currentAdventureType]);
 
   // Track persistent adventure progress (for UI bar) and session coins (for Step 6 trigger)
-  const { progressFraction: persistentProgressFraction, activity: persistentActivity } = useAdventurePersistentProgress();
+  const { progressFraction: persistentProgressFraction, activity: persistentActivity, coinsSoFar: persistentCoinsSoFar, targetCoins: persistentTargetCoins } = useAdventurePersistentProgress();
 
-  // Show Step 6 overlay when session has 8 correct answers (80 coins) within same quest
+  // Show Step 6 overlay when session has 5 correct answers (50 coins) within same quest
   React.useEffect(() => {
     try {
-      // Trigger after 8 correct answers in the same adventure (10 coins each)
-      const popupThresholdMet = sessionCoins >= 80;
+      // Trigger when 50 coins are collected in the current adventure
+      // (either this session or persisted progress across sign-up)
+      // Note: Firestore-backed persistent progress is in QUESTIONS (target 5),
+      // so convert to coins when the target is small.
+      const persistentCoinsEquivalent = (typeof persistentTargetCoins === 'number' && persistentTargetCoins <= 10)
+        ? (persistentCoinsSoFar * 10)
+        : persistentCoinsSoFar;
+      const popupThresholdMet = (sessionCoins >= 50) || (persistentCoinsEquivalent >= 50);
 
       // High-priority UI gates: suppress trainer popup if any are active
       const assignmentJustEnded = (() => {
@@ -1086,7 +1092,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         } catch {}
       }
     } catch {}
-  }, [currentScreen, sessionCoins, needsAdventureStep6Intro, showStep5Intro]);
+  }, [currentScreen, sessionCoins, needsAdventureStep6Intro, showStep5Intro, persistentCoinsSoFar, persistentTargetCoins]);
 
   // Enforce suppression while Step 6 overlay is visible
   React.useEffect(() => {
@@ -1097,6 +1103,23 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       } catch {}
     }
   }, [showStep6Intro]);
+
+  // Arm Step 7 as soon as 5 correct answers (50 coins) are reached in House, independent of Step 6
+  React.useEffect(() => {
+    try {
+      if (
+        currentScreen === 1 &&
+        needsAdventureStep7HomeMoreIntro &&
+        persistentActivity === 'house' &&
+        sessionCoins >= 50
+      ) {
+        const pending = localStorage.getItem('pending_step7_home_more') === 'true';
+        if (!pending) {
+          localStorage.setItem('pending_step7_home_more', 'true');
+        }
+      }
+    } catch {}
+  }, [currentScreen, sessionCoins, persistentActivity, needsAdventureStep7HomeMoreIntro]);
 
   // When Step 6 is dismissed (Next), mark a pending Step 7 trigger so it only shows after returning home
   React.useEffect(() => {
@@ -6846,40 +6869,54 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       return `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
                     })()}
                   </p>
-                  <Button
-                    className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
-                    onClick={() => {
-                      try { ttsService.stop(); } catch {}
-                      // Allow pet speech again after overlay
-                      try { ttsService.setSuppressNonKrafty(false); } catch {}
-                      setShowStep6Intro(false);
-                      completeAdventureStep6Intro();
-                      // Set pending Step 7 trigger only when today's quest was House
-                      // and only if Step 7 is actually needed
-                      try {
-                        const pendingActivity = persistentActivity;
-                        if (pendingActivity === 'house') {
-                          // Avoid re-arming Step 7 if already completed
-                          const stateStr = localStorage.getItem('reading-app-tutorial-state');
-                          let alreadyCompleted = false;
-                          if (stateStr) {
-                            try {
-                              const s = JSON.parse(stateStr);
-                              alreadyCompleted = !!s.adventureStep7HomeMoreIntroCompleted;
-                            } catch {}
+                  {isAnonymous ? (
+                    <Button
+                      className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={() => {
+                        try { ttsService.stop(); } catch {}
+                        // Unsuppress before navigation in case user returns
+                        try { ttsService.setSuppressNonKrafty(false); } catch {}
+                        navigate('/auth?redirect=/app');
+                      }}
+                    >
+                      Sign up
+                    </Button>
+                  ) : (
+                    <Button
+                      className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={() => {
+                        try { ttsService.stop(); } catch {}
+                        // Allow pet speech again after overlay
+                        try { ttsService.setSuppressNonKrafty(false); } catch {}
+                        setShowStep6Intro(false);
+                        completeAdventureStep6Intro();
+                        // Set pending Step 7 trigger only when today's quest was House
+                        // and only if Step 7 is actually needed
+                        try {
+                          const pendingActivity = persistentActivity;
+                          if (pendingActivity === 'house') {
+                            // Avoid re-arming Step 7 if already completed
+                            const stateStr = localStorage.getItem('reading-app-tutorial-state');
+                            let alreadyCompleted = false;
+                            if (stateStr) {
+                              try {
+                                const s = JSON.parse(stateStr);
+                                alreadyCompleted = !!s.adventureStep7HomeMoreIntroCompleted;
+                              } catch {}
+                            }
+                            if (!alreadyCompleted) {
+                              localStorage.setItem('pending_step7_home_more', 'true');
+                            }
                           }
-                          if (!alreadyCompleted) {
-                            localStorage.setItem('pending_step7_home_more', 'true');
-                          }
-                        }
-                      } catch {}
-                      // Continue normal adventure flow
-                      // If any pet line was suppressed while the overlay was visible, replay it now
-                      try { ttsService.replayLastSuppressed(); } catch {}
-                    }}
-                  >
-                    Next
-                  </Button>
+                        } catch {}
+                        // Continue normal adventure flow
+                        // If any pet line was suppressed while the overlay was visible, replay it now
+                        try { ttsService.replayLastSuppressed(); } catch {}
+                      }}
+                    >
+                      Next
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

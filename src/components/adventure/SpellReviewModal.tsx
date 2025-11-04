@@ -55,8 +55,8 @@ const SpellReviewModal: React.FC<SpellReviewModalProps> = ({ open, items, onComp
       if (!ttsEnabled) return;
       try {
         if (wrongIndex === 0 && !didSpeakWrongsIntroRef.current) {
-          didSpeakWrongsIntroRef.current = true;
           await ttsService.speak("Here's a quick review", { voice: jessicaVoiceId });
+          didSpeakWrongsIntroRef.current = true;
         }
         await ttsService.speak(current.word, { voice: jessicaVoiceId });
       } catch {}
@@ -94,7 +94,8 @@ const SpellReviewModal: React.FC<SpellReviewModalProps> = ({ open, items, onComp
     // Speak intro line via ElevenLabs
     try { if (ttsEnabled) ttsService.stop(); } catch {}
     if (ttsEnabled) {
-      ttsService.speak('and here are the ones you already knew!', { voice: jessicaVoiceId }).catch(() => {});
+      const rightsIntro = didSpeakWrongsIntroRef.current ? 'and here are the ones you already knew!' : 'here are the ones you already knew!';
+      ttsService.speak(rightsIntro, { voice: jessicaVoiceId }).catch(() => {});
     }
     return () => {
       if (timer) clearTimeout(timer);

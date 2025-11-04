@@ -5,6 +5,17 @@
 export type WorksheetLinksMap = Record<string, string>;
 
 export const worksheetLinks: WorksheetLinksMap = {
+   // ReadKraft_K — Kindergarten
+"K-O.3": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-O.3.pdf?alt=media&token=4250418e-9416-4a82-bc71-df01e99987a2", // [add topic here]
+"K-P.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-P.2.pdf?alt=media&token=ce3fc219-6c16-4322-9ba0-dcc8606c744c", // [add topic here]
+"K-Q.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-Q.2.pdf?alt=media&token=0b5df2dd-9790-4c87-931e-f7a3c6429ad7", // [add topic here]
+"K-R.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-R.2.pdf?alt=media&token=fdac66fb-7ed3-4d74-bc33-26caaf5587dc", // [add topic here]
+"K-S.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-S.2.pdf?alt=media&token=1368d9e4-fe35-4c76-9d7d-d8f5eb839aba", // [add topic here]
+"K-T.1.1": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-T.1.1.pdf?alt=media&token=56dda62e-2fb4-4e0b-9eaf-a2d4228dc280", // [add topic here]
+"K-T.1.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-T.1.2.pdf?alt=media&token=7081ec01-d806-4c4d-b77f-22bf81b9ddd9", // [add topic here]
+"K-T.1.3": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-T.1.3.pdf?alt=media&token=ff8b2d05-9681-4d26-a22d-d1b44c1ba613", // [add topic here]
+"K-T.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_K-T.2.pdf?alt=media&token=614dcf4a-e07b-4119-9b4b-245c96a35ab3", // [add topic here]
+
   // ReadKraft_1 — Grade 1
   "1-H.1": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_1-H.1.pdf?alt=media&token=5eda583b-03a8-4a40-ae87-823f4efff873", // Initial Consonant Blends
   "1-H.4": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_1-H.4.pdf?alt=media&token=d58614d2-0f4a-4955-8c93-980b4784d1d2", // Final Consonant Blends
