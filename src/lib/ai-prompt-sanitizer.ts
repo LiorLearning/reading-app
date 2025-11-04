@@ -111,14 +111,11 @@ Rules you must always follow:
 
 - ${petInstruction}
 
-7. People
-- Remove all people or humans. Animals or pets are allowed.
+7. People: Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 
-Rules:  
-1. Clothing must always be **fully modest and family-friendly**:  
-   - Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.  
-   - Female characters should always be depicted in **full-body clothes**.  
-   - Male characters should always wear **full-body armor, suits, tunics, or robes**.  
+Strict Rules:  
+1. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
+2. Clothing must always be **fully modest and family-friendly**: Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.   
 2. No cleavage, no bare thighs, no exposed stomach, no revealing cuts.  
 3. Replace “sexy, tight, skimpy, sheer, lingerie, bikini, low-cut” or similar terms with **modest, noble, and adventurous clothing**.  
 4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children’s storybook or animated adventure film**.  
@@ -305,21 +302,22 @@ Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${ch
       const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
 
 CRITICAL RULES:
-1. Remove ALL violent language (fighting → competing, battle → contest, violent → intense)
-2. Keep the visual excitement and epic nature
-3. Make it completely family-friendly for ages 8-14  
-4. Preserve character names and main visual elements
-5. Use heroic, adventurous, and magical language instead
-6. Return ONLY the cleaned prompt, no explanations
-7. PET PERSONA MAPPING: ${petInstruction}
+1. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
+2. Tone down violent language (fighting → competing, battle → contest, violent → intense)
+3. Keep the visual excitement and epic nature
+4. Make it completely family-friendly for ages 8-13  
+5. Preserve character names and main visual elements
+6. Use heroic, adventurous, and magical language instead
+7. Return ONLY the cleaned prompt, no explanations
+8. PET PERSONA MAPPING: ${petInstruction}
 
-8. People
-- Remove all people or humans. Animals or pets are allowed.
+8. People: Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly cats. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
 - "sword battle" → "sword training demonstration" 
 - "violent clash" → "intense magical showdown"
+- "create a beautiful lady in a bikini" → "create a beautiful ${currentPetId} in a modest outfit"
 
 Transform this image request:`;
 

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut } from "lucide-react";
+import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut, UserPlus, LogIn } from "lucide-react";
 import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation, hasSeenWhiteboard, markWhiteboardSeen, loadSpellboxTopicProgressAsync } from "@/lib/utils";
 import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 
@@ -40,7 +40,7 @@ import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { trackEvent } from "@/lib/feedback-service";
 import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
-import { useAdventurePersistentProgress } from "@/hooks/use-adventure-progress";
+import { useAdventurePersistentProgress, useAdventureProgressForType } from "@/hooks/use-adventure-progress";
 import { useSessionCoins } from "@/hooks/use-session-coins";
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
@@ -131,6 +131,14 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
 // Persistent progress bar wrapper to keep JSX clean
 const PersistentAdventureProgressBar: React.FC = () => {
   const { progressFraction, activity } = useAdventurePersistentProgress();
+  return (
+    <AdventureFeedingProgress progressFraction={progressFraction} />
+  );
+};
+
+// Per-type daily progress bar for Adventure screen
+const PerTypeAdventureProgressBar: React.FC<{ type?: string }> = ({ type }) => {
+  const { progressFraction } = useAdventureProgressForType(type);
   return (
     <AdventureFeedingProgress progressFraction={progressFraction} />
   );
@@ -230,6 +238,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   
   // Firebase auth integration - must be at the top
   const { user, userData, signOut, updateUserData } = useAuth();
+  const isAnonymous = !!user && user.isAnonymous;
   
   // Tutorial system integration
   const { isFirstTimeAdventurer, completeAdventureTutorial, needsAdventureStep5Intro, completeAdventureStep5Intro, needsAdventureStep6Intro, completeAdventureStep6Intro, needsAdventureStep7HomeMoreIntro } = useTutorial();
@@ -726,7 +735,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         entryMessageCycle: entryMessageCycleCountRef.current,
         messageCycleCount,
       };
-      console.log('[SpellBox][AutoEffect][Enter]', debugCtx);
     } catch {}
     // Allow reopening even if the word matches lastResolvedWord (needed for multi-round repeats).
     // Freshness/cycle gates below prevent stale re-opens.
@@ -737,7 +745,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const lastTs = lastAi?.timestamp || 0;
         const exitAt = assignmentExitAtRef.current || 0;
         if (exitAt && lastTs && lastTs < exitAt) {
-          console.log('🛑 SpellBox opener: ignoring pre-diagnosis AI message', { lastTs, exitAt, currentSpellingWord });
           return;
         }
         // Freshness/session gate: only open if the last AI message is fresh for this entry,
@@ -746,13 +753,11 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         const hasNewCycleSinceEntry = messageCycleCount > (entryMessageCycleCountRef.current || 0);
         if (!isFreshForEntry && !hasNewCycleSinceEntry) {
           // Stale spelling message from a previous session/navigation; suppress SpellBox.
-          console.log('🛑 SpellBox opener: suppressed by freshness/cycle gate', { isFreshForEntry, hasNewCycleSinceEntry, lastTs, enteredAdventureAt: enteredAdventureAtRef.current, messageCycleCount, entryMessageCycle: entryMessageCycleCountRef.current });
           setShowSpellBox(false);
           setCurrentSpellQuestion(null);
           return;
         }
       } catch {}
-      console.log('✅ SpellBox opener: proceeding with currentSpellingWord', { currentSpellingWord, topicId: selectedTopicId });
       // console.log('🔤 SPELLBOX TRIGGER DEBUG:', {
       //   currentSpellingWord,
       //   hasOriginalQuestion: !!originalSpellingQuestion,
@@ -785,7 +790,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           questionText: currentSpellingSentence || originalSpellingQuestion.questionText
         };
         
-        console.log('[SpellBox][AutoEffect] setCurrentSpellQuestion (enhanced)', { id: enhancedQuestion.id, audio: enhancedQuestion.audio, word: enhancedQuestion.word });
         setCurrentSpellQuestion(enhancedQuestion);
       } else {
         // Fallback: Convert the spelling word to a SpellingQuestion format (no prefilled data)
@@ -813,16 +817,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           aiTutor: bankQuestion?.aiTutor
         };
         
-        console.log('[SpellBox][AutoEffect] setCurrentSpellQuestion (fallback)', { id: spellQuestion.id, audio: spellQuestion.audio, word: spellQuestion.word });
         setCurrentSpellQuestion(spellQuestion);
       }
       
       // Show SpellBox and temporarily disable mic/text input below
-      console.log('[SpellBox][AutoEffect] setShowSpellBox(true)');
       setShowSpellBox(true);
       try { setDisableInputForSpell(true); } catch {}
     } else {
-      console.log('[SpellBox][AutoEffect] setShowSpellBox(false) path', { currentSpellingWord, currentScreen, lastResolvedWord: lastResolvedWordRef.current });
       setShowSpellBox(false);
       setCurrentSpellQuestion(null);
       // Re-enable input when SpellBox is not active
@@ -2137,13 +2138,15 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       const shouldReplaceTranscribingMessage = lastMessage &&
         lastMessage.type === 'user' &&
         lastMessage.content === 'transcribing...';
-      const verdict = await moderation(text);
+        const userName = userData?.username || '';
+        const verdict = await moderation(userName, text);
       if (verdict) {
         fetch('https://api.readkraft.com/api/discord', {
           method: 'POST',
           body: JSON.stringify({
             content: text,
-            "type": "user_input_mod",
+            type: "user_input_mod",
+            username: userName
           }),
           headers: {
             'Content-Type': 'application/json'
@@ -2428,7 +2431,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
           
-        console.log(`🎓 Spelling question grade selection - selectedGradeFromDropdown: ${selectedGradeFromDropdown}, userData.gradeDisplayName: ${userData?.gradeDisplayName}, using: ${currentGrade}`);
         
         // Additional debug info removed (localStorage dropped)
         // console.log(`🔥 Grade from Firebase: ${userData?.gradeDisplayName || 'none'}`);
@@ -2437,7 +2439,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
         const preferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
         const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds, preferredLevel) : null;
-        console.log(`🔤 Fetched spelling question:`, { isSpellingPhase, currentGrade, question: spellingQuestion ? { id: spellingQuestion.id, topicId: spellingQuestion.topicId, word: spellingQuestion.audio } : null });
         
         // Store the original spelling question (with prefilled data) for later use
           
@@ -2873,17 +2874,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Update adventure tracker when messages are sent
   React.useEffect(() => {
     if (chatMessages.length > 0 && currentAdventureId && currentAdventureType && user) {
-      // Get current pet from localStorage
-      let currentPet = 'bobo'; // default fallback
+      // Get current pet consistently with PetProgressStorage
+      let currentPet = 'dog';
       try {
-        const petData = localStorage.getItem('litkraft_pet_data');
-        if (petData) {
-          const parsed = JSON.parse(petData);
-          const ownedPets = parsed.ownedPets || [];
-          if (ownedPets.length > 0) {
-            currentPet = ownedPets[0]; // Use first owned pet
-          }
-        }
+        currentPet = PetProgressStorage.getCurrentSelectedPet() || 'dog';
       } catch (error) {
         console.warn('Could not determine current pet for adventure tracking:', error);
       }
@@ -4812,6 +4806,24 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     return true;
   }, [devWhiteboardEnabled, selectedTopicId, whiteboardGradeEligible, isWhiteboardSuppressedByAssignment, currentGradeDisplayName]);
 
+  // Auto-clear: if SpellBox is not visible anymore, ensure input is re-enabled
+  React.useEffect(() => {
+    try {
+      if (!showSpellBox && disableInputForSpell) {
+        setDisableInputForSpell(false);
+      }
+    } catch {}
+  }, [showSpellBox, disableInputForSpell]);
+
+  // Auto-clear: when whiteboard prompt/lesson becomes active, do not keep SpellBox gating the input
+  React.useEffect(() => {
+    try {
+      if ((isWhiteboardPromptActive || isWhiteboardLessonActive) && disableInputForSpell) {
+        setDisableInputForSpell(false);
+      }
+    } catch {}
+  }, [isWhiteboardPromptActive, isWhiteboardLessonActive, disableInputForSpell]);
+
   React.useEffect(() => {
     if (!whiteboardGradeEligible) return;
     if (!selectedTopicId || selectedTopicId !== WHITEBOARD_LESSON_TOPIC) return;
@@ -5058,6 +5070,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   }, [whiteboardGradeEligible, grade1DisplayedTopicId, currentSpellQuestion?.topicId]);
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
+  const adventureInputDisabledReason = isAdventureInputDisabled
+    ? (disableInputForSpell
+        ? 'SpellBox awaiting Next'
+        : (isWhiteboardPromptActive
+            ? 'Whiteboard prompt'
+            : (isWhiteboardLessonActive ? 'Whiteboard lesson' : 'Disabled')))
+    : undefined;
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
@@ -5195,7 +5214,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   </DropdownMenuItem>
                   {/* Kindergarten */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">Kindergarten</span>
                       {selectedGradeAndLevel?.grade === 'Kindergarten' && (
@@ -5206,8 +5225,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', 'Kindergarten')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', 'Kindergarten'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5217,8 +5236,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', 'Kindergarten')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === 'Kindergarten' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', 'Kindergarten'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5232,7 +5251,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 1st Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">1st Grade</span>
                       {selectedGradeAndLevel?.grade === '1st Grade' && (
@@ -5243,8 +5262,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '1st Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '1st Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5254,8 +5273,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '1st Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '1st Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '1st Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5269,7 +5288,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 2nd Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">2nd Grade</span>
                       {selectedGradeAndLevel?.grade === '2nd Grade' && (
@@ -5280,8 +5299,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border border-white/30 bg-white/95 text-slate-900 shadow-xl rounded-2xl backdrop-blur"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '2nd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '2nd Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5291,8 +5310,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '2nd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '2nd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '2nd Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5306,7 +5325,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 3rd Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">3rd Grade</span>
                       {selectedGradeAndLevel?.grade === '3rd Grade' && (
@@ -5317,8 +5336,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '3rd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '3rd Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5328,8 +5347,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '3rd Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '3rd Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '3rd Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5343,7 +5362,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 4th Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">4th Grade</span>
                       {selectedGradeAndLevel?.grade === '4th Grade' && (
@@ -5354,8 +5373,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '4th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '4th Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5365,8 +5384,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '4th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '4th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '4th Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5380,7 +5399,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
                   {/* 5th Grade */}
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' ? 'bg-blue-100' : ''}`}>
+                    <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                       <span className="text-lg">🎓</span>
                       <span className="font-semibold">5th Grade</span>
                       {selectedGradeAndLevel?.grade === '5th Grade' && (
@@ -5391,8 +5410,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       className="w-48 border-2 border-gray-300 bg-white shadow-xl rounded-xl"
                     >
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('start', '5th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? 'bg-green-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('start', '5th Grade'); }}
                       >
                         <span className="text-lg">🌱</span>
                         <div>
@@ -5402,8 +5421,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         {selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'start' ? <span className="ml-auto text-green-600">✓</span> : null}
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''}`}
-                        onClick={() => handlePreferenceSelection('middle', '5th Grade')}
+                        className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th Grade' && selectedGradeAndLevel?.level === 'middle' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50' : ''}`}
+                        onClick={() => { if (isAnonymous) { navigate('/auth?redirect=/app'); return; } handlePreferenceSelection('middle', '5th Grade'); }}
                       >
                         <span className="text-lg">🚀</span>
                         <div>
@@ -5430,24 +5449,37 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                         </div>
                       </DropdownMenuItem>
 
-                  {/* Sign Out Option */}
-                  <DropdownMenuItem 
-                    className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg border-t"
-                    onClick={async () => {
-                      playClickSound();
-                      try {
-                        await signOut();
-                      } catch (error) {
-                        console.error('Error signing out:', error);
-                      }
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 text-red-600" />
-                    <div>
-                      <div className="font-semibold text-red-600">Sign Out</div>
-                      <div className="text-sm text-gray-500">Return to login</div>
-                    </div>
-                  </DropdownMenuItem>
+                  {/* Auth CTA / Sign Out */}
+                  {isAnonymous ? (
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-green-50 cursor-pointer rounded-lg border-t"
+                      onClick={() => { playClickSound(); navigate('/auth?redirect=/app'); }}
+                    >
+                      <UserPlus className="h-4 w-4 text-green-600" />
+                      <div>
+                        <div className="font-semibold text-green-600">Sign up / Sign in</div>
+                        <div className="text-sm text-gray-500">Create your account</div>
+                      </div>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2 px-4 py-3 hover:bg-red-50 cursor-pointer rounded-lg border-t"
+                      onClick={async () => {
+                        playClickSound();
+                        try {
+                          await signOut();
+                        } catch (error) {
+                          console.error('Error signing out:', error);
+                        }
+                      }}
+                    >
+                      <LogOut className="h-4 w-4 text-red-600" />
+                      <div>
+                        <div className="font-semibold text-red-600">Sign Out</div>
+                        <div className="text-sm text-gray-500">Return to login</div>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -5513,8 +5545,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             <div className="text-center">
               {currentScreen === 1 ? (
                 <div className="flex items-center justify-center gap-2">
-                  {/* Adventure Feeding Progress (persistent) */}
-                  <PersistentAdventureProgressBar />
+                  {/* Adventure Feeding Progress (per-type, daily) */}
+                  <PerTypeAdventureProgressBar type={currentAdventureType} />
                   {/* <Button
                     variant="outline"
                     size="icon"
@@ -5997,11 +6029,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petName = PetProgressStorage.getPetDisplayName(currentPetId);
           const petType = PetProgressStorage.getPetType(currentPetId);
+          // Capture a brief snippet from the most recent chat to ensure continuity post-whiteboard
+          const recentSnippet = (() => {
+            try {
+              const last = [...chatMessages].reverse().find(m => m && (m.type === 'ai' || m.type === 'user')) as any;
+              const text = (last?.content || '').trim();
+              if (!text) return '';
+              return text.length > 400 ? (text.slice(0, 400) + '…') : text;
+            } catch {
+              return '';
+            }
+          })();
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
             chatMessages,
             currentAdventureContext,
-            undefined,
+            recentSnippet || undefined,
             currentAdventureContext?.summary,
             userData,
             petName,
@@ -6052,17 +6095,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                       lastAi?.content ||
                       lastAi?.spelling_sentence || null
                     );
-                try {
-                  console.log('[Overlay][Props]', {
-                    showSpellBox,
-                    currentSpellQuestionId: currentSpellQuestion?.id,
-                    overlayWord,
-                    overlaySentence,
-                    lastAiSpellingSentence: lastAi?.spelling_sentence,
-                    lastAiContentAfter: lastAi?.content_after_spelling,
-                    lastAiContent: lastAi?.content,
-                  });
-                } catch {}
                 return (
                   <LeftPetOverlay 
                     petImageUrl={currentPetAvatarImage}
@@ -6115,6 +6147,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               explanation: currentSpellQuestion.explanation,
                               isPrefilled: currentSpellQuestion.isPrefilled,
                               prefilledIndexes: currentSpellQuestion.prefilledIndexes,
+                              topicId: currentSpellQuestion.topicId || selectedTopicId,
                               aiTutor: (currentSpellQuestion as any)?.aiTutor,
                             } : null,
                             showHints: true,
@@ -6123,6 +6156,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                             onSkip: handleSpellSkip,
                             onNext: handleSpellNext,
                             highlightNext: highlightSpellNext,
+                            // Pass logging props
+                            userId: user?.uid,
+                            topicId: currentSpellQuestion?.topicId || selectedTopicId,
+                            grade: selectedGradeFromDropdown || userData?.gradeDisplayName,
                             sendMessage,
                             isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
@@ -6346,6 +6383,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               onGenerate={onGenerate}
                               onAddMessage={onAddMessage}
                               disabled={isAdventureInputDisabled}
+                              disabledReason={adventureInputDisabledReason}
                               onDisabledClick={() => setHighlightSpellNext(true)}
                             />
                           </div>
@@ -6735,6 +6773,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             onGenerate={onGenerate}
             onAddMessage={onAddMessage}
             disabled={isAdventureInputDisabled}
+            disabledReason={adventureInputDisabledReason}
             onDisabledClick={() => setHighlightSpellNext(true)}
           />
         )}

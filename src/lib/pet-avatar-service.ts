@@ -628,7 +628,7 @@ export const useCurrentPetAvatarImage = () => {
       // ignore and fall through
     }
 
-    // Enforce daily sadness assignment cap: only assigned pets can be sad today
+    // Enforce daily sadness assignment cap: assigned → sad baseline; unassigned → neutral
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_sadness') : null;
       if (raw) {
@@ -636,7 +636,9 @@ export const useCurrentPetAvatarImage = () => {
         const today = new Date().toISOString().slice(0, 10);
         const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
         const isAssignedToday = sad?.date === today && assigned.includes(currentPetId);
-        if (!isAssignedToday) {
+        if (isAssignedToday) {
+          return 'coins_0';
+        } else {
           // Clamp to neutral-or-better buckets; never render coins_0 for unassigned pets
           if (todayCoins >= 50) return 'coins_50';
           if (todayCoins >= 30) return 'coins_30';
@@ -646,7 +648,7 @@ export const useCurrentPetAvatarImage = () => {
       }
     } catch {}
 
-    // Force sad when pet will be sad on wakeup or heart is empty (align with PetPage)
+    // Legacy fallback: heart/flags can still trigger sadness if reached
     try {
       const petProgress = PetProgressStorage.getPetProgress(currentPetId);
       const { heartData, sleepData } = petProgress;

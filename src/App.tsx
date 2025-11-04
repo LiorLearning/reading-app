@@ -20,6 +20,7 @@ import { stateStoreApi } from "@/lib/state-store-api";
 import { useDeviceGate } from "@/hooks/use-device-gate";
 import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
+import { toast } from "@/hooks/use-toast";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,33 @@ const DevQuestionHotspot: React.FC = () => {
       onClick={handleIncrementQuestion}
       className="fixed top-2 left-2 h-10 w-10 opacity-0 z-[9999] cursor-pointer"
     />
+  );
+};
+
+// Dev-only visible button to shift Firebase time windows by +9h (simulated)
+const DevTimeShiftButton: React.FC = () => {
+  if (!import.meta.env.DEV) return null;
+  const { user } = useAuth();
+
+  const onShift = async () => {
+    try {
+      if (!user?.uid) return;
+      await stateStoreApi.devShiftDailyQuestsTime(user.uid, 9);
+      toast({ title: "Shifted +9h", description: "Daily windows moved earlier by 9h." });
+    } catch (e) {
+      toast({ title: "Shift failed", description: "Could not shift time.", variant: "destructive" as any });
+    }
+  };
+
+  return (
+    <button
+      aria-label="dev-time-shift"
+      title="Time +9h"
+      onClick={onShift}
+      className="fixed bottom-3 right-3 z-[9999] h-9 px-3 rounded-md bg-black/80 text-white text-xs shadow-md"
+    >
+      ⏩ +9h
+    </button>
   );
 };
 
@@ -202,6 +230,7 @@ const App = () => (
           <Sonner position="top-left" />
           <DevCoinHotspot />
           <DevQuestionHotspot />
+          <DevTimeShiftButton />
           <BrowserRouter>
             <Routes>
               {/* Dedicated auth route for signup/login and upgrade linking */}

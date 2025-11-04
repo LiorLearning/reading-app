@@ -22,6 +22,7 @@ import { CoinSystem } from '@/pages/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
 import analytics from '@/lib/analytics';
+import { autoMigrateOnLogin } from '@/lib/firebase-data-migration';
 
 // Google Identity Services types
 declare global {
@@ -130,6 +131,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             } catch {}
             setUserData(data);
+            // Trigger background migration of local data to Firebase and reconcile trackers
+            try { autoMigrateOnLogin(user.uid); } catch {}
             
             // Check if user signed in with Google
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
@@ -158,6 +161,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             
             await setDoc(userDocRef, newUserData);
             setUserData(newUserData);
+            // Trigger background migration (noop for brand new users) and tracker reconciliation
+            try { autoMigrateOnLogin(user.uid); } catch {}
             
             // Check if user signed in with Google
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
@@ -316,6 +321,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
           const target = 5;
           let ownedPets: string[] = [];
+          let didTriggerPostLoginMigration = false;
 
           // UserState live: coins + owned pets + per-pet levels
           unsubscribeUserState = onSnapshot(doc(db, 'userStates', user.uid), (snap) => {
@@ -378,6 +384,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               // Keep local pet list in sync for selector
               try { PetDataService.addOwnedPet(petId); } catch {}
             }
+
+            // Ensure a current selected pet is set before migration/reconciliation
+            try {
+              const currentSelected = PetProgressStorage.getCurrentSelectedPet();
+              if (!currentSelected) {
+                const firstOwned = (ownedPets && ownedPets.length > 0) ? ownedPets[0] : 'dog';
+                PetProgressStorage.setCurrentSelectedPet(firstOwned);
+              }
+            } catch {}
+
+            // Trigger background migration after pet selection is guaranteed
+            if (!didTriggerPostLoginMigration) {
+              didTriggerPostLoginMigration = true;
+              try { autoMigrateOnLogin(user.uid); } catch {}
+            }
           });
 
           // DailyQuests live: quest progress bar
@@ -386,38 +407,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (!ownedPets || ownedPets.length === 0) {
               ownedPets = Object.keys((d || {})).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
             }
-            const states = ownedPets.map((pet) => {
-              const petObj = (d?.[pet] ?? {}) as any;
-              const index = Number(petObj?._activityIndex ?? 0) % seq.length;
-              const key = seq[index];
-              const prog = Number(petObj?.[key] ?? 0);
-              const sleepStartAt = petObj?._sleepStartAt || null;
-              const sleepEndAt = petObj?._sleepEndAt || null;
-              const completedAtAny = petObj?._completedAt || null;
-              const completedAtMs = completedAtAny?.toMillis ? completedAtAny.toMillis() : (completedAtAny ? new Date(completedAtAny).getTime() : null);
-              const lastCompletedActivity = (typeof petObj?._lastCompletedActivity === 'string') ? petObj._lastCompletedActivity : null;
-              const cooldownAny = petObj?._cooldownUntil || null;
-              const cooldownUntilMs = cooldownAny?.toMillis ? cooldownAny.toMillis() : (cooldownAny ? new Date(cooldownAny).getTime() : null);
-              return { pet, activity: key, progress: prog, target, completed: prog >= target, activityIndex: index, cooldownUntil: petObj?._cooldownUntil ?? null, cooldownUntilMs, sleepStartAt, sleepEndAt, completedAtMs, lastCompletedActivity };
-            });
+          const states = ownedPets.map((pet) => {
+            const petObj = (d?.[pet] ?? {}) as any;
+            const index = Number(petObj?._activityIndex ?? 0) % seq.length;
+            const indexKey = seq[index];
+            const cuAny: any = petObj?._cooldownUntil || null;
+            const cuMs = cuAny?.toMillis ? cuAny.toMillis() : (typeof cuAny?.seconds === 'number' ? cuAny.seconds * 1000 : (typeof cuAny === 'number' ? cuAny : (typeof cuAny === 'string' ? (isNaN(Date.parse(cuAny)) ? null : Date.parse(cuAny)) : (cuAny ? new Date(cuAny).getTime() : null))));
+            const petHasActiveCooldown = Boolean(cuMs && Date.now() < cuMs);
+            const userAct = (d?._userCurrentActivity || seq[0]) as string;
+            const pointerKey = (typeof userAct === 'string' && userAct) ? userAct : indexKey;
+            const lastCompleted = (typeof petObj?._lastCompletedActivity === 'string' && petObj._lastCompletedActivity) ? petObj._lastCompletedActivity : indexKey;
+            const effectiveKey = petHasActiveCooldown ? lastCompleted : pointerKey;
+            const prog = Number(petObj?.[effectiveKey] ?? 0);
+            const sleepStartAt = petObj?._sleepStartAt || null;
+            const sleepEndAt = petObj?._sleepEndAt || null;
+            return { pet, activity: effectiveKey, progress: prog, target, completed: prog >= target, activityIndex: index, cooldownUntil: petObj?._cooldownUntil ?? null, sleepStartAt, sleepEndAt };
+          });
             try {
               localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
-              // Hydrate user-scoped todo pointer for shared rotation
-              try {
-                const userAct = (d?._userCurrentActivity || seq[0]) as string;
-                const lastSwitchAny = d?._userLastSwitchAt as any;
-                const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : (lastSwitchAny ? new Date(lastSwitchAny).getTime() : Date.now());
-                localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: userAct, lastSwitchTime: lastSwitchMs }));
-                // Mirror into PetProgressStorage global settings if available
-                try { PetProgressStorage.setGlobalSettings({ userTodoData: { currentType: userAct, lastSwitchTime: lastSwitchMs } } as any); } catch {}
-                window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: userAct, lastSwitchTime: lastSwitchMs } }));
-              } catch {}
-              // Also expose sadness assignment if present
+            // Also hydrate a user-scoped pointer for the shared daily assignment if present
+            try {
+              const userAct = (d?._userCurrentActivity || (Array.isArray(seq) && seq.length > 0 ? seq[0] : 'house')) as string;
+              const lastSwitchAny = (d?._userLastSwitchAt as any) || null;
+              const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : (lastSwitchAny ? new Date(lastSwitchAny).getTime() : Date.now());
+              localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: userAct, lastSwitchTime: lastSwitchMs }));
+              window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: userAct, lastSwitchTime: lastSwitchMs } }));
+            } catch {}
+              // Also expose sadness assignment and any client-forced sadness (purchase) if present
               try {
                 const sad = (d?._sadness || null);
                 if (sad && sad.date) {
                   localStorage.setItem('litkraft_daily_sadness', JSON.stringify(sad));
                   window.dispatchEvent(new CustomEvent('dailySadnessUpdated', { detail: sad }));
+                }
+                const sadForce = (d?._sadForce || null);
+                if (sadForce && sadForce.date) {
+                  // Convert pets object map to string[] for compact client consumption
+                  const forcedList = Array.isArray(sadForce.pets) ? sadForce.pets : Object.keys(sadForce.pets || {});
+                  localStorage.setItem('litkraft_forced_sad_pets', JSON.stringify({ date: sadForce.date, pets: forcedList }));
+                  window.dispatchEvent(new CustomEvent('dailyForcedSadUpdated', { detail: { date: sadForce.date, pets: forcedList } }));
                 }
               } catch {}
               // Mirror live sleep windows per-pet for the timer

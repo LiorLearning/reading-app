@@ -3,6 +3,7 @@ import { GoogleGenAI, PersonGeneration } from '@google/genai';
 import { ChatMessage } from './utils';
 import { toast } from 'sonner'
 import analytics from '@/lib/analytics';
+import { PetProgressStorage } from '@/lib/pet-progress-storage';
 
 export interface ImageGenerationResult {
   success: boolean;
@@ -50,12 +51,6 @@ export class MultiProviderImageGenerator {
 
     let lastError: Error | null = null;
     const startTime = Date.now();
-
-    // console.log(`🚀 [MultiProviderImageGenerator.generateWithFallback()] Starting image generation`);
-    // console.log(`📝 [MultiProviderImageGenerator.generateWithFallback()] Full prompt: "${prompt}"`);
-    // console.log(`👤 [MultiProviderImageGenerator.generateWithFallback()] User ID: ${userId}`);
-    // console.log(`⚙️ [MultiProviderImageGenerator.generateWithFallback()] Options:`, options);
-    // console.log(`🔄 [MultiProviderImageGenerator.generateWithFallback()] Available providers: ${this.providers.map(p => p.name).join(', ')}`);
 
     // Try each provider in order
     for (let attempt = 0; attempt < this.providers.length; attempt++) {
@@ -164,7 +159,16 @@ export class MultiProviderImageGenerator {
         break;
 
       case 'flux-schnell':
-        refinedPrompt = `${refinedPrompt}. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
+        // Get current pet for consistency with AI prompt sanitizer
+        const currentPetId = ((): string => {
+          try {
+            return PetProgressStorage.getCurrentSelectedPet() || localStorage.getItem('current_pet') || 'dog';
+          } catch {
+            return 'dog';
+          }
+        })();
+        
+        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         break;
         // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
       case 'google-imagen':

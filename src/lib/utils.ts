@@ -1861,31 +1861,9 @@ export function openaiClient() {
   });
 }
 
-export async function moderation(text: string | null | undefined): Promise<boolean> {
+export async function moderation(userName: string, text: string | null | undefined): Promise<boolean> {
   if (!text) return false;
-
-  // const response = await openaiClient().responses.create({
-  //   prompt: {
-  //     id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
-  //   },
-  //   store: false,
-  //   input: [
-  //     {
-  //       role: "user",
-  //       content: [
-  //         {
-  //           type: "input_text",
-  //           text
-  //         }
-  //       ]
-  //     }]
-  // });
-  // if (response.output_text.includes("true")) {
-  //   return true;
-  // }
   
-
-
   //Lowercase and replace any non-alphanumeric (unicode letters/digits) with spaces
   const normalized = text
     .toLowerCase()
@@ -1903,11 +1881,32 @@ export async function moderation(text: string | null | undefined): Promise<boole
     }
   }
 
+    const response = await openaiClient().responses.create({
+    prompt: {
+      id: "pmpt_68fd89ceb3ac81949d993547421cd434082fd0c40ffb90e3"
+    },
+    store: false,
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text
+          }
+        ]
+      }]
+  });
+  if (response.output_text?.toLowerCase().includes("true")) {
+    return true;
+  }
+
   fetch('https://api.readkraft.com/api/discord', {
     method: 'POST',
     body: JSON.stringify({
       content: text,
-      "type": "user_input",
+      username: userName,
+      type: "user_input",
     }),
     headers: {
       'Content-Type': 'application/json'

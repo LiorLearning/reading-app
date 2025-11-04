@@ -116,13 +116,7 @@ export class UnifiedAIStreamingService {
     
     // console.log(`🎯 Created new AbortController for session: ${sessionId}`);
     
-    try {
-      // console.log('🚀 [UnifiedAIStreamingService.generateUnifiedResponse()] Generating unified AI response with potential images...');
-      // console.log('📝 [UnifiedAIStreamingService.generateUnifiedResponse()] User message:', userMessage);
-      // console.log('👤 [UnifiedAIStreamingService.generateUnifiedResponse()] User ID:', userId);
-      // console.log('🎯 [UnifiedAIStreamingService.generateUnifiedResponse()] Session ID:', sessionId);
-      // console.log('🎨 [UnifiedAIStreamingService.generateUnifiedResponse()] Adventure ID:', adventureId);
-      
+    try { 
       // 🎯 NEW: Signal automatic generation cancellation at start of unified session
       const { aiService } = await import('./ai-service');
       aiService.unifiedSystemTakingOver();
@@ -143,17 +137,6 @@ export class UnifiedAIStreamingService {
       // Check if response contains image generation requests
       // Pass user message for fallback visual detection, not AI response content
       const hasImages = ResponseProcessor.containsImageRequests(aiResponse, userMessage);
-      
-      // console.log('🔍 [UnifiedAIStreamingService.generateUnifiedResponse()] Image generation analysis:', {
-      //   userMessage: userMessage,
-      //   responsePreview: aiResponse.substring(0, 200) + '...',
-      //   hasExplicitTags: aiResponse.includes('<generateImage>'),
-      //   userHasVisualKeywords: userMessage ? ResponseProcessor.shouldGenerateImageFromContent(userMessage) : false,
-      //   aiHasVisualKeywords: ResponseProcessor.shouldGenerateImageFromContent(aiResponse),
-      //   willGenerateImages: hasImages,
-      //   extractedImagePrompts: ResponseProcessor.extractImagePrompts(aiResponse),
-      //   reason: aiResponse.includes('<generateImage>') ? 'explicit_tags' : (userMessage && ResponseProcessor.shouldGenerateImageFromContent(userMessage) ? 'user_visual_content' : 'no_images')
-      // });
       
       if (!hasImages) {
         // Force image generation using Flux-first pipeline on every prompt
@@ -329,11 +312,8 @@ export class UnifiedAIStreamingService {
       );
       if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
         sanitizedUserMessage = sanitizationResult.sanitizedPrompt;
-        // console.log('✅ Prompt sanitized successfully');
-        // console.log('🔄 Original:', userMessage.substring(0, 100) + '...');
-        // console.log('✨ Sanitized:', sanitizedUserMessage.substring(0, 100) + '...');
-      } else {
-        // console.log('⚠️ Sanitization failed, using original prompt');
+        } else {
+        console.log('⚠️ Sanitization failed, using original prompt');
       }
     } catch (sanitizationError) {
       console.warn('⚠️ Prompt sanitization error, using original prompt:', sanitizationError);
@@ -428,11 +408,6 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
       { role: "user", content: enhancedUserMessage }
     ];
     
-    // console.log('🤖 Calling OpenAI with enhanced image-aware prompt...');
-    // console.log('📝 System prompt preview:', systemPrompt.substring(0, 200) + '...');
-    // console.log('💬 Original user message:', userMessage);
-    // console.log('🧹 Sanitized user message:', sanitizedUserMessage);
-    
     const response = await this.client.chat.completions.create({
       model: "gpt-4o", // Use GPT-4o for best image decision making
       messages: messages as any,
@@ -446,11 +421,6 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
     if (!content) {
       throw new Error('No response content received from AI');
     }
-    
-    // console.log('🤖 RAW AI Response received:', content);
-    // console.log('🔍 Contains <generateImage> tags:', content.includes('<generateImage>'));
-    // console.log('🎯 User message was about visual content:', userMessage.toLowerCase().includes('dragon') || userMessage.toLowerCase().includes('robot') || userMessage.toLowerCase().includes('fight'));
-    // console.log('📝 System prompt included image generation instructions:', messages[0].content.includes('generateImage'));
     
     return content;
   }

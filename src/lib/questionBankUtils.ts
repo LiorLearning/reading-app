@@ -401,7 +401,6 @@ export const getNextSpellboxQuestion = (
   
   // Get the current topic based on progression logic
   const currentTopicId = getNextSpellboxTopic(gradeDisplayName, allTopicIds, preferredLevel);
-  console.log(`🎯 getNextSpellboxQuestion: Determined topic`, { gradeDisplayName, currentTopicId, allTopicIdsPreview: allTopicIds.slice(0, 3), preferredLevel });
   
   if (!currentTopicId) {
     console.log('🏁 getNextSpellboxQuestion: All topics completed with passing grades');
@@ -432,7 +431,6 @@ export const getNextSpellboxQuestion = (
   if (firstPassLen < 10) {
     const idx = Math.min(firstPassLen, 9);
     const q = topicQuestions[idx] || topicQuestions[0];
-    console.log('[Spellbox][Select] First pass selection', { currentTopicId, firstPassLen, selectedIndex: idx, questionId: q?.id, word: q?.audio });
     return q;
   }
 
@@ -442,7 +440,6 @@ export const getNextSpellboxQuestion = (
   if (pool.length > 0 && cursor < pool.length) {
     const qid = pool[cursor];
     const selected = topicQuestions.find(q => q.id === qid) || topicQuestions[0];
-    console.log('[Spellbox][Select] Round pool selection', { currentTopicId, poolSize: pool.length, cursor, questionId: selected?.id, word: selected?.audio });
     return selected;
   }
 
@@ -451,14 +448,12 @@ export const getNextSpellboxQuestion = (
   if (nextPool.length > 0) {
     const qid = nextPool[0];
     const selected = topicQuestions.find(q => q.id === qid) || topicQuestions[0];
-    console.log('[Spellbox][Select] Next-round-first selection (cursor at end)', { currentTopicId, nextPoolSize: nextPool.length, questionId: selected?.id, word: selected?.audio });
     return selected;
   }
 
   // Final fallback: pick the first unmastered among the first 10
   const firstPassIds = topicProgress?.firstPassQuestionIds || [];
   const fallback = topicQuestions.find(q => firstPassIds.includes(q.id) && !masteredIds.has(q.id)) || topicQuestions[0];
-  console.log('[Spellbox][Select] Fallback selection among first-pass unmastered', { currentTopicId, questionId: fallback?.id, word: fallback?.audio });
   return fallback;
 };
 
