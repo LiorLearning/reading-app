@@ -69,7 +69,6 @@ class FirebaseSpellboxLogsService {
 
       const now = serverTimestamp() as Timestamp;
       const nowMillis = Date.now();
-
       if (docSnap.exists()) {
         // Document exists - update it
         
@@ -127,6 +126,8 @@ class FirebaseSpellboxLogsService {
           updated_at: now,
           questions: questions
         });
+        
+        console.log('[SpellboxLogs] ✅ Updated existing document:', docId);
       } else {
         // Document doesn't exist - create new one    
         const docData = {
@@ -143,6 +144,8 @@ class FirebaseSpellboxLogsService {
           }]
         };
         await setDoc(docRef, docData);
+        
+        console.log('[SpellboxLogs] ✅ Created new document:', docId);
       }
     } catch (error: any) {
       console.error('[SpellboxLogs] ❌ ERROR logging attempt:', {

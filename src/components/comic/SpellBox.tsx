@@ -218,17 +218,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Get the working sentence - this ensures we always have something to work with
   const workingSentence = ensureSpellingSentence(targetWord, sentence, questionText);
   
-  // // console.log('🎯 SpellBox Debug:', { 
-  //   sentence, 
-  //   sentenceLength: sentence?.length,
-  //   targetWord, 
-  //   questionText, 
-  //   workingSentence,
-  //   workingSentenceLength: workingSentence?.length,
-  //   hasQuestion: !!question 
-  // });
-  
-
   // Debug: Check if target word is found in working sentence
   const wordFoundInSentence = workingSentence && targetWord && 
     workingSentence.toLowerCase().includes(targetWord.toLowerCase());
@@ -746,7 +735,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setLastSubmittedAnswer(completeWord);
     
     // Log attempt to Firestore
-    if (effectiveUserId && effectiveTopicId && question) {
+    // Check for valid non-empty strings
+    const hasValidUserId = effectiveUserId && effectiveUserId.trim() !== '';
+    const hasValidTopicId = effectiveTopicId && effectiveTopicId.trim() !== '';
+    const hasValidQuestion = !!question && !!question.id;
+    
+    if (hasValidUserId && hasValidTopicId && hasValidQuestion) {
       
       // Only log if answer changed (to avoid duplicate logs for same attempt)
       if (changedSinceLast || correct) {
@@ -757,6 +751,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         // Generate question_blank format from current parts
         const currentQuestionBlank = generateQuestionBlank(parts);
         
+        
         firebaseSpellboxLogsService.logSpellboxAttempt(
           effectiveUserId,
           effectiveTopicId,
@@ -766,20 +761,26 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           currentQuestionBlank, // Format like "_ _ T" where _ represents blanks
           completeWord,
           correct
-        ).catch((error) => {
-          console.error('[SpellboxLogs] Failed to log attempt:', error);
+        ).then(() => {
+         // console.log('[SpellboxLogs] ✅ Successfully logged attempt');
+        }).catch((error) => {
+          console.error('[SpellboxLogs] ❌ Failed to log attempt:', error);
         });
       } else {
-        console.log('[SpellboxLogs] Skipping log - answer unchanged since last submission');
+      //  console.log('[SpellboxLogs] Skipping log - answer unchanged since last submission');
       }
     } else {
-      console.warn('[SpellboxLogs] Cannot log attempt - missing required data:', {
+      console.warn('[SpellboxLogs] ⚠️ Cannot log attempt - missing required data:', {
         hasUserId: !!effectiveUserId,
         hasTopicId: !!effectiveTopicId,
         hasQuestion: !!question,
         userId: effectiveUserId,
         topicId: effectiveTopicId,
-        questionId: question?.id
+        questionId: question?.id,
+        propUserId,
+        propTopicId,
+        questionTopicId: question?.topicId,
+        userUid: user?.uid
       });
     }
     
@@ -1005,20 +1006,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         margin: '0 4px'
                       }}>
                         {parts.map((part, partIndex) => {
-                          // console.log('🎨 Rendering part:', { partIndex, part, type: part.type });
-                          
-                          // Debug: Log current state for this part
-                          // console.log('🔤 SPELLBOX RENDER STATE:', {
-                          //   partIndex,
-                          //   partType: part.type,
-                          //   partContent: part.content,
-                          //   partAnswer: part.answer,
-                          //   currentUserAnswer: userAnswer,
-                          //   isComplete,
-                          //   isCorrect,
-                          //   targetWord
-                          // });
-                          
                           if (part.type === 'text') {
                             // Render each prefilled character in its own dotted box
                             return (
