@@ -438,7 +438,7 @@ export function ProgressTracking(): JSX.Element {
                   <a
                     aria-label="Download worksheet"
                     title="Download worksheet"
-                    href={worksheetLinks[card.topicId]}
+                    href={`${worksheetLinks[card.topicId]}#zoom=50`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={playClickSound}
