@@ -8,6 +8,8 @@ import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Volume2, Square, ChevronRight, Lightbulb } from 'lucide-react';
+import { firebaseSpellboxLogsService } from '@/lib/firebase-spellbox-logs-service';
+import { useAuth } from '@/hooks/use-auth';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -43,6 +45,7 @@ interface SpellBoxProps {
     explanation: string;
     isPrefilled?: boolean;
     prefilledIndexes?: number[];
+    topicId?: string; // Added for logging
     aiTutor?: {
       target_word?: string;
       question?: string; // mask like "_ _ p"
@@ -51,6 +54,11 @@ interface SpellBoxProps {
       spelling_pattern_or_rule?: string;
     };
   };
+  
+  // Logging props (optional - will use auth hook if not provided)
+  userId?: string;
+  topicId?: string;
+  grade?: string;
   
   // UI options
   showProgress?: boolean;
@@ -95,7 +103,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   sendMessage,
   interruptRealtimeSession,
   nextUnlockDelayMs = 0
-  , isAssignmentFlow = false
+  , isAssignmentFlow = false,
+  
+  // Logging props
+  userId: propUserId,
+  topicId: propTopicId,
+  grade: propGrade
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
@@ -108,6 +121,14 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [canClickNext, setCanClickNext] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<string>('');
+  
+  // Get auth context for logging
+  const { user, userData } = useAuth();
+  
+  // Determine effective userId, topicId, and grade for logging
+  const effectiveUserId = propUserId || user?.uid || '';
+  const effectiveTopicId = propTopicId || question?.topicId || '';
+  const effectiveGrade = propGrade || userData?.gradeDisplayName || '';
   
   // Tutorial system integration
   const {
@@ -197,17 +218,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Get the working sentence - this ensures we always have something to work with
   const workingSentence = ensureSpellingSentence(targetWord, sentence, questionText);
   
-  // // console.log('🎯 SpellBox Debug:', { 
-  //   sentence, 
-  //   sentenceLength: sentence?.length,
-  //   targetWord, 
-  //   questionText, 
-  //   workingSentence,
-  //   workingSentenceLength: workingSentence?.length,
-  //   hasQuestion: !!question 
-  // });
-  
-
   // Debug: Check if target word is found in working sentence
   const wordFoundInSentence = workingSentence && targetWord && 
     workingSentence.toLowerCase().includes(targetWord.toLowerCase());
@@ -312,6 +322,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const parts = parseWord(targetWord);
   const totalBlanks = parts.filter(part => part.type === 'blank').length;
   const correctlySpelledWords = isCorrect ? totalBlanks : 0;
+  
+  // Generate question_blank format like "_ _ T" from parts array
+  const generateQuestionBlank = useCallback((parts: WordPart[]): string => {
+    return parts.map(part => {
+      if (part.type === 'blank') {
+        // Replace each blank character with an underscore
+        return '_'.repeat(part.answer?.length || 0);
+      } else {
+        // Show the text content as-is
+        return part.content || '';
+      }
+    }).join(' '); // Join with spaces for readability
+  }, []);
   
   // console.log('🧩 SpellBox Parts Debug:', {
   //   targetWord,
@@ -700,7 +723,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const handleSubmitAttempt = useCallback(() => {
     // Enable submit once any letter is entered (non-space)
     const canSubmit = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      return;
+    }
     const completeWord = reconstructCompleteWord(userAnswer);
     const correct = isWordCorrect(completeWord, targetWord);
     setHasSubmitted(true);
@@ -708,6 +733,57 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     // Record submitted answer for change detection on subsequent submits
     const changedSinceLast = completeWord !== lastSubmittedAnswer;
     setLastSubmittedAnswer(completeWord);
+    
+    // Log attempt to Firestore
+    // Check for valid non-empty strings
+    const hasValidUserId = effectiveUserId && effectiveUserId.trim() !== '';
+    const hasValidTopicId = effectiveTopicId && effectiveTopicId.trim() !== '';
+    const hasValidQuestion = !!question && !!question.id;
+    
+    if (hasValidUserId && hasValidTopicId && hasValidQuestion) {
+      
+      // Only log if answer changed (to avoid duplicate logs for same attempt)
+      if (changedSinceLast || correct) {
+        // Always use targetWord (full word) as primary source, fallback to question.correctAnswer if targetWord is empty
+        // targetWord is more reliable as it contains the full word (e.g., "BAG"), not just a single letter
+        const fullCorrectAnswer = (targetWord || question.correctAnswer || '').toUpperCase();
+        
+        // Generate question_blank format from current parts
+        const currentQuestionBlank = generateQuestionBlank(parts);
+        
+        
+        firebaseSpellboxLogsService.logSpellboxAttempt(
+          effectiveUserId,
+          effectiveTopicId,
+          effectiveGrade,
+          question.id,
+          fullCorrectAnswer, // Always use full word string (e.g., "BAG", not "B")
+          currentQuestionBlank, // Format like "_ _ T" where _ represents blanks
+          completeWord,
+          correct
+        ).then(() => {
+         // console.log('[SpellboxLogs] ✅ Successfully logged attempt');
+        }).catch((error) => {
+          console.error('[SpellboxLogs] ❌ Failed to log attempt:', error);
+        });
+      } else {
+      //  console.log('[SpellboxLogs] Skipping log - answer unchanged since last submission');
+      }
+    } else {
+      console.warn('[SpellboxLogs] ⚠️ Cannot log attempt - missing required data:', {
+        hasUserId: !!effectiveUserId,
+        hasTopicId: !!effectiveTopicId,
+        hasQuestion: !!question,
+        userId: effectiveUserId,
+        topicId: effectiveTopicId,
+        questionId: question?.id,
+        propUserId,
+        propTopicId,
+        questionTopicId: question?.topicId,
+        userUid: user?.uid
+      });
+    }
+    
     if (correct) {
       if (interruptRealtimeSession) {
         try { interruptRealtimeSession(); } catch {}
@@ -756,7 +832,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         } catch {}
       }
     }
-  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer]);
+  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer, effectiveUserId, effectiveTopicId, effectiveGrade, parts, generateQuestionBlank]);
 
   // Focus next empty box (scoped to this component)
   const focusNextEmptyBox = useCallback(() => {
@@ -930,20 +1006,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         margin: '0 4px'
                       }}>
                         {parts.map((part, partIndex) => {
-                          // console.log('🎨 Rendering part:', { partIndex, part, type: part.type });
-                          
-                          // Debug: Log current state for this part
-                          // console.log('🔤 SPELLBOX RENDER STATE:', {
-                          //   partIndex,
-                          //   partType: part.type,
-                          //   partContent: part.content,
-                          //   partAnswer: part.answer,
-                          //   currentUserAnswer: userAnswer,
-                          //   isComplete,
-                          //   isCorrect,
-                          //   targetWord
-                          // });
-                          
                           if (part.type === 'text') {
                             // Render each prefilled character in its own dotted box
                             return (

@@ -31,6 +31,7 @@ interface LeftPetOverlayProps {
       explanation: string;
       isPrefilled?: boolean;
       prefilledIndexes?: number[];
+      topicId?: string; // Added for logging
       aiTutor?: {
         target_word?: string;
         question?: string;
@@ -52,6 +53,10 @@ interface LeftPetOverlayProps {
     isDisabled?: boolean;
     /** When true, treat as assignment flow to allow realtime hinting */
     isAssignmentFlow?: boolean;
+    // Logging props
+    userId?: string;
+    topicId?: string;
+    grade?: string;
   };
   // Emotion/heart UI
   emotionActive?: boolean;
@@ -595,6 +600,9 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                         sendMessage={spellInline.sendMessage}
                         interruptRealtimeSession={interruptRealtimeSession}
                         isAssignmentFlow={!!spellInline.isAssignmentFlow}
+                        userId={spellInline.userId}
+                        topicId={spellInline.topicId}
+                        grade={spellInline.grade}
                       />
                     ) : displayHtml ? (
                       <div dangerouslySetInnerHTML={{ __html: displayHtml }} />
