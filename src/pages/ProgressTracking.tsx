@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CheckCircle, AlertCircle, Circle, TrendingUp, Award, RefreshCw, Eye } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, Circle, TrendingUp, Award, RefreshCw, Eye, Download } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { 
   loadSpellboxTopicProgress, 
@@ -19,6 +19,7 @@ import { sampleMCQData } from '@/data/mcq-questions';
 import WhiteboardLesson from '@/components/adventure/WhiteboardLesson';
 import { markWhiteboardSeen } from '@/lib/utils';
 import { getLessonScript } from '@/data/lesson-scripts';
+import { worksheetLinks } from '@/data/worksheet-links';
 
 interface TopicProgressCard {
   topicId: string;
@@ -430,6 +431,22 @@ export function ProgressTracking(): JSX.Element {
                   >
                     <Eye className="h-3 w-3" />
                   </button>
+                )}
+
+                {/* Download Worksheet (shown only if link exists) */}
+                {worksheetLinks[card.topicId] && (
+                  <a
+                    aria-label="Download worksheet"
+                    title="Download worksheet"
+                    href={worksheetLinks[card.topicId]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={playClickSound}
+                    className="absolute bottom-3 left-3 w-7 h-7 rounded-full border border-gray-300/70 shadow-sm bg-white/80 text-gray-700 flex items-center justify-center hover:bg-white"
+                    download
+                  >
+                    <Download className="h-3 w-3" />
+                  </a>
                 )}
               </Card>
             );
