@@ -33,6 +33,16 @@ export const worksheetLinks: WorksheetLinksMap = {
 
   // ReadKraft_3 — Grade 3
   "3-A.3.1": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.3.1.pdf?alt=media&token=00a09ff7-3ed3-4dee-9424-d464c2862402",
+  "3-A.3.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.3.2.pdf?alt=media&token=88c71ce2-7ada-447f-bd22-dade8916771b",
+  "3-A.3.3": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.3.3.pdf?alt=media&token=fdca31d8-8ba6-45a6-806d-78942b95a5b1",
+  "3-A.3.4": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.3.4.pdf?alt=media&token=d9fcbd30-d271-42e1-bd30-eca77e327206",
+  "3-A.4.1": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.4.1.pdf?alt=media&token=3393bfd5-987e-45b7-ba3a-29dd6f48b56c",
+  "3-A.4.2": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.4.2.pdf?alt=media&token=1ced11c3-eb06-4965-a1ad-cee25d2b5181",
+  "3-A.4.3": "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.4.3.pdf?alt=media&token=11b35f78-6014-496f-befa-d8d95826bcb2",
+  "3-A.5":   "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.5.pdf?alt=media&token=ad438846-19f9-45d7-9e3e-7b3d0e6dba3e",
+  "3-A.6":   "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.6.pdf?alt=media&token=471c6676-76ac-4101-9784-9d94cad1b686",
+  "3-A.7":   "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-A.7.pdf?alt=media&token=fdc48b1e-2c79-4c66-869a-ea2e163e23e5",
+  "3-C.3":   "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/worksheets%2FReadKraft_3-C.3.pdf?alt=media&token=b829d08c-9c26-4d26-ab12-f08bfdb5de0e",
 };
 
 
