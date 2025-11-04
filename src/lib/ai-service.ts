@@ -1,4 +1,6 @@
 import OpenAI from 'openai';
+import { composePrompt } from './prompt';
+import { getGenericOpeningInstruction } from './prompt/GenericPrompt';
 import { SpellingQuestion } from './questionBankUtils';
 import { UnifiedAIStreamingService, UnifiedAIResponse } from './unified-ai-streaming-service';
 
@@ -2048,19 +2050,13 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     // console.log('🎯 buildChatContext: Config found:', !!config, 'Using fallback:', adventureType !== 'food' && !this.adventureConfigs[adventureType]);
     // console.log('🎯 buildChatContext: Selected config type:', adventureType in this.adventureConfigs ? adventureType : 'food (fallback)');
     
-    // Generate system prompt using the configuration template
-    const systemPrompt = adventureType === 'story'
-      ? config.systemPromptTemplate(
-          petTypeDescription,
-          petName,
-          userData,
-          adventureState,
-          currentAdventure,
-          summary,
-          spellingWord,
-          phaseInstructions,
-          adventureType
-        )
+    // Generate system prompt using the composer for all structured adventures
+    const structuredAdventures = [
+      'house','food','dressing-competition','travel','friend','who-made-the-pets-sick',
+      'pet-school','pet-theme-park','pet-mall','pet-care','plant-dreams','story'
+    ];
+    const systemPrompt = structuredAdventures.includes(adventureType)
+      ? composePrompt(adventureType, petTypeDescription, petName, userData)
       : config.systemPromptTemplate(
           petTypeDescription,
           petName,
@@ -2398,15 +2394,21 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       // console.log('🎯 generateInitialMessage: Config found:', !!config, 'Using fallback:', adventureType !== 'food' && !this.adventureConfigs[adventureType]);
       // console.log('🎯 generateInitialMessage: Selected config type:', adventureType in this.adventureConfigs ? adventureType : 'food (fallback)');
       
-      // Generate system prompt using the configuration template
-      const systemContent = config.initialMessageTemplate(
-        adventureMode,
-        petTypeDescription,
-        petName,
-        userData,
-        currentAdventure,
-        summary
-      );
+      // Generate initial message using composer + generic opening for structured adventures
+      const structuredInitial = [
+        'house','food','dressing-competition','travel','friend','who-made-the-pets-sick',
+        'pet-school','pet-theme-park','pet-mall','pet-care','plant-dreams','story'
+      ];
+      const systemContent = structuredInitial.includes(adventureType)
+        ? `${composePrompt(adventureType, petTypeDescription, petName, userData)}\n\n${getGenericOpeningInstruction(petTypeDescription, petName, userData)}`
+        : config.initialMessageTemplate(
+            adventureMode,
+            petTypeDescription,
+            petName,
+            userData,
+            currentAdventure,
+            summary
+          );
 
 
       const systemMessage = {
