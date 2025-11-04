@@ -233,17 +233,17 @@ import {
       );
     }
   
-    // Ensure field exists for effective key
-    if (typeof (petObj?.[effectiveKey]) !== 'number') {
-      batch.set(questsRef, { [pet]: { [effectiveKey]: 0 } } as any, { merge: true });
+    // Ensure field exists for the specific adventure key we're crediting
+    if (typeof (petObj?.[perAdventureKey]) !== 'number') {
+      batch.set(questsRef, { [pet]: { [perAdventureKey]: 0 } } as any, { merge: true });
     }
 
-    // Increment quest progress for effective activity
+    // Increment quest progress for the credited adventure
     batch.set(
       questsRef,
       {
         [pet]: {
-          [effectiveKey]: increment(questionsSolved),
+          [perAdventureKey]: increment(questionsSolved),
         },
         updatedAt: nowServerTimestamp(),
       } as any,
@@ -264,7 +264,7 @@ import {
     );
   
     // If we can determine completion pre-increment, annotate cooldown timestamps (best-effort)
-    const currentProgress = Number(petObj?.[effectiveKey] ?? 0);
+    const currentProgress = Number(petObj?.[perAdventureKey] ?? 0);
     const predicted = currentProgress + questionsSolved;
     const alreadyCompleted = Boolean(petObj?._completedAt);
     if (predicted >= QUEST_TARGET && !alreadyCompleted) {

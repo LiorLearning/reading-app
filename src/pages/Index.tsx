@@ -40,7 +40,7 @@ import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { trackEvent } from "@/lib/feedback-service";
 import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
-import { useAdventurePersistentProgress } from "@/hooks/use-adventure-progress";
+import { useAdventurePersistentProgress, useAdventureProgressForType } from "@/hooks/use-adventure-progress";
 import { useSessionCoins } from "@/hooks/use-session-coins";
 import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
 import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
@@ -131,6 +131,14 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
 // Persistent progress bar wrapper to keep JSX clean
 const PersistentAdventureProgressBar: React.FC = () => {
   const { progressFraction, activity } = useAdventurePersistentProgress();
+  return (
+    <AdventureFeedingProgress progressFraction={progressFraction} />
+  );
+};
+
+// Per-type daily progress bar for Adventure screen
+const PerTypeAdventureProgressBar: React.FC<{ type?: string }> = ({ type }) => {
+  const { progressFraction } = useAdventureProgressForType(type);
   return (
     <AdventureFeedingProgress progressFraction={progressFraction} />
   );
@@ -2137,7 +2145,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           method: 'POST',
           body: JSON.stringify({
             content: text,
-            "type": "user_input_mod",
+            type: "user_input_mod",
+            username: userName
           }),
           headers: {
             'Content-Type': 'application/json'
@@ -5513,8 +5522,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             <div className="text-center">
               {currentScreen === 1 ? (
                 <div className="flex items-center justify-center gap-2">
-                  {/* Adventure Feeding Progress (persistent) */}
-                  <PersistentAdventureProgressBar />
+                  {/* Adventure Feeding Progress (per-type, daily) */}
+                  <PerTypeAdventureProgressBar type={currentAdventureType} />
                   {/* <Button
                     variant="outline"
                     size="icon"
@@ -5997,11 +6006,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           const currentPetId = PetProgressStorage.getCurrentSelectedPet();
           const petName = PetProgressStorage.getPetDisplayName(currentPetId);
           const petType = PetProgressStorage.getPetType(currentPetId);
+          // Capture a brief snippet from the most recent chat to ensure continuity post-whiteboard
+          const recentSnippet = (() => {
+            try {
+              const last = [...chatMessages].reverse().find(m => m && (m.type === 'ai' || m.type === 'user')) as any;
+              const text = (last?.content || '').trim();
+              if (!text) return '';
+              return text.length > 400 ? (text.slice(0, 400) + '…') : text;
+            } catch {
+              return '';
+            }
+          })();
           const initialMessage = await aiService.generateInitialMessage(
             adventureMode,
             chatMessages,
             currentAdventureContext,
-            undefined,
+            recentSnippet || undefined,
             currentAdventureContext?.summary,
             userData,
             petName,
