@@ -1,9 +1,12 @@
 import React from 'react';
-import pandaSticker from '@/assets/panda2.png';
+import pandaImg from '@/assets/panda2.png';
+import deerImg from '@/assets/deer.png';
+import pikaImg from '@/assets/pika.png';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Star, Download, Loader2, RotateCcw, Pencil } from 'lucide-react';
 import { generateQuestionImageForWord, generateImageWithPrompt, buildDefaultPrompt } from '@/lib/question-image-channel';
+import { sampleMCQData } from '@/data/mcq-questions';
 
 interface WordPuzzle {
   scrambled: string[];
@@ -16,76 +19,78 @@ interface WordPuzzle {
 // Lightweight, reliable image URLs (fallback to emoji if any fails)
 const wordPuzzles: WordPuzzle[] = [
   {
-      scrambled: ['L', 'A', 'B', 'K', 'C'],
-      answer: 'black',
-      image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBw0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ8NDQ0NFREWFhURFRUYHSggGBolGxUVITEhJSk3Ljo6Fx8zODM4Nyg5LjcBCgoKDQ0NDg0NDisZFRkrKy0rNzcrKys3LS0tKzctKy0rLSs3LTcrLSsrKysrKystKysrKysrLSsrKysrKysrK//AABEIAQMAwgMBIgACEQEDEQH/xAAWAAEBAQAAAAAAAAAAAAAAAAAAAQf/xAAWEAEBAQAAAAAAAAAAAAAAAAAAARH/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/EABURAQEAAAAAAAAAAAAAAAAAAAAR/9oADAMBAAIRAxEAPwDDgFABFAAABAAAFBAABUFBQRFAUAEABQBRFAEAQAVRAUBFABFAEVBFAABQAAAQAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQBQQFEUAAABAAUAAAAAAAAAAAABFBBUBRAAARRFFAAAEAAABQAAAAAAQAAEABQAEAEUAVFAFAAAEABQAAAABAVAEAEABVAEQABUBQVFAAFAAAAAAAAAAEAAAQAAAAAAAQAUABVABAAUAAAAAAABAURABQAQAAFRAUBQBQAAAAAAAAAAABBQEAQABAFBAVQAAAFAAAAAAAAAAAAQUAAARQEUBAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUUBAUEAAAAAAAAAAAAAAAAAABQAEAWooIoCCgIKAgoCAoIKAgoCCgIKAgoACgYKCxKigiQAAAAAAAAAAAAAAAAAFABFUAAUf/Z',
-      alt: 'Black cat cartoon',
-      emoji: '🐈‍⬛',
+  "scrambled": ["T", "B", "A"],
+  "answer": "bat",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=BAT](https://dummyimage.com/600x400/ffffff/000000&text=BAT)",
+  "alt": "A small bat with wings spread",
+  "emoji": "🦇"
+  },
+  {
+  "scrambled": ["T", "C", "A"],
+  "answer": "cat",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=CAT](https://dummyimage.com/600x400/ffffff/000000&text=CAT)",
+  "alt": "A cute house cat",
+  "emoji": "🐱"
+  },
+  {
+  "scrambled": ["H", "T", "A"],
+  "answer": "hat",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=HAT](https://dummyimage.com/600x400/ffffff/000000&text=HAT)",
+  "alt": "A simple hat",
+  "emoji": "👒"
+  },
+  {
+  "scrambled": ["D", "S", "A"],
+  "answer": "sad",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=SAD](https://dummyimage.com/600x400/ffffff/000000&text=SAD)",
+  "alt": "A sad face icon",
+  "emoji": "😞"
+  },
+  {
+  "scrambled": ["M", "D", "A"],
+  "answer": "mad",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=MAD](https://dummyimage.com/600x400/ffffff/000000&text=MAD)",
+  "alt": "An angry face icon",
+  "emoji": "😠"
+  },
+  {
+  "scrambled": ["G", "A", "B"],
+  "answer": "bag",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=BAG](https://dummyimage.com/600x400/ffffff/000000&text=BAG)",
+  "alt": "A school bag",
+  "emoji": "🎒"
+  },
+  {
+  "scrambled": ["A", "M", "J"],
+  "answer": "jam",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=JAM](https://dummyimage.com/600x400/ffffff/000000&text=JAM)",
+  "alt": "A jar of fruit jam",
+  "emoji": "🥫"
+  },
+  {
+  "scrambled": ["A", "P", "M"],
+  "answer": "map",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=MAP](https://dummyimage.com/600x400/ffffff/000000&text=MAP)",
+  "alt": "A folded paper map",
+  "emoji": "🗺️"
+  },
+  {
+    "scrambled": ["N", "C", "A"],
+    "answer": "can",
+    "image": "[https://dummyimage.com/600x400/ffffff/000000&text=CAN](https://dummyimage.com/600x400/ffffff/000000&text=CAN)",
+    "alt": "A soda can",
+    "emoji": "🥤"
     },
-    {
-      scrambled: ['R', 'A', 'G', 'B'],
-      answer: 'grab',
-      image: 'https://images.pexels.com/photos/10821179/pexels-photo-10821179.jpeg',
-      alt: 'Cartoon hand grabbing something',
-      emoji: '✋',
-    },
-    {
-      scrambled: ['T', 'E', 'S', 'P'],
-      answer: 'step',
-      image: 'https://media.istockphoto.com/id/1270884495/video/slow-motion-legs-of-confidence-business-man-office-worker-in-suit-and-leather-shoe-walking-up.jpg?s=640x640&k=20&c=917cdTN91UVI6_6MOcCoYbKw2YyKp9LgwOaWQcDNpdI=',
-      alt: 'Cartoon footsteps or steps',
-      emoji: '👣',
-    },
-    {
-      scrambled: ['O', 'B', 'K', 'L', 'C'],
-      answer: 'block',
-      image: 'https://images.pexels.com/photos/1340185/pexels-photo-1340185.jpeg?cs=srgb&dl=pexels-magda-ehlers-pexels-1340185.jpg&fm=jpg',
-      alt: 'Colorful toy building blocks',
-      emoji: '🧱',
-    },
-    {
-      scrambled: ['A', 'R', 'B', 'C'],
-      answer: 'crab',
-      image: 'https://www.shutterstock.com/image-vector/childrens-flat-vector-illustration-on-600nw-2473413989.jpg',
-      alt: 'Red crab cartoon',
-      emoji: '🦀',
-    },
-    {
-      scrambled: ['R', 'A', 'T', 'P'],
-      answer: 'trap',
-      image: 'https://atlas-content-cdn.pixelsquid.com/stock-images/bear-trap-Od7Ged4-600.jpg',
-      alt: 'Cartoon mouse trap',
-      emoji: '🪤',
-    },
-    {
-      scrambled: ['A', 'P', 'E', 'D', 'S'],
-      answer: 'spade',
-      image: 'https://m.media-amazon.com/images/I/51NQTFsGc4L.jpg',
-      alt: 'Cartoon garden spade',
-      emoji: '🛠️',
-    },
-    {
-      scrambled: ['L', 'O', 'K', 'C', 'C'],
-      answer: 'clock',
-      image: 'https://media.istockphoto.com/id/931336618/vector/clock-vector-icon-isolated.jpg?s=612x612&w=0&k=20&c=I8EBJl8i6olqcrhAtKko74ydFEVbfCQ6s5Pbsx6vfas=',
-      alt: 'Cartoon wall clock',
-      emoji: '⏰',
-    },
-    {
-      scrambled: ['R', 'P', 'D', 'O'],
-      answer: 'drop',
-      image: 'https://static.vecteezy.com/system/resources/thumbnails/044/570/540/small/single-water-drop-on-transparent-background-free-png.png',
-      alt: 'Cartoon water drop',
-      emoji: '💧',
-    },
-    {
-      scrambled: ['I', 'L', 'P', 'S'],
-      answer: 'slip',
-      image: 'https://static.vecteezy.com/system/resources/previews/060/016/230/non_2x/man-falls-sliding-on-slippery-wet-floor-person-slipping-falling-down-injury-danger-flat-illustration-isolated-on-white-background-vector.jpg',
-      alt: 'Cartoon slip warning sign',
-      emoji: '⚠️',
-    },
+  {
+  "scrambled": ["N", "C", "A"],
+  "answer": "can",
+  "image": "[https://dummyimage.com/600x400/ffffff/000000&text=CAN](https://dummyimage.com/600x400/ffffff/000000&text=CAN)",
+  "alt": "A soda can",
+  "emoji": "🥤"
+  }
   ]
+  
+  
   ;
 
 export default function WorksheetTopic1H1(): React.ReactElement {
@@ -97,6 +102,290 @@ export default function WorksheetTopic1H1(): React.ReactElement {
   const [activePromptIndex, setActivePromptIndex] = React.useState<number | null>(null);
   const [promptText, setPromptText] = React.useState<string>('');
   const [isSendingPrompt, setIsSendingPrompt] = React.useState(false);
+  const [selectedTopicId, setSelectedTopicId] = React.useState<string | null>(null);
+  const [selectedPet, setSelectedPet] = React.useState<'panda' | 'deer' | 'pika'>('panda');
+  const [selectedPetMessage, setSelectedPetMessage] = React.useState<string>('');
+  const [wordEditText, setWordEditText] = React.useState<string>('');
+
+  const petAssets: Record<'panda' | 'deer' | 'pika', string> = {
+    panda: pandaImg as unknown as string,
+    deer: deerImg as unknown as string,
+    pika: pikaImg as unknown as string,
+  };
+
+  const petAltText: Record<'panda' | 'deer' | 'pika', string> = {
+    panda: 'Panda super happy',
+    deer: 'Legendary Deer guardian',
+    pika: 'Electric Pikachu friend',
+  };
+
+  const petMessages: Record<'panda' | 'deer' | 'pika', string[]> = {
+    panda: [
+      "I once tried to use bamboo as a straw. It didn’t work, but I looked cool.",
+      "When I dance, I call it the Panda Shuffle.",
+      "I once sneezed so loudly a monkey dropped his banana!",
+      "I tried yoga once. I fell asleep halfway through.",
+      "I roll down hills for fun — it’s my cardio routine!",
+      "I can eat for 12 hours straight. It’s a superpower, not a problem.",
+      "Sometimes I clap when I see butterflies. They’re too pretty!",
+      "I once sat on my tail and thought it disappeared!",
+      "My favorite shape is round — like me!",
+      "I once tried to juggle bamboo sticks and invented ‘panda juggling chaos.’",
+      "If naps were an Olympic sport, I’d have 10 gold medals.",
+      "I once mistook a rock for bamboo. Crunchy surprise!",
+      "My belly is so soft, squirrels use it as a trampoline.",
+      "I once wore mud like a spa mask. Nature’s beauty routine!",
+      "When it rains, I play in puddles like they’re mini oceans.",
+      "Sometimes I forget what I’m chewing halfway through chewing.",
+      "I once tried to climb a small tree and made it smaller.",
+      "My favorite sound is the ‘plop’ of bamboo falling — that means lunch!",
+      "I once waved at my reflection. He waved back. We’re friends now.",
+      "I dream about bamboo pizza with honey drizzle.",
+      "I once wore leaves as shoes. Very slippery fashion!",
+      "I’m not lazy; I’m just saving energy for snacks.",
+      "I once tried to roar like a tiger and sounded like a hiccup.",
+      "My favorite word? Nap.",
+      "I once used my belly as a drum — got applause from birds.",
+      "Sometimes I roll for so long, I forget what direction I started in.",
+      "I once tried to hide behind a tiny bush. Spoiler: it didn’t work.",
+      "I love bamboo so much, I named one Mr. Crunchy.",
+      "I once sat on a turtle thinking it was a rock. We’re friends now.",
+      "When I sneeze, I scare myself and then laugh about it.",
+      "My tail is small but mighty — it helps me sit like a boss.",
+      "I once painted with mud. I called it ‘Abstract Panda.’",
+      "Sometimes I hum while chewing. It’s my lunch song.",
+      "I once tried swimming. Let’s just say... pandas aren’t dolphins.",
+      "I love sliding on wet grass — it’s nature’s roller coaster.",
+      "I once tried to count my toes and got distracted by bamboo.",
+      "My best nap spot changes daily — variety is important.",
+      "When I trip, I pretend it’s a dance move.",
+      "I once winked at a frog. He blushed green!"
+    ],
+    pika: [
+      "I once zapped a cookie. Now it’s crispy on another level!",
+      "When I sneeze, I light up a whole room!",
+      "I tried to make toast once — the bread exploded.",
+      "I can make thunder jealous of my lightning style.",
+      "My fur is static-proof… mostly.",
+      "I once scared my own reflection. We both screamed!",
+      "When I get excited, my cheeks glow like party lights.",
+      "I once powered a TV for five seconds. Best five seconds ever!",
+      "I love cloud watching — sometimes I shock them into funny shapes.",
+      "I once made popcorn with my thunderbolt. Science is delicious!",
+      "I tried to play tag with lightning. It cheated!",
+      "My tail is my best selfie tool — always charged and ready.",
+      "Once I zapped a puddle and created bubble lightning!",
+      "I tried to charge my friend’s phone. It called the weather app instead!",
+      "When I run fast, I spark trails like a superhero.",
+      "I once made a disco light show for fireflies.",
+      "My dream job? Storm decorator!",
+      "I once zapped a stick and turned it into my magic wand.",
+      "Sometimes I hum in electricity. It’s called Pika Jazz.",
+      "I once powered a blender by accident. Smoothie explosion!",
+      "My favorite number? 1,000,000 volts of fun!",
+      "I once tried to power a robot vacuum. It chased me for an hour.",
+      "I’m small but I can outshine a flashlight any day!",
+      "I love playing hide and seek, but glowing cheeks make me lose.",
+      "I once zapped a balloon. It flew to Pikachu heaven.",
+      "My favorite snack? Shock-olate chips!",
+      "When I sneeze, I accidentally charge the air around me.",
+      "I once powered a Christmas tree. It was my brightest idea!",
+      "Sometimes I zap my pillow for extra fluff.",
+      "My fur smells like lightning and cotton candy after storms.",
+      "I once zapped a door handle. Now it zaps back!",
+      "I once tried surfing on electricity waves. Epic fail, but stylish!",
+      "My favorite color? Yellow, of course — it goes with lightning.",
+      "I once zapped my food to make it warm. Overcooked… again.",
+      "My best friend is thunder. We make noise together.",
+      "I once scared a cat with static sparks. We’re frenemies now.",
+      "Sometimes I make sparks into heart shapes for fun.",
+      "I once powered a merry-go-round with my cheeks. Spin-tacular!",
+      "I’m basically a furry power bank with personality!"
+    ],
+    deer: [
+      "My antlers glow brighter than most night lights.",
+      "I once raced the wind — it barely kept up!",
+      "When I gallop, the forest hums along.",
+      "I once tripped on a vine and pretended it was a dance move.",
+      "Stars follow me sometimes. I think they like my sparkle.",
+      "I once sneezed and made a rainbow sneeze trail!",
+      "My reflection once winked at me. We’re on good terms.",
+      "I can jump so high, clouds wave hello!",
+      "I once scared a rabbit by glowing too bright. Sorry, bunny!",
+      "When I laugh, leaves fall like confetti.",
+      "I sometimes wear vines as necklaces — forest fashion!",
+      "I once leapt over a river and landed in a lily patch.",
+      "My favorite hobby? Moonlight strolls.",
+      "I once hummed a tune that made trees sway along.",
+      "Sometimes my antlers pick up bird songs — best playlist ever!",
+      "I once wished on a shooting star and it followed me home.",
+      "I can whisper to flowers — they giggle back.",
+      "Once I ran so fast I caught a breeze and named it Breezy.",
+      "I love painting the night sky with my glowing horns.",
+      "I once wore moss on my hooves to sneak past frogs.",
+      "When it rains, I twirl like it’s my forest concert.",
+      "I once used my reflection to practice winking — nailed it!",
+      "My favorite snack? Starfruit and magic dew.",
+      "I once turned fog into sparkles with one stomp.",
+      "Sometimes I hum and butterflies land on me to listen.",
+      "I once jumped over a rainbow just for fun.",
+      "My hooves make music when I run — it’s forest jazz!",
+      "I once told a joke to a tree. It dropped its leaves laughing.",
+      "When I’m happy, even rocks glow a little near me.",
+      "I once wore flower crowns for a week. Fashion legend.",
+      "I once found a cloud stuck on a branch — I helped it up.",
+      "My antlers are basically Wi-Fi for forest creatures.",
+      "I once scared the stars by shining too bright.",
+      "When I stomp twice, crickets start singing!",
+      "I once used moonlight as a mirror — fabulous results!",
+      "Sometimes I race my shadow. It cheats!",
+      "I can smell time — it smells like morning dew.",
+      "When I nap, the forest goes quiet out of respect.",
+      "I once made lightning jealous with my glow!"
+    ]
+  };
+  ;
+
+  React.useEffect(() => {
+    const msgs = petMessages[selectedPet] || [];
+    const msg = msgs.length ? msgs[Math.floor(Math.random() * msgs.length)] : '';
+    setSelectedPetMessage(msg);
+  }, [selectedPet]);
+
+  React.useEffect(() => {
+    if (activePromptIndex !== null) {
+      setWordEditText(puzzles[activePromptIndex]?.answer || '');
+    } else {
+      setWordEditText('');
+    }
+  }, [activePromptIndex, puzzles]);
+
+  const topicIds = React.useMemo(() => Object.keys(sampleMCQData.topics || {}), []);
+
+  const shuffle = React.useCallback(<T,>(items: T[]): T[] => {
+    const a = items.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }, []);
+
+  // Crypto-strong random int in [0, max)
+  const secureRandomInt = React.useCallback((maxExclusive: number): number => {
+    if (maxExclusive <= 0) return 0;
+    const cryptoObj: Crypto | undefined = (typeof window !== 'undefined' ? (window as any).crypto : undefined);
+    if (!cryptoObj || typeof cryptoObj.getRandomValues !== 'function') {
+      return Math.floor(Math.random() * maxExclusive);
+    }
+    const range = 0x100000000; // 2^32
+    const limit = range - (range % maxExclusive);
+    const buf = new Uint32Array(1);
+    let x = 0;
+    do {
+      cryptoObj.getRandomValues(buf);
+      x = buf[0];
+    } while (x >= limit);
+    return x % maxExclusive;
+  }, []);
+
+  // Fisher–Yates using secure RNG
+  const shuffleSecure = React.useCallback(<T,>(items: T[]): T[] => {
+    const a = items.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = secureRandomInt(i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }, [secureRandomInt]);
+
+  // Scramble letters strongly and avoid trivial patterns
+  const scrambleLetters = React.useCallback((word: string): string[] => {
+    const original = word.toUpperCase().split('');
+    if (original.length <= 1) return original;
+    const originalStr = original.join('');
+    const reversedStr = original.slice().reverse().join('');
+    let attempt = 0;
+    let scrambled = original.slice();
+    while (attempt < 8) {
+      scrambled = shuffleSecure(scrambled);
+      const scrStr = scrambled.join('');
+      if (scrStr !== originalStr && scrStr !== reversedStr) break;
+      attempt++;
+    }
+    // Force a swap for stubborn 2-letter (or repeated) cases
+    if (scrambled.join('') === originalStr && original.length >= 2) {
+      const i = 0;
+      const j = (0 + Math.max(1, secureRandomInt(original.length))) % original.length;
+      [scrambled[i], scrambled[j]] = [scrambled[j], scrambled[i]];
+    }
+    return scrambled;
+  }, [shuffleSecure, secureRandomInt]);
+
+  const applyTopicToPuzzles = React.useCallback((topicId: string) => {
+    const topic = sampleMCQData.topics?.[topicId];
+    if (!topic) return;
+    const words = topic.questions
+      .map((q: any) => {
+        // PRIMARY: use audio field which consistently holds the whole word
+        if (typeof q?.audio === 'string') return q.audio;
+        // SECONDARY: try full word fields
+        if (typeof q?.word === 'string') return q.word;
+        if (typeof q?.aiHook?.targetWord === 'string') return q.aiHook.targetWord;
+        // FALLBACKS: use correctAnswer or MCQ option
+        if (typeof q?.correctAnswer === 'string') return q.correctAnswer;
+        if (typeof q?.correctAnswer === 'number' && Array.isArray(q?.options)) {
+          const idx = q.correctAnswer as number;
+          const opts = q.options as any[];
+          const val = idx >= 0 && idx < opts.length ? opts[idx] : null;
+          if (typeof val === 'string') return val;
+        }
+        return null;
+      })
+      .filter((w: string | null): w is string => !!w)
+      .map(w => w.trim())
+      .filter(w => /^[a-zA-Z]+$/.test(w))
+      .filter(w => w.length >= 3); // avoid graphemes like 'oi', 'oy'
+
+    const lower = words.map(w => w.toLowerCase());
+    if (lower.length === 0) { setPuzzles([]); return; }
+    let picked: string[];
+    if (lower.length >= 10) {
+      picked = shuffle(lower).slice(0, 10);
+    } else {
+      const extended: string[] = [];
+      for (let i = 0; i < 10; i++) {
+        extended.push(lower[i % lower.length]);
+      }
+      picked = shuffle(extended);
+    }
+    const next: WordPuzzle[] = picked.map(answerLower => {
+      const scrambled = scrambleLetters(answerLower);
+      return {
+        scrambled,
+        answer: answerLower,
+        image: '',
+        alt: `Picture of ${answerLower}`,
+        emoji: '✨'
+      };
+    });
+    setPuzzles(next);
+  }, [shuffle, scrambleLetters]);
+
+  const applyWordChange = React.useCallback(() => {
+    const idx = activePromptIndex;
+    if (idx === null) return;
+    const raw = (wordEditText || '').trim();
+    const clean = raw.replace(/[^a-zA-Z]/g, '').toLowerCase();
+    if (!clean) return;
+    setPuzzles(prev => prev.map((p, i) => i === idx ? {
+      ...p,
+      answer: clean,
+      scrambled: scrambleLetters(clean),
+      image: '',
+      alt: `Picture of ${clean}`,
+    } : p));
+  }, [activePromptIndex, wordEditText, scrambleLetters]);
 
   const retryOne = React.useCallback(async (index: number) => {
     try {
@@ -234,7 +523,7 @@ export default function WorksheetTopic1H1(): React.ReactElement {
       });
 
       // PDF-only: add mascot image at bottom-right of every worksheet page (local asset)
-      const stickerUrl = pandaSticker as unknown as string;
+      const stickerUrl = petAssets[selectedPet] as unknown as string;
       Array.from(clone.querySelectorAll('.worksheet-page')).forEach(page => {
         const pageEl = page as HTMLElement;
         // Ensure absolute children position against the page box
@@ -246,7 +535,7 @@ export default function WorksheetTopic1H1(): React.ReactElement {
         // Set crossorigin before src (harmless for same-origin)
         img.setAttribute('crossorigin', 'anonymous');
         img.src = stickerUrl;
-        img.alt = 'Panda super happy';
+        img.alt = petAltText[selectedPet];
         const style = img.style as CSSStyleDeclaration & { [key: string]: any };
         style.position = 'absolute';
         style.right = '16px';
@@ -298,7 +587,7 @@ export default function WorksheetTopic1H1(): React.ReactElement {
         bubble.appendChild(tail);
 
         const bubbleText = document.createElement('div');
-        bubbleText.textContent = 'Psst… here’s my little secret — I can’t jump, but oh boy, I can roll like a pro!';
+        bubbleText.textContent = selectedPetMessage || '';
         const bt = bubbleText.style as CSSStyleDeclaration & { [key: string]: any };
         bt.margin = '0';
         bt.display = 'block';
@@ -637,14 +926,15 @@ export default function WorksheetTopic1H1(): React.ReactElement {
       // Clean up the clone
       document.body.removeChild(clone);
 
-      pdf.save('ReadKraft_Worksheet.pdf');
+      const filename = selectedTopicId ? `ReadKraft_${selectedTopicId}.pdf` : 'ReadKraft_Worksheet.pdf';
+      pdf.save(filename);
     } catch (err) {
       console.error('Error generating PDF:', err);
       alert('There was an error generating the PDF. Please try again.');
     } finally {
       setIsGenerating(false);
     }
-  }, [loadScript]);
+  }, [loadScript, selectedPet, selectedPetMessage]);
 
   return (
     <div className="relative min-h-screen p-4 md:p-8 print:p-0" style={{fontFamily:'system-ui, -apple-system, sans-serif'}}>
@@ -734,7 +1024,7 @@ export default function WorksheetTopic1H1(): React.ReactElement {
           </div>
           <div className="relative z-10">
             <h3 className="pdf-topic text-center text-xl md:text-2xl font-extrabold text-primary mb-1 tracking-wide">
-              Consonant blends
+            Consonant -le ending
             </h3>
             <p className="pdf-instruction text-center text-lg md:text-xl text-foreground mb-6 md:mb-8" style={{fontWeight:400}}>
             Unscramble the letters to name the pictures!
@@ -924,6 +1214,102 @@ export default function WorksheetTopic1H1(): React.ReactElement {
               >
                 Reset to Default
               </Button>
+            </div>
+            <div className="mt-5 pt-4 border-t border-primary/10">
+              <div className="text-sm font-semibold text-primary mb-2">Topic Selector</div>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <div className="flex flex-wrap gap-2 max-h-[260px] overflow-auto pr-1">
+                    {topicIds.map((tid) => (
+                      <Button
+                        key={tid}
+                        variant={selectedTopicId === tid ? 'default' : 'outline'}
+                        className="h-8 px-2 rounded-md text-xs"
+                        onClick={() => { setSelectedTopicId(tid); applyTopicToPuzzles(tid); }}
+                      >
+                        {tid}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-primary mb-2">Answers</div>
+                  <div className="max-h-[260px] overflow-auto pr-1">
+                    <ul className="text-xs leading-6 list-disc pl-4">
+                      {puzzles.map((p, i) => (
+                        <li key={i}>{p.answer}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 pt-4 border-t border-primary/10">
+              <div className="text-sm font-semibold text-primary mb-2">Word Editor</div>
+              {activePromptIndex !== null ? (
+                <>
+                  <Input
+                    value={wordEditText}
+                    onChange={(e) => setWordEditText(e.target.value)}
+                    placeholder="Type new word (letters only)"
+                    className="h-9"
+                  />
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button
+                      onClick={applyWordChange}
+                      disabled={!/^\s*[A-Za-z]+\s*$/.test(wordEditText)}
+                      className="h-9 px-3 rounded-lg"
+                    >
+                      Update Word
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setWordEditText(puzzles[activePromptIndex!]?.answer || '')}
+                      className="h-9 px-3 rounded-lg"
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-xs text-muted-foreground">Select a card (use the pencil) to edit its word.</div>
+              )}
+            </div>
+            <div className="mt-5 pt-4 border-t border-primary/10">
+              <div className="text-sm font-semibold text-primary mb-2">Pet Selector</div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={selectedPet === 'panda' ? 'default' : 'outline'}
+                  className="h-8 px-3 rounded-md text-xs"
+                  onClick={() => setSelectedPet('panda')}
+                >
+                  Panda
+                </Button>
+                <Button
+                  variant={selectedPet === 'deer' ? 'default' : 'outline'}
+                  className="h-8 px-3 rounded-md text-xs"
+                  onClick={() => setSelectedPet('deer')}
+                >
+                  Deer
+                </Button>
+                <Button
+                  variant={selectedPet === 'pika' ? 'default' : 'outline'}
+                  className="h-8 px-3 rounded-md text-xs"
+                  onClick={() => setSelectedPet('pika')}
+                >
+                  Pikachu
+                </Button>
+              </div>
+              <div className="mt-3">
+                <div className="text-xs text-muted-foreground mb-1">Message used in PDF</div>
+                <div className="p-3 rounded-md border-2 border-primary/20 bg-white text-sm leading-snug min-h-[48px]">
+                  {selectedPetMessage ? (
+                    <span>{selectedPetMessage}</span>
+                  ) : (
+                    <span className="text-muted-foreground">No message</span>
+                  )}
+                </div>
+              </div>
             </div>
           </aside>
         </div>
