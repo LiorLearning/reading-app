@@ -472,12 +472,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [currentQuestionIndex, isVisible]);
 
-  // Generate stable messageId for TTS (only changes when targetWord changes)
-  const messageId = useMemo(() => 
-    `krafty-spellbox-audio-${targetWord}-${Date.now()}`, 
-    [targetWord]
-  );
-  const isSpeaking = useTTSSpeaking(messageId);
+  // Track only the SpellBox word speaker state (AI tutor speech), isolated from ElevenLabs
+  const [isWordSpeaking, setIsWordSpeaking] = useState(false);
 
   // TTS message ID for first-time instruction
   const instructionMessageId = useMemo(() => 
@@ -665,31 +661,43 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [instructionMessageId]);
 
-  // Play word audio using ElevenLabs TTS
+  // Play word via AI tutor (speak only the single word). Toggle with interrupt.
   const playWordAudio = useCallback(async () => {
-    // console.log('🎵 SPELLBOX SPEAKER BUTTON: Click detected', {
-    //   audioText,
-    //   targetWord,
-    //   messageId,
-    //   isSpeaking
-    // });
-    
     playClickSound();
     
-    if (isSpeaking) {
-      // console.log('🎵 SPELLBOX SPEAKER BUTTON: Stopping current speech');
-      ttsService.stop();
-    } else {
-      // console.log('🎵 SPELLBOX SPEAKER BUTTON: Starting speech with ElevenLabs TTS at 0.7x speed');
-      await ttsService.speak(audioText, {
-        stability: 0.7,
-        similarity_boost: 0.9,
-        speed: 0.7,  // Set speed to 0.7x for SpellBox words
-        messageId: messageId,
-        voice: jessicaVoiceId
-      });
+    // Toggle: if currently speaking, interrupt tutor speech
+    if (isWordSpeaking) {
+      try { if (interruptRealtimeSession) interruptRealtimeSession(); } catch {}
+      setIsWordSpeaking(false);
+      return;
     }
-  }, [audioText, targetWord, messageId, isSpeaking]);
+    
+    // Ensure we have a word and a realtime channel
+    const wordOnly = (audioText || '').trim();
+    if (!wordOnly || !sendMessage) {
+      console.warn('[SpellBox] AI tutor speak skipped — missing word or sendMessage');
+      return;
+    }
+    
+    // Build a strict request that asks the tutor to pronounce ONLY the word
+    const payloadObj = {
+      type: 'speak_word',
+      word: wordOnly,
+      instruction: `Say exactly the single word "${wordOnly}" once. No other words or sounds.`
+    };
+    const payload = JSON.stringify(payloadObj);
+    try { console.log('[SpellBox.playWordAudio] Sending to tutor:', payload); } catch {}
+    
+    try {
+      sendMessage(payload);
+      setIsWordSpeaking(true);
+      // Auto-reset after a short duration to recover UI state if no end signal
+      window.setTimeout(() => setIsWordSpeaking(false), Math.max(1200, Math.min(3000, wordOnly.length * 200)));
+    } catch (err) {
+      console.error('[SpellBox.playWordAudio] Failed to send tutor request', err);
+      setIsWordSpeaking(false);
+    }
+  }, [audioText, sendMessage, interruptRealtimeSession, isWordSpeaking]);
 
   // Gate the Next chevron after a correct answer if a delay is requested
   useEffect(() => {
@@ -1244,12 +1252,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           onClick={playWordAudio}
                           className={cn(
                             'ml-2 h-11 w-11 rounded-lg border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
-                            isSpeaking && 'bg-red-500 text-white hover:bg-red-600'
+                            isWordSpeaking && 'bg-red-500 text-white hover:bg-red-600'
                           )}
-                          title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
-                          aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
+                          title={isWordSpeaking ? 'Stop audio' : 'Listen to this word'}
+                          aria-label={isWordSpeaking ? 'Stop audio' : 'Play audio'}
                         >
-                          {isSpeaking ? (
+                          {isWordSpeaking ? (
                             <Square className="h-5 w-5" />
                           ) : (
                             <Volume2 className="h-5 w-5" />
@@ -1496,12 +1504,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               onClick={playWordAudio}
                               className={cn(
                                 'ml-1 h-8 w-8 rounded-md border-2 border-black bg-white text-foreground shadow-[0_3px_0_rgba(0,0,0,0.6)]',
-                                isSpeaking ? 'bg-red-500 text-white hover:bg-red-600' : 'hover:bg-primary hover:text-primary-foreground'
+                                isWordSpeaking ? 'bg-red-500 text-white hover:bg-red-600' : 'hover:bg-primary hover:text-primary-foreground'
                               )}
-                              title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
-                              aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
+                              title={isWordSpeaking ? 'Stop audio' : 'Listen to this word'}
+                              aria-label={isWordSpeaking ? 'Stop audio' : 'Play audio'}
                             >
-                              {isSpeaking ? (
+                              {isWordSpeaking ? (
                                 <Square className="h-4 w-4" />
                               ) : (
                                 <Volume2 className="h-4 w-4" />
