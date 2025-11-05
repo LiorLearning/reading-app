@@ -663,7 +663,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [instructionMessageId]);
 
-  // Play word audio using ElevenLabs TTS
+  // Play word audio. Prefer realtime agent (if enabled), else ElevenLabs TTS
   const playWordAudio = useCallback(async () => {
     // console.log('🎵 SPELLBOX SPEAKER BUTTON: Click detected', {
     //   audioText,
@@ -674,6 +674,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     
     playClickSound();
     
+    // If we're in assignment flow and a realtime session is wired in, ask the agent to speak the word verbatim
+    if (isAssignmentFlow && sendMessage) {
+      try { interruptRealtimeSession?.(); } catch {}
+      // Use a clear directive so the agent speaks only the target word once
+      // Append a zero-width nonce so repeated clicks are treated as unique turns
+      const zwsp = '\u200B';
+      const nonceSuffix = zwsp.repeat(Math.floor(Math.random() * 4) + 1);
+      const directive = `SAY_ONLY: ${audioText}\nSay only this word once. No extra words.${nonceSuffix}`;
+      try { sendMessage(directive); } catch {}
+      return;
+    }
+
     if (isSpeaking) {
       // console.log('🎵 SPELLBOX SPEAKER BUTTON: Stopping current speech');
       ttsService.stop();
