@@ -32,8 +32,8 @@ export class MultiProviderImageGenerator {
   constructor() {
     this.providers = [
       new FluxSchnellProvider(),
-      new GoogleImagenProvider(),
       new OpenAIProvider(),
+      new GoogleImagenProvider(),
       new AzureOpenAIProvider(),
       new StableDiffusionProvider()
     ];
