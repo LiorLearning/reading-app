@@ -479,6 +479,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   );
   const isSpeaking = useTTSSpeaking(messageId);
 
+  // Local speaking flag for realtime tutor playback of the word-only speaker button
+  const [isWordSpeakingRT, setIsWordSpeakingRT] = useState(false);
+  const wordSpeakingTimerRef = useRef<number | null>(null);
+
   // TTS message ID for first-time instruction
   const instructionMessageId = useMemo(() => 
     'spellbox-first-time-instruction',
@@ -665,31 +669,43 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [instructionMessageId]);
 
-  // Play word audio using ElevenLabs TTS
+  // Play/stop word audio using the realtime AI tutor (speak ONLY the word)
   const playWordAudio = useCallback(async () => {
-    // console.log('🎵 SPELLBOX SPEAKER BUTTON: Click detected', {
-    //   audioText,
-    //   targetWord,
-    //   messageId,
-    //   isSpeaking
-    // });
-    
     playClickSound();
-    
-    if (isSpeaking) {
-      // console.log('🎵 SPELLBOX SPEAKER BUTTON: Stopping current speech');
-      ttsService.stop();
-    } else {
-      // console.log('🎵 SPELLBOX SPEAKER BUTTON: Starting speech with ElevenLabs TTS at 0.7x speed');
-      await ttsService.speak(audioText, {
-        stability: 0.7,
-        similarity_boost: 0.9,
-        speed: 0.7,  // Set speed to 0.7x for SpellBox words
-        messageId: messageId,
-        voice: jessicaVoiceId
-      });
+    // Toggle stop if currently speaking via realtime
+    if (isWordSpeakingRT) {
+      try { interruptRealtimeSession?.(); } catch {}
+      setIsWordSpeakingRT(false);
+      return;
     }
-  }, [audioText, targetWord, messageId, isSpeaking]);
+
+    // Ensure we only ever ask to speak the isolated target word
+    const wordOnly = (targetWord || '').trim();
+    if (!wordOnly) return;
+
+    // Interrupt any previous realtime audio and instruct the tutor to say ONLY the word
+    try { interruptRealtimeSession?.(); } catch {}
+    try {
+      // Strong directive so the agent pronounces just the word and nothing else
+      const directive = `Speak ONLY this exact word, with no other words, sounds, or punctuation: ${wordOnly}`;
+      sendMessage?.(directive);
+      setIsWordSpeakingRT(true);
+      // Auto-reset the local speaking state so repeat clicks send again even if
+      // the realtime agent doesn't emit an end event back to the UI
+      if (wordSpeakingTimerRef.current) window.clearTimeout(wordSpeakingTimerRef.current);
+      wordSpeakingTimerRef.current = window.setTimeout(() => {
+        setIsWordSpeakingRT(false);
+        wordSpeakingTimerRef.current = null;
+      }, 500);
+    } catch {
+      setIsWordSpeakingRT(false);
+    }
+  }, [targetWord, sendMessage, interruptRealtimeSession, isWordSpeakingRT]);
+
+  // Cleanup any pending timers on unmount
+  useEffect(() => {
+    return () => { if (wordSpeakingTimerRef.current) window.clearTimeout(wordSpeakingTimerRef.current); };
+  }, []);
 
   // Gate the Next chevron after a correct answer if a delay is requested
   useEffect(() => {
@@ -1244,12 +1260,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           onClick={playWordAudio}
                           className={cn(
                             'ml-2 h-11 w-11 rounded-lg border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
-                            isSpeaking && 'bg-red-500 text-white hover:bg-red-600'
+                            isWordSpeakingRT && 'bg-red-500 text-white hover:bg-red-600'
                           )}
-                          title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
-                          aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
+                          title={isWordSpeakingRT ? 'Stop audio' : 'Listen to this word'}
+                          aria-label={isWordSpeakingRT ? 'Stop audio' : 'Play audio'}
                         >
-                          {isSpeaking ? (
+                          {isWordSpeakingRT ? (
                             <Square className="h-5 w-5" />
                           ) : (
                             <Volume2 className="h-5 w-5" />
