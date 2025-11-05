@@ -383,9 +383,6 @@ ${sanitizedConversationContext}`;
         } else {
           console.error(`❌ Image ${index + 1} generation failed:`, result.error);
           
-          // No loading sound to stop
-          
-          // Stream error and continue to next prompt (don't mark as successful)
           yield { 
             type: 'error', 
             content: result.error || 'Failed to generate image',
