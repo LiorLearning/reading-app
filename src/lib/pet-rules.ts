@@ -12,7 +12,7 @@ export interface PetRule {
 export const PET_RULES: Record<string, PetRule> = {
 	dog: {
 		description: 'a friendly dog pet who is loyal, playful, and brave',
-		instruction: 'Replace any second-person references ("you") with the pet persona: "a friendly dog pet who is loyal, playful, and brave" when forming visual descriptions. Maintain first-person dialogue in chat as the pet, but image prompts should describe the pet in third-person.'
+		instruction: 'Replace any second-person references ("you") with the pet persona: "a friendly dog pet who is loyal, playful, and brave" when forming visual descriptions.'
 	},
 	cat: {
 		description: 'a curious black cat pet who is clever, agile, and gentle',
