@@ -107,11 +107,6 @@ Rules you must always follow:
 5. CLEANLINESS
 - Do not include any text, signs, or labels in the rewritten prompt.
 - Do not add explanations — only output the cleaned prompt.
-6. PET PERSONA MAPPING
-
-- ${petInstruction}
-
-7. People: Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 
 Strict Rules:  
 1. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
@@ -141,6 +136,8 @@ Output: "brave female warrior in full protective armor with modest clothing"
 "The warrior stands confidently in a medieval castle courtyard"
 
 Now clean the actual content provided below:`;
+// 6. PET PERSONA MAPPING: ${petInstruction}
+
 // If the input contains copyrighted or trademarked characters, creatures, or names, transform them into unique, original, and imaginative versions that preserve the same adventurous spirit.
 // Replace names with new, original titles that feel magical and exciting.
 // Instead of copying the copyrighted design, describe the character’s features in detail (for example:
@@ -150,14 +147,8 @@ Now clean the actual content provided below:`;
 // Always make the descriptions distinctive and original, emphasizing their textures, colors, magical effects, and adventurous qualities rather than relying on franchise identity.
       const userMessage = `Main Prompt: ${originalPrompt}
 
-Adventure Context: ${adventureContext || 'No additional context provided'}
-
-Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}`;
-      
-      // console.log('🤖 AI Sanitizer: Sending to GPT-4o-mini...');
-      // console.log('📨 AI Sanitizer SYSTEM PROMPT:', systemPrompt.substring(0, 200) + '...');
-      // console.log('📨 AI Sanitizer USER MESSAGE:', userMessage);
-      // console.log('⏳ AI Sanitizer: Making OpenAI API call...');
+Adventure Context: ${adventureContext || 'No additional context provided'}`;
+//Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
 
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest",
@@ -309,9 +300,6 @@ CRITICAL RULES:
 5. Preserve character names and main visual elements
 6. Use heroic, adventurous, and magical language instead
 7. Return ONLY the cleaned prompt, no explanations
-8. PET PERSONA MAPPING: ${petInstruction}
-
-8. People: Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly cats. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
@@ -320,11 +308,12 @@ EXAMPLES:
 - "create a beautiful lady in a bikini" → "create a beautiful ${currentPetId} in a modest outfit"
 
 Transform this image request:`;
+// 8. PET PERSONA MAPPING: ${petInstruction}
 
       const userMessage = context 
-      ? `Context: ${context}\n\nPrompt to sanitize: ${originalPrompt}\n\nChild Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}`
-      : `${originalPrompt}\n\nChild Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}`;
-
+      ? `Context: ${context}\n\nPrompt to sanitize: ${originalPrompt}`
+      : `${originalPrompt}`;
+      // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
       const completion = await this.client.chat.completions.create({
         model: "gpt-4o-mini", // Fast and cost-effective for this task
         messages: [
