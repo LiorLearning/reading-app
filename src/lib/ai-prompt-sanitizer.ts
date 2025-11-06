@@ -313,14 +313,12 @@ Transform this image request:`;
 // 8. PET PERSONA MAPPING: ${petInstruction}
 
       const adventureMessages = loadUserAdventure();
-      let messages = adventureMessages.filter(msg => msg.type === 'user').slice(-2);
-      let lastUserMessage = '';
-      if (messages.length === 2) {
-        lastUserMessage = messages[0]?.content;
-      }
+      let messages = adventureMessages.filter((msg) => !msg?.hiddenInChat).slice(-3, -1);
+      let lastUserMessage = `${messages?.[0]?.content ? `last ${messages[0]?.type} message: ${messages[0]?.content}.` : ''}
+      ${messages?.[1]?.content ? `last ${messages[1]?.type} message: ${messages[1]?.content}.` : ''}`;
       const userMessage = context 
-      ? `Context: ${context}\n\nPrompt to sanitize: ${lastUserMessage ? `Last user message: ${lastUserMessage}. \n\n` : ''}${originalPrompt}`
-      : `${lastUserMessage ? `Last user message: ${lastUserMessage}. \n\n` : ''}${originalPrompt}`;
+      ? `Context: ${context}\n\nPrompt to sanitize: ${lastUserMessage ? `Last user message: ${lastUserMessage} user message: ` : ''}${originalPrompt}`
+      : `${lastUserMessage ? `${lastUserMessage} user message: ` : ''}${originalPrompt}`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
       const completion = await this.client.chat.completions.create({
         model: "gpt-4o-mini", // Fast and cost-effective for this task
