@@ -4031,7 +4031,8 @@ const getSleepyPetImage = (clicks: number) => {
       {(() => {
         const displayStreak = (() => {
           const s = Math.max(0, Number(streakForModal || 0));
-          return (s <= 0 && isTodayHeartFilled()) ? 1 : s;
+          // Show the true per-pet streak sum; do not force-minimum to 1 when daily heart is filled
+          return s;
         })();
         const onStreakClick = () => {
           try {
@@ -4993,6 +4994,16 @@ const getSleepyPetImage = (clicks: number) => {
                   ? 'bg-green-500'
                   : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-500')));
             const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
+            // Per-pet sleep streak from dailyQuests (live-hydrated)
+            const petStreak = (() => {
+              try {
+                const raw = localStorage.getItem('litkraft_pet_streaks');
+                if (!raw) return 0;
+                const map = JSON.parse(raw) as Record<string, number>;
+                const v = Number(map?.[petId] || 0);
+                return Number.isFinite(v) ? v : 0;
+              } catch { return 0; }
+            })();
 
             return (
               <button
@@ -5030,6 +5041,11 @@ const getSleepyPetImage = (clicks: number) => {
                   ) : (
                     <span className="absolute inset-0 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
                   )}
+                </div>
+                {/* Streak badge top-left */}
+                <div className={`pointer-events-none absolute -top-3 -left-3 bg-orange-500 text-white rounded-full min-w-9 h-9 px-2 text-[14px] leading-[36px] text-center shadow-lg border-2 border-white flex items-center justify-center`} title={`Sleep streak: ${petStreak}`} aria-label={`streak-${petStreak}`}>
+                  <span className="mr-1">🔥</span>
+                  <span>{petStreak}</span>
                 </div>
                 {/* Mood badge top-right */}
                 <div className={`pointer-events-none absolute -top-3 -right-3 ${bg} text-white rounded-full w-9 h-9 text-[18px] leading-[36px] text-center shadow-lg border-2 border-white`} aria-label={`mood-${mood}`} title={`Mood: ${mood}`}>

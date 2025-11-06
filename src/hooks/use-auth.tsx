@@ -54,6 +54,8 @@ export interface UserData {
   isFirstTime: boolean;
   createdAt: Date;
   lastLoginAt: Date;
+  country?: string;
+  countryCode?: string;
 }
 
 interface AuthContextType {
@@ -118,6 +120,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
           const userDocRef = doc(db, 'users', user.uid);
           const userDoc = await getDoc(userDocRef);
+
+          const fetchAndUpdateCountry = async (prevCountry?: string, prevCountryCode?: string) => {
+            try {
+              const res = await fetch('https://ipwho.is/?fields=country,country_code');
+              if (!res.ok) return;
+              const geo: any = await res.json();
+              const country = String((geo?.country || '')).trim();
+              const countryCode = String((geo?.country_code || '')).trim();
+              const updates: any = {};
+              if (country && country !== (prevCountry || '')) updates.country = country;
+              if (countryCode && countryCode !== (prevCountryCode || '')) updates.countryCode = countryCode;
+              if (Object.keys(updates).length > 0) {
+                await updateDoc(userDocRef, updates);
+              }
+            } catch {}
+          };
           
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
@@ -144,6 +162,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch (e) {
               console.warn('Failed to update lastLoginAt:', e);
             }
+            try { await fetchAndUpdateCountry(data.country, data.countryCode); } catch {}
           } else {
             // New user, set initial data - default grade is "assignment"
             const newUserData: UserData = {
@@ -161,6 +180,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             
             await setDoc(userDocRef, newUserData);
             setUserData(newUserData);
+            try { await fetchAndUpdateCountry(undefined, undefined); } catch {}
             // Trigger background migration (noop for brand new users) and tracker reconciliation
             try { autoMigrateOnLogin(user.uid); } catch {}
             
@@ -316,6 +336,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.warn('Hydration from Firestore failed:', e);
         }
 
+        // Record visit time and normalize per-pet streaks once on sign-in
+        try {
+          await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid);
+        } catch {}
+
         // Live listeners (real-time updates)
         try {
           const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
@@ -425,6 +450,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           });
             try {
               localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
+              // Publish per-pet sleep streaks and a derived total for top-right hearts
+              try {
+                const pets = (ownedPets && ownedPets.length > 0) ? ownedPets : Object.keys(d).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+                const perPet: Record<string, number> = {};
+                let total = 0;
+                pets.forEach((p) => {
+                  const v = Number(((d?.[p] || {}) as any)?.streak || 0);
+                  perPet[p] = Number.isFinite(v) ? v : 0;
+                  total += perPet[p];
+                });
+                localStorage.setItem('litkraft_pet_streaks', JSON.stringify(perPet));
+                localStorage.setItem('litkraft_streak', String(total));
+                window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: total } }));
+              } catch {}
             // Also hydrate a user-scoped pointer for the shared daily assignment if present
             try {
               const userAct = (d?._userCurrentActivity || (Array.isArray(seq) && seq.length > 0 ? seq[0] : 'house')) as string;
@@ -542,6 +581,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
               const nowMs = Date.now();
               if (nowMs - lastRolloverAttempt < 60000) return;
+              // Update lastcameto and normalize streaks on focus
+              try { await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid); } catch {}
               const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
               const needsRollover = questStates.some((s: any) => {
                 const completed = Number(s?.progress || 0) >= 5;

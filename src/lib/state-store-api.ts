@@ -118,7 +118,7 @@ import {
     const result: Record<string, any> = {};
     for (const pet of pets) {
       const task = ACTIVITY_SEQUENCE[0];
-      result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null };
+      result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null, streak: 0 };
     }
     // Initialize shared user pointer so it's always present and drives quest selection
     result._userCurrentActivity = ACTIVITY_SEQUENCE[0];
@@ -775,6 +775,7 @@ import {
     getDailyQuests,
     startPetSleep,
     clearPetSleep,
+    updateVisitAndNormalizeStreaks,
     setPetName,
     setWeeklyHeart,
     incrementStreakIfEligible,
@@ -886,18 +887,56 @@ import {
   export async function startPetSleep(input: StartPetSleepInput): Promise<void> {
     const { userId, pet, durationMs = 8 * 60 * 60 * 1000 } = input;
     const questsRef = dailyQuestsDocRef(userId);
-    const snap = await getDoc(questsRef);
-    const batch = writeBatch(db);
-    if (!snap.exists()) {
-      batch.set(questsRef, createInitialDailyQuests([pet]));
-    }
-    const endTs = Timestamp.fromMillis(Date.now() + durationMs);
-    batch.set(
-      questsRef,
-      { [pet]: { _sleepStartAt: nowServerTimestamp(), _sleepEndAt: endTs }, updatedAt: nowServerTimestamp() } as any,
-      { merge: true }
-    );
-    await batch.commit();
+
+    // Compute and persist per-pet sleep streak based on 24h gap between sleep starts
+    await runTransaction(db, async (txn) => {
+      const snap = await txn.get(questsRef);
+      const data = (snap.exists() ? (snap.data() as any) : {}) as any;
+
+      // Ensure base structure exists for this pet
+      if (!snap.exists()) {
+        txn.set(questsRef, createInitialDailyQuests([pet]));
+      } else if (!data[pet]) {
+        const task = ACTIVITY_SEQUENCE[0];
+        txn.set(questsRef, { [pet]: { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null, streak: 0 } } as any, { merge: true });
+      }
+
+      const petObj = (data?.[pet] ?? {}) as any;
+      const prevStartAny = petObj?._sleepStartAt as any;
+
+      // Convert Timestamp-like to ms
+      const toMs = (anyTs: any): number | null => {
+        try {
+          if (!anyTs) return null;
+          if (typeof anyTs.toMillis === 'function') return Number(anyTs.toMillis());
+          const t = new Date(anyTs as any).getTime();
+          return Number.isFinite(t) ? t : null;
+        } catch {
+          return null;
+        }
+      };
+
+      const nowMs = Date.now();
+      const prevStartMs = toMs(prevStartAny);
+      const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+      let nextStreak: number;
+      if (!prevStartMs || !Number.isFinite(prevStartMs)) {
+        // First sleep record → start at 1
+        nextStreak = 1;
+      } else {
+        const diff = nowMs - prevStartMs;
+        // If gap > 24h → reset to 0; else increment by 1
+        nextStreak = diff > TWENTY_FOUR_HOURS_MS ? 0 : Math.max(0, Number(petObj?.streak || 0)) + 1;
+      }
+
+      const endTs = Timestamp.fromMillis(nowMs + durationMs);
+      txn.set(
+        questsRef,
+        { [pet]: { _sleepStartAt: Timestamp.fromMillis(nowMs), _sleepEndAt: endTs, streak: nextStreak }, updatedAt: nowServerTimestamp() } as any,
+        { merge: true }
+      );
+    });
   }
   
   export interface ClearPetSleepInput {
@@ -915,6 +954,63 @@ import {
       { merge: true }
     );
     await batch.commit();
+  }
+
+  // ==========================
+  // Visit tracking and streak normalization
+  // ==========================
+
+  /**
+   * Record user's visit time in dailyQuests.lastcameto and normalize per-pet sleep streaks.
+   * Rule: if (now - _sleepStartAt) > 24h, set pet.streak = 0 (no increment on visit).
+   */
+  export async function updateVisitAndNormalizeStreaks(userId: string): Promise<void> {
+    if (!userId) return;
+    const questsRef = dailyQuestsDocRef(userId);
+    const snap = await getDoc(questsRef);
+
+    if (!snap.exists()) {
+      // Create a minimal doc with lastcameto; do not initialize pets here to avoid unintended writes
+      await setDoc(questsRef, { lastcameto: nowServerTimestamp(), createdAt: nowServerTimestamp(), updatedAt: nowServerTimestamp() } as any, { merge: true });
+      return;
+    }
+
+    const data = (snap.data() as any) || {};
+    const updates: Record<string, any> = { lastcameto: nowServerTimestamp(), updatedAt: nowServerTimestamp() };
+
+    // Helper convert Timestamp-like to ms
+    const toMs = (anyTs: any): number | null => {
+      try {
+        if (!anyTs) return null;
+        if (typeof anyTs.toMillis === 'function') return Number(anyTs.toMillis());
+        const t = new Date(anyTs as any).getTime();
+        return Number.isFinite(t) ? t : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const nowMs = Date.now();
+    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+    // Normalize per owned pet present in dailyQuests
+    const petKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !String(k).startsWith('_'));
+    for (const pet of petKeys) {
+      const petObj = (data?.[pet] ?? {}) as any;
+      const prevStartMs = toMs(petObj?._sleepStartAt);
+      if (!prevStartMs) continue;
+      const diff = nowMs - prevStartMs;
+      if (diff > TWENTY_FOUR_HOURS_MS) {
+        const curr = Number(petObj?.streak || 0);
+        if (curr !== 0) {
+          updates[pet] = { ...(updates[pet] || {}), streak: 0 };
+        }
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await setDoc(questsRef, updates as any, { merge: true });
+    }
   }
 
   // ==========================
