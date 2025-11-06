@@ -34,6 +34,7 @@ import { getPetEmotionActionMedia } from '@/lib/pet-avatar-service';
 import DailySpellReviewModal from '@/components/adventure/DailySpellReviewModal';
 import { getLocalDateKey, getUniqueFirstTryCountForDate } from '@/lib/spell-review-log';
 import { CenteredLevelProgressBar, TopRightHeartsAndCoins } from '@/components/ui/TopBars';
+import PerPetStreakModal from '@/components/PerPetStreakModal';
 
 
 type Props = {
@@ -125,6 +126,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Reinforced streak modal state
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [streakForModal, setStreakForModal] = useState(0);
+  const [showPerPetStreakModal, setShowPerPetStreakModal] = useState(false);
+  const [perPetStreakModalData, setPerPetStreakModalData] = useState<{ petId: string; streak: number; slots: number[] } | null>(null);
 
   // Daily word list modal and count (local timezone)
   const [isDailyReviewOpen, setIsDailyReviewOpen] = useState(false);
@@ -1423,14 +1426,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
             } catch {}
 
             if (anyPetDone && lastShown !== todayStr) {
-              // Read the latest streak (already updated above) for the modal
-              let modalStreak = 0;
-              try {
-                const s = Number(localStorage.getItem('litkraft_streak') || '0');
-                modalStreak = Number.isNaN(s) ? 0 : s;
-              } catch {}
-              try { setStreakForModal(modalStreak); } catch {}
-              // Fill today's weekly heart, set streak, and open modal
+              // Fill today's weekly heart
               markTodayHeartFilled();
               // Refresh local weekly hearts count immediately (works even before Firestore roundtrip)
               try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
@@ -1460,8 +1456,20 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
                   })();
                 }
               } catch {}
-              // streakForModal already set from updateStreak()
-              setShowStreakModal(true);
+              // Open per-pet streak modal for the current pet instead of the global reinforced modal
+              try {
+                const petId = currentPet;
+                const rawStreaks = localStorage.getItem('litkraft_pet_streaks') || '{}';
+                const rawSlots = localStorage.getItem('litkraft_pet_streak_slots') || '{}';
+                const mapStreaks = JSON.parse(rawStreaks) as Record<string, number>;
+                const mapSlots = JSON.parse(rawSlots) as Record<string, number[]>;
+                const slotsArr = Array.isArray(mapSlots?.[petId]) ? mapSlots[petId] : [0,0,0,0,0];
+                setPerPetStreakModalData({ petId, streak: Number(mapStreaks?.[petId] || 0), slots: slotsArr });
+                setShowPerPetStreakModal(true);
+              } catch {
+                setPerPetStreakModalData({ petId: currentPet, streak: 0, slots: [0,0,0,0,0] });
+                setShowPerPetStreakModal(true);
+              }
               localStorage.setItem(hasShownKey, todayStr);
             }
           } catch {}
@@ -4992,7 +5000,8 @@ const getSleepyPetImage = (clicks: number) => {
                 ? 'bg-green-400'
                 : (isCoins30Tile
                   ? 'bg-green-500'
-                  : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-500')));
+                  : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-600')));
+            const bgSoft = `${bg}`;
             const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
             // Per-pet sleep streak from dailyQuests (live-hydrated)
             const petStreak = (() => {
@@ -5023,34 +5032,48 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 ${
-                  isActive
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
-                    : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
+                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${
+                  isActive ? 'border-white ring-2 ring-white/80' : 'border-white/40 hover:border-white/60'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
               >
                 <div className="relative w-full h-full">
+                  <div className="absolute inset-0 z-0 rounded-2xl blur-xl mix-blend-screen bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.85)_0%,_rgba(255,255,255,0.5)_50%,_transparent_78%)]"></div>
                   {petHasImages ? (
                     <img
                       src={petImageUrl}
                       alt={PetProgressStorage.getPetDisplayName(petId)}
-                      className="w-full h-full object-contain p-1 drop-shadow-sm"
+                      className="relative z-10 w-full h-full object-contain p-1 drop-shadow-sm"
                       loading="lazy"
                     />
                   ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
+                    <span className="absolute inset-0 z-10 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
                   )}
                 </div>
-                {/* Streak badge top-left */}
-                <div className={`pointer-events-none absolute -top-3 -left-3 bg-orange-500 text-white rounded-full min-w-9 h-9 px-2 text-[14px] leading-[36px] text-center shadow-lg border-2 border-white flex items-center justify-center`} title={`Sleep streak: ${petStreak}`} aria-label={`streak-${petStreak}`}>
-                  <span className="mr-1">🔥</span>
+                {/* Streak chip top-right (clickable) */}
+                <button
+                  className={`pointer-events-auto absolute -top-3 -right-3 text-white rounded-full min-w-9 h-9 px-2 text-[14px] leading-[36px] text-center shadow-lg border-2 border-white flex items-center justify-center bg-gradient-to-br from-teal-400 via-emerald-500 to-cyan-500 hover:brightness-110 active:scale-95`}
+                  title={`Sleep streak: ${petStreak}`}
+                  aria-label={`streak-${petStreak}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    try {
+                      const rawStreaks = localStorage.getItem('litkraft_pet_streaks') || '{}';
+                      const rawSlots = localStorage.getItem('litkraft_pet_streak_slots') || '{}';
+                      const mapStreaks = JSON.parse(rawStreaks) as Record<string, number>;
+                      const mapSlots = JSON.parse(rawSlots) as Record<string, number[]>;
+                      const slotsArr = Array.isArray(mapSlots?.[petId]) ? mapSlots[petId] : [0,0,0,0,0];
+                      setPerPetStreakModalData({ petId, streak: Number(mapStreaks?.[petId] || 0), slots: slotsArr });
+                      setShowPerPetStreakModal(true);
+                    } catch {
+                      setPerPetStreakModalData({ petId, streak: petStreak, slots: [0,0,0,0,0] });
+                      setShowPerPetStreakModal(true);
+                    }
+                  }}
+                >
+                  <span className="mr-1">❤️</span>
                   <span>{petStreak}</span>
-                </div>
-                {/* Mood badge top-right */}
-                <div className={`pointer-events-none absolute -top-3 -right-3 ${bg} text-white rounded-full w-9 h-9 text-[18px] leading-[36px] text-center shadow-lg border-2 border-white`} aria-label={`mood-${mood}`} title={`Mood: ${mood}`}>
-                  {badge}
-                </div>
+                </button>
               </button>
             );
           })}
@@ -5283,6 +5306,17 @@ const getSleepyPetImage = (clicks: number) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Per-Pet Streak Modal */}
+      {showPerPetStreakModal && perPetStreakModalData && (
+        <PerPetStreakModal
+          open={true}
+          onClose={() => { setShowPerPetStreakModal(false); setPerPetStreakModalData(null); }}
+          petId={perPetStreakModalData.petId}
+          streak={perPetStreakModalData.streak}
+          slots={perPetStreakModalData.slots}
+        />
       )}
 
       {/* Rename Pet Modal */}

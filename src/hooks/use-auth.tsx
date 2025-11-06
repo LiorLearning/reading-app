@@ -454,13 +454,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               try {
                 const pets = (ownedPets && ownedPets.length > 0) ? ownedPets : Object.keys(d).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
                 const perPet: Record<string, number> = {};
+                const perPetSlots: Record<string, number[]> = {};
                 let total = 0;
                 pets.forEach((p) => {
                   const v = Number(((d?.[p] || {}) as any)?.streak || 0);
                   perPet[p] = Number.isFinite(v) ? v : 0;
                   total += perPet[p];
+                  // Mirror 5-slot array if present
+                  const slotsAny = ((d?.[p] || {}) as any)?.streakSlots;
+                  const slots = Array.isArray(slotsAny) ? slotsAny.map((x: any) => (Number(x) ? 1 : 0)) : [];
+                  if (slots.length === 5) perPetSlots[p] = slots;
                 });
                 localStorage.setItem('litkraft_pet_streaks', JSON.stringify(perPet));
+                localStorage.setItem('litkraft_pet_streak_slots', JSON.stringify(perPetSlots));
                 localStorage.setItem('litkraft_streak', String(total));
                 window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: total } }));
               } catch {}
