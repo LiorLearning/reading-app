@@ -288,12 +288,7 @@ export class ResponseProcessor {
           if (sanitizationResult.success && sanitizationResult.sanitizedPrompt) {
             sanitizedRawPrompt = sanitizationResult.sanitizedPrompt;
             sanitizedConversationContext = sanitizationResult.sanitizedContext || originalConversationContext;
-            // console.log('✅ ResponseProcessor: Prompt and context sanitized successfully');
-            // console.log('🔄 Original prompt:', rawPrompt.substring(0, 100) + '...');
-            // console.log('✨ Sanitized prompt:', sanitizedRawPrompt.substring(0, 100) + '...');
-            // console.log('🔄 Original context:', originalConversationContext.substring(0, 100) + '...');
-            // console.log('✨ Sanitized context:', sanitizedConversationContext.substring(0, 100) + '...');
-          } else {
+           } else {
             // console.log('⚠️ ResponseProcessor: Sanitization failed, using original prompt and context');
           }
         } catch (sanitizationError) {

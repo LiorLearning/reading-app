@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { getPetRule } from '@/lib/pet-rules';
+import { loadUserAdventure } from '@/lib/utils';
 
 interface SanitizedPromptResult {
   sanitizedPrompt: string;
@@ -109,11 +110,11 @@ Rules you must always follow:
 - Do not add explanations — only output the cleaned prompt.
 
 Strict Rules:  
-1. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
+1. Preserve any animal or objects mentioned. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 2. Clothing must always be **fully modest and family-friendly**: Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.   
 2. No cleavage, no bare thighs, no exposed stomach, no revealing cuts.  
 3. Replace “sexy, tight, skimpy, sheer, lingerie, bikini, low-cut” or similar terms with **modest, noble, and adventurous clothing**.  
-4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children’s storybook or animated adventure film**.  
+4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children's storybook or animated adventure film**.  
 5. Never allow sexual, romantic, or suggestive undertones. 
 
 
@@ -293,7 +294,7 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
 
 CRITICAL RULES:
-1. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
+1. Strict rules: Preserve any animal or objects mentioned. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 2. Tone down violent language (fighting → competing, battle → contest, violent → intense)
 3. Keep the visual excitement and epic nature
 4. Make it completely family-friendly for ages 8-13  
@@ -306,13 +307,20 @@ EXAMPLES:
 - "sword battle" → "sword training demonstration" 
 - "violent clash" → "intense magical showdown"
 - "create a beautiful lady in a bikini" → "create a beautiful ${currentPetId} in a modest outfit"
+- "kangaroo is escaping from a zoo" → "kangaroo is escaping from a zoo"
 
 Transform this image request:`;
 // 8. PET PERSONA MAPPING: ${petInstruction}
 
+      const adventureMessages = loadUserAdventure();
+      let messages = adventureMessages.filter(msg => msg.type === 'user').slice(-2);
+      let lastUserMessage = '';
+      if (messages.length === 2) {
+        lastUserMessage = messages[0]?.content;
+      }
       const userMessage = context 
-      ? `Context: ${context}\n\nPrompt to sanitize: ${originalPrompt}`
-      : `${originalPrompt}`;
+      ? `Context: ${context}\n\nPrompt to sanitize: ${lastUserMessage ? `Last user message: ${lastUserMessage}. \n\n` : ''}${originalPrompt}`
+      : `${lastUserMessage ? `Last user message: ${lastUserMessage}. \n\n` : ''}${originalPrompt}`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
       const completion = await this.client.chat.completions.create({
         model: "gpt-4o-mini", // Fast and cost-effective for this task
