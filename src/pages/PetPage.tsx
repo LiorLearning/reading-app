@@ -361,6 +361,9 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Pet store state
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
   const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
+  // Rename modal state
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [renamingPetId, setRenamingPetId] = useState<string | null>(null);
   
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
@@ -5206,13 +5209,26 @@ const getSleepyPetImage = (clicks: number) => {
                     
                     {/* Pet Name (user-given name shown after purchase) */}
                     <div className={`text-lg font-semibold mb-3 ${pet.isLocked && !pet.owned ? 'text-gray-500' : 'text-gray-800'}`}>
-                      {pet.owned ? PetProgressStorage.getPetDisplayName(pet.id) : ''}
+                      <div className="flex items-center justify-center gap-2">
+                        <span>{pet.owned ? PetProgressStorage.getPetDisplayName(pet.id) : ''}</span>
+                        {pet.owned && (
+                          <Button
+                            variant="comic"
+                            size="icon"
+                            className="h-6 w-6 bg-white text-gray-800 rounded-md border-2 border-foreground shadow-solid text-xs leading-none"
+                            onClick={() => { setRenamingPetId(pet.id); setIsRenameModalOpen(true); }}
+                            aria-label={`Rename ${PetProgressStorage.getPetDisplayName(pet.id)}`}
+                          >
+                            ✏️
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Purchase Button or Status */}
                     {pet.owned ? (
-                      <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">
-                        ✅ Owned
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">✅ Owned</div>
                       </div>
                     ) : pet.isLocked ? (
                       <div className="w-full px-4 py-3 rounded-xl font-bold text-lg bg-gray-400 text-gray-600 cursor-not-allowed">
@@ -5252,6 +5268,34 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         </div>
       )}
+
+      {/* Rename Pet Modal */}
+      {isRenameModalOpen && renamingPetId && (() => {
+        const data: any = (getPetStoreData() as any)[renamingPetId];
+        const species = renamingPetId.charAt(0).toUpperCase() + renamingPetId.slice(1);
+        return (
+          <PetNamingModal
+            isOpen={true}
+            onClose={() => { setIsRenameModalOpen(false); setRenamingPetId(null); }}
+            petId={renamingPetId}
+            petEmoji={data?.emoji || '🐾'}
+            petSpeciesName={species}
+            defaultNames={[]}
+            onSubmit={async (newName: string) => {
+              try { PetProgressStorage.setPetName(renamingPetId, newName); } catch {}
+              try {
+                if (user?.uid) {
+                  await stateStoreApi.setPetName({ userId: user.uid, pet: renamingPetId as any, name: newName });
+                  try { analytics.capture('pet_renamed', { pet_id: renamingPetId, pet_name: newName, pet_type: renamingPetId, pet_level: getLevelInfo().currentLevel }); } catch {}
+                }
+              } catch {}
+              setIsRenameModalOpen(false);
+              setRenamingPetId(null);
+              setStoreRefreshTrigger(prev => prev + 1);
+            }}
+          />
+        );
+      })()}
 
       {/* Step 7 overlay visuals */}
       {showStep7 && (
