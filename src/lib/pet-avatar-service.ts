@@ -141,6 +141,9 @@ export const getCurrentPetAvatarImage = (
     if (currentPet === 'deer') {
       return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b";
     }
+    if (currentPet === 'labubu') {
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9";
+    }
   }
   
   // Check if Bobo is owned and being displayed
@@ -587,6 +590,17 @@ export const useCurrentPetAvatarImage = () => {
           sleep2: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_163624_image.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN",
           sleep3: "https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20250909_165610_dog_den_no_bg.png&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN"
         }
+      },
+      labubu: {
+        1: {
+          coins_0: "https://placehold.co/400x400?text=Labubu+Sad",
+          coins_10: "https://placehold.co/400x400?text=Labubu+Normal",
+          coins_30: "https://placehold.co/400x400?text=Labubu+Happy",
+          coins_50: "https://placehold.co/400x400?text=Labubu+Super+Happy",
+          sleep1: "https://placehold.co/400x400.gif?text=Labubu+Sleep+1",
+          sleep2: "https://placehold.co/400x400.gif?text=Labubu+Sleep+2",
+          sleep3: "https://placehold.co/400x400.gif?text=Labubu+Sleep+3"
+        }
       }
     };
 
@@ -891,6 +905,18 @@ export const useCurrentPetAvatarImage = () => {
         return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sad.gif?alt=media&token=f17b657c-4857-448a-b0ba-2511843b0eb4";
       }
     }
+
+    if (currentPetId === 'labubu' && isPetOwned('labubu')) {
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-v-happy-unscreen.gif?alt=media&token=f068945a-127c-4e8a-91ca-fe0dedbaa7c8";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-happy-unscreen.gif?alt=media&token=89475226-501b-4587-8a3f-9bc157880acd";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-neutral-unscreen.gif?alt=media&token=8da89fe5-4421-4f8d-9140-5bd2a222fadd";
+      } else {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sad-unscreen.gif?alt=media&token=538a4dec-b0c1-451c-bfdb-7f5a76ff3276";
+      }
+    }
     
     return null; // No special pet handling needed
   };
@@ -1008,7 +1034,13 @@ const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>
     water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-eating.gif?alt=media&token=5bd7f5b4-87e4-46b7-880d-b926256c7147',
     pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-petting.gif?alt=media&token=031c12c1-d160-4146-9abe-820df68b6c06',
     needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sad.gif?alt=media&token=f17b657c-4857-448a-b0ba-2511843b0eb4',
-  }
+  },
+  labubu: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-eating-unscreen.gif?alt=media&token=bfa938f1-9580-4836-9a63-d4aa4bd83920',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-water-unscreen.gif?alt=media&token=e29c767d-b3e0-4862-b62c-c1e6d8dd841a',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-pet-unscreen.gif?alt=media&token=827604b5-f2b6-44ea-b5bf-7e94c9ee109b',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sad-unscreen.gif?alt=media&token=538a4dec-b0c1-451c-bfdb-7f5a76ff3276',
+  } 
 };
 
 // Helper: compute current level for a given pet using PetProgressStorage and same thresholds as PetPage
@@ -1083,6 +1115,7 @@ const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
   pikachu: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpikachu-baby-sad-gif.gif?alt=media&token=ca7ad473-0ede-40f8-8d25-ceb43e64fd8d',
   panda: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fpanda-baby-sad-gif.gif?alt=media&token=28583607-2ca8-405d-8dcd-9dafc57feaf0',
   deer: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sad.gif?alt=media&token=f17b657c-4857-448a-b0ba-2511843b0eb4',
+  labubu: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-neutral-unscreen.gif?alt=media&token=8da89fe5-4421-4f8d-9140-5bd2a222fadd',
 };
 
 export const getPetYawnMedia = (petType: string): string => {
