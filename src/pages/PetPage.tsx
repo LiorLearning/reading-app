@@ -18,7 +18,7 @@ import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn, PencilLine } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
@@ -361,6 +361,9 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Pet store state
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
   const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
+  // Rename modal state
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [renamingPetId, setRenamingPetId] = useState<string | null>(null);
   
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
@@ -2115,6 +2118,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b"
         }
+      },
+      labubu: {
+        1: {
+          // Level 1 Labubu images - coin-based progression (placeholders)
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sad.png?alt=media&token=a6b67700-840e-4250-adb2-f1d4095c3d02",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-neutral.png?alt=media&token=5fc04006-3104-4a5b-98be-70f0d3d860f2",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-happy.png?alt=media&token=70e46226-c012-49b8-83ee-2df9cfe1c3cd",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-super-happy.png?alt=media&token=fa575c3d-8d79-4e46-af96-ebdd108d708c",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9"
+        }
       }
     };
 
@@ -2593,7 +2608,7 @@ const getSleepyPetImage = (clicks: number) => {
       dog: {
         id: 'dog',
         emoji: '🐶',
-        name: 'Buddy',
+        name: 'Dog',
         owned: isPetOwned('dog'),
         cost: 50,
         requiredLevel: 1,
@@ -2603,7 +2618,7 @@ const getSleepyPetImage = (clicks: number) => {
       cat: {
         id: 'cat',
         emoji: '🐱',
-        name: 'Whiskers',
+        name: 'Cat',
         owned: isPetOwned('cat'),
         cost: 50,
         requiredLevel: 1,
@@ -2613,7 +2628,7 @@ const getSleepyPetImage = (clicks: number) => {
       hamster: {
         id: 'hamster',
         emoji: '🐹',
-        name: 'Peanut',
+        name: 'Hamster',
         owned: isPetOwned('hamster'),
         cost: 50,
         requiredLevel: 1,
@@ -2623,7 +2638,7 @@ const getSleepyPetImage = (clicks: number) => {
       monkey: {
         id: 'monkey',
         emoji: '🐵',
-        name: 'Chipper',
+        name: 'Monkey',
         owned: isPetOwned('monkey'),
         cost: 300,
         requiredLevel: 5,
@@ -2633,7 +2648,7 @@ const getSleepyPetImage = (clicks: number) => {
       parrot: {
         id: 'parrot',
         emoji: '🦜',
-        name: 'Rio',
+        name: 'Parrot',
         owned: isPetOwned('parrot'),
         cost: 300,
         requiredLevel: 5,
@@ -2643,7 +2658,7 @@ const getSleepyPetImage = (clicks: number) => {
       dragon: {
         id: 'dragon',
         emoji: '🐉',
-        name: 'Ember',
+        name: 'Dragon',
         owned: isPetOwned('dragon'),
         cost: 500,
         requiredLevel: 10,
@@ -2653,7 +2668,7 @@ const getSleepyPetImage = (clicks: number) => {
       unicorn: {
         id: 'unicorn',
         emoji: '🦄',
-        name: 'Stardust',
+        name: 'Unicorn',
         owned: isPetOwned('unicorn'),
         cost: 500,
         requiredLevel: 10,
@@ -2662,7 +2677,7 @@ const getSleepyPetImage = (clicks: number) => {
       },  panda: {
         id: 'panda',
         emoji: '🐼',
-        name: 'Bamboo',
+        name: 'Panda',
         owned: isPetOwned('panda'),
         cost: 1000,
         requiredLevel: 15,
@@ -2672,7 +2687,7 @@ const getSleepyPetImage = (clicks: number) => {
       deer: {
         id: 'deer',
         emoji: '🦌',
-        name: 'Antler',
+        name: 'Deer',
         owned: isPetOwned('deer'),
         cost: 1000,
         requiredLevel: 15,
@@ -2688,6 +2703,16 @@ const getSleepyPetImage = (clicks: number) => {
         requiredLevel: 20,
         isLocked: userLevel < 20,
         category: 'legendary'
+      },
+      labubu: {
+        id: 'labubu',
+        emoji: '🧸',
+        name: 'Labubu',
+        owned: isPetOwned('labubu'),
+        cost: 2000,
+        requiredLevel: 20,
+        isLocked: userLevel < 20,
+        category: 'Collectible: 1/4'
       },
     
     };
@@ -5163,56 +5188,62 @@ const getSleepyPetImage = (clicks: number) => {
                       L{pet.requiredLevel}
                     </div>
                     
-                    {/* Pet Image or Emoji */}
+                    {/* Pet Image or Emoji (container removed for a cleaner look) */}
                     {pet.isLocked && !pet.owned ? (
-                      <div
-                        className={`w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 ${
-                          PetProgressStorage.getCurrentSelectedPet() === pet.id
-                            ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
-                            : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
-                        } mb-4 mx-auto`}
-                      >
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'] as string[]).includes(pet.id) ? (
-                          <img
-                            src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
-                            alt={`${pet.name} (locked)`}
-                            className="h-24 w-24 object-contain filter grayscale brightness-0 opacity-40"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="text-6xl grayscale opacity-40">{pet.emoji}</div>
-                        )}
-                      </div>
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                        <img
+                          src={getLevelBasedPetImage(pet.id, 1, pet.id === 'labubu' ? 'coins_10' : 'coins_50')}
+                          alt={`${pet.name} (locked)`}
+                          className="h-24 w-24 object-contain filter grayscale opacity-70 mb-4 mx-auto block"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="text-6xl grayscale opacity-70 mb-4 mx-auto">{pet.emoji}</div>
+                      )
                     ) : (
-                      <div
-                        className={`w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 ${
-                          PetProgressStorage.getCurrentSelectedPet() === pet.id
-                            ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
-                            : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
-                        } mb-4 mx-auto`}
-                      >
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'] as string[]).includes(pet.id) ? (
-                          <img
-                            src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
-                            alt={pet.name}
-                            className="h-24 w-24 object-contain drop-shadow-sm"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="text-6xl">{pet.emoji}</div>
-                        )}
-                      </div>
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                        <img
+                          src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
+                          alt={pet.name}
+                          className="h-24 w-24 object-contain drop-shadow-sm mb-4 mx-auto block"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="text-6xl mb-4 mx-auto">{pet.emoji}</div>
+                      )
                     )}
                     
                     {/* Pet Name (user-given name shown after purchase) */}
                     <div className={`text-lg font-semibold mb-3 ${pet.isLocked && !pet.owned ? 'text-gray-500' : 'text-gray-800'}`}>
-                      {pet.owned ? PetProgressStorage.getPetDisplayName(pet.id) : ''}
+                      <div className="flex items-center justify-center gap-2">
+                        <span>
+                          {(() => {
+                            // Show user-given name if owned; otherwise show default species name
+                            const defaultName = pet.name || (pet.id ? (pet.id.charAt(0).toUpperCase() + pet.id.slice(1)) : '');
+                            if (pet.owned) {
+                              const userName = PetProgressStorage.getPetDisplayName(pet.id);
+                              return (userName && userName.trim()) ? userName : defaultName;
+                            }
+                            return defaultName;
+                          })()}
+                        </span>
+                        {pet.owned && (
+                          <button
+                            onClick={() => { setRenamingPetId(pet.id); setIsRenameModalOpen(true); }}
+                            aria-label={`Rename ${PetProgressStorage.getPetDisplayName(pet.id)}`}
+                            className="p-0 m-0 bg-transparent border-none text-gray-500 hover:text-gray-800"
+                            title="Rename"
+                          >
+                            <PencilLine className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Purchase Button or Status */}
                     {pet.owned ? (
-                      <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">
-                        ✅ Owned
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">✅ Owned</div>
                       </div>
                     ) : pet.isLocked ? (
                       <div className="w-full px-4 py-3 rounded-xl font-bold text-lg bg-gray-400 text-gray-600 cursor-not-allowed">
@@ -5252,6 +5283,34 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         </div>
       )}
+
+      {/* Rename Pet Modal */}
+      {isRenameModalOpen && renamingPetId && (() => {
+        const data: any = (getPetStoreData() as any)[renamingPetId];
+        const species = renamingPetId.charAt(0).toUpperCase() + renamingPetId.slice(1);
+        return (
+          <PetNamingModal
+            isOpen={true}
+            onClose={() => { setIsRenameModalOpen(false); setRenamingPetId(null); }}
+            petId={renamingPetId}
+            petEmoji={data?.emoji || '🐾'}
+            petSpeciesName={species}
+            defaultNames={[]}
+            onSubmit={async (newName: string) => {
+              try { PetProgressStorage.setPetName(renamingPetId, newName); } catch {}
+              try {
+                if (user?.uid) {
+                  await stateStoreApi.setPetName({ userId: user.uid, pet: renamingPetId as any, name: newName });
+                  try { analytics.capture('pet_renamed', { pet_id: renamingPetId, pet_name: newName, pet_type: renamingPetId, pet_level: getLevelInfo().currentLevel }); } catch {}
+                }
+              } catch {}
+              setIsRenameModalOpen(false);
+              setRenamingPetId(null);
+              setStoreRefreshTrigger(prev => prev + 1);
+            }}
+          />
+        );
+      })()}
 
       {/* Step 7 overlay visuals */}
       {showStep7 && (

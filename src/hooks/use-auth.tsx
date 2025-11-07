@@ -588,23 +588,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      const isUpgradeMode = typeof window !== 'undefined' && window.location && window.location.search.includes('mode=upgrade');
       const current = auth.currentUser;
-      if (current && current.isAnonymous && isUpgradeMode) {
-        // Link Google to the current anonymous user to preserve UID
-        const linkedCred = await linkWithPopup(current, provider);
-        // Ensure email is persisted to Firestore immediately on upgrade
+      if (current && current.isAnonymous) {
         try {
-          await reload(linkedCred.user);
-        } catch {}
-        try {
-          const userDocRef = doc(db, 'users', linkedCred.user.uid);
-          const emailNow = (linkedCred.user.email || '').trim();
-          if (emailNow) {
-            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+          // Link Google to the current anonymous user to preserve UID
+          const linkedCred = await linkWithPopup(current, provider);
+          // Ensure email is persisted to Firestore immediately on upgrade
+          try {
+            await reload(linkedCred.user);
+          } catch {}
+          try {
+            const userDocRef = doc(db, 'users', linkedCred.user.uid);
+            const emailNow = (linkedCred.user.email || '').trim();
+            if (emailNow) {
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            }
+          } catch (e) {
+            console.warn('Failed to persist email after Google link:', e);
           }
-        } catch (e) {
-          console.warn('Failed to persist email after Google link:', e);
+        } catch (error: any) {
+          // If the Google credential already belongs to an existing account, just sign into it
+          const code = (error && (error.code || error?.message)) || '';
+          if (
+            String(code).includes('auth/credential-already-in-use') ||
+            String(code).includes('auth/email-already-in-use') ||
+            String(code).includes('auth/account-exists-with-different-credential')
+          ) {
+            const cred = GoogleAuthProvider.credentialFromError?.(error);
+            if (cred) {
+              await signInWithCredential(auth, cred);
+              return;
+            }
+          }
+          throw error;
         }
       } else {
         await signInWithPopup(auth, provider);
@@ -730,9 +746,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Create Google Auth Provider credential from the One Tap response
       const credential = GoogleAuthProvider.credential(response.credential);
-      
-      // Sign in with the credential
-      await signInWithCredential(auth, credential);
+      const current = auth.currentUser;
+      if (current && current.isAnonymous) {
+        try {
+          // Link One Tap Google credential to the current anonymous user to preserve UID
+          const linkedUser = await linkWithCredential(current, credential);
+          // Ensure email is persisted to Firestore immediately on upgrade
+          try {
+            await reload(linkedUser.user);
+          } catch {}
+          try {
+            const userDocRef = doc(db, 'users', linkedUser.user.uid);
+            const emailNow = (linkedUser.user.email || '').trim();
+            if (emailNow) {
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            }
+          } catch (e) {
+            console.warn('Failed to persist email after One Tap link:', e);
+          }
+        } catch (error: any) {
+          // If the credential is already attached to another account, just sign into that account
+          const code = (error && (error.code || error?.message)) || '';
+          if (
+            String(code).includes('auth/credential-already-in-use') ||
+            String(code).includes('auth/email-already-in-use') ||
+            String(code).includes('auth/account-exists-with-different-credential')
+          ) {
+            // For One Tap we already have the credential; sign in with it
+            await signInWithCredential(auth, credential);
+            return;
+          }
+          throw error;
+        }
+      } else {
+        // Sign in normally if not anonymous
+        await signInWithCredential(auth, credential);
+      }
     } catch (error) {
       console.error('Error with One Tap sign-in:', error);
       throw error;

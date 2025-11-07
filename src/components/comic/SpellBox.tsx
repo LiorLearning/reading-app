@@ -116,6 +116,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [isCorrect, setIsCorrect] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  // Unlocks after the first incorrect submit and persists until the question changes
+  const [hintUnlocked, setHintUnlocked] = useState(false);
   const [aiHint, setAiHint] = useState<string>('');
   const [isGeneratingHint, setIsGeneratingHint] = useState(false);
   const [canClickNext, setCanClickNext] = useState(false);
@@ -805,6 +807,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       }
       const nextAttempt = attempts + 1;
       setAttempts(nextAttempt);
+      // Unlock the hint bulb after the first wrong checked attempt
+      setHintUnlocked(true);
       try {
         if (onComplete && attempts === 0) {
           onComplete(false, completeWord, 1);
@@ -867,6 +871,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setHasSubmitted(false);
       setLastSubmittedAnswer('');
       setShowHint(false);
+      setHintUnlocked(false);
       setAttempts(0);
       setAiHint('');
       setIsGeneratingHint(false);
@@ -1271,8 +1276,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
           
 
-          {/* Hint button (incorrect response) positioned at top-right of SpellBox */}
-          {hasSubmitted && !isCorrect && showHints && (
+          {/* Hint button: appears after the first incorrect submit and persists until next question */}
+          {hintUnlocked && showHints && (
             <div className="absolute top-2 right-2 z-20">
               <Button
                 variant="comic"
@@ -1514,8 +1519,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               </div>
             )}
 
-            {/* Inline hints */}
-            {hasSubmitted && !isCorrect && showHints && (
+            {/* Inline hint button: persists after first wrong submit */}
+            {hintUnlocked && showHints && (
               <div style={{ padding: '8px 0' }}>
                 <Button
                   variant="comic"
