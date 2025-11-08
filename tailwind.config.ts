@@ -17,6 +17,17 @@ export default {
 				'2xl': '1400px'
 			}
 		},
+		screens: {
+			'sm': '640px',
+			'md': '768px',
+			'lg': '1024px',
+			'xl': '1280px',
+			'2xl': '1536px',
+			// iPad specific breakpoints
+			'ipad-mini': '768px',
+			'ipad': '810px',
+			'ipad-pro': '1024px',
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',

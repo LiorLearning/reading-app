@@ -3590,7 +3590,7 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* ADDED FOR HOME PAGE FUNCTIONALITY: Grade Selection Button - Top Left */}
       {userData && (
-        <div className="absolute top-5 left-5 z-30 flex items-center gap-3">
+        <div className="absolute top-0 left-0 z-30 flex items-center gap-3" style={{ paddingTop: 'clamp(8px, env(safe-area-inset-top, 0px) + 8px, 20px)', paddingLeft: 'clamp(8px, 2vw, 20px)' }}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -4067,6 +4067,8 @@ const getSleepyPetImage = (clicks: number) => {
             streak={displayStreak}
             coins={coins}
             onStreakClick={onStreakClick}
+            className="top-0 right-0" 
+            style={{ paddingTop: 'clamp(8px, env(safe-area-inset-top, 0px) + 8px, 20px)', paddingRight: 'clamp(8px, 2vw, 24px)' }}
           />
         );
       })()}
@@ -4116,8 +4118,8 @@ const getSleepyPetImage = (clicks: number) => {
         )}
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-8 z-10 mt-12">
-        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-visible" style={{ minHeight: 'clamp(380px, 45vh, 520px)' }}>
+      <div className="flex-1 flex flex-col items-center justify-center relative px-4 md:px-6 lg:px-8 z-10" style={{ marginTop: 'clamp(60px, 12vh, 120px)', paddingTop: 'clamp(20px, 4vh, 40px)' }}>
+        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-visible" style={{ minHeight: 'clamp(300px, 40vh, 520px)', maxWidth: '100%' }}>
         {/* Compact emoji-only bubble closer to the pet */}
         {!showPetShop && (
           <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2" style={{ top: bubbleTopPx }}>
@@ -4149,7 +4151,7 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         )}
           {/* Pet pinned to bottom, nudged lower for tighter spacing with Today card */}
-          <div ref={petRef} className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-6 sm:translate-y-8 drop-shadow-2xl">
+          <div ref={petRef} className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 md:translate-y-6 lg:translate-y-8 drop-shadow-2xl" style={{ maxWidth: '90%' }}>
             {isSleepingGifLoading && (
               <div className="absolute inset-0 z-40 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
@@ -4163,31 +4165,64 @@ const getSleepyPetImage = (clicks: number) => {
               <img 
                 src={getPetImage()}
                 alt="Pet"
-                className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                  sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
-                }`}
+                className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105`}
                 style={{
+                  width: sleepClicks > 0 ? 'clamp(200px, 25vw, 280px)' : 'clamp(180px, 22vw, 260px)',
+                  height: sleepClicks > 0 ? 'clamp(200px, 25vw, 280px)' : 'clamp(180px, 22vw, 260px)',
+                  maxHeight: sleepClicks > 0 ? '280px' : '260px',
                   animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
                             getCumulativeCarePercentage() >= 60 ? 'petEvolve 800ms ease-out' : 'none'
                 }}
               />
-              {/* Evolution strip anchored to pet (desktop) */}
-              <div className="absolute top-1/2 left-full -translate-y-1/2 ml-4 z-20 hidden sm:block">
+              {/* Pets list on left side - showing evolution levels */}
+              <div className="absolute top-1/2 right-full -translate-y-1/2 z-20 hidden sm:flex flex-col gap-2 md:gap-3 items-center" style={{ marginRight: 'clamp(8px, 2vw, 16px)' }}>
                 {(() => {
                   const { currentLevel } = getLevelInfo();
-                  const levelInfo = getLevelInfo();
-                  const ringPct = Math.max(0, Math.min(100, Math.round(levelInfo.progressPercentage)));
-                  return (
-                    <EvolutionStrip
-                      currentLevel={currentLevel}
-                      stageLevels={[1, 5, 10]}
-                      orientation="vertical"
-                      size="sm"
-                      petType={currentPet}
-                      unlockedImage={getLevelBasedPetImage(currentPet, currentLevel, 'coins_10')}
-                      ringProgressPct={ringPct}
-                    />
-                  );
+                  const stageLevels = [2, 5, 10];
+                  return stageLevels.map((level) => {
+                    const isUnlocked = currentLevel >= level;
+                    const isCurrent = currentLevel === level;
+                    return (
+                      <div key={level} className="flex flex-col items-center">
+                        <div className={`relative rounded-2xl border-2 transition-all duration-300 ${
+                          isUnlocked
+                            ? 'bg-gradient-to-br from-green-50 to-emerald-100 border-green-300 shadow-lg'
+                            : 'bg-gray-100 border-gray-300 opacity-60'
+                        }`} style={{ 
+                          width: 'clamp(48px, 6vw, 72px)', 
+                          height: 'clamp(48px, 6vw, 72px)',
+                          minWidth: '48px',
+                          minHeight: '48px',
+                          padding: 'clamp(4px, 0.5vw, 8px)'
+                        }}>
+                          {isUnlocked ? (
+                            <img
+                              src={getLevelBasedPetImage(currentPet, level, 'coins_50')}
+                              alt={`Level ${level}`}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="text-xl md:text-2xl grayscale opacity-70 w-full h-full flex items-center justify-center">
+                              {(() => {
+                                const petEmoji = PetProgressStorage.getPetType(currentPet) === 'dog' ? '🐶' :
+                                                PetProgressStorage.getPetType(currentPet) === 'cat' ? '🐱' :
+                                                PetProgressStorage.getPetType(currentPet) === 'hamster' ? '🐹' : '🐾';
+                                return petEmoji;
+                              })()}
+                            </div>
+                          )}
+                          {isUnlocked && (
+                            <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white" style={{ width: 'clamp(16px, 2vw, 20px)', height: 'clamp(16px, 2vw, 20px)' }}>
+                              ✓
+                            </div>
+                          )}
+                        </div>
+                        <div className={`text-xs md:text-sm font-semibold text-center mt-1 text-white drop-shadow-md ${isCurrent ? 'font-bold' : ''}`}>
+                          L{level}
+                        </div>
+                      </div>
+                    );
+                  });
                 })()}
               </div>
               {/* Evolution strip anchored to pet (mobile) */}
@@ -4273,8 +4308,8 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Below-bubble To-Dos: Travel and Sleep */}
       {!showPetShop && (
-        <div className="relative z-20 mt-16 flex justify-center pb-24">
-          <div className="rounded-[24px] shadow-xl p-4 w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
+        <div className="relative z-20 mt-8 md:mt-12 lg:mt-16 flex justify-center pb-16 md:pb-20 lg:pb-24 px-4">
+          <div className="rounded-[24px] shadow-xl p-3 md:p-4 w-full max-w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
             <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
             <div className="mt-1 flex flex-col gap-4">
@@ -4686,7 +4721,8 @@ const getSleepyPetImage = (clicks: number) => {
         variant="outline"
         size="icon"
         aria-label="Open camera"
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] z-40 [&_svg]:!size-9"
+        className="fixed bottom-4 md:bottom-6 right-4 md:right-6 h-14 w-14 md:h-16 md:w-16 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] z-40 [&_svg]:!size-8 md:[&_svg]:!size-9"
+        style={{ bottom: 'clamp(16px, 4vw, 24px)', right: 'clamp(16px, 4vw, 24px)' }}
       >
         <Camera />
       </Button>
@@ -4906,7 +4942,7 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Pet Switcher - Only show if user owns multiple pets */}
       {(orderedOwnedPets.length > 1) && (
-        <div className="fixed top-24 left-6 z-20 flex flex-col gap-3 items-center">
+        <div className="fixed z-20 flex flex-col gap-2 md:gap-3 items-center" style={{ top: 'clamp(80px, 15vh, 120px)', left: 'clamp(16px, 2vw, 24px)' }}>
           <div className="text-lg font-semibold text-white drop-shadow-md mb-1">
             Pets: {orderedOwnedPets.length}
           </div>

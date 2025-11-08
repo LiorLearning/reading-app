@@ -5088,10 +5088,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       <div className="w-full flex-1 flex flex-col min-h-0">
         {/* Header Panel */}
         <header 
-          className="relative flex items-center justify-center py-3 lg:py-4 border-b border-white/20 text-white overflow-hidden header-panel-gradient"
+          className="relative flex items-center justify-center py-2 md:py-3 lg:py-4 border-b border-white/20 text-white overflow-hidden header-panel-gradient"
           style={{
             borderBottomColor: 'hsl(var(--primary) / 0.35)',
-            boxShadow: '0 10px 24px -10px rgba(20, 20, 60, 0.45)'
+            boxShadow: '0 10px 24px -10px rgba(20, 20, 60, 0.45)',
+            paddingTop: 'clamp(8px, env(safe-area-inset-top, 0px) + 8px, 16px)',
+            minHeight: 'clamp(48px, 8vw, 64px)'
           }}
         >
           <div className="pointer-events-none absolute inset-0 opacity-[0.55] mix-blend-soft-light bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.45),transparent_50%),radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.25),transparent_65%)]"></div>

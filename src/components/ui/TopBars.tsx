@@ -15,9 +15,9 @@ export function CenteredLevelProgressBar({
 }: CenteredLevelProgressBarProps): JSX.Element {
   const pct = Math.max(0, Math.min(100, Math.round(percent)));
   return (
-    <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none ${className || ''}`}>
-      <div className="rounded-xl px-2 py-1 pointer-events-auto">
-        <div className="relative h-9 w-72">
+    <div className={`fixed top-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none ${className || ''}`} style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="rounded-xl px-2 py-1 pointer-events-auto backdrop-blur-sm bg-white/10">
+        <div className="relative h-9 w-72 md:w-80 lg:w-96" style={{ height: 'clamp(32px, 4vw, 36px)', width: 'clamp(288px, 40vw, 384px)' }}>
           {/* Track */}
           <div className="absolute inset-y-0 left-0 right-0 bg-white/30 rounded-full border border-white/40 overflow-hidden">
             <div
@@ -56,9 +56,10 @@ export function TopRightHeartsAndCoins({
   coins,
   onStreakClick,
   className,
-}: TopRightHeartsAndCoinsProps): JSX.Element {
+  style,
+}: TopRightHeartsAndCoinsProps & { style?: React.CSSProperties }): JSX.Element {
   return (
-    <div className={`fixed top-6 right-6 z-30 flex items-center gap-5 ${className || ''}`}>
+    <div className={`fixed z-30 flex items-center gap-3 md:gap-5 ${className || ''}`} style={style || { top: '24px', right: '24px' }}>
       {/* Streak */}
       <div
         className="rounded-xl px-4 py-2 cursor-pointer hover:bg-white/5"
