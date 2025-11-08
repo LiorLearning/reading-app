@@ -5091,7 +5091,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           className="relative flex items-center justify-center py-3 lg:py-4 border-b border-white/20 text-white overflow-hidden header-panel-gradient"
           style={{
             borderBottomColor: 'hsl(var(--primary) / 0.35)',
-            boxShadow: '0 10px 24px -10px rgba(20, 20, 60, 0.45)'
+            boxShadow: '0 10px 24px -10px rgba(20, 20, 60, 0.45)',
+            paddingTop: 'calc(var(--safe-area-top, 0px) + 0.75rem)'
           }}
         >
           <div className="pointer-events-none absolute inset-0 opacity-[0.55] mix-blend-soft-light bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.65),transparent_55%),radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.45),transparent_50%),radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.25),transparent_65%)]"></div>
@@ -5099,7 +5100,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           <div 
             className="absolute left-0 flex items-center gap-2 lg:gap-3"
             style={{
-              marginLeft: `clamp(16px, 5vw, 48px)`,
+              marginLeft: `calc(var(--safe-area-left, 0px) + clamp(16px, 5vw, 48px))`,
               top: '50%',
               transform: 'translateY(-50%)'
             }}
@@ -5614,7 +5615,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           <div 
             className="absolute right-0 flex items-center gap-3"
             style={{
-              marginRight: `clamp(16px, 5vw, 48px)`
+              marginRight: `calc(var(--safe-area-right, 0px) + clamp(16px, 5vw, 48px))`
             }}
           >
 
@@ -5735,7 +5736,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               backgroundImage: `url('/backgrounds/random.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              backgroundBlendMode: 'multiply'
+            backgroundBlendMode: 'multiply',
+            paddingLeft: 'calc(var(--safe-area-left, 0px) + 1rem)',
+            paddingRight: 'calc(var(--safe-area-right, 0px) + 1rem)',
+            paddingBottom: 'calc(var(--safe-area-bottom, 0px) + 1.5rem)'
             }}
             role="main"
           >
@@ -5744,7 +5748,13 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
             {/* DEV tools: top-right */}
             {currentScreen === 1 && (
-              <div className="fixed right-4 top-4 z-50 flex flex-col items-end gap-2">
+              <div
+                className="fixed z-50 flex flex-col items-end gap-2"
+                style={{
+                  right: 'calc(var(--safe-area-right, 0px) + 1rem)',
+                  top: 'calc(var(--safe-area-top, 0px) + 1rem)'
+                }}
+              >
                 {/* Skip SpellBox when active */}
                 {/*
                   DEV: Next Spell button intentionally disabled
@@ -5793,10 +5803,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                   return shouldShowBackButton;
                 })() && (
                   <div 
-                    className="fixed left-4 top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:left-8"
+                    className="fixed top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:left-8"
                     style={{
                       // Ensure button stays within viewport on all screen sizes
-                      left: 'max(16px, min(32px, calc((100vw - 1280px) / 2 + 16px)))'
+                      left: 'calc(var(--safe-area-left, 0px) + max(16px, min(32px, calc((100vw - 1280px) / 2 + 16px))))'
                     }}
                   >
                     <Button
@@ -5852,10 +5862,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
             {/* Right Arrow Navigation - Outside the main container */}
             {false && (
               <div 
-                className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:right-8"
+                className="fixed top-1/2 transform -translate-y-1/2 z-40 lg:absolute lg:right-8"
                 style={{
                   // Ensure button stays within viewport on all screen sizes
-                  right: 'max(16px, min(32px, calc((100vw - 1280px) / 2 + 16px)))'
+                  right: 'calc(var(--safe-area-right, 0px) + max(16px, min(32px, calc((100vw - 1280px) / 2 + 16px))))'
                 }}
               >
                 <Button

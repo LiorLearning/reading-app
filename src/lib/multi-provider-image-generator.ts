@@ -271,7 +271,7 @@ class FluxSchnellProvider implements ImageProvider {
           go_fast: true,
           output_quality: 100,
           num_inference_steps: 4,
-          aspect_ratio: '5:4',
+          aspect_ratio: '1:1',
           output_format: 'png'
           //safety_tolerance: 1,
           //prompt_upsampling: false,
