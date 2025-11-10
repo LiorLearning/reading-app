@@ -15,6 +15,8 @@ export interface SpellingQuestion {
   audio: string;
   explanation: string;
   templateType: string;
+  /** When true, this is a reading-aloud question (mic instead of typing) */
+  isReading?: boolean;
   isPrefilled?: boolean;
   prefilledIndexes?: number[];
   /** Optional: metadata for the realtime spelling tutor prompt */
@@ -43,7 +45,8 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
   
   Object.values(sampleMCQData.topics).forEach(topic => {
     topic.questions.forEach(question => {
-      if (question.isSpelling === true) {
+      // Include both spelling and reading questions in the SpellBox pipeline
+      if (question.isSpelling === true || question.isReading === true) {
         // Determine the actual spelling target word
         let spellingTarget = question.audio || question.word;
         
@@ -62,6 +65,7 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
           audio: spellingTarget, // Use the determined spelling target
           explanation: question.explanation,
           templateType: question.templateType,
+          isReading: question.isReading === true,
           isPrefilled: question.isPrefilled,
           prefilledIndexes: question.prefilledIndexes,
           // Pass through any aiTutor metadata from the MCQ source so SpellBox can enrich the realtime prompt

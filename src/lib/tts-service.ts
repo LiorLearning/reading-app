@@ -607,6 +607,93 @@ class TextToSpeechService {
       similarity_boost: 0.75,
     });
   }
+
+  /**
+   * Speak text but pause (silence) in place of the target word.
+   * Implementation: speak the text before the word, wait pauseMs, then speak the rest.
+   * If the word is not found (case-insensitive, word boundary), falls back to a single speak().
+   */
+  async speakWithPauseAtWord(
+    fullText: string,
+    targetWord: string,
+    options?: TTSOptions & { pauseMs?: number; speakAfter?: boolean }
+  ): Promise<void> {
+    const DEBUG_TTS_MASK = true;
+    const dbg = (...args: any[]) => { if (DEBUG_TTS_MASK) { try { console.log('[TTS][Mask]', ...args); } catch {} } };
+    const text = this.cleanTextForSpeech(fullText || '');
+    const word = (targetWord || '').trim();
+    const { pauseMs: pauseOverride, speakAfter = false, ...ttsOptions } = options || {};
+    dbg('inputs', { text, word, speakAfter });
+    if (!text || !word) {
+      dbg('fallback: empty text/word -> speak() whole');
+      await this.speak(text, ttsOptions);
+      return;
+    }
+    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Word-boundary match; case-insensitive
+    const re = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'i');
+    let start = -1;
+    let end = -1;
+    const m = text.match(re);
+    if (m && m.index !== undefined) {
+      start = m.index;
+      end = start + m[0].length;
+      dbg('match via regex', { match: m[0], start, end });
+    } else {
+      // Robust fallback: token-based search ignoring punctuation variants
+      const normalize = (s: string) =>
+        s
+          .toLowerCase()
+          .replace(/[_*~`()[\]{}"“”'’.,!?;:—–-]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      const tokens = normalize(text).split(' ');
+      const tw = normalize(word);
+      const idx = tokens.indexOf(tw);
+      dbg('token search', { tokensLen: tokens.length, target: tw, idx });
+      if (idx >= 0) {
+        // Reconstruct offsets by walking original cleaned text words
+        let seen = -1;
+        let cursor = 0;
+        const words = text.split(/\s+/);
+        for (let i = 0; i < words.length; i++) {
+          if (normalize(words[i]).length === 0) {
+            cursor += (words[i] + ' ').length;
+            continue;
+          }
+          seen++;
+          if (seen === idx) {
+            start = text.indexOf(words[i], cursor);
+            end = start + words[i].length;
+            break;
+          }
+          cursor = text.indexOf(words[i], cursor) + words[i].length + 1;
+        }
+        dbg('reconstructed offsets', { start, end });
+      }
+    }
+    if (start < 0 || end < 0) {
+      // As a last resort, remove the word and speak the remainder (no pause) to avoid leaking the answer.
+      const removed = text.replace(re, '').replace(/\s{2,}/g, ' ').trim();
+      dbg('fallback: could not locate offsets; speaking with word removed', { removed });
+      await this.speak(removed, ttsOptions);
+      return;
+    }
+    const before = text.slice(0, start).trim();
+    const after = text.slice(end).trim();
+    const pauseMs = Math.max(150, Math.min(1500, pauseOverride ?? 450));
+    dbg('segments', { before, pauseMs, after, speakAfter });
+    // Speak before (if any)
+    if (before) {
+      await this.speak(before, ttsOptions);
+    }
+    // Silent pause
+    await new Promise<void>(resolve => setTimeout(resolve, pauseMs));
+    // Speak after (if any)
+    if (speakAfter && after) {
+      await this.speak(after, ttsOptions);
+    }
+  }
 }
 
 // Export a singleton instance

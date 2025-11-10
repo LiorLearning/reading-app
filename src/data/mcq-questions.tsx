@@ -94,6 +94,33 @@ interface FillBlankQuestion {
   aiTutor: AItutor;
 }
 
+interface ReadingQuestion {
+  id: number;
+  topicId: string;
+  topicName: string;
+  questionElements: string;
+  answerElements: string;
+  progressTopicName: string;
+
+  templateType: string;
+  word: string;
+  imageUrl: string | null;
+  explanation: string;
+  questionText: string;
+  correctAnswer: string;
+  template: string;
+  isSpacing: boolean;
+  isSorting: boolean;
+  isSpelling: boolean;
+  aiHook: AIHook;
+  passage?: string; // Optional for reading comprehension
+  audio: string; // Audio text for speaker button
+  isReading: boolean;
+  isPrefilled?: boolean; // Optional: whether this spelling question has prefilled characters
+  prefilledIndexes?: number[]; // Optional: array of character indexes that are prefilled
+  aiTutor: AItutor;
+}
+
 interface TopicInfo {
   topicId: string;
   topicName: string;
@@ -106,7 +133,7 @@ interface TopicInfo {
 
 interface Topic {
   topicInfo: TopicInfo;
-  questions: (MCQQuestion | DragDropQuestion | FillBlankQuestion)[];
+  questions: (MCQQuestion | DragDropQuestion | FillBlankQuestion| ReadingQuestion)[];
 }
 
 export interface MCQData {
@@ -141,7 +168,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [0,2],
           aiHook: {
             targetWord: 'cat',
@@ -175,7 +203,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: 'dog',
@@ -209,7 +238,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2,3],
           aiHook: {
             targetWord: 'blend',
@@ -243,7 +273,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [0, 3],
           aiHook: {
             targetWord: 'bark',
@@ -277,7 +308,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "cake",
@@ -311,7 +343,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "glue",
@@ -345,7 +378,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,4,5],
           aiHook: {
             targetWord: "weight",
@@ -380,7 +414,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "noodle",
@@ -428,7 +463,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'ran',
@@ -462,7 +498,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cat',
@@ -496,7 +533,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'bag',
@@ -530,7 +568,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'jam',
@@ -564,7 +603,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'map',
@@ -598,7 +638,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fan',
@@ -632,7 +673,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'pan',
@@ -666,7 +708,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cap',
@@ -700,7 +743,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'dad',
@@ -734,7 +778,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'man',
@@ -768,7 +813,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'bat',
@@ -802,7 +848,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'tag',
@@ -836,7 +883,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'tap',
@@ -870,7 +918,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'van',
@@ -904,7 +953,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'jam',
@@ -938,7 +988,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'rag',
@@ -972,7 +1023,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'can',
@@ -1006,7 +1058,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dad',
@@ -1040,7 +1093,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'mad',
@@ -1074,7 +1128,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'ham',
@@ -1122,7 +1177,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'red',
@@ -1156,7 +1212,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bed',
@@ -1190,7 +1247,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'pen',
@@ -1224,7 +1282,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'jet',
@@ -1258,7 +1317,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'hen',
@@ -1292,7 +1352,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'web',
@@ -1326,7 +1387,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'leg',
@@ -1360,7 +1422,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'net',
@@ -1394,7 +1457,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'men',
@@ -1428,7 +1492,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pet',
@@ -1462,7 +1527,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'den',
@@ -1496,7 +1562,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'wet',
@@ -1530,7 +1597,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'set',
@@ -1564,7 +1632,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'let',
@@ -1598,7 +1667,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'met',
@@ -1632,7 +1702,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'get',
@@ -1666,7 +1737,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'vet',
@@ -1700,7 +1772,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hem',
@@ -1734,7 +1807,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'peg',
@@ -1768,7 +1842,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bet',
@@ -1814,7 +1889,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'rip',
@@ -1848,7 +1924,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dip',
@@ -1882,7 +1959,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'lip',
@@ -1916,7 +1994,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'tip',
@@ -1950,7 +2029,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'sip',
@@ -1984,7 +2064,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pin',
@@ -2018,7 +2099,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'fin',
@@ -2052,7 +2134,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'win',
@@ -2086,7 +2169,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'sit',
@@ -2120,7 +2204,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hit',
@@ -2154,7 +2239,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'pig',
@@ -2188,7 +2274,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dig',
@@ -2222,7 +2309,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'wig',
@@ -2256,7 +2344,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fix',
@@ -2290,7 +2379,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'mix',
@@ -2324,7 +2414,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'six',
@@ -2358,7 +2449,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'lid',
@@ -2392,7 +2484,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'kid',
@@ -2426,7 +2519,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'big',
@@ -2460,7 +2554,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'zip',
@@ -2506,7 +2601,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'top',
@@ -2540,7 +2636,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hop',
@@ -2574,7 +2671,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'pot',
@@ -2608,7 +2706,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'log',
@@ -2642,7 +2741,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'dog',
@@ -2676,7 +2776,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'box',
@@ -2710,7 +2811,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'hot',
@@ -2744,7 +2846,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fog',
@@ -2778,7 +2881,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2, 3],
       aiHook: {
         targetWord: 'rock',
@@ -2812,7 +2916,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2, 3],
       aiHook: {
         targetWord: 'sock',
@@ -2846,7 +2951,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'mop',
@@ -2880,7 +2986,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pop',
@@ -2914,7 +3021,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'job',
@@ -2948,7 +3056,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cob',
@@ -2982,7 +3091,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'pod',
@@ -3016,7 +3126,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'dot',
@@ -3050,7 +3161,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'rod',
@@ -3084,7 +3196,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cop',
@@ -3118,7 +3231,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'lot',
@@ -3152,7 +3266,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'fox',
@@ -3197,7 +3312,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'mug',
@@ -3231,7 +3347,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bug',
@@ -3265,7 +3382,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'sun',
@@ -3299,7 +3417,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'rug',
@@ -3333,7 +3452,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'tub',
@@ -3367,7 +3487,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cup',
@@ -3401,7 +3522,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'mud',
@@ -3435,7 +3557,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pug',
@@ -3469,7 +3592,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'jug',
@@ -3503,7 +3627,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hug',
@@ -3537,7 +3662,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'sub',
@@ -3571,7 +3697,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'cub',
@@ -3605,7 +3732,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'fun',
@@ -3639,7 +3767,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bun',
@@ -3673,7 +3802,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'nut',
@@ -3707,7 +3837,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'hut',
@@ -3741,7 +3872,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'gum',
@@ -3775,7 +3907,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'pup',
@@ -3809,7 +3942,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1, 2],
       aiHook: {
         targetWord: 'bus',
@@ -3843,7 +3977,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2],
       aiHook: {
         targetWord: 'bud',
@@ -3890,7 +4025,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'cat',
@@ -3924,7 +4060,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'bag',
@@ -3958,7 +4095,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'cap',
@@ -3994,7 +4132,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'dog',
@@ -4028,7 +4167,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'pot',
@@ -4062,7 +4202,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'log',
@@ -4098,7 +4239,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'jam',
@@ -4132,7 +4274,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'fox',
@@ -4166,7 +4309,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'bag',
@@ -4200,7 +4344,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'rod',
@@ -4248,7 +4393,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'pen',
@@ -4282,7 +4428,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'bed',
@@ -4316,7 +4463,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'hen',
@@ -4352,7 +4500,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'pig',
@@ -4386,7 +4535,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'lip',
@@ -4420,7 +4570,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'fin',
@@ -4456,7 +4607,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'jet',
@@ -4490,7 +4642,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'sit',
@@ -4524,7 +4677,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'ten',
@@ -4558,7 +4712,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'pin',
@@ -4605,7 +4760,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'tag',
@@ -4639,7 +4795,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'hat',
@@ -4673,7 +4830,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'pig',
@@ -4707,7 +4865,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'sun',
@@ -4741,7 +4900,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'dog',
@@ -4775,7 +4935,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'pen',
@@ -4809,7 +4970,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'cat',
@@ -4843,7 +5005,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'cup',
@@ -4877,7 +5040,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'hen',
@@ -4911,7 +5075,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'fox',
@@ -4945,7 +5110,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'bed',
@@ -4979,7 +5145,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'log',
@@ -5013,7 +5180,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'fin',
@@ -5047,7 +5215,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'jam',
@@ -5081,7 +5250,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'tub',
@@ -5115,7 +5285,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'jet',
@@ -5149,7 +5320,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'lip',
@@ -5183,7 +5355,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'cap',
@@ -5217,7 +5390,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'rod',
@@ -5251,7 +5425,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: 'bus',
@@ -5297,7 +5472,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cop',
@@ -5331,7 +5507,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cat',
@@ -5365,7 +5542,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pen',
@@ -5399,7 +5577,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pig',
@@ -5433,7 +5612,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bus',
@@ -5467,7 +5647,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'dog',
@@ -5501,7 +5682,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'hat',
@@ -5535,7 +5717,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'net',
@@ -5569,7 +5752,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'lip',
@@ -5603,7 +5787,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cup',
@@ -5637,7 +5822,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'jam',
@@ -5671,7 +5857,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bed',
@@ -5705,7 +5892,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'sun',
@@ -5739,7 +5927,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fox',
@@ -5773,7 +5962,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'rib',
@@ -5807,7 +5997,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bat',
@@ -5841,7 +6032,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'hen',
@@ -5875,7 +6067,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mud',
@@ -5909,7 +6102,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'log',
@@ -5943,7 +6137,8 @@ export const sampleMCQData: MCQData = {
       isSpacing: false,
       isSorting: true,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fin',
@@ -5990,7 +6185,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6024,7 +6220,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6058,7 +6255,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6092,7 +6290,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6126,7 +6325,8 @@ export const sampleMCQData: MCQData = {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6160,7 +6360,8 @@ aiTutor: {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6194,7 +6395,8 @@ aiTutor: {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6228,7 +6430,8 @@ aiTutor: {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6262,7 +6465,8 @@ aiTutor: {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6296,7 +6500,8 @@ aiTutor: {
           isSpacing: true,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -6343,7 +6548,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'elephant',
             intent: 'mcq',
@@ -6377,7 +6583,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'banana',
             intent: 'mcq',
@@ -6411,7 +6618,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'computer',
             intent: 'mcq',
@@ -6445,7 +6653,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'umbrella',
             intent: 'mcq',
@@ -6479,7 +6688,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'giraffe',
             intent: 'mcq',
@@ -6513,7 +6723,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'cucumber',
             intent: 'mcq',
@@ -6547,7 +6758,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'chocolate',
             intent: 'mcq',
@@ -6581,7 +6793,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'dinosaur',
             intent: 'mcq',
@@ -6615,7 +6828,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'avocado',
             intent: 'mcq',
@@ -6649,7 +6863,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'butterfly',
             intent: 'mcq',
@@ -6696,7 +6911,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6730,7 +6946,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6764,7 +6981,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6798,7 +7016,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6832,7 +7051,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6866,7 +7086,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6900,7 +7121,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6934,7 +7156,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -6968,7 +7191,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7002,7 +7226,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7048,7 +7273,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
@@ -7082,7 +7308,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
@@ -7116,7 +7343,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
@@ -7150,7 +7378,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
@@ -7184,7 +7413,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
@@ -7218,7 +7448,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
@@ -7252,7 +7483,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
@@ -7286,7 +7518,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
@@ -7320,7 +7553,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long o sounds',
             intent: 'mcq',
@@ -7354,7 +7588,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'mcq',
@@ -7400,7 +7635,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7434,7 +7670,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7468,7 +7705,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7502,7 +7740,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7536,7 +7775,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7570,7 +7810,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7604,7 +7845,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7638,7 +7880,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7672,7 +7915,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7706,7 +7950,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -7754,7 +7999,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7789,7 +8035,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7824,7 +8071,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7859,7 +8107,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7894,7 +8143,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7929,7 +8179,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7964,7 +8215,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -7999,7 +8251,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -8034,7 +8287,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -8069,7 +8323,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -8115,7 +8370,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8149,7 +8405,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8183,7 +8440,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8217,7 +8475,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8251,7 +8510,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8285,7 +8545,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8319,7 +8580,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8353,7 +8615,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8387,7 +8650,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8421,7 +8685,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'digraph identification',
             intent: 'mcq',
@@ -8467,7 +8732,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sound',
             intent: 'mcq',
@@ -8501,7 +8767,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sound',
             intent: 'mcq',
@@ -8535,7 +8802,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sound',
             intent: 'mcq',
@@ -8569,7 +8837,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sound',
             intent: 'mcq',
@@ -8603,7 +8872,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sound',
             intent: 'mcq',
@@ -8637,7 +8907,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sound',
             intent: 'mcq',
@@ -8671,7 +8942,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sound',
             intent: 'mcq',
@@ -8705,7 +8977,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sound',
             intent: 'mcq',
@@ -8739,7 +9012,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sound',
             intent: 'mcq',
@@ -8773,6 +9047,7 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
+        isReading: false,
         isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sound',
@@ -8819,7 +9094,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -8853,7 +9129,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -8887,7 +9164,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -8921,7 +9199,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -8955,7 +9234,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -8989,7 +9269,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -9023,7 +9304,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -9057,7 +9339,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -9091,7 +9374,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -9125,7 +9409,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'beginning sounds',
             intent: 'mcq',
@@ -9171,7 +9456,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9205,7 +9491,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9239,7 +9526,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9273,7 +9561,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9307,7 +9596,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9341,7 +9631,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9375,7 +9666,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9409,7 +9701,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9443,7 +9736,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -9477,8 +9771,10 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
-        prefilledIndexes: [],          aiHook: {
+          isReading: false,
+          isPrefilled: false,
+          prefilledIndexes: [],          
+          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
             questionLine: "Listen to the word. Then, fill in the missing digraph: _eel",
@@ -9495,6 +9791,735 @@ aiTutor: {
         }
       ],
     },
+    '1-R-H.1': {
+  topicInfo: {
+    topicId: '1-R-H.1',
+    topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+    progressTopicName: 'Initial Consonant Blends',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Great job! The word is 'black'.",
+      questionText: 'Complete the word to match the picture: _ack',
+      correctAnswer: 'black',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling:false,
+      isReading: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ack',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'black',
+        question: '_ _ a c k',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'bl' blend combines the /b/ and /l/ sounds, said together quickly without a vowel between them."
+      },
+      audio: 'black'
+    },
+    {
+      id: 2,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'grab'.",
+      questionText: 'Complete the word to match the picture: _ab',
+      correctAnswer: 'grab',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ab',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'grab',
+        question: '_ _ a b',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'gr' blend combines the /g/ and /r/ sounds, said together quickly without a vowel between them."
+      },
+      audio: 'grab'
+    },
+    {
+      id: 3,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Well done! The word is 'step'.",
+      questionText: 'Complete the word to match the picture: _ep',
+      correctAnswer: 'step',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ep',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'step',
+        question: '_ _ e p',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'st' blend joins the /s/ and /t/ sounds at the start of words like 'step' and 'stop'."
+      },
+      audio: 'step'
+    },
+    {
+      id: 4,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Awesome! The word is 'block'.",
+      questionText: 'Complete the word to match the picture: _ock',
+      correctAnswer: 'block',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ock',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'block',
+        question: '_ _ o c k',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'bl' blend joins the /b/ and /l/ sounds at the start of words like 'block' and 'blue'."
+      },
+      audio: 'block'
+    },
+    {
+      id: 5,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'crab'.",
+      questionText: 'Complete the word to match the picture: _ab',
+      correctAnswer: 'crab',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ab',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'crab',
+        question: '_ _ a b',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'cr' blend combines the /k/ and /r/ sounds at the start of words like 'crab' and 'crack'."
+      },
+      audio: 'crab'
+    },
+    {
+      id: 6,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "You did it! The word is 'trap'.",
+      questionText: 'Complete the word to match the picture: _ap',
+      correctAnswer: 'trap',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ap',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'trap',
+        question: '_ _ a p',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'tr' blend joins the /t/ and /r/ sounds at the start of words like 'trap' and 'tree'."
+      },
+      audio: 'trap'
+    },
+    {
+      id: 7,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'spade'.",
+      questionText: 'Complete the word to match the picture: _ade',
+      correctAnswer: 'spade',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ade',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'spade',
+        question: '_ _ a d e',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'sp' blend joins the /s/ and /p/ sounds at the start of words like 'spade' and 'spin'."
+      },
+      audio: 'spade'
+    },
+    {
+      id: 8,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Good job! The word is 'clock'.",
+      questionText: 'Complete the word to match the picture: _ock',
+      correctAnswer: 'clock',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ock',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'clock',
+        question: '_ _ o c k',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'cl' blend combines the /k/ and /l/ sounds at the start of words like 'clock' and 'clap'."
+      },
+      audio: 'clock'
+    },
+    {
+      id: 9,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Terrific! The word is 'drop'.",
+      questionText: 'Complete the word to match the picture: _op',
+      correctAnswer: 'drop',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _op',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'drop',
+        question: '_ _ o p',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'dr' blend joins the /d/ and /r/ sounds at the start of words like 'drop' and 'drum'."
+      },
+      audio: 'drop'
+    },
+    {
+      id: 10,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Wonderful! The word is 'slip'.",
+      questionText: 'Complete the word to match the picture: _ip',
+      correctAnswer: 'slip',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ip',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'slip',
+        question: '_ _ i p',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'sl' blend combines the /s/ and /l/ sounds at the start of words like 'slip' and 'slide'."
+      },
+      audio: 'slip'
+    },
+    {
+      id: 11,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Nice! The word is 'flag'.",
+      questionText: 'Complete the word to match the picture: _ag',
+      correctAnswer: 'flag',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ag',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'flag',
+        question: '_ _ a g',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'fl' blend joins the /f/ and /l/ sounds at the start of words like 'flag' and 'flip'."
+      },
+      audio: 'flag'
+    },
+    {
+      id: 12,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Great work! The word is 'plant'.",
+      questionText: 'Complete the word to match the picture: _ant',
+      correctAnswer: 'plant',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ant',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'plant',
+        question: '_ _ a n t',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'pl' blend combines the /p/ and /l/ sounds at the start of words like 'plant' and 'play'."
+      },
+      audio: 'plant'
+    },
+    {
+      id: 13,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Great! The word is 'frank'.",
+      questionText: 'Complete the word to match the picture: _ank',
+      correctAnswer: 'frank',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ank',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'frank',
+        question: '_ _ a n k',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'fr' blend joins the /f/ and /r/ sounds at the start of words like 'frank' and 'frog'."
+      },
+      audio: 'frank'
+    },
+    {
+      id: 14,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Nice! The word is 'flame'.",
+      questionText: 'Complete the word to match the picture: _ame',
+      correctAnswer: 'flame',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ame',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'flame',
+        question: '_ _ a m e',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'fl' blend joins the /f/ and /l/ sounds at the start of words like 'flame' and 'flat'."
+      },
+      audio: 'flame'
+    },
+    {
+      id: 15,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Great! The word is 'smile'.",
+      questionText: 'Complete the word to match the picture: _ile',
+      correctAnswer: 'smile',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ile',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'smile',
+        question: '_ _ i l e',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'sm' blend combines the /s/ and /m/ sounds at the start of words like 'smile' and 'smash'."
+      },
+      audio: 'smile'
+    },
+    {
+      id: 16,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Nice! The word is 'snack'.",
+      questionText: 'Complete the word to match the picture: _ack',
+      correctAnswer: 'snack',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ack',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'snack',
+        question: '_ _ a c k',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'sn' blend joins the /s/ and /n/ sounds at the start of words like 'snack' and 'snake'."
+      },
+      audio: 'snack'
+    },
+    {
+      id: 17,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Great! The word is 'skate'.",
+      questionText: 'Complete the word to match the picture: _ate',
+      correctAnswer: 'skate',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ate',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'skate',
+        question: '_ _ a t e',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'sk' blend combines the /s/ and /k/ sounds at the start of words like 'skate' and 'skirt'."
+      },
+      audio: 'skate'
+    },
+    {
+      id: 18,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Nice! The word is 'prize'.",
+      questionText: 'Complete the word to match the picture: _ize',
+      correctAnswer: 'prize',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ize',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'prize',
+        question: '_ _ i z e',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'pr' blend joins the /p/ and /r/ sounds at the start of words like 'prize' and 'press'."
+      },
+      audio: 'prize'
+    },
+    {
+      id: 19,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Great! The word is 'glove'.",
+      questionText: 'Complete the word to match the picture: _ove',
+      correctAnswer: 'glove',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+isSpelling: false,
+      isReading: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ove',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'glove',
+        question: '_ _ o v e',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'gl' blend combines the /g/ and /l/ sounds at the start of words like 'glove' and 'glass'."
+      },
+      audio: 'glove'
+    },
+    {
+      id: 20,
+      topicId: '1-R-H.1',
+      topicName: 'Complete_the_word_with_the_right_initial_consonant_blend',
+      progressTopicName: 'Initial Consonant Blends',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'blend',
+      imageUrl: null,
+      explanation: "Nice! The word is 'brag'.",
+      questionText: 'Complete the word to match the picture: _ag',
+      correctAnswer: 'brag',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: false,
+      isReading: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'blend',
+        intent: 'fill_blank',
+        questionLine: 'Complete the word to match the picture: _ag',
+        imagePrompt: 'Educational scene showing complete_the_word_with_the_right_initial_consonant_blend concepts'
+      },
+      aiTutor: {
+        target_word: 'brag',
+        question: '_ _ a g',
+        student_entry: '',
+        topic_to_reinforce: 'Initial consonant blends',
+        spelling_pattern_or_rule: "The 'br' blend joins the /b/ and /r/ sounds at the start of words like 'brag' and 'brush'."
+      },
+      audio: 'brag'
+    }
+  ]
+},
 '1-H.1': {
   topicInfo: {
     topicId: '1-H.1',
@@ -9522,6 +10547,7 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
+      isReading: false,
       isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
@@ -9556,7 +10582,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9590,7 +10617,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9624,7 +10652,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -9658,7 +10687,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9692,7 +10722,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9726,7 +10757,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -9760,7 +10792,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -9794,7 +10827,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9828,7 +10862,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9862,7 +10897,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'blend',
@@ -9896,7 +10932,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -9930,7 +10967,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -9964,7 +11002,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -9998,7 +11037,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -10032,7 +11072,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -10066,7 +11107,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -10100,7 +11142,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -10134,7 +11177,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: 'blend',
@@ -10168,6 +11212,7 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
+      isReading: false,
       isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
@@ -10216,7 +11261,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10250,7 +11296,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10284,7 +11331,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10318,7 +11366,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10352,7 +11401,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10386,7 +11436,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10420,7 +11471,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10454,7 +11506,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10488,7 +11541,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10522,7 +11576,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -10568,7 +11623,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10602,7 +11658,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10636,7 +11693,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10670,7 +11728,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10704,7 +11763,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10738,7 +11798,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10772,7 +11833,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10806,7 +11868,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10840,7 +11903,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10874,7 +11938,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10908,7 +11973,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10942,7 +12008,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -10976,7 +12043,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11010,7 +12078,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11044,7 +12113,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11078,7 +12148,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11112,7 +12183,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11146,7 +12218,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11180,7 +12253,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11214,7 +12288,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: 'blend',
@@ -11261,7 +12336,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11295,7 +12371,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11329,7 +12406,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11363,7 +12441,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11397,7 +12476,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11431,7 +12511,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11465,7 +12546,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11499,7 +12581,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11533,7 +12616,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11567,7 +12651,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -11614,7 +12699,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11648,7 +12734,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11682,7 +12769,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11716,7 +12804,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11750,7 +12839,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11784,7 +12874,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11818,7 +12909,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11852,7 +12944,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11886,7 +12979,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11920,7 +13014,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -11967,7 +13062,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -12001,7 +13097,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12035,7 +13132,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -12069,7 +13167,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel sorting',
           intent: 'mcq',
@@ -12103,7 +13202,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -12137,7 +13237,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel sorting',
           intent: 'mcq',
@@ -12171,7 +13272,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -12205,7 +13307,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12239,7 +13342,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel sorting',
           intent: 'mcq',
@@ -12273,7 +13377,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'blend',
           intent: 'mcq',
@@ -12319,7 +13424,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12353,7 +13459,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12387,7 +13494,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12421,7 +13529,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12455,7 +13564,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12489,7 +13599,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12523,7 +13634,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12557,7 +13669,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12591,7 +13704,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12625,7 +13739,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: 'short a sounds',
@@ -12672,7 +13787,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12706,7 +13822,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12740,7 +13857,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12774,7 +13892,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12808,7 +13927,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12842,7 +13962,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12876,7 +13997,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12910,7 +14032,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12944,7 +14067,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -12978,7 +14102,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -13025,7 +14150,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13059,7 +14185,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13093,7 +14220,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13127,7 +14255,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13161,7 +14290,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13195,7 +14325,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13229,7 +14360,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13263,7 +14395,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13297,7 +14430,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13331,7 +14465,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13378,7 +14513,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13412,7 +14548,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13446,7 +14583,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13480,7 +14618,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13514,7 +14653,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13548,7 +14688,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13582,7 +14723,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13616,7 +14758,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13650,7 +14793,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13684,7 +14828,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -13731,7 +14876,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13765,7 +14911,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13799,7 +14946,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13833,7 +14981,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13867,7 +15016,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13901,7 +15051,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13935,7 +15086,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -13969,7 +15121,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -14003,7 +15156,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -14037,7 +15191,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -14084,7 +15239,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14118,7 +15274,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14152,7 +15309,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14186,7 +15344,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14220,7 +15379,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14254,7 +15414,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14288,7 +15449,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14322,7 +15484,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14356,7 +15519,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14390,7 +15554,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sound',
           intent: 'mcq',
@@ -14437,7 +15602,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14471,7 +15637,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14505,7 +15672,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14539,7 +15707,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14573,7 +15742,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14607,7 +15777,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14641,7 +15812,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14675,7 +15847,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14709,7 +15882,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14743,7 +15917,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -14790,7 +15965,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -14824,7 +16000,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -14858,7 +16035,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -14892,7 +16070,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -14926,7 +16105,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -14960,7 +16140,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -14994,7 +16175,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -15028,7 +16210,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -15062,7 +16245,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -15096,7 +16280,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sound',
           intent: 'mcq',
@@ -15143,7 +16328,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15177,7 +16363,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15211,7 +16398,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15245,7 +16433,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15279,7 +16468,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15313,7 +16503,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15347,7 +16538,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15381,7 +16573,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15415,7 +16608,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15449,7 +16643,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15496,7 +16691,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -15530,7 +16726,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15564,7 +16761,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short a sounds',
           intent: 'mcq',
@@ -15598,7 +16796,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -15632,7 +16831,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -15666,7 +16866,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -15700,7 +16901,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short u sounds',
           intent: 'mcq',
@@ -15734,7 +16936,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short e sounds',
           intent: 'mcq',
@@ -15768,7 +16971,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short i sounds',
           intent: 'mcq',
@@ -15802,7 +17006,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'short o sounds',
           intent: 'mcq',
@@ -15849,7 +17054,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -15883,7 +17089,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -15917,7 +17124,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -15951,7 +17159,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -15985,7 +17194,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16019,7 +17229,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16053,7 +17264,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16087,7 +17299,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16121,7 +17334,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16155,7 +17369,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16202,7 +17417,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16236,7 +17452,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16270,7 +17487,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16304,7 +17522,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16338,7 +17557,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16372,7 +17592,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16406,7 +17627,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16440,7 +17662,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16474,7 +17697,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16508,7 +17732,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'silent e',
           intent: 'mcq',
@@ -16555,7 +17780,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16589,7 +17815,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16623,7 +17850,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16657,7 +17885,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16691,7 +17920,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16725,7 +17955,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16759,7 +17990,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16793,7 +18025,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16827,7 +18060,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16861,7 +18095,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'vowel team',
           intent: 'mcq',
@@ -16908,7 +18143,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'fur',
           intent: 'mcq',
@@ -16942,7 +18178,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'hard',
           intent: 'mcq',
@@ -16976,7 +18213,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'cart',
           intent: 'mcq',
@@ -17010,7 +18248,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'bird',
           intent: 'mcq',
@@ -17044,7 +18283,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'star',
           intent: 'mcq',
@@ -17078,7 +18318,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'corn',
           intent: 'mcq',
@@ -17112,7 +18353,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'fork',
           intent: 'mcq',
@@ -17146,7 +18388,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'barn',
           intent: 'mcq',
@@ -17180,7 +18423,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'horn',
           intent: 'mcq',
@@ -17214,7 +18458,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'curl',
           intent: 'mcq',
@@ -17260,7 +18505,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'farm',
@@ -17294,7 +18540,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'bark',
@@ -17328,7 +18575,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: 'car',
@@ -17362,7 +18610,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'star',
@@ -17396,7 +18645,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'yard',
@@ -17430,7 +18680,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'corn',
@@ -17464,7 +18715,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'fork',
@@ -17498,7 +18750,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'horn',
@@ -17532,7 +18785,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: 'storm',
@@ -17566,7 +18820,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: 'short',
@@ -17611,7 +18866,8 @@ aiTutor: {
       correctAnswer: 'her',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0],
       aiHook: { targetWord: 'her', intent: 'fill_blank', questionLine: "Complete the word: h__", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'her',
@@ -17637,7 +18893,8 @@ aiTutor: {
       correctAnswer: 'fern',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'fern', intent: 'fill_blank', questionLine: "Complete the word: f__n", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'fern',
@@ -17664,7 +18921,8 @@ aiTutor: {
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
       // show b,u,t,t then blank for e,r
-      isPrefilled: true, prefilledIndexes: [0, 1, 2, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1, 2, 3],
       aiHook: { targetWord: 'butter', intent: 'fill_blank', questionLine: "Complete the word: b u t t _ _", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'butter',
@@ -17692,7 +18950,8 @@ aiTutor: {
       correctAnswer: 'bird',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'bird', intent: 'fill_blank', questionLine: "Complete the word: b__d", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'bird',
@@ -17718,7 +18977,8 @@ aiTutor: {
       correctAnswer: 'shirt',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 1, 4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1, 4],
       aiHook: { targetWord: 'shirt', intent: 'fill_blank', questionLine: "Complete the word: sh__t", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'shirt',
@@ -17744,7 +19004,8 @@ aiTutor: {
       correctAnswer: 'girl',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'girl', intent: 'fill_blank', questionLine: "Complete the word: g__l", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'girl',
@@ -17772,7 +19033,8 @@ aiTutor: {
       correctAnswer: 'germ',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'germ', intent: 'fill_blank', questionLine: "Complete the word: g__m", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'germ',
@@ -17798,7 +19060,8 @@ aiTutor: {
       correctAnswer: 'verb',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'verb', intent: 'fill_blank', questionLine: "Complete the word: v__b", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'verb',
@@ -17826,7 +19089,8 @@ aiTutor: {
       correctAnswer: 'stir',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1],
       aiHook: { targetWord: 'stir', intent: 'fill_blank', questionLine: "Complete the word: st__", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'stir',
@@ -17852,7 +19116,8 @@ aiTutor: {
       correctAnswer: 'dirt',
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'dirt', intent: 'fill_blank', questionLine: "Complete the word: d__t", imagePrompt: 'Educational scene showing er/ir r-controlled vowel concepts' },
       aiTutor: {
         target_word: 'dirt',
@@ -17888,7 +19153,8 @@ aiTutor: {
       questionText: "Complete the word: f__",
       correctAnswer: 'fur', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0],
       aiHook: { targetWord: 'fur', intent: 'fill_blank', questionLine: "Complete the word: f__", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'fur', question: 'f _ _', student_entry: '',
@@ -17910,7 +19176,8 @@ aiTutor: {
       questionText: "Complete the word: b__d",
       correctAnswer: 'bird', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'bird', intent: 'fill_blank', questionLine: "Complete the word: b__d", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'bird', question: 'b _ _ d', student_entry: '',
@@ -17932,7 +19199,8 @@ aiTutor: {
       questionText: "Complete the word: b__n",
       correctAnswer: 'burn', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'burn', intent: 'fill_blank', questionLine: "Complete the word: b__n", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'burn', question: 'b _ _ n', student_entry: '',
@@ -17954,7 +19222,8 @@ aiTutor: {
       questionText: "Complete the word: h__",
       correctAnswer: 'her', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0],
       aiHook: { targetWord: 'her', intent: 'fill_blank', questionLine: "Complete the word: h__", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'her', question: 'h _ _', student_entry: '',
@@ -17976,7 +19245,8 @@ aiTutor: {
       questionText: "Complete the word: h__t",
       correctAnswer: 'hurt', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'hurt', intent: 'fill_blank', questionLine: "Complete the word: h__t", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'hurt', question: 'h _ _ t', student_entry: '',
@@ -17998,7 +19268,8 @@ aiTutor: {
       questionText: "Complete the word: g__l",
       correctAnswer: 'girl', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'girl', intent: 'fill_blank', questionLine: "Complete the word: g__l", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'girl', question: 'g _ _ l', student_entry: '',
@@ -18020,7 +19291,8 @@ aiTutor: {
       questionText: "Complete the word: t__n",
       correctAnswer: 'turn', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'turn', intent: 'fill_blank', questionLine: "Complete the word: t__n", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'turn', question: 't _ _ n', student_entry: '',
@@ -18042,7 +19314,8 @@ aiTutor: {
       questionText: "Complete the word: b u t t _ _",
       correctAnswer: 'butter', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 1, 2, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1, 2, 3],
       aiHook: { targetWord: 'butter', intent: 'fill_blank', questionLine: "Complete the word: b u t t _ _", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'butter', question: 'b u t t _ _', student_entry: '',
@@ -18064,7 +19337,8 @@ aiTutor: {
       questionText: "Complete the word: c__l",
       correctAnswer: 'curl', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'curl', intent: 'fill_blank', questionLine: "Complete the word: c__l", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'curl', question: 'c _ _ l', student_entry: '',
@@ -18086,7 +19360,8 @@ aiTutor: {
       questionText: "Complete the word: f__n",
       correctAnswer: 'fern', template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: { targetWord: 'fern', intent: 'fill_blank', questionLine: "Complete the word: f__n", imagePrompt: 'Scene with er/ir/ur r-controlled vowels' },
       aiTutor: {
         target_word: 'fern', question: 'f _ _ n', student_entry: '',
@@ -18126,7 +19401,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18160,7 +19436,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18194,7 +19471,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18228,7 +19506,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18262,7 +19541,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18296,7 +19576,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18330,7 +19611,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18364,7 +19646,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18398,7 +19681,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18432,7 +19716,8 @@ aiTutor: {
         isSpacing: false,
         isSorting: false,
         isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],        aiHook: {
           targetWord: 'diphthong recognition',
           intent: 'mcq',
@@ -18479,7 +19764,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18514,7 +19800,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18549,7 +19836,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18584,7 +19872,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18619,7 +19908,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18654,7 +19944,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18689,7 +19980,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18724,7 +20016,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18759,7 +20052,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18794,7 +20088,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'reading_comprehension',
@@ -18842,7 +20137,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -18877,7 +20173,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -18912,7 +20209,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -18947,7 +20245,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -18982,7 +20281,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -19017,7 +20317,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -19052,7 +20353,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -19087,7 +20389,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -19122,7 +20425,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -19157,7 +20461,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short e sounds',
             intent: 'reading_comprehension',
@@ -19205,7 +20510,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19240,7 +20546,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19275,7 +20582,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19310,7 +20618,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19345,7 +20654,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19380,7 +20690,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19415,7 +20726,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19450,7 +20762,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19485,7 +20798,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19520,7 +20834,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short i sounds',
             intent: 'reading_comprehension',
@@ -19568,7 +20883,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19603,7 +20919,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19638,7 +20955,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19673,7 +20991,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19708,7 +21027,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19743,7 +21063,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19778,7 +21099,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19813,7 +21135,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19848,7 +21171,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19883,7 +21207,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short o sounds',
             intent: 'reading_comprehension',
@@ -19931,7 +21256,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -19966,7 +21292,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20001,7 +21328,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20036,7 +21364,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20071,7 +21400,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20106,7 +21436,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20141,7 +21472,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20176,7 +21508,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20211,7 +21544,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20246,7 +21580,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short u sounds',
             intent: 'reading_comprehension',
@@ -20294,7 +21629,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20329,7 +21665,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20364,7 +21701,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20399,7 +21737,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20434,7 +21773,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20469,7 +21809,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20504,7 +21845,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20539,7 +21881,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20574,7 +21917,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20609,7 +21953,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -20657,7 +22002,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20692,7 +22038,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20727,7 +22074,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20762,7 +22110,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20797,7 +22146,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20832,7 +22182,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20867,7 +22218,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20902,7 +22254,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20937,7 +22290,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -20972,7 +22326,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel team',
             intent: 'reading_comprehension',
@@ -21020,7 +22375,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21055,7 +22411,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21090,7 +22447,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21125,7 +22483,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21160,7 +22519,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21195,7 +22555,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21230,7 +22591,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21265,7 +22627,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21300,7 +22663,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21335,7 +22699,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21383,7 +22748,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21418,7 +22784,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21453,7 +22820,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21488,7 +22856,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21523,7 +22892,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21558,7 +22928,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21593,7 +22964,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21628,7 +23000,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21663,7 +23036,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21698,7 +23072,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21746,7 +23121,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21781,7 +23157,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21816,7 +23193,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21851,7 +23229,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21886,7 +23265,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21921,7 +23301,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21956,7 +23337,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -21991,7 +23373,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22026,7 +23409,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22061,7 +23445,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22109,7 +23494,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22144,7 +23530,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22179,7 +23566,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22214,7 +23602,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22249,7 +23638,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22284,7 +23674,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22319,7 +23710,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22354,7 +23746,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22389,7 +23782,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22424,7 +23818,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22472,7 +23867,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22507,7 +23903,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22542,7 +23939,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22577,7 +23975,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22612,7 +24011,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22647,7 +24047,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22682,7 +24083,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22717,7 +24119,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22752,7 +24155,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22787,7 +24191,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: true,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'drag_and_drop_sorting',
@@ -22834,7 +24239,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -22868,7 +24274,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -22902,7 +24309,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -22936,7 +24344,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -22970,7 +24379,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -23004,7 +24414,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -23038,7 +24449,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -23072,7 +24484,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -23106,7 +24519,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -23140,7 +24554,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'present tense',
             intent: 'mcq',
@@ -23187,7 +24602,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23221,7 +24637,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23255,7 +24672,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23289,7 +24707,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23323,7 +24742,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23357,7 +24777,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23391,7 +24812,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23425,7 +24847,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23459,7 +24882,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23493,7 +24917,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'past tense',
             intent: 'mcq',
@@ -23540,7 +24965,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'again',
             intent: 'mcq',
@@ -23574,7 +25000,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'each',
             intent: 'mcq',
@@ -23608,7 +25035,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'from',
             intent: 'mcq',
@@ -23642,7 +25070,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'may',
             intent: 'mcq',
@@ -23676,7 +25105,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'stop',
             intent: 'mcq',
@@ -23710,7 +25140,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'than',
             intent: 'mcq',
@@ -23744,7 +25175,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'when',
             intent: 'mcq',
@@ -23778,7 +25210,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'again',
             intent: 'mcq',
@@ -23812,7 +25245,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'each',
             intent: 'mcq',
@@ -23846,7 +25280,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'from',
             intent: 'mcq',
@@ -23893,7 +25328,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'has',
             intent: 'mcq',
@@ -23927,7 +25363,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'gave',
             intent: 'mcq',
@@ -23961,7 +25398,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'them',
             intent: 'mcq',
@@ -23995,7 +25433,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'after',
             intent: 'mcq',
@@ -24029,7 +25468,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'best',
             intent: 'mcq',
@@ -24063,7 +25503,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'once',
             intent: 'mcq',
@@ -24097,7 +25538,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'were',
             intent: 'mcq',
@@ -24131,7 +25573,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'has',
             intent: 'mcq',
@@ -24165,7 +25608,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'gave',
             intent: 'mcq',
@@ -24199,7 +25643,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'them',
             intent: 'mcq',
@@ -24246,7 +25691,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'as',
             intent: 'mcq',
@@ -24280,7 +25726,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'by',
             intent: 'mcq',
@@ -24314,7 +25761,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'four',
             intent: 'mcq',
@@ -24348,7 +25796,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'her',
             intent: 'mcq',
@@ -24382,7 +25831,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'more',
             intent: 'mcq',
@@ -24416,7 +25866,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'some',
             intent: 'mcq',
@@ -24450,7 +25901,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'think',
             intent: 'mcq',
@@ -24484,7 +25936,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'way',
             intent: 'mcq',
@@ -24518,7 +25971,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'her',
             intent: 'mcq',
@@ -24552,7 +26006,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'more',
             intent: 'mcq',
@@ -24599,7 +26054,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'from',
             intent: 'mcq',
@@ -24633,7 +26089,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'after',
             intent: 'mcq',
@@ -24667,7 +26124,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'them',
             intent: 'mcq',
@@ -24701,7 +26159,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'once',
             intent: 'mcq',
@@ -24735,7 +26194,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'way',
             intent: 'mcq',
@@ -24769,7 +26229,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'best',
             intent: 'mcq',
@@ -24803,7 +26264,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'gave',
             intent: 'mcq',
@@ -24837,7 +26299,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'more',
             intent: 'mcq',
@@ -24871,7 +26334,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'think',
             intent: 'mcq',
@@ -24905,7 +26369,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'as',
             intent: 'mcq',
@@ -24952,7 +26417,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -24986,7 +26452,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25020,7 +26487,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25054,7 +26522,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25088,7 +26557,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25122,7 +26592,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25156,7 +26627,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25190,7 +26662,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25224,7 +26697,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25258,7 +26732,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -25305,7 +26780,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'ask',
             intent: 'mcq',
@@ -25339,7 +26815,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'five',
             intent: 'mcq',
@@ -25373,7 +26850,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'just',
             intent: 'mcq',
@@ -25407,7 +26885,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long',
             intent: 'mcq',
@@ -25441,7 +26920,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'read',
             intent: 'mcq',
@@ -25475,7 +26955,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'then',
             intent: 'mcq',
@@ -25509,7 +26990,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'want',
             intent: 'mcq',
@@ -25543,7 +27025,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'ask',
             intent: 'mcq',
@@ -25577,7 +27060,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'five',
             intent: 'mcq',
@@ -25611,7 +27095,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'long',
             intent: 'mcq',
@@ -25658,7 +27143,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'any',
             intent: 'mcq',
@@ -25692,7 +27178,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'give',
             intent: 'mcq',
@@ -25726,7 +27213,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'his',
             intent: 'mcq',
@@ -25760,7 +27248,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'new',
             intent: 'mcq',
@@ -25794,7 +27283,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'open',
             intent: 'mcq',
@@ -25828,7 +27318,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sleep',
             intent: 'mcq',
@@ -25862,7 +27353,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'wish',
             intent: 'mcq',
@@ -25896,7 +27388,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'give',
             intent: 'mcq',
@@ -25930,7 +27423,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'his',
             intent: 'mcq',
@@ -25964,7 +27458,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'new',
             intent: 'mcq',
@@ -26011,7 +27506,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'also',
             intent: 'mcq',
@@ -26045,7 +27541,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'fly',
             intent: 'mcq',
@@ -26079,7 +27576,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'know',
             intent: 'mcq',
@@ -26113,7 +27611,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'live',
             intent: 'mcq',
@@ -26147,7 +27646,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'old',
             intent: 'mcq',
@@ -26181,7 +27681,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'soon',
             intent: 'mcq',
@@ -26215,7 +27716,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'why',
             intent: 'mcq',
@@ -26249,7 +27751,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'also',
             intent: 'mcq',
@@ -26283,7 +27786,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'fly',
             intent: 'mcq',
@@ -26317,7 +27821,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'live',
             intent: 'mcq',
@@ -26364,7 +27869,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -26398,7 +27904,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -26432,7 +27939,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -26466,7 +27974,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'mcq',
@@ -26500,7 +28009,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word recognition',
             intent: 'mcq',
@@ -26534,7 +28044,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word identification',
             intent: 'mcq',
@@ -26568,7 +28079,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'word recognition',
             intent: 'mcq',
@@ -26602,7 +28114,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sight word usage',
             intent: 'mcq',
@@ -26636,7 +28149,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'contextual usage',
             intent: 'mcq',
@@ -26670,7 +28184,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'recognition',
             intent: 'mcq',
@@ -26717,7 +28232,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -26751,7 +28267,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -26785,7 +28302,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -26819,7 +28337,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'mcq',
@@ -26853,7 +28372,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -26887,7 +28407,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -26921,7 +28442,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'vowel sorting',
             intent: 'mcq',
@@ -26955,7 +28477,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'blend',
             intent: 'mcq',
@@ -26989,7 +28512,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'short a sounds',
             intent: 'mcq',
@@ -27023,7 +28547,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sentence spacing',
             intent: 'mcq',
@@ -27071,7 +28596,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'context clue',
             intent: 'reading_comprehension',
@@ -27106,7 +28632,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'context clue',
             intent: 'reading_comprehension',
@@ -27141,7 +28668,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'context clue',
             intent: 'reading_comprehension',
@@ -27176,7 +28704,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'main idea',
             intent: 'reading_comprehension',
@@ -27211,7 +28740,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'sequence',
             intent: 'reading_comprehension',
@@ -27246,7 +28776,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'characters',
             intent: 'reading_comprehension',
@@ -27281,7 +28812,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'setting',
             intent: 'reading_comprehension',
@@ -27316,7 +28848,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'problem',
             intent: 'reading_comprehension',
@@ -27351,7 +28884,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'solution',
             intent: 'reading_comprehension',
@@ -27386,7 +28920,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'prediction',
             intent: 'reading_comprehension',
@@ -27434,7 +28969,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character actions',
             intent: 'reading_comprehension',
@@ -27469,7 +29005,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character motivation',
             intent: 'reading_comprehension',
@@ -27504,7 +29041,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character feelings',
             intent: 'reading_comprehension',
@@ -27539,7 +29077,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'plot understanding',
             intent: 'reading_comprehension',
@@ -27574,7 +29113,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character interaction',
             intent: 'reading_comprehension',
@@ -27609,7 +29149,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character decision',
             intent: 'reading_comprehension',
@@ -27644,7 +29185,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'conflict resolution',
             intent: 'reading_comprehension',
@@ -27679,7 +29221,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character reassurance',
             intent: 'reading_comprehension',
@@ -27714,7 +29257,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'story setting',
             intent: 'reading_comprehension',
@@ -27749,7 +29293,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'character preference',
             intent: 'reading_comprehension',
@@ -27797,7 +29342,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'magical flute',
             intent: 'reading_comprehension',
@@ -27832,7 +29378,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'tricks',
             intent: 'reading_comprehension',
@@ -27867,7 +29414,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'money',
             intent: 'reading_comprehension',
@@ -27902,7 +29450,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'rats',
             intent: 'reading_comprehension',
@@ -27937,7 +29486,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'flute',
             intent: 'reading_comprehension',
@@ -27972,7 +29522,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'shoes',
             intent: 'reading_comprehension',
@@ -28007,7 +29558,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'trick',
             intent: 'reading_comprehension',
@@ -28042,7 +29594,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'fast',
             intent: 'reading_comprehension',
@@ -28077,7 +29630,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'king',
             intent: 'reading_comprehension',
@@ -28112,7 +29666,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'walk',
             intent: 'reading_comprehension',
@@ -28160,7 +29715,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28195,7 +29751,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28230,7 +29787,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28265,7 +29823,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28300,7 +29859,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28335,7 +29895,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28370,7 +29931,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28405,7 +29967,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28440,7 +30003,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28475,7 +30039,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28523,7 +30088,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28558,7 +30124,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28593,7 +30160,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28628,7 +30196,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28663,7 +30232,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28698,7 +30268,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28733,7 +30304,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28768,7 +30340,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28803,7 +30376,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28838,7 +30412,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'reading comprehension',
             intent: 'reading_comprehension',
@@ -28886,7 +30461,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Big Ben',
             intent: 'reading_comprehension',
@@ -28921,7 +30497,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Lisbon',
             intent: 'reading_comprehension',
@@ -28956,7 +30533,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Eiffel Tower',
             intent: 'reading_comprehension',
@@ -28991,7 +30569,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Statue of Liberty',
             intent: 'reading_comprehension',
@@ -29026,7 +30605,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Great Wall of China',
             intent: 'reading_comprehension',
@@ -29061,7 +30641,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Sydney Opera House',
             intent: 'reading_comprehension',
@@ -29096,7 +30677,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Pyramids of Giza',
             intent: 'reading_comprehension',
@@ -29131,7 +30713,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Colosseum',
             intent: 'reading_comprehension',
@@ -29166,7 +30749,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Taj Mahal',
             intent: 'reading_comprehension',
@@ -29201,7 +30785,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: 'Machu Picchu',
             intent: 'reading_comprehension',
@@ -29247,7 +30832,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "cake",
@@ -29281,7 +30867,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "cat",
@@ -29315,7 +30902,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "bike",
@@ -29349,7 +30937,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "sit",
@@ -29383,7 +30972,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "rope",
@@ -29417,7 +31007,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "dog",
@@ -29451,7 +31042,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "fame",
@@ -29486,7 +31078,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "bed",
@@ -29521,7 +31114,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "note",
@@ -29556,7 +31150,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "cup",
@@ -29592,7 +31187,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "kite",
@@ -29628,7 +31224,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [2],
           aiHook: {
             targetWord: "kit",
@@ -29675,7 +31272,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "hay",
@@ -29709,7 +31307,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "cake",
@@ -29743,7 +31342,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "rain",
@@ -29777,7 +31377,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "play",
@@ -29811,7 +31412,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "gate",
@@ -29845,7 +31447,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "mail",
@@ -29879,7 +31482,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "day",
@@ -29913,7 +31517,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "game",
@@ -29947,7 +31552,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,4],
       aiHook: {
         targetWord: "rainbow",
@@ -29981,7 +31587,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "bake",
@@ -30015,7 +31622,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "train",
@@ -30049,7 +31657,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "gray",
@@ -30083,7 +31692,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "name",
@@ -30117,7 +31727,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "chain",
@@ -30151,7 +31762,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "lake",
@@ -30185,7 +31797,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "stay",
@@ -30219,7 +31832,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "paint",
@@ -30253,7 +31867,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "plate",
@@ -30287,7 +31902,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "trail",
@@ -30321,7 +31937,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "grape",
@@ -30368,7 +31985,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [2,3,4],
 //       aiHook: {
 //         targetWord: "speak",
@@ -30402,7 +32020,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "peak",
@@ -30436,7 +32055,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "team",
@@ -30470,7 +32090,7 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
 //       prefilledIndexes: [2,3,4],
 //       aiHook: {
 //         targetWord: "dream",
@@ -30504,7 +32124,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [2,3,4],
 //       aiHook: {
 //         targetWord: "cream",
@@ -30538,7 +32159,7 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
 //       prefilledIndexes: [3,4,5],
 //       aiHook: {
 //         targetWord: "stream",
@@ -30572,7 +32193,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [2,3,4],
 //       aiHook: {
 //         targetWord: "clean",
@@ -30606,7 +32228,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [2,3,4],
 //       aiHook: {
 //         targetWord: "steak",
@@ -30640,7 +32263,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "seat",
@@ -30674,7 +32298,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "meat",
@@ -30708,7 +32333,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "neat",
@@ -30742,7 +32368,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3,4],
 //       aiHook: {
 //         targetWord: "treat",
@@ -30776,7 +32403,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3,4],
 //       aiHook: {
 //         targetWord: "bread",
@@ -30810,7 +32438,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3,4],
 //       aiHook: {
 //         targetWord: "great",
@@ -30844,7 +32473,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "bead",
@@ -30878,7 +32508,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "read",
@@ -30912,7 +32543,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3,4],
 //       aiHook: {
 //         targetWord: "leafy",
@@ -30946,7 +32578,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3,4,5],
 //       aiHook: {
 //         targetWord: "teapot",
@@ -30980,7 +32613,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "weak",
@@ -31014,7 +32648,8 @@ aiTutor: {
 //       isSpacing: false,
 //       isSorting: false,
 //       isSpelling: true,
-//       isPrefilled: true,
+//       isReading: false,
+// isPrefilled: true,
 //       prefilledIndexes: [1,2,3],
 //       aiHook: {
 //         targetWord: "leap",
@@ -31061,7 +32696,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0], // s shown; student types 'ee'
       aiHook: {
         targetWord: "see",
@@ -31095,7 +32731,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1], // t,r shown; student types 'ee'
       aiHook: {
         targetWord: "tree",
@@ -31129,7 +32766,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0], // b shown; student types 'ee'
       aiHook: {
         targetWord: "bee",
@@ -31163,7 +32801,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // g,r,n shown; student types 'ee'
       aiHook: {
         targetWord: "green",
@@ -31197,7 +32836,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // l,f shown; student types 'ea'
       aiHook: {
         targetWord: "leaf",
@@ -31231,7 +32871,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4], // b,c,h shown; student types 'ea'
       aiHook: {
         targetWord: "beach",
@@ -31265,7 +32906,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // s,l,p shown; student types 'ee'
       aiHook: {
         targetWord: "sleep",
@@ -31299,7 +32941,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // m,t shown; student types 'ea'
       aiHook: {
         targetWord: "meat",
@@ -31333,7 +32976,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // f,t shown; student types 'ee'
       aiHook: {
         targetWord: "feet",
@@ -31367,7 +33011,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // c,l,n shown; student types 'ea'
       aiHook: {
         targetWord: "clean",
@@ -31401,7 +33046,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // r,d shown; student types 'ea'
       aiHook: {
         targetWord: "read",
@@ -31435,7 +33081,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,5], // s,t,r,t shown; student types 'ee'
       aiHook: {
         targetWord: "street",
@@ -31469,7 +33116,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4], // p,c,h shown; student types 'ea'
       aiHook: {
         targetWord: "peach",
@@ -31503,7 +33151,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // s,h,p shown; student types 'ee'
       aiHook: {
         targetWord: "sheep",
@@ -31537,7 +33186,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // t,m shown; student types 'ea'
       aiHook: {
         targetWord: "team",
@@ -31571,7 +33221,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4], // t,c,h shown; student types 'ea'
       aiHook: {
         targetWord: "teach",
@@ -31605,7 +33256,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // s,t shown; student types 'ea'
       aiHook: {
         targetWord: "seat",
@@ -31639,7 +33291,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1], // k,n shown; student types 'ee'
       aiHook: {
         targetWord: "knee",
@@ -31673,7 +33326,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // d,r,m shown; student types 'ea'
       aiHook: {
         targetWord: "dream",
@@ -31707,7 +33361,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // q,u,n shown; student types 'ee'
       aiHook: {
         targetWord: "queen",
@@ -31755,7 +33410,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "my",
@@ -31790,7 +33446,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "fly",
@@ -31825,7 +33482,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "cry",
@@ -31862,7 +33520,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "kite",
@@ -31897,7 +33556,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "bike",
@@ -31932,7 +33592,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "time",
@@ -31969,7 +33630,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "pie",
@@ -32004,7 +33666,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "lie",
@@ -32039,7 +33702,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "tie",
@@ -32076,7 +33740,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "dry",
@@ -32111,7 +33776,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "sky",
@@ -32146,7 +33812,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "try",
@@ -32183,7 +33850,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "five",
@@ -32218,7 +33886,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "ride",
@@ -32253,7 +33922,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "slide",
@@ -32288,7 +33958,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "drive",
@@ -32323,7 +33994,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "line",
@@ -32358,7 +34030,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "nine",
@@ -32395,7 +34068,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "die",
@@ -32430,7 +34104,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "pie",
@@ -32479,7 +34154,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "pole",
@@ -32514,7 +34190,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "rope",
@@ -32549,7 +34226,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "home",
@@ -32586,7 +34264,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "boat",
@@ -32621,7 +34300,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "road",
@@ -32656,7 +34336,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "toad",
@@ -32693,7 +34374,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "snow",
@@ -32728,7 +34410,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "show",
@@ -32763,7 +34446,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "blow",
@@ -32800,7 +34484,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "cone",
@@ -32835,7 +34520,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "stone",
@@ -32870,7 +34556,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "foam",
@@ -32905,7 +34592,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "float",
@@ -32940,7 +34628,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "glow",
@@ -32975,7 +34664,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "goat",
@@ -33010,7 +34700,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "coat",
@@ -33045,7 +34736,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "foam",
@@ -33080,7 +34772,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,4],
       aiHook: {
         targetWord: "throne",
@@ -33115,7 +34808,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "float",
@@ -33150,7 +34844,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "glow",
@@ -33197,7 +34892,8 @@ aiTutor: {
       correctAnswer: "cube",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "cube",
         intent: "fill_blank",
@@ -33228,7 +34924,8 @@ aiTutor: {
       correctAnswer: "flute",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 1, 4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "flute",
         intent: "fill_blank",
@@ -33261,7 +34958,8 @@ aiTutor: {
       correctAnswer: "moon",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "moon",
         intent: "fill_blank",
@@ -33292,7 +34990,8 @@ aiTutor: {
       correctAnswer: "food",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "food",
         intent: "fill_blank",
@@ -33325,7 +35024,8 @@ aiTutor: {
       correctAnswer: "tune",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "tune",
         intent: "fill_blank",
@@ -33356,7 +35056,8 @@ aiTutor: {
       correctAnswer: "room",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "room",
         intent: "fill_blank",
@@ -33387,7 +35088,8 @@ aiTutor: {
       correctAnswer: "mule",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 2],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 2],
       aiHook: {
         targetWord: "mule",
         intent: "fill_blank",
@@ -33418,7 +35120,8 @@ aiTutor: {
       correctAnswer: "broom",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 1, 4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "broom",
         intent: "fill_blank",
@@ -33449,7 +35152,8 @@ aiTutor: {
       correctAnswer: "tube",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: "tube",
         intent: "fill_blank",
@@ -33480,7 +35184,8 @@ aiTutor: {
       correctAnswer: "spoon",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0, 1, 4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "spoon",
         intent: "fill_blank",
@@ -33524,7 +35229,8 @@ aiTutor: {
       correctAnswer: "blue",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "blue",
         intent: "fill_blank",
@@ -33556,7 +35262,8 @@ aiTutor: {
       correctAnswer: "glue",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "glue",
         intent: "fill_blank",
@@ -33590,7 +35297,8 @@ aiTutor: {
       correctAnswer: "stew",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "stew",
         intent: "fill_blank",
@@ -33622,7 +35330,8 @@ aiTutor: {
       correctAnswer: "grew",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "grew",
         intent: "fill_blank",
@@ -33656,7 +35365,8 @@ aiTutor: {
       correctAnswer: "few",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0],
       aiHook: {
         targetWord: "few",
         intent: "fill_blank",
@@ -33688,7 +35398,8 @@ aiTutor: {
       correctAnswer: "true",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "true",
         intent: "fill_blank",
@@ -33720,7 +35431,8 @@ aiTutor: {
       correctAnswer: "chew",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "chew",
         intent: "fill_blank",
@@ -33752,7 +35464,8 @@ aiTutor: {
       correctAnswer: "clue",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "clue",
         intent: "fill_blank",
@@ -33784,7 +35497,8 @@ aiTutor: {
       correctAnswer: "new",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0],
       aiHook: {
         targetWord: "new",
         intent: "fill_blank",
@@ -33816,7 +35530,8 @@ aiTutor: {
       correctAnswer: "rescue",
       template: "fill_blank",
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1,2,3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,2,3],
       aiHook: {
         targetWord: "rescue",
         intent: "fill_blank",
@@ -33864,7 +35579,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'coin',
@@ -33901,7 +35617,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: 'boy',
@@ -33938,7 +35655,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'boil',
@@ -33975,7 +35693,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: 'toy',
@@ -34012,7 +35731,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'soil',
@@ -34049,7 +35769,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: 'enjoy',
@@ -34086,7 +35807,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 3],
       aiHook: {
         targetWord: 'join',
@@ -34123,7 +35845,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: 'toy',
@@ -34160,7 +35883,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: 'spoil',
@@ -34197,7 +35921,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: 'joy',
@@ -34244,7 +35969,8 @@ aiTutor: {
       correctAnswer: "ou",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1,4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shout",
         intent: "fill_blank",
@@ -34276,7 +36002,8 @@ aiTutor: {
       correctAnswer: "ou",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1,4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "cloud",
         intent: "fill_blank",
@@ -34308,7 +36035,8 @@ aiTutor: {
       correctAnswer: "ow",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0],
       aiHook: {
         targetWord: "cow",
         intent: "fill_blank",
@@ -34340,7 +36068,8 @@ aiTutor: {
       correctAnswer: "ow",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [2],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [2],
       aiHook: {
         targetWord: "owl",
         intent: "fill_blank",
@@ -34374,7 +36103,8 @@ aiTutor: {
       correctAnswer: "ou",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,3,4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "house",
         intent: "fill_blank",
@@ -34406,7 +36136,8 @@ aiTutor: {
       correctAnswer: "ow",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1,4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "brown",
         intent: "fill_blank",
@@ -34438,7 +36169,8 @@ aiTutor: {
       correctAnswer: "ou",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,3,4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "mouse",
         intent: "fill_blank",
@@ -34470,7 +36202,8 @@ aiTutor: {
       correctAnswer: "ow",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,1,4],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "crown",
         intent: "fill_blank",
@@ -34502,7 +36235,8 @@ aiTutor: {
       correctAnswer: "ou",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "loud",
         intent: "fill_blank",
@@ -34534,7 +36268,8 @@ aiTutor: {
       correctAnswer: "ow",
       template: 'fill_blank',
       isSpacing: false, isSorting: false, isSpelling: true,
-      isPrefilled: true, prefilledIndexes: [0,3],
+      isReading: false,
+isPrefilled: true, prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "down",
         intent: "fill_blank",
@@ -34581,7 +36316,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "mean",
@@ -34615,7 +36351,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "book",
@@ -34649,7 +36386,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "road",
@@ -34683,7 +36421,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "cook",
@@ -34717,7 +36456,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "beach",
@@ -34751,7 +36491,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "boat",
@@ -34785,7 +36526,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "team",
@@ -34819,7 +36561,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "goat",
@@ -34852,7 +36595,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "moon",
@@ -34886,7 +36630,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "clean",
@@ -34920,7 +36665,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "soap",
@@ -34954,7 +36700,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "foot",
@@ -34988,7 +36735,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "leaf",
@@ -35022,7 +36770,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "look",
@@ -35056,7 +36805,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "road",
@@ -35090,7 +36840,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "coat",
@@ -35124,7 +36875,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "roof",
@@ -35158,7 +36910,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "read",
@@ -35192,7 +36945,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "pool",
@@ -35226,7 +36980,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "bean",
@@ -35274,7 +37029,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "basket",
@@ -35308,7 +37064,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "minus",
@@ -35343,7 +37100,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "shiny",
@@ -35379,7 +37137,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "rocket",
@@ -35415,7 +37174,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "open",
@@ -35450,7 +37210,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "music",
@@ -35486,7 +37247,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "hotel",
@@ -35520,7 +37282,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "tablet",
@@ -35554,7 +37317,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "pilot",
@@ -35590,7 +37354,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "cabin",
@@ -35638,7 +37403,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: "table",
@@ -35672,7 +37438,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3,4],
       aiHook: {
         targetWord: "cable",
@@ -35706,7 +37473,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4],
       aiHook: {
         targetWord: "apple",
@@ -35740,7 +37508,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "bottle",
@@ -35774,7 +37543,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "candle",
@@ -35808,7 +37578,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "little",
@@ -35842,7 +37613,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "puzzle",
@@ -35876,7 +37648,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "jungle",
@@ -35910,7 +37683,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "circle",
@@ -35944,7 +37718,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "handle",
@@ -35978,7 +37753,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "giggle",
@@ -36012,7 +37788,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "buckle",
@@ -36046,7 +37823,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [5,6],
       aiHook: {
         targetWord: "sparkle",
@@ -36080,7 +37858,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "simple",
@@ -36114,7 +37893,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "cradle",
@@ -36148,7 +37928,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "bundle",
@@ -36182,7 +37963,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "turtle",
@@ -36216,7 +37998,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3,4,5],
       aiHook: {
         targetWord: "rattle",
@@ -36250,7 +38033,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5],
       aiHook: {
         targetWord: "pickle",
@@ -36284,7 +38068,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4,5,6],
       aiHook: {
         targetWord: "whistle",
@@ -36332,7 +38117,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "laptop",
@@ -36366,7 +38152,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "sunset",
@@ -36401,7 +38188,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "bathtub",
@@ -36436,7 +38224,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "backpack",
@@ -36471,7 +38260,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-            isPrefilled: false,
+            isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "basket",
@@ -36506,7 +38296,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "bedroom",
@@ -36541,7 +38332,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "sunflower",
@@ -36576,7 +38368,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "football",
@@ -36611,7 +38404,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "notebook",
@@ -36646,7 +38440,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "bookmark",
@@ -36692,7 +38487,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "sunrise",
@@ -36727,7 +38523,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "mailbox",
@@ -36762,7 +38559,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "puppet",
@@ -36797,7 +38595,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "backpack",
@@ -36832,7 +38631,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "baseball",
@@ -36867,7 +38667,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-                isPrefilled: false,
+                isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "footprint",
@@ -36902,7 +38703,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "notebook",
@@ -36936,7 +38738,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "raincoat",
@@ -36971,7 +38774,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "sandbox",
@@ -37005,7 +38809,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: false,
+          isReading: false,
+isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: "starfish",
@@ -37051,7 +38856,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isPrefilled: true,
+          isReading: false,
+isPrefilled: true,
           prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "cabin",
@@ -37086,7 +38892,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "traffic",
@@ -37120,7 +38927,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "helmet",
@@ -37154,7 +38962,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "drumstick",
@@ -37188,7 +38997,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "planet",
@@ -37222,7 +39032,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "hundred",
@@ -37256,7 +39067,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,3],
           aiHook: {
             targetWord: "insect",
@@ -37290,7 +39102,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "rocket",
@@ -37324,7 +39137,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "basket",
@@ -37358,7 +39172,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "picnic", 
@@ -37404,7 +39219,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3],
       aiHook: {
         targetWord: "crumb",
@@ -37438,7 +39254,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3],
       aiHook: {
         targetWord: "thumb",
@@ -37472,7 +39289,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4],
       aiHook: {
         targetWord: "knock",
@@ -37506,7 +39324,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3],
       aiHook: {
         targetWord: "know",
@@ -37540,7 +39359,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4],
       aiHook: {
         targetWord: "wrist",
@@ -37574,7 +39394,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4],
       aiHook: {
         targetWord: "write",
@@ -37608,7 +39429,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4],
       aiHook: {
         targetWord: "gnome",
@@ -37642,7 +39464,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3],
       aiHook: {
         targetWord: "gnat",
@@ -37676,7 +39499,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,4,5],
       aiHook: {
         targetWord: "castle",
@@ -37710,7 +39534,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2,3,4],
       aiHook: {
         targetWord: "whale",
@@ -37743,7 +39568,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2,3,4],
       aiHook: {
         targetWord: "ghost",
@@ -37777,7 +39603,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3],
       aiHook: {
         targetWord: "knee",
@@ -37811,7 +39638,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4,5],
       aiHook: {
         targetWord: "honest",
@@ -37845,7 +39673,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3],
       aiHook: {
         targetWord: "climb",
@@ -37879,7 +39708,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2],
       aiHook: {
         targetWord: "lamb",
@@ -37913,7 +39743,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4],
       aiHook: {
         targetWord: "knife",
@@ -37947,7 +39778,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,4],
       aiHook: {
         targetWord: "doubt",
@@ -37981,7 +39813,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2,3,4,5],
       aiHook: {
         targetWord: "island",
@@ -38015,7 +39848,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3],
       aiHook: {
         targetWord: "hour",
@@ -38049,7 +39883,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [1,2,3,4,5],
       aiHook: {
         targetWord: "wreath",
@@ -38098,7 +39933,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "clerk",
@@ -38132,7 +39968,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "bird",
@@ -38166,7 +40003,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "car",
@@ -38200,7 +40038,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "corn",
@@ -38234,7 +40073,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "fur",
@@ -38268,7 +40108,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "herd",
@@ -38302,7 +40143,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "farm",
@@ -38336,7 +40178,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shirt",
@@ -38370,7 +40213,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "burn",
@@ -38404,7 +40248,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "fork",
@@ -38438,7 +40283,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "star",
@@ -38472,7 +40318,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "word",
@@ -38506,7 +40353,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "girl",
@@ -38540,7 +40388,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "nurse",
@@ -38574,7 +40423,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "cart",
@@ -38608,7 +40458,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "storm",
@@ -38642,7 +40493,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "curl",
@@ -38676,7 +40528,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "term",
@@ -38710,7 +40563,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shark",
@@ -38744,7 +40598,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "world",
@@ -38792,7 +40647,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "third",
@@ -38826,7 +40682,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "nurse",
@@ -38860,7 +40717,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "bird",
@@ -38894,7 +40752,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "fern",
@@ -38928,7 +40787,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "curl",
@@ -38962,7 +40822,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shirt",
@@ -38996,7 +40857,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "herd",
@@ -39030,7 +40892,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "burn",
@@ -39064,7 +40927,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "term",
@@ -39098,7 +40962,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "turn",
@@ -39131,7 +40996,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "first",
@@ -39165,7 +41031,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "her",
@@ -39199,7 +41066,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "fur",
@@ -39233,7 +41101,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "sir",
@@ -39267,7 +41136,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "hurt",
@@ -39301,7 +41171,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "bird",
@@ -39335,7 +41206,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "term",
@@ -39369,7 +41241,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "curl",
@@ -39403,7 +41276,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "shirt",
@@ -39437,7 +41311,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "nurse",
@@ -39485,7 +41360,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "short a sounds",
             intent: "mcq",
@@ -39519,7 +41395,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "long a sounds",
             intent: "mcq",
@@ -39553,7 +41430,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -39587,7 +41465,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -39621,7 +41500,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "mcq",
@@ -39655,7 +41535,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "short a sounds",
             intent: "mcq",
@@ -39689,7 +41570,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "long a sounds",
             intent: "mcq",
@@ -39723,7 +41605,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -39757,7 +41640,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -39791,7 +41675,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "mcq",
@@ -39837,7 +41722,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -39871,7 +41757,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -39905,7 +41792,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -39939,7 +41827,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -39973,7 +41862,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -40007,7 +41897,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -40041,7 +41932,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -40075,7 +41967,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -40109,7 +42002,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -40143,7 +42037,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "mcq",
@@ -40189,7 +42084,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "kit",
             intent: "mcq",
@@ -40223,7 +42119,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bike",
             intent: "mcq",
@@ -40257,7 +42154,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "fin",
             intent: "mcq",
@@ -40291,7 +42189,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "slide",
             intent: "mcq",
@@ -40325,7 +42224,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "lip",
             intent: "mcq",
@@ -40359,7 +42259,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "pin",
             intent: "mcq",
@@ -40393,7 +42294,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "line",
             intent: "mcq",
@@ -40427,7 +42329,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sip",
             intent: "mcq",
@@ -40461,7 +42364,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "kite",
             intent: "mcq",
@@ -40495,7 +42399,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "slip",
             intent: "mcq",
@@ -40541,7 +42446,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "con",
             intent: "mcq",
@@ -40575,7 +42481,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sock",
             intent: "mcq",
@@ -40609,7 +42516,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "joke",
             intent: "mcq",
@@ -40643,7 +42551,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "rope",
             intent: "mcq",
@@ -40677,7 +42586,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "mop",
             intent: "mcq",
@@ -40711,7 +42621,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "hop",
             intent: "mcq",
@@ -40745,7 +42656,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "hole",
             intent: "mcq",
@@ -40779,7 +42691,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "robe",
             intent: "mcq",
@@ -40813,7 +42726,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                   targetWord: "log",
             intent: "mcq",
@@ -40847,7 +42761,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "coke",
             intent: "mcq",
@@ -40893,7 +42808,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
@@ -40927,7 +42843,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "hug",
             intent: "mcq",
@@ -40961,7 +42878,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "mutt",
             intent: "mcq",
@@ -40995,7 +42913,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vulge",
             intent: "mcq",
@@ -41029,7 +42948,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
@@ -41063,7 +42983,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sum",
             intent: "mcq",
@@ -41097,7 +43018,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "rump",
             intent: "mcq",
@@ -41131,7 +43053,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "tune",
             intent: "mcq",
@@ -41165,7 +43088,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
@@ -41199,7 +43123,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                 targetWord: "bug",
             intent: "mcq",
@@ -41245,7 +43170,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "glue",
             intent: "mcq",
@@ -41279,7 +43205,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "treat",
             intent: "mcq",
@@ -41313,7 +43240,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "rail",
             intent: "mcq",
@@ -41347,7 +43275,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "leaf",
             intent: "mcq",
@@ -41381,7 +43310,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
@@ -41415,7 +43345,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "beach",
             intent: "mcq",
@@ -41449,7 +43380,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "rain",
             intent: "mcq",
@@ -41483,7 +43415,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "peach",
             intent: "mcq",
@@ -41517,7 +43450,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "train",
             intent: "mcq",
@@ -41551,7 +43485,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "team",
             intent: "mcq",
@@ -41596,7 +43531,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "train",
@@ -41630,7 +43566,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "boat",
@@ -41664,7 +43601,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "rain",
@@ -41698,7 +43636,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "team",
@@ -41732,7 +43671,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "goat",
@@ -41766,7 +43706,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "meat",
@@ -41800,7 +43741,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "green",
@@ -41834,7 +43776,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "moon",
@@ -41868,7 +43811,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "book",
@@ -41902,7 +43846,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "seed",
@@ -41936,7 +43881,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,4],
       aiHook: {
         targetWord: "beach",
@@ -41970,7 +43916,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "mail",
@@ -42004,7 +43951,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "road",
@@ -42038,7 +43986,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "bread",
@@ -42072,7 +44021,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "queen",
@@ -42106,7 +44056,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "fruit",
@@ -42140,7 +44091,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "piece",
@@ -42174,7 +44126,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "field",
@@ -42208,7 +44161,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "soap",
@@ -42242,7 +44196,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "paint",
@@ -42290,7 +44245,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cat",
             intent: "mcq",
@@ -42324,7 +44280,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "dog",
             intent: "mcq",
@@ -42358,7 +44315,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel team",
             intent: "mcq",
@@ -42392,7 +44350,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bird",
             intent: "mcq",
@@ -42426,7 +44385,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "children",
             intent: "mcq",
@@ -42460,7 +44420,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                 targetWord: "car",
             intent: "mcq",
@@ -42494,7 +44455,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "wind",
             intent: "mcq",
@@ -42528,7 +44490,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "farmer",
             intent: "mcq",
@@ -42562,7 +44525,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "chef",
             intent: "mcq",
@@ -42596,7 +44560,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                           targetWord: "boy",
             intent: "mcq",
@@ -42642,7 +44607,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cake",
             intent: "mcq",
@@ -42676,7 +44642,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "tree",
             intent: "mcq",
@@ -42710,7 +44677,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
@@ -42744,7 +44712,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "kite",
             intent: "mcq",
@@ -42778,7 +44747,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cube",
             intent: "mcq",
@@ -42812,7 +44782,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bake",
             intent: "mcq",
@@ -42846,7 +44817,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bee",
             intent: "mcq",
@@ -42880,7 +44852,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cone",
             intent: "mcq",
@@ -42914,7 +44887,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "pie",
             intent: "mcq",
@@ -42948,7 +44922,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "flute",
             intent: "mcq",
@@ -42994,7 +44969,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "joy",
             intent: "mcq",
@@ -43028,7 +45004,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "howl",
             intent: "mcq",
@@ -43062,7 +45039,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "boil",
             intent: "mcq",
@@ -43096,7 +45074,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "coin",
             intent: "mcq",
@@ -43130,7 +45109,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cow",
             intent: "mcq",
@@ -43164,7 +45144,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soil",
             intent: "mcq",
@@ -43198,7 +45179,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "toy",
             intent: "mcq",
@@ -43232,7 +45214,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "loud",
             intent: "mcq",
@@ -43266,7 +45249,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                     targetWord: "brown",
             intent: "mcq",
@@ -43300,7 +45284,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cloud",
             intent: "mcq",
@@ -43346,7 +45331,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "The boy has lots of coins with him.",
             intent: "mcq",
@@ -43380,7 +45366,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "Ms. Boyle points out an owl for the scouts.",
             intent: "mcq",
@@ -43414,7 +45401,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "The water comes out of the owl's mouth!",
             intent: "mcq",
@@ -43448,7 +45436,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "The toy has lots of foil on it.",
             intent: "mcq",
@@ -43482,7 +45471,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                 targetWord: "The boy has lots of coins with him.",
             intent: "mcq",
@@ -43516,7 +45506,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "The water comes out of the owl's mouth!",
             intent: "mcq",
@@ -43550,7 +45541,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "Ms. Boyle points out an owl for the scouts.",
             intent: "mcq",
@@ -43584,7 +45576,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "The water comes out of the owl's mouth!",
             intent: "mcq",
@@ -43618,7 +45611,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "The boy has lots of coins with him.",
             intent: "mcq",
@@ -43652,7 +45646,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                     targetWord: "Ms. Boyle points out an owl for the scouts.",
             intent: "mcq",
@@ -43698,7 +45693,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "health",
             intent: "mcq",
@@ -43732,7 +45728,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reach",
             intent: "mcq",
@@ -43766,7 +45763,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "loud",
             intent: "mcq",
@@ -43800,7 +45798,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "boot",
             intent: "mcq",
@@ -43834,7 +45833,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bike",
             intent: "mcq",
@@ -43868,7 +45868,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                 targetWord: "love",
             intent: "mcq",
@@ -43902,7 +45903,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "home",
             intent: "mcq",
@@ -43936,7 +45938,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "gave",
             intent: "mcq",
@@ -43970,7 +45973,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "boat",
             intent: "mcq",
@@ -44004,7 +46008,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                   targetWord: "bread",
             intent: "mcq",
@@ -44050,7 +46055,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "escape",
             intent: "mcq",
@@ -44084,7 +46090,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sunrise",
             intent: "mcq",
@@ -44118,7 +46125,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "railroad",
             intent: "mcq",
@@ -44152,7 +46160,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "notebook",
             intent: "mcq",
@@ -44186,7 +46195,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sunset",
             intent: "mcq",
@@ -44220,7 +46230,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
                 targetWord: "basket",
             intent: "mcq",
@@ -44254,7 +46265,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "mountain",
             intent: "mcq",
@@ -44288,7 +46300,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "pencil",
             intent: "mcq",
@@ -44322,7 +46335,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "kitchen",
             intent: "mcq",
@@ -44356,7 +46370,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "market",
             intent: "mcq",
@@ -44402,7 +46417,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "happy",
             intent: "mcq",
@@ -44436,7 +46452,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
               targetWord: "preview",
             intent: "mcq",
@@ -44470,7 +46487,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "happiness", 
             intent: "mcq",
@@ -44504,7 +46522,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "run",
             intent: "mcq",
@@ -44538,7 +46557,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "disagree",
             intent: "mcq",
@@ -44572,7 +46592,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sadness",
             intent: "mcq",
@@ -44606,7 +46627,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "play",
             intent: "mcq",
@@ -44640,7 +46662,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "misunderstand",
             intent: "mcq",
@@ -44674,7 +46697,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "quickly",
             intent: "mcq",
@@ -44708,7 +46732,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "thinking",
             intent: "mcq",
@@ -44754,7 +46779,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "preview",
             intent: "mcq",
@@ -44788,7 +46814,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "misunderstand",
             intent: "mcq",
@@ -44822,7 +46849,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "preheat",
             intent: "mcq",
@@ -44856,7 +46884,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "rewrite",
             intent: "mcq",
@@ -44890,7 +46919,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "misplace",
             intent: "mcq",
@@ -44924,7 +46954,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "prepay",
             intent: "mcq",
@@ -44958,7 +46989,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "remake",
             intent: "mcq",
@@ -44992,7 +47024,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "misjudge",
             intent: "mcq",
@@ -45026,7 +47059,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "revisit",
             intent: "mcq",
@@ -45060,7 +47094,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "view",
             intent: "mcq",
@@ -45107,7 +47142,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "fearful",
             intent: "mcq",
@@ -45141,7 +47177,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "thoughtful",
             intent: "mcq",
@@ -45175,7 +47212,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "colorless",
             intent: "mcq",
@@ -45209,7 +47247,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "joyful",
             intent: "mcq",
@@ -45243,7 +47282,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "hopeless",
             intent: "mcq",
@@ -45277,7 +47317,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "careful",
             intent: "mcq",
@@ -45311,7 +47352,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "restless",
             intent: "mcq",
@@ -45345,7 +47387,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "painful",
             intent: "mcq",
@@ -45379,7 +47422,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "endless",
             intent: "mcq",
@@ -45413,7 +47457,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "grateful",
             intent: "mcq",
@@ -45459,7 +47504,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "unhappy",
             intent: "mcq",
@@ -45493,7 +47539,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "hopeful",
             intent: "mcq",
@@ -45527,7 +47574,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "careless",
             intent: "mcq",
@@ -45561,7 +47609,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "invisible",
             intent: "mcq",
@@ -45595,7 +47644,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "disagree",
             intent: "mcq",
@@ -45629,7 +47679,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "preheat",
             intent: "mcq",
@@ -45663,7 +47714,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "rewrite",
             intent: "mcq",
@@ -45697,7 +47749,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "unfold",
             intent: "mcq",
@@ -45731,7 +47784,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "kindness",
             intent: "mcq",
@@ -45765,7 +47819,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "impossible",
             intent: "mcq",
@@ -45811,7 +47866,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -45845,7 +47901,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -45879,7 +47936,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -45913,7 +47971,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -45947,7 +48006,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -45981,7 +48041,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -46015,7 +48076,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -46049,7 +48111,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -46083,7 +48146,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -46117,7 +48181,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "closed vowel exception",
             intent: "mcq",
@@ -46163,7 +48228,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
@@ -46197,7 +48263,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
@@ -46231,7 +48298,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
@@ -46265,7 +48333,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
@@ -46299,7 +48368,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
@@ -46333,7 +48403,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
@@ -46367,7 +48438,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
@@ -46401,7 +48473,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
@@ -46435,7 +48508,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft c",
             intent: "mcq",
@@ -46469,7 +48543,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "soft g",
             intent: "mcq",
@@ -46515,7 +48590,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "flour/flower",
             intent: "mcq",
@@ -46549,7 +48625,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "flu/flew",
             intent: "mcq",
@@ -46583,7 +48660,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sea/see",
             intent: "mcq",
@@ -46617,7 +48695,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "knight/night",
             intent: "mcq",
@@ -46651,7 +48730,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bear/bare",
             intent: "mcq",
@@ -46685,7 +48765,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "pair/pear",
             intent: "mcq",
@@ -46719,7 +48800,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "right/write",
             intent: "mcq",
@@ -46753,7 +48835,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "son/sun",
             intent: "mcq",
@@ -46787,7 +48870,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "whole/hole",
             intent: "mcq",
@@ -46821,7 +48905,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "plane/plain",
             intent: "mcq",
@@ -46867,7 +48952,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bye",
             intent: "mcq",
@@ -46901,7 +48987,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sea",
             intent: "mcq",
@@ -46935,7 +49022,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "pair",
             intent: "mcq",
@@ -46969,7 +49057,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "knight",
             intent: "mcq",
@@ -47003,7 +49092,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "flower",
             intent: "mcq",
@@ -47037,7 +49127,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "right",
             intent: "mcq",
@@ -47071,7 +49162,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "two",
             intent: "mcq",
@@ -47105,7 +49197,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "break",
             intent: "mcq",
@@ -47139,7 +49232,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "bear",
             intent: "mcq",
@@ -47173,7 +49267,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "cent",
             intent: "mcq",
@@ -47219,7 +49314,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47253,7 +49349,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47287,7 +49384,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47321,7 +49419,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47355,7 +49454,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47389,7 +49489,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47423,7 +49524,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47457,7 +49559,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47491,7 +49594,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47525,7 +49629,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word recognition",
             intent: "mcq",
@@ -47571,7 +49676,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47605,7 +49711,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47639,7 +49746,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47673,7 +49781,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47707,7 +49816,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47741,7 +49851,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47775,7 +49886,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47809,7 +49921,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47843,7 +49956,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47877,7 +49991,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sight word",
             intent: "mcq",
@@ -47923,7 +50038,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "character feelings",
             intent: "mcq",
@@ -47957,7 +50073,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "character development",
             intent: "mcq",
@@ -47991,7 +50108,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "setting description",
             intent: "mcq",
@@ -48025,7 +50143,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "theme",
             intent: "mcq",
@@ -48059,7 +50178,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "plot",
             intent: "mcq",
@@ -48093,7 +50213,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "setting",
             intent: "mcq",
@@ -48127,7 +50248,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "character action",
             intent: "mcq",
@@ -48161,7 +50283,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "science fiction element",
             intent: "mcq",
@@ -48195,7 +50318,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "conflict",
             intent: "mcq",
@@ -48229,7 +50353,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "imagination",
             intent: "mcq",
@@ -48275,7 +50400,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48309,7 +50435,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48343,7 +50470,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48377,7 +50505,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48411,7 +50540,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48445,7 +50575,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48479,7 +50610,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48513,7 +50645,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48547,7 +50680,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48581,7 +50715,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "mcq",
@@ -48627,7 +50762,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48661,7 +50797,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48695,7 +50832,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48729,7 +50867,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48763,7 +50902,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48797,7 +50937,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48831,7 +50972,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48865,7 +51007,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48899,7 +51042,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48933,7 +51077,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "r-controlled vowels",
             intent: "mcq",
@@ -48979,7 +51124,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49013,7 +51159,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49047,7 +51194,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49081,7 +51229,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49115,7 +51264,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49149,7 +51299,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49183,7 +51334,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49217,7 +51369,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49251,7 +51404,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49285,7 +51439,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence matching",
             intent: "mcq",
@@ -49331,7 +51486,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49365,7 +51521,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49399,7 +51556,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49433,7 +51591,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49467,7 +51626,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49501,7 +51661,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49535,7 +51696,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49569,7 +51731,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49603,7 +51766,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49637,7 +51801,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "action verbs",
             intent: "mcq",
@@ -49683,7 +51848,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49717,7 +51883,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49751,7 +51918,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49785,7 +51953,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49819,7 +51988,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49853,7 +52023,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49887,7 +52058,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49921,7 +52093,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49955,7 +52128,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -49989,7 +52163,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sense words",
             intent: "mcq",
@@ -50036,7 +52211,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50071,7 +52247,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50106,7 +52283,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50141,7 +52319,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50176,7 +52355,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50211,7 +52391,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50246,7 +52427,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50281,7 +52463,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50316,7 +52499,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50351,7 +52535,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -50398,7 +52583,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "long vowel sounds",
             intent: "reading_comprehension",
@@ -50433,7 +52619,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel sorting",
             intent: "reading_comprehension",
@@ -50468,7 +52655,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "blend",
             intent: "reading_comprehension",
@@ -50503,7 +52691,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -50538,7 +52727,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "long e sounds",
             intent: "reading_comprehension",
@@ -50573,7 +52763,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "short a sounds",
             intent: "reading_comprehension",
@@ -50608,7 +52799,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "short i sounds",
             intent: "reading_comprehension",
@@ -50643,7 +52835,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence blending",
             intent: "reading_comprehension",
@@ -50678,7 +52871,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "long o sounds",
             intent: "reading_comprehension",
@@ -50713,7 +52907,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "vowel blend",
             intent: "reading_comprehension",
@@ -50760,7 +52955,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -50795,7 +52991,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -50830,7 +53027,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -50865,7 +53063,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -50900,7 +53099,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -50935,7 +53135,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -50970,7 +53171,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -51005,7 +53207,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -51040,7 +53243,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -51075,7 +53279,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comprehension",
             intent: "reading_comprehension",
@@ -51122,7 +53327,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "character motivation",
             intent: "reading_comprehension",
@@ -51157,7 +53363,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "setting",
             intent: "reading_comprehension",
@@ -51192,7 +53399,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "plot",
             intent: "reading_comprehension",
@@ -51227,7 +53435,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "theme",
             intent: "reading_comprehension",
@@ -51262,7 +53471,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "character trait",
             intent: "reading_comprehension",
@@ -51297,7 +53507,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "conflict",
             intent: "reading_comprehension",
@@ -51332,7 +53543,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "resolution",
             intent: "reading_comprehension",
@@ -51367,7 +53579,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "anticipation",
             intent: "reading_comprehension",
@@ -51402,7 +53615,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "mood",
             intent: "reading_comprehension",
@@ -51437,7 +53651,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "confidence",
             intent: "reading_comprehension",
@@ -51484,7 +53699,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51519,7 +53735,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51554,7 +53771,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51589,7 +53807,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51624,7 +53843,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51659,7 +53879,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51694,7 +53915,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51729,7 +53951,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51764,7 +53987,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51799,7 +54023,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -51846,7 +54071,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
@@ -51881,7 +54107,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "toy voyaging",
             intent: "reading_comprehension",
@@ -51916,7 +54143,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comic books",
             intent: "reading_comprehension",
@@ -51951,7 +54179,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
@@ -51986,7 +54215,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "toy voyaging",
             intent: "reading_comprehension",
@@ -52021,7 +54251,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comic books",
             intent: "reading_comprehension",
@@ -52056,7 +54287,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
@@ -52091,7 +54323,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "toy voyaging",
             intent: "reading_comprehension",
@@ -52126,7 +54359,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "comic books",
             intent: "reading_comprehension",
@@ -52161,7 +54395,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "surfing",
             intent: "reading_comprehension",
@@ -52208,7 +54443,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52243,7 +54479,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52278,7 +54515,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52313,7 +54551,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52348,7 +54587,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52383,7 +54623,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52418,7 +54659,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52453,7 +54695,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52488,7 +54731,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52523,7 +54767,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "reading comprehension",
             intent: "reading_comprehension",
@@ -52570,7 +54815,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52605,7 +54851,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52640,7 +54887,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52675,7 +54923,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52710,7 +54959,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52745,7 +54995,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52780,7 +55031,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52815,7 +55067,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52850,7 +55103,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52885,7 +55139,8 @@ aiTutor: {
           isSpacing: false,
           isSorting: false,
           isSpelling: false,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],          aiHook: {
             targetWord: "sentence spacing",
             intent: "reading_comprehension",
@@ -52932,7 +55187,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "pay",
@@ -52966,7 +55222,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "cake",
@@ -53000,7 +55257,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "rain",
@@ -53034,7 +55292,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "play",
@@ -53068,7 +55327,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "gate",
@@ -53102,7 +55362,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "mail",
@@ -53136,7 +55397,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: "day",
@@ -53170,7 +55432,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "game",
@@ -53204,7 +55467,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,4],
       aiHook: {
         targetWord: "rainbow",
@@ -53238,7 +55502,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,2],
       aiHook: {
         targetWord: "bake",
@@ -53284,7 +55549,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "steak",
@@ -53319,7 +55585,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "they",
@@ -53354,7 +55621,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "break",
@@ -53389,7 +55657,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "prey",
@@ -53424,7 +55693,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "great",
@@ -53459,7 +55729,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "obey",
@@ -53494,7 +55765,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "break",
@@ -53529,7 +55801,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2,3],
       aiHook: {
         targetWord: "survey",
@@ -53564,7 +55837,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "they",
@@ -53599,7 +55873,8 @@ aiTutor: {
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 4],
       aiHook: {
         targetWord: "great",
@@ -53646,6 +55921,7 @@ questionText: "Complete the word: t",
 correctAnswer: 'eigh',
 template: 'fill_blank',
 isSpacing: false, isSorting: false, isSpelling: true,
+isReading: false,
 isPrefilled: true, prefilledIndexes: [4],
 aiHook: {
 targetWord: 'eight',
@@ -53678,6 +55954,7 @@ questionText: "Complete the word: w",
 correctAnswer: 'eigh',
 template: 'fill_blank',
 isSpacing: false, isSorting: false, isSpelling: true,
+isReading: false,
 isPrefilled: true, prefilledIndexes: [0],
 aiHook: {
 targetWord: 'weigh',
@@ -53710,6 +55987,7 @@ questionText: "Complete the word: sl____",
 correctAnswer: 'eigh',
 template: 'fill_blank',
 isSpacing: false, isSorting: false, isSpelling: true,
+isReading: false,
 isPrefilled: true, prefilledIndexes: [0,1],
 aiHook: {
 targetWord: 'sleigh',
@@ -53743,7 +56021,8 @@ audio: 'sleigh'
   correctAnswer: 'ey',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,1],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
   aiHook: {
     targetWord: 'they',
     intent: 'fill_blank',
@@ -53775,7 +56054,8 @@ audio: 'sleigh'
   correctAnswer: 'ea',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,1,4],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,4],
   aiHook: {
     targetWord: 'break',
     intent: 'fill_blank',
@@ -53807,7 +56087,8 @@ audio: 'sleigh'
   correctAnswer: 'eigh',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,5,6,7],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,5,6,7],
   aiHook: {
     targetWord: 'neighbor',
     intent: 'fill_blank',
@@ -53839,7 +56120,8 @@ audio: 'sleigh'
   correctAnswer: 'ey',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,1],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
   aiHook: {
     targetWord: 'prey',
     intent: 'fill_blank',
@@ -53871,7 +56153,8 @@ audio: 'sleigh'
   correctAnswer: 'ea',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,1,4],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1,4],
   aiHook: {
     targetWord: 'great',
     intent: 'fill_blank',
@@ -53903,7 +56186,8 @@ audio: 'sleigh'
   correctAnswer: 'eigh',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,5],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,5],
   aiHook: {
     targetWord: 'weight',
     intent: 'fill_blank',
@@ -53935,7 +56219,8 @@ audio: 'sleigh'
   correctAnswer: 'ey',
   template: 'fill_blank',
   isSpacing: false, isSorting: false, isSpelling: true,
-  isPrefilled: true, prefilledIndexes: [0,1],
+  isReading: false,
+isPrefilled: true, prefilledIndexes: [0,1],
   aiHook: {
     targetWord: 'obey',
     intent: 'fill_blank',
@@ -53982,7 +56267,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "shake",
@@ -54016,7 +56302,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "train",
@@ -54050,7 +56337,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "day",
@@ -54084,7 +56372,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "plate",
@@ -54118,7 +56407,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "rain",
@@ -54152,7 +56442,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "eight",
@@ -54186,7 +56477,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "gray",
@@ -54220,7 +56512,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "break",
@@ -54254,7 +56547,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "they",
@@ -54288,7 +56582,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "paint",
@@ -54322,7 +56617,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "play",
@@ -54356,7 +56652,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "chain",
@@ -54390,7 +56687,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "parade",
@@ -54424,7 +56722,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "steak",
@@ -54458,7 +56757,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "relay",
@@ -54492,7 +56792,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "neighbor",
@@ -54526,7 +56827,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "whale",
@@ -54560,7 +56862,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "display",
@@ -54594,7 +56897,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "obey",
@@ -54628,7 +56932,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "faint",
@@ -54675,7 +56980,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0], // s shown; student types 'ee'
       aiHook: {
         targetWord: "see",
@@ -54709,7 +57015,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1], // t,r shown; student types 'ee'
       aiHook: {
         targetWord: "tree",
@@ -54743,7 +57050,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0], // b shown; student types 'ee'
       aiHook: {
         targetWord: "bee",
@@ -54777,7 +57085,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // g,r,n shown; student types 'ee'
       aiHook: {
         targetWord: "green",
@@ -54811,7 +57120,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // l,f shown; student types 'ea'
       aiHook: {
         targetWord: "leaf",
@@ -54845,7 +57155,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4], // b,c,h shown; student types 'ea'
       aiHook: {
         targetWord: "beach",
@@ -54879,7 +57190,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // s,l,p shown; student types 'ee'
       aiHook: {
         targetWord: "sleep",
@@ -54913,7 +57225,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // m,t shown; student types 'ea'
       aiHook: {
         targetWord: "meat",
@@ -54947,7 +57260,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // f,t shown; student types 'ee'
       aiHook: {
         targetWord: "feet",
@@ -54981,7 +57295,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // c,l,n shown; student types 'ea'
       aiHook: {
         targetWord: "clean",
@@ -55015,7 +57330,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // r,d shown; student types 'ea'
       aiHook: {
         targetWord: "read",
@@ -55049,7 +57365,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,5], // s,t,r,t shown; student types 'ee'
       aiHook: {
         targetWord: "street",
@@ -55083,7 +57400,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4], // p,c,h shown; student types 'ea'
       aiHook: {
         targetWord: "peach",
@@ -55117,7 +57435,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // s,h,p shown; student types 'ee'
       aiHook: {
         targetWord: "sheep",
@@ -55151,7 +57470,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // t,m shown; student types 'ea'
       aiHook: {
         targetWord: "team",
@@ -55185,7 +57505,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4], // t,c,h shown; student types 'ea'
       aiHook: {
         targetWord: "teach",
@@ -55219,7 +57540,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3], // s,t shown; student types 'ea'
       aiHook: {
         targetWord: "seat",
@@ -55253,7 +57575,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1], // k,n shown; student types 'ee'
       aiHook: {
         targetWord: "knee",
@@ -55287,7 +57610,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // d,r,m shown; student types 'ea'
       aiHook: {
         targetWord: "dream",
@@ -55321,7 +57645,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4], // q,u,n shown; student types 'ee'
       aiHook: {
         targetWord: "queen",
@@ -55369,7 +57694,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "these",
@@ -55403,7 +57729,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "scene",
@@ -55439,7 +57766,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "field",
@@ -55473,7 +57801,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "chief",
@@ -55509,7 +57838,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "niece",
@@ -55543,7 +57873,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,5,6],
       aiHook: {
         targetWord: "believe",
@@ -55577,7 +57908,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3,4,6],
       aiHook: {
         targetWord: "complete",
@@ -55611,7 +57943,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3,5],
       aiHook: {
         targetWord: "athlete",
@@ -55645,7 +57978,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "piece",
@@ -55679,7 +58013,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "theme",
@@ -55726,7 +58061,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1],
       aiHook: {
         targetWord: "tree",
@@ -55760,7 +58096,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "beach",
@@ -55794,7 +58131,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "sweet",
@@ -55828,7 +58166,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "field",
@@ -55862,7 +58201,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "these",
@@ -55896,7 +58236,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "scene",
@@ -55930,7 +58271,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3],
       aiHook: {
         targetWord: "leaf",
@@ -55964,7 +58306,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "sleep",
@@ -55998,7 +58341,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,3,4],
       aiHook: {
         targetWord: "peace",
@@ -56032,7 +58376,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "chief",
@@ -56066,7 +58411,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "theme",
@@ -56100,7 +58446,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3,4,6],
       aiHook: {
         targetWord: "complete",
@@ -56134,7 +58481,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "green",
@@ -56168,7 +58516,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "speak",
@@ -56202,7 +58551,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "thief",
@@ -56236,7 +58586,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4,5],
       aiHook: {
         targetWord: "cheese",
@@ -56270,7 +58621,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4,5],
       aiHook: {
         targetWord: "breeze",
@@ -56304,7 +58656,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,2,3,5],
       aiHook: {
         targetWord: "athlete",
@@ -56338,7 +58691,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,4],
       aiHook: {
         targetWord: "queen",
@@ -56372,7 +58726,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0,1,3],
       aiHook: {
         targetWord: "theme",
@@ -56419,7 +58774,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "kite",
@@ -56453,7 +58809,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "pie",
@@ -56487,7 +58844,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "fly",
@@ -56521,7 +58879,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "light",
@@ -56555,7 +58914,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "kind",
@@ -56589,7 +58949,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "wild",
@@ -56623,7 +58984,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "tie",
@@ -56657,7 +59019,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "high",
@@ -56691,7 +59054,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "cry",
@@ -56725,7 +59089,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "sky",
@@ -56759,7 +59124,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "mile",
@@ -56793,7 +59159,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "night",
@@ -56827,7 +59194,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "child",
@@ -56861,7 +59229,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "try",
@@ -56895,7 +59264,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "lie",
@@ -56929,7 +59299,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "fight",
@@ -56963,7 +59334,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "blind",
@@ -56997,7 +59369,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "dry",
@@ -57031,7 +59404,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "white",
@@ -57065,7 +59439,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "sight",
@@ -57113,7 +59488,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "rose",
@@ -57147,7 +59523,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "boat",
@@ -57181,7 +59558,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "snow",
@@ -57215,7 +59593,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "goat",
@@ -57249,7 +59628,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "cold",
@@ -57283,7 +59663,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "gold",
@@ -57317,7 +59698,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "show",
@@ -57351,7 +59733,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "coat",
@@ -57385,7 +59768,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "most",
@@ -57419,7 +59803,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "bolt",
@@ -57452,7 +59837,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "home",
@@ -57486,7 +59872,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "road",
@@ -57520,7 +59907,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "low",
@@ -57554,7 +59942,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "toast",
@@ -57588,7 +59977,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "rope",
@@ -57622,7 +60012,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "golden",
@@ -57656,7 +60047,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "close",
@@ -57690,7 +60082,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "float",
@@ -57724,7 +60117,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "stone",
@@ -57758,7 +60152,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "coat",
@@ -57805,7 +60200,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "glue",
@@ -57839,7 +60235,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "blue",
@@ -57873,7 +60270,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "moon",
@@ -57907,7 +60305,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "stew",
@@ -57941,7 +60340,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "fruit",
@@ -57975,7 +60375,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "tune",
@@ -58009,7 +60410,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "boot",
@@ -58043,7 +60445,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "chew",
@@ -58077,7 +60480,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "juice",
@@ -58111,7 +60515,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "room",
@@ -58145,7 +60550,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "suit",
@@ -58179,7 +60585,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "true",
@@ -58213,7 +60620,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "pool",
@@ -58247,7 +60655,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "flute",
@@ -58281,7 +60690,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "grew",
@@ -58315,7 +60725,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "spoon",
@@ -58349,7 +60760,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "cube",
@@ -58383,7 +60795,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "bloom",
@@ -58417,7 +60830,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "rescue",
@@ -58451,7 +60865,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "fume",
@@ -58499,7 +60914,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "pilot",
@@ -58533,7 +60949,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "music",
@@ -58567,7 +60984,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "robot",
@@ -58601,7 +61019,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "silent",
@@ -58635,7 +61054,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "lemon",
@@ -58669,7 +61089,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "tiger",
@@ -58703,7 +61124,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "camel",
@@ -58737,7 +61159,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "focus",
@@ -58771,7 +61194,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "melon",
@@ -58805,7 +61229,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "cabin",
@@ -58851,7 +61276,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "puddle",
@@ -58885,7 +61311,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "apple",
@@ -58919,7 +61346,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "candle",
@@ -58953,7 +61381,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "table",
@@ -58987,7 +61416,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "bubble",
@@ -59021,7 +61451,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "turtle",
@@ -59055,7 +61486,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "giggle",
@@ -59089,7 +61521,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "noodle",
@@ -59123,7 +61556,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "jungle",
@@ -59157,7 +61591,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "rattle",
@@ -59190,7 +61625,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "cradle",
@@ -59224,7 +61660,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "handle",
@@ -59258,7 +61695,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "bottle",
@@ -59292,7 +61730,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "uncle",
@@ -59326,7 +61765,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "tickle",
@@ -59360,7 +61800,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "circle",
@@ -59394,7 +61835,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "little",
@@ -59428,7 +61870,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "simple",
@@ -59462,7 +61905,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "beetle",
@@ -59496,7 +61940,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: "sparkle",
@@ -59544,7 +61989,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "pepper",
@@ -59578,7 +62024,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "rabbit",
@@ -59612,7 +62059,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "kitten",
@@ -59646,7 +62094,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "napkin",
@@ -59680,7 +62129,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "pencil",
@@ -59714,7 +62164,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "dinner",
@@ -59748,7 +62199,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "basket",
@@ -59782,7 +62234,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "rocket",
@@ -59815,7 +62268,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "music",
@@ -59849,7 +62303,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "summer",
@@ -59883,7 +62338,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "picnic",
@@ -59917,7 +62373,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "dentist",
@@ -59951,7 +62408,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "magnet",
@@ -59985,7 +62443,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "animal",
@@ -60019,7 +62478,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "banana",
@@ -60053,7 +62513,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "computer",
@@ -60087,7 +62548,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "reptile",
@@ -60121,7 +62583,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: "pilot",
@@ -60155,7 +62618,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "garden",
@@ -60189,7 +62653,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: "carrot",
@@ -60237,7 +62702,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,3],
           aiHook: {
             targetWord: "said",
@@ -60271,7 +62737,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,5,6],
           aiHook: {
             targetWord: "because",
@@ -60306,7 +62773,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,3,4],
           aiHook: {
             targetWord: "could",
@@ -60341,7 +62809,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,5],
           aiHook: {
             targetWord: "people",
@@ -60376,7 +62845,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "their",
@@ -60411,7 +62881,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,5],
           aiHook: {
             targetWord: "friend",
@@ -60446,7 +62917,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2],
           aiHook: {
             targetWord: "other",
@@ -60481,7 +62953,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,4],
           aiHook: {
             targetWord: "which",
@@ -60516,7 +62989,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1],
           aiHook: {
             targetWord: "know",
@@ -60551,7 +63025,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: true,
+        isReading: false,
+isPrefilled: true,
         prefilledIndexes: [0,1,2,3,6],
           aiHook: {
             targetWord: "through",
@@ -60598,7 +63073,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "through",
@@ -60633,7 +63109,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "their",
@@ -60669,7 +63146,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "because",
@@ -60704,7 +63182,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "friend",
@@ -60739,7 +63218,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "people",
@@ -60774,7 +63254,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "where",
@@ -60809,7 +63290,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-                isPrefilled: false,
+                isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "again",
@@ -60844,7 +63326,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "know",
@@ -60880,7 +63363,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "could",
@@ -60916,7 +63400,8 @@ audio: 'sleigh'
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isPrefilled: false,
+        isReading: false,
+isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "every",
@@ -60964,7 +63449,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'catch',
@@ -60998,7 +63484,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'match',
@@ -61032,7 +63519,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'witch',
@@ -61066,7 +63554,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: 'peach',
@@ -61100,7 +63589,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: 'bench',
@@ -61134,7 +63624,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'fetch',
@@ -61168,7 +63659,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chip',
@@ -61202,7 +63694,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'patch',
@@ -61236,7 +63729,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'rich',
@@ -61270,7 +63764,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'march',
@@ -61316,7 +63811,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'badge',
@@ -61350,7 +63846,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'fudge',
@@ -61384,7 +63881,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1, 2],
       aiHook: {
         targetWord: 'bridge',
@@ -61418,7 +63916,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0],
       aiHook: {
         targetWord: 'edge',
@@ -61452,7 +63951,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'judge',
@@ -61486,7 +63986,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'page',
@@ -61520,7 +64021,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'large',
@@ -61554,7 +64056,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'lodge',
@@ -61588,7 +64091,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'ridge',
@@ -61622,7 +64126,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'stage',
@@ -61668,7 +64173,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [3, 4, 5],
       aiHook: {
         targetWord: 'gentle',
@@ -61702,7 +64208,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'giant',
@@ -61736,7 +64243,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'gym',
@@ -61770,7 +64278,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'jump',
@@ -61804,7 +64313,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [0, 1],
       aiHook: {
         targetWord: 'badge',
@@ -61838,7 +64348,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'page',
@@ -61872,7 +64383,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'magic',
@@ -61906,7 +64418,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'judge',
@@ -61940,7 +64453,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'energy',
@@ -61974,7 +64488,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'jelly',
@@ -62021,7 +64536,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'unhappy',
@@ -62055,7 +64571,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'retell',
@@ -62089,7 +64606,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'preheat',
@@ -62123,7 +64641,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'preview',
@@ -62157,7 +64676,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'misprint',
@@ -62191,7 +64711,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'dislike',
@@ -62225,7 +64746,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'discover',
@@ -62259,7 +64781,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'incorrect',
@@ -62293,7 +64816,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'untie',
@@ -62327,7 +64851,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'remake',
@@ -62374,7 +64899,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'happy',
@@ -62408,7 +64934,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'sly',
@@ -62442,7 +64969,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'reply',
@@ -62476,7 +65004,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'yesterday',
@@ -62510,7 +65039,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'funny',
@@ -62544,7 +65074,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'youth',
@@ -62578,7 +65109,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'angry',
@@ -62612,7 +65144,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mighty',
@@ -62646,7 +65179,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'lazy',
@@ -62680,7 +65214,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'symbol',
@@ -62714,7 +65249,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mystery',
@@ -62761,7 +65297,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'word',
@@ -62795,7 +65332,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'work',
@@ -62829,7 +65367,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'world',
@@ -62863,7 +65402,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'worm',
@@ -62897,7 +65437,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'worth',
@@ -62931,7 +65472,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'worse',
@@ -62965,7 +65507,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'worship',
@@ -62999,7 +65542,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fork',
@@ -63033,7 +65577,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'storm',
@@ -63067,7 +65612,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'horse',
@@ -63114,7 +65660,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'April',
@@ -63148,7 +65695,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'May',
@@ -63182,7 +65730,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'June',
@@ -63216,7 +65765,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'July',
@@ -63250,7 +65800,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'August',
@@ -63284,7 +65835,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'September',
@@ -63318,7 +65870,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'October',
@@ -63352,7 +65905,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'November',
@@ -63386,7 +65940,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'December',
@@ -63420,7 +65975,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'month',
@@ -63466,7 +66022,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'flew',
@@ -63500,7 +66057,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chew',
@@ -63534,7 +66092,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'screw',
@@ -63568,7 +66127,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'stew',
@@ -63602,7 +66162,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'drew',
@@ -63636,7 +66197,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'crew',
@@ -63670,7 +66232,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'grew',
@@ -63704,7 +66267,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'blew',
@@ -63738,7 +66302,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'jewel',
@@ -63772,7 +66337,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'threw',
@@ -63819,7 +66385,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'few',
@@ -63853,7 +66420,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'new',
@@ -63887,7 +66455,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pew',
@@ -63921,7 +66490,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'stew',
@@ -63955,7 +66525,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'nephew',
@@ -63989,7 +66560,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'blew',
@@ -64023,7 +66595,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'grew',
@@ -64057,7 +66630,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'threw',
@@ -64091,7 +66665,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'crew',
@@ -64125,7 +66700,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chew',
@@ -64172,7 +66748,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'unit',
@@ -64206,7 +66783,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'music',
@@ -64240,7 +66818,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'human',
@@ -64274,7 +66853,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cube',
@@ -64308,7 +66888,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cute',
@@ -64342,7 +66923,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'few',
@@ -64376,7 +66958,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'new',
@@ -64410,7 +66993,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'rescue',
@@ -64444,7 +67028,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'value',
@@ -64478,7 +67063,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'confuse',
@@ -64525,7 +67111,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'head',
@@ -64559,7 +67146,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bread',
@@ -64593,7 +67181,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'dead',
@@ -64627,7 +67216,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'lead',
@@ -64661,7 +67251,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'read',
@@ -64695,7 +67286,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'meant',
@@ -64729,7 +67321,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'sweat',
@@ -64763,7 +67356,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'weather',
@@ -64797,7 +67391,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'feather',
@@ -64831,7 +67426,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'ready',
@@ -64878,7 +67474,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'step',
@@ -64912,7 +67509,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'head',
@@ -64946,7 +67544,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'meant',
@@ -64980,7 +67579,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'sweat',
@@ -65014,7 +67614,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'feather',
@@ -65048,7 +67649,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pleasant',
@@ -65082,7 +67684,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'said',
@@ -65116,7 +67719,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'friend',
@@ -65150,7 +67754,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'many',
@@ -65184,7 +67789,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'leopard',
@@ -65231,7 +67837,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'write',
@@ -65265,7 +67872,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrong',
@@ -65299,7 +67907,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrap',
@@ -65333,7 +67942,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wreck',
@@ -65367,7 +67977,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrist',
@@ -65401,7 +68012,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrench',
@@ -65435,7 +68047,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrinkle',
@@ -65469,7 +68082,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wreath',
@@ -65503,7 +68117,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrestle',
@@ -65537,7 +68152,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrote',
@@ -65584,7 +68200,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knee',
@@ -65618,7 +68235,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knife',
@@ -65652,7 +68270,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knock',
@@ -65686,7 +68305,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'know',
@@ -65720,7 +68340,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knot',
@@ -65754,7 +68375,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knight',
@@ -65788,7 +68410,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knob',
@@ -65822,7 +68445,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knit',
@@ -65856,7 +68480,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knowledge',
@@ -65890,7 +68515,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knack',
@@ -65937,7 +68563,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'her',
@@ -65971,7 +68598,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fern',
@@ -66005,7 +68633,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bird',
@@ -66039,7 +68668,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'shirt',
@@ -66073,7 +68703,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'burn',
@@ -66107,7 +68738,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'nurse',
@@ -66141,7 +68773,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'earth',
@@ -66175,7 +68808,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'learn',
@@ -66209,7 +68843,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'word',
@@ -66243,7 +68878,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'work',
@@ -66290,7 +68926,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'love',
@@ -66324,7 +68961,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'some',
@@ -66358,7 +68996,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'come',
@@ -66392,7 +69031,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'done',
@@ -66426,7 +69066,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'none',
@@ -66460,7 +69101,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'son',
@@ -66494,7 +69136,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'month',
@@ -66528,7 +69171,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mother',
@@ -66562,7 +69206,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'brother',
@@ -66596,7 +69241,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'glove',
@@ -66643,7 +69289,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'love',
@@ -66677,7 +69324,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'come',
@@ -66711,7 +69359,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mother',
@@ -66745,7 +69394,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'write',
@@ -66779,7 +69429,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wrong',
@@ -66813,7 +69464,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'knee',
@@ -66847,7 +69499,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'her',
@@ -66881,7 +69534,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bird',
@@ -66915,7 +69569,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'burn',
@@ -66949,7 +69604,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'earth',
@@ -66996,7 +69652,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'eight',
@@ -67030,7 +69687,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'eighteen',
@@ -67064,7 +69722,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'eighty',
@@ -67098,7 +69757,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'eighth',
@@ -67132,7 +69792,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'weight',
@@ -67166,7 +69827,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'neighbor',
@@ -67200,7 +69862,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'sleigh',
@@ -67234,7 +69897,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'freight',
@@ -67268,7 +69932,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'height',
@@ -67302,7 +69967,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'neighborly',
@@ -67349,7 +70015,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'tune',
@@ -67383,7 +70050,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'cube',
@@ -67417,7 +70085,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'mule',
@@ -67451,7 +70120,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [2,3],
       aiHook: {
         targetWord: 'huge',
@@ -67485,7 +70155,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cute',
@@ -67519,7 +70190,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'use',
@@ -67553,7 +70225,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fume',
@@ -67587,7 +70260,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'plume',
@@ -67621,7 +70295,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'flute',
@@ -67655,7 +70330,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Tuesday',
@@ -67702,7 +70378,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'hear',
@@ -67736,7 +70413,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'near',
@@ -67770,7 +70448,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'clear',
@@ -67804,7 +70483,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bear',
@@ -67838,7 +70518,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pear',
@@ -67872,7 +70553,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wear',
@@ -67906,7 +70588,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'earth',
@@ -67940,7 +70623,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'learn',
@@ -67974,7 +70658,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'early',
@@ -68008,7 +70693,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'heard',
@@ -68055,7 +70741,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'her',
@@ -68089,7 +70776,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bird',
@@ -68123,7 +70811,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'burn',
@@ -68157,7 +70846,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fern',
@@ -68191,7 +70881,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'curl',
@@ -68225,7 +70916,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'learn',
@@ -68259,7 +70951,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'word',
@@ -68293,7 +70986,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'work',
@@ -68327,7 +71021,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'turn',
@@ -68361,7 +71056,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'shirt',
@@ -68408,7 +71104,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'phone',
@@ -68442,7 +71139,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'photo',
@@ -68476,7 +71174,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'graph',
@@ -68510,7 +71209,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'dolphin',
@@ -68544,7 +71244,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'alphabet',
@@ -68578,7 +71279,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'nephew',
@@ -68612,7 +71314,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'trophy',
@@ -68646,7 +71349,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'elephant',
@@ -68680,7 +71384,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'sphere',
@@ -68714,7 +71419,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'physics',
@@ -68761,7 +71467,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'field',
@@ -68795,7 +71502,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'piece',
@@ -68829,7 +71537,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chief',
@@ -68863,7 +71572,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'belief',
@@ -68897,7 +71607,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'achieve',
@@ -68931,7 +71642,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pie',
@@ -68965,7 +71677,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'tie',
@@ -68999,7 +71712,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'lie',
@@ -69033,7 +71747,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'die',
@@ -69067,7 +71782,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'flies',
@@ -69114,7 +71830,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'phone',
@@ -69148,7 +71865,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'photo',
@@ -69182,7 +71900,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'graph',
@@ -69216,7 +71935,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'dolphin',
@@ -69250,7 +71970,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chief',
@@ -69284,7 +72005,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'piece',
@@ -69318,7 +72040,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'pie',
@@ -69352,7 +72075,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'tie',
@@ -69386,7 +72110,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'achieve',
@@ -69420,7 +72145,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'trophy',
@@ -69467,7 +72193,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bright',
@@ -69501,7 +72228,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'flight',
@@ -69535,7 +72263,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'drive',
@@ -69569,7 +72298,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'prize',
@@ -69603,7 +72333,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'high',
@@ -69637,7 +72368,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'midnight',
@@ -69671,7 +72403,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'lightning',
@@ -69705,7 +72438,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'slice',
@@ -69739,7 +72473,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'stripe',
@@ -69773,7 +72508,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'reply',
@@ -69820,7 +72556,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'soul',
@@ -69854,7 +72591,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'four',
@@ -69888,7 +72626,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'court',
@@ -69922,7 +72661,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'course',
@@ -69956,7 +72696,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'shoulder',
@@ -69990,7 +72731,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mould',
@@ -70024,7 +72766,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'poultry',
@@ -70058,7 +72801,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'resource',
@@ -70092,7 +72836,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mourn',
@@ -70126,7 +72871,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'tournament',
@@ -70173,7 +72919,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'soup',
@@ -70207,7 +72954,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'group',
@@ -70241,7 +72989,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'youth',
@@ -70275,7 +73024,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'coupon',
@@ -70309,7 +73059,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [4],
       aiHook: {
         targetWord: 'route',
@@ -70343,7 +73094,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wound',
@@ -70377,7 +73129,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'cougar',
@@ -70411,7 +73164,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [6],
       aiHook: {
         targetWord: 'routine',
@@ -70445,7 +73199,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [5],
       aiHook: {
         targetWord: 'troupe',
@@ -70479,7 +73234,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: true,
+      isReading: false,
+isPrefilled: true,
       prefilledIndexes: [6,7,8],
       aiHook: {
         targetWord: 'moustache',
@@ -70526,7 +73282,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'about',
@@ -70560,7 +73317,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'around',
@@ -70594,7 +73352,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'again',
@@ -70628,7 +73387,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'across',
@@ -70662,7 +73422,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'agree',
@@ -70696,7 +73457,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'awake',
@@ -70730,7 +73492,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'alike',
@@ -70764,7 +73527,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'aloud',
@@ -70798,7 +73562,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'above',
@@ -70832,7 +73597,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'away',
@@ -70879,7 +73645,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'paint',
@@ -70913,7 +73680,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'remain',
@@ -70947,7 +73715,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chain',
@@ -70981,7 +73750,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'display',
@@ -71015,7 +73785,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'portray',
@@ -71049,7 +73820,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'update',
@@ -71083,7 +73855,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'escape',
@@ -71117,7 +73890,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mistake',
@@ -71151,7 +73925,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'great',
@@ -71185,7 +73960,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'break',
@@ -71232,7 +74008,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'station',
@@ -71266,7 +74043,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'action',
@@ -71300,7 +74078,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'motion',
@@ -71334,7 +74113,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'nation',
@@ -71368,7 +74148,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'fiction',
@@ -71402,7 +74183,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'question',
@@ -71436,7 +74218,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'attention',
@@ -71470,7 +74253,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'mention',
@@ -71504,7 +74288,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'invention',
@@ -71538,7 +74323,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'creation',
@@ -71585,7 +74371,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'warm',
@@ -71619,7 +74406,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'warn',
@@ -71653,7 +74441,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'ward',
@@ -71687,7 +74476,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'warp',
@@ -71721,7 +74511,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wart',
@@ -71755,7 +74546,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'swarm',
@@ -71789,7 +74581,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'warden',
@@ -71823,7 +74616,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wardrobe',
@@ -71857,7 +74651,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'dwarf',
@@ -71891,7 +74686,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'war',
@@ -71938,7 +74734,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'great',
@@ -71972,7 +74769,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'break',
@@ -72006,7 +74804,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'nation',
@@ -72040,7 +74839,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'action',
@@ -72074,7 +74874,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'motion',
@@ -72108,7 +74909,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'creation',
@@ -72142,7 +74944,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'warm',
@@ -72176,7 +74979,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'warn',
@@ -72210,7 +75014,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'ward',
@@ -72244,7 +75049,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'wardrobe',
@@ -72291,7 +75097,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'money',
@@ -72325,7 +75132,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'honey',
@@ -72359,7 +75167,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'valley',
@@ -72393,7 +75202,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'chimney',
@@ -72427,7 +75237,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'donkey',
@@ -72461,7 +75272,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'journey',
@@ -72495,7 +75307,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'they',
@@ -72529,7 +75342,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'grey',
@@ -72563,7 +75377,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'prey',
@@ -72597,7 +75412,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'obey',
@@ -72644,7 +75460,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'tree',
@@ -72678,7 +75495,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'green',
@@ -72712,7 +75530,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'leaf',
@@ -72746,7 +75565,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'beach',
@@ -72780,7 +75600,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'theme',
@@ -72814,7 +75635,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'complete',
@@ -72848,7 +75670,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'happy',
@@ -72882,7 +75705,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'bunny',
@@ -72916,7 +75740,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'key',
@@ -72950,7 +75775,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'valley',
@@ -72996,7 +75822,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'toe',
@@ -73030,7 +75857,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'foe',
@@ -73064,7 +75892,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'woe',
@@ -73098,7 +75927,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'doe',
@@ -73132,7 +75962,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Joe',
@@ -73166,7 +75997,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'home',
@@ -73200,7 +76032,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'stone',
@@ -73234,7 +76067,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'rope',
@@ -73268,7 +76102,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'globe',
@@ -73302,7 +76137,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'slope',
@@ -73349,7 +76185,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'home',
@@ -73383,7 +76220,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'stone',
@@ -73417,7 +76255,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'boat',
@@ -73451,7 +76290,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'road',
@@ -73485,7 +76325,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'snow',
@@ -73519,7 +76360,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'grow',
@@ -73553,7 +76395,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'toe',
@@ -73587,7 +76430,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Joe',
@@ -73621,7 +76465,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'robot',
@@ -73655,7 +76500,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'moment',
@@ -73702,7 +76548,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'magic',
@@ -73736,7 +76583,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'music',
@@ -73770,7 +76618,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'comic',
@@ -73804,7 +76653,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'basic',
@@ -73838,7 +76688,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'public',
@@ -73872,7 +76723,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'traffic',
@@ -73906,7 +76758,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'athletic',
@@ -73940,7 +76793,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'heroic',
@@ -73974,7 +76828,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'electric',
@@ -74008,7 +76863,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'scientific',
@@ -74055,7 +76911,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Sunday',
@@ -74089,7 +76946,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Monday',
@@ -74123,7 +76981,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Tuesday',
@@ -74157,7 +77016,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Wednesday',
@@ -74191,7 +77051,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Thursday',
@@ -74225,7 +77086,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Friday',
@@ -74259,7 +77121,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'Saturday',
@@ -74293,7 +77156,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'January',
@@ -74327,7 +77191,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'February',
@@ -74361,7 +77226,8 @@ audio: 'sleigh'
       isSpacing: false,
       isSorting: false,
       isSpelling: true,
-      isPrefilled: false,
+      isReading: false,
+isPrefilled: false,
       prefilledIndexes: [],
       aiHook: {
         targetWord: 'March',
