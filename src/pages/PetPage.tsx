@@ -5133,29 +5133,34 @@ const getSleepyPetImage = (clicks: number) => {
       {showPetShop && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl max-w-4xl w-11/12 max-h-[85vh] shadow-2xl relative border-2 border-gray-200 flex flex-col">
-            {/* Close button */}
-            <button
-              onClick={() => setShowPetShop(false)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white border-none cursor-pointer text-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-10"
-            >
-              ×
-            </button>
-
             {/* Header */}
-            <div className="p-6 border-b-2 border-gray-200 flex items-center justify-between flex-shrink-0">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-800">Pet Book</h2>
-                {(() => {
-                  const data = getPetStoreData();
-                  const total = Object.keys(data).length;
-                  const owned = Object.values(data).filter((p: any) => p.owned).length;
-                  return (
-                    <div className="text-gray-600 mt-2 font-medium">{owned} out of {total} pets</div>
-                  );
-                })()}
-              </div>
-              <div className="inline-block px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold shadow-lg">
-                💰 {coins} coins
+            <div className="relative px-6 pt-6 pb-4 border-b-2 border-gray-200 flex-shrink-0">
+              {/* Close button - aligned with header top padding */}
+              <button
+                onClick={() => setShowPetShop(false)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white border-none cursor-pointer text-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-10"
+                aria-label="Close pet shop"
+              >
+                ×
+              </button>
+
+              <div className="flex items-start justify-between gap-4 pr-14">
+                <div className="flex-1">
+                  <h2 className="text-3xl font-bold text-gray-800 mb-1">Pet Book</h2>
+                  {(() => {
+                    const data = getPetStoreData();
+                    const total = Object.keys(data).length;
+                    const owned = Object.values(data).filter((p: any) => p.owned).length;
+                    return (
+                      <div className="text-sm text-gray-600 font-medium">{owned} out of {total} pets</div>
+                    );
+                  })()}
+                </div>
+                {/* Coin display - aligned with close button */}
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold shadow-lg whitespace-nowrap">
+                  <span className="text-lg">💰</span>
+                  <span>{coins.toLocaleString()}</span>
+                </div>
               </div>
             </div>
 
