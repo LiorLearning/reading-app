@@ -3512,14 +3512,20 @@ const getSleepyPetImage = (clicks: number) => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col overflow-y-auto overflow-x-hidden" style={{
-      backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center 50%',
-      backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed',
-      fontFamily: 'Quicksand, system-ui, sans-serif'
-    }}>
+    <div
+      className="relative flex min-h-[100dvh] flex-col overflow-x-hidden overflow-y-auto"
+      style={{
+        backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 45%',
+        backgroundRepeat: 'no-repeat',
+        fontFamily: 'Quicksand, system-ui, sans-serif',
+        paddingTop: 'calc(var(--safe-area-top, 0px))',
+        paddingBottom: 'calc(var(--safe-area-bottom, 0px))',
+        paddingLeft: 'calc(var(--safe-area-left, 0px))',
+        paddingRight: 'calc(var(--safe-area-right, 0px))'
+      }}
+    >
       {/* Invisible dev buttons (top-right) to advance time */}
       {import.meta.env && (import.meta as any).env?.DEV ? (
         <>
@@ -3586,11 +3592,14 @@ const getSleepyPetImage = (clicks: number) => {
       {/* Daily intro now handled inside PetSelectionFlow as Step 3 */}
       
       {/* Glass overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
+      <div className="pointer-events-none absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
 
       {/* ADDED FOR HOME PAGE FUNCTIONALITY: Grade Selection Button - Top Left */}
       {userData && (
-        <div className="absolute top-5 left-5 z-30 flex items-center gap-3">
+        <div
+          className="absolute left-4 z-30 flex items-center gap-3 sm:left-5"
+          style={{ top: 'calc(var(--safe-area-top, 0px) + 1.25rem)' }}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -4116,8 +4125,8 @@ const getSleepyPetImage = (clicks: number) => {
         )}
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-8 z-10 mt-12">
-        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-visible" style={{ minHeight: 'clamp(380px, 45vh, 520px)' }}>
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 pt-6 sm:px-6 md:px-8 lg:px-10 lg:pt-8">
+        <div ref={stageRef} className="relative flex w-full items-end justify-center overflow-visible" style={{ minHeight: 'clamp(340px, 48vh, 540px)' }}>
         {/* Compact emoji-only bubble closer to the pet */}
         {!showPetShop && (
           <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2" style={{ top: bubbleTopPx }}>
@@ -4273,8 +4282,8 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Below-bubble To-Dos: Travel and Sleep */}
       {!showPetShop && (
-        <div className="relative z-20 mt-16 flex justify-center pb-24">
-          <div className="rounded-[24px] shadow-xl p-4 w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
+        <div className="relative z-20 mt-12 flex justify-center pb-24 sm:mt-14 lg:mt-16">
+          <div className="w-full max-w-[420px] rounded-[24px] shadow-xl p-4 mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
             <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
             <div className="mt-1 flex flex-col gap-4">
@@ -4904,9 +4913,15 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       )}
 
-      {/* Pet Switcher - Only show if user owns multiple pets */}
-      {(orderedOwnedPets.length > 1) && (
-        <div className="fixed top-24 left-6 z-20 flex flex-col gap-3 items-center">
+      {/* Pet Switcher rail */}
+      {orderedOwnedPets.length > 0 && (
+        <div
+          className="fixed z-20 hidden flex-col items-center gap-3 md:flex"
+          style={{
+            top: 'calc(var(--safe-area-top, 0px) + 5.5rem)',
+            left: 'clamp(1rem, 3vw, 2.5rem)'
+          }}
+        >
           <div className="text-lg font-semibold text-white drop-shadow-md mb-1">
             Pets: {orderedOwnedPets.length}
           </div>
@@ -5034,7 +5049,7 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 ${
+                className={`relative h-20 w-20 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 md:h-20 md:w-20 lg:h-24 lg:w-24 ${
                   isActive
                     ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
                     : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
@@ -5077,7 +5092,10 @@ const getSleepyPetImage = (clicks: number) => {
       )}
 
   {/* Global top-right shortcuts: More and Shop */}
-  <div className="fixed top-48 right-6 z-30 flex flex-col gap-3 items-end">
+  <div
+    className="fixed top-48 z-30 flex flex-col gap-3 items-end"
+    style={{ right: 'calc(var(--safe-area-right, 0px) + 1.5rem)' }}
+  >
     <Button
       aria-label="More"
       onClick={() => { handleActionClick('more'); }}
