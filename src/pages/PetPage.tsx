@@ -2410,9 +2410,10 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
-        // 3rd should store as grade3, 4th/5th as grade4
+        // 3rd should store as grade3, 4th as grade4, 5th as grade5
         if (name === '3rd Grade') return 'grade3';
-        if (name === '4th Grade' || name === '5th Grade') return 'grade4';
+        if (name === '4th Grade') return 'grade4';
+        if (name === '5th Grade') return 'grade5';
         return '';
       };
       const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
@@ -2422,10 +2423,12 @@ const getSleepyPetImage = (clicks: number) => {
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = incomingGradeDisplayName;
       // Lightweight migration: if selecting 4th/5th but previously stored as grade3, upgrade to grade4
-      if ((incomingGradeDisplayName === '4th Grade' || incomingGradeDisplayName === '5th Grade') && gradeCode === 'grade3') {
+      if ((incomingGradeDisplayName === '4th Grade') && gradeCode === 'grade3') {
         gradeCode = 'grade4';
       }
-
+      if (incomingGradeDisplayName === '5th Grade' && gradeCode === 'grade3' || gradeCode === 'grade4') {
+        gradeCode = 'grade5';
+      }
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -3830,7 +3833,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">5th Level</span>
+                  <span className="font-semibold">5th Grade</span>
                   {selectedGradeAndLevel?.grade === '5th' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}

@@ -679,7 +679,7 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   const isGrade = (n: string, targets: Array<string | number>) =>
     targets.some(t => (typeof t === 'number' ? n.includes(`${t}`) : n.includes(t.toLowerCase())));
 
-  // 4th/5th behave like grade 4 content
+  // Map display grade to content grade prefix used in topic IDs
   if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '5';
   if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '4';
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
@@ -817,6 +817,7 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     if (contentGrade === '2') return id.startsWith('2-');
     if (contentGrade === '3') return id.startsWith('3-');
     if (contentGrade === '4') return id.startsWith('4-');
+    if (contentGrade === '5') return id.startsWith('5-');
     return false;
   });
   
@@ -879,6 +880,23 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
         if (startIndex === -1) {
           startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
           if (startIndex === -1) startIndex = 0;
+        }
+      }
+    }
+  } else if (contentGrade === '5') {
+    // Grade 5 content - find first 5- topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('5-'));
+    if (startIndex === -1) {
+      // Fallback to grade 4 → grade 3 → grade 2 → grade 1
+      startIndex = allTopicIds.findIndex(id => id.startsWith('4-'));
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
+        if (startIndex === -1) {
+          startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
+          if (startIndex === -1) {
+            startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+            if (startIndex === -1) startIndex = 0;
+          }
         }
       }
     }
@@ -1635,7 +1653,7 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
     // Respect current level anchor when no progress exists
     if (preferredLevel === 'middle') {
       const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
-      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5', '4': '4-A.20', '5': '5-A.20' };
       const desired = middleAnchors[contentGrade];
       if (desired && allTopicIds.includes(desired)) {
         return desired;
@@ -1674,7 +1692,7 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
   if (preferredLevel === 'middle') {
     try {
       const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
-      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5', '4': '4-A.20', '5': '5-A.20' };
       const anchor = middleAnchors[contentGrade];
       const anchorIdx = anchor ? scanTopicIds.indexOf(anchor) : -1;
       if (anchorIdx >= 0) {

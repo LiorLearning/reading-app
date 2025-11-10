@@ -523,6 +523,8 @@ export async function setSpellboxAnchorForLevel(
       '1': '1-T.2.1',
       '2': '2-P.2',
       '3': '3-A.5',
+      '4': '4-A.20',
+      '5': '5-A.20',
     };
 
     // Desired anchor by level

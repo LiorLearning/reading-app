@@ -399,6 +399,143 @@ export const sampleMCQData: MCQData = {
           ,
           audio:"noodle"
         },
+        {
+          id: 9,
+          topicId: 'A-',
+          topicName: 'Spell_the_/ch/_sound_TCH_rule',
+          progressTopicName: "The 'TCH' spelling rule",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'march',
+          imageUrl: null,
+          explanation: "Outstanding! The word is 'march' — /ch/ comes after an r-controlled vowel, so we spell it with 'ch'.",
+          questionText: 'mar__',
+          correctAnswer: 'march',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'march',
+            intent: 'fill_blank',
+            questionLine: '____',
+            imagePrompt: 'People marching or the month of March'
+          },
+          aiTutor: {
+            target_word: 'march',
+            question: 'mar__',
+            student_entry: '',
+            topic_to_reinforce: "TCH rule for /ch/",
+            spelling_pattern_or_rule: "TCH Rule: Use TCH to spell /ch/ right after a short vowel (match, witch). Use CH at the beginning of a word or after a consonant, r-controlled, or long vowel (chip, rich, beach). In 'march', /ch/ comes after the r-controlled vowel 'ar', so we use CH!"
+          },
+          audio: 'march'
+        },
+        {
+          id: 10,
+          topicId: 'A-',
+          topicName: 'EAR_multiple_sounds',
+          progressTopicName: "EAR and its three sounds",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'heard',
+          imageUrl: null,
+          explanation: "Good listening — 'heard' uses EAR to make the /er/ sound (like 'her').",
+          questionText: '____',
+          correctAnswer: 'heard',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'heard',
+            intent: 'fill_blank',
+            questionLine: '____',
+            imagePrompt: 'Someone cupping their ear to show they heard a sound'
+          },
+          aiTutor: {
+            target_word: 'heard',
+            question: '____',
+            student_entry: '',
+            topic_to_reinforce: "EAR phonogram",
+            spelling_pattern_or_rule: "EAR = /er/ in 'heard'. Remember: EAR can be /ear/ (hear), /air/ (bear), or /er/ (heard) — check the word and listen closely."
+          },
+          audio: 'heard'
+        },
+
+        {
+          id: 11,
+          topicId: 'A-',
+          topicName: 'Learn phonograms si',
+          progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'collision',
+          imageUrl: null,
+          explanation: "Great! The word is 'collision' — we hear li-zhun because collide ends with /d/, so si says /zh/.",
+          questionText: 'colli__on',
+          correctAnswer: 'collision',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+          targetWord: 'collision',
+          intent: 'fill_blank',
+          questionLine: 'colli__on',
+          imagePrompt: 'Two bumper cars colliding'
+          },
+          aiTutor: {
+          target_word: 'collision',
+          question: 'colli__on',
+          student_entry: '',
+          topic_to_reinforce: "Phonogram 'si'",
+          spelling_pattern_or_rule: "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
+          },
+          audio: 'collision'
+          },
+        {
+          id: 12,
+          topicId: 'A-',
+          topicName: 'Spell_words_ending_in_ij_spelled_age',
+          progressTopicName: "Words ending in /ij/ spelled -AGE",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          template: 'fill_blank',
+          word: 'carriage',
+          imageUrl: null,
+          explanation: "Great! The word is 'carriage' — the ending -AGE says /ij/.",
+          questionText: '______',
+          correctAnswer: 'carriage',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'carriage',
+            intent: 'fill_blank',
+            questionLine: '______',
+            imagePrompt: "A horse-drawn carriage on a cobblestone street"
+          },
+          aiTutor: {
+            target_word: 'carriage',
+            question: '______',
+            student_entry: '',
+            topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+            spelling_pattern_or_rule: "The -AGE ending makes the /ij/ sound in words like carriage, village, and package. The silent E marks the soft G and indicates the final syllable /ij/."
+          },
+          audio: 'carriage'
+        },
       ],
   },
    'K-O.3': {
