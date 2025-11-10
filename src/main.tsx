@@ -2,6 +2,16 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import analytics from '@/lib/analytics'
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
 
 analytics.init()
-createRoot(document.getElementById("root")!).render(<App />);
+
+createRoot(document.getElementById("root")!).render(
+  <>
+    <App />
+    <SpeedInsights />
+    <Analytics />
+  </>
+);
