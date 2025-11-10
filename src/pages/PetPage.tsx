@@ -1357,7 +1357,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       
       // Increment sleep clicks (max 3) - no den required
       if (sleepClicks < 3) {
-        const newSleepClicks = sleepClicks + 1;
+        const newSleepClicks = 3;
         
         // If sleep is completed (3 clicks), start the 8-hour sleep timer
         if (newSleepClicks >= 3) {
