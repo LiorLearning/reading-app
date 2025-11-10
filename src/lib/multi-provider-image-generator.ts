@@ -264,6 +264,7 @@ class FluxSchnellProvider implements ImageProvider {
       headers: {
         'Content-Type': 'application/json',
         'prefer': 'wait',
+        'ignore-moderation': 'true',
       },
       body: JSON.stringify({
         input: {
