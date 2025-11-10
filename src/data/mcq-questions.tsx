@@ -141,7 +141,7 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
-          isPrefilled: false,
+          isPrefilled: true,
           prefilledIndexes: [0,2],
           aiHook: {
             targetWord: 'cat',
@@ -286,11 +286,11 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell the long a word silent e ai ay concepts"
           },
           aiTutor: {
-            target_word: 'cake',
-            question: "_ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Spell the long A word',
-            spelling_pattern_or_rule: "The silent 'e' makes the 'a' say its name in 'cake'."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"cake"
         },
@@ -320,11 +320,11 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell the long u word silent e ue oo ew concepts"
           },
           aiTutor: {
-            target_word: 'glue',
-            question: "_ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Spell the long U word',
-            spelling_pattern_or_rule: "The silent 'e' makes the 'u' say its name in 'glue'."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"glue"
         },
@@ -354,13 +354,12 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell the long a word silent e ai ay ae eigh concepts"
           },
           aiTutor: {
-            target_word: 'weight',
-            question: 'w _ _ _ h t',
-            student_entry: '',
-            topic_to_reinforce: 'Spell the long A word',
-            spelling_pattern_or_rule: "The letters ‘eigh’ make the long /eɪ/ sound in 'weight', as in 'eight' and 'neighbor'."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"weight"
         },
         {
@@ -389,14 +388,12 @@ export const sampleMCQData: MCQData = {
             imagePrompt: "Educational scene showing spell consonant le words concepts"
           },
           aiTutor: {
-            target_word: 'noodle',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Spell vowel team words with long vowel sounds',
-            spelling_pattern_or_rule: "The word 'noodle' has the vowel team ‘oo’ that makes the long /uː/ sound, as in 'moon' and 'food', followed by the final syllable ‘-le’."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"noodle"
         },
       ],
@@ -10595,9 +10592,9 @@ aiTutor: {
       templateType: 'fill_blank',
       word: 'blend',
       imageUrl: null,
-      explanation: "Well done! The word is 'jump'.",
-      questionText: 'Complete the word: ju__',
-      correctAnswer: 'jump',
+      explanation: "Well done! The word is 'hump'.",
+      questionText: 'Complete the word: hu__',
+      correctAnswer: 'hump',
       template: 'fill_blank',
       isSpacing: false,
       isSorting: false,
@@ -10607,17 +10604,17 @@ aiTutor: {
       aiHook: {
         targetWord: 'blend',
         intent: 'fill_blank',
-        questionLine: 'Complete the word: ju__',
+        questionLine: 'Complete the word: hu__',
         imagePrompt: 'Educational scene showing complete_the_word_with_the_right_final_consonant_blend concepts'
       },
       aiTutor: {
-        target_word: 'jump',
-        question: 'j u _ _',
+        target_word: 'hump',
+        question: 'h u _ _',
         student_entry: '',
         topic_to_reinforce: 'Final consonant blends',
-        spelling_pattern_or_rule: "The 'mp' blend joins the /m/ and /p/ sounds at the end of words like 'jump' and 'lamp'."
+        spelling_pattern_or_rule: "The 'mp' blend joins the /m/ and /p/ sounds at the end of words like 'hump' and 'lamp'."
       },
-      audio: 'jump'
+      audio: 'hump'
     },
     {
       id: 3,
@@ -29256,11 +29253,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'cake',
-            question: "_ _ k _",
-            student_entry: "",
-            topic_to_reinforce: 'Long A with silent e (CVCe pattern) — how the silent e changes a short vowel to a long vowel sound',
-            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘a’ becomes /eɪ/"
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"cake"
         },
@@ -29290,11 +29287,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'cat',
-            question: "_ _ t",
-            student_entry: "",
-            topic_to_reinforce: 'Short A vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
-  spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘a’ makes the short /æ/ sound as in cat, hat, and bag."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"cat"
         },
@@ -29324,11 +29321,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'bike',
-            question: '_ _ k _',
-            student_entry: '',
-            topic_to_reinforce: 'Long I with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
-            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘i’ becomes /aɪ/ as in bike, like, and hike."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"bike"
         },
@@ -29358,11 +29355,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'sit',
-            question: '_ _ t',
-            student_entry: '',
-            topic_to_reinforce: 'Short I vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
-            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘i’ makes the short /ɪ/ sound as in sit, pin, and lip."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"sit"
         },
@@ -29392,11 +29389,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'rope',
-            question: '_ _ p _',
-            student_entry: '',
-            topic_to_reinforce: 'Long O with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
-            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘o’ becomes /oʊ/ as in rope, hope, and nose."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"rope"
         },
@@ -29426,11 +29423,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'dog',
-            question: '_ _ g',
-            student_entry: '',
-            topic_to_reinforce: 'Short O vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
-            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘o’ makes the short /ɒ/ sound as in dog, log, and hop."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
           },
           audio:"dog"
         },
@@ -29460,13 +29457,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'fame',
-            question: '_ _ m _',
-            student_entry: '',
-            topic_to_reinforce: 'Long A with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
-            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘a’ becomes /eɪ/ as in fame, game, and name."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+          },
           audio:"fame"
         },
         {
@@ -29495,13 +29491,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'bed',
-            question: '_ _ d',
-            student_entry: '',
-            topic_to_reinforce: 'Short E vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
-            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘e’ makes the short /ɛ/ sound as in bed, red, and net."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+          },
           audio:"bed"
         },
         {
@@ -29530,13 +29525,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'note',
-            question: '_ _ t _',
-            student_entry: '',
-            topic_to_reinforce: 'Long O with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
-            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘o’ becomes /oʊ/ as in note, rope, and home."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+          },
           audio:"note"
         },
         {
@@ -29565,18 +29559,16 @@ aiTutor: {
             imagePrompt: "Educational scene showing sort short and long vowel words concepts"
           },
           aiTutor: {
-            target_word: 'cup',
-            question: '_ _ p',
-            student_entry: '',
-            topic_to_reinforce: 'Short U vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
-            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘u’ makes the short /ʌ/ sound as in cup, sun, and bus."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: "Silent-e rule: a final 'e' is usually silent but makes the vowel before it say its long name (a_e, i_e, o_e, u_e). If adding/removing the final 'e' changes the vowel from short to long, it's a silent-e pattern."
+          },
           audio:"cup"
         },
         {
-          id: 11,
+          id: 12,
           topicId: '2-J.1',
           topicName: 'Sort_short_and_long_vowel_words',
           progressTopicName: 'Sneaky Silent E: Short and Long Vowels',
@@ -29602,17 +29594,16 @@ aiTutor: {
           },
           aiTutor: {
             target_word: 'kite',
-            question: '_ _ t _',
-            student_entry: '',
-            topic_to_reinforce: 'Long I with silent e (CVCe pattern) — how the silent e changes a short vowel into a long vowel sound',
-            spelling_pattern_or_rule: "In CVCe words, the final ‘e’ is silent and makes the vowel say its name. Here, ‘i’ becomes /aɪ/ as in kite, ride, and time."
-          }
-          
-          ,
+            question: "Listen carefully to the word 'kite'. Does the vowel say its name or make a short sound?",
+            student_entry: "",
+            topic_to_reinforce: 'Sort short and long vowel sounds',
+            spelling_pattern_or_rule:
+              "When you add a silent e to the end of a word, it makes the vowel say its name. 'Kit' becomes 'kite' — short i turns into long i."
+          },
           audio: "kite"
         },
         {
-          id: 12,
+          id: 11,
           topicId: '2-J.1',
           topicName: 'Sort_short_and_long_vowel_words',
           progressTopicName: 'Sneaky Silent E: Short and Long Vowels',
@@ -29638,10 +29629,11 @@ aiTutor: {
           },
           aiTutor: {
             target_word: 'kit',
-            question: '_ _ t',
-            student_entry: '',
-            topic_to_reinforce: 'Short I vowel sound (CVC pattern) — how short vowels stay the same without a silent e',
-            spelling_pattern_or_rule: "In CVC words, the vowel is short because there’s no silent e at the end. Here, ‘i’ makes the short /ɪ/ sound as in kit, sit, and pin."
+            question: "Listen carefully to the word 'kit'. Does the vowel say its name or make a short sound?",
+            student_entry: "",
+            topic_to_reinforce: 'Sort short and long vowel sounds',
+            spelling_pattern_or_rule:
+              "The vowel i is short in 'kit' because there’s no silent e at the end. Short vowels say their quick sounds — /ĭ/ in 'kit'."
           },
           audio: "kit"
         }
@@ -35283,12 +35275,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'basket',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
-            spelling_pattern_or_rule: "The word 'basket' has two closed syllables: 'bas' and 'ket'. In closed syllables, the vowel is followed by a consonant, making the vowel short — /bæs/ + /kɪt/ → basket."
-          },          
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"basket"
         },
         {
@@ -35317,13 +35309,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'minus',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on whether a syllable is open or closed',
-            spelling_pattern_or_rule: "The word 'minus' has two syllables: 'mi' and 'nus'. The first syllable 'mi' is open, so the vowel says its name (/aɪ/). The second syllable 'nus' is closed, so the vowel is short (/ʌ/)."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"minus"
         },
         {
@@ -35352,14 +35343,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'shiny',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on whether a syllable is open or closed',
-            spelling_pattern_or_rule: "The word 'shiny' has two syllables: 'shi' and 'ny'. The first syllable 'shi' is open, so the vowel says its name (/aɪ/). The second syllable 'ny' is also open, ending with a vowel sound (/i/)."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"shiny"
         },
         {
@@ -35388,14 +35377,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'rocket',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
-            spelling_pattern_or_rule: "The word 'rocket' has two closed syllables: 'roc' and 'ket'. In both syllables, the vowels are followed by consonants, making the vowel sounds short — /rɒk/ + /ɪt/ → rocket."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"rocket"
         },
         {
@@ -35424,13 +35411,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'open',
-            question: '_ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open syllables — how vowels make long sounds when the syllable ends in a vowel',
-            spelling_pattern_or_rule: "The word 'open' has two syllables: 'o' and 'pen'. The first syllable 'o' is open, so the vowel says its name (/oʊ/). The second syllable 'pen' is closed, so the vowel is short (/ɛ/)."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"open"
         },
         {
@@ -35459,14 +35445,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'music',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'music' has two syllables: 'mu' and 'sic'. The first syllable 'mu' is open, so the vowel says its name (/uː/). The second syllable 'sic' is closed, so the vowel is short (/ɪ/)."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"music"
         },
         {
@@ -35495,12 +35479,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'hotel',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'hotel' has two syllables: 'ho' and 'tel'. The first syllable 'ho' is open, so the vowel says its name (/oʊ/). The second syllable 'tel' is closed, so the vowel is short (/ɛ/)."
-          }          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"hotel"
         },
         {
@@ -35529,11 +35513,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'tablet',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
-            spelling_pattern_or_rule: "The word 'tablet' has two closed syllables: 'tab' and 'let'. In both syllables, the vowels are followed by consonants, making the vowel sounds short — /tæb/ + /lɛt/ → tablet."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"tablet"
         },
@@ -35563,14 +35547,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'pilot',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'pilot' has two syllables: 'pi' and 'lot'. The first syllable 'pi' is open, so the vowel says its name (/aɪ/). The second syllable 'lot' is closed, so the vowel is short (/ʌ/)."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"pilot"
         },
         {
@@ -35599,14 +35581,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'cabin',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — each syllable ends with a consonant and has a short vowel sound',
-            spelling_pattern_or_rule: "The word 'cabin' has two closed syllables: 'cab' and 'in'. In both syllables, the vowels are followed by consonants, making the vowel sounds short — /kæb/ + /ɪn/ → cabin."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"cabin"
         }
       ]
@@ -36341,12 +36321,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'laptop',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'laptop' has two closed syllables: 'lap' and 'top'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /ɒ/). When combined, they form a two-syllable word: lap + top → laptop."
-          }          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"laptop"
         },
         {
@@ -36375,13 +36355,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'sunset',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'sunset' has two closed syllables: 'sun' and 'set'. In each syllable, the vowel is followed by a consonant, making the vowel sound short (/ʌ/ and /ɛ/). When combined, they form a two-syllable word: sun + set → sunset."
-          }         
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"sunset"
         },
         {
@@ -36410,13 +36389,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'bathtub',
-            question: '_ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'bathtub' has two closed syllables: 'bath' and 'tub'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /ʌ/). When combined, they form a two-syllable word: bath + tub → bathtub."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"bathtub"
         },
         {
@@ -36445,13 +36423,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'backpack',
-            question: '_ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'backpack' has two closed syllables: 'back' and 'pack'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /pæk/). When combined, they form a two-syllable word: back + pack → backpack."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"backpack"
         },
         {
@@ -36480,13 +36457,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'basket',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'basket' has two closed syllables: 'bas' and 'ket'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /kɛt/). When combined, they form a two-syllable word: bas + ket → basket."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"basket"
         },
         {
@@ -36515,13 +36491,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'bedroom',
-            question: '_ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'bedroom' has two closed syllables: 'bed' and 'room'. Each syllable ends with a consonant, giving both vowels short sounds (/æ/ and /ʊm/). When combined, they form a two-syllable word: bed + room → bedroom."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"bedroom"
         },
         {
@@ -36550,13 +36525,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'sunflower',
-            question: '_ _ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'sunflower' has two closed syllables: 'sun' and 'flower'. Each syllable ends with a consonant, giving both vowels short sounds (/sʌn/ and /flaʊər/). When combined, they form a two-syllable word: sun + flower → sunflower."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"sunflower"
         },
         {
@@ -36585,13 +36559,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'football',
-            question: '_ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'football' has two closed syllables: 'foot' and 'ball'. Each syllable ends with a consonant, giving both vowels short sounds (/fʊt/ and /bæl/). When combined, they form a two-syllable word: foot + ball → football."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"football"
         },
         {
@@ -36620,13 +36593,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'notebook',
-            question: '_ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'notebook' has two closed syllables: 'note' and 'book'. Each syllable ends with a consonant, giving both vowels short sounds (/nəʊt/ and /bʊk/). When combined, they form a two-syllable word: note + book → notebook."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"notebook"
         },
         {
@@ -36655,7 +36627,7 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word easier concepts"
           },
           aiTutor: {
-            target_word: 'bookmark',
+            target_word: 'blend',
             question: "Listen to the word. Then, fill in the missing digraph: _eel",
             student_entry: "My name is John.",
             topic_to_reinforce: 'Fill in the missing sounds',
@@ -36701,13 +36673,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'sunrise',
-            question: '_ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'sunrise' has two closed syllables: 'sun' and 'rise'. Each syllable ends with a consonant, giving both vowels short sounds (/sʌn/ and /raɪz/). When combined, they form a two-syllable word: sun + rise → sunrise."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"sunrise"
         },
         {
@@ -36736,13 +36707,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'mailbox',
-            question: '_ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'mailbox' has two closed syllables: 'mail' and 'box'. Each syllable ends with a consonant, giving both vowels short sounds (/mɑɪl/ and /bɒks/). When combined, they form a two-syllable word: mail + box → mailbox."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"mailbox"
         },
         {
@@ -36771,13 +36741,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'puppet',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'puppet' has two closed syllables: 'pup' and 'pet'. Each syllable ends with a consonant, giving both vowels short sounds (/pʌp/ and /pɛt/). When combined, they form a two-syllable word: pup + pet → puppet."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"puppet"
         },
         {
@@ -36806,13 +36775,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'backpack',
-            question: '_ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'backpack' has two closed syllables: 'back' and 'pack'. Each syllable ends with a consonant, giving both vowels short sounds (/bæk/ and /pæk/). When combined, they form a two-syllable word: back + pack → backpack."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"backpack"
         },
         {
@@ -36841,13 +36809,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'baseball',
-            question: '_ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'baseball' has two closed syllables: 'base' and 'ball'. Each syllable ends with a consonant, giving both vowels short sounds (/beɪs/ and /bæl/). When combined, they form a two-syllable word: base + ball → baseball."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"baseball"
         },
         {
@@ -36876,13 +36843,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'footprint',
-            question: '_ _ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'footprint' has two closed syllables: 'foot' and 'print'. Each syllable ends with a consonant, giving both vowels short sounds (/fʊt/ and /prɪnt/). When combined, they form a two-syllable word: foot + print → footprint."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"footprint"
         },
         {
@@ -36911,11 +36877,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'notebook',
-            question: '_ _ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'notebook' has two closed syllables: 'note' and 'book'. Each syllable ends with a consonant, giving both vowels short sounds (/nəʊt/ and /bʊk/). When combined, they form a two-syllable word: note + book → notebook."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"notebook"
         },
@@ -36945,13 +36911,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'raincoat',
-            question: "_ _ _ _ _ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'raincoat' has two closed syllables: 'rain' and 'coat'. Each syllable ends with a consonant, giving both vowels short sounds (/reɪn/ and /kəʊt/). When combined, they form a two-syllable word: rain + coat → raincoat."
-          }          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"raincoat"
         },
         {
@@ -36980,11 +36945,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'sandbox',
-            question: "_ _ _ _ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'sandbox' has two closed syllables: 'sand' and 'box'. Each syllable ends with a consonant, giving both vowels short sounds (/sænd/ and /bɒks/). When combined, they form a two-syllable word: sand + box → sandbox."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"sandbox"
         },
@@ -37014,11 +36979,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing put two syllables together to create a word harder concepts"
           },
           aiTutor: {
-            target_word: 'starfish',
-            question: "_ _ _ _ _ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Combining two syllables to form compound or multisyllabic words',
-            spelling_pattern_or_rule: "The word 'starfish' has two closed syllables: 'star' and 'fish'. Each syllable ends with a consonant, giving both vowels short sounds (/stɑːr/ and /fɪʃ/). When combined, they form a two-syllable word: star + fish → starfish."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"starfish"
         }
@@ -37060,13 +37025,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'cabin',
-            question: 'c a b _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when a syllable ends with a consonant, the vowel before it is usually short. Both syllables in 'cabin' follow this closed-syllable pattern."
-          }
-,          
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"cabin"
         },
         {
@@ -37095,12 +37059,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'traffic',
-            question: 't r a f _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In multisyllabic words, when each syllable ends with a consonant, the vowels usually make short sounds. Both syllables in 'traffic' follow the closed-syllable pattern."
-          },          
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"traffic"
         },
         {
@@ -37129,12 +37093,12 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'helmet',
-            question: 'h e l _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'helmet' follow this closed-syllable pattern."
-          },          
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"helmet"
         },
         {
@@ -37163,11 +37127,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'drumstick',
-            question: 'd r u m _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when a syllable ends with a consonant, the vowel before it is usually short. Both syllables in 'drumstick' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"drumstick"
         },
@@ -37197,11 +37161,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'planet',
-            question: "p l a n _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'planet' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"planet"
         },
@@ -37231,11 +37195,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'hundred',
-            question: "h u n _ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'hundred' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"hundred"
         },
@@ -37265,11 +37229,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'insect',
-            question: "i n _ _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'insect' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"insect"
         },
@@ -37299,11 +37263,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'rocket',
-            question: "r o c _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'rocket' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"rocket"
         },
@@ -37333,11 +37297,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'basket',
-            question: "b a s _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'basket' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"basket"
         },
@@ -37367,11 +37331,11 @@ aiTutor: {
             imagePrompt: "Educational scene showing complete the two syllable words concepts"
           },
           aiTutor: {
-            target_word: 'picnic',
-            question: "p i c _ _ _",
-            student_entry: '',
-            topic_to_reinforce: 'Closed syllables — how each syllable ends with a consonant, giving the vowel a short sound',
-            spelling_pattern_or_rule: "In two-syllable words, when each syllable ends with a consonant, the vowel before it is short. Both syllables in 'picnic' follow this closed-syllable pattern."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"picnic"
         }
@@ -58508,12 +58472,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'pilot',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'pilot' has two syllables: 'pi' and 'lot'. The first syllable 'pi' is open, so the vowel says its name (/aɪ/). The second syllable 'lot' is closed, so the vowel is short (/ɒ/)."
-          },          
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"pilot"
         },
         {
@@ -58542,11 +58506,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'music',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'music' has two syllables: 'mu' and 'sic'. The first syllable 'mu' is open, so the vowel says its name (/mju/). The second syllable 'sic' is closed, so the vowel is short (/ɪ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"music"
         },
@@ -58576,11 +58540,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'robot',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'robot' has two syllables: 'ro' and 'bot'. The first syllable 'ro' is open, so the vowel says its name (/rəʊ/). The second syllable 'bot' is closed, so the vowel is short (/ɒ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"robot"
         },
@@ -58610,11 +58574,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'silent',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'silent' has two syllables: 'si' and 'lent'. The first syllable 'si' is open, so the vowel says its name (/sɪ/). The second syllable 'lent' is closed, so the vowel is short (/ɪ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"silent"
         },
@@ -58644,11 +58608,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'lemon',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'lemon' has two syllables: 'le' and 'mon'. The first syllable 'le' is open, so the vowel says its name (/lɪ/). The second syllable 'mon' is closed, so the vowel is short (/ɒ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"lemon"
         },
@@ -58678,11 +58642,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'tiger',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'tiger' has two syllables: 'ti' and 'ger'. The first syllable 'ti' is open, so the vowel says its name (/tɪ/). The second syllable 'ger' is closed, so the vowel is short (/ɒ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"tiger"
         },
@@ -58712,11 +58676,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'camel',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'camel' has two syllables: 'ca' and 'mel'. The first syllable 'ca' is open, so the vowel says its name (/kæ/). The second syllable 'mel' is closed, so the vowel is short (/ɒ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"camel"
         },
@@ -58746,11 +58710,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'focus',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'focus' has two syllables: 'fo' and 'cus'. The first syllable 'fo' is open, so the vowel says its name (/foʊ/). The second syllable 'cus' is closed, so the vowel is short (/ɪ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"focus"
         },
@@ -58780,11 +58744,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'melon',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'melon' has two syllables: 'me' and 'lon'. The first syllable 'me' is open, so the vowel says its name (/mɪ/). The second syllable 'lon' is closed, so the vowel is short (/ɒ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"melon"
         },
@@ -58814,11 +58778,11 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell words with open and closed syllables concepts"
           },
           aiTutor: {
-            target_word: 'cabin',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Open and closed syllables — how vowel sounds change based on syllable type',
-            spelling_pattern_or_rule: "The word 'cabin' has two syllables: 'ca' and 'bin'. The first syllable 'ca' is open, so the vowel says its name (/kæ/). The second syllable 'bin' is closed, so the vowel is short (/ɪ/)."
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
           },
           audio:"cabin"
         }
@@ -60246,12 +60210,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'said',
-            question: 's _ _ d',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'said' is a sight word because it doesn’t follow normal vowel sound rules. The letters ‘ai’ make the short /ɛ/ sound instead of a long vowel sound."
-          },          
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"said"
         },
         {
@@ -60280,13 +60244,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'because',
-            question: 'b e c _ _ s e',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'because' is a sight word because it doesn’t follow typical sound–letter patterns. The vowel sounds and spelling don’t match regular phonics rules, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"because"
         },
         {
@@ -60315,13 +60278,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'could',
-            question: 'c _ _ l d',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'could' is a sight word because it doesn’t follow normal vowel sound rules. The letters ‘ou’ make the short /ʊ/ sound, as in 'book' and 'should', instead of a long vowel sound."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"could"
         },
         {
@@ -60350,13 +60312,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'people',
-            question: 'p e o _ _ e',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'people' is a sight word because the letters ‘eo’ make the long /iː/ sound, which is irregular. Since it doesn’t follow normal phonics rules, it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"people"
         },
         {
@@ -60385,13 +60346,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'their',
-            question: 't h _ _ r',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'their' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ei’ make the long /eɪ/ sound instead of the expected /ɪ/ or /ɛ/, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"their"
         },
         {
@@ -60420,13 +60380,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'friend',
-            question: 'f r i _ _ d',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'friend' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ie’ make the short /ɛ/ sound, as in 'red', instead of the usual /aɪ/ sound, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"friend"
         },
         {
@@ -60455,13 +60414,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'other',
-            question: 'o t h _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'other' is a sight word because it doesn’t follow typical sound–letter patterns. The letter ‘o’ makes the short /ʌ/ sound (like in 'mother' and 'brother') instead of the usual long /oʊ/ sound."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"other"
         },
         {
@@ -60490,13 +60448,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'which',
-            question: 'w h _ _ h',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'which' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘wh’ make the /w/ sound, and the word’s spelling doesn’t match its pronunciation exactly, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"which"
         },
         {
@@ -60525,13 +60482,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'know',
-            question: 'k n _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'know' is a sight word because it doesn’t follow typical sound–letter patterns. The letter ‘k’ is silent, and the letters ‘ow’ make the long /oʊ/ sound, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"know"
         },
         {
@@ -60560,13 +60516,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word easier concepts"
           },
           aiTutor: {
-            target_word: 'through',
-            question: 't h r o _ _ h',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'through' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ough’ make the long /uː/ sound, which is unusual and doesn’t follow normal phonics rules."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"through"
         }
       ]
@@ -60607,13 +60562,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'through',
-            question: '_ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'through' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ough’ make the long /uː/ sound, which is unusual and doesn’t follow normal phonics rules."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"through"
         },
         {
@@ -60642,14 +60596,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'their',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'their' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ei’ make the long /ɛər/ sound, as in 'hair' and 'pair', instead of the usual /iː/ or /aɪ/, so it’s best learned by sight."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"their"
         },
         {
@@ -60678,13 +60630,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'because',
-            question: '_ _ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'because' is a sight word because it doesn’t follow typical sound–letter patterns. The vowel sounds don’t match regular phonics rules — 'e' sounds like /ɪ/ and 'au' sounds like /ɔː/ — so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"because"
         },
         {
@@ -60713,13 +60664,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'friend',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'friend' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ie’ make the short /ɛ/ sound, as in 'red', instead of the usual /aɪ/ sound, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"friend"
         },
         {
@@ -60748,13 +60698,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'people',
-            question: '_ _ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'people' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘eo’ make the long /iː/ sound, as in 'peel' and 'deep', which is irregular, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"people"
         },
         {
@@ -60783,13 +60732,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'where',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'where' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ere’ make the /ɛər/ sound, as in 'there' and 'wear', instead of the usual long /iː/ sound, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"where"
         },
         {
@@ -60818,13 +60766,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'again',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'again' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ai’ make the short /ɪ/ sound, as in 'pin' and 'begin', instead of the usual /eɪ/ sound, so it’s best learned by sight."
-          }
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"again"
         },
         {
@@ -60853,14 +60800,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'know',
-            question: '_ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'know' is a sight word because it doesn’t follow typical sound–letter patterns. The letter ‘k’ is silent, and the letters ‘ow’ make the long /oʊ/ sound, which is unusual and doesn’t follow normal phonics rules."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"know"
         },
         {
@@ -60889,14 +60834,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'could',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'could' is a sight word because it doesn’t follow typical sound–letter patterns. The letters ‘ou’ make the short /ʊ/ sound, as in 'book' and 'should', instead of a long vowel sound."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"could"
         },
         {
@@ -60925,14 +60868,12 @@ audio: 'sleigh'
             imagePrompt: "Educational scene showing spell the sight word harder concepts"
           },
           aiTutor: {
-            target_word: 'every',
-            question: '_ _ _ _ _',
-            student_entry: '',
-            topic_to_reinforce: 'Sight word recognition — learning common words that don’t follow regular spelling rules',
-            spelling_pattern_or_rule: "The word 'every' is a sight word because it doesn’t follow typical sound–letter patterns. The vowels are reduced — the first ‘e’ makes the short /ɛ/ sound, and the second syllable sounds like /ri/ — so it’s best learned by sight."
-          }
-          
-          ,
+            target_word: 'blend',
+            question: "Listen to the word. Then, fill in the missing digraph: _eel",
+            student_entry: "My name is John.",
+            topic_to_reinforce: 'Fill in the missing sounds',
+            spelling_pattern_or_rule: ''
+          },
           audio:"every"
         }
       ]
@@ -74732,7 +74673,13568 @@ audio: 'sleigh'
         "audio": "month"
       }
     ]
-  }
+  },
+  '5-A.1': {
+    topicInfo: {
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+    },
+    questions: [
+    {
+    id: 1,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'propulsion',
+    imageUrl: null,
+    explanation: "Great! The word is 'propulsion' — we hear pul-shun because si turns into /sh/ right before -ion.",
+    questionText: 'propul__on',
+    correctAnswer: 'propulsion',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,1,2,3,4,5,6,9],
+    aiHook: {
+    targetWord: 'propulsion',
+    intent: 'fill_blank',
+    questionLine: 'propul__on',
+    imagePrompt: 'A rocket showing strong propulsion'
+    },
+    aiTutor: {
+    target_word: 'propulsion',
+    question: 'propul__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'propulsion', si comes after a consonant and before -ion, so it says /sh/. Rule: consonant + sion → /shun/ (propulsion, compulsion, convulsion). Tip: If you hear “...shun” after a consonant, choose -sion."
+    },
+    audio: 'propulsion'
+    },
+    {
+    id: 2,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'torsion',
+    imageUrl: null,
+    explanation: "Great! The word is 'torsion' — we hear tor-shun because si makes /sh/ before -ion.",
+    questionText: 'tor__on',
+    correctAnswer: 'torsion',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,1],
+    aiHook: {
+    targetWord: 'torsion',
+    intent: 'fill_blank',
+    questionLine: 'tor__on',
+    imagePrompt: 'A twisted rope showing torsion'
+    },
+    aiTutor: {
+    target_word: 'torsion',
+    question: 'tor__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'torsion', si sits after a consonant and just before -ion, so it says /sh/. Rule: consonant + sion → /shun/. Tip: Listen for the “shun” ending."
+    },
+    audio: 'torsion'
+    },
+    {
+    id: 3,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'pension',
+    imageUrl: null,
+    explanation: "Great! The word is 'pension' — we hear pen-shun because n + sion makes /shun/.",
+    questionText: 'pen__on',
+    correctAnswer: 'pension',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,1,2,6,7],
+    aiHook: {
+    targetWord: 'pension',
+    intent: 'fill_blank',
+    questionLine: 'pen__on',
+    imagePrompt: 'A retiree thinking about a pension'
+    },
+    aiTutor: {
+    target_word: 'pension',
+    question: 'pen__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'pension', n + sion spells /shun/. Rule: n + sion → /shun/ (pension, tension, extension, mansion). Tip: Spot the n right before the “shun” sound."
+    },
+    audio: 'pension'
+    },
+    {
+    id: 4,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'mansion',
+    imageUrl: null,
+    explanation: "Great! The word is 'mansion' — we hear man-shun because n + sion makes /shun/.",
+    questionText: 'man__on',
+    correctAnswer: 'mansion',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [7],
+    aiHook: {
+    targetWord: 'mansion',
+    intent: 'fill_blank',
+    questionLine: 'man__on',
+    imagePrompt: 'A large mansion on a hill'
+    },
+    aiTutor: {
+    target_word: 'mansion',
+    question: 'man__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'mansion', n + sion spells /shun/. Rule: n + sion → /shun/ (mansion, expansion). Tip: If you hear n before “shun,” write -sion."
+    },
+    audio: 'mansion'
+    },
+    {
+    id: 5,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'excursion',
+    imageUrl: null,
+    explanation: "Great! The word is 'excursion' — we hear cur-zhun because si is between vowel sounds and says /zh/.",
+    questionText: 'excur__on',
+    correctAnswer: 'excursion',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,2,3,4],
+    aiHook: {
+    targetWord: 'excursion',
+    intent: 'fill_blank',
+    questionLine: 'excur__on',
+    imagePrompt: 'A family on a city excursion'
+    },
+    aiTutor: {
+    target_word: 'excursion',
+    question: 'excur__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'excursion', si is hugged by vowel sounds, so it says /zh/. Rule: vowel-sound + si + vowel-sound → /zh/ (excursion, erosion, division). Tip: If it sounds like “zhŭn,” think -sion with /zh/."
+    },
+    audio: 'excursion'
+    },
+    {
+    id: 6,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'television',
+    imageUrl: null,
+    explanation: "Great! The word is 'television' — we hear vi-zhun because si sits between vowels and says /zh/.",
+    questionText: 'televi__on',
+    correctAnswer: 'television',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [5,8,9],
+    aiHook: {
+    targetWord: 'television',
+    intent: 'fill_blank',
+    questionLine: 'televi__on',
+    imagePrompt: 'A television set'
+    },
+    aiTutor: {
+    target_word: 'television',
+    question: 'televi__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'television', vowels hug si, so it says /zh/. Rule: vowel + si + vowel → /zh/ (television, cohesion, division). Tip: Vowels around si make the buzzy /zh/ sound."
+    },
+    audio: 'television'
+    },
+    {
+    id: 7,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'division',
+    imageUrl: null,
+    explanation: "Great! The word is 'division' — we hear vi-zhun because the base divide ends with a buzzy sound, so si becomes /zh/.",
+    questionText: 'divi__on',
+    correctAnswer: 'division',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [2,3],
+    aiHook: {
+    targetWord: 'division',
+    intent: 'fill_blank',
+    questionLine: 'divi__on',
+    imagePrompt: 'A math division equation on a board'
+    },
+    aiTutor: {
+    target_word: 'division',
+    question: 'divi__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'division', the base divide ends voiced (…/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (divide→division, collide→collision, erode→erosion). Tip: A buzzy last sound in the base points to /zh/."
+    },
+    audio: 'division'
+    },
+    {
+    id: 8,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'explosion',
+    imageUrl: null,
+    explanation: "Great! The word is 'explosion' — we hear plo-zhun because the base explode ends with /d/, so si says /zh/.",
+    questionText: 'explo__on',
+    correctAnswer: 'explosion',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,1,2,3,4,5],
+    aiHook: {
+    targetWord: 'explosion',
+    intent: 'fill_blank',
+    questionLine: 'explo__on',
+    imagePrompt: "A comic-style 'BOOM!' explosion"
+    },
+    aiTutor: {
+    target_word: 'explosion',
+    question: 'explo__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'explosion', the base explode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (explode→explosion, erode→erosion, confuse→confusion). Tip: Hear the buzz in the base, choose /zh/."
+    },
+    audio: 'explosion'
+    },
+    {
+    id: 9,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'erosion',
+    imageUrl: null,
+    explanation: "Great! The word is 'erosion' — we hear ro-zhun because erode ends with /d/, so si says /zh/.",
+    questionText: 'ero__on',
+    correctAnswer: 'erosion',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [2],
+    aiHook: {
+    targetWord: 'erosion',
+    intent: 'fill_blank',
+    questionLine: 'ero__on',
+    imagePrompt: 'Riverbank soil erosion'
+    },
+    aiTutor: {
+    target_word: 'erosion',
+    question: 'ero__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'erosion', the base erode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (erode→erosion, collide→collision). Tip: Voiced base endings make the buzzy /zh/."
+    },
+    audio: 'erosion'
+    },
+    {
+    id: 10,
+    topicId: '5-A.1',
+    topicName: 'Learn phonograms si',
+    progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    word: 'collision',
+    imageUrl: null,
+    explanation: "Great! The word is 'collision' — we hear li-zhun because collide ends with /d/, so si says /zh/.",
+    questionText: 'colli__on',
+    correctAnswer: 'collision',
+    template: 'fill_blank',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,3],
+    aiHook: {
+    targetWord: 'collision',
+    intent: 'fill_blank',
+    questionLine: 'colli__on',
+    imagePrompt: 'Two bumper cars colliding'
+    },
+    aiTutor: {
+    target_word: 'collision',
+    question: 'colli__on',
+    student_entry: '',
+    topic_to_reinforce: "Phonogram 'si'",
+    spelling_pattern_or_rule: "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
+    },
+    audio: 'collision'
+    }
+    ]
+    },
+  '5-A.2': {
+    topicInfo: {
+      topicId: '5-A.2',
+      topicName: 'Spell_the_/kt/_sound_spelled_CT',
+      progressTopicName: '/kt/ spelled CT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank'
+    },
+    questions: [
+      {
+        id: 1,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'insect',
+        imageUrl: null,
+        explanation: "Nice! The word is 'insect', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'inse__',
+        correctAnswer: 'insect',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 2, 3],
+        aiHook: {
+          targetWord: 'insect',
+          intent: 'fill_blank',
+          questionLine: 'inse__',
+          imagePrompt: 'A close-up of a small insect on a leaf'
+        },
+        aiTutor: {
+          target_word: 'insect',
+          question: 'inse__',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'insect'
+      },
+      {
+        id: 2,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'abstract',
+        imageUrl: null,
+        explanation: "Nice! The word is 'abstract', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'abstra__',
+        correctAnswer: 'abstract',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 2, 3, 4, 5],
+        aiHook: {
+          targetWord: 'abstract',
+          intent: 'fill_blank',
+          questionLine: 'abstra__',
+          imagePrompt: 'Abstract shapes and patterns artwork'
+        },
+        aiTutor: {
+          target_word: 'abstract',
+          question: 'abstra__',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'abstract'
+      },
+      {
+        id: 3,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'vector',
+        imageUrl: null,
+        explanation: "Nice! The word is 'vector', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 've__or',
+        correctAnswer: 'vector',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 4, 5],
+        aiHook: {
+          targetWord: 'vector',
+          intent: 'fill_blank',
+          questionLine: 've__or',
+          imagePrompt: 'An arrow on a coordinate grid representing a vector'
+        },
+        aiTutor: {
+          target_word: 'vector',
+          question: 've__or',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'vector'
+      },
+      {
+        id: 4,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'octopus',
+        imageUrl: null,
+        explanation: "Nice! The word is 'octopus', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'o___pus',
+        correctAnswer: 'octopus',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 4, 5, 6],
+        aiHook: {
+          targetWord: 'octopus',
+          intent: 'fill_blank',
+          questionLine: 'o___pus',
+          imagePrompt: 'A purple octopus swimming underwater'
+        },
+        aiTutor: {
+          target_word: 'octopus',
+          question: 'o___pus',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'octopus'
+      },
+      {
+        id: 5,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'distinct',
+        imageUrl: null,
+        explanation: "Nice! The word is 'distinct', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'disti___',
+        correctAnswer: 'distinct',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 2, 3, 4],
+        aiHook: {
+          targetWord: 'distinct',
+          intent: 'fill_blank',
+          questionLine: 'disti___',
+          imagePrompt: 'Two clearly different butterflies side by side'
+        },
+        aiTutor: {
+          target_word: 'distinct',
+          question: 'disti___',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'distinct'
+      },
+      {
+        id: 6,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'extinct',
+        imageUrl: null,
+        explanation: "Nice! The word is 'extinct', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'ext_n__',
+        correctAnswer: 'extinct',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 2, 4],
+        aiHook: {
+          targetWord: 'extinct',
+          intent: 'fill_blank',
+          questionLine: 'ext_n__',
+          imagePrompt: 'A dinosaur fossil skeleton in a museum'
+        },
+        aiTutor: {
+          target_word: 'extinct',
+          question: 'ext_n__',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'extinct'
+      },
+      {
+        id: 7,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'spectator',
+        imageUrl: null,
+        explanation: "Nice! The word is 'spectator', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'spe___tor',
+        correctAnswer: 'spectator',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 2, 6, 7, 8],
+        aiHook: {
+          targetWord: 'spectator',
+          intent: 'fill_blank',
+          questionLine: 'spe___tor',
+          imagePrompt: 'A crowd of spectators watching a sports game'
+        },
+        aiTutor: {
+          target_word: 'spectator',
+          question: 'spe___tor',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'spectator'
+      },
+      {
+        id: 8,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'construct',
+        imageUrl: null,
+        explanation: "Nice! The word is 'construct', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'c_ns_r___',
+        correctAnswer: 'construct',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 2, 3, 5],
+        aiHook: {
+          targetWord: 'construct',
+          intent: 'fill_blank',
+          questionLine: 'c_ns_r___',
+          imagePrompt: 'Workers constructing a building'
+        },
+        aiTutor: {
+          target_word: 'construct',
+          question: 'c_ns_r___',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'construct'
+      },
+      {
+        id: 9,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'deflect',
+        imageUrl: null,
+        explanation: "Nice! The word is 'deflect', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'de_l___',
+        correctAnswer: 'deflect',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 1, 3],
+        aiHook: {
+          targetWord: 'deflect',
+          intent: 'fill_blank',
+          questionLine: 'de_l___',
+          imagePrompt: 'A shield deflecting an arrow'
+        },
+        aiTutor: {
+          target_word: 'deflect',
+          question: 'de_l___',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'deflect'
+      },
+      {
+        id: 10,
+        topicId: '5-A.2',
+        topicName: 'Spell_the_/kt/_sound_spelled_CT',
+        progressTopicName: '/kt/ spelled CT',
+        questionElements: 'image + audio + text',
+        answerElements: 'text',
+        templateType: 'fill_blank',
+        word: 'conflict',
+        imageUrl: null,
+        explanation: "Nice! The word is 'conflict', the /k/ /t/ sound is spelled as CT. Hear /k/ then /t/? That team together is written as CT if it's either in the middle or the end of a word.",
+        questionText: 'c_n_l___',
+        correctAnswer: 'conflict',
+        template: 'fill_blank',
+        isSpacing: false,
+        isSorting: false,
+        isSpelling: true,
+        isPrefilled: true,
+        prefilledIndexes: [0, 2, 4],
+        aiHook: {
+          targetWord: 'conflict',
+          intent: 'fill_blank',
+          questionLine: 'c_n_l___',
+          imagePrompt: 'Two teams in a tug-of-war showing conflict'
+        },
+        aiTutor: {
+          target_word: 'conflict',
+          question: 'c_n_l___',
+          student_entry: '',
+          topic_to_reinforce: '/kt/ spelled CT',
+          spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+        },
+        audio: 'conflict'
+      }
+    ]
+  },
+ 
+'5-A.3': {
+topicInfo: {
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank'
+},
+questions: [
+{
+id: 1,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'negotiation',
+imageUrl: null,
+explanation: "Nice! The word is 'negotiation' — the ending /shun/ is spelled -ation (ne-go-she-AY-shun).",
+questionText: 'nego__a__on',
+correctAnswer: 'negotiation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3], // 'nego' shown; both sound chunks (ti, at) are blanked
+aiHook: {
+targetWord: 'negotiation',
+intent: 'fill_blank',
+questionLine: 'nego__a__on',
+imagePrompt: 'Two people at a table shaking hands after a negotiation'
+},
+aiTutor: {
+target_word: 'negotiation',
+question: 'nego__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'negotiation', the /ā-shun/ sound is spelled -ation. Rule: When you hear /a–shun/, use -ation (nation, location, celebration, negotiation). Tip: If the part before the ending sounds like a long A (ay), pick -ation."
+},
+audio: 'negotiation'
+},
+{
+id: 2,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'conservation',
+imageUrl: null,
+explanation: "Nice! The word is 'conservation' — the ending /shun/ is spelled -ation (con-ser-VA-AY-shun).",
+questionText: 'conserv__a__on',
+correctAnswer: 'conservation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4,5,6,7], // 'conserva' shown, hide 'ti' and keep pattern
+aiHook: {
+targetWord: 'conservation',
+intent: 'fill_blank',
+questionLine: 'conserv__a__on',
+imagePrompt: 'Hands holding a small plant to show conservation'
+},
+aiTutor: {
+target_word: 'conservation',
+question: 'conserv__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'conservation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation (vacation, rotation, conservation). Tip: Long A + /shun/ = -ation."
+},
+audio: 'conservation'
+},
+{
+id: 3,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'transformation',
+imageUrl: null,
+explanation: "Nice! The word is 'transformation' — the ending /shun/ is spelled -ation (trans-for-MAY-shun).",
+questionText: 'transfor__a__on',
+correctAnswer: 'transformation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4,5,6,7,8], // 'transform' shown
+aiHook: {
+targetWord: 'transformation',
+intent: 'fill_blank',
+questionLine: 'transfor__a__on',
+imagePrompt: 'A caterpillar transforming into a butterfly'
+},
+aiTutor: {
+target_word: 'transformation',
+question: 'transfor__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'transformation', the /ā-shun/ sound is spelled -ation. Rule: If it sounds like ay-shun, write -ation (formation, transformation). Tip: Hearing MAY-shun points to -ation."
+},
+audio: 'transformation'
+},
+{
+id: 4,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'circulation',
+imageUrl: null,
+explanation: "Nice! The word is 'circulation' — the ending /shun/ is spelled -ation (cir-cu-LAY-shun).",
+questionText: 'circ__a__on',
+correctAnswer: 'circulation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3], // fewer letters shown (medium)
+aiHook: {
+targetWord: 'circulation',
+intent: 'fill_blank',
+questionLine: 'circ__a__on',
+imagePrompt: 'Arrows showing blood circulation through the body'
+},
+aiTutor: {
+target_word: 'circulation',
+question: 'circ__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'circulation', the /ā-shun/ sound is spelled -ation. Rule: Many science/process words use -ation (circulation, respiration). Tip: AY + shun → -ation."
+},
+audio: 'circulation'
+},
+{
+id: 5,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'orientation',
+imageUrl: null,
+explanation: "Nice! The word is 'orientation' — the ending /shun/ is spelled -ation (o-ri-en-TAY-shun).",
+questionText: 'or__n__a__on',
+correctAnswer: 'orientation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1], // just 'or' shown (medium+)
+aiHook: {
+targetWord: 'orientation',
+intent: 'fill_blank',
+questionLine: 'or__n__a__on',
+imagePrompt: 'A map and a compass for orientation'
+},
+aiTutor: {
+target_word: 'orientation',
+question: 'or__n__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'orientation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation even after a base like orient. Tip: Long A before /shun/? Choose -ation."
+},
+audio: 'orientation'
+},
+{
+id: 6,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'adaptation',
+imageUrl: null,
+explanation: "Nice! The word is 'adaptation' — the ending /shun/ is spelled -ation (a-dap-TAY-shun).",
+questionText: 'a__p__a__on',
+correctAnswer: 'adaptation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0], // 'a' only (medium+)
+aiHook: {
+targetWord: 'adaptation',
+intent: 'fill_blank',
+questionLine: 'a__p__a__on',
+imagePrompt: 'An animal changing to survive in its habitat (adaptation)'
+},
+aiTutor: {
+target_word: 'adaptation',
+question: 'a__p__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'adaptation', the /ā-shun/ sound is spelled -ation after adapt. Rule: If adding the ending after t makes ay-shun, use -ation (adapt→adaptation). Tip: Hear AY? Choose -ation."
+},
+audio: 'adaptation'
+},
+{
+id: 7,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'regulation',
+imageUrl: null,
+explanation: "Nice! The word is 'regulation' — the ending /shun/ is spelled -ation (re-gu-LAY-shun).",
+questionText: '__g__l__a__on',
+correctAnswer: 'regulation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [], // hard segment (few cues)
+aiHook: {
+targetWord: 'regulation',
+intent: 'fill_blank',
+questionLine: '__g__l__a__on',
+imagePrompt: 'A rulebook or a checklist to show regulation'
+},
+aiTutor: {
+target_word: 'regulation',
+question: '__g__l__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'regulation', the /ā-shun/ sound is spelled -ation. Rule: -ation is common for this sound (regulation, population). Tip: Long A + shun → -ation."
+},
+audio: 'regulation'
+},
+{
+id: 8,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'exploration',
+imageUrl: null,
+explanation: "Nice! The word is 'exploration' — the ending /shun/ is spelled -ation (ex-plor-AY-shun).",
+questionText: 'ex__o__a__on',
+correctAnswer: 'exploration',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // no prefill (hard)
+aiHook: {
+targetWord: 'exploration',
+intent: 'fill_blank',
+questionLine: 'ex__o__a__on',
+imagePrompt: 'A person exploring with a flashlight and map'
+},
+aiTutor: {
+target_word: 'exploration',
+question: 'ex__o__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'exploration', the /ā-shun/ sound is spelled -ation. Rule: Hear AY then shun? Choose -ation. Tip: AY-shun = -ation."
+},
+audio: 'exploration'
+},
+{
+id: 9,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'translation',
+imageUrl: null,
+explanation: "Nice! The word is 'translation' — the ending /shun/ is spelled -ation (trans-LAY-shun).",
+questionText: 'tr__s__a__on',
+correctAnswer: 'translation',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // no prefill (hard)
+aiHook: {
+targetWord: 'translation',
+intent: 'fill_blank',
+questionLine: 'tr__s__a__on',
+imagePrompt: 'Two speech bubbles in different languages showing translation'
+},
+aiTutor: {
+target_word: 'translation',
+question: 'tr__s__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'translation', the /ā-shun/ sound is spelled -ation. Rule: Many language/process words take -ation (translation, conjugation). Tip: Long A before shun → -ation."
+},
+audio: 'translation'
+},
+{
+id: 10,
+topicId: '5-A.3',
+topicName: 'Learn_more_words_ending_in_tion',
+progressTopicName: 'Words ending in -tion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'population',
+imageUrl: null,
+explanation: "Nice! The word is 'population' — the ending /shun/ is spelled -ation (pop-u-LAY-shun).",
+questionText: '__p__l__a__on',
+correctAnswer: 'population',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // no prefill (hard)
+aiHook: {
+targetWord: 'population',
+intent: 'fill_blank',
+questionLine: '__p__l__a__on',
+imagePrompt: 'A crowd of people representing population'
+},
+aiTutor: {
+target_word: 'population',
+question: '__p__l__a__on',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -tion',
+spelling_pattern_or_rule: "In 'population', the /ā-shun/ sound is spelled -ation. Rule: -ation is very common for this sound (population, regulation). Tip: Hear AY? -ation is usually right."
+},
+audio: 'population'
+}
+]
+},
+
+'5-A.4': {
+topicInfo: {
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank'
+},
+questions: [
+{
+id: 1,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'access',
+imageUrl: null,
+explanation: "Nice! The word is 'access' — the final /s/ is spelled -ss, and the short first vowel is protected by doubled letters (ac-cess).",
+questionText: 'acce__',
+correctAnswer: 'access',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3], // only the -ss (sound) missing (easy)
+aiHook: {
+targetWord: 'access',
+intent: 'fill_blank',
+questionLine: 'acce__',
+imagePrompt: 'A key card tapping on a door reader for access'
+},
+aiTutor: {
+target_word: 'access',
+question: 'acce__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'access', cc keeps the first vowel short and -ss makes a strong ending /s/. Rule: Short first vowel + firm final /s/ often uses doubles (access, success). Tip: Doubled letters protect short vowels and keep the hissy s strong."
+},
+audio: 'access'
+},
+{
+id: 2,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'process',
+imageUrl: null,
+explanation: "Nice! The word is 'process' — the final /s/ is spelled -ss (pro-cess).",
+questionText: 'proce__',
+correctAnswer: 'process',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4], // only -ss missing (easy)
+aiHook: {
+targetWord: 'process',
+intent: 'fill_blank',
+questionLine: 'proce__',
+imagePrompt: 'A flowchart showing a process'
+},
+aiTutor: {
+target_word: 'process',
+question: 'proce__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'process', the firm ending /s/ is -ss. Rule: Words with a clear, holdable last /s/ often use -ss (process, recess). Tip: If the last sound is a steady hiss, try -ss."
+},
+audio: 'process'
+},
+{
+id: 3,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'success',
+imageUrl: null,
+explanation: "Nice! The word is 'success' — the final /s/ is spelled -ss, and cc keeps the ŭ short (suc-cess).",
+questionText: 'succe__',
+correctAnswer: 'success',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4,5], // only last -s missing? keep two underscores for -ss → we kept both missing
+aiHook: {
+targetWord: 'success',
+intent: 'fill_blank',
+questionLine: 'succe__',
+imagePrompt: 'A trophy or medal showing success'
+},
+aiTutor: {
+target_word: 'success',
+question: 'succe__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'success', cc keeps the vowel short and -ss marks a strong final /s/. Rule: Double letters protect short vowels and mark strong endings (success, access). Tip: Short vowel + strong /s/ → expect doubles."
+},
+audio: 'success'
+},
+{
+id: 4,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'address',
+imageUrl: null,
+explanation: "Nice! The word is 'address' — the final /s/ is spelled -ss, with stress on the second part (ad-dress).",
+questionText: 'addre__',
+correctAnswer: 'address',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4], // medium
+aiHook: {
+targetWord: 'address',
+intent: 'fill_blank',
+questionLine: 'addre__',
+imagePrompt: 'A house number on a mailbox (address)'
+},
+aiTutor: {
+target_word: 'address',
+question: 'addre__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'address', -ss makes the crisp ending /s/. Rule: A stressed ending with a firm /s/ often uses -ss (address, distress). Tip: If you clearly hear the hiss at the end, -ss fits."
+},
+audio: 'address'
+},
+{
+id: 5,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'distress',
+imageUrl: null,
+explanation: "Nice! The word is 'distress' — the final /s/ is spelled -ss (dis-tress).",
+questionText: 'di__re__',
+correctAnswer: 'distress',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1], // few letters shown (medium+)
+aiHook: {
+targetWord: 'distress',
+intent: 'fill_blank',
+questionLine: 'di__re__',
+imagePrompt: 'A SOS signal or a person needing help (distress)'
+},
+aiTutor: {
+target_word: 'distress',
+question: 'di__re__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'distress', -ss marks the strong ending /s/. Rule: Words finishing with a sharp /s/ often use -ss (distress, suppress). Tip: Strong hiss at the finish? Choose -ss."
+},
+audio: 'distress'
+},
+{
+id: 6,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'recess',
+imageUrl: null,
+explanation: "Nice! The word is 'recess' — the final /s/ is spelled -ss (re-cess).",
+questionText: 're__s__',
+correctAnswer: 'recess',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'recess',
+intent: 'fill_blank',
+questionLine: 're__s__',
+imagePrompt: 'Kids playing outside for recess'
+},
+aiTutor: {
+target_word: 'recess',
+question: 're__s__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'recess', -ss shows a clear last /s/. Rule: Many everyday/school words end with -ss (recess, compass). Tip: Clear last /s/ → -ss."
+},
+audio: 'recess'
+},
+{
+id: 7,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'suppress',
+imageUrl: null,
+explanation: "Nice! The word is 'suppress' — the final /s/ is spelled -ss, and pp keeps the vowel short (sup-press).",
+questionText: 'su__re__',
+correctAnswer: 'suppress',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'suppress',
+intent: 'fill_blank',
+questionLine: 'su__re__',
+imagePrompt: 'A hand gently stopping a bouncing ball (suppress)'
+},
+aiTutor: {
+target_word: 'suppress',
+question: 'su__re__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'suppress', pp protects the short vowel and -ss gives a firm ending /s/. Rule: Short vowel + strong last /s/ often uses doubles (suppress). Tip: Doubles = short vowel + strong hiss."
+},
+audio: 'suppress'
+},
+{
+id: 8,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'bypass',
+imageUrl: null,
+explanation: "Nice! The word is 'bypass' — the final /s/ is spelled -ss (by-pass).",
+questionText: 'by__a__',
+correctAnswer: 'bypass',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'bypass',
+intent: 'fill_blank',
+questionLine: 'by__a__',
+imagePrompt: 'A road sign showing a city bypass'
+},
+aiTutor: {
+target_word: 'bypass',
+question: 'by__a__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'bypass', -ss shows the clear ending /s/. Rule: One-syllable bases with a strong last /s/ often end in -ss (pass, class, bypass). Tip: Crisp last /s/? Try -ss."
+},
+audio: 'bypass'
+},
+{
+id: 9,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'embarrass',
+imageUrl: null,
+explanation: "Nice! The word is 'embarrass' — the final /s/ is spelled -ss, and -rr- marks the stressed middle (em-bar-rass).",
+questionText: 'em__rra__',
+correctAnswer: 'embarrass',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'embarrass',
+intent: 'fill_blank',
+questionLine: 'em__rra__',
+imagePrompt: 'A blushing face to show embarrassment'
+},
+aiTutor: {
+target_word: 'embarrass',
+question: 'em__rra__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'embarrass', -rr- helps the middle sound and -ss gives a strong final /s/. Rule: Learn the em-bar-rass pattern as a chunk. Tip: Clap the parts: em | bar | rass."
+},
+audio: 'embarrass'
+},
+{
+id: 10,
+topicId: '5-A.4',
+topicName: 'Learn_to_spell_words_ending_in_ss',
+progressTopicName: 'Words ending in -ss',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'surpass',
+imageUrl: null,
+explanation: "Nice! The word is 'surpass' — the final /s/ is spelled -ss (sur-pass).",
+questionText: 's__pa__',
+correctAnswer: 'surpass',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hardest
+aiHook: {
+targetWord: 'surpass',
+intent: 'fill_blank',
+questionLine: 's__pa__',
+imagePrompt: 'A runner passing the finish line (surpass)'
+},
+aiTutor: {
+target_word: 'surpass',
+question: 's__pa__',
+student_entry: '',
+topic_to_reinforce: 'Words ending in -ss',
+spelling_pattern_or_rule: "In 'surpass', -ss marks the strong ending /s/. Rule: Verbs with a firm last /s/ often use -ss (surpass, compress→compression). Tip: Notice how -ss can turn into -ssion when you add the /shun/ ending (discuss→discussion, compress→compression)."
+},
+audio: 'surpass'
+}
+]
+},
+
+'5-A.6': {
+topicInfo: {
+topicId: '5-A.6',
+topicName: 'Spell_/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank'
+},
+questions: [
+{
+id: 1,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'tension',
+imageUrl: null,
+explanation: "Nice! The word is 'tension' — the /shun/ ending is spelled -sion with n + sion (ten-shun).",
+questionText: 'ten__on',
+correctAnswer: 'tension',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2], // only the sound letters hidden (easy)
+aiHook: {
+targetWord: 'tension',
+intent: 'fill_blank',
+questionLine: 'ten__on',
+imagePrompt: 'A tight rope showing tension'
+},
+aiTutor: {
+target_word: 'tension',
+question: 'ten__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'tension', n + sion spells /shun/. Rule: A consonant—especially n—right before -sion makes /shun/ (tension, pension, mansion). Tip: Spot the n before the ending."
+},
+audio: 'tension'
+},
+{
+id: 2,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'extension',
+imageUrl: null,
+explanation: "Nice! The word is 'extension' — the /shun/ ending is spelled -sion after n (ex-ten-shun).",
+questionText: 'ex__n__on',
+correctAnswer: 'extension',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1], // easy
+aiHook: {
+targetWord: 'extension',
+intent: 'fill_blank',
+questionLine: 'ex__n__on',
+imagePrompt: 'An extension cord plugged into a socket'
+},
+aiTutor: {
+target_word: 'extension',
+question: 'ex__n__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'extension', n + sion makes /shun/. Rule: After n, choose -sion to say shun (extension, ascension). Tip: ex | TEN | shun helps you hear it."
+},
+audio: 'extension'
+},
+{
+id: 3,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'expansion',
+imageUrl: null,
+explanation: "Nice! The word is 'expansion' — the /shun/ ending is spelled -sion after n (ex-pan-shun).",
+questionText: 'expa__on',
+correctAnswer: 'expansion',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3], // easy
+aiHook: {
+targetWord: 'expansion',
+intent: 'fill_blank',
+questionLine: 'expa__on',
+imagePrompt: 'A balloon getting bigger to show expansion'
+},
+aiTutor: {
+target_word: 'expansion',
+question: 'expa__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'expansion', n + sion gives /shun/. Rule: If the base ends with an n sound, -sion usually says shun (expansion). Tip: Hear N before the ending? Pick -sion."
+},
+audio: 'expansion'
+},
+{
+id: 4,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'suspension',
+imageUrl: null,
+explanation: "Nice! The word is 'suspension' — the /shun/ ending is spelled -sion after n (sus-pen-shun).",
+questionText: 'suspe__on',
+correctAnswer: 'suspension',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3], // medium
+aiHook: {
+targetWord: 'suspension',
+intent: 'fill_blank',
+questionLine: 'suspe__on',
+imagePrompt: 'Car suspension springs close-up'
+},
+aiTutor: {
+target_word: 'suspension',
+question: 'suspe__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'suspension', n + sion spells /shun/. Rule: n + sion is a common team (suspension, distension). Tip: n before the ending = shun."
+},
+audio: 'suspension'
+},
+{
+id: 5,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'ascension',
+imageUrl: null,
+explanation: "Nice! The word is 'ascension' — the /shun/ ending is spelled -sion after n (a-sen-shun).",
+questionText: 'ascen__on',
+correctAnswer: 'ascension',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4], // medium
+aiHook: {
+targetWord: 'ascension',
+intent: 'fill_blank',
+questionLine: 'ascen__on',
+imagePrompt: 'An arrow going upward showing ascension'
+},
+aiTutor: {
+target_word: 'ascension',
+question: 'ascen__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'ascension', n + sion → /shun/. Rule: Words from ascend use ascension with -sion. Tip: If the base connects to -end/-nd, -sion often says shun."
+},
+audio: 'ascension'
+},
+{
+id: 6,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'propulsion',
+imageUrl: null,
+explanation: "Nice! The word is 'propulsion' — the /shun/ ending is spelled -sion after a consonant (…l + sion) (pro-pul-shun).",
+questionText: 'propul__on',
+correctAnswer: 'propulsion',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: true,
+prefilledIndexes: [0,1,2,3,4,5,6], // medium+
+aiHook: {
+targetWord: 'propulsion',
+intent: 'fill_blank',
+questionLine: 'propul__on',
+imagePrompt: 'A rocket with flames to show propulsion'
+},
+aiTutor: {
+target_word: 'propulsion',
+question: 'propul__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'propulsion', a consonant + sion (…l + sion) makes /shun/. Rule: When a consonant sits right before sion, the ending often says /shun/ (propulsion, compulsion, convulsion). Tip: Hear …pul-shun? Write -sion."
+},
+audio: 'propulsion'
+},
+{
+id: 7,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'discussion',
+imageUrl: null,
+explanation: "Nice! The word is 'discussion' — the /shun/ ending is spelled -ssion (dis-cus-shun).",
+questionText: 'discu__on',
+correctAnswer: 'discussion',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'discussion',
+intent: 'fill_blank',
+questionLine: 'discu__on',
+imagePrompt: 'Students in a circle having a discussion'
+},
+aiTutor: {
+target_word: 'discussion',
+question: 'discu__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'discussion', -ssion spells /shun/. Rule: Bases ending in -cuss change to -ssion (discuss → discussion). Tip: Two s before -ion often become the /shun/ sound."
+},
+audio: 'discussion'
+},
+{
+id: 8,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'admission',
+imageUrl: null,
+explanation: "Nice! The word is 'admission' — the /shun/ ending is spelled -ssion (ad-mi-shun).",
+questionText: 'admi__on',
+correctAnswer: 'admission',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'admission',
+intent: 'fill_blank',
+questionLine: 'admi__on',
+imagePrompt: 'A ticket admitting a person into a museum'
+},
+aiTutor: {
+target_word: 'admission',
+question: 'admi__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'admission', -ssion spells /shun/. Rule: Bases ending in -mit change to -mission (admit → admission, submit → submission, permit → permission). Tip: mit → mission makes /shun/."
+},
+audio: 'admission'
+},
+{
+id: 9,
+topicId: '5-A.6',
+topicName: 'Spell/shun/with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'permission',
+imageUrl: null,
+explanation: "Nice! The word is 'permission' — the /shun/ ending is spelled -ssion (per-mi-shun).",
+questionText: 'permi__on',
+correctAnswer: 'permission',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hard
+aiHook: {
+targetWord: 'permission',
+intent: 'fill_blank',
+questionLine: 'permi__on',
+imagePrompt: 'A permission slip being signed'
+},
+aiTutor: {
+target_word: 'permission',
+question: 'permi__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'permission', -ssion spells /shun/. Rule: permit → permission follows the same mit → mission pattern (also submit → submission, admit → admission). Tip: If the base ends with mit, expect -mission."
+},
+audio: 'permission'
+},
+{
+id: 10,
+topicId: '5-A.6',
+topicName: 'Spell/shun/_with_sion',
+progressTopicName: 'The /shŭn/ sound spelled -sion',
+questionElements: 'image + audio + text',
+answerElements: 'text',
+templateType: 'fill_blank',
+word: 'compression',
+imageUrl: null,
+explanation: "Nice! The word is 'compression' — the /shun/ ending is spelled -ssion (com-pres-shun).",
+questionText: 'compre__on',
+correctAnswer: 'compression',
+template: 'fill_blank',
+isSpacing: false,
+isSorting: false,
+isSpelling: true,
+isPrefilled: false,
+prefilledIndexes: [], // hardest
+aiHook: {
+targetWord: 'compression',
+intent: 'fill_blank',
+questionLine: 'compre__on',
+imagePrompt: 'Hands pressing a sponge to show compression'
+},
+aiTutor: {
+target_word: 'compression',
+question: 'compre__on',
+student_entry: '',
+topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
+spelling_pattern_or_rule: "In 'compression', -ssion spells /shun/. Rule: Bases ending in -press become -pression (compress → compression, express → expression). Tip: press → pression gives the /shun/ ending."
+},
+audio: 'compression'
+}
+]
+},
+
+"5-A.7": {
+    "topicInfo": {
+      "topicId": "5-A.7",
+      "topicName": "Second_sound_of_TH_voiced",
+      "progressTopicName": "The buzzing TH sound (/ð/)",
+      "questionElements": "image + audio + text",
+      "answerElements": "text",
+      "templateType": "fill_blank"
+    },
+    "questions": [
+      {
+        "id": 1,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "algorithm",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'algorithm' — this TH sounds like a soft, buzzing “th” (it feels a bit like a gentle /d/) and is spelled 'th'.",
+        "questionText": "algori__m",
+        "correctAnswer": "algorithm",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 2, 3, 4, 5, 8],
+        "aiHook": {
+          "targetWord": "algorithm",
+          "intent": "fill_blank",
+          "questionLine": "algori__m",
+          "imagePrompt": "Flowchart steps showing an algorithm"
+        },
+        "aiTutor": {
+          "target_word": "algorithm",
+          "question": "algori__m",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "In 'algorithm', TH is between vowel sounds, so it makes the soft, buzzing TH (like a gentle /d/). We still spell it 'th'. Quick check: put a hand on your throat—if it buzzes, use the soft TH sound."
+        },
+        "audio": "algorithm"
+      },
+      {
+        "id": 2,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "logarithm",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'logarithm' — the TH is the soft, buzzing “th” (it feels a bit like /d/) and is spelled 'th'.",
+        "questionText": "loga__hm",
+        "correctAnswer": "logarithm",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 2, 3, 8],
+        "aiHook": {
+          "targetWord": "logarithm",
+          "intent": "fill_blank",
+          "questionLine": "loga__hm",
+          "imagePrompt": "A math graph with a logarithmic curve"
+        },
+        "aiTutor": {
+          "target_word": "logarithm",
+          "question": "loga__hm",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "When TH sits between vowel sounds, it often uses the soft, buzzing TH (feels a bit like /d/). Keep spelling 'th'. Tip: throat buzz = soft TH sound."
+        },
+        "audio": "logarithm"
+      },
+      {
+        "id": 3,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "although",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'although' — the TH is the soft, buzzing “th” (a gentle /d/ feel) between vowels, and it’s spelled 'th'.",
+        "questionText": "al__ough",
+        "correctAnswer": "although",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 4, 5, 6, 7],
+        "aiHook": {
+          "targetWord": "although",
+          "intent": "fill_blank",
+          "questionLine": "al__ough",
+          "imagePrompt": "Two ideas connected with the word 'although'"
+        },
+        "aiTutor": {
+          "target_word": "although",
+          "question": "al__ough",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "In 'although', vowels on both sides keep your voice on, so the TH is the soft, buzzing kind. Write 'th'; your voice gives the gentle /d/ feel."
+        },
+        "audio": "although"
+      },
+      {
+        "id": 4,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "breathe",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'breathe' — adding the silent e makes the TH a soft, buzzing “th” (gentle /d/ feel). We still spell it 'th'.",
+        "questionText": "brea__e",
+        "correctAnswer": "breathe",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 2, 3, 6],
+        "aiHook": {
+          "targetWord": "breathe",
+          "intent": "fill_blank",
+          "questionLine": "brea__e",
+          "imagePrompt": "Person taking a deep breath calmly"
+        },
+        "aiTutor": {
+          "target_word": "breathe",
+          "question": "brea__e",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "Silent e can turn quiet TH into the soft, buzzing TH: breath → breathe. Letters stay 'th'. Tip: add e, feel the buzz, sound feels closer to a gentle /d/."
+        },
+        "audio": "breathe"
+      },
+      {
+        "id": 5,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "loathe",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'loathe' — the TH is the soft, buzzing “th” (feels a bit like /d/) before the silent e; we spell it 'th'.",
+        "questionText": "loa__e",
+        "correctAnswer": "loathe",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 2, 5],
+        "aiHook": {
+          "targetWord": "loathe",
+          "intent": "fill_blank",
+          "questionLine": "loa__e",
+          "imagePrompt": "A face showing strong dislike (loathe)"
+        },
+        "aiTutor": {
+          "target_word": "loathe",
+          "question": "loa__e",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "Vowel + TH + silent e often makes the soft, buzzing TH: loathe, bathe, clothe. Spelling is 'th'. Tip: if an e comes after TH, try the buzzing sound."
+        },
+        "audio": "loathe"
+      },
+      {
+        "id": 6,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "scythe",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'scythe' — the TH is the soft, buzzing “th” (a gentle /d/ feel) in the -the ending; we spell it 'th'.",
+        "questionText": "scy__e",
+        "correctAnswer": "scythe",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 2, 5],
+        "aiHook": {
+          "targetWord": "scythe",
+          "intent": "fill_blank",
+          "questionLine": "scy__e",
+          "imagePrompt": "A curved farming tool (scythe)"
+        },
+        "aiTutor": {
+          "target_word": "scythe",
+          "question": "scy__e",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "Words that end with -the often use the soft, buzzing TH: scythe, wreathe, soothe. We always write 'th'. Check with the throat-buzz test."
+        },
+        "audio": "scythe"
+      },
+      {
+        "id": 7,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "soothe",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'soothe' — the TH is the soft, buzzing “th” (gentle /d/ feel) before the silent e; we spell it 'th'.",
+        "questionText": "soo__e",
+        "correctAnswer": "soothe",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": true,
+        "prefilledIndexes": [0, 1, 2, 5],
+        "aiHook": {
+          "targetWord": "soothe",
+          "intent": "fill_blank",
+          "questionLine": "soo__e",
+          "imagePrompt": "A calming scene with gentle waves"
+        },
+        "aiTutor": {
+          "target_word": "soothe",
+          "question": "soo__e",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "Vowel + TH + e often sounds like the soft, buzzing TH (close to a gentle /d/): soothe, breathe, loathe. Keep spelling 'th'."
+        },
+        "audio": "soothe"
+      },
+      {
+        "id": 8,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "gather",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'gather' — the TH is the soft, buzzing “th” (a gentle /d/ feel) in the -ther family; we spell it 'th'.",
+        "questionText": "ga__er",
+        "correctAnswer": "gather",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": false,
+        "prefilledIndexes": [],
+        "aiHook": {
+          "targetWord": "gather",
+          "intent": "fill_blank",
+          "questionLine": "ga__er",
+          "imagePrompt": "People gathering together"
+        },
+        "aiTutor": {
+          "target_word": "gather",
+          "question": "ga__er",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "In -ther words (gather, weather, other), TH often uses the soft, buzzing sound. It may feel like a gentle /d/, but you still write 'th'."
+        },
+        "audio": "gather"
+      },
+      {
+        "id": 9,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "weathering",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'weathering' — the TH is the soft, buzzing “th” (gentle /d/ feel) inside -ther-, and we spell it 'th'.",
+        "questionText": "wea__ering",
+        "correctAnswer": "weathering",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": false,
+        "prefilledIndexes": [],
+        "aiHook": {
+          "targetWord": "weathering",
+          "intent": "fill_blank",
+          "questionLine": "wea__ering",
+          "imagePrompt": "Rocks breaking down from wind and rain (weathering)"
+        },
+        "aiTutor": {
+          "target_word": "weathering",
+          "question": "wea__ering",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "In the -ther family (weather, feather, leather), TH is usually the soft, buzzing sound. Keep spelling 'th'. Quick check: hand on throat—feel the buzz."
+        },
+        "audio": "weathering"
+      },
+      {
+        "id": 10,
+        "topicId": "5-A.7",
+        "topicName": "Second_sound_of_TH_voiced",
+        "progressTopicName": "The buzzing TH sound (/ð/)",
+        "questionElements": "image + audio + text",
+        "answerElements": "text",
+        "templateType": "fill_blank",
+        "word": "mother",
+        "imageUrl": null,
+        "explanation": "Wonderful! The word is 'mother' — the TH is the soft, buzzing “th” (it feels a bit like /d/) between vowels, and we spell it 'th'.",
+        "questionText": "mo__er",
+        "correctAnswer": "mother",
+        "template": "fill_blank",
+        "isSpacing": false,
+        "isSorting": false,
+        "isSpelling": true,
+        "isPrefilled": false,
+        "prefilledIndexes": [],
+        "aiHook": {
+          "targetWord": "mother",
+          "intent": "fill_blank",
+          "questionLine": "mo__er",
+          "imagePrompt": "A mother and child smiling together"
+        },
+        "aiTutor": {
+          "target_word": "mother",
+          "question": "mo__er",
+          "student_entry": "",
+          "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
+          "spelling_pattern_or_rule": "Between vowels (mo-ther), TH usually makes the soft, buzzing sound (like a gentle /d/). Still spell it 'th'. Tip: if it buzzes, choose the soft TH."
+        },
+        "audio": "mother"
+      }
+    ]
+  },
+  '5-A.8': {
+  topicInfo: {
+    topicId: '5-A.8',
+    topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+    progressTopicName: 'Adding two suffixes in order',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- hope family ---
+    {
+      id: 1,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hope',
+      imageUrl: null,
+      explanation: "The base word is ‘hope’. It ends with a silent E.",
+      questionText: 'h _ _ e',
+      correctAnswer: 'hope',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'hope',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ e',
+        imagePrompt: 'A bright sunrise symbolizing hope'
+      },
+      aiTutor: {
+        target_word: 'hope',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Base words before adding suffixes',
+        spelling_pattern_or_rule: "‘Hope’ ends in silent E. When adding a vowel suffix, drop the E. Example: hope → hoping, hopeful."
+      },
+      audio: 'hope'
+    },
+    {
+      id: 2,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hopeful',
+      imageUrl: null,
+      explanation: "Add ‘-ful’ to ‘hope’. Drop the silent E before adding the suffix.",
+      questionText: 'h _ _ e f _ l',
+      correctAnswer: 'hopeful',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'hopeful',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ e f _ l',
+        imagePrompt: 'A hopeful person smiling at the sky'
+      },
+      aiTutor: {
+        target_word: 'hopeful',
+        question: 'h o p e _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Drop the final E before adding -ful',
+        spelling_pattern_or_rule: "In ‘hopeful,’ the silent E is dropped before adding -ful. Rule: Drop E before vowel suffixes like -ing, -able, -ous, -ful."
+      },
+      audio: 'hopeful'
+    },
+    {
+      id: 3,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hopefulness',
+      imageUrl: null,
+      explanation: "Add ‘-ful’ and then ‘-ness’ in order.",
+      questionText: 'h _ _ e f _ l n _ s _',
+      correctAnswer: 'hopefulness',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,5,6],
+      aiHook: {
+        targetWord: 'hopefulness',
+        intent: 'fill_blank',
+        questionLine: 'h  _ e f _ l n _ s _',
+        imagePrompt: 'A person radiating positivity and hopefulness'
+      },
+      aiTutor: {
+        target_word: 'hopefulness',
+        question: 'h o p e f u l _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Adding two suffixes: -ful + -ness',
+        spelling_pattern_or_rule: "In ‘hopefulness,’ drop the E before -ful, then add -ness. Always add suffixes one at a time: hope → hopeful → hopefulness."
+      },
+      audio: 'hopefulness'
+    },
+
+    // --- read family ---
+    {
+      id: 4,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'read',
+      imageUrl: null,
+      explanation: "‘Read’ is the base word.",
+      questionText: 'r _ _ d',
+      correctAnswer: 'read',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'read',
+        intent: 'fill_blank',
+        questionLine: 'r _ _ d',
+        imagePrompt: 'A student reading a book'
+      },
+      aiTutor: {
+        target_word: 'read',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Base words before suffixes',
+        spelling_pattern_or_rule: "‘Read’ is the root. No letter change is needed before adding consonant or vowel suffixes."
+      },
+      audio: 'read'
+    },
+    {
+      id: 5,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'readable',
+      imageUrl: null,
+      explanation: "Add ‘-able’ to ‘read’.",
+      questionText: 'r _ _ d a b _ e',
+      correctAnswer: 'readable',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'readable',
+        intent: 'fill_blank',
+        questionLine: 'r _ _ d a b _ e',
+        imagePrompt: 'An easy-to-read book'
+      },
+      aiTutor: {
+        target_word: 'readable',
+        question: 'r e a d _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Adding -able to a base word',
+        spelling_pattern_or_rule: "In ‘readable,’ just add -able. No changes needed since the word doesn’t end in a silent E or a short vowel."
+      },
+      audio: 'readable'
+    },
+    {
+      id: 6,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'readability',
+      imageUrl: null,
+      explanation: "Add ‘-able’ then ‘-ity’.",
+      questionText: 'r _ _ d a b _ l _ t y',
+      correctAnswer: 'readability',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,5],
+      aiHook: {
+        targetWord: 'readability',
+        intent: 'fill_blank',
+        questionLine: 'r _ _ d a b _ l _ t y',
+        imagePrompt: 'Text with readability score on a computer screen'
+      },
+      aiTutor: {
+        target_word: 'readability',
+        question: 'r e a d a b _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Adding two suffixes in sequence',
+        spelling_pattern_or_rule: "In ‘readability,’ first add -able, then add -ity. No letter changes are needed because the base word ends in a consonant."
+      },
+      audio: 'readability'
+    }, {
+      id: 7,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'plan',
+      imageUrl: null,
+      explanation: "The base word is ‘plan’.",
+      questionText: 'p l _ n',
+      correctAnswer: 'plan',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plan',
+        intent: 'fill_blank',
+        questionLine: 'p l _ n',
+        imagePrompt: 'A student writing a plan in a notebook'
+      },
+      aiTutor: {
+        target_word: 'plan',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Base words before suffixes',
+        spelling_pattern_or_rule: "‘Plan’ is a one-syllable word with one vowel and one consonant — it follows the 1-1-1 doubling rule when adding vowel suffixes."
+      },
+      audio: 'plan'
+    },
+    {
+      id: 8,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'planning',
+      imageUrl: null,
+      explanation: "Add ‘-ing’ to ‘plan’ — double the final N before -ing.",
+      questionText: 'p l a n n _ n g',
+      correctAnswer: 'planning',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'planning',
+        intent: 'fill_blank',
+        questionLine: 'p l a n n _ n g',
+        imagePrompt: 'Someone planning their week on a calendar'
+      },
+      aiTutor: {
+        target_word: 'planning',
+        question: 'p l a n _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: '1-1-1 doubling rule before -ing',
+        spelling_pattern_or_rule: "‘Planning’ doubles the final N because ‘plan’ is a one-syllable word with one vowel before the final consonant (1-1-1 rule)."
+      },
+      audio: 'planning'
+    },
+    {
+      id: 9,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'plannedness',
+      imageUrl: null,
+      explanation: "Add ‘-ed’ and then ‘-ness’ to form ‘plannedness’.",
+      questionText: 'p l a n n _ d n _ s _',
+      correctAnswer: 'plannedness',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'plannedness',
+        intent: 'fill_blank',
+        questionLine: 'p l a n n _ d n _ s _',
+        imagePrompt: 'A neatly organized calendar showing plannedness'
+      },
+      aiTutor: {
+        target_word: 'plannedness',
+        question: 'p l a n n _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling before adding -ed and stacking -ness',
+        spelling_pattern_or_rule: "‘Plannedness’ shows both doubling and suffix stacking. First, double the final N for -ed, then add -ness (plan → planned → plannedness)."
+      },
+      audio: 'plannedness'
+    },
+
+    // --- long word example ---
+    {
+      id: 10,
+      topicId: '5-A.8',
+      topicName: 'Learn_how_to_add_two_suffixes_to_a_word',
+      progressTopicName: 'Adding two suffixes in order',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'beautifully',
+      imageUrl: null,
+      explanation: "Start with ‘beauty’, change Y to I, then add -ful and -ly.",
+      questionText: 'b _ a u t _ f _ l l _',
+      correctAnswer: 'beautifully',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2,3,4,6,8,9],
+      aiHook: {
+        targetWord: 'beautifully',
+        intent: 'fill_blank',
+        questionLine: 'b _ a u t _ f _ l l _',
+        imagePrompt: 'A butterfly flying beautifully over flowers'
+      },
+      aiTutor: {
+        target_word: 'beautifully',
+        question: 'b _ a u t _ f _ l l _',
+        student_entry: '',
+        topic_to_reinforce: 'Change Y to I before adding -ful and -ly',
+        spelling_pattern_or_rule: "‘Beautifully’ follows the Y-to-I rule: change Y to I before adding -ful, then add -ly (beauty → beautiful → beautifully)."
+      },
+      audio: 'beautifully'
+    }
+  ]
+},
+  '5-A.9': {
+  topicInfo: {
+    topicId: '5-A.9',
+    topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+    progressTopicName: "/eks/ and /egs/ spelled ex",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'exit',
+      imageUrl: null,
+      explanation: "Good start! The word is 'exit' — it begins with 'ex' that makes the /eks/ sound.",
+      questionText: 'ex___',
+      correctAnswer: 'exit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'exit',
+        intent: 'fill_blank',
+        questionLine: 'ex___',
+        imagePrompt: "An exit door sign glowing above a doorway"
+      },
+      aiTutor: {
+        target_word: 'exit',
+        question: '_ _ i t',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /eks/ and /egs/ spelled ex",
+        spelling_pattern_or_rule: "When 'ex' appears before a vowel, it often says /egs/, as in 'exit' and 'extra'."
+      },
+      audio: 'exit'
+    },
+    {
+      id: 2,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'extra',
+      imageUrl: null,
+      explanation: "Nice! The word is 'extra' — 'ex' makes the /eks/ sound before the consonant 't'.",
+      questionText: 'ex____',
+      correctAnswer: 'extra',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4],
+      aiHook: {
+        targetWord: 'extra',
+        intent: 'fill_blank',
+        questionLine: 'ex____',
+        imagePrompt: "A student adding extra sprinkles on ice cream"
+      },
+      aiTutor: {
+        target_word: 'extra',
+        question: '_ _ t r a',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /eks/ spelled ex",
+        spelling_pattern_or_rule: "When 'ex' comes before a consonant, it makes /eks/ — as in 'extra' and 'expect'."
+      },
+      audio: 'extra'
+    },
+    {
+      id: 3,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'expect',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'expect' — again, 'ex' says /eks/.",
+      questionText: 'e____t',
+      correctAnswer: 'expect',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4,5],
+      aiHook: {
+        targetWord: 'expect',
+        intent: 'fill_blank',
+        questionLine: 'e____t',
+        imagePrompt: "A student waiting with hope — representing the word 'expect'"
+      },
+      aiTutor: {
+        target_word: 'expect',
+        question: '_ _ p e c t',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /eks/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — expect, explain, express."
+      },
+      audio: 'expect'
+    },
+    {
+      id: 4,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'example',
+      imageUrl: null,
+      explanation: "Great! The word is 'example' — here 'ex' says /egz/ because it’s followed by a vowel.",
+      questionText: 'ex_____',
+      correctAnswer: 'example',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [4,5,6],
+      aiHook: {
+        targetWord: 'example',
+        intent: 'fill_blank',
+        questionLine: 'ex_____',
+        imagePrompt: "Teacher showing an example on the board"
+      },
+      aiTutor: {
+        target_word: 'example',
+        question: '_ _ _ _ p l e',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /egs/ spelled ex",
+        spelling_pattern_or_rule: "When 'ex' comes before a vowel, it often says /egz/, as in 'example' and 'examine'."
+      },
+      audio: 'example'
+    },
+    {
+      id: 5,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'examine',
+      imageUrl: null,
+      explanation: "Nice thinking! The word is 'examine' — 'ex' makes the /egz/ sound before a vowel.",
+      questionText: 'e____ne',
+      correctAnswer: 'examine',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'examine',
+        intent: 'fill_blank',
+        questionLine: 'e____ne',
+        imagePrompt: "A doctor examining a patient"
+      },
+      aiTutor: {
+        target_word: 'examine',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /egs/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' says /egz/ before a vowel — examine, example, exact."
+      },
+      audio: 'examine'
+    },
+    {
+      id: 6,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'exist',
+      imageUrl: null,
+      explanation: "Well done! The word is 'exist' — 'ex' says /egz/ before the vowel 'i'.",
+      questionText: '_x___t',
+      correctAnswer: 'exist',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'exist',
+        intent: 'fill_blank',
+        questionLine: '_x___t',
+        imagePrompt: "A planet existing in space with stars around"
+      },
+      aiTutor: {
+        target_word: 'exist',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /egs/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' before a vowel usually says /egz/, like in exist and example."
+      },
+      audio: 'exist'
+    },
+    {
+      id: 7,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'exercise',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'exercise' — the 'ex' says /eks/ here.",
+      questionText: '_x_____e',
+      correctAnswer: 'exercise',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [4,5,6,7],
+      aiHook: {
+        targetWord: 'exercise',
+        intent: 'fill_blank',
+        questionLine: '_x_____e',
+        imagePrompt: "Someone exercising or stretching"
+      },
+      aiTutor: {
+        target_word: 'exercise',
+        question: '_ _ _ _ c i s e',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /eks/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' before consonant sounds says /eks/ — exercise, express, extra."
+      },
+      audio: 'exercise'
+    },
+    {
+      id: 8,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'exact',
+      imageUrl: null,
+      explanation: "You're sharp! The word is 'exact' — 'ex' says /egz/ because it’s before a vowel sound.",
+      questionText: '____ct',
+      correctAnswer: 'exact',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'exact',
+        intent: 'fill_blank',
+        questionLine: '____ct',
+        imagePrompt: "Two identical puzzle pieces showing an exact match"
+      },
+      aiTutor: {
+        target_word: 'exact',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /egs/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' says /egz/ before a vowel — exact, examine, example."
+      },
+      audio: 'exact'
+    },
+    {
+      id: 9,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'excellent',
+      imageUrl: null,
+      explanation: "Amazing! The word is 'excellent' — 'ex' says /eks/ before the consonant.",
+      questionText: '_____lent',
+      correctAnswer: 'excellent',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'excellent',
+        intent: 'fill_blank',
+        questionLine: '_____lent',
+        imagePrompt: "A student receiving an excellent grade A+"
+      },
+      aiTutor: {
+        target_word: 'excellent',
+        question: '_ _ _ _ l l e n t',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /eks/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — excellent, express, extra."
+      },
+      audio: 'excellent'
+    },
+    {
+      id: 10,
+      topicId: '5-A.9',
+      topicName: 'Spell_words_with_eks_and_egs_spelled_ex',
+      progressTopicName: "/eks/ and /egs/ spelled ex",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'exchange',
+      imageUrl: null,
+      explanation: "Perfect finish! The word is 'exchange' — 'ex' says /eks/ before the consonant 'ch'.",
+      questionText: '_x_______',
+      correctAnswer: 'exchange',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'exchange',
+        intent: 'fill_blank',
+        questionLine: '_x_______',
+        imagePrompt: "Two children exchanging gifts"
+      },
+      aiTutor: {
+        target_word: 'exchange',
+        question: '_ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Spelling words with /eks/ spelled ex",
+        spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — exchange, express, explore."
+      },
+      audio: 'exchange'
+    }
+  ]
+},
+'5-A.10': {
+  topicInfo: {
+    topicId: '5-A.10',
+    topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+    progressTopicName: 'OR in Unaccented Syllables',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'doctor',
+      imageUrl: null,
+      explanation: "Nice! The word is 'doctor' — OR in the last syllable is unaccented and sounds like /er/.",
+      questionText: '______',
+      correctAnswer: 'doctor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'doctor',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A smiling doctor with a stethoscope in a hospital"
+      },
+      aiTutor: {
+        target_word: 'doctor',
+        question: 'd o c t _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🩺 OR can say /er/ in unaccented syllables — doctor, actor, visitor."
+      },
+      audio: 'doctor'
+    },
+    {
+      id: 2,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'color',
+      imageUrl: null,
+      explanation: "Great! The word is 'color' — the OR makes the /er/ sound.",
+      questionText: '_____',
+      correctAnswer: 'color',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'color',
+        intent: 'fill_blank',
+        questionLine: '_____',
+        imagePrompt: "A palette of bright paint colors"
+      },
+      aiTutor: {
+        target_word: 'color',
+        question: 'c o l _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🎨 In unaccented syllables, OR sounds like /er/ — color, sailor, favor."
+      },
+      audio: 'color'
+    },
+    {
+      id: 3,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'sailor',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'sailor' — OR in the second syllable is unaccented and sounds like /er/.",
+      questionText: '______',
+      correctAnswer: 'sailor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'sailor',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A sailor standing on a ship deck with ocean waves"
+      },
+      aiTutor: {
+        target_word: 'sailor',
+        question: 's a i l _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "⚓ OR = /er/ in an unaccented syllable — sailor, color, doctor."
+      },
+      audio: 'sailor'
+    },
+    {
+      id: 4,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'actor',
+      imageUrl: null,
+      explanation: "Great work! The word is 'actor' — OR says /er/ in the unaccented syllable.",
+      questionText: '______',
+      correctAnswer: 'actor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'actor',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "An actor performing on stage under bright lights"
+      },
+      aiTutor: {
+        target_word: 'actor',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🎭 When OR comes in an unaccented syllable, it sounds like /er/ — actor, doctor."
+      },
+      audio: 'actor'
+    },
+    {
+      id: 5,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'favor',
+      imageUrl: null,
+      explanation: "Nice! The word is 'favor' — OR in the last syllable is unaccented.",
+      questionText: '______',
+      correctAnswer: 'favor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'favor',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A friend handing a small gift as a favor"
+      },
+      aiTutor: {
+        target_word: 'favor',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🎁 In unaccented syllables, OR = /er/ — favor, color, neighbor."
+      },
+      audio: 'favor'
+    },
+    {
+      id: 6,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'visitor',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'visitor' — OR is unaccented and sounds like /er/.",
+      questionText: '_______',
+      correctAnswer: 'visitor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'visitor',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A visitor waving hello at the front door"
+      },
+      aiTutor: {
+        target_word: 'visitor',
+        question: 'v i s i t _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🚪 OR = /er/ in the last unaccented syllable — visitor, actor, doctor."
+      },
+      audio: 'visitor'
+    },
+    {
+      id: 7,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'mirror',
+      imageUrl: null,
+      explanation: "Good job! The word is 'mirror' — the OR is unaccented and says /er/.",
+      questionText: '______',
+      correctAnswer: 'mirror',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'mirror',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A mirror reflecting a smiling child"
+      },
+      aiTutor: {
+        target_word: 'mirror',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🪞 In unaccented syllables, OR = /er/ — mirror, sailor, doctor."
+      },
+      audio: 'mirror'
+    },
+    {
+      id: 8,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'author',
+      imageUrl: null,
+      explanation: "Nice! The word is 'author' — the OR is unaccented and says /er/.",
+      questionText: '______',
+      correctAnswer: 'author',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'author',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "An author writing in a notebook at a desk"
+      },
+      aiTutor: {
+        target_word: 'author',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "📚 OR can be unaccented and sound like /er/ — author, sailor, visitor."
+      },
+      audio: 'author'
+    },
+    {
+      id: 9,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'tractor',
+      imageUrl: null,
+      explanation: "Great! The word is 'tractor' — OR in the last syllable is unaccented.",
+      questionText: '______',
+      correctAnswer: 'tractor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'tractor',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A red tractor plowing a farm field"
+      },
+      aiTutor: {
+        target_word: 'tractor',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🚜 In unaccented syllables, OR = /er/ — tractor, doctor, actor."
+      },
+      audio: 'tractor'
+    },
+    {
+      id: 10,
+      topicId: '5-A.10',
+      topicName: 'Spell_words_with_OR_in_unaccented_syllables',
+      progressTopicName: 'OR in Unaccented Syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'senator',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'senator' — the OR is unaccented and says /er/.",
+      questionText: '_______',
+      correctAnswer: 'senator',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'senator',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A senator speaking at a podium in a government hall"
+      },
+      aiTutor: {
+        target_word: 'senator',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR in unaccented syllables',
+        spelling_pattern_or_rule: "🏛️ OR = /er/ in the last unaccented syllable — senator, visitor, actor."
+      },
+      audio: 'senator'
+    }
+  ]
+},
+'5-A.11': {
+  topicInfo: {
+    topicId: '5-A.11',
+    topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+    progressTopicName: 'Phonogram OUGH — many sounds by word family',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- OUGH = /oʊ/ (THOUGH family) ---
+    {
+      id: 1,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'though',
+      imageUrl: null,
+      explanation: "‘Though’ uses OUGH to spell the long O sound /oʊ/; GH is silent.",
+      questionText: 't h _ _ _ h',
+      correctAnswer: 'though',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'though',
+        intent: 'fill_blank',
+        questionLine: 't h _ _ _ h',
+        imagePrompt: 'Two ideas contrasted with the word “though” between them'
+      },
+      aiTutor: {
+        target_word: 'though',
+        question: 't h _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /oʊ/ (though family)',
+        spelling_pattern_or_rule: "In ‘though,’ OUGH says /oʊ/ (long O) and GH is silent. This family includes words like though and although."
+      },
+      audio: 'though'
+    },
+    {
+      id: 2,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'although',
+      imageUrl: null,
+      explanation: "‘Although’ keeps OUGH = /oʊ/; GH is silent.",
+      questionText: 'a l t h _ _ _ _',
+      correctAnswer: 'although',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'although',
+        intent: 'fill_blank',
+        questionLine: 'a l t h _ _ _ _',
+        imagePrompt: 'A sentence beginning with “Although …” on lined paper'
+      },
+      aiTutor: {
+        target_word: 'although',
+        question: 'a l t h _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /oʊ/ (though family)',
+        spelling_pattern_or_rule: "In ‘although,’ OUGH spells /oʊ/ (long O). Memorize the THOUGH-family as one sound group: though, although."
+      },
+      audio: 'although'
+    },
+
+    // --- OUGH = /uː/ (THROUGH family) ---
+    {
+      id: 3,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'through',
+      imageUrl: null,
+      explanation: "‘Through’ uses OUGH to spell the long OO sound /uː/; GH is silent.",
+      questionText: 't h r _ _ _ h',
+      correctAnswer: 'through',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'through',
+        intent: 'fill_blank',
+        questionLine: 't h r _ _ _ h',
+        imagePrompt: 'An arrow passing through a target'
+      },
+      aiTutor: {
+        target_word: 'through',
+        question: 't h r _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /uː/ (through family)',
+        spelling_pattern_or_rule: "In ‘through,’ OUGH says /uː/ (long OO). Learn the THROUGH-family as /uː/: through, throughout."
+      },
+      audio: 'through'
+    },
+    {
+      id: 4,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'throughout',
+      imageUrl: null,
+      explanation: "‘Throughout’ keeps OUGH = /uː/ from ‘through.’",
+      questionText: 't h r _ _ _ g h _ _ t',
+      correctAnswer: 'throughout',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'throughout',
+        intent: 'fill_blank',
+        questionLine: 't h r _ _ _ g h _ _ t',
+        imagePrompt: 'Dots spread throughout a map'
+      },
+      aiTutor: {
+        target_word: 'throughout',
+        question: 't h r _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /uː/ (through family)',
+        spelling_pattern_or_rule: "In ‘throughout,’ the OUGH chunk still says /uː/. Treat the OUGH as one sound unit from the THROUGH-family."
+      },
+      audio: 'throughout'
+    },
+
+    // --- OUGH = /ʌf/ (UFF family) ---
+    {
+      id: 5,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'rough',
+      imageUrl: null,
+      explanation: "‘Rough’ uses OUGH to spell the /ʌf/ sound; GH is silent.",
+      questionText: 'r _ _ _ h',
+      correctAnswer: 'rough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'rough',
+        intent: 'fill_blank',
+        questionLine: 'r _ _ _ _',
+        imagePrompt: 'A rough sandpaper texture'
+      },
+      aiTutor: {
+        target_word: 'rough',
+        question: 'r _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /ʌf/ (uff family)',
+        spelling_pattern_or_rule: "In ‘rough,’ OUGH says /ʌf/ (like ‘uff’). Memorize the UFF-family: rough, tough, enough."
+      },
+      audio: 'rough'
+    },
+    {
+      id: 6,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'tough',
+      imageUrl: null,
+      explanation: "‘Tough’ uses OUGH for /ʌf/; GH is silent.",
+      questionText: 't _ _ _ h',
+      correctAnswer: 'tough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'tough',
+        intent: 'fill_blank',
+        questionLine: 't _ _ _ h',
+        imagePrompt: 'A tough rope being pulled'
+      },
+      aiTutor: {
+        target_word: 'tough',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /ʌf/ (uff family)',
+        spelling_pattern_or_rule: "In ‘tough,’ OUGH spells /ʌf/ (uff). Learn this small set: tough, rough, enough."
+      },
+      audio: 'tough'
+    },
+    {
+      id: 7,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'enough',
+      imageUrl: null,
+      explanation: "‘Enough’ also uses OUGH = /ʌf/; GH is silent.",
+      questionText: 'e n _ _ _ h',
+      correctAnswer: 'enough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'enough',
+        intent: 'fill_blank',
+        questionLine: 'e n _ _ _ h',
+        imagePrompt: 'An overflowing jar showing “enough”'
+      },
+      aiTutor: {
+        target_word: 'enough',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /ʌf/ (uff family)',
+        spelling_pattern_or_rule: "In ‘enough,’ OUGH says /ʌf/ (uff). Practice the trio together to lock the sound: enough–rough–tough."
+      },
+      audio: 'enough'
+    },
+
+    // --- OUGH = /ɔː/ (THOUGHT family) ---
+    {
+      id: 8,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'thought',
+      imageUrl: null,
+      explanation: "‘Thought’ uses OUGH to spell /ɔː/; GH is silent and final T is pronounced.",
+      questionText: 't h _ _ _ h t',
+      correctAnswer: 'thought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,6],
+      aiHook: {
+        targetWord: 'thought',
+        intent: 'fill_blank',
+        questionLine: 't h _ _ _ h t',
+        imagePrompt: 'A person thinking with a thought bubble'
+      },
+      aiTutor: {
+        target_word: 'thought',
+        question: 't h _ _ _ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /ɔː/ (thought family)',
+        spelling_pattern_or_rule: "In ‘thought,’ OUGH says /ɔː/ (as in ‘aw’). Practice this family: thought, brought (note: OUGHT words also carry this /ɔː/ sound)."
+      },
+      audio: 'thought'
+    },
+
+    // --- OUGH = /aʊ/ (BOUGH family) ---
+    {
+      id: 9,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bough',
+      imageUrl: null,
+      explanation: "‘Bough’ uses OUGH to spell /aʊ/ (ow sound); GH is silent.",
+      questionText: 'b _ _ _ h',
+      correctAnswer: 'bough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'bough',
+        intent: 'fill_blank',
+        questionLine: 'b _ _ _ h',
+        imagePrompt: 'A heavy tree bough with leaves'
+      },
+      aiTutor: {
+        target_word: 'bough',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGH = /aʊ/ (bough family)',
+        spelling_pattern_or_rule: "In ‘bough,’ OUGH says /aʊ/ (ow). Learn this small family with the same /aʊ/ sound (bough, drought in some dialects)."
+      },
+      audio: 'bough'
+    },
+
+    // --- OUGH = /ɒf/ or /ɔːf/ (COUGH) ---
+    {
+      id: 10,
+      topicId: '5-A.11',
+      topicName: 'Learn_phonogram_OUGH_multiple_sounds',
+      progressTopicName: 'Phonogram OUGH — many sounds by word family',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cough',
+      imageUrl: null,
+      explanation: "‘Cough’ uses OUGH to spell the /ɒf/ (or /ɔːf/) sound; GH is silent.",
+      questionText: 'c _ _ _ h',
+      correctAnswer: 'cough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'cough',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ _ h',
+        imagePrompt: 'A person covering their mouth while coughing'
+      },
+      aiTutor: {
+        target_word: 'cough',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'One spelling, many sounds',
+        spelling_pattern_or_rule: "In ‘cough,’ OUGH says /ɒf/ (or /ɔːf/). Compare OUGH families: /oʊ/ (though), /uː/ (through), /ʌf/ (rough/tough/enough), /ɔː/ (thought), /aʊ/ (bough), and /ɒf/ (cough)."
+      },
+      audio: 'cough'
+    }
+  ]
+},
+'5-A.12': {
+  topicInfo: {
+    topicId: '5-A.12',
+    topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+    progressTopicName: 'Words with short U sound spelled OU',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 5 words with prefilled indexes [2,3] ---
+    {
+      id: 1,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'young',
+      imageUrl: null,
+      explanation: "Nice! The word is 'young' — OU makes the short U sound /ŭ/.",
+      questionText: 'y _ _ n g',
+      correctAnswer: 'young',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3,4],
+      aiHook: {
+        targetWord: 'young',
+        intent: 'fill_blank',
+        questionLine: 'y _ _ n g',
+        imagePrompt: "A group of young children playing outdoors"
+      },
+      aiTutor: {
+        target_word: 'young',
+        question: 'y _ _ n g',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "In certain words, the vowel team 'ou' represents the short U sound /ŭ/. This happens in words like young, touch, and trouble, where the letters 'ou' do not say /ow/ or /oo/ but instead /ŭ/."
+      },
+      audio: 'young'
+    },
+    {
+      id: 2,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'country',
+      imageUrl: null,
+      explanation: "Great! The word is 'country' — OU spells the short U sound /ŭ/.",
+      questionText: 'c _ _ n t r y',
+      correctAnswer: 'country',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5, 6],
+      aiHook: {
+        targetWord: 'country',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ n t r y',
+        imagePrompt: "A green countryside with hills and farms"
+      },
+      aiTutor: {
+        target_word: 'country',
+        question: 'c _ _ n t r y',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "The 'ou' vowel team can represent /ŭ/ in some words, especially before N or T, like country and cousin."
+      },
+      audio: 'country'
+    },
+    {
+      id: 3,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cousin',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'cousin' — OU makes the short U sound /ŭ/.",
+      questionText: 'c _ _ s i n',
+      correctAnswer: 'cousin',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5],
+      aiHook: {
+        targetWord: 'cousin',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ s i n',
+        imagePrompt: "Two cousins hugging and smiling together"
+      },
+      aiTutor: {
+        target_word: 'cousin',
+        question: 'c _ _ s i n',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "The vowel pair 'ou' can say /ŭ/ in words like cousin and country. This is a less common but regular pattern."
+      },
+      audio: 'cousin'
+    },
+    {
+      id: 4,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'touch',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'touch' — OU makes the short U sound /ŭ/.",
+      questionText: 't _ _ c h',
+      correctAnswer: 'touch',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3,4],
+      aiHook: {
+        targetWord: 'touch',
+        intent: 'fill_blank',
+        questionLine: 't _ _ c h',
+        imagePrompt: "A hand gently touching a flower"
+      },
+      aiTutor: {
+        target_word: 'touch',
+        question: 't _ _ c h',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "When 'ou' is followed by CH, it often says /ŭ/ instead of /ow/. Words like touch, young, and double follow this rule."
+      },
+      audio: 'touch'
+    },
+    {
+      id: 5,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'trouble',
+      imageUrl: null,
+      explanation: "Good job! The word is 'trouble' — OU says /ŭ/.",
+      questionText: 't r _ _ b l e',
+      correctAnswer: 'trouble',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5,6],
+      aiHook: {
+        targetWord: 'trouble',
+        intent: 'fill_blank',
+        questionLine: 't r _ _ b l e',
+        imagePrompt: "A child looking worried after causing trouble"
+      },
+      aiTutor: {
+        target_word: 'trouble',
+        question: 't r _ _ b l e',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "The letters 'ou' spell /ŭ/ before BL or other consonant clusters, as in trouble, double, and country."
+      },
+      audio: 'trouble'
+    },
+
+    // --- 5 words with blank questions (no prefilled indexes) ---
+    {
+      id: 6,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'double',
+      imageUrl: null,
+      explanation: "Nice! The word is 'double' — OU says /ŭ/ before BL.",
+      questionText: '______',
+      correctAnswer: 'double',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [5],
+      aiHook: {
+        targetWord: 'double',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Two scoops of ice cream side by side showing 'double'"
+      },
+      aiTutor: {
+        target_word: 'double',
+        question: '_____e',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "In words like double and trouble, 'ou' makes the short U sound /ŭ/. This happens especially before BL or B."
+      },
+      audio: 'double'
+    },
+    {
+      id: 7,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nourish',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'nourish' — OU says /ŭ/ before R.",
+      questionText: '______',
+      correctAnswer: 'nourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [6],
+      aiHook: {
+        targetWord: 'nourish',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A plant being watered to nourish it"
+      },
+      aiTutor: {
+        target_word: 'nourish',
+        question: '_____h',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "When 'ou' comes before R, it can make the short U sound /ŭ/, as in nourish and flourish."
+      },
+      audio: 'nourish'
+    },
+    {
+      id: 8,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'rough',
+      imageUrl: null,
+      explanation: "Nice! The word is 'rough' — OU spells /ŭ/ before GH.",
+      questionText: '______',
+      correctAnswer: 'rough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [3,4],
+      aiHook: {
+        targetWord: 'rough',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A rough rocky surface"
+      },
+      aiTutor: {
+        target_word: 'rough',
+        question: '_ _ _ g h',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "The letters 'ou' can make /ŭ/ before GH, as in rough and tough. The GH is silent."
+      },
+      audio: 'rough'
+    },
+    {
+      id: 9,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'southern',
+      imageUrl: null,
+      explanation: "Great! The word is 'southern' — OU says /ŭ/ before TH.",
+      questionText: '______',
+      correctAnswer: 'southern',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'southern',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A map showing the southern region of a country"
+      },
+      aiTutor: {
+        target_word: 'southern',
+        question: '_ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "When 'ou' is followed by TH, it often makes the short U sound /ŭ/, as in southern and country."
+      },
+      audio: 'southern'
+    },
+    {
+      id: 10,
+      topicId: '5-A.12',
+      topicName: 'Spell_words_with_the_sound_of_short_u_spelled_ou',
+      progressTopicName: 'Words with short U sound spelled OU',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'tough',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'tough' — OU spells /ŭ/ before GH.",
+      questionText: '______',
+      correctAnswer: 'tough',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'tough',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A strong athlete lifting weights showing toughness"
+      },
+      aiTutor: {
+        target_word: 'tough',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'Words with short U sound spelled OU',
+        spelling_pattern_or_rule: "When 'ou' is followed by GH, it often represents /ŭ/. The GH is silent, as in tough, rough, and enough."
+      },
+      audio: 'tough'
+    }
+  ]
+},
+'5-A.13': {
+  topicInfo: {
+    topicId: '5-A.13',
+    topicName: 'Learn_phonograms_UI_and_GN',
+    progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fruit',
+      imageUrl: null,
+      explanation: "‘Fruit’ uses UI to spell the long /oo/ sound.",
+      questionText: 'f r _ _ t',
+      correctAnswer: 'fruit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4],
+      aiHook: {
+        targetWord: 'fruit',
+        intent: 'fill_blank',
+        questionLine: 'f r _ _ t',
+        imagePrompt: 'A bowl filled with colorful fruit'
+      },
+      aiTutor: {
+        target_word: 'fruit',
+        question: 'f r _ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram UI (long oo)',
+        spelling_pattern_or_rule: "In ‘fruit,’ the vowel team UI makes the long /oo/ sound. UI is used in many words for /uː/ in the middle syllable."
+      },
+      audio: 'fruit'
+    },
+    {
+      id: 2,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'suit',
+      imageUrl: null,
+      explanation: "‘Suit’ also uses UI to spell the long /oo/ sound.",
+      questionText: 's _ _ t',
+      correctAnswer: 'suit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'suit',
+        intent: 'fill_blank',
+        questionLine: 's _ _ t',
+        imagePrompt: 'A formal suit on a hanger'
+      },
+      aiTutor: {
+        target_word: 'suit',
+        question: 's _ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram UI (long oo)',
+        spelling_pattern_or_rule: "In ‘suit,’ UI makes the /uː/ sound. Like ‘fruit’ and ‘juice,’ UI stands for the long /oo/ sound in stressed syllables."
+      },
+      audio: 'suit'
+    },
+    {
+      id: 3,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'juice',
+      imageUrl: null,
+      explanation: "‘Juice’ has UI spelling the long /oo/ sound.",
+      questionText: 'j _ _ c e',
+      correctAnswer: 'juice',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'juice',
+        intent: 'fill_blank',
+        questionLine: 'j _ _ c e',
+        imagePrompt: 'A glass of orange juice'
+      },
+      aiTutor: {
+        target_word: 'juice',
+        question: 'j _ _ c e',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram UI (long oo)',
+        spelling_pattern_or_rule: "In ‘juice,’ the letters UI spell /uː/. The silent E softens the C, changing /k/ to /s/."
+      },
+      audio: 'juice'
+    },
+    {
+      id: 4,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bruise',
+      imageUrl: null,
+      explanation: "‘Bruise’ uses UI for /oo/ again and ends with a soft S sound.",
+      questionText: 'b r _ _ s e',
+      correctAnswer: 'bruise',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [5],
+      aiHook: {
+        targetWord: 'bruise',
+        intent: 'fill_blank',
+        questionLine: 'b r _ _ s e',
+        imagePrompt: 'A small bruise on a person’s arm'
+      },
+      aiTutor: {
+        target_word: 'bruise',
+        question: '_ _ _ _ _ e',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram UI (long oo)',
+        spelling_pattern_or_rule: "In ‘bruise,’ UI makes /uː/ as in ‘fruit.’ The final E makes the S soft, so it says /z/ instead of /s/."
+      },
+      audio: 'bruise'
+    },
+    {
+      id: 5,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cruise',
+      imageUrl: null,
+      explanation: "‘Cruise’ shows UI spelling /uː/ again.",
+      questionText: 'c r _ _ s e',
+      correctAnswer: 'cruise',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [5],
+      aiHook: {
+        targetWord: 'cruise',
+        intent: 'fill_blank',
+        questionLine: 'c r _ _ s e',
+        imagePrompt: 'A large cruise ship on the ocean'
+      },
+      aiTutor: {
+        target_word: 'cruise',
+        question: '_ _ _ _ _ e',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram UI (long oo)',
+        spelling_pattern_or_rule: "In ‘cruise,’ UI makes the /uː/ sound again. The silent E softens the ending and keeps the vowel long."
+      },
+      audio: 'cruise'
+    },
+    {
+      id: 6,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'sign',
+      imageUrl: null,
+      explanation: "‘Sign’ has a silent G before N.",
+      questionText: 's i _ _',
+      correctAnswer: 'sign',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1],
+      aiHook: {
+        targetWord: 'sign',
+        intent: 'fill_blank',
+        questionLine: 's i _ _',
+        imagePrompt: 'A road sign on a street corner'
+      },
+      aiTutor: {
+        target_word: 'sign',
+        question: 's i _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram GN (silent g)',
+        spelling_pattern_or_rule: "In ‘sign,’ the G is silent before N. GN spells /n/, and G reappears in sound in related words like ‘signal.’"
+      },
+      audio: 'sign'
+    },
+    {
+      id: 7,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'design',
+      imageUrl: null,
+      explanation: "‘Design’ has a silent G that affects related words like ‘signature.’",
+      questionText: 'd e s i _ _',
+      correctAnswer: 'design',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'design',
+        intent: 'fill_blank',
+        questionLine: 'd e s i _ _',
+        imagePrompt: 'A student sketching a design'
+      },
+      aiTutor: {
+        target_word: 'design',
+        question: 'd e s i _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram GN (silent g)',
+        spelling_pattern_or_rule: "In ‘design,’ GN says /n/. The silent G reappears in ‘signature.’ GN keeps the same base meaning in both."
+      },
+      audio: 'design'
+    },
+    {
+      id: 8,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'reign',
+      imageUrl: null,
+      explanation: "‘Reign’ has a silent G — only N is pronounced.",
+      questionText: 'r e i _ _',
+      correctAnswer: 'reign',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'reign',
+        intent: 'fill_blank',
+        questionLine: 'r e i _ _',
+        imagePrompt: 'A king during his reign'
+      },
+      aiTutor: {
+        target_word: 'reign',
+        question: 'r e i _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram GN (silent g)',
+        spelling_pattern_or_rule: "‘Reign’ uses GN to spell /n/. The G is silent, but it reappears in pronunciation in ‘regal.’"
+      },
+      audio: 'reign'
+    },
+    {
+      id: 9,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'foreign',
+      imageUrl: null,
+      explanation: "‘Foreign’ uses GN for /n/ and silent G again.",
+      questionText: 'f o r e i _ _',
+      correctAnswer: 'foreign',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,2,3,4],
+      aiHook: {
+        targetWord: 'foreign',
+        intent: 'fill_blank',
+        questionLine: 'f o r e i _ _',
+        imagePrompt: 'A globe showing foreign countries'
+      },
+      aiTutor: {
+        target_word: 'foreign',
+        question: 'f o r e i _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram GN (silent g)',
+        spelling_pattern_or_rule: "‘Foreign’ has silent G again before N. GN spells /n/, and G reappears when adding suffixes like ‘foreigner.’"
+      },
+      audio: 'foreign'
+    },
+    {
+      id: 10,
+      topicId: '5-A.13',
+      topicName: 'Learn_phonograms_UI_and_GN',
+      progressTopicName: 'Phonograms UI (long oo) and GN (silent g)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'gnaw',
+      imageUrl: null,
+      explanation: "‘Gnaw’ starts with silent G — only the N is pronounced.",
+      questionText: 'g n _ _',
+      correctAnswer: 'gnaw',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'gnaw',
+        intent: 'fill_blank',
+        questionLine: 'g n _ _',
+        imagePrompt: 'A beaver gnawing on a tree branch'
+      },
+      aiTutor: {
+        target_word: 'gnaw',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram GN (silent g)',
+        spelling_pattern_or_rule: "At the start of words like ‘gnaw,’ G is silent before N. GN spells /n/ in both beginning and ending positions."
+      },
+      audio: 'gnaw'
+    }
+  ]
+},
+'5-A.14': {
+   topicInfo: {
+    topicId: '5-A.14',
+    topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+    progressTopicName: 'Words with /n/ sound spelled GN',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  
+  questions: [
+    // --- 3 words starting with GN (silent G) ---
+    {
+      id: 1,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'gnaw',
+      imageUrl: null,
+      explanation: "Nice! The word is 'gnaw' — GN at the start makes /n/; the G is silent.",
+      questionText: 'g n _ _',
+      correctAnswer: 'gnaw',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2, 3],
+      aiHook: {
+        targetWord: 'gnaw',
+        intent: 'fill_blank',
+        questionLine: 'g n _ _',
+        imagePrompt: "A beaver gnawing on a log"
+      },
+      aiTutor: {
+        target_word: 'gnaw',
+        question: '_ _ a w',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "When a word begins with GN, the G is silent and the N says /n/ (gnaw, gnome, gnat)."
+      },
+      audio: 'gnaw'
+    },
+    {
+      id: 2,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'gnome',
+      imageUrl: null,
+      explanation: "Great! The word is 'gnome' — GN at the start says /n/; the G is silent.",
+      questionText: 'g n _ _ e',
+      correctAnswer: 'gnome',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4,5],
+      aiHook: {
+        targetWord: 'gnome',
+        intent: 'fill_blank',
+        questionLine: 'g n _ _ e',
+        imagePrompt: "A garden gnome statue with a hat"
+      },
+      aiTutor: {
+        target_word: 'gnome',
+        question: '_ _ o m e',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "GN at the beginning of a word spells the /n/ sound with a silent G (gnome, gnaw, gnat)."
+      },
+      audio: 'gnome'
+    },
+    {
+      id: 3,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'gnat',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'gnat' — the G is silent and the N says /n/.",
+      questionText: 'g n _ _',
+      correctAnswer: 'gnat',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'gnat',
+        intent: 'fill_blank',
+        questionLine: 'g n _ _',
+        imagePrompt: "A tiny gnat flying near a fruit bowl"
+      },
+      aiTutor: {
+        target_word: 'gnat',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "When GN starts a word, the G is not pronounced; only /n/ is heard (gnat, gnome, gnaw)."
+      },
+      audio: 'gnat'
+    },
+
+    // --- 3 words ending in GN (silent G) ---
+    {
+      id: 4,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'sign',
+      imageUrl: null,
+      explanation: "Nice! The word is 'sign' — GN at the end says /n/; the G is silent.",
+      questionText: 's _ _ n',
+      correctAnswer: 'sign',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'sign',
+        intent: 'fill_blank',
+        questionLine: 's _ _ n',
+        imagePrompt: "A road sign with arrows"
+      },
+      aiTutor: {
+        target_word: 'sign',
+        question: 's _ _',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "GN at the end of a word spells the /n/ sound with a silent G (sign, design, align)."
+      },
+      audio: 'sign'
+    },
+    {
+      id: 5,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'design',
+      imageUrl: null,
+      explanation: "Great! The word is 'design' — final GN says /n/; G stays silent.",
+      questionText: 'd e s i _ _',
+      correctAnswer: 'design',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'design',
+        intent: 'fill_blank',
+        questionLine: 'd e s i _ _',
+        imagePrompt: "A student sketching a design on graph paper"
+      },
+      aiTutor: {
+        target_word: 'design',
+        question: 'd e s i _ _',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "At the end of a word, GN represents /n/ with a silent G (design, align, sign)."
+      },
+      audio: 'design'
+    },
+    {
+      id: 6,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'align',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'align' — final GN says /n/; the G is silent.",
+      questionText: 'a l i _ _',
+      correctAnswer: 'align',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'align',
+        intent: 'fill_blank',
+        questionLine: 'a l i _ _',
+        imagePrompt: "Two objects being aligned in a straight line"
+      },
+      aiTutor: {
+        target_word: 'align',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "Final GN is pronounced /n/ with a silent G (align, design, sign)."
+      },
+      audio: 'align'
+    },
+
+    // --- 3 words with GN in the middle that show the morphology rule (G becomes pronounced when suffix breaks the pair) ---
+    {
+      id: 7,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'signal',
+      imageUrl: null,
+      explanation: "Nice! The word is 'signal' — from the base word 'sign'. Adding a suffix breaks GN so the G is pronounced.",
+      questionText: '______',
+      correctAnswer: 'signal',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5],
+      aiHook: {
+        targetWord: 'signal',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A hand giving a clear signal or a traffic signal light"
+      },
+      aiTutor: {
+        target_word: 'signal',
+        question: 's i _ _ a l',
+        student_entry: '',
+        topic_to_reinforce: 'GN pronunciation change with suffixes',
+        spelling_pattern_or_rule: "In base words like sign, GN spells /n/ with silent G. When a suffix or extra syllable is added (signal, signature), the GN pair is split across syllables and the G is pronounced."
+      },
+      audio: 'signal'
+    },
+    {
+      id: 8,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'signature',
+      imageUrl: null,
+      explanation: "Great! The word is 'signature' — from 'sign'. The added syllables break GN, so the G is pronounced.",
+      questionText: '______',
+      correctAnswer: 'signature',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6,7,8],
+      aiHook: {
+        targetWord: 'signature',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A close-up of a hand writing a signature"
+      },
+      aiTutor: {
+        target_word: 'signature',
+        question: 's _ _ _ a t u r e',
+        student_entry: '',
+        topic_to_reinforce: 'GN pronunciation change with suffixes',
+        spelling_pattern_or_rule: "The base sign has silent G. In signature, the GN is divided by added syllables, so the G becomes audible. This shows how adding suffixes can change pronunciation while spelling remains consistent."
+      },
+      audio: 'signature'
+    },
+    {
+      id: 9,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'resignation',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'resignation' — from 'resign'. The suffix breaks GN so the G is pronounced.",
+      questionText: '______',
+      correctAnswer: 'resignation',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [7,8,9,10],
+      aiHook: {
+        targetWord: 'resignation',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A formal letter labeled resignation"
+      },
+      aiTutor: {
+        target_word: 'resignation',
+        question: '_ _ _ _ _ _ a t i o n',
+        student_entry: '',
+        topic_to_reinforce: 'GN pronunciation change with suffixes',
+        spelling_pattern_or_rule: "In resign, GN spells /n/ with silent G. In resignation, the extra syllable splits the pair so the G is pronounced. Compare sign → signal/signature; design → designate/designation."
+      },
+      audio: 'resignation'
+    },
+
+    // --- 1 extra (your choice) ---
+    {
+      id: 10,
+      topicId: '5-A.14',
+      topicName: 'Spell_words_with_the_sound_of_n_spelled_gn',
+      progressTopicName: 'Words with /n/ sound spelled GN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'foreign',
+      imageUrl: null,
+      explanation: "Great! The word is 'foreign' — GN = /n/ with silent G.",
+      questionText: '______',
+      correctAnswer: 'foreign',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'foreign',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A globe showing different countries"
+      },
+      aiTutor: {
+        target_word: 'foreign',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'GN = /n/ (silent G)',
+        spelling_pattern_or_rule: "GN within a word often still represents /n/ with a silent G (foreign, campaign, benign). Some related forms can change pronunciation when syllables are added (benign → benignity)."
+      },
+      audio: 'foreign'
+    }
+    
+  ]
+},
+'5-A.15': {
+  topicInfo: {
+    topicId: '5-A.15',
+    topicName: 'Spell_words_with_the_sound_of_e_spelled_ie',
+    progressTopicName: "The sound of /ē/ spelled IE",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ie',
+      progressTopicName: "The sound of /ē/ spelled IE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'field',
+      imageUrl: null,
+      explanation: "Nice! The word is 'field' — IE spells the long E sound /ē/ in the middle.",
+      questionText: '______',
+      correctAnswer: 'field',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'field',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A wide green field under a bright sky"
+      },
+      aiTutor: {
+        target_word: 'field',
+        question: 'f _ _ l d',
+        student_entry: '',
+        topic_to_reinforce: "The sound of /ē/ spelled IE",
+        spelling_pattern_or_rule: " I before E when the sound is /ē/: field, shield, yield."
+      },
+      audio: 'field'
+    },
+    {
+      id: 2,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ie',
+      progressTopicName: "The sound of /ē/ spelled IE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'chief',
+      imageUrl: null,
+      explanation: "Great! The word is 'chief' — IE spells /ē/ before F.",
+      questionText: '______',
+      correctAnswer: 'chief',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: 'chief',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A leader (chief) addressing a group, friendly classroom style"
+      },
+      aiTutor: {
+        target_word: 'chief',
+        question: 'c h _ _ f',
+        student_entry: '',
+        topic_to_reinforce: "The sound of /ē/ spelled IE",
+        spelling_pattern_or_rule: "IE makes the /ē/ sound: chief, thief, relief."
+      },
+      audio: 'chief'
+    },
+    {
+      id: 3,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ie',
+      progressTopicName: "The sound of /ē/ spelled IE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'believe',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'believe' — IE spells the /ē/ sound.",
+      questionText: '_______',
+      correctAnswer: 'believe',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5,6],
+      aiHook: {
+        targetWord: 'believe',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A student pointing to a poster that says “Believe”"
+      },
+      aiTutor: {
+        target_word: 'believe',
+        question: 'b e l _ _ v e',
+        student_entry: '',
+        topic_to_reinforce: "The sound of /ē/ spelled IE",
+        spelling_pattern_or_rule: "I before E when the sound is /ē/: believe, achieve, relief."
+      },
+      audio: 'believe'
+    },
+    {
+      id: 4,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ei_after_c',
+      progressTopicName: "The sound of /ē/ spelled EI (after C)",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'receive',
+      imageUrl: null,
+      explanation: "Nice! The word is 'receive' — after C, we spell /ē/ with EI.",
+      questionText: '_______',
+      correctAnswer: 'receive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5,6],
+      aiHook: {
+        targetWord: 'receive',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A smiling child receiving a gift box"
+      },
+      aiTutor: {
+        target_word: 'receive',
+        question: ' r e c _ _ v e',
+        student_entry: '',
+        topic_to_reinforce: "I before E Except C",
+        spelling_pattern_or_rule: "🎁 When the /ē/ sound comes after C, spell it with EI — receive, ceiling, receipt."
+      },
+      audio: 'receive'
+    },
+    {
+      id: 5,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ei_after_c',
+      progressTopicName: "The sound of /ē/ spelled EI (after C)",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ceiling',
+      imageUrl: null,
+      explanation: "Great! The word is 'ceiling' — EI comes after C and makes the /ē/ sound.",
+      questionText: '_______',
+      correctAnswer: 'ceiling',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5,6],
+      aiHook: {
+        targetWord: 'ceiling',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A decorated ceiling with a hanging light"
+      },
+      aiTutor: {
+        target_word: 'ceiling',
+        question: 'C _ _ L I N G',
+        student_entry: '',
+        topic_to_reinforce: "I before E Except C",
+        spelling_pattern_or_rule: "🏠 After C, use EI for the /ē/ sound — ceiling, receive."
+      },
+      audio: 'ceiling'
+    },
+    {
+      id: 6,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ei_after_c',
+      progressTopicName: "The sound of /ē/ spelled EI (after C)",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'deceive',
+      imageUrl: null,
+      explanation: "Nice! The word is 'deceive' — EI follows C and makes the /ē/ sound.",
+      questionText: '_______',
+      correctAnswer: 'deceive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5,6],
+      aiHook: {
+        targetWord: 'deceive',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A cartoon showing someone trying to trick another person playfully"
+      },
+      aiTutor: {
+        target_word: 'deceive',
+        question: 'd e c _ _ v e',
+        student_entry: '',
+        topic_to_reinforce: "I before E Generalization — Part 2",
+        spelling_pattern_or_rule: "🎭 After C, use EI to spell the /ē/ sound — deceive, receive, conceive."
+      },
+      audio: 'deceive'
+    },
+    {
+      id: 7,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ie',
+      progressTopicName: "The sound of /ē/ spelled IE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'achieve',
+      imageUrl: null,
+      explanation: "Nice! The word is 'achieve' — IE spells the /ē/ sound here.",
+      questionText: '_______',
+      correctAnswer: 'achieve',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'achieve',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A student holding a trophy in celebration"
+      },
+      aiTutor: {
+        target_word: 'achieve',
+        question: 'a c h _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "The sound of /ē/ spelled IE",
+        spelling_pattern_or_rule: "🏆 I before E when the sound is /ē/: achieve, believe."
+      },
+      audio: 'achieve'
+    },
+    {
+      id: 8,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ei_after_c',
+      progressTopicName: "The sound of /ē/ spelled EI (after C)",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'deceit',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'deceit' — EI follows C and makes /ē/.",
+      questionText: '_______',
+      correctAnswer: 'deceit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,5],
+      aiHook: {
+        targetWord: 'deceit',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A child hiding a surprise behind their back"
+      },
+      aiTutor: {
+        target_word: 'deceit',
+        question: '_ _ c _ _ t',
+        student_entry: '',
+        topic_to_reinforce: "I before E Generalization — Part 2",
+        spelling_pattern_or_rule: "🕵️ EI after C says /ē/: deceit, conceit, receive."
+      },
+      audio: 'deceit'
+    },
+    {
+      id: 9,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ie',
+      progressTopicName: "The sound of /ē/ spelled IE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'thief',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'thief' — IE spells /ē/ before F.",
+      questionText: '______',
+      correctAnswer: 'thief',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'thief',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A sneaky thief tiptoeing (cartoon, kid-safe)"
+      },
+      aiTutor: {
+        target_word: 'thief',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "The sound of /ē/ spelled IE",
+        spelling_pattern_or_rule: "🕵️ IE = /ē/: thief, chief, brief."
+      },
+      audio: 'thief'
+    },
+    {
+      id: 10,
+      topicId: '5-A.15',
+      topicName: 'Spell_words_with_the_sound_of_e_spelled_ei_after_c',
+      progressTopicName: "The sound of /ē/ spelled EI (after C)",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'perceive',
+      imageUrl: null,
+      explanation: "Nice! The word is 'perceive' — EI after C makes /ē/.",
+      questionText: '_______',
+      correctAnswer: 'perceive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [6,7],
+      aiHook: {
+        targetWord: 'perceive',
+        intent: 'fill_blank',
+        questionLine: '_______',
+        imagePrompt: "A scientist observing through a magnifying glass"
+      },
+      aiTutor: {
+        target_word: 'perceive',
+        question: '_ _ _ _ _ _ v e',
+        student_entry: '',
+        topic_to_reinforce: "I before E Generalization — Part 2",
+        spelling_pattern_or_rule: "🔍 After C, spell /ē/ with EI — perceive, receive."
+      },
+      audio: 'perceive'
+    }
+  ]
+},
+'5-A.16': {
+  topicInfo: {
+    topicId: '5-A.16',
+    topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+    progressTopicName: 'Words with long /ē/ sound spelled EI',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'protein',
+      imageUrl: null,
+      explanation: "‘Protein’ uses EI to spell the long /ē/ sound in the second syllable.",
+      questionText: 'p r o t _ _ n',
+      correctAnswer: 'protein',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,6],
+      aiHook: {
+        targetWord: 'protein',
+        intent: 'fill_blank',
+        questionLine: 'p r o t _ _ n',
+        imagePrompt: 'A plate with foods rich in protein like eggs and beans'
+      },
+      aiTutor: {
+        target_word: 'protein',
+        question: 'p r o t _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/',
+        spelling_pattern_or_rule: "In ‘protein,’ EI spells the long /ē/ in an unstressed syllable. EI keeps a steady vowel sound even without following C."
+      },
+      audio: 'protein'
+    },
+    {
+      id: 2,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'freight',
+      imageUrl: null,
+      explanation: "‘Freight’ uses EI to spell a long vowel sound, as in ‘eight.’",
+      questionText: 'f r _ _ g h t',
+      correctAnswer: 'freight',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4,5,6],
+      aiHook: {
+        targetWord: 'freight',
+        intent: 'fill_blank',
+        questionLine: 'f r _ _ g h t',
+        imagePrompt: 'A freight train carrying cargo'
+      },
+      aiTutor: {
+        target_word: 'freight',
+        question: 'f r _ _ g h t',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ or /ā/ long vowel team',
+        spelling_pattern_or_rule: "In ‘freight,’ EI spells a long vowel sound (like /ā/ in eight). This pattern occurs in weight, sleigh, and freight — steady EI vowel teams."
+      },
+      audio: 'freight'
+    },
+    {
+      id: 3,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'reins',
+      imageUrl: null,
+      explanation: "‘Reins’ uses EI to spell a long vowel sound, same pattern as in ‘rain.’",
+      questionText: 'r _ _ n s',
+      correctAnswer: 'reins',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'reins',
+        intent: 'fill_blank',
+        questionLine: 'r _ _ n s',
+        imagePrompt: 'A rider holding horse reins'
+      },
+      aiTutor: {
+        target_word: 'reins',
+        question: 'r _ _ n s',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/',
+        spelling_pattern_or_rule: "In ‘reins,’ EI spells the long /ā/ sound. This spelling shows up in words connected to rain/ray patterns (rein, vein, neighbor)."
+      },
+      audio: 'reins'
+    },
+    {
+      id: 4,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'either',
+      imageUrl: null,
+      explanation: "‘Either’ uses EI to spell the /ē/ sound at the start.",
+      questionText: '_ _ t h e r',
+      correctAnswer: 'either',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3,4,5],
+      aiHook: {
+        targetWord: 'either',
+        intent: 'fill_blank',
+        questionLine: '_ _ t h e r',
+        imagePrompt: 'Two paths showing choices for “either this or that”'
+      },
+      aiTutor: {
+        target_word: 'either',
+        question: '_ _ t h e r',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/',
+        spelling_pattern_or_rule: "In ‘either,’ EI spells /ē/ in the first syllable. EI here makes a clear long vowel team sound even though it doesn’t follow C."
+      },
+      audio: 'either'
+    },
+    {
+      id: 5,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'seize',
+      imageUrl: null,
+      explanation: "‘Seize’ uses EI to spell /ē/ after S — a memorized pattern.",
+      questionText: 's _ _ z e',
+      correctAnswer: 'seize',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [4],
+      aiHook: {
+        targetWord: 'seize',
+        intent: 'fill_blank',
+        questionLine: 's _ _ z e',
+        imagePrompt: 'A hand seizing a golden key'
+      },
+      aiTutor: {
+        target_word: 'seize',
+        question: '_ _ _ _ e',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/',
+        spelling_pattern_or_rule: "In ‘seize,’ EI spells /ē/ after S. This is one of the few steady EI words outside the “after C” rule — memorize its pattern."
+      },
+      audio: 'seize'
+    },
+    {
+      id: 6,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ceiling',
+      imageUrl: null,
+      explanation: "‘Ceiling’ follows the ‘I before E except after C’ rule — EI spells /ē/ after C.",
+      questionText: 'c _ _ l i n g',
+      correctAnswer: 'ceiling',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,5,6],
+      aiHook: {
+        targetWord: 'ceiling',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ l i n g',
+        imagePrompt: 'A white ceiling with a lamp hanging'
+      },
+      aiTutor: {
+        target_word: 'ceiling',
+        question: 'c _ _ _ _ n g',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/',
+        spelling_pattern_or_rule: "In ‘ceiling,’ EI follows C and spells /ē/, fitting the rule. This contrasts with other EI words that break it (protein, seize)."
+      },
+      audio: 'ceiling'
+    },
+    {
+      id: 7,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'neighbor',
+      imageUrl: null,
+      explanation: "‘Neighbor’ uses EI to spell the long /ā/ sound, similar to ‘eight’.",
+      questionText: 'n _ _ g h b o r',
+      correctAnswer: 'neighbor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5,6,7],
+      aiHook: {
+        targetWord: 'neighbor',
+        intent: 'fill_blank',
+        questionLine: 'n _ _ g h b o r',
+        imagePrompt: 'Two friendly neighbors talking over a fence'
+      },
+      aiTutor: {
+        target_word: 'neighbor',
+        question: 'n _ _ g h b o r',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ or /ā/',
+        spelling_pattern_or_rule: "In ‘neighbor,’ EI spells the long /ā/ sound. This vowel team pattern repeats in eight, weight, sleigh, and neighbor."
+      },
+      audio: 'neighbor'
+    },
+    {
+      id: 8,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'veil',
+      imageUrl: null,
+      explanation: "‘Veil’ uses EI to spell a long /ā/ sound — similar to ‘rein’.",
+      questionText: 'v _ _ l',
+      correctAnswer: 'veil',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'veil',
+        intent: 'fill_blank',
+        questionLine: 'v _ _ l',
+        imagePrompt: 'A wedding veil on a bride'
+      },
+      aiTutor: {
+        target_word: 'veil',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ or /ā/',
+        spelling_pattern_or_rule: "In ‘veil,’ EI says /ā/. This vowel team spelling is shared by rein, vein, and neighbor, all using EI for long vowel sounds."
+      },
+      audio: 'veil'
+    },
+    {
+      id: 9,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'receive',
+      imageUrl: null,
+      explanation: "‘Receive’ follows the classic ‘after C’ rule — EI spells /ē/ after C.",
+      questionText: 'r _ c _ _ v e',
+      correctAnswer: 'receive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2,5,6],
+      aiHook: {
+        targetWord: 'receive',
+        intent: 'fill_blank',
+        questionLine: 'r _ c _ _ v e',
+        imagePrompt: 'Hands receiving a gift box'
+      },
+      aiTutor: {
+        target_word: 'receive',
+        question: 'r _ c _ _ v e',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ after C',
+        spelling_pattern_or_rule: "In ‘receive,’ EI follows C and spells /ē/, fitting the main spelling rule. This pattern repeats in perceive and deceive."
+      },
+      audio: 'receive'
+    },
+    {
+      id: 10,
+      topicId: '5-A.16',
+      topicName: 'Spell_words_with_the_sound_of_long_e_spelled_ei',
+      progressTopicName: 'Words with long /ē/ sound spelled EI',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'deceive',
+      imageUrl: null,
+      explanation: "‘Deceive’ follows the ‘after C’ rule — EI spells /ē/ after C.",
+      questionText: 'd _ c _ _ v e',
+      correctAnswer: 'deceive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'deceive',
+        intent: 'fill_blank',
+        questionLine: 'd _ c _ _ v e',
+        imagePrompt: 'A person pretending to trick someone — concept of deceive'
+      },
+      aiTutor: {
+        target_word: 'deceive',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ after C',
+        spelling_pattern_or_rule: "In ‘deceive,’ EI follows C and spells /ē/, perfectly matching the rule: ‘I before E except after C.’ Compare receive, conceive, and perceive."
+      },
+      audio: 'deceive'
+    }
+    
+  ]
+},
+'5-A.17': {
+  topicInfo: {
+    topicId: '5-A.17',
+    topicName: 'Learn_more_words_with_long_e_spelled_EA',
+    progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- Long E pattern ---
+    {
+      id: 1,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'eat',
+      imageUrl: null,
+      explanation: "‘Eat’ uses EA to spell the long /ē/ sound.",
+      questionText: '_ _ t',
+      correctAnswer: 'eat',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'eat',
+        intent: 'fill_blank',
+        questionLine: '_ _ t',
+        imagePrompt: 'A child eating breakfast'
+      },
+      aiTutor: {
+        target_word: 'eat',
+        question: '_ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘eat,’ EA is a vowel team saying long /ē/. EA often spells /ē/ at the start or middle of words like eat and each."
+      },
+      audio: 'eat'
+    },
+    {
+      id: 2,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'team',
+      imageUrl: null,
+      explanation: "‘Team’ has EA spelling long /ē/.",
+      questionText: 't _ _ m',
+      correctAnswer: 'team',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'team',
+        intent: 'fill_blank',
+        questionLine: 't _ _ m',
+        imagePrompt: 'A soccer team huddled together'
+      },
+      aiTutor: {
+        target_word: 'team',
+        question: 't _ _ m',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘team,’ EA spells long /ē/. This pattern appears in many one-syllable words ending with a single consonant, like team, dream, and clean."
+      },
+      audio: 'team'
+    },
+    {
+      id: 3,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dream',
+      imageUrl: null,
+      explanation: "‘Dream’ uses EA to spell long /ē/.",
+      questionText: 'd r _ _ m',
+      correctAnswer: 'dream',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: 'dream',
+        intent: 'fill_blank',
+        questionLine: 'd r _ _ m',
+        imagePrompt: 'A child dreaming at night'
+      },
+      aiTutor: {
+        target_word: 'dream',
+        question: 'd r _ _ m',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘dream,’ EA spells long /ē/ before M. EA says /ē/ in many words ending with M or N (dream, clean, mean)."
+      },
+      audio: 'dream'
+    },
+    {
+      id: 4,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'reason',
+      imageUrl: null,
+      explanation: "‘Reason’ has EA spelling /ē/ in the first syllable.",
+      questionText: 'r _ _ s o n',
+      correctAnswer: 'reason',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'reason',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ s o n',
+        imagePrompt: 'A student thinking of a reason'
+      },
+      aiTutor: {
+        target_word: 'reason',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘reason,’ EA spells /ē/ in the first syllable. EA often makes long /ē/ in open syllables before S or Z sounds."
+      },
+      audio: 'reason'
+    },
+    {
+      id: 5,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'clean',
+      imageUrl: null,
+      explanation: "‘Clean’ uses EA to spell the long /ē/ sound.",
+      questionText: 'c l _ _ n',
+      correctAnswer: 'clean',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'clean',
+        intent: 'fill_blank',
+        questionLine: 'c l _ _ n',
+        imagePrompt: 'A clean shiny floor'
+      },
+      aiTutor: {
+        target_word: 'clean',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘clean,’ EA spells long /ē/. EA says /ē/ in most vowel-team words ending with N (clean, mean, bean)."
+      },
+      audio: 'clean'
+    },
+    {
+      id: 6,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'speak',
+      imageUrl: null,
+      explanation: "‘Speak’ uses EA to spell long /ē/ before K.",
+      questionText: 's p _ _ k',
+      correctAnswer: 'speak',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'speak',
+        intent: 'fill_blank',
+        questionLine: 's p _ _ k',
+        imagePrompt: 'A person speaking at a microphone'
+      },
+      aiTutor: {
+        target_word: 'speak',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘speak,’ EA spells long /ē/. EA usually says /ē/ before K, as in speak and streak."
+      },
+      audio: 'speak'
+    },
+    {
+      id: 7,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'teacher',
+      imageUrl: null,
+      explanation: "‘Teacher’ has EA spelling long /ē/ in the first syllable.",
+      questionText: 't _ _ c h e r',
+      correctAnswer: 'teacher',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'teacher',
+        intent: 'fill_blank',
+        questionLine: 't _ _ c h e r',
+        imagePrompt: 'A teacher writing on a chalkboard'
+      },
+      aiTutor: {
+        target_word: 'teacher',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA = long /ē/',
+        spelling_pattern_or_rule: "In ‘teacher,’ EA says /ē/ at the start of the word. EA often spells /ē/ before CH or D in multi-syllable words (teacher, feature)."
+      },
+      audio: 'teacher'
+    },
+
+    // --- Short E pattern ---
+    {
+      id: 8,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'head',
+      imageUrl: null,
+      explanation: "‘Head’ uses EA but says short /ĕ/.",
+      questionText: 'h _ _ d',
+      correctAnswer: 'head',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'head',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ d',
+        imagePrompt: 'A person pointing to their head'
+      },
+      aiTutor: {
+        target_word: 'head',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA can spell short /ĕ/',
+        spelling_pattern_or_rule: "In ‘head,’ EA spells short /ĕ/. A few EA words have this short sound and must be memorized (head, bread, lead)."
+      },
+      audio: 'head'
+    },
+    {
+      id: 9,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bread',
+      imageUrl: null,
+      explanation: "‘Bread’ has EA but says short /ĕ/ instead of /ē/.",
+      questionText: 'b r _ _ d',
+      correctAnswer: 'bread',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'bread',
+        intent: 'fill_blank',
+        questionLine: 'b r _ _ d',
+        imagePrompt: 'A loaf of bread on a table'
+      },
+      aiTutor: {
+        target_word: 'bread',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA can spell short /ĕ/',
+        spelling_pattern_or_rule: "In ‘bread,’ EA spells short /ĕ/. EA can make /ĕ/ before D, as in bread, lead, and dead."
+      },
+      audio: 'bread'
+    },
+    {
+      id: 10,
+      topicId: '5-A.17',
+      topicName: 'Learn_more_words_with_long_e_spelled_EA',
+      progressTopicName: 'EA spelling the long /ē/ sound (and sometimes short /ĕ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ready',
+      imageUrl: null,
+      explanation: "‘Ready’ uses EA but says short /ĕ/ in the first syllable.",
+      questionText: 'r _ _ d y',
+      correctAnswer: 'ready',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'ready',
+        intent: 'fill_blank',
+        questionLine: 'r _ _ d y',
+        imagePrompt: 'A student ready for school'
+      },
+      aiTutor: {
+        target_word: 'ready',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EA can spell short /ĕ/',
+        spelling_pattern_or_rule: "In ‘ready,’ EA spells short /ĕ/ in the first syllable. Many two-syllable words with EA + consonant + Y use the short /ĕ/ sound (ready, heavy)."
+      },
+      audio: 'ready'
+    }
+  ]
+},
+'5-A.18': {
+  topicInfo: {
+    topicId: '5-A.18',
+    topicName: 'Spell_more_words_with_Silent_E',
+    progressTopicName: 'More Words with Silent E',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'relative',
+      imageUrl: null,
+      explanation: "Nice! The word is 'relative' — Silent E keeps the word from ending in V (-ive).",
+      questionText: 'r e l _ _ _ _ _',
+      correctAnswer: 'relative',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'relative',
+        intent: 'fill_blank',
+        questionLine: 'r e l a _ _ _ _',
+        imagePrompt: "A simple family tree showing relatives"
+      },
+      aiTutor: {
+        target_word: 'relative',
+        question: 'r e l _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "Silent E keeps the words relative from ending in V (the -ive ending)."
+      },
+      audio: 'relative'
+    },
+    {
+      id: 2,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'prove',
+      imageUrl: null,
+      explanation: "Great! The word is 'prove' — Silent E keeps the word from ending in V.",
+      questionText: 'p r o _ _',
+      correctAnswer: 'prove',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'prove',
+        intent: 'fill_blank',
+        questionLine: 'p r o _ _',
+        imagePrompt: "A scientist proving a result with a chart"
+      },
+      aiTutor: {
+        target_word: 'prove',
+        question: 'p r o _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "Silent E keeps the words prove from ending in V (have, give, prove)."
+      },
+      audio: 'prove'
+    },
+    {
+      id: 3,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'engine',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'engine' — a “Handyman E” that helps the word be spelled correctly.",
+      questionText: 'e n g _ _ _',
+      correctAnswer: 'engine',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'engine',
+        intent: 'fill_blank',
+        questionLine: 'e n g _ _ _',
+        imagePrompt: "A simple car engine illustration (kid-safe, educational)"
+      },
+      aiTutor: {
+        target_word: 'engine',
+        question: 'e n g _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "Silent E helps the word engine from ending in N"
+      },
+      audio: 'engine'
+    },
+    {
+      id: 4,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'promise',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'promise' — a “Handyman E” word.",
+      questionText: 'p r o _ _ _ _',
+      correctAnswer: 'promise',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2],
+      aiHook: {
+        targetWord: 'promise',
+        intent: 'fill_blank',
+        questionLine: 'p r o _ _ _ _',
+        imagePrompt: "Two kids shaking hands to make a promise"
+      },
+      aiTutor: {
+        target_word: 'promise',
+        question: 'p r o _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "Silent E helps the word promise from ending in S"
+      },
+      audio: 'promise'
+    },
+    {
+      id: 5,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'move',
+      imageUrl: null,
+      explanation: "Great! The word is 'move' — Silent E keeps the word from ending in V.",
+      questionText: 'm o v _',
+      correctAnswer: 'move',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'move',
+        intent: 'fill_blank',
+        questionLine: 'm o v _',
+        imagePrompt: "Boxes being moved during a house move"
+      },
+      aiTutor: {
+        target_word: 'move',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "Silent E helps the word move from ending in V"
+      },
+      audio: 'move'
+    },
+    {
+      id: 6,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'service',
+      imageUrl: null,
+      explanation: "Good job! The word is 'service' — Silent E helps keep the C soft.",
+      questionText: '______',
+      correctAnswer: 'service',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'service',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A friendly customer service desk with a helper"
+      },
+      aiTutor: {
+        target_word: 'service',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "🎯 Silent E can help keep C soft (service)."
+      },
+      audio: 'service'
+    },
+    {
+      id: 7,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'debate',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'debate' — Silent E makes the vowel before it long (a → /ā/).",
+      questionText: '______',
+      correctAnswer: 'debate',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'debate',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Two students at a podium having a friendly debate"
+      },
+      aiTutor: {
+        target_word: 'debate',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "📣 Silent E keeps the word debate from ending in T"
+      },
+      audio: 'debate'
+    },
+    {
+      id: 8,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'captive',
+      imageUrl: null,
+      explanation: "Nice! The word is 'captive' — Silent E keeps the word from ending in V (-ive).",
+      questionText: '______',
+      correctAnswer: 'captive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'captive',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A storybook scene of a captured knight (kid-safe)"
+      },
+      aiTutor: {
+        target_word: 'captive',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "🔒 Silent E keeps English words from ending in V (the -ive ending)."
+      },
+      audio: 'captive'
+    },
+    {
+      id: 9,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'active',
+      imageUrl: null,
+      explanation: "Great! The word is 'active' — Silent E keeps the word from ending in V (-ive).",
+      questionText: '______',
+      correctAnswer: 'active',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'active',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Kids being active in a playground"
+      },
+      aiTutor: {
+        target_word: 'active',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "🏃 Silent E keeps words from ending in V (the -ive ending)."
+      },
+      audio: 'active'
+    },
+    {
+      id: 10,
+      topicId: '5-A.18',
+      topicName: 'Spell_more_words_with_Silent_E',
+      progressTopicName: 'More Words with Silent E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'olive',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'olive' — Silent E keeps the word from ending in V (-ive).",
+      questionText: '______',
+      correctAnswer: 'olive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'olive',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A small bowl of green olives (clear, simple, child-friendly)"
+      },
+      aiTutor: {
+        target_word: 'olive',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'Jobs of Silent E',
+        spelling_pattern_or_rule: "🫒 Silent E keeps English words from ending in V (the -ive ending)."
+      },
+      audio: 'olive'
+    }
+  ]
+},
+'5-A.19': {
+  topicInfo: {
+    topicId: '5-A.19',
+    topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+    progressTopicName: "Sound of /z/ spelled S",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nose',
+      imageUrl: null,
+      explanation: "Nice! The word is 'nose' — S between vowels sounds like /z/.",
+      questionText: 'n o _ e',
+      correctAnswer: 'nose',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,3],
+      aiHook: {
+        targetWord: 'nose',
+        intent: 'fill_blank',
+        questionLine: 'n o _ e',
+        imagePrompt: "A cartoon nose smelling a flower"
+      },
+      aiTutor: {
+        target_word: 'nose',
+        question: 'n o _ e',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "👃 S between vowels or voiced sounds often says /z/ — as in nose, rose, music."
+      },
+      audio: 'nose'
+    },
+    {
+      id: 2,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'rose',
+      imageUrl: null,
+      explanation: "Great! The word is 'rose' — S between vowels or voiced sounds says /z/.",
+      questionText: 'r o _ e',
+      correctAnswer: 'rose',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,3],
+      aiHook: {
+        targetWord: 'rose',
+        intent: 'fill_blank',
+        questionLine: 'r o _ e',
+        imagePrompt: "A single red rose on a green stem"
+      },
+      aiTutor: {
+        target_word: 'rose',
+        question: 'r o _ e',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🌹 The S says /z/ in rose, nose, and those."
+      },
+      audio: 'rose'
+    },
+    {
+      id: 3,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'reason',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'reason' — S between vowels sounds like /z/.",
+      questionText: 'r e a _ o n',
+      correctAnswer: 'reason',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'reason',
+        intent: 'fill_blank',
+        questionLine: 'r e a _ o n',
+        imagePrompt: "A light bulb above a student's head representing a reason or idea"
+      },
+      aiTutor: {
+        target_word: 'reason',
+        question: 'r e a _ o n',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "💡 When S comes between vowels, it usually says /z/ — reason, season, music."
+      },
+      audio: 'reason'
+    },
+    {
+      id: 4,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'music',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'music' — S between vowels sounds like /z/.",
+      questionText: 'm u _ i c',
+      correctAnswer: 'music',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 4],
+      aiHook: {
+        targetWord: 'music',
+        intent: 'fill_blank',
+        questionLine: 'm u _ i c',
+        imagePrompt: "Notes floating in the air from a guitar or piano"
+      },
+      aiTutor: {
+        target_word: 'music',
+        question: 'm _ _ _ c',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🎵 S between vowels often says /z/ — music, reason, desert."
+      },
+      audio: 'music'
+    },
+    {
+      id: 5,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'desert',
+      imageUrl: null,
+      explanation: "Great! The word is 'desert' (noun) — S says /z/ between voiced sounds.",
+      questionText: 'd e _ e r t',
+      correctAnswer: 'desert',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 4,5],
+      aiHook: {
+        targetWord: 'desert',
+        intent: 'fill_blank',
+        questionLine: 'd e _ e r t',
+        imagePrompt: "A sandy desert with a cactus and sun"
+      },
+      aiTutor: {
+        target_word: 'desert',
+        question: 'd _ _ _ r t',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🏜️ In the noun 'desert', the S says /z/. Compare to the verb 'desert' (/s/)."
+      },
+      audio: 'desert'
+    },
+    {
+      id: 6,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'design',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'design' — S says /z/ between vowels.",
+      questionText: '______',
+      correctAnswer: 'design',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [4,5],
+      aiHook: {
+        targetWord: 'design',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A student drawing a design on paper"
+      },
+      aiTutor: {
+        target_word: 'design',
+        question: '_ _ _ _ g n',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🎨 S says /z/ between vowels — design, reason, music."
+      },
+      audio: 'design'
+    },
+    {
+      id: 7,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'present',
+      imageUrl: null,
+      explanation: "Nice! The word is 'present' (noun) — S between vowels says /z/.",
+      questionText: '______',
+      correctAnswer: 'present',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'present',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A wrapped present with a bow"
+      },
+      aiTutor: {
+        target_word: 'present',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🎁 When S is between vowels, it says /z/ — present, reason, cousin."
+      },
+      audio: 'present'
+    },
+    {
+      id: 8,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cousin',
+      imageUrl: null,
+      explanation: "Good job! The word is 'cousin' — S between vowels says /z/.",
+      questionText: '______',
+      correctAnswer: 'cousin',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'cousin',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Two cousins smiling together in a park"
+      },
+      aiTutor: {
+        target_word: 'cousin',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "👨‍👩‍👧‍👦 S between vowels = /z/ — cousin, reason, present."
+      },
+      audio: 'cousin'
+    },
+    {
+      id: 9,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'season',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'season' — S says /z/ between vowels.",
+      questionText: '______',
+      correctAnswer: 'season',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'season',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Four seasons shown as a tree in spring, summer, fall, and winter"
+      },
+      aiTutor: {
+        target_word: 'season',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🍂 S between vowels says /z/ — season, reason, music."
+      },
+      audio: 'season'
+    },
+    {
+      id: 10,
+      topicId: '5-A.19',
+      topicName: 'Spell_words_with_the_sound_of_z_spelled_s',
+      progressTopicName: "Sound of /z/ spelled S",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'wisdom',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'wisdom' — S before a voiced consonant says /z/.",
+      questionText: '______',
+      correctAnswer: 'wisdom',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'wisdom',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "An owl wearing glasses symbolizing wisdom"
+      },
+      aiTutor: {
+        target_word: 'wisdom',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Sound of /z/ spelled S",
+        spelling_pattern_or_rule: "🦉 S before voiced sounds like /d/ or /m/ often says /z/ — wisdom, music."
+      },
+      audio: 'wisdom'
+    }
+  ]
+},
+'5-A.20': {
+  topicInfo: {
+    topicId: '5-A.20',
+    topicName: 'Spell_words_ending_in_ij_spelled_age',
+    progressTopicName: "Words ending in /ij/ spelled -AGE",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'village',
+      imageUrl: null,
+      explanation: "Nice! The word is 'village' — the ending -AGE says /ij/.",
+      questionText: 'v i l _ _ _',
+      correctAnswer: 'village',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'village',
+        intent: 'fill_blank',
+        questionLine: 'v i l _ _ _',
+        imagePrompt: "A peaceful village with small houses and trees"
+      },
+      aiTutor: {
+        target_word: 'village',
+        question: 'v i l l _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "When a word ends in the sound /ij/, it is often spelled with the suffix -AGE. The final -E is silent, and the letters AGE together make the /ij/ sound, as in village, package, and message."
+      },
+      audio: 'village'
+    },
+    {
+      id: 2,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'package',
+      imageUrl: null,
+      explanation: "Great! The word is 'package' — the ending -AGE says /ij/.",
+      questionText: 'p a c k _ _ _',
+      correctAnswer: 'package',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'package',
+        intent: 'fill_blank',
+        questionLine: 'p a c k _ _',
+        imagePrompt: "A brown package with a label being delivered"
+      },
+      aiTutor: {
+        target_word: 'package',
+        question: 'p a c k _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The letters AGE at the end of a word make the /ij/ sound. This pattern is common in words with a short vowel before the G, such as package, baggage, and village."
+      },
+      audio: 'package'
+    },
+    {
+      id: 3,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'message',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'message' — the ending -AGE says /ij/.",
+      questionText: 'm e s _ _ _',
+      correctAnswer: 'message',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3 ],
+      aiHook: {
+        targetWord: 'message',
+        intent: 'fill_blank',
+        questionLine: 'm e s _ _ _',
+        imagePrompt: "A smartphone showing a new text message notification"
+      },
+      aiTutor: {
+        target_word: 'message',
+        question: 'm e s s_ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The ending -AGE represents the sound /ij/. The final E is silent, and the preceding vowel is short. Examples include message, village, and package."
+      },
+      audio: 'message'
+    },
+    {
+      id: 4,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courage',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'courage' — the ending -AGE says /ij/.",
+      questionText: 'c o u r _ _ _',
+      correctAnswer: 'courage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'courage',
+        intent: 'fill_blank',
+        questionLine: 'c o u _ _ _',
+        imagePrompt: "A young person bravely speaking on stage"
+      },
+      aiTutor: {
+        target_word: 'courage',
+        question: 'c o u r _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The suffix -AGE spells the sound /ij/ at the end of many words. The base word often has a short vowel, and the E is silent. Examples: courage, storage, package."
+      },
+      audio: 'courage'
+    },
+    {
+      id: 5,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'storage',
+      imageUrl: null,
+      explanation: "Great! The word is 'storage' — the ending -AGE says /ij/.",
+      questionText: 's t o r _ _ _',
+      correctAnswer: 'storage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3],
+      aiHook: {
+        targetWord: 'storage',
+        intent: 'fill_blank',
+        questionLine: 's t o _ _ _',
+        imagePrompt: "A storage unit with stacked boxes inside"
+      },
+      aiTutor: {
+        target_word: 'storage',
+        question: 's t o r _ _ _',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "When you hear the sound /ij/ at the end of a word, it is often spelled with the letters AGE. The final E is silent. Examples: storage, courage, and message."
+      },
+      audio: 'storage'
+    },
+    {
+      id: 6,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'garage',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'garage' — the ending -AGE says /ij/.",
+      questionText: '______',
+      correctAnswer: 'garage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'garage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A car parked inside a home garage"
+      },
+      aiTutor: {
+        target_word: 'garage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The -AGE ending can make the sound /ij/ in words of French origin, such as garage and collage. The final E is silent."
+      },
+      audio: 'garage'
+    },
+    {
+      id: 7,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'postage',
+      imageUrl: null,
+      explanation: "Good job! The word is 'postage' — the ending -AGE says /ij/.",
+      questionText: '______',
+      correctAnswer: 'postage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'postage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A letter with postage stamps in the corner"
+      },
+      aiTutor: {
+        target_word: 'postage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The ending -AGE makes the /ij/ sound and is used to form nouns. Postage means the cost or act of sending mail. Similar words include message and package."
+      },
+      audio: 'postage'
+    },
+    {
+      id: 8,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'manage',
+      imageUrl: null,
+      explanation: "Nice! The word is 'manage' — the ending -AGE says /ij/.",
+      questionText: '______',
+      correctAnswer: 'manage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'manage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A person managing time or organizing work on a clipboard"
+      },
+      aiTutor: {
+        target_word: 'manage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The letters AGE spell the /ij/ sound at the end of many verbs that become nouns or adjectives by adding -age, such as manage, carriage, and passage."
+      },
+      audio: 'manage'
+    },
+    {
+      id: 9,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'carriage',
+      imageUrl: null,
+      explanation: "Great! The word is 'carriage' — the ending -AGE says /ij/.",
+      questionText: '______',
+      correctAnswer: 'carriage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'carriage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A horse-drawn carriage on a cobblestone street"
+      },
+      aiTutor: {
+        target_word: 'carriage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The -AGE ending makes the /ij/ sound in words like carriage, village, and package. The silent E marks the soft G and indicates the final syllable /ij/."
+      },
+      audio: 'carriage'
+    },
+    {
+      id: 10,
+      topicId: '5-A.20',
+      topicName: 'Spell_words_ending_in_ij_spelled_age',
+      progressTopicName: "Words ending in /ij/ spelled -AGE",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'passage',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'passage' — the ending -AGE says /ij/.",
+      questionText: '______',
+      correctAnswer: 'passage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'passage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A narrow hallway or passageway with light at the end"
+      },
+      aiTutor: {
+        target_word: 'passage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+        spelling_pattern_or_rule: "The ending -AGE says /ij/ and often appears in nouns formed from verbs, describing an act or result. The G is soft because of the final E, and the vowel before G is short, as in passage, message, and village."
+      },
+      audio: 'passage'
+    }
+  ]
+},
+'5-A.21': {
+  topicInfo: {
+    topicId: '5-A.21',
+    topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+    progressTopicName: "Words with /oo/ sound spelled UI",
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fruit',
+      imageUrl: null,
+      explanation: "Great! The word is 'fruit' — UI says /oo/ in the middle of the word.",
+      questionText: 'f r _ _ t',
+      correctAnswer: 'fruit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4],
+      aiHook: {
+        targetWord: 'fruit',
+        intent: 'fill_blank',
+        questionLine: 'f r _ _ t',
+        imagePrompt: "A basket of colorful fruits on a table"
+      },
+      aiTutor: {
+        target_word: 'fruit',
+        question: 'f r _ _ t',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "The vowel team 'ui' represents the long /oo/ sound, usually found in the middle of a stressed syllable. Examples: fruit, juice, suit, cruise."
+      },
+      audio: 'fruit'
+    },
+    {
+      id: 2,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'juice',
+      imageUrl: null,
+      explanation: "Nice job! The word is 'juice' — UI says /oo/ before the soft C.",
+      questionText: 'j _ _ c e',
+      correctAnswer: 'juice',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'juice',
+        intent: 'fill_blank',
+        questionLine: 'j _ _ c e',
+        imagePrompt: "A glass of orange juice with a straw"
+      },
+      aiTutor: {
+        target_word: 'juice',
+        question: 'j _ _ c e',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "When 'ui' appears before a soft C or S, it still says /oo/. Examples: juice, bruise."
+      },
+      audio: 'juice'
+    },
+    {
+      id: 3,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'suit',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'suit' — UI says /oo/ in the stressed syllable.",
+      questionText: 's _ _ t',
+      correctAnswer: 'suit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'suit',
+        intent: 'fill_blank',
+        questionLine: 's _ _ t',
+        imagePrompt: "A person wearing a business suit"
+      },
+      aiTutor: {
+        target_word: 'suit',
+        question: 's _ _ t',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "The letters 'ui' often spell the long /oo/ sound in stressed syllables, as in suit, fruit, and cruise."
+      },
+      audio: 'suit'
+    },
+    {
+      id: 4,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cruise',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'cruise' — UI says /oo/ before a voiced S.",
+      questionText: 'c r _ _ s e',
+      correctAnswer: 'cruise',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4,5],
+      aiHook: {
+        targetWord: 'cruise',
+        intent: 'fill_blank',
+        questionLine: 'c r _ _ s e',
+        imagePrompt: "A large cruise ship sailing on the ocean"
+      },
+      aiTutor: {
+        target_word: 'cruise',
+        question: 'c r _ _ s e',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "The vowel team 'ui' says /oo/ in the middle of stressed syllables, often before voiced consonants. Examples: cruise, bruise."
+      },
+      audio: 'cruise'
+    },
+    {
+      id: 5,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bruise',
+      imageUrl: null,
+      explanation: "Good job! The word is 'bruise' — UI says /oo/ before S.",
+      questionText: 'b r _ _ s e',
+      correctAnswer: 'bruise',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4,5],
+      aiHook: {
+        targetWord: 'bruise',
+        intent: 'fill_blank',
+        questionLine: 'b r _ _ s e',
+        imagePrompt: "A person showing a small bruise on their arm"
+      },
+      aiTutor: {
+        target_word: 'bruise',
+        question: 'b r _ _ s e',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "The combination 'ui' makes the /oo/ sound in words like bruise and cruise. The silent E keeps the S soft and helps mark the long vowel sound."
+      },
+      audio: 'bruise'
+    },
+    {
+      id: 6,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'pursuit',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'pursuit' — UI says /oo/ in the second syllable.",
+      questionText: '______',
+      correctAnswer: 'pursuit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [6],
+      aiHook: {
+        targetWord: 'pursuit',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A runner chasing another in a race symbolizing pursuit"
+      },
+      aiTutor: {
+        target_word: 'pursuit',
+        question: '_ _ _ _ _ _ t',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "In pursuit, the letters 'ui' make the long /oo/ sound in the stressed syllable. Similar patterns appear in recruit and fruit."
+      },
+      audio: 'pursuit'
+    },
+    {
+      id: 7,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'recruit',
+      imageUrl: null,
+      explanation: "Great! The word is 'recruit' — UI says /oo/ in the second syllable.",
+      questionText: '______',
+      correctAnswer: 'recruit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'recruit',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A team recruiting a new player or employee"
+      },
+      aiTutor: {
+        target_word: 'recruit',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "In recruit, 'ui' represents the /oo/ sound in a stressed syllable. The letters 'ui' typically appear between two consonants."
+      },
+      audio: 'recruit'
+    },
+    {
+      id: 8,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'suitcase',
+      imageUrl: null,
+      explanation: "Nice! The word is 'suitcase' — UI says /oo/ in the first syllable.",
+      questionText: '______',
+      correctAnswer: 'suitcase',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'suitcase',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A traveler pulling a suitcase at an airport"
+      },
+      aiTutor: {
+        target_word: 'suitcase',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "The word suitcase combines suit (/soo-t/) and case. The 'ui' keeps its long /oo/ sound, as in fruit and cruise."
+      },
+      audio: 'suitcase'
+    },
+    {
+      id: 9,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ruin',
+      imageUrl: null,
+      explanation: "Nice work! The word is 'ruin' — UI says /oo/ in the first syllable.",
+      questionText: '______',
+      correctAnswer: 'ruin',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'ruin',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "An old stone castle ruin covered in vines"
+      },
+      aiTutor: {
+        target_word: 'ruin',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "The vowel team 'ui' spells the long /oo/ sound in stressed syllables, as in ruin and fruit. The two vowels work together to represent one sound."
+      },
+      audio: 'ruin'
+    },
+    {
+      id: 10,
+      topicId: '5-A.21',
+      topicName: 'Spell_words_with_the_sound_of_oo_spelled_ui',
+      progressTopicName: "Words with /oo/ sound spelled UI",
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'suitable',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'suitable' — UI says /oo/ in the first syllable.",
+      questionText: '______',
+      correctAnswer: 'suitable',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'suitable',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A person choosing a suitable outfit for an event"
+      },
+      aiTutor: {
+        target_word: 'suitable',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: "Words with /oo/ sound spelled UI",
+        spelling_pattern_or_rule: "In suitable, the 'ui' vowel team spells the long /oo/ sound, just as in suit and fruit. The suffix '-able' forms an adjective meaning 'fit or right for a purpose.'"
+      },
+      audio: 'suitable'
+    },
+  ],
+},
+
+
+
+'5-A.22': {
+  topicInfo: {
+    topicId: '5-A.22',
+    topicName: 'Spell_words_with_a_followed_by_l',
+    progressTopicName: 'A before L (changed vs not changed)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 5 words with prefilled indexes [2,3] (changed A sound) ---
+    {
+      id: 1,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'walk',
+      imageUrl: null,
+      explanation: "Nice! The word is 'walk' — A before L changes its sound to /aw/.",
+      questionText: 'w _ _ k',
+      correctAnswer: 'walk',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'walk',
+        intent: 'fill_blank',
+        questionLine: 'w _ _ k',
+        imagePrompt: "A person walking on a forest trail"
+      },
+      aiTutor: {
+        target_word: 'walk',
+        question: 'w _ _ k',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "When A comes before L, it often changes its sound from /ă/ to /aw/, as in walk, talk, and chalk. This vowel change makes the word sound broader, not short like 'cat'."
+      },
+      audio: 'walk'
+    },
+    {
+      id: 2,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'talk',
+      imageUrl: null,
+      explanation: "Great! The word is 'talk' — A before L changes to /aw/.",
+      questionText: 't _ _ k',
+      correctAnswer: 'talk',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'talk',
+        intent: 'fill_blank',
+        questionLine: 't _ _ k',
+        imagePrompt: "Two friends talking at a cafe"
+      },
+      aiTutor: {
+        target_word: 'talk',
+        question: 't _ _ k',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "A before L often changes its sound from /ă/ to /aw/. In talk, the A does not say /ă/ but /aw/ instead."
+      },
+      audio: 'talk'
+    },
+    {
+      id: 3,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'chalk',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'chalk' — A before L changes to /aw/.",
+      questionText: 'c h _ _ k',
+      correctAnswer: 'chalk',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4],
+      aiHook: {
+        targetWord: 'chalk',
+        intent: 'fill_blank',
+        questionLine: 'c h _ _ k',
+        imagePrompt: "A child drawing on the sidewalk with chalk"
+      },
+      aiTutor: {
+        target_word: 'chalk',
+        question: 'c h _ _ k',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "When A is followed by L and K, it often changes from /ă/ to /aw/. This happens in words like chalk, walk, and talk."
+      },
+      audio: 'chalk'
+    },
+    {
+      id: 4,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'stalk',
+      imageUrl: null,
+      explanation: "Nice! The word is 'stalk' — A before L changes to /aw/.",
+      questionText: 's t _ _ k',
+      correctAnswer: 'stalk',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4],
+      aiHook: {
+        targetWord: 'stalk',
+        intent: 'fill_blank',
+        questionLine: 's t _ _ k',
+        imagePrompt: "A tall stalk of corn in a field"
+      },
+      aiTutor: {
+        target_word: 'stalk',
+        question: 's t _ _ k',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "When A comes before L and K, the sound usually changes to /aw/. Examples: stalk, talk, walk."
+      },
+      audio: 'stalk'
+    },
+    {
+      id: 5,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'small',
+      imageUrl: null,
+      explanation: "Good job! The word is 'small' — A before L changes its sound.",
+      questionText: 's m _ _ l',
+      correctAnswer: 'small',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,4],
+      aiHook: {
+        targetWord: 'small',
+        intent: 'fill_blank',
+        questionLine: 's m _ _ l',
+        imagePrompt: "A small puppy sitting beside a big dog"
+      },
+      aiTutor: {
+        target_word: 'small',
+        question: 's m _ _ l',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "When A is followed by LL, it often changes to /aw/. Words like small, ball, and tall share this sound shift."
+      },
+      audio: 'small'
+    },
+
+    // --- 5 words with blank questions (no prefilled indexes, not changed A sound) ---
+    {
+      id: 6,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'salt',
+      imageUrl: null,
+      explanation: "Nice! The word is 'salt' — A before L does not change; it keeps its /ă/ sound.",
+      questionText: '______',
+      correctAnswer: 'salt',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'salt',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A bowl of salt with a spoon"
+      },
+      aiTutor: {
+        target_word: 'salt',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "In words like salt and almost, A before L does not change its sound. Not every A before L says /aw/ — some stay short /ă/."
+      },
+      audio: 'salt'
+    },
+    {
+      id: 7,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'almost',
+      imageUrl: null,
+      explanation: "Great! The word is 'almost' — A before L does not change its sound.",
+      questionText: '______',
+      correctAnswer: 'almost',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'almost',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A glass of water that is almost full"
+      },
+      aiTutor: {
+        target_word: 'almost',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "Some words with A before L do not change the vowel sound, such as almost, algebra, and balcony."
+      },
+      audio: 'almost'
+    },
+    {
+      id: 8,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'algebra',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'algebra' — A before L keeps its short /ă/ sound.",
+      questionText: '______',
+      correctAnswer: 'algebra',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'algebra',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Math symbols and equations showing algebra"
+      },
+      aiTutor: {
+        target_word: 'algebra',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "In algebra, the A before L keeps its regular short sound /ă/, not /aw/. The rule has exceptions — learners sort these to notice the difference."
+      },
+      audio: 'algebra'
+    },
+    {
+      id: 9,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'balcony',
+      imageUrl: null,
+      explanation: "Good! The word is 'balcony' — A before L keeps its short /ă/ sound.",
+      questionText: '______',
+      correctAnswer: 'balcony',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'balcony',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A balcony overlooking a city street"
+      },
+      aiTutor: {
+        target_word: 'balcony',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "In balcony, the A before L does not change its sound. It stays short /ă/ because it’s part of an unstressed syllable."
+      },
+      audio: 'balcony'
+    },
+    {
+      id: 10,
+      topicId: '5-A.22',
+      topicName: 'Spell_words_with_a_followed_by_l',
+      progressTopicName: 'A before L (changed vs not changed)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'alphabet',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'alphabet' — A before L does not change its sound.",
+      questionText: '______',
+      correctAnswer: 'alphabet',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'alphabet',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Colorful alphabet letters arranged in order"
+      },
+      aiTutor: {
+        target_word: 'alphabet',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'A before L',
+        spelling_pattern_or_rule: "In alphabet, the A before L keeps its normal /ă/ sound. It does not change because it’s not followed by a silent L or a consonant cluster like LK or LL."
+      },
+      audio: 'alphabet'
+    }
+  ]
+},
+'5-A.23': {
+  topicInfo: {
+    topicId: '5-A.23',
+    topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+    progressTopicName: 'Words with /ər/ sound spelled OUR',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- First 3 with prefilled indexes [2,3] ---
+    {
+      id: 1,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courage',
+      imageUrl: null,
+      explanation: "Nice! The word is 'courage' — OUR says /ər/, not /owr/.",
+      questionText: 'c _ _ age',
+      correctAnswer: 'courage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6],
+      aiHook: {
+        targetWord: 'courage',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ age',
+        imagePrompt: "A child standing bravely on stage showing courage"
+      },
+      aiTutor: {
+        target_word: 'courage',
+        question: 'c _ _ _ a g e',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "In certain words, the letters OUR represent the reduced /ər/ sound in an unstressed syllable. Examples include courage, nourish, flourish, courtesy, and journey."
+      },
+      audio: 'courage'
+    },
+    {
+      id: 2,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courtesy',
+      imageUrl: null,
+      explanation: "Good job! The word is 'courtesy' — OUR says /ər/.",
+      questionText: 'c _ _ t e s y',
+      correctAnswer: 'courtesy',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 4,5,6,7],
+      aiHook: {
+        targetWord: 'courtesy',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ t e s y',
+        imagePrompt: "Someone holding a door open to show courtesy"
+      },
+      aiTutor: {
+        target_word: 'courtesy',
+        question: 'c _ _ _ t e s y',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "When OUR appears in an unstressed syllable, it often spells /ər/. In courtesy, the vowel is reduced and pronounced /ər/."
+      },
+      audio: 'courtesy'
+    },
+    {
+      id: 3,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nourish',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'nourish' — OUR makes the /ər/ sound.",
+      questionText: 'n _ _ ish',
+      correctAnswer: 'nourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 4,5,6],
+      aiHook: {
+        targetWord: 'nourish',
+        intent: 'fill_blank',
+        questionLine: 'n _ _ ish',
+        imagePrompt: "Water and sunlight nourishing a growing plant"
+      },
+      aiTutor: {
+        target_word: 'nourish',
+        question: 'n _ _ _ i s h',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "In nourish, OUR spells the reduced /ər/ sound because the syllable is unstressed. Compare flourish and courage."
+      },
+      audio: 'nourish'
+    },
+
+    // --- Remaining 7 blank (no prefilled indexes) ---
+    {
+      id: 4,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'flourish',
+      imageUrl: null,
+      explanation: "Nice! The word is 'flourish' — OUR spells /ər/ in the first syllable.",
+      questionText: '______',
+      correctAnswer: 'flourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,5,6,7],
+      aiHook: {
+        targetWord: 'flourish',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A plant flourishing with many green leaves"
+      },
+      aiTutor: {
+        target_word: 'flourish',
+        question: 'f l _ _ _ i s h',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "OUR can represent /ər/ in an unstressed syllable, as in flourish, nourish, and courage."
+      },
+      audio: 'flourish'
+    },
+    {
+      id: 5,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'journey',
+      imageUrl: null,
+      explanation: "Great! The word is 'journey' — OUR makes the /ər/ sound.",
+      questionText: '______',
+      correctAnswer: 'journey',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6],
+      aiHook: {
+        targetWord: 'journey',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A traveler starting a long journey on a path"
+      },
+      aiTutor: {
+        target_word: 'journey',
+        question: 'j _ _ _ n e y',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "In journey, OUR spells /ər/ in the first syllable due to vowel reduction in an unstressed position."
+      },
+      audio: 'journey'
+    },
+    {
+      id: 6,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'encourage',
+      imageUrl: null,
+      explanation: "Nice! The word is 'encourage' — OUR says /ər/.",
+      questionText: '______',
+      correctAnswer: 'encourage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'encourage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A teacher encouraging a student with a thumbs-up"
+      },
+      aiTutor: {
+        target_word: 'encourage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "The base word courage has OUR = /ər/. Adding the prefix en- keeps the OUR pronounced /ər/: en + courage → encourage."
+      },
+      audio: 'encourage'
+    },
+    {
+      id: 7,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'discourage',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'discourage' — OUR says /ər/.",
+      questionText: '______',
+      correctAnswer: 'discourage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'discourage',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A coach discouraging negative talk with a gesture"
+      },
+      aiTutor: {
+        target_word: 'discourage',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "Derived from courage; the OUR remains /ər/ when prefixes or suffixes are added: discourage, encouraged, encouragement."
+      },
+      audio: 'discourage'
+    },
+    {
+      id: 8,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nourishment',
+      imageUrl: null,
+      explanation: "Good job! The word is 'nourishment' — OUR = /ər/.",
+      questionText: '______',
+      correctAnswer: 'nourishment',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'nourishment',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Healthy foods providing nourishment"
+      },
+      aiTutor: {
+        target_word: 'nourishment',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "The word nourishment comes from nourish. In both, OUR spells the reduced /ər/ sound in an unstressed syllable."
+      },
+      audio: 'nourishment'
+    },
+    {
+      id: 9,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courteous',
+      imageUrl: null,
+      explanation: "Nice! The word is 'courteous' — OUR spells /ər/.",
+      questionText: '______',
+      correctAnswer: 'courteous',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'courteous',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A student being courteous by letting someone go first"
+      },
+      aiTutor: {
+        target_word: 'courteous',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "Courteous is built from courtesy. In both forms, OUR spells the /ər/ sound in an unstressed syllable."
+      },
+      audio: 'courteous'
+    },
+    {
+      id: 10,
+      topicId: '5-A.23',
+      topicName: 'Spell_words_with_the_sound_of_er_spelled_our',
+      progressTopicName: 'Words with /ər/ sound spelled OUR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'journal',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'journal' — OUR spells /ər/ at the start.",
+      questionText: '______',
+      correctAnswer: 'journal',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'journal',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "An open journal with a pen on a desk"
+      },
+      aiTutor: {
+        target_word: 'journal',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /ər/',
+        spelling_pattern_or_rule: "In journal and journey, the sequence OUR is pronounced /ər/ in an unstressed syllable at the beginning of the word."
+      },
+      audio: 'journal'
+    }
+  ]
+},
+'5-A.24': {
+  topicInfo: {
+    topicId: '5-A.24',
+    topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+    progressTopicName: 'Words with long OO sound',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 5 with prefilled indexes [2,3] (long OO sound) ---
+    {
+      id: 1,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'food',
+      imageUrl: null,
+      explanation: "Nice! The word is 'food' — OO spells the long /oo/ sound.",
+      questionText: 'f _ _ d',
+      correctAnswer: 'food',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'food',
+        intent: 'fill_blank',
+        questionLine: 'f _ _ d',
+        imagePrompt: "A plate of healthy food with fruits and vegetables"
+      },
+      aiTutor: {
+        target_word: 'food',
+        question: 'f _ _ d',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "When two O’s appear together in the middle of a word, they often spell the long /oo/ sound, as in food, moon, and school."
+      },
+      audio: 'food'
+    },
+    {
+      id: 2,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'moon',
+      imageUrl: null,
+      explanation: "Great! The word is 'moon' — OO spells the long /oo/ sound.",
+      questionText: 'm _ _ n',
+      correctAnswer: 'moon',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 3],
+      aiHook: {
+        targetWord: 'moon',
+        intent: 'fill_blank',
+        questionLine: 'm _ _ n',
+        imagePrompt: "A bright full moon shining in the night sky"
+      },
+      aiTutor: {
+        target_word: 'moon',
+        question: 'm _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "OO often spells the long /oo/ sound, as in moon, food, and broom."
+      },
+      audio: 'moon'
+    },
+    {
+      id: 3,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'school',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'school' — OO makes the long /oo/ sound.",
+      questionText: 's c h _ _ l',
+      correctAnswer: 'school',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2, 4],
+      aiHook: {
+        targetWord: 'school',
+        intent: 'fill_blank',
+        questionLine: 's c h _ _ l',
+        imagePrompt: "A cheerful school building with children playing outside"
+      },
+      aiTutor: {
+        target_word: 'school',
+        question: 's c h _ _ l',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "When OO comes after CH or SCH, it usually says long /oo/, as in school, choose, and broom."
+      },
+      audio: 'school'
+    },
+    {
+      id: 4,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'broom',
+      imageUrl: null,
+      explanation: "Nice! The word is 'broom' — OO says long /oo/.",
+      questionText: 'b r _ _ m',
+      correctAnswer: 'broom',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1, 4],
+      aiHook: {
+        targetWord: 'broom',
+        intent: 'fill_blank',
+        questionLine: 'b r _ _ m',
+        imagePrompt: "A broom leaning against a wall"
+      },
+      aiTutor: {
+        target_word: 'broom',
+        question: 'b r _ _ m',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "OO in broom says long /oo/. Double O between consonants often makes this sound."
+      },
+      audio: 'broom'
+    },
+    {
+      id: 5,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'boost',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'boost' — OO says long /oo/.",
+      questionText: 'b _ _ st',
+      correctAnswer: 'boost',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'boost',
+        intent: 'fill_blank',
+        questionLine: 'b _ _ st',
+        imagePrompt: "A rocket boosting off into space"
+      },
+      aiTutor: {
+        target_word: 'boost',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "OO in boost spells the long /oo/ sound, like in food and moon."
+      },
+      audio: 'boost'
+    },
+
+    // --- 5 blank (no prefilled indexes) ---
+    {
+      id: 6,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'smooth',
+      imageUrl: null,
+      explanation: "Nice! The word is 'smooth' — OO spells the long /oo/ sound.",
+      questionText: '______',
+      correctAnswer: 'smooth',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'smooth',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A smooth stone by the river"
+      },
+      aiTutor: {
+        target_word: 'smooth',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "OO between consonants can make a long /oo/ sound as in smooth, broom, and moon."
+      },
+      audio: 'smooth'
+    },
+    {
+      id: 7,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'spoon',
+      imageUrl: null,
+      explanation: "Good! The word is 'spoon' — OO says long /oo/.",
+      questionText: '______',
+      correctAnswer: 'spoon',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'spoon',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A shiny silver spoon on a table"
+      },
+      aiTutor: {
+        target_word: 'spoon',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "OO spells the long /oo/ sound in words like spoon, moon, and food."
+      },
+      audio: 'spoon'
+    },
+    {
+      id: 8,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'roof',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'roof' — OO says long /oo/.",
+      questionText: '______',
+      correctAnswer: 'roof',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'roof',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A red roof on top of a house"
+      },
+      aiTutor: {
+        target_word: 'roof',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "Double O can make a long /oo/ sound in roof, food, and moon. Learners can sort words with short and long OO sounds."
+      },
+      audio: 'roof'
+    },
+    {
+      id: 9,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'goose',
+      imageUrl: null,
+      explanation: "Great! The word is 'goose' — OO spells the long /oo/ sound.",
+      questionText: '______',
+      correctAnswer: 'goose',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'goose',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A white goose near a pond"
+      },
+      aiTutor: {
+        target_word: 'goose',
+        question: 'g _ _ s e',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "When OO is followed by SE, it keeps its long /oo/ sound, as in goose and choose."
+      },
+      audio: 'goose'
+    },
+    {
+      id: 10,
+      topicId: '5-A.24',
+      topicName: 'Spell_words_with_the_long_oo_sound_spelled_oo',
+      progressTopicName: 'Words with long OO sound',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'choose',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'choose' — OO makes the long /oo/ sound.",
+      questionText: '______',
+      correctAnswer: 'choose',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'choose',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A child choosing a book from a shelf"
+      },
+      aiTutor: {
+        target_word: 'choose',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OO = long /oo/',
+        spelling_pattern_or_rule: "In choose, OO spells the long /oo/ sound. Compare with book and good, where OO says short /ŭ/."
+      },
+      audio: 'choose'
+    }
+  ]
+},
+'5-A.25': {
+  topicInfo: {
+    topicId: '5-A.25',
+    topicName: 'Spell_words_with_awt_spelled_ought',
+    progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 5 with prefilled indexes [2,3,4] ---
+    {
+      id: 1,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bought',
+      imageUrl: null,
+      explanation: "Nice! The word is 'bought' — OUGHT says /awt/.",
+      questionText: 'b _ _ _ _ t',
+      correctAnswer: 'bought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'bought',
+        intent: 'fill_blank',
+        questionLine: 'b _ _ _ _ _',
+        imagePrompt: "A shopper who just bought some items from a store"
+      },
+      aiTutor: {
+        target_word: 'bought',
+        question: 'b _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "OUGHT says /awt/ in bought, thought, and brought. The GH is silent but affects the vowel sound."
+      },
+      audio: 'bought'
+    },
+    {
+      id: 2,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'brought',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'brought' — OUGHT spells /awt/.",
+      questionText: 'b r _ _ _ _ t',
+      correctAnswer: 'brought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'brought',
+        intent: 'fill_blank',
+        questionLine: 'b r _ _ _ _ _',
+        imagePrompt: "A student who brought their backpack to school"
+      },
+      aiTutor: {
+        target_word: 'brought',
+        question: 'b r _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "In brought, OUGHT says /awt/. This pattern appears in a small family of words where GH is silent."
+      },
+      audio: 'brought'
+    },
+    {
+      id: 3,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'forethought',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'forethought' — OUGHT spells /awt/.",
+      questionText: '______',
+      correctAnswer: 'forethought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,5],
+      aiHook: {
+        targetWord: 'forethought',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A person planning ahead, showing forethought"
+      },
+      aiTutor: {
+        target_word: 'forethought',
+        question: 'f o r e t h _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "Forethought keeps the same /awt/ sound from thought. The GH stays silent in both words."
+      },
+      audio: 'forethought'
+    },  {
+
+    id: 4,
+    topicId: '5-A.25',
+    topicName: 'Spell_words_with_awt_spelled_ought',
+    progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank',
+    template: 'fill_blank',
+    word: 'thoughtful',
+    imageUrl: null,
+    explanation: "Nice! The word is 'thoughtful' — OUGHT spells /awt/.",
+    questionText: '______',
+    correctAnswer: 'thoughtful',
+    isSpacing: false,
+    isSorting: false,
+    isSpelling: true,
+    isPrefilled: true,
+    prefilledIndexes: [0,1,7,8,9],
+    aiHook: {
+      targetWord: 'thoughtful',
+      intent: 'fill_blank',
+      questionLine: '______',
+      imagePrompt: "A child writing a thoughtful note to a friend"
+    },
+    aiTutor: {
+      target_word: 'thoughtful',
+      question: 't h _ _ _ _ _ f u l',
+      student_entry: '',
+      topic_to_reinforce: 'OUGHT = /awt/',
+      spelling_pattern_or_rule: "In the OUGHT family, the letters OUGHT say /awt/ while GH is silent. This pattern holds in words like thought, thoughtful, brought, and bought."
+    },
+    audio: 'thoughtful'
+  },  
+    {
+      id: 5,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'overwrought',
+      imageUrl: null,
+      explanation: "Great! The word is 'overwrought' — OUGHT spells /awt/.",
+      questionText: '______',
+      correctAnswer: 'overwrought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,5],
+      aiHook: {
+        targetWord: 'overwrought',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "An artist feeling overwrought while finishing a painting"
+      },
+      aiTutor: {
+        target_word: 'overwrought',
+        question: 'o v e r w r _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "Overwrought combines the prefix over- and wrought (meaning shaped). In both, OUGHT = /awt/."
+      },
+      audio: 'overwrought'
+    },    {
+      id: 6,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'thought',
+      imageUrl: null,
+      explanation: "Great! The word is 'thought' — OUGHT says /awt/.",
+      questionText: 't _ _ _ _ ',
+      correctAnswer: 'thought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'thought',
+        intent: 'fill_blank',
+        questionLine: 't _ _ _ _ t',
+        imagePrompt: "A person with a lightbulb over their head representing a thought"
+      },
+      aiTutor: {
+        target_word: 'thought',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "OUGHT says /awt/ in thought, bought, and brought. The GH is silent but affects the vowel sound."
+      },
+      audio: 'thought'
+    },
+    {
+      id: 7,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fought',
+      imageUrl: null,
+      explanation: "Nice! The word is 'fought' — OUGHT says /awt/.",
+      questionText: 'f _ _ _ _ t',
+      correctAnswer: 'fought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'fought',
+        intent: 'fill_blank',
+        questionLine: 'f _ _ _ _ t',
+        imagePrompt: "Two medieval knights who fought in a friendly sparring match"
+      },
+      aiTutor: {
+        target_word: 'fought',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "The OUGHT spelling pattern says /awt/ in fought, sought, and thought. The GH is silent but lengthens the vowel."
+      },
+      audio: 'fought'
+    },
+    {
+      id: 8,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'sought',
+      imageUrl: null,
+      explanation: "Good job! The word is 'sought' — OUGHT spells /awt/.",
+      questionText: 's _ _ _ _ t',
+      correctAnswer: 'sought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'sought',
+        intent: 'fill_blank',
+        questionLine: 's _ _ _ _ _',
+        imagePrompt: "A detective sought clues with a magnifying glass"
+      },
+      aiTutor: {
+        target_word: 'sought',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "In sought, OUGHT says /awt/. This family of words includes bought, thought, and brought."
+      },
+      audio: 'sought'
+    },
+
+    // --- 5 blank (no prefilled indexes) ---
+    {
+      id: 9,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'wrought',
+      imageUrl: null,
+      explanation: "Excellent! The word is 'wrought' — OUGHT spells /awt/.",
+      questionText: '______',
+      correctAnswer: 'wrought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'wrought',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "Beautifully wrought iron gates with intricate design"
+      },
+      aiTutor: {
+        target_word: 'wrought',
+        question: 'w _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "Wrought means shaped or formed. It belongs to the same OUGHT = /awt/ family as bought and thought."
+      },
+      audio: 'wrought'
+    },
+    {
+      id: 10,
+      topicId: '5-A.25',
+      topicName: 'Spell_words_with_awt_spelled_ought',
+      progressTopicName: 'Words with /awt/ sound spelled OUGHT',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nought',
+      imageUrl: null,
+      explanation: "Fantastic! The word is 'nought' — OUGHT spells /awt/.",
+      questionText: '______',
+      correctAnswer: 'nought',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'nought',
+        intent: 'fill_blank',
+        questionLine: '______',
+        imagePrompt: "A zero written on a chalkboard representing nought"
+      },
+      aiTutor: {
+        target_word: 'nought',
+        question: '______',
+        student_entry: '',
+        topic_to_reinforce: 'OUGHT = /awt/',
+        spelling_pattern_or_rule: "In nought and ought, OUGHT spells /awt/. The GH is silent and the vowel says /aw/."
+      },
+      audio: 'nought'
+    }
+  ]
+},
+'5-A.26': {
+  topicInfo: {
+    topicId: '5-A.26',
+    topicName: 'Pluralize_words_ending_in_f_and_fe',
+    progressTopicName: 'Plurals of F/FE words (VES rule)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- Pair 1: leaf → leaves ---
+    {
+      id: 1,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'leaf',
+      imageUrl: null,
+      explanation: "Great! The word is 'leaf' — it ends with the letter F that says /f/.",
+      questionText: 'l e a _',
+      correctAnswer: 'leaf',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'leaf',
+        intent: 'fill_blank',
+        questionLine: 'l e a _',
+        imagePrompt: "A single green leaf on a branch"
+      },
+      aiTutor: {
+        target_word: 'leaf',
+        question: 'l e a _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing F-ending words',
+        spelling_pattern_or_rule: "Spell the base word: l–ea–f. Focus on the final letter F — it makes the /f/ sound. We’ll change that F when we make it plural."
+      },
+      audio: 'leaf'
+    },
+    {
+      id: 2,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'leaves',
+      imageUrl: null,
+      explanation: "Excellent! The plural of 'leaf' is 'leaves' — F changes to V and we add ES.",
+      questionText: 'l e a _ _ _',
+      correctAnswer: 'leaves',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'leaves',
+        intent: 'fill_blank',
+        questionLine: 'l e a _ _ _',
+        imagePrompt: "Several green leaves on a tree"
+      },
+      aiTutor: {
+        target_word: 'leaves',
+        question: 'l e a _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing F-ending words',
+        spelling_pattern_or_rule: "To form the plural, the final F changes to V and we add ES → leaves. Compare: leaf → leaves (F → VES)."
+      },
+      audio: 'leaves'
+    },
+
+    // --- Pair 2: wolf → wolves ---
+    {
+      id: 3,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'wolf',
+      imageUrl: null,
+      explanation: "Nice! The word is 'wolf' — the final F makes the /f/ sound.",
+      questionText: 'w o l _',
+      correctAnswer: 'wolf',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'wolf',
+        intent: 'fill_blank',
+        questionLine: 'w o l _',
+        imagePrompt: "A lone wolf standing on a snowy hill"
+      },
+      aiTutor: {
+        target_word: 'wolf',
+        question: 'w o l _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing F-ending words',
+        spelling_pattern_or_rule: "Spell it carefully: w–o–l–f. The last letter F says /f/. When you make it plural, the F will change to VES."
+      },
+      audio: 'wolf'
+    },
+    {
+      id: 4,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'wolves',
+      imageUrl: null,
+      explanation: "Great job! The plural of 'wolf' is 'wolves' — F changes to V and add ES.",
+      questionText: 'w o l _ _ _',
+      correctAnswer: 'wolves',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'wolves',
+        intent: 'fill_blank',
+        questionLine: 'w o l _ _ _',
+        imagePrompt: "A pack of wolves running through a forest"
+      },
+      aiTutor: {
+        target_word: 'wolves',
+        question: 'w o l _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing F-ending words',
+        spelling_pattern_or_rule: "When pluralized, the final F becomes V and add ES → wolves. Compare: wolf → wolves (F → VES)."
+      },
+      audio: 'wolves'
+    },
+
+    // --- Pair 3: knife → knives ---
+    {
+      id: 5,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'knife',
+      imageUrl: null,
+      explanation: "Good! The word is 'knife' — it ends with FE, and the F makes the /f/ sound.",
+      questionText: 'k n i f _',
+      correctAnswer: 'knife',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'knife',
+        intent: 'fill_blank',
+        questionLine: 'k n i f _',
+        imagePrompt: "A silver kitchen knife on a cutting board"
+      },
+      aiTutor: {
+        target_word: 'knife',
+        question: 'k _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing FE-ending words',
+        spelling_pattern_or_rule: "Spell it carefully: k–ni–fe. The word ends with FE, where F still says /f/. In plurals, FE will change to VES."
+      },
+      audio: 'knife'
+    },
+    {
+      id: 6,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'knives',
+      imageUrl: null,
+      explanation: "Fantastic! The plural of 'knife' is 'knives' — FE changes to VES.",
+      questionText: 'k n i _ _ _',
+      correctAnswer: 'knives',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'knives',
+        intent: 'fill_blank',
+        questionLine: 'k n i _ _ _',
+        imagePrompt: "A set of kitchen knives in a wooden block"
+      },
+      aiTutor: {
+        target_word: 'knives',
+        question: 'k n _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing FE-ending words',
+        spelling_pattern_or_rule: "When pluralized, FE becomes V and we add ES → knives. Compare: knife → knives (FE → VES)."
+      },
+      audio: 'knives'
+    },
+
+    // --- Pair 4: life → lives ---
+    {
+      id: 7,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'life',
+      imageUrl: null,
+      explanation: "Nice! The word is 'life' — it ends with FE that sounds like /f/.",
+      questionText: 'l i f _',
+      correctAnswer: 'life',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'life',
+        intent: 'fill_blank',
+        questionLine: 'l i f _',
+        imagePrompt: "A picture representing life with plants and sunlight"
+      },
+      aiTutor: {
+        target_word: 'life',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing FE-ending words',
+        spelling_pattern_or_rule: "Spell the base: l–i–fe. The FE at the end gives the /f/ sound. FE will change when we make it plural."
+      },
+      audio: 'life'
+    },
+    {
+      id: 8,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'lives',
+      imageUrl: null,
+      explanation: "Wonderful! The plural of 'life' is 'lives' — FE changes to VES.",
+      questionText: 'l i _ _ _',
+      correctAnswer: 'lives',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'lives',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: "Pictures of many people living their lives"
+      },
+      aiTutor: {
+        target_word: 'lives',
+        question: 'l i _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing FE-ending words',
+        spelling_pattern_or_rule: "Make it plural: change FE to V and add ES → lives. Compare: life → lives (FE → VES)."
+      },
+      audio: 'lives'
+    },
+
+    // --- Pair 5: wife → wives ---
+    {
+      id: 9,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'wife',
+      imageUrl: null,
+      explanation: "Good work! The word is 'wife' — ends with FE that makes /f/.",
+      questionText: 'w i f _',
+      correctAnswer: 'wife',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'wife',
+        intent: 'fill_blank',
+        questionLine: 'w i f _',
+        imagePrompt: "A smiling woman representing the word wife"
+      },
+      aiTutor: {
+        target_word: 'wife',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing FE-ending words',
+        spelling_pattern_or_rule: "Spell it: w–i–fe. The FE ending represents /f/. Remember this pattern; it will change to VES in the plural."
+      },
+      audio: 'wife'
+    },
+    {
+      id: 10,
+      topicId: '5-A.26',
+      topicName: 'Pluralize_words_ending_in_f_and_fe',
+      progressTopicName: 'Plurals of F/FE words (VES rule)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'wives',
+      imageUrl: null,
+      explanation: "Fantastic! The plural of 'wife' is 'wives' — FE becomes VES.",
+      questionText: 'w i _ _ _',
+      correctAnswer: 'wives',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'wives',
+        intent: 'fill_blank',
+        questionLine: 'w i _ _ _',
+        imagePrompt: "A group of wives standing together smiling"
+      },
+      aiTutor: {
+        target_word: 'wives',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing FE-ending words',
+        spelling_pattern_or_rule: "To make the plural, **change FE to V** and **add ES** → wives. Compare: wife → wives (FE → VES)."
+      },
+      audio: 'wives'
+    }
+  ]
+},
+'5-A.27': {
+  topicInfo: {
+    topicId: '5-A.27',
+    topicName: 'Pluralize_words_ending_in_o',
+    progressTopicName: 'Plurals of words ending in O (add -ES)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- Pair 1: potato → potatoes ---
+    {
+      id: 1,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'potato',
+      imageUrl: null,
+      explanation: "Great! The word is 'potato' — it ends in a consonant + o.",
+      questionText: 'p o t a t _',
+      correctAnswer: 'potato',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'potato',
+        intent: 'fill_blank',
+        questionLine: 'p o t a t _',
+        imagePrompt: "A single brown potato on a white background"
+      },
+      aiTutor: {
+        target_word: 'potato',
+        question: 'p o t a t _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "Spell it carefully: p–o–t–a–t–o. The word ends with a consonant (t) + o. When a word ends this way, we usually add -ES to make it plural."
+      },
+      audio: 'potato'
+    },
+    {
+      id: 2,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'potatoes',
+      imageUrl: null,
+      explanation: "Excellent! The plural of 'potato' is 'potatoes' — add -ES.",
+      questionText: 'p o t a t _ _',
+      correctAnswer: 'potatoes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'potatoes',
+        intent: 'fill_blank',
+        questionLine: 'p o t a t _ _',
+        imagePrompt: "A group of potatoes in a basket"
+      },
+      aiTutor: {
+        target_word: 'potatoes',
+        question: 'p o t a t _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "To make it plural, add -ES because the base ends with a consonant + o → potatoes. Compare: potato → potatoes."
+      },
+      audio: 'potatoes'
+    },
+    // --- Pair 5: torpedo → torpedoes ---
+    {
+      id: 2,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'torpedo',
+      imageUrl: null,
+      explanation: "Good! The word is 'torpedo' — ends with d + o.",
+      questionText: 't o r p e d _',
+      correctAnswer: 'torpedo',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,5],
+      aiHook: {
+        targetWord: 'torpedo',
+        intent: 'fill_blank',
+        questionLine: 't o r p e d _',
+        imagePrompt: "A single underwater torpedo"
+      },
+      aiTutor: {
+        target_word: 'torpedo',
+        question: 't o r p e d _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "Spell it: t–or–pe–do. The word ends with a consonant + o. For such endings, we add -ES to make it plural."
+      },
+      audio: 'torpedo'
+    },
+    {
+      id: 3,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'torpedoes',
+      imageUrl: null,
+      explanation: "Fantastic! The plural of 'torpedo' is 'torpedoes' — add -ES.",
+      questionText: 't o r p e d _ _',
+      correctAnswer: 'torpedoes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4,5],
+      aiHook: {
+        targetWord: 'torpedoes',
+        intent: 'fill_blank',
+        questionLine: 't o r p e d _ _ _',
+        imagePrompt: "Multiple torpedoes launched underwater"
+      },
+      aiTutor: {
+        target_word: 'torpedoes',
+        question: 't o r p e d _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "Make the plural by adding -ES because it ends with a consonant + o → torpedoes. Compare: torpedo → torpedoes."
+      },
+      audio: 'torpedoes'
+    },
+
+    // --- Pair 2: tomato → tomatoes ---
+    {
+      id: 4,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'tomato',
+      imageUrl: null,
+      explanation: "Good! The word is 'tomato' — ends with a consonant + o.",
+      questionText: 't o m a t _',
+      correctAnswer: 'tomato',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'tomato',
+        intent: 'fill_blank',
+        questionLine: 't o m a t _',
+        imagePrompt: "A single red tomato on a table"
+      },
+      aiTutor: {
+        target_word: 'tomato',
+        question: 't o m a t _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "Spell it: t–o–m–a–t–o. Ends with t + o, a consonant + o. This kind of word takes -ES to make it plural."
+      },
+      audio: 'tomato'
+    },
+    {
+      id: 5,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'tomatoes',
+      imageUrl: null,
+      explanation: "Nice! The plural of 'tomato' is 'tomatoes' — add -ES.",
+      questionText: 't o m a t _ _',
+      correctAnswer: 'tomatoes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'tomatoes',
+        intent: 'fill_blank',
+        questionLine: 't o m a t _ _ _',
+        imagePrompt: "A basket full of ripe tomatoes"
+      },
+      aiTutor: {
+        target_word: 'tomatoes',
+        question: 't o m a t _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "To make it plural, add -ES because the word ends with consonant + o → tomatoes. Compare: tomato → tomatoes."
+      },
+      audio: 'tomatoes'
+    },
+
+    // --- Pair 3: hero → heroes ---
+    {
+      id: 6,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hero',
+      imageUrl: null,
+      explanation: "Great! The word is 'hero' — ends with r + o.",
+      questionText: 'h e r _',
+      correctAnswer: 'hero',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'hero',
+        intent: 'fill_blank',
+        questionLine: 'h e r _',
+        imagePrompt: "A superhero standing proudly"
+      },
+      aiTutor: {
+        target_word: 'hero',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "The base word ends with consonant + o. Most words like this add -ES to form the plural."
+      },
+      audio: 'hero'
+    },
+    {
+      id: 7,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'heroes',
+      imageUrl: null,
+      explanation: "Excellent! The plural of 'hero' is 'heroes' — add -ES.",
+      questionText: 'h e r _ _',
+      correctAnswer: 'heroes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'heroes',
+        intent: 'fill_blank',
+        questionLine: 'h e r _ _',
+        imagePrompt: "Several heroes standing together"
+      },
+      aiTutor: {
+        target_word: 'heroes',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "When pluralized, add -ES because the base ends in consonant + o → heroes. Compare: hero → heroes."
+      },
+      audio: 'heroes'
+    },
+
+    // --- Pair 4: echo → echoes ---
+    {
+      id: 8,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'echo',
+      imageUrl: null,
+      explanation: "Nice! The word is 'echo' — ends with ch + o sound.",
+      questionText: 'e c h _',
+      correctAnswer: 'echo',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'echo',
+        intent: 'fill_blank',
+        questionLine: 'e c h _',
+        imagePrompt: "A sound wave bouncing off mountains"
+      },
+      aiTutor: {
+        target_word: 'echo',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "Spell the base word: e–ch–o. It ends with a consonant + o, so it will add -ES in plural."
+      },
+      audio: 'echo'
+    },
+    {
+      id: 9,
+      topicId: '5-A.27',
+      topicName: 'Pluralize_words_ending_in_o',
+      progressTopicName: 'Plurals of words ending in O (add -ES)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'echoes',
+      imageUrl: null,
+      explanation: "Wonderful! The plural of 'echo' is 'echoes' — add -ES.",
+      questionText: 'e c h _ _',
+      correctAnswer: 'echoes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'echoes',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _ _',
+        imagePrompt: "Echoes bouncing through a canyon"
+      },
+      aiTutor: {
+        target_word: 'echoes',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing O-ending words',
+        spelling_pattern_or_rule: "Add -ES because the base ends with a consonant + o → echoes. Compare: echo → echoes."
+      },
+      audio: 'echoes'
+    },
+
+  ]
+},
+'5-A.28': {
+  topicInfo: {
+    topicId: '5-A.28',
+    topicName: 'Review_plurals_with_s_and_es',
+    progressTopicName: 'Review plurals with -S and -ES',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 1–2: cat → cats ---
+    {
+      id: 1,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cat',
+      imageUrl: null,
+      explanation: "The word is 'cat' — spell it carefully before adding -s for plural.",
+      questionText: '_ _ _',
+      correctAnswer: 'cat',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'cat',
+        intent: 'fill_blank',
+        questionLine: 'c a _',
+        imagePrompt: 'A single cat sitting on the floor'
+      },
+      aiTutor: {
+        target_word: 'cat',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "‘Cat’ ends with a regular consonant sound /t/. To make it plural, just add -S → cats."
+      },
+      audio: 'cat'
+    },
+    {
+      id: 2,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cats',
+      imageUrl: null,
+      explanation: "Plural of 'cat' is 'cats' — add -S at the end.",
+      questionText: 'c a _ _',
+      correctAnswer: 'cats',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'cats',
+        intent: 'fill_blank',
+        questionLine: 'c a _ _',
+        imagePrompt: 'A group of cats sitting together'
+      },
+      aiTutor: {
+        target_word: 'cats',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "Words like 'cat' take a simple -S to make them plural → cats. Most nouns follow this regular -S pattern."
+      },
+      audio: 'cats'
+    },
+
+    // --- 3–4: bus → buses ---
+    {
+      id: 3,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dog',
+      imageUrl: null,
+      explanation: "‘Bus’ ends in S, which needs -ES when pluralized.",
+      questionText: 'b u _',
+      correctAnswer: 'bus',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'dog',
+        intent: 'fill_blank',
+        questionLine: 'b u _',
+        imagePrompt: 'A yellow school bus'
+      },
+      aiTutor: {
+        target_word: 'dog',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "Words like 'dog' take a simple -S to make them plural → dogs. Most nouns follow this regular -S pattern."
+      },
+      audio: 'dog'
+    },
+    {
+      id: 4,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dogs',
+      imageUrl: null,
+      explanation: "The plural of 'dog' is 'dogs' — add -S at the end.",
+      questionText: 'd o _ _ _',
+      correctAnswer: 'dogs',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'dogs',
+        intent: 'fill_blank',
+        questionLine: 'b u _ _ _',
+        imagePrompt: 'Several dogs playing together'
+      },
+      aiTutor: {
+        target_word: 'dogs',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "Words like 'dog' take a simple -S to make them plural → dogs. Most nouns follow this regular -S pattern."
+      },
+      audio: 'dogs'
+    },
+
+    // --- 5–6: box → boxes ---
+    {
+      id: 5,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'box',
+      imageUrl: null,
+      explanation: "‘Box’ ends with an X sound — it will need -ES for plural.",
+      questionText: 'b o _ _',
+      correctAnswer: 'box',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'box',
+        intent: 'fill_blank',
+        questionLine: 'b o _ _',
+        imagePrompt: 'A single cardboard box'
+      },
+      aiTutor: {
+        target_word: 'box',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "The word 'box' ends with /ks/. Because of the X, add -ES in plural → boxes."
+      },
+      audio: 'box'
+    },
+    {
+      id: 6,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'boxes',
+      imageUrl: null,
+      explanation: "Plural of 'box' is 'boxes' — add -ES to words ending in X.",
+      questionText: 'b o _ _ _ _',
+      correctAnswer: 'boxes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'boxes',
+        intent: 'fill_blank',
+        questionLine: 'b o _ _ _ _',
+        imagePrompt: 'Several boxes stacked together'
+      },
+      aiTutor: {
+        target_word: 'boxes',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "Add -ES after X for plural forms → box → boxes. The E helps pronounce /ɪz/ clearly."
+      },
+      audio: 'boxes'
+    },
+
+    // --- 7–8: dish → dishes ---
+    {
+      id: 7,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dish',
+      imageUrl: null,
+      explanation: "‘Dish’ ends in SH — that sound needs -ES for plural.",
+      questionText: 'd i s _',
+      correctAnswer: 'dish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'dish',
+        intent: 'fill_blank',
+        questionLine: 'd i s _',
+        imagePrompt: 'A single clean dish on a table'
+      },
+      aiTutor: {
+        target_word: 'dish',
+        question: 'd i s _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "‘Dish’ ends with /ʃ/. Words ending in SH need -ES for plural to sound clear → dishes."
+      },
+      audio: 'dish'
+    },
+    {
+      id: 8,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dishes',
+      imageUrl: null,
+      explanation: "Plural of 'dish' is 'dishes' — add -ES after SH.",
+      questionText: 'd i s _ _ _',
+      correctAnswer: 'dishes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'dishes',
+        intent: 'fill_blank',
+        questionLine: 'd i s _ _ _',
+        imagePrompt: 'A stack of clean dishes'
+      },
+      aiTutor: {
+        target_word: 'dishes',
+        question: 'd i s h _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "Add -ES to words ending with SH to form the plural. Compare: dish → dishes. The E keeps pronunciation smooth."
+      },
+      audio: 'dishes'
+    },
+
+    // --- 9–10: brush → brushes ---
+    {
+      id: 9,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'brush',
+      imageUrl: null,
+      explanation: "‘Brush’ ends in SH, so it will take -ES for plural.",
+      questionText: 'b r u s _',
+      correctAnswer: 'brush',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'brush',
+        intent: 'fill_blank',
+        questionLine: 'b r u s _',
+        imagePrompt: 'A single paintbrush on a desk'
+      },
+      aiTutor: {
+        target_word: 'brush',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "‘Brush’ ends with the SH sound. For such endings, add -ES to form plural → brushes."
+      },
+      audio: 'brush'
+    },
+    {
+      id: 10,
+      topicId: '5-A.28',
+      topicName: 'Review_plurals_with_s_and_es',
+      progressTopicName: 'Review plurals with -S and -ES',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'brushes',
+      imageUrl: null,
+      explanation: "Plural of 'brush' is 'brushes' — add -ES at the end.",
+      questionText: 'b r u s _ _ _',
+      correctAnswer: 'brushes',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'brushes',
+        intent: 'fill_blank',
+        questionLine: 'b r u s _ _ _',
+        imagePrompt: 'Several brushes placed in a cup'
+      },
+      aiTutor: {
+        target_word: 'brushes',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -S and -ES',
+        spelling_pattern_or_rule: "Words ending in SH or CH add -ES to form plurals → brush → brushes. The E keeps the sound /ɪz/ clear."
+      },
+      audio: 'brushes'
+    }
+  ]
+},
+'5-A.29': {
+  topicInfo: {
+    topicId: '5-A.29',
+    topicName: 'Review_plurals_with_ies_and_en',
+    progressTopicName: 'Review plurals with -IES and -EN',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 1–2: baby → babies ---
+    {
+      id: 1,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'baby',
+      imageUrl: null,
+      explanation: "The word is 'baby' — it ends in a consonant + y.",
+      questionText: 'b a b _',
+      correctAnswer: 'baby',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'baby',
+        intent: 'fill_blank',
+        questionLine: 'b a b _',
+        imagePrompt: 'A smiling baby sitting on a blanket'
+      },
+      aiTutor: {
+        target_word: 'baby',
+        question: 'b a b _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -IES',
+        spelling_pattern_or_rule: "The word 'baby' ends with a consonant (b) before y. When pluralized, the y changes to i before adding -ES → babies."
+      },
+      audio: 'baby'
+    },
+    {
+      id: 2,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'babies',
+      imageUrl: null,
+      explanation: "Plural of 'baby' is 'babies' — change y → i and add -ES.",
+      questionText: 'b a b _ _ _',
+      correctAnswer: 'babies',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'babies',
+        intent: 'fill_blank',
+        questionLine: 'b a b _ _ _',
+        imagePrompt: 'Several babies crawling on a play mat'
+      },
+      aiTutor: {
+        target_word: 'babies',
+        question: 'b a b _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -IES',
+        spelling_pattern_or_rule: "When a word ends in consonant + y, change the y to i and add -ES → babies. Compare: baby → babies."
+      },
+      audio: 'babies'
+    },
+
+    // --- 3–4: lady → ladies ---
+    {
+      id: 3,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'lady',
+      imageUrl: null,
+      explanation: "‘Lady’ ends in a consonant + y — this pattern changes y → i before adding -ES.",
+      questionText: 'l a d _',
+      correctAnswer: 'lady',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'lady',
+        intent: 'fill_blank',
+        questionLine: 'l a d _',
+        imagePrompt: 'A lady wearing a hat and smiling'
+      },
+      aiTutor: {
+        target_word: 'lady',
+        question: 'l a d _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -IES',
+        spelling_pattern_or_rule: "‘Lady’ ends with the /d/ sound followed by y. When pluralizing, y changes to i, then add -ES → ladies."
+      },
+      audio: 'lady'
+    },
+    {
+      id: 4,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ladies',
+      imageUrl: null,
+      explanation: "Plural of 'lady' is 'ladies' — change y to i and add -ES.",
+      questionText: 'l a d _ _ _',
+      correctAnswer: 'ladies',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'ladies',
+        intent: 'fill_blank',
+        questionLine: 'l a d _ _ _',
+        imagePrompt: 'A group of ladies walking together'
+      },
+      aiTutor: {
+        target_word: 'ladies',
+        question: 'l a d _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -IES',
+        spelling_pattern_or_rule: "To pluralize words ending in consonant + y, change y → i and add -ES. Example: lady → ladies."
+      },
+      audio: 'ladies'
+    },
+
+    // --- 5–6: city → cities ---
+    {
+      id: 5,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'city',
+      imageUrl: null,
+      explanation: "‘City’ ends with consonant + y, so y changes to i in plural.",
+      questionText: 'c i t _',
+      correctAnswer: 'city',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'city',
+        intent: 'fill_blank',
+        questionLine: 'c i t _',
+        imagePrompt: 'A busy city skyline'
+      },
+      aiTutor: {
+        target_word: 'city',
+        question: 'c i t _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -IES',
+        spelling_pattern_or_rule: "When a word like 'city' ends with a consonant before y, change y → i and add -ES → cities."
+      },
+      audio: 'city'
+    },
+    {
+      id: 6,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'cities',
+      imageUrl: null,
+      explanation: "Plural of 'city' is 'cities' — y changes to i, then add -ES.",
+      questionText: 'c i t _ _ _',
+      correctAnswer: 'cities',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'cities',
+        intent: 'fill_blank',
+        questionLine: 'c i t _ _ _',
+        imagePrompt: 'Several glowing cities at night from above'
+      },
+      aiTutor: {
+        target_word: 'cities',
+        question: 'c i t _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -IES',
+        spelling_pattern_or_rule: "In plural forms, words ending with consonant + y change y → i, then add -ES → cities."
+      },
+      audio: 'cities'
+    },
+
+    // --- 7–8: child → children ---
+    {
+      id: 7,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'child',
+      imageUrl: null,
+      explanation: "‘Child’ is an irregular noun that adds -EN to form its plural.",
+      questionText: 'c h i l _',
+      correctAnswer: 'child',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'child',
+        intent: 'fill_blank',
+        questionLine: 'c h i l _',
+        imagePrompt: 'A single child playing outside'
+      },
+      aiTutor: {
+        target_word: 'child',
+        question: 'c h i l _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -EN',
+        spelling_pattern_or_rule: "‘Child’ is a special irregular word. It changes completely when pluralized — not just by adding -S or -ES."
+      },
+      audio: 'child'
+    },
+    {
+      id: 8,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'children',
+      imageUrl: null,
+      explanation: "Plural of 'child' is 'children' — one of the few that ends in -EN.",
+      questionText: 'c h i l _ _ _ _',
+      correctAnswer: 'children',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'children',
+        intent: 'fill_blank',
+        questionLine: 'c h i l _ _ _ _',
+        imagePrompt: 'Several children playing together'
+      },
+      aiTutor: {
+        target_word: 'children',
+        question: 'c h i l _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -EN',
+        spelling_pattern_or_rule: "Some irregular words form plurals with -EN, not -S or -ES. Example: child → children."
+      },
+      audio: 'children'
+    },
+
+    // --- 9–10: ox → oxen ---
+    {
+      id: 9,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ox',
+      imageUrl: null,
+      explanation: "‘Ox’ is another irregular noun that takes -EN in its plural form.",
+      questionText: 'o _',
+      correctAnswer: 'ox',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'ox',
+        intent: 'fill_blank',
+        questionLine: 'o _',
+        imagePrompt: 'A single ox standing in a field'
+      },
+      aiTutor: {
+        target_word: 'ox',
+        question: 'o _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -EN',
+        spelling_pattern_or_rule: "‘Ox’ is short and ends with the /ks/ sound. Its plural form adds -EN → oxen, not -ES."
+      },
+      audio: 'ox'
+    },
+    {
+      id: 10,
+      topicId: '5-A.29',
+      topicName: 'Review_plurals_with_ies_and_en',
+      progressTopicName: 'Review plurals with -IES and -EN',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'oxen',
+      imageUrl: null,
+      explanation: "Plural of 'ox' is 'oxen' — this word uses the old -EN plural pattern.",
+      questionText: 'o _ _ _',
+      correctAnswer: 'oxen',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'oxen',
+        intent: 'fill_blank',
+        questionLine: 'o _ _ _',
+        imagePrompt: 'Two oxen pulling a cart'
+      },
+      aiTutor: {
+        target_word: 'oxen',
+        question: 'o _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Pluralizing with -EN',
+        spelling_pattern_or_rule: "A few English words use -EN for plural. ‘Ox’ follows this old English rule → oxen."
+      },
+      audio: 'oxen'
+    }
+  ]
+},
+'5-A.30': {
+  topicInfo: {
+    topicId: '5-A.30',
+    topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+    progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- 1–2: run → running ---
+    {
+      id: 1,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'run',
+      imageUrl: null,
+      explanation: "The base word is 'run' — one syllable, one vowel, one consonant at the end.",
+      questionText: 'r u _',
+      correctAnswer: 'run',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'run',
+        intent: 'fill_blank',
+        questionLine: 'r u _',
+        imagePrompt: 'A person running fast outdoors'
+      },
+      aiTutor: {
+        target_word: 'run',
+        question: 'r u _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "‘Run’ is a one-syllable word with one vowel followed by one consonant (n). When adding a vowel suffix like -ing, double the final consonant → running."
+      },
+      audio: 'run'
+    },
+    {
+      id: 2,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'running',
+      imageUrl: null,
+      explanation: "The word is 'running' — double the final n before adding -ing.",
+      questionText: 'r u _ _ _ _ _',
+      correctAnswer: 'running',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'running',
+        intent: 'fill_blank',
+        questionLine: 'r u _ _ _ _ _',
+        imagePrompt: 'A person running on a track'
+      },
+      aiTutor: {
+        target_word: 'running',
+        question: 'r u _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "When adding -ing to ‘run,’ double the final consonant (n) because it’s a 1-1-1 word: one syllable, one vowel, one consonant → running."
+      },
+      audio: 'running'
+    },
+
+    // --- 3–4: hop → hopping ---
+    {
+      id: 3,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hop',
+      imageUrl: null,
+      explanation: "‘Hop’ ends with one vowel + one consonant — it fits the doubling pattern.",
+      questionText: 'h o _',
+      correctAnswer: 'hop',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'hop',
+        intent: 'fill_blank',
+        questionLine: 'h o _',
+        imagePrompt: 'A rabbit ready to hop'
+      },
+      aiTutor: {
+        target_word: 'hop',
+        question: 'h o _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "‘Hop’ is a 1-1-1 word, is a one-syllable word with one vowel followed by one consonant (n).. When adding -ing, double the last consonant to keep the short vowel sound → hopping."
+      },
+      audio: 'hop'
+    },
+    {
+      id: 4,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hopping',
+      imageUrl: null,
+      explanation: "The plural form is 'hopping' — the final p is doubled before -ing.",
+      questionText: 'h o _ _ _ _ _',
+      correctAnswer: 'hopping',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'hopping',
+        intent: 'fill_blank',
+        questionLine: 'h o _ _ _ _ _',
+        imagePrompt: 'A rabbit hopping across the grass'
+      },
+      aiTutor: {
+        target_word: 'hopping',
+        question: 'h o _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "‘Hop’ becomes ‘hopping’ when adding -ing because you double the final p — one syllable, one vowel, one consonant."
+      },
+      audio: 'hopping'
+    },
+
+    // --- 5–6: big → bigger ---
+    {
+      id: 5,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'big',
+      imageUrl: null,
+      explanation: "‘Big’ is one syllable with one vowel and one final consonant.",
+      questionText: 'b i _',
+      correctAnswer: 'big',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'big',
+        intent: 'fill_blank',
+        questionLine: 'b i _',
+        imagePrompt: 'A big red ball'
+      },
+      aiTutor: {
+        target_word: 'big',
+        question: 'b i _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "‘Big’ fits the 1-1-1 rule (one vowel, one consonant). When adding a vowel suffix like -er, double the g → bigger."
+      },
+      audio: 'big'
+    },
+    {
+      id: 6,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bigger',
+      imageUrl: null,
+      explanation: "The word is 'bigger' — the final g doubles before adding -er.",
+      questionText: 'b i _ _ _ _',
+      correctAnswer: 'bigger',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'bigger',
+        intent: 'fill_blank',
+        questionLine: 'b i _ _ _ _',
+        imagePrompt: 'Two boxes, one bigger than the other'
+      },
+      aiTutor: {
+        target_word: 'bigger',
+        question: 'b i _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "In ‘bigger,’ the g doubles before adding -er. The 1-1-1 pattern helps keep the short vowel sound from changing."
+      },
+      audio: 'bigger'
+    },
+
+    // --- 7–8: plan → planned ---
+    {
+      id: 7,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'plan',
+      imageUrl: null,
+      explanation: "‘Plan’ is one syllable with one vowel before a single consonant — fits the doubling pattern.",
+      questionText: 'p l a _',
+      correctAnswer: 'plan',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'plan',
+        intent: 'fill_blank',
+        questionLine: 'p l a _',
+        imagePrompt: 'A person writing a plan on paper'
+      },
+      aiTutor: {
+        target_word: 'plan',
+        question: 'p l a _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "‘Plan’ ends with one consonant after one vowel, so when adding -ed, the n doubles → planned."
+      },
+      audio: 'plan'
+    },
+    {
+      id: 8,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'planned',
+      imageUrl: null,
+      explanation: "The word is 'planned' — the n doubles before adding -ed.",
+      questionText: 'p l a _ _ _ _',
+      correctAnswer: 'planned',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'planned',
+        intent: 'fill_blank',
+        questionLine: 'p l a _ _ _ _',
+        imagePrompt: 'A planner with written notes'
+      },
+      aiTutor: {
+        target_word: 'planned',
+        question: 'p l a _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "For short words like ‘plan,’ double the final consonant before adding vowel suffixes like -ed. It keeps the short vowel sound steady → planned."
+      },
+      audio: 'planned'
+    },
+
+    // --- 9–10: fit → fitted ---
+    {
+      id: 9,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fit',
+      imageUrl: null,
+      explanation: "‘Fit’ is short, with one vowel and one final consonant — fits the doubling rule.",
+      questionText: 'f i _',
+      correctAnswer: 'fit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'fit',
+        intent: 'fill_blank',
+        questionLine: 'f i _',
+        imagePrompt: 'A shirt that fits perfectly'
+      },
+      aiTutor: {
+        target_word: 'fit',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "‘Fit’ is a one-syllable word ending in one vowel and one consonant. When adding -ed, double the t → fitted."
+      },
+      audio: 'fit'
+    },
+    {
+      id: 10,
+      topicId: '5-A.30',
+      topicName: 'Learn_the_Doubling_Rule_for_adding_vowel_suffixes',
+      progressTopicName: 'Doubling Rule for vowel suffixes (-ing, -ed, -er)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fitted',
+      imageUrl: null,
+      explanation: "The word is 'fitted' — the t doubles before adding -ed.",
+      questionText: '_ _ _ _ _ _',
+      correctAnswer: 'fitted',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1],
+      aiHook: {
+        targetWord: 'fitted',
+        intent: 'fill_blank',
+        questionLine: 'f i _ _ _ _',
+        imagePrompt: 'A fitted shirt on display'
+      },
+      aiTutor: {
+        target_word: 'fitted',
+        question: 'f i _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Doubling Rule for vowel suffixes',
+        spelling_pattern_or_rule: "When adding -ed to short 1-1-1 words like ‘fit,’ double the final consonant to keep the vowel short → fitted."
+      },
+      audio: 'fitted'
+    }
+  ]
+},
+
+'5-A.31': {
+  topicInfo: {
+    topicId: '5-A.31',
+    topicName: 'Learn_phonograms_OUR_and_CI',
+    progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courage',
+      imageUrl: null,
+      explanation: "‘Courage’ uses OUR to spell the /ər/ sound in the first syllable.",
+      questionText: 'c _ _ r a g e',
+      correctAnswer: 'courage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6],
+      aiHook: {
+        targetWord: 'courage',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ _ a g e',
+        imagePrompt: 'A brave child showing courage while climbing'
+      },
+      aiTutor: {
+        target_word: 'courage',
+        question: 'c _ _ _ a g e',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram OUR (/ər/)',
+        spelling_pattern_or_rule: "In ‘courage,’ the letters OUR spell the /ər/ sound. OUR often sounds like ER in unstressed syllables (courage, nourish)."
+      },
+      audio: 'courage'
+    },
+    {
+      id: 2,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nourish',
+      imageUrl: null,
+      explanation: "‘Nourish’ uses OUR for the /ər/ sound too.",
+      questionText: 'n _ _ r i s h',
+      correctAnswer: 'nourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6],
+      aiHook: {
+        targetWord: 'nourish',
+        intent: 'fill_blank',
+        questionLine: 'n _ _ r i s h',
+        imagePrompt: 'Healthy food that nourishes the body'
+      },
+      aiTutor: {
+        target_word: 'nourish',
+        question: 'n _ _ _ i s h',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram OUR (/ər/)',
+        spelling_pattern_or_rule: "In ‘nourish,’ OUR spells /ər/. This is common when OUR is in an unstressed syllable before a soft ending like –ish."
+      },
+      audio: 'nourish'
+    },
+    {
+      id: 3,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'flourish',
+      imageUrl: null,
+      explanation: "‘Flourish’ has OUR saying /ər/ in the first syllable.",
+      questionText: 'f l _ _ r i s h',
+      correctAnswer: 'flourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,5,6,7],
+      aiHook: {
+        targetWord: 'flourish',
+        intent: 'fill_blank',
+        questionLine: 'f l _ _ r i s h',
+        imagePrompt: 'A blooming plant flourishing in sunlight'
+      },
+      aiTutor: {
+        target_word: 'flourish',
+        question: 'f l _ _ _ i s h',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram OUR (/ər/)',
+        spelling_pattern_or_rule: "In ‘flourish,’ the letters OUR spell /ər/. The vowel sound changes because OUR appears in an unstressed syllable."
+      },
+      audio: 'flourish'
+    },
+    {
+      id: 4,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'journey',
+      imageUrl: null,
+      explanation: "‘Journey’ uses OUR for the /ər/ sound at the start.",
+      questionText: 'j _ _ r n e y',
+      correctAnswer: 'journey',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [5,6],
+      aiHook: {
+        targetWord: 'journey',
+        intent: 'fill_blank',
+        questionLine: 'j _ _ r n e y',
+        imagePrompt: 'A traveler on a long journey'
+      },
+      aiTutor: {
+        target_word: 'journey',
+        question: '_ _ _ _ _ e y',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram OUR (/ər/)',
+        spelling_pattern_or_rule: "In ‘journey,’ OUR spells the /ər/ sound. The word’s first syllable is unstressed, which makes the vowel sound softer."
+      },
+      audio: 'journey'
+    },
+    {
+      id: 5,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courtesy',
+      imageUrl: null,
+      explanation: "‘Courtesy’ starts with OUR spelling the /ər/ sound.",
+      questionText: 'c _ _ r t e s y',
+      correctAnswer: 'courtesy',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'courtesy',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ r t e s y',
+        imagePrompt: 'A polite child showing courtesy'
+      },
+      aiTutor: {
+        target_word: 'courtesy',
+        question: '_ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram OUR (/ər/)',
+        spelling_pattern_or_rule: "In ‘courtesy,’ the letters OUR say /ər/. This pattern occurs in words where OUR appears before T or D in unstressed syllables."
+      },
+      audio: 'courtesy'
+    },
+    {
+      id: 6,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'special',
+      imageUrl: null,
+      explanation: "‘Special’ uses CI for the /ʃ/ sound before the vowel A.",
+      questionText: 's p e _ _ a l',
+      correctAnswer: 'special',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,2,5,6],
+      aiHook: {
+        targetWord: 'special',
+        intent: 'fill_blank',
+        questionLine: 's p e _ _ a l',
+        imagePrompt: 'A birthday cake that says special day'
+      },
+      aiTutor: {
+        target_word: 'special',
+        question: 's p e _ _ a l',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram CI (/ʃ/)',
+        spelling_pattern_or_rule: "In ‘special,’ CI spells /ʃ/ before a vowel. When C is followed by I, it usually changes to the soft /ʃ/ sound."
+      },
+      audio: 'special'
+    },
+    {
+      id: 7,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'musician',
+      imageUrl: null,
+      explanation: "‘Musician’ uses CI to spell /ʃ/ before A.",
+      questionText: 'm u s i _ _ a n',
+      correctAnswer: 'musician',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,2,3,6,7],
+      aiHook: {
+        targetWord: 'musician',
+        intent: 'fill_blank',
+        questionLine: 'm u s i _ _ a n',
+        imagePrompt: 'A musician playing a guitar on stage'
+      },
+      aiTutor: {
+        target_word: 'musician',
+        question: 'm u s i _ _ a n',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram CI (/ʃ/)',
+        spelling_pattern_or_rule: "In ‘musician,’ CI makes /ʃ/. It connects to ‘music,’ where the C is hard but becomes soft before I or A."
+      },
+      audio: 'musician'
+    },
+    {
+      id: 8,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'magician',
+      imageUrl: null,
+      explanation: "‘Magician’ uses CI to spell /ʃ/ in the middle.",
+      questionText: 'm a g i _ _ a n',
+      correctAnswer: 'magician',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,2,3,6,7],
+      aiHook: {
+        targetWord: 'magician',
+        intent: 'fill_blank',
+        questionLine: 'm a g i _ _ a n',
+        imagePrompt: 'A magician performing a magic trick on stage'
+      },
+      aiTutor: {
+        target_word: 'magician',
+        question: 'm a g i _ _ a n',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram CI (/ʃ/)',
+        spelling_pattern_or_rule: "In ‘magician,’ CI spells /ʃ/. The root ‘magic’ changes from hard /k/ to soft /ʃ/ when the suffix –ian is added."
+      },
+      audio: 'magician'
+    },
+    {
+      id: 9,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'physician',
+      imageUrl: null,
+      explanation: "‘Physician’ has CI making the /ʃ/ sound again.",
+      questionText: 'p h y s i _ _ a n',
+      correctAnswer: 'physician',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1, 2,3,4,7,8],
+      aiHook: {
+        targetWord: 'physician',
+        intent: 'fill_blank',
+        questionLine: 'p h y s i _ _ a n',
+        imagePrompt: 'A physician checking a patient'
+      },
+      aiTutor: {
+        target_word: 'physician',
+        question: 'p h y s i _ _ a n',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram CI (/ʃ/)',
+        spelling_pattern_or_rule: "In ‘physician,’ CI spells /ʃ/. It comes from the same root as ‘physics,’ but the ending –cian softens the sound."
+      },
+      audio: 'physician'
+    },
+    {
+      id: 10,
+      topicId: '5-A.31',
+      topicName: 'Learn_phonograms_OUR_and_CI',
+      progressTopicName: 'Phonograms OUR (/ər/) and CI (/ʃ/)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'electrician',
+      imageUrl: null,
+      explanation: "‘Electrician’ ends with CI spelling /ʃ/ again.",
+      questionText: 'e l e c t r i _ _ a n',
+      correctAnswer: 'electrician',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'electrician',
+        intent: 'fill_blank',
+        questionLine: 'e l e c t r i _ _ a n',
+        imagePrompt: 'An electrician fixing a light bulb'
+      },
+      aiTutor: {
+        target_word: 'electrician',
+        question: '_ _ _ _ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Phonogram CI (/ʃ/)',
+        spelling_pattern_or_rule: "In ‘electrician,’ CI makes /ʃ/ before A. It follows the same pattern as ‘magician’ and ‘musician.’"
+      },
+      audio: 'electrician'
+    }
+  ]
+},
+'5-A.32': {
+  topicInfo: {
+    topicId: '5-A.32',
+    topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+    progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- ER Words ---
+    {
+      id: 1,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'her',
+      imageUrl: null,
+      explanation: "Nice! The word is 'her' — ER spells the /er/ sound.",
+      questionText: 'h _ _',
+      correctAnswer: 'her',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'her',
+        intent: 'fill_blank',
+        questionLine: 'h _ _',
+        imagePrompt: "A girl pointing to herself to show 'her'"
+      },
+      aiTutor: {
+        target_word: 'her',
+        question: 'h _ _',
+        student_entry: '',
+        topic_to_reinforce: 'ER = /er/',
+        spelling_pattern_or_rule: "In ‘her,’ the letters ER spell the /er/ sound. ER is the most common way to spell /er/ at the end or middle of a word."
+      },
+      audio: 'her'
+    },
+    {
+      id: 2,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fern',
+      imageUrl: null,
+      explanation: "Good work! The word is 'fern' — ER spells the /er/ sound.",
+      questionText: 'f _ _ n',
+      correctAnswer: 'fern',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'fern',
+        intent: 'fill_blank',
+        questionLine: 'f _ _ n',
+        imagePrompt: "A green fern plant growing in a pot"
+      },
+      aiTutor: {
+        target_word: 'fern',
+        question: 'f _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'ER = /er/',
+        spelling_pattern_or_rule: "In ‘fern,’ ER spells /er/ again. ER is used in many words with the stressed /er/ sound, like her, term, and serve."
+      },
+      audio: 'fern'
+    },
+    {
+      id: 3,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'herd',
+      imageUrl: null,
+      explanation: "Great! The word is 'herd' — ER spells /er/.",
+      questionText: 'h _ _ d',
+      correctAnswer: 'herd',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'herd',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ d',
+        imagePrompt: "A herd of cows walking in a field"
+      },
+      aiTutor: {
+        target_word: 'herd',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'ER = /er/',
+        spelling_pattern_or_rule: "In ‘herd,’ ER makes /er/. It often appears before D or T, as in herd, term, and clerk."
+      },
+      audio: 'herd'
+    },
+
+    // --- IR Words ---
+    {
+      id: 4,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bird',
+      imageUrl: null,
+      explanation: "Nice! The word is 'bird' — IR spells the /er/ sound.",
+      questionText: 'b _ _ d',
+      correctAnswer: 'bird',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'bird',
+        intent: 'fill_blank',
+        questionLine: 'b _ _ d',
+        imagePrompt: "A small bird sitting on a branch"
+      },
+      aiTutor: {
+        target_word: 'bird',
+        question: 'b _ _ d',
+        student_entry: '',
+        topic_to_reinforce: 'IR = /er/',
+        spelling_pattern_or_rule: "In ‘bird,’ the letters IR spell /er/. IR often appears before D, L, or T — bird, girl, first."
+      },
+      audio: 'bird'
+    },
+    {
+      id: 5,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'shirt',
+      imageUrl: null,
+      explanation: "‘Shirt’ uses IR for the /er/ sound.",
+      questionText: 's h _ _ t',
+      correctAnswer: 'shirt',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: 'shirt',
+        intent: 'fill_blank',
+        questionLine: 's h _ _ t',
+        imagePrompt: "A folded shirt on a table"
+      },
+      aiTutor: {
+        target_word: 'shirt',
+        question: 's h _ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'IR = /er/',
+        spelling_pattern_or_rule: "In ‘shirt,’ IR spells /er/. IR often appears in the middle of one-syllable words like bird, shirt, and dirt."
+      },
+      audio: 'shirt'
+    },
+    {
+      id: 6,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'girl',
+      imageUrl: null,
+      explanation: "‘Girl’ also has IR for the /er/ sound.",
+      questionText: 'g _ _ l',
+      correctAnswer: 'girl',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'girl',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _',
+        imagePrompt: "A young girl smiling"
+      },
+      aiTutor: {
+        target_word: 'girl',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'IR = /er/',
+        spelling_pattern_or_rule: "In ‘girl,’ IR makes /er/. IR is the second most common way to spell /er/ after ER."
+      },
+      audio: 'girl'
+    },
+
+    // --- UR Words ---
+    {
+      id: 7,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nurse',
+      imageUrl: null,
+      explanation: "‘Nurse’ uses UR for the /er/ sound.",
+      questionText: 'n _ _ s e',
+      correctAnswer: 'nurse',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'nurse',
+        intent: 'fill_blank',
+        questionLine: 'n _ _ s e',
+        imagePrompt: "A nurse helping a patient"
+      },
+      aiTutor: {
+        target_word: 'nurse',
+        question: 'n _ _ s e',
+        student_entry: '',
+        topic_to_reinforce: 'UR = /er/',
+        spelling_pattern_or_rule: "In ‘nurse,’ UR spells /er/. UR is often used before S, T, or D as in nurse, hurt, and burst."
+      },
+      audio: 'nurse'
+    },
+    {
+      id: 8,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'curl',
+      imageUrl: null,
+      explanation: "‘Curl’ has UR spelling /er/.",
+      questionText: 'c _ _ l',
+      correctAnswer: 'curl',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'curl',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ l',
+        imagePrompt: "A curling ribbon or curly hair"
+      },
+      aiTutor: {
+        target_word: 'curl',
+        question: 'c _ _ l',
+        student_entry: '',
+        topic_to_reinforce: 'UR = /er/',
+        spelling_pattern_or_rule: "In ‘curl,’ UR spells /er/. UR can appear before L or N in short one-syllable words."
+      },
+      audio: 'curl'
+    },
+    {
+      id: 9,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'hurt',
+      imageUrl: null,
+      explanation: "‘Hurt’ uses UR for the /er/ sound.",
+      questionText: 'h _ _ t',
+      correctAnswer: 'hurt',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'hurt',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ t',
+        imagePrompt: "A child with a small scrape on the knee"
+      },
+      aiTutor: {
+        target_word: 'hurt',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'UR = /er/',
+        spelling_pattern_or_rule: "In ‘hurt,’ UR spells /er/. UR often appears before T or D and makes the same /er/ sound as ER and IR."
+      },
+      audio: 'hurt'
+    },
+
+    // --- Mixed Review ---
+    {
+      id: 10,
+      topicId: '5-A.32',
+      topicName: 'Learn_three_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound (ER, IR, UR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'thirsty',
+      imageUrl: null,
+      explanation: "‘Thirsty’ uses IR for /er/ — a good review of all three spellings.",
+      questionText: 't h _ _ s t y',
+      correctAnswer: 'thirsty',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'thirsty',
+        intent: 'fill_blank',
+        questionLine: 't h _ _ s t y',
+        imagePrompt: "A thirsty boy drinking water"
+      },
+      aiTutor: {
+        target_word: 'thirsty',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'ER / IR / UR = /er/',
+        spelling_pattern_or_rule: "In ‘thirsty,’ IR spells /er/. Remember: ER, IR, and UR all say /er/ — learn which one fits by pattern and position."
+      },
+      audio: 'thirsty'
+    }
+  ]
+},
+'5-A.33': {
+  topicInfo: {
+    topicId: '5-A.33',
+    topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+    progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- OR Words ---
+    {
+      id: 1,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'actor',
+      imageUrl: null,
+      explanation: "‘Actor’ uses OR to spell the /er/ sound at the end.",
+      questionText: 'a c t _ _',
+      correctAnswer: 'actor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,2],
+      aiHook: {
+        targetWord: 'actor',
+        intent: 'fill_blank',
+        questionLine: 'a c t _ _',
+        imagePrompt: 'An actor performing on stage'
+      },
+      aiTutor: {
+        target_word: 'actor',
+        question: 'a c t _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "In ‘actor,’ the suffix -or is unstressed and the letters OR say /ər/. Use OR to spell /er/ in agent nouns ending with -or (actor, doctor)."
+      },
+      audio: 'actor'
+    },
+    {
+      id: 2,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'doctor',
+      imageUrl: null,
+      explanation: "‘Doctor’ ends with OR spelling /er/.",
+      questionText: 'd o c t _ _',
+      correctAnswer: 'doctor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,2,3],
+      aiHook: {
+        targetWord: 'doctor',
+        intent: 'fill_blank',
+        questionLine: 'd o c t _ _',
+        imagePrompt: 'A doctor examining a patient'
+      },
+      aiTutor: {
+        target_word: 'doctor',
+        question: 'd o c t _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "In ‘doctor,’ -or is an unstressed ending; OR says /ər/. Choose OR for occupational nouns ending in -or (doctor, inventor)."
+      },
+      audio: 'doctor'
+    },
+    {
+      id: 3,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'visitor',
+      imageUrl: null,
+      explanation: "‘Visitor’ ends with OR spelling /er/ again.",
+      questionText: 'v i s i t _ _',
+      correctAnswer: 'visitor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'visitor',
+        intent: 'fill_blank',
+        questionLine: 'v i s i t _ _',
+        imagePrompt: 'A visitor entering a museum'
+      },
+      aiTutor: {
+        target_word: 'visitor',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "‘Visitor’ = visit + -or. In this unstressed final syllable, OR spells /ər/. Use OR to spell /er/ in -or endings attached to verbs (visit → visitor)."
+      },
+      audio: 'visitor'
+    },
+
+    // --- EAR Words ---
+    {
+      id: 4,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'learn',
+      imageUrl: null,
+      explanation: "‘Learn’ uses EAR to spell the /er/ sound.",
+      questionText: 'l _ _ r n',
+      correctAnswer: 'learn',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4],
+      aiHook: {
+        targetWord: 'learn',
+        intent: 'fill_blank',
+        questionLine: 'l _ _ r n',
+        imagePrompt: 'A child learning from a book'
+      },
+      aiTutor: {
+        target_word: 'learn',
+        question: 'l _ _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "In ‘learn,’ EAR is an r-controlled vowel that says /ər/ (not /ear/). EAR commonly spells /er/ before RN or RT (learn, earth)."
+      },
+      audio: 'learn'
+    },
+    {
+      id: 5,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'heard',
+      imageUrl: null,
+      explanation: "‘Heard’ has EAR spelling /er/.",
+      questionText: 'h _ _ r d',
+      correctAnswer: 'heard',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4],
+      aiHook: {
+        targetWord: 'heard',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ _ d',
+        imagePrompt: 'A person who just heard a sound'
+      },
+      aiTutor: {
+        target_word: 'heard',
+        question: 'h _ _ r d',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "‘Heard’ (past of ‘hear’) uses EAR to say /ər/ before -d. EAR can shift from /ear/ to /er/ in inflected forms (hear → hEArd)."
+      },
+      audio: 'heard'
+    },
+    {
+      id: 6,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'earth',
+      imageUrl: null,
+      explanation: "‘Earth’ also uses EAR to spell /er/.",
+      questionText: '_ _ _ t h',
+      correctAnswer: 'earth',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [3,4],
+      aiHook: {
+        targetWord: 'earth',
+        intent: 'fill_blank',
+        questionLine: 'e _ _ t h',
+        imagePrompt: 'A globe representing planet Earth'
+      },
+      aiTutor: {
+        target_word: 'earth',
+        question: '_ _ _ t h',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "In ‘earth,’ EAR is r-controlled and says /ər/ before -th. EAR frequently spells /er/ in EAR+TH and EAR+RN patterns."
+      },
+      audio: 'earth'
+    },
+
+    // --- OUR Words ---
+    {
+      id: 7,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'courage',
+      imageUrl: null,
+      explanation: "‘Courage’ has OUR saying /er/ in the first syllable.",
+      questionText: 'c _ _ r a g e',
+      correctAnswer: 'courage',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6],
+      aiHook: {
+        targetWord: 'courage',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ _ a g e',
+        imagePrompt: 'A brave child showing courage'
+      },
+      aiTutor: {
+        target_word: 'courage',
+        question: 'c _ _ _ a g e',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /er/',
+        spelling_pattern_or_rule: "In ‘courage,’ the unstressed syllable uses OUR to say /ər/ before -age. Choose OUR for /er/ in words like courage, nourish, flourish."
+      },
+      audio: 'courage'
+    },
+    {
+      id: 8,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nourish',
+      imageUrl: null,
+      explanation: "‘Nourish’ also uses OUR to spell the /er/ sound.",
+      questionText: 'n _ _ r i s h',
+      correctAnswer: 'nourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4,5,6],
+      aiHook: {
+        targetWord: 'nourish',
+        intent: 'fill_blank',
+        questionLine: 'n _ _ r i s h',
+        imagePrompt: 'Healthy foods that nourish the body'
+      },
+      aiTutor: {
+        target_word: 'nourish',
+        question: 'n _ _ _ i s h',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /er/',
+        spelling_pattern_or_rule: "In ‘nourish,’ OUR appears in an unstressed first syllable and says /ər/ before -ish. Use OUR + (ish/age/ish-type endings) for /er/."
+      },
+      audio: 'nourish'
+    },
+    {
+      id: 9,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'flourish',
+      imageUrl: null,
+      explanation: "‘Flourish’ uses OUR for the /er/ sound as well.",
+      questionText: 'f l _ _ r i s h',
+      correctAnswer: 'flourish',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0, 1,5,6,7],
+      aiHook: {
+        targetWord: 'flourish',
+        intent: 'fill_blank',
+        questionLine: 'f l _ _ _ i s h',
+        imagePrompt: 'A plant flourishing in sunlight'
+      },
+      aiTutor: {
+        target_word: 'flourish',
+        question: 'f l _ _ _ i s h',
+        student_entry: '',
+        topic_to_reinforce: 'OUR = /er/',
+        spelling_pattern_or_rule: "In ‘flourish,’ the OUR in the first (unstressed) syllable spells /ər/ before -ish. OUR commonly says /er/ in similar word shapes."
+      },
+      audio: 'flourish'
+    },
+
+    // --- Mixed (within-topic review) ---
+    {
+      id: 10,
+      topicId: '5-A.33',
+      topicName: 'Learn_three_more_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'More ways to spell the /er/ sound (OR, EAR, OUR)',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'mentor',
+      imageUrl: null,
+      explanation: "‘Mentor’ ends with OR spelling /er/ — mixed review inside the topic.",
+      questionText: 'm e n t _ _',
+      correctAnswer: 'mentor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'mentor',
+        intent: 'fill_blank',
+        questionLine: 'm e n  _ _',
+        imagePrompt: 'A mentor guiding a student'
+      },
+      aiTutor: {
+        target_word: 'mentor',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR / EAR / OUR = /er/',
+        spelling_pattern_or_rule: "‘Mentor’ uses final -or where OR says /ər/ in an unstressed ending. Compare within-topic patterns: OR (mentor), EAR (earth), OUR (courage) — all spell /er/ in different contexts."
+      },
+      audio: 'mentor'
+    }
+  ]
+},
+'5-A.34': {
+  topicInfo: {
+    topicId: '5-A.34',
+    topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+    progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- ER words ---
+    {
+      id: 1,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'her',
+      imageUrl: null,
+      explanation: "‘Her’ uses ER to spell the /er/ sound.",
+      questionText: 'h _ r',
+      correctAnswer: 'her',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,2],
+      aiHook: {
+        targetWord: 'her',
+        intent: 'fill_blank',
+        questionLine: 'h _ r',
+        imagePrompt: 'A girl smiling, representing “her”'
+      },
+      aiTutor: {
+        target_word: 'her',
+        question: 'h _ r',
+        student_entry: '',
+        topic_to_reinforce: 'ER = /er/',
+        spelling_pattern_or_rule: "ER is the most common way to spell the /er/ sound in stressed syllables, as in her, fern, and serve."
+      },
+      audio: 'her'
+    },
+    {
+      id: 2,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'fern',
+      imageUrl: null,
+      explanation: "‘Fern’ has ER spelling the /er/ sound in the middle.",
+      questionText: 'f _ r n',
+      correctAnswer: 'fern',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'fern',
+        intent: 'fill_blank',
+        questionLine: 'f _ r n',
+        imagePrompt: 'A green fern plant in a forest'
+      },
+      aiTutor: {
+        target_word: 'fern',
+        question: 'f _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'ER = /er/',
+        spelling_pattern_or_rule: "In ‘fern,’ ER makes the /er/ sound in the middle of the word. ER commonly appears before N or V (fern, serve)."
+      },
+      audio: 'fern'
+    },
+    {
+      id: 3,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'term',
+      imageUrl: null,
+      explanation: "‘Term’ ends with ER spelling /er/.",
+      questionText: 't _ r m',
+      correctAnswer: 'term',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'term',
+        intent: 'fill_blank',
+        questionLine: 't _ r m',
+        imagePrompt: 'A student writing the word “term” on paper'
+      },
+      aiTutor: {
+        target_word: 'term',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'ER = /er/',
+        spelling_pattern_or_rule: "In ‘term,’ ER makes the /er/ sound at the end of the syllable. ER is often found at the end of single-syllable words."
+      },
+      audio: 'term'
+    },
+
+    // --- IR words ---
+    {
+      id: 4,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'bird',
+      imageUrl: null,
+      explanation: "‘Bird’ uses IR to spell /er/.",
+      questionText: 'b _ r d',
+      correctAnswer: 'bird',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'bird',
+        intent: 'fill_blank',
+        questionLine: 'b _ _ d',
+        imagePrompt: 'A bird sitting on a branch'
+      },
+      aiTutor: {
+        target_word: 'bird',
+        question: 'b _ _ d',
+        student_entry: '',
+        topic_to_reinforce: 'IR = /er/',
+        spelling_pattern_or_rule: "IR makes the /er/ sound in many words like bird, first, and girl. It is often used before consonants like D, L, or ST."
+      },
+      audio: 'bird'
+    },
+    {
+      id: 5,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'shirt',
+      imageUrl: null,
+      explanation: "‘Shirt’ uses IR to make the /er/ sound in the middle.",
+      questionText: 's h _ r t',
+      correctAnswer: 'shirt',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,4],
+      aiHook: {
+        targetWord: 'shirt',
+        intent: 'fill_blank',
+        questionLine: 's h _ r t',
+        imagePrompt: 'A folded shirt on a hanger'
+      },
+      aiTutor: {
+        target_word: 'shirt',
+        question: 's h _ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'IR = /er/',
+        spelling_pattern_or_rule: "IR spells /er/ in ‘shirt.’ It often occurs before T or D. The vowel sound is controlled by the R."
+      },
+      audio: 'shirt'
+    },
+    {
+      id: 6,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'first',
+      imageUrl: null,
+      explanation: "‘First’ has IR spelling /er/ before ST.",
+      questionText: 'f _ r s t',
+      correctAnswer: 'first',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'first',
+        intent: 'fill_blank',
+        questionLine: 'f _ r s t',
+        imagePrompt: 'A gold medal showing 1st place'
+      },
+      aiTutor: {
+        target_word: 'first',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'IR = /er/',
+        spelling_pattern_or_rule: "IR spells /er/ in ‘first,’ especially before consonant clusters like ST. Common in one-syllable words (bird, first, third)."
+      },
+      audio: 'first'
+    },
+
+    // --- UR words ---
+    {
+      id: 7,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'nurse',
+      imageUrl: null,
+      explanation: "‘Nurse’ uses UR to spell /er/ in the first syllable.",
+      questionText: 'n _ r s e',
+      correctAnswer: 'nurse',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4],
+      aiHook: {
+        targetWord: 'nurse',
+        intent: 'fill_blank',
+        questionLine: 'n _ r s e',
+        imagePrompt: 'A nurse helping a patient'
+      },
+      aiTutor: {
+        target_word: 'nurse',
+        question: 'n _ _ s e',
+        student_entry: '',
+        topic_to_reinforce: 'UR = /er/',
+        spelling_pattern_or_rule: "UR spells /er/ in many words like nurse and turn. It is often used before S, N, or L."
+      },
+      audio: 'nurse'
+    },
+    {
+      id: 8,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'turn',
+      imageUrl: null,
+      explanation: "‘Turn’ uses UR to spell /er/.",
+      questionText: 't _ r n',
+      correctAnswer: 'turn',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3],
+      aiHook: {
+        targetWord: 'turn',
+        intent: 'fill_blank',
+        questionLine: 't _ r n',
+        imagePrompt: 'A person turning a steering wheel'
+      },
+      aiTutor: {
+        target_word: 'turn',
+        question: 't _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'UR = /er/',
+        spelling_pattern_or_rule: "UR spells /er/ in ‘turn.’ This pattern appears often before N or L (turn, curl, burn)."
+      },
+      audio: 'turn'
+    },
+    {
+      id: 9,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'burn',
+      imageUrl: null,
+      explanation: "‘Burn’ uses UR spelling the /er/ sound.",
+      questionText: 'b _ r n',
+      correctAnswer: 'burn',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'burn',
+        intent: 'fill_blank',
+        questionLine: 'b _ r n',
+        imagePrompt: 'A candle flame representing burn'
+      },
+      aiTutor: {
+        target_word: 'burn',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'UR = /er/',
+        spelling_pattern_or_rule: "In ‘burn,’ UR spells /er/. UR is common before N or D in one-syllable words."
+      },
+      audio: 'burn'
+    },
+
+    // --- Mixed review ---
+    {
+      id: 10,
+      topicId: '5-A.34',
+      topicName: 'Review_three_common_ways_to_spell_the_er_sound_Part_1',
+      progressTopicName: 'Three ways to spell the /er/ sound: ER, IR, UR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'third',
+      imageUrl: null,
+      explanation: "‘Third’ is a review word — IR spells /er/.",
+      questionText: 't h _ r d',
+      correctAnswer: 'third',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'third',
+        intent: 'fill_blank',
+        questionLine: 't h _ r d',
+        imagePrompt: 'A race podium showing 3rd place'
+      },
+      aiTutor: {
+        target_word: 'third',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'ER, IR, UR = /er/',
+        spelling_pattern_or_rule: "‘Third’ reviews the IR spelling for /er/. ER, IR, and UR all say /er/, and must be memorized by pattern and word family."
+      },
+      audio: 'third'
+    }
+  ]
+},
+'5-A.35': {
+  topicInfo: {
+    topicId: '5-A.35',
+    topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+    progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- OR words ---
+    {
+      id: 1,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'actor',
+      imageUrl: null,
+      explanation: "‘Actor’ uses OR to spell the /er/ sound in the final syllable.",
+      questionText: 'a c t _ r',
+      correctAnswer: 'actor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'actor',
+        intent: 'fill_blank',
+        questionLine: 'a c t _ r',
+        imagePrompt: 'An actor performing on stage'
+      },
+      aiTutor: {
+        target_word: 'actor',
+        question: 'a c t _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "In ‘actor,’ OR says /er/ in an unstressed syllable at the end. This is common in words ending in -or, like actor and doctor."
+      },
+      audio: 'actor'
+    },
+    {
+      id: 2,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'sailor',
+      imageUrl: null,
+      explanation: "‘Sailor’ ends with OR spelling /er/.",
+      questionText: 's a i l _ _',
+      correctAnswer: 'sailor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'sailor',
+        intent: 'fill_blank',
+        questionLine: 's a i l _ r',
+        imagePrompt: 'A sailor on a ship deck'
+      },
+      aiTutor: {
+        target_word: 'sailor',
+        question: 's a i l _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "In ‘sailor,’ OR says /er/ in an unstressed syllable. Many words for people end with -or or -er, like sailor and teacher."
+      },
+      audio: 'sailor'
+    },
+    {
+      id: 3,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'doctor',
+      imageUrl: null,
+      explanation: "‘Doctor’ ends with OR spelling the /er/ sound.",
+      questionText: 'd o c t _ r',
+      correctAnswer: 'doctor',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'doctor',
+        intent: 'fill_blank',
+        questionLine: 'd o c t _ r',
+        imagePrompt: 'A doctor holding a stethoscope'
+      },
+      aiTutor: {
+        target_word: 'doctor',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "In ‘doctor,’ OR spells /er/ at the end of a word. The OR ending often says /er/ in occupations and roles (doctor, actor)."
+      },
+      audio: 'doctor'
+    },
+
+    // --- EAR words ---
+    {
+      id: 4,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'learn',
+      imageUrl: null,
+      explanation: "‘Learn’ uses EAR to spell the /er/ sound.",
+      questionText: 'l _ _ r n',
+      correctAnswer: 'learn',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4],
+      aiHook: {
+        targetWord: 'learn',
+        intent: 'fill_blank',
+        questionLine: 'l _ _ r n',
+        imagePrompt: 'A child learning in class'
+      },
+      aiTutor: {
+        target_word: 'learn',
+        question: 'l _ _ _ n',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "In ‘learn,’ EAR says /er/. EAR can spell the /er/ sound instead of the long /ē/ sound in certain words (learn, earth)."
+      },
+      audio: 'learn'
+    },
+    {
+      id: 5,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'pearl',
+      imageUrl: null,
+      explanation: "‘Pearl’ uses EAR to spell the /er/ sound before L.",
+      questionText: 'p _ _ _ l',
+      correctAnswer: 'pearl',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,4],
+      aiHook: {
+        targetWord: 'pearl',
+        intent: 'fill_blank',
+        questionLine: 'p _ _ r l',
+        imagePrompt: 'A shiny pearl in a shell'
+      },
+      aiTutor: {
+        target_word: 'pearl',
+        question: 'p _ _ _ l',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "In ‘pearl,’ EAR makes the /er/ sound before L. This spelling appears in few words (pearl, early, learn)."
+      },
+      audio: 'pearl'
+    },
+    {
+      id: 6,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'earth',
+      imageUrl: null,
+      explanation: "‘Earth’ uses EAR to spell the /er/ sound.",
+      questionText: '_ _ r t h',
+      correctAnswer: 'earth',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'earth',
+        intent: 'fill_blank',
+        questionLine: '_ _ r t h',
+        imagePrompt: 'A picture of planet Earth from space'
+      },
+      aiTutor: {
+        target_word: 'earth',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "In ‘earth,’ EAR spells the /er/ sound. EAR can spell either /ɜːr/ or /ər/, depending on accent and stress."
+      },
+      audio: 'earth'
+    },
+
+    // --- Mixed review words ---
+    {
+      id: 7,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'word',
+      imageUrl: null,
+      explanation: "‘Word’ has OR spelling /er/ instead of /ɔː/.",
+      questionText: 'w _ r d',
+      correctAnswer: 'word',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'word',
+        intent: 'fill_blank',
+        questionLine: 'w _ r d',
+        imagePrompt: 'A dictionary showing the word “word”'
+      },
+      aiTutor: {
+        target_word: 'word',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR and EAR = /er/',
+        spelling_pattern_or_rule: "In ‘word,’ OR says /er/ instead of /ɔː/. It’s an irregular but common pattern similar to work and world."
+      },
+      audio: 'word'
+    },
+    {
+      id: 8,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'early',
+      imageUrl: null,
+      explanation: "‘Early’ has EAR spelling the /er/ sound.",
+      questionText: '_ _ r l y',
+      correctAnswer: 'early',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'early',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ l y',
+        imagePrompt: 'A person waking up early'
+      },
+      aiTutor: {
+        target_word: 'early',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EAR = /er/',
+        spelling_pattern_or_rule: "‘Early’ uses EAR to spell /er/. EAR often appears before L or TH (early, earth)."
+      },
+      audio: 'early'
+    },
+    {
+      id: 9,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'color',
+      imageUrl: null,
+      explanation: "‘Color’ has OR spelling /er/ in an unstressed syllable.",
+      questionText: 'c o l _ r',
+      correctAnswer: 'color',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'color',
+        intent: 'fill_blank',
+        questionLine: 'c o l _ r',
+        imagePrompt: 'A paint palette with many colors'
+      },
+      aiTutor: {
+        target_word: 'color',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "In ‘color,’ OR says /er/ in an unstressed final syllable. The /er/ sound often occurs at the end of words like color and actor."
+      },
+      audio: 'color'
+    },
+    {
+      id: 10,
+      topicId: '5-A.35',
+      topicName: 'Review_two_additional_ways_to_spell_the_er_sound_Part_2',
+      progressTopicName: 'Two more ways to spell the /er/ sound: OR and EAR',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'world',
+      imageUrl: null,
+      explanation: "‘World’ has OR spelling /er/ before L and D.",
+      questionText: 'w _ r l d',
+      correctAnswer: 'world',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'world',
+        intent: 'fill_blank',
+        questionLine: 'w _ r l d',
+        imagePrompt: 'A globe showing the world map'
+      },
+      aiTutor: {
+        target_word: 'world',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'OR = /er/',
+        spelling_pattern_or_rule: "‘World’ uses OR for /er/ before L and D, similar to word and work. These are irregular but high-frequency patterns."
+      },
+      audio: 'world'
+    }
+  ]
+},
+'5-A.36': {
+  topicInfo: {
+    topicId: '5-A.36',
+    topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+    progressTopicName: 'AR saying /ər/ in unstressed syllables',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    {
+      id: 1,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+      progressTopicName: 'AR saying /ər/ in unstressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'solar',
+      imageUrl: null,
+      explanation: "‘Solar’ has AR in the second, unstressed syllable — it sounds like /ər/.",
+      questionText: 's o l _ _',
+      correctAnswer: 'solar',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'solar',
+        intent: 'fill_blank',
+        questionLine: 's o l _ _',
+        imagePrompt: 'A bright solar panel capturing sunlight'
+      },
+      aiTutor: {
+        target_word: 'solar',
+        question: 's o l _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
+        spelling_pattern_or_rule: "In ‘solar,’ the AR in the unstressed final syllable sounds like /ər/. AR says /ar/ when stressed (car) but /ər/ when unstressed (solar)."
+      },
+      audio: 'solar'
+    },
+    {
+      id: 2,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+      progressTopicName: 'AR saying /ər/ in unstressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'polar',
+      imageUrl: null,
+      explanation: "‘Polar’ has AR in an unstressed ending that says /ər/.",
+      questionText: 'p o l _ _',
+      correctAnswer: 'polar',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2],
+      aiHook: {
+        targetWord: 'polar',
+        intent: 'fill_blank',
+        questionLine: 'p o l _ _',
+        imagePrompt: 'A polar bear standing on ice'
+      },
+      aiTutor: {
+        target_word: 'polar',
+        question: 'p o l _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
+        spelling_pattern_or_rule: "In ‘polar,’ AR is in an unstressed syllable and says /ər/. Compare stressed AR in car vs. unstressed AR in polar."
+      },
+      audio: 'polar'
+    },
+    {
+      id: 3,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+      progressTopicName: 'AR saying /ər/ in unstressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'collar',
+      imageUrl: null,
+      explanation: "‘Collar’ has AR at the end, unstressed, sounding like /ər/.",
+      questionText: 'c o l l _ _',
+      correctAnswer: 'collar',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3],
+      aiHook: {
+        targetWord: 'collar',
+        intent: 'fill_blank',
+        questionLine: 'c o l l _ _',
+        imagePrompt: 'A dog wearing a red collar'
+      },
+      aiTutor: {
+        target_word: 'collar',
+        question: 'c o l l _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
+        spelling_pattern_or_rule: "In ‘collar,’ AR comes after a double L in an unstressed syllable and says /ər/. When AR is not stressed, the vowel weakens to /ər/."
+      },
+      audio: 'collar'
+    },
+    {
+      id: 4,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+      progressTopicName: 'AR saying /ər/ in unstressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'grammar',
+      imageUrl: null,
+      explanation: "‘Grammar’ ends with AR in an unstressed syllable pronounced /ər/.",
+      questionText: 'g r a m m _ _',
+      correctAnswer: 'grammar',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,4],
+      aiHook: {
+        targetWord: 'grammar',
+        intent: 'fill_blank',
+        questionLine: 'g r a m m _ _',
+        imagePrompt: 'An open grammar textbook with words highlighted'
+      },
+      aiTutor: {
+        target_word: 'grammar',
+        question: 'g r a m m _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
+        spelling_pattern_or_rule: "In ‘grammar,’ AR at the end is unstressed and says /ər/. This pattern appears in words ending with -ar after a doubled consonant."
+      },
+      audio: 'grammar'
+    }, {
+      id: 5,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_stressed_syllables',
+      progressTopicName: 'AR saying /ar/ in stressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'car',
+      imageUrl: null,
+      explanation: "‘Car’ has AR in a stressed syllable that says /ar/.",
+      questionText: 'c _ _',
+      correctAnswer: 'car',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'car',
+        intent: 'fill_blank',
+        questionLine: 'c _ _',
+        imagePrompt: 'A red car parked on the street'
+      },
+      aiTutor: {
+        target_word: 'car',
+        question: 'c _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ar/ in stressed syllables',
+        spelling_pattern_or_rule: "In ‘car,’ the AR is stressed and says /ar/. When AR carries the main stress, the vowel sound is strong /ar/, not weakened /ər/."
+      },
+      audio: 'car'
+    },
+    {
+      id: 6,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_stressed_syllables',
+      progressTopicName: 'AR saying /ar/ in stressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',       
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'garden',
+      imageUrl: null,
+      explanation: "‘Garden’ has AR in the first, stressed syllable — it says /ar/.",
+      questionText: 'g _ _ d e n',
+      correctAnswer: 'garden',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5],
+      aiHook: {
+        targetWord: 'garden',
+        intent: 'fill_blank',
+        questionLine: 'g _ _ d e n',
+        imagePrompt: 'A garden full of colorful flowers'
+      },
+      aiTutor: {
+        target_word: 'garden',
+        question: 'g _ _ d e n',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ar/ in stressed syllables',
+        spelling_pattern_or_rule: "In ‘garden,’ AR is in the stressed first syllable and says /ar/. When AR starts the word or has emphasis, it keeps its full /ar/ sound."
+      },
+      audio: 'garden'
+    },
+    {
+      id: 7,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_stressed_syllables',
+      progressTopicName: 'AR saying /ar/ in stressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'harvest',
+      imageUrl: null,
+      explanation: "‘Harvest’ begins with AR in a stressed syllable, sounding /ar/.",
+      questionText: 'h _ _ v e s t',
+      correctAnswer: 'harvest',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5,6],
+      aiHook: {
+        targetWord: 'harvest',
+        intent: 'fill_blank',
+        questionLine: 'h _ _ v e s t',
+        imagePrompt: 'A farmer harvesting golden wheat'
+      },
+      aiTutor: {
+        target_word: 'harvest',
+        question: 'h _ _ v e s t',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ar/ in stressed syllables',
+        spelling_pattern_or_rule: "In ‘harvest,’ AR carries stress and says /ar/. AR stays /ar/ when it’s the strong, spoken part of a word."
+      },
+      audio: 'harvest'
+    }, 
+    {
+      id: 8,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+      progressTopicName: 'AR saying /ər/ in unstressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'beggar',
+      imageUrl: null,
+      explanation: "‘Beggar’ has AR in an unstressed syllable, saying /ər/.",
+      questionText: 'b e g g _ _',
+      correctAnswer: 'beggar',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2,3],
+      aiHook: {
+        targetWord: 'beggar',
+        intent: 'fill_blank',
+        questionLine: 'b e g g _ _',
+        imagePrompt: 'A person holding a bowl for help'
+      },
+      aiTutor: {
+        target_word: 'beggar',
+        question: '_ _ g g _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
+        spelling_pattern_or_rule: "In ‘beggar,’ AR follows a doubled consonant and forms an unstressed /ər/. Words ending with -gar or -lar often have AR sounding like /ər/."
+      },
+      audio: 'beggar'
+    },
+    {
+      id: 9,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_stressed_syllables',
+      progressTopicName: 'AR saying /ar/ in stressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'start',
+      imageUrl: null,
+      explanation: "‘Start’ has AR in a stressed syllable, making a strong /ar/ sound.",
+      questionText: 's t _ _ t',
+      correctAnswer: 'start',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'start',
+        intent: 'fill_blank',
+        questionLine: 's t _ _ t',
+        imagePrompt: 'A runner ready at the start line'
+      },
+      aiTutor: {
+        target_word: 'start',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ar/ in stressed syllables',
+        spelling_pattern_or_rule: "In ‘start,’ AR is stressed and says /ar/. When AR follows a single consonant and carries stress, it keeps the full /ar/ sound."
+      },
+      audio: 'start'
+    },
+   
+   
+    {
+      id: 10,
+      topicId: '5-A.36',
+      topicName: 'Spell_words_with_AR_in_unstressed_syllables',
+      progressTopicName: 'AR saying /ər/ in unstressed syllables',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dollar',
+      imageUrl: null,
+      explanation: "‘Dollar’ ends with AR saying /ər/ — another unstressed example.",
+      questionText: 'd o l l _ _',
+      correctAnswer: 'dollar',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'dollar',
+        intent: 'fill_blank',
+        questionLine: 'd o l l _ _',
+        imagePrompt: 'A stack of dollar bills'
+      },
+      aiTutor: {
+        target_word: 'dollar',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
+        spelling_pattern_or_rule: "In ‘dollar,’ AR occurs in an unstressed syllable after LL and sounds like /ər/. Similar to collar and grammar — AR weakens in unstressed endings."
+      },
+      audio: 'dollar'
+    }
+  ]
+},
+
+
+
+
+'5-A.37': {
+  topicInfo: {
+    topicId: '5-A.37',
+    topicName: 'Analyze_three_long_E_spellings_Part_1',
+    progressTopicName: 'Long E spellings: e, ea, ey',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- e family ---
+    {
+      id: 1,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'me',
+      imageUrl: null,
+      explanation: "‘Me’ has a single final E spelling the long /ē/ sound.",
+      questionText: 'm _',
+      correctAnswer: 'me',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'me',
+        intent: 'fill_blank',
+        questionLine: 'm _',
+        imagePrompt: 'A person pointing to themselves to indicate “me”'
+      },
+      aiTutor: {
+        target_word: 'me',
+        question: '_ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled single E',
+        spelling_pattern_or_rule: "In ‘me,’ a single final E in an open syllable says /ē/. This is the simplest long E spelling pattern."
+      },
+      audio: 'me'
+    },
+    {
+      id: 2,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'he',
+      imageUrl: null,
+      explanation: "‘He’ also ends with a single E that spells long /ē/.",
+      questionText: 'h _',
+      correctAnswer: 'he',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'he',
+        intent: 'fill_blank',
+        questionLine: 'h _',
+        imagePrompt: 'A boy with the label “he” underneath'
+      },
+      aiTutor: {
+        target_word: 'he',
+        question: '_ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled single E',
+        spelling_pattern_or_rule: "In ‘he,’ the E at the end is long /ē/ because it is in an open syllable. Words like me, he, and we follow this rule."
+      },
+      audio: 'he'
+    },
+    {
+      id: 3,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'she',
+      imageUrl: null,
+      explanation: "‘She’ has the same pattern — an open syllable ending with E saying /ē/.",
+      questionText: 's h _',
+      correctAnswer: 'she',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'she',
+        intent: 'fill_blank',
+        questionLine: 's h _',
+        imagePrompt: 'A girl labeled “she”'
+      },
+      aiTutor: {
+        target_word: 'she',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled single E',
+        spelling_pattern_or_rule: "In ‘she,’ a single final E in an open syllable spells the /ē/ sound, just like in he and me."
+      },
+      audio: 'she'
+    },
+
+    // --- ea family ---
+    {
+      id: 4,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'eat',
+      imageUrl: null,
+      explanation: "‘Eat’ uses EA to spell long /ē/ at the start of the word.",
+      questionText: '_ _ t',
+      correctAnswer: 'eat',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [2],
+      aiHook: {
+        targetWord: 'eat',
+        intent: 'fill_blank',
+        questionLine: '_ _ t',
+        imagePrompt: 'A person eating food'
+      },
+      aiTutor: {
+        target_word: 'eat',
+        question: '_ _ t',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled EA',
+        spelling_pattern_or_rule: "In ‘eat,’ EA spells the long /ē/ sound. EA is one of the most common long E spellings in English words like eat, team, and dream."
+      },
+      audio: 'eat'
+    },
+    {
+      id: 5,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'team',
+      imageUrl: null,
+      explanation: "‘Team’ also uses EA to spell the /ē/ sound in the middle.",
+      questionText: 't _ _ m',
+      correctAnswer: 'team',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'team',
+        intent: 'fill_blank',
+        questionLine: 't _ _ m',
+        imagePrompt: 'A sports team working together'
+      },
+      aiTutor: {
+        target_word: 'team',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled EA',
+        spelling_pattern_or_rule: "In ‘team,’ EA makes the /ē/ sound in the middle. EA is a vowel team that often represents the long E sound in words like team and dream."
+      },
+      audio: 'team'
+    },
+    {
+      id: 6,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'dream',
+      imageUrl: null,
+      explanation: "‘Dream’ uses EA to spell the long /ē/ sound before M.",
+      questionText: 'd _ _ _ m',
+      correctAnswer: 'dream',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'dream',
+        intent: 'fill_blank',
+        questionLine: 'd _ _ _ m',
+        imagePrompt: 'A person sleeping with a dream cloud'
+      },
+      aiTutor: {
+        target_word: 'dream',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled EA',
+        spelling_pattern_or_rule: "In ‘dream,’ EA spells /ē/. EA is a common vowel team used to show the long E sound before consonants like M or T."
+      },
+      audio: 'dream'
+    },
+
+    // --- ey family ---
+    {
+      id: 7,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'key',
+      imageUrl: null,
+      explanation: "‘Key’ uses EY to spell long /ē/ at the end.",
+      questionText: 'k _ _',
+      correctAnswer: 'key',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'key',
+        intent: 'fill_blank',
+        questionLine: '_ _ _',
+        imagePrompt: 'A shiny metal key'
+      },
+      aiTutor: {
+        target_word: 'key',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled EY',
+        spelling_pattern_or_rule: "In ‘key,’ EY says /ē/ at the end of a word. EY and Y both often show the long E sound in final position."
+      },
+      audio: 'key'
+    },
+    {
+      id: 8,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'money',
+      imageUrl: null,
+      explanation: "‘Money’ ends with EY, which makes the /ē/ sound.",
+      questionText: 'm o n _ _',
+      correctAnswer: 'money',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'money',
+        intent: 'fill_blank',
+        questionLine: 'm o n _ _',
+        imagePrompt: 'A pile of coins and dollar bills'
+      },
+      aiTutor: {
+        target_word: 'money',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled EY',
+        spelling_pattern_or_rule: "In ‘money,’ EY at the end says /ē/. EY often spells /ē/ in two-syllable words like honey and turkey."
+      },
+      audio: 'money'
+    },
+    {
+      id: 9,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'turkey',
+      imageUrl: null,
+      explanation: "‘Turkey’ ends with EY, which spells long /ē/.",
+      questionText: 't u r k _ _',
+      correctAnswer: 'turkey',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'turkey',
+        intent: 'fill_blank',
+        questionLine: 't u r k _ _',
+        imagePrompt: 'A turkey bird in the farmyard'
+      },
+      aiTutor: {
+        target_word: 'turkey',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E spelled EY',
+        spelling_pattern_or_rule: "In ‘turkey,’ EY spells /ē/ at the end. Words ending in EY often have the long E sound, such as key and monkey."
+      },
+      audio: 'turkey'
+    },
+
+    // --- mixed review ---
+    {
+      id: 10,
+      topicId: '5-A.37',
+      topicName: 'Analyze_three_long_E_spellings_Part_1',
+      progressTopicName: 'Long E spellings: e, ea, ey',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'each',
+      imageUrl: null,
+      explanation: "‘Each’ uses EA for the /ē/ sound — one of the most frequent long E spellings.",
+      questionText: '_ _ c h',
+      correctAnswer: 'each',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'each',
+        intent: 'fill_blank',
+        questionLine: '_ _ c h',
+        imagePrompt: 'Two apples labeled “each” to show one per person'
+      },
+      aiTutor: {
+        target_word: 'each',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Review of long E spellings: e, ea, ey',
+        spelling_pattern_or_rule: "In ‘each,’ EA says /ē/. EA, E, and EY are all common ways to spell the long E sound. EA is the most frequent of these three."
+      },
+      audio: 'each'
+    }
+  ]
+},
+'5-A.38': {
+  topicInfo: {
+    topicId: '5-A.38',
+    topicName: 'Analyze_three_long_E_spellings_Part_2',
+    progressTopicName: 'Long E spellings: EE, IE, Y',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- EE words ---
+    {
+      id: 1,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'see',
+      imageUrl: null,
+      explanation: "‘See’ uses EE to spell the long E sound /ē/.",
+      questionText: 's _ _',
+      correctAnswer: 'see',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'see',
+        intent: 'fill_blank',
+        questionLine: 's _ _',
+        imagePrompt: 'Two open eyes looking forward'
+      },
+      aiTutor: {
+        target_word: 'see',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EE = /ē/',
+        spelling_pattern_or_rule: "In ‘see,’ the vowel team EE spells /ē/. EE commonly appears in one-syllable words like see, bee, and feet."
+      },
+      audio: 'see'
+    },
+    {
+      id: 2,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'tree',
+      imageUrl: null,
+      explanation: "‘Tree’ uses EE in the final position to make /ē/.",
+      questionText: 't _ _ _',
+      correctAnswer: 'tree',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'tree',
+        intent: 'fill_blank',
+        questionLine: 't _ _ _',
+        imagePrompt: 'A tall green tree in a park'
+      },
+      aiTutor: {
+        target_word: 'tree',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EE = /ē/',
+        spelling_pattern_or_rule: "In ‘tree,’ EE spells /ē/ at the end of the word. EE is a reliable long E spelling in words like tree, green, and three."
+      },
+      audio: 'tree'
+    },
+    {
+      id: 3,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'green',
+      imageUrl: null,
+      explanation: "‘Green’ uses EE to spell /ē/ in the middle of the word.",
+      questionText: 'g _ _ _ _',
+      correctAnswer: 'green',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'green',
+        intent: 'fill_blank',
+        questionLine: 'g _ _ _ _',
+        imagePrompt: 'A field of green grass'
+      },
+      aiTutor: {
+        target_word: 'green',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EE = /ē/',
+        spelling_pattern_or_rule: "In ‘green,’ the EE vowel team spells /ē/ between consonants. EE is common before N or D (green, seed)."
+      },
+      audio: 'green'
+    },
+
+    // --- IE words ---
+    {
+      id: 4,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'piece',
+      imageUrl: null,
+      explanation: "‘Piece’ uses IE to spell the long E sound /ē/.",
+      questionText: 'p _ _ _ _',
+      correctAnswer: 'piece',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'piece',
+        intent: 'fill_blank',
+        questionLine: 'p _ _ _ _',
+        imagePrompt: 'A jigsaw puzzle piece held in a hand'
+      },
+      aiTutor: {
+        target_word: 'piece',
+        question: 'p _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'IE = /ē/',
+        spelling_pattern_or_rule: "In ‘piece,’ the vowel team IE spells /ē/. IE commonly spells /ē/ in words like piece, field, and chief."
+      },
+      audio: 'piece'
+    },
+    {
+      id: 5,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'field',
+      imageUrl: null,
+      explanation: "‘Field’ uses IE for /ē/ before LD.",
+      questionText: 'f _ _ _ _',
+      correctAnswer: 'field',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'field',
+        intent: 'fill_blank',
+        questionLine: 'f _ _ _ _',
+        imagePrompt: 'A grassy sports field with boundary lines'
+      },
+      aiTutor: {
+        target_word: 'field',
+        question: 'f _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'IE = /ē/',
+        spelling_pattern_or_rule: "In ‘field,’ IE spells /ē/ before the consonant cluster LD. IE spells /ē/ in field, shield, and piece."
+      },
+      audio: 'field'
+    },
+
+    // from here on, fully blank (no prefill) ---
+    {
+      id: 6,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'chief',
+      imageUrl: null,
+      explanation: "‘Chief’ uses the IE vowel team to spell /ē/.",
+      questionText: '_ _ _ _ _',
+      correctAnswer: 'chief',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'chief',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: 'A team leader wearing a badge labeled “chief”'
+      },
+      aiTutor: {
+        target_word: 'chief',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'IE = /ē/',
+        spelling_pattern_or_rule: "In ‘chief,’ IE spells the long E sound /ē/. IE is a frequent long E spelling in words like chief, thief, and brief."
+      },
+      audio: 'chief'
+    },
+
+    // --- Y words (final Y = /ē/) ---
+    {
+      id: 7,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'happy',
+      imageUrl: null,
+      explanation: "‘Happy’ ends with Y that says /ē/ in a two-syllable word.",
+      questionText: '_ _ _ _ _',
+      correctAnswer: 'happy',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'happy',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: 'A smiling child with a happy expression'
+      },
+      aiTutor: {
+        target_word: 'happy',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Final Y = /ē/',
+        spelling_pattern_or_rule: "In ‘happy,’ final Y says /ē/ because the word has two syllables. Final Y often says /ē/ in words like happy, candy, and puppy."
+      },
+      audio: 'happy'
+    },
+    {
+      id: 8,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'candy',
+      imageUrl: null,
+      explanation: "‘Candy’ ends with Y that spells the /ē/ sound.",
+      questionText: '_ _ _ _ _',
+      correctAnswer: 'candy',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'candy',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: 'Colorful wrapped candies'
+      },
+      aiTutor: {
+        target_word: 'candy',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Final Y = /ē/',
+        spelling_pattern_or_rule: "In ‘candy,’ the final Y says /ē/ in an unstressed ending. Many two-syllable nouns use final Y as /ē/ (candy, bunny, puppy)."
+      },
+      audio: 'candy'
+    },
+    {
+      id: 9,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'funny',
+      imageUrl: null,
+      explanation: "‘Funny’ ends with Y that makes the long E sound /ē/.",
+      questionText: '_ _ _ _ _',
+      correctAnswer: 'funny',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'funny',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: 'A comic scene that looks funny'
+      },
+      aiTutor: {
+        target_word: 'funny',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Final Y = /ē/',
+        spelling_pattern_or_rule: "In ‘funny,’ final Y spells /ē/. This Y-as-/ē/ ending is frequent in two-syllable words like funny, sunny, and jelly."
+      },
+      audio: 'funny'
+    },
+
+    // --- Mixed review ---
+    {
+      id: 10,
+      topicId: '5-A.38',
+      topicName: 'Analyze_three_long_E_spellings_Part_2',
+      progressTopicName: 'Long E spellings: EE, IE, Y',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'monkey',
+      imageUrl: null,
+      explanation: "‘Monkey’ ends with EY, which spells the long E sound /ē/ — a mixed review of long-E endings.",
+      questionText: '_ _ _ _ _ _',
+      correctAnswer: 'monkey',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'monkey',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _ _',
+        imagePrompt: 'A playful monkey hanging from a tree branch'
+      },
+      aiTutor: {
+        target_word: 'monkey',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Long E endings (Y / EY)',
+        spelling_pattern_or_rule: "In ‘monkey,’ the ending EY spells /ē/. This reviews that both Y and EY can make long E at the end of words."
+      },
+      audio: 'monkey'
+    }
+  ]
+},
+'5-A.39': {
+  topicInfo: {
+    topicId: '5-A.39',
+    topicName: 'Analyze_three_long_E_spellings_Part_3',
+    progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+    questionElements: 'image + audio + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+
+  questions: [
+    // --- EI words (receive, ceiling, deceit) ---
+    {
+      id: 1,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'receive',
+      imageUrl: null,
+      explanation: "‘Receive’ spells /ē/ with EI after C (the “i before e except after c” pattern).",
+      questionText: 'r e c _ _ v e',
+      correctAnswer: 'receive',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,5,6],
+      aiHook: {
+        targetWord: 'receive',
+        intent: 'fill_blank',
+        questionLine: 'r e c _ _ v e',
+        imagePrompt: 'Hands receiving a package'
+      },
+      aiTutor: {
+        target_word: 'receive',
+        question: 'r e c _ _ v e',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ (often after C)',
+        spelling_pattern_or_rule: "In ‘receive,’ EI spells the long E sound /ē/ because it follows C. This matches the common guideline: after C, use EI for /ē/ (receive, ceiling)."
+      },
+      audio: 'receive'
+    },
+    {
+      id: 2,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'ceiling',
+      imageUrl: null,
+      explanation: "‘Ceiling’ uses EI after C to make /ē/ in the first syllable.",
+      questionText: 'c _ _ l i n g',
+      correctAnswer: 'ceiling',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,3,4,5,6],
+      aiHook: {
+        targetWord: 'ceiling',
+        intent: 'fill_blank',
+        questionLine: 'c _ _ l i n g',
+        imagePrompt: 'A room showing a flat white ceiling with a light'
+      },
+      aiTutor: {
+        target_word: 'ceiling',
+        question: 'c _ _ l i n g',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ (often after C)',
+        spelling_pattern_or_rule: "In ‘ceiling,’ EI spells /ē/ right after C. Learn the EI-after-C family: receive, ceiling, conceive."
+      },
+      audio: 'ceiling'
+    },
+    {
+      id: 3,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'deceit',
+      imageUrl: null,
+      explanation: "‘Deceit’ also uses EI to spell /ē/ after C in the middle.",
+      questionText: 'd e c _ _ t',
+      correctAnswer: 'deceit',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'deceit',
+        intent: 'fill_blank',
+        questionLine: 'd e c _ _ t',
+        imagePrompt: 'A broken mask symbolizing deceit'
+      },
+      aiTutor: {
+        target_word: 'deceit',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'EI = /ē/ (often after C)',
+        spelling_pattern_or_rule: "In ‘deceit,’ EI spells /ē/ after C. This reinforces the EI-after-C pattern for long E (deceit, receive, ceiling)."
+      },
+      audio: 'deceit'
+    },
+
+    // --- I words (machine, police, magazine) ---
+    {
+      id: 4,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'machine',
+      imageUrl: null,
+      explanation: "‘Machine’ spells /ē/ with single I in an unstressed syllable (ma-CHINE).",
+      questionText: 'm a c h _ n e',
+      correctAnswer: 'machine',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [0,1,2,3,5,6],
+      aiHook: {
+        targetWord: 'machine',
+        intent: 'fill_blank',
+        questionLine: 'm a c h _ n e',
+        imagePrompt: 'A simple vending machine'
+      },
+      aiTutor: {
+        target_word: 'machine',
+        question: 'm a c h _ n e',
+        student_entry: '',
+        topic_to_reinforce: 'I = /ē/ in certain borrowed/Latinate words',
+        spelling_pattern_or_rule: "In ‘machine,’ the I says /ē/ due to its French/Latinate origin. Learn this small pattern set: machine, police, magazine."
+      },
+      audio: 'machine'
+    },
+    {
+      id: 5,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'police',
+      imageUrl: null,
+      explanation: "‘Police’ uses I for /ē/ in the second syllable (po-LICE).",
+      questionText: 'p o l _ c e',
+      correctAnswer: 'police',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'police',
+        intent: 'fill_blank',
+        questionLine: 'p o l _ c e',
+        imagePrompt: 'A friendly police badge'
+      },
+      aiTutor: {
+        target_word: 'police',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'I = /ē/ in certain borrowed/Latinate words',
+        spelling_pattern_or_rule: "In ‘police,’ I says /ē/ in an unstressed syllable because of its borrowed origin. Pair with machine and magazine."
+      },
+      audio: 'police'
+    },
+
+    // from here on: fully blank (no prefill)
+    {
+      id: 6,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'magazine',
+      imageUrl: null,
+      explanation: "‘Magazine’ has I saying /ē/ in the third syllable (mag-a-ZINE).",
+      questionText: '_ _ _ _ _ _ _ _',
+      correctAnswer: 'magazine',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: true,
+      prefilledIndexes: [4],
+      aiHook: {
+        targetWord: 'magazine',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _ _ _ _',
+        imagePrompt: 'A stack of magazines on a table'
+      },
+      aiTutor: {
+        target_word: 'magazine',
+        question: '_ _ _ _ z _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'I = /ē/ in certain borrowed/Latinate words',
+        spelling_pattern_or_rule: "In ‘magazine,’ the single I represents /ē/ due to its word origin. Group with machine and police as an I = /ē/ set."
+      },
+      audio: 'magazine'
+    },
+
+    // --- E-consonant-E words (these, theme, complete) ---
+    {
+      id: 7,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'these',
+      imageUrl: null,
+      explanation: "‘These’ shows E-consonant-E spelling the long E sound /ē/.",
+      questionText: '_ _ _ _ _',
+      correctAnswer: 'these',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'these',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: 'Two objects pointed at with the caption “these”'
+      },
+      aiTutor: {
+        target_word: 'these',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'E-consonant-E = /ē/',
+        spelling_pattern_or_rule: "In ‘these,’ the E-consonant-E pattern makes the first E long (/ē/). This pattern also appears in theme and complete."
+      },
+      audio: 'these'
+    },
+    {
+      id: 8,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'theme',
+      imageUrl: null,
+      explanation: "‘Theme’ uses the E-consonant-E pattern to spell /ē/.",
+      questionText: '_ _ _ _ _',
+      correctAnswer: 'theme',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'theme',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _',
+        imagePrompt: 'A book cover labeled “theme” on a classroom desk'
+      },
+      aiTutor: {
+        target_word: 'theme',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'E-consonant-E = /ē/',
+        spelling_pattern_or_rule: "In ‘theme,’ E-consonant-E makes the first E long (/ē/). This silent-E pattern can signal long vowels in words like theme and these."
+      },
+      audio: 'theme'
+    },
+    {
+      id: 9,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'complete',
+      imageUrl: null,
+      explanation: "‘Complete’ ends with the E-consonant-E pattern making /ē/ in the second syllable.",
+      questionText: '_ _ _ _ _ _ _ _',
+      correctAnswer: 'complete',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'complete',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _ _ _ _',
+        imagePrompt: 'A completed checklist with all boxes checked'
+      },
+      aiTutor: {
+        target_word: 'complete',
+        question: '_ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'E-consonant-E = /ē/',
+        spelling_pattern_or_rule: "In ‘complete,’ the final silent-E creates the long E sound in the last syllable (/plēt/). This is the E-consonant-E long-vowel pattern."
+      },
+      audio: 'complete'
+    },
+
+    // --- Mixed review (any long-E pattern) ---
+    {
+      id: 10,
+      topicId: '5-A.39',
+      topicName: 'Analyze_three_long_E_spellings_Part_3',
+      progressTopicName: 'Long E spellings: EI, I, E-consonant-E',
+      questionElements: 'image + audio + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      template: 'fill_blank',
+      word: 'family',
+      imageUrl: null,
+      explanation: "‘Family’ ends with Y that says /ē/ — a mixed long-E review from earlier topics.",
+      questionText: '_ _ _ _ _ _',
+      correctAnswer: 'family',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'family',
+        intent: 'fill_blank',
+        questionLine: '_ _ _ _ _ _',
+        imagePrompt: 'A friendly family portrait illustration'
+      },
+      aiTutor: {
+        target_word: 'family',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Mixed review of long-E endings',
+        spelling_pattern_or_rule: "In ‘family,’ final Y represents /ē/ (fa-mi-ly). This mixed item reminds learners that long-E can also be spelled with Y at the end."
+      },
+      audio: 'family'
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
 }};
 
 export type {
