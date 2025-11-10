@@ -3141,11 +3141,6 @@ Return ONLY the new reading passage, nothing else.`;
     }, 40000);
 
     try {
-      // console.log('🌟 [AIService.generateAdventureImage()] Generating adventure image with user adventure context (EARLY-EXIT ENABLED)');
-      // console.log('📝 [AIService.generateAdventureImage()] Input prompt:', prompt);
-      // console.log('👤 [AIService.generateAdventureImage()] Adventure ID:', adventureId);
-      // console.log('📜 [AIService.generateAdventureImage()] User adventure context length:', userAdventure.length);
-
       // Extract adventure context with high priority on recent messages
       const adventureContext = this.extractAdventureContext(userAdventure);
       // console.log('[AIService.generateAdventureImage()] Adventure context for image:', adventureContext);

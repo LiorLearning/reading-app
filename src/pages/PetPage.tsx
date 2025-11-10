@@ -18,7 +18,7 @@ import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn } from 'lucide-react';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn, PencilLine } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
@@ -361,6 +361,9 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Pet store state
   const [storeRefreshTrigger, setStoreRefreshTrigger] = useState(0); // Trigger to refresh store data
   const [purchaseLoadingId, setPurchaseLoadingId] = useState<string | null>(null);
+  // Rename modal state
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [renamingPetId, setRenamingPetId] = useState<string | null>(null);
   
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
@@ -2115,6 +2118,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b",
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdeer-baby-sleeping.gif?alt=media&token=64839044-7f44-4372-9558-ed8f5668766b"
         }
+      },
+      labubu: {
+        1: {
+          // Level 1 Labubu images - coin-based progression (placeholders)
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sad.png?alt=media&token=a6b67700-840e-4250-adb2-f1d4095c3d02",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-neutral.png?alt=media&token=5fc04006-3104-4a5b-98be-70f0d3d860f2",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-happy.png?alt=media&token=70e46226-c012-49b8-83ee-2df9cfe1c3cd",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-super-happy.png?alt=media&token=fa575c3d-8d79-4e46-af96-ebdd108d708c",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Flabubu-sleeping-unscreen.gif?alt=media&token=e289832a-593f-4117-a8a3-af0cad9f9db9"
+        }
       }
     };
 
@@ -2593,7 +2608,7 @@ const getSleepyPetImage = (clicks: number) => {
       dog: {
         id: 'dog',
         emoji: '🐶',
-        name: 'Buddy',
+        name: 'Dog',
         owned: isPetOwned('dog'),
         cost: 50,
         requiredLevel: 1,
@@ -2603,7 +2618,7 @@ const getSleepyPetImage = (clicks: number) => {
       cat: {
         id: 'cat',
         emoji: '🐱',
-        name: 'Whiskers',
+        name: 'Cat',
         owned: isPetOwned('cat'),
         cost: 50,
         requiredLevel: 1,
@@ -2613,7 +2628,7 @@ const getSleepyPetImage = (clicks: number) => {
       hamster: {
         id: 'hamster',
         emoji: '🐹',
-        name: 'Peanut',
+        name: 'Hamster',
         owned: isPetOwned('hamster'),
         cost: 50,
         requiredLevel: 1,
@@ -2623,7 +2638,7 @@ const getSleepyPetImage = (clicks: number) => {
       monkey: {
         id: 'monkey',
         emoji: '🐵',
-        name: 'Chipper',
+        name: 'Monkey',
         owned: isPetOwned('monkey'),
         cost: 300,
         requiredLevel: 5,
@@ -2633,7 +2648,7 @@ const getSleepyPetImage = (clicks: number) => {
       parrot: {
         id: 'parrot',
         emoji: '🦜',
-        name: 'Rio',
+        name: 'Parrot',
         owned: isPetOwned('parrot'),
         cost: 300,
         requiredLevel: 5,
@@ -2643,7 +2658,7 @@ const getSleepyPetImage = (clicks: number) => {
       dragon: {
         id: 'dragon',
         emoji: '🐉',
-        name: 'Ember',
+        name: 'Dragon',
         owned: isPetOwned('dragon'),
         cost: 500,
         requiredLevel: 10,
@@ -2653,7 +2668,7 @@ const getSleepyPetImage = (clicks: number) => {
       unicorn: {
         id: 'unicorn',
         emoji: '🦄',
-        name: 'Stardust',
+        name: 'Unicorn',
         owned: isPetOwned('unicorn'),
         cost: 500,
         requiredLevel: 10,
@@ -2662,7 +2677,7 @@ const getSleepyPetImage = (clicks: number) => {
       },  panda: {
         id: 'panda',
         emoji: '🐼',
-        name: 'Bamboo',
+        name: 'Panda',
         owned: isPetOwned('panda'),
         cost: 1000,
         requiredLevel: 15,
@@ -2672,7 +2687,7 @@ const getSleepyPetImage = (clicks: number) => {
       deer: {
         id: 'deer',
         emoji: '🦌',
-        name: 'Antler',
+        name: 'Deer',
         owned: isPetOwned('deer'),
         cost: 1000,
         requiredLevel: 15,
@@ -2688,6 +2703,16 @@ const getSleepyPetImage = (clicks: number) => {
         requiredLevel: 20,
         isLocked: userLevel < 20,
         category: 'legendary'
+      },
+      labubu: {
+        id: 'labubu',
+        emoji: '🧸',
+        name: 'Labubu',
+        owned: isPetOwned('labubu'),
+        cost: 2000,
+        requiredLevel: 20,
+        isLocked: userLevel < 20,
+        category: 'Collectible: 1/4'
       },
     
     };
@@ -3487,14 +3512,20 @@ const getSleepyPetImage = (clicks: number) => {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col overflow-y-auto overflow-x-hidden" style={{
-      backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center 50%',
-      backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed',
-      fontFamily: 'Quicksand, system-ui, sans-serif'
-    }}>
+    <div
+      className="relative flex min-h-[100dvh] flex-col overflow-x-hidden overflow-y-auto"
+      style={{
+        backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 45%',
+        backgroundRepeat: 'no-repeat',
+        fontFamily: 'Quicksand, system-ui, sans-serif',
+        paddingTop: 'calc(var(--safe-area-top, 0px))',
+        paddingBottom: 'calc(var(--safe-area-bottom, 0px))',
+        paddingLeft: 'calc(var(--safe-area-left, 0px))',
+        paddingRight: 'calc(var(--safe-area-right, 0px))'
+      }}
+    >
       {/* Invisible dev buttons (top-right) to advance time */}
       {import.meta.env && (import.meta as any).env?.DEV ? (
         <>
@@ -3561,11 +3592,14 @@ const getSleepyPetImage = (clicks: number) => {
       {/* Daily intro now handled inside PetSelectionFlow as Step 3 */}
       
       {/* Glass overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
+      <div className="pointer-events-none absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
 
       {/* ADDED FOR HOME PAGE FUNCTIONALITY: Grade Selection Button - Top Left */}
       {userData && (
-        <div className="absolute top-5 left-5 z-30 flex items-center gap-3">
+        <div
+          className="absolute left-4 z-30 flex items-center gap-3 sm:left-5"
+          style={{ top: 'calc(var(--safe-area-top, 0px) + 1.25rem)' }}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -4091,8 +4125,8 @@ const getSleepyPetImage = (clicks: number) => {
         )}
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-8 z-10 mt-12">
-        <div ref={stageRef} className="relative w-full flex justify-center items-end overflow-visible" style={{ minHeight: 'clamp(380px, 45vh, 520px)' }}>
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 pt-6 sm:px-6 md:px-8 lg:px-10 lg:pt-8">
+        <div ref={stageRef} className="relative flex w-full items-end justify-center overflow-visible" style={{ minHeight: 'clamp(340px, 48vh, 540px)' }}>
         {/* Compact emoji-only bubble closer to the pet */}
         {!showPetShop && (
           <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2" style={{ top: bubbleTopPx }}>
@@ -4248,8 +4282,8 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Below-bubble To-Dos: Travel and Sleep */}
       {!showPetShop && (
-        <div className="relative z-20 mt-16 flex justify-center pb-24">
-          <div className="rounded-[24px] shadow-xl p-4 w-[420px] mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
+        <div className="relative z-20 mt-12 flex justify-center pb-24 sm:mt-14 lg:mt-16">
+          <div className="w-full max-w-[420px] rounded-[24px] shadow-xl p-4 mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
             <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
             <div className="mt-1 flex flex-col gap-4">
@@ -4879,9 +4913,15 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       )}
 
-      {/* Pet Switcher - Only show if user owns multiple pets */}
-      {(orderedOwnedPets.length > 1) && (
-        <div className="fixed top-24 left-6 z-20 flex flex-col gap-3 items-center">
+      {/* Pet Switcher rail */}
+      {orderedOwnedPets.length > 0 && (
+        <div
+          className="fixed z-20 hidden flex-col items-center gap-3 md:flex"
+          style={{
+            top: 'calc(var(--safe-area-top, 0px) + 5.5rem)',
+            left: 'clamp(1rem, 3vw, 2.5rem)'
+          }}
+        >
           <div className="text-lg font-semibold text-white drop-shadow-md mb-1">
             Pets: {orderedOwnedPets.length}
           </div>
@@ -5009,7 +5049,7 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 ${
+                className={`relative h-20 w-20 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 md:h-20 md:w-20 lg:h-24 lg:w-24 ${
                   isActive
                     ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
                     : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
@@ -5052,7 +5092,10 @@ const getSleepyPetImage = (clicks: number) => {
       )}
 
   {/* Global top-right shortcuts: More and Shop */}
-  <div className="fixed top-48 right-6 z-30 flex flex-col gap-3 items-end">
+  <div
+    className="fixed top-48 z-30 flex flex-col gap-3 items-end"
+    style={{ right: 'calc(var(--safe-area-right, 0px) + 1.5rem)' }}
+  >
     <Button
       aria-label="More"
       onClick={() => { handleActionClick('more'); }}
@@ -5090,29 +5133,34 @@ const getSleepyPetImage = (clicks: number) => {
       {showPetShop && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl max-w-4xl w-11/12 max-h-[85vh] shadow-2xl relative border-2 border-gray-200 flex flex-col">
-            {/* Close button */}
-            <button
-              onClick={() => setShowPetShop(false)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white border-none cursor-pointer text-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-10"
-            >
-              ×
-            </button>
-
             {/* Header */}
-            <div className="p-6 border-b-2 border-gray-200 flex items-center justify-between flex-shrink-0">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-800">Pet Book</h2>
-                {(() => {
-                  const data = getPetStoreData();
-                  const total = Object.keys(data).length;
-                  const owned = Object.values(data).filter((p: any) => p.owned).length;
-                  return (
-                    <div className="text-gray-600 mt-2 font-medium">{owned} out of {total} pets</div>
-                  );
-                })()}
-              </div>
-              <div className="inline-block px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold shadow-lg">
-                💰 {coins} coins
+            <div className="relative px-6 pt-6 pb-4 border-b-2 border-gray-200 flex-shrink-0">
+              {/* Close button - aligned with header top padding */}
+              <button
+                onClick={() => setShowPetShop(false)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white border-none cursor-pointer text-lg flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-10"
+                aria-label="Close pet shop"
+              >
+                ×
+              </button>
+
+              <div className="flex items-start justify-between gap-4 pr-14">
+                <div className="flex-1">
+                  <h2 className="text-3xl font-bold text-gray-800 mb-1">Pet Book</h2>
+                  {(() => {
+                    const data = getPetStoreData();
+                    const total = Object.keys(data).length;
+                    const owned = Object.values(data).filter((p: any) => p.owned).length;
+                    return (
+                      <div className="text-sm text-gray-600 font-medium">{owned} out of {total} pets</div>
+                    );
+                  })()}
+                </div>
+                {/* Coin display - aligned with close button */}
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl text-white font-semibold shadow-lg whitespace-nowrap">
+                  <span className="text-lg">💰</span>
+                  <span>{coins.toLocaleString()}</span>
+                </div>
               </div>
             </div>
 
@@ -5163,56 +5211,62 @@ const getSleepyPetImage = (clicks: number) => {
                       L{pet.requiredLevel}
                     </div>
                     
-                    {/* Pet Image or Emoji */}
+                    {/* Pet Image or Emoji (container removed for a cleaner look) */}
                     {pet.isLocked && !pet.owned ? (
-                      <div
-                        className={`w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 ${
-                          PetProgressStorage.getCurrentSelectedPet() === pet.id
-                            ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
-                            : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
-                        } mb-4 mx-auto`}
-                      >
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'] as string[]).includes(pet.id) ? (
-                          <img
-                            src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
-                            alt={`${pet.name} (locked)`}
-                            className="h-24 w-24 object-contain filter grayscale brightness-0 opacity-40"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="text-6xl grayscale opacity-40">{pet.emoji}</div>
-                        )}
-                      </div>
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                        <img
+                          src={getLevelBasedPetImage(pet.id, 1, pet.id === 'labubu' ? 'coins_10' : 'coins_50')}
+                          alt={`${pet.name} (locked)`}
+                          className="h-24 w-24 object-contain filter grayscale opacity-70 mb-4 mx-auto block"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="text-6xl grayscale opacity-70 mb-4 mx-auto">{pet.emoji}</div>
+                      )
                     ) : (
-                      <div
-                        className={`w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 ${
-                          PetProgressStorage.getCurrentSelectedPet() === pet.id
-                            ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
-                            : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
-                        } mb-4 mx-auto`}
-                      >
-                        {(['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'] as string[]).includes(pet.id) ? (
-                          <img
-                            src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
-                            alt={pet.name}
-                            className="h-24 w-24 object-contain drop-shadow-sm"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="text-6xl">{pet.emoji}</div>
-                        )}
-                      </div>
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                        <img
+                          src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
+                          alt={pet.name}
+                          className="h-24 w-24 object-contain drop-shadow-sm mb-4 mx-auto block"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="text-6xl mb-4 mx-auto">{pet.emoji}</div>
+                      )
                     )}
                     
                     {/* Pet Name (user-given name shown after purchase) */}
                     <div className={`text-lg font-semibold mb-3 ${pet.isLocked && !pet.owned ? 'text-gray-500' : 'text-gray-800'}`}>
-                      {pet.owned ? PetProgressStorage.getPetDisplayName(pet.id) : ''}
+                      <div className="flex items-center justify-center gap-2">
+                        <span>
+                          {(() => {
+                            // Show user-given name if owned; otherwise show default species name
+                            const defaultName = pet.name || (pet.id ? (pet.id.charAt(0).toUpperCase() + pet.id.slice(1)) : '');
+                            if (pet.owned) {
+                              const userName = PetProgressStorage.getPetDisplayName(pet.id);
+                              return (userName && userName.trim()) ? userName : defaultName;
+                            }
+                            return defaultName;
+                          })()}
+                        </span>
+                        {pet.owned && (
+                          <button
+                            onClick={() => { setRenamingPetId(pet.id); setIsRenameModalOpen(true); }}
+                            aria-label={`Rename ${PetProgressStorage.getPetDisplayName(pet.id)}`}
+                            className="p-0 m-0 bg-transparent border-none text-gray-500 hover:text-gray-800"
+                            title="Rename"
+                          >
+                            <PencilLine className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Purchase Button or Status */}
                     {pet.owned ? (
-                      <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">
-                        ✅ Owned
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="px-4 py-2 bg-green-500 text-white rounded-xl font-bold">✅ Owned</div>
                       </div>
                     ) : pet.isLocked ? (
                       <div className="w-full px-4 py-3 rounded-xl font-bold text-lg bg-gray-400 text-gray-600 cursor-not-allowed">
@@ -5252,6 +5306,34 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         </div>
       )}
+
+      {/* Rename Pet Modal */}
+      {isRenameModalOpen && renamingPetId && (() => {
+        const data: any = (getPetStoreData() as any)[renamingPetId];
+        const species = renamingPetId.charAt(0).toUpperCase() + renamingPetId.slice(1);
+        return (
+          <PetNamingModal
+            isOpen={true}
+            onClose={() => { setIsRenameModalOpen(false); setRenamingPetId(null); }}
+            petId={renamingPetId}
+            petEmoji={data?.emoji || '🐾'}
+            petSpeciesName={species}
+            defaultNames={[]}
+            onSubmit={async (newName: string) => {
+              try { PetProgressStorage.setPetName(renamingPetId, newName); } catch {}
+              try {
+                if (user?.uid) {
+                  await stateStoreApi.setPetName({ userId: user.uid, pet: renamingPetId as any, name: newName });
+                  try { analytics.capture('pet_renamed', { pet_id: renamingPetId, pet_name: newName, pet_type: renamingPetId, pet_level: getLevelInfo().currentLevel }); } catch {}
+                }
+              } catch {}
+              setIsRenameModalOpen(false);
+              setRenamingPetId(null);
+              setStoreRefreshTrigger(prev => prev + 1);
+            }}
+          />
+        );
+      })()}
 
       {/* Step 7 overlay visuals */}
       {showStep7 && (

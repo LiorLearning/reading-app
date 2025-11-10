@@ -680,7 +680,7 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
     targets.some(t => (typeof t === 'number' ? n.includes(`${t}`) : n.includes(t.toLowerCase())));
 
   // 4th/5th behave like grade 4 content
-  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '4';
+  if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '5';
   if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '4';
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
   if (isGrade(name, ['2nd', 'second', 'grade 2', 'grade2', '2'])) return '2';
