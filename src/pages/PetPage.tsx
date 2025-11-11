@@ -1357,7 +1357,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       
       // Increment sleep clicks (max 3) - no den required
       if (sleepClicks < 3) {
-        const newSleepClicks = sleepClicks + 1;
+        const newSleepClicks = 3;
         
         // If sleep is completed (3 clicks), start the 8-hour sleep timer
         if (newSleepClicks >= 3) {
@@ -2083,6 +2083,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
         }
       },
+      wolf: {
+        1: {
+          // Level 1 Wolf images - coin-based progression (placeholders)
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.png?alt=media&token=40eb967c-1a64-494f-afc1-11fe8f35dec1",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-normal.png?alt=media&token=fa77bae0-6a3f-4c09-8a4b-0313f3301181",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-happy.png?alt=media&token=cc960a63-b3a9-46f0-a5b4-c3087df4d324",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-superhappy.png?alt=media&token=49761d77-8a4a-4c87-8f5b-74869c2f19f1",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba"
+        }
+      },
       pikachu: {
         1: {
           // Level 1 Parrot images - coin-based progression
@@ -2410,9 +2422,10 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
-        // 3rd should store as grade3, 4th/5th as grade4
+        // 3rd should store as grade3, 4th as grade4, 5th as grade5
         if (name === '3rd Grade') return 'grade3';
-        if (name === '4th Grade' || name === '5th Grade') return 'grade4';
+        if (name === '4th Grade') return 'grade4';
+        if (name === '5th Grade') return 'grade5';
         return '';
       };
       const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
@@ -2422,10 +2435,12 @@ const getSleepyPetImage = (clicks: number) => {
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = incomingGradeDisplayName;
       // Lightweight migration: if selecting 4th/5th but previously stored as grade3, upgrade to grade4
-      if ((incomingGradeDisplayName === '4th Grade' || incomingGradeDisplayName === '5th Grade') && gradeCode === 'grade3') {
+      if ((incomingGradeDisplayName === '4th Grade') && gradeCode === 'grade3') {
         gradeCode = 'grade4';
       }
-
+      if (incomingGradeDisplayName === '5th Grade' && gradeCode === 'grade3' || gradeCode === 'grade4') {
+        gradeCode = 'grade5';
+      }
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -2694,6 +2709,16 @@ const getSleepyPetImage = (clicks: number) => {
         isLocked: userLevel < 15,
         category: 'legendary'
       },
+      wolf: {
+        id: 'wolf',
+        emoji: '🐺',
+        name: 'Wolf',
+        owned: isPetOwned('wolf'),
+        cost: 1000,
+        requiredLevel: 15,
+        isLocked: userLevel < 15,
+        category: 'legendary'
+      },
       pikachu: {
         id: 'pikachu',
         emoji: '🦅',
@@ -2704,6 +2729,7 @@ const getSleepyPetImage = (clicks: number) => {
         isLocked: userLevel < 20,
         category: 'legendary'
       },
+      
       labubu: {
         id: 'labubu',
         emoji: '🧸',
@@ -3830,7 +3856,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">5th Level</span>
+                  <span className="font-semibold">5th Grade</span>
                   {selectedGradeAndLevel?.grade === '5th' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
@@ -4945,7 +4971,7 @@ const getSleepyPetImage = (clicks: number) => {
             const levelForPet = (() => {
               try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
             })();
-            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'].includes(petType);
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer','labubu'].includes(petType);
             // Determine per-tile care state so badge + thumbnail are consistent
             const careStateForTile = (() => {
               // 1) Sleep check via local mirror
@@ -5029,7 +5055,7 @@ const getSleepyPetImage = (clicks: number) => {
                 : (isCoins30Tile
                   ? 'bg-green-500'
                   : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-500')));
-            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'wolf' ? '🐺' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : petType === 'labubu' ? '🧸' : '🐾';
 
             return (
               <button
@@ -5213,7 +5239,7 @@ const getSleepyPetImage = (clicks: number) => {
                     
                     {/* Pet Image or Emoji (container removed for a cleaner look) */}
                     {pet.isLocked && !pet.owned ? (
-                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
                         <img
                           src={getLevelBasedPetImage(pet.id, 1, pet.id === 'labubu' ? 'coins_10' : 'coins_50')}
                           alt={`${pet.name} (locked)`}
@@ -5224,7 +5250,7 @@ const getSleepyPetImage = (clicks: number) => {
                         <div className="text-6xl grayscale opacity-70 mb-4 mx-auto">{pet.emoji}</div>
                       )
                     ) : (
-                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
                         <img
                           src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                           alt={pet.name}

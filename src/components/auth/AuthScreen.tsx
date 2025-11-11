@@ -122,15 +122,15 @@ export const AuthScreen: React.FC = () => {
               <BookOpen className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">LitCraft</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">ReadKraft</h1>
           <p className="text-blue-100">Interactive Reading Adventures</p>
         </div>
 
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center text-white">Welcome!</CardTitle>
+            <CardTitle className="text-2xl text-center text-white">Log In / Sign Up</CardTitle>
             <CardDescription className="text-center text-blue-100">
-              Sign in to continue your reading journey
+              Let's get you started on your reading journey!
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -187,7 +187,7 @@ export const AuthScreen: React.FC = () => {
               className="w-full text-blue-200 hover:text-white hover:bg-white/10"
             >
               <Mail className="mr-2 h-4 w-4" />
-              Sign in with Email
+              Log in / Sign up with Email
               {showEmailAuth ? (
                 <ChevronUp className="ml-2 h-4 w-4" />
               ) : (
