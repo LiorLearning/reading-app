@@ -399,6 +399,143 @@ export const sampleMCQData: MCQData = {
           ,
           audio:"noodle"
         },
+        {
+          id: 9,
+          topicId: 'A-',
+          topicName: 'Spell_the_/ch/_sound_TCH_rule',
+          progressTopicName: "The 'TCH' spelling rule",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'march',
+          imageUrl: null,
+          explanation: "Outstanding! The word is 'march' — /ch/ comes after an r-controlled vowel, so we spell it with 'ch'.",
+          questionText: 'mar__',
+          correctAnswer: 'march',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'march',
+            intent: 'fill_blank',
+            questionLine: '____',
+            imagePrompt: 'People marching or the month of March'
+          },
+          aiTutor: {
+            target_word: 'march',
+            question: 'mar__',
+            student_entry: '',
+            topic_to_reinforce: "TCH rule for /ch/",
+            spelling_pattern_or_rule: "TCH Rule: Use TCH to spell /ch/ right after a short vowel (match, witch). Use CH at the beginning of a word or after a consonant, r-controlled, or long vowel (chip, rich, beach). In 'march', /ch/ comes after the r-controlled vowel 'ar', so we use CH!"
+          },
+          audio: 'march'
+        },
+        {
+          id: 10,
+          topicId: 'A-',
+          topicName: 'EAR_multiple_sounds',
+          progressTopicName: "EAR and its three sounds",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'heard',
+          imageUrl: null,
+          explanation: "Good listening — 'heard' uses EAR to make the /er/ sound (like 'her').",
+          questionText: '____',
+          correctAnswer: 'heard',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'heard',
+            intent: 'fill_blank',
+            questionLine: '____',
+            imagePrompt: 'Someone cupping their ear to show they heard a sound'
+          },
+          aiTutor: {
+            target_word: 'heard',
+            question: '____',
+            student_entry: '',
+            topic_to_reinforce: "EAR phonogram",
+            spelling_pattern_or_rule: "EAR = /er/ in 'heard'. Remember: EAR can be /ear/ (hear), /air/ (bear), or /er/ (heard) — check the word and listen closely."
+          },
+          audio: 'heard'
+        },
+
+        {
+          id: 11,
+          topicId: 'A-',
+          topicName: 'Learn phonograms si',
+          progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'collision',
+          imageUrl: null,
+          explanation: "Great! The word is 'collision' — we hear li-zhun because collide ends with /d/, so si says /zh/.",
+          questionText: 'colli__on',
+          correctAnswer: 'collision',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+          targetWord: 'collision',
+          intent: 'fill_blank',
+          questionLine: 'colli__on',
+          imagePrompt: 'Two bumper cars colliding'
+          },
+          aiTutor: {
+          target_word: 'collision',
+          question: 'colli__on',
+          student_entry: '',
+          topic_to_reinforce: "Phonogram 'si'",
+          spelling_pattern_or_rule: "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
+          },
+          audio: 'collision'
+          },
+        {
+          id: 12,
+          topicId: 'A-',
+          topicName: 'Spell_words_ending_in_ij_spelled_age',
+          progressTopicName: "Words ending in /ij/ spelled -AGE",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          template: 'fill_blank',
+          word: 'carriage',
+          imageUrl: null,
+          explanation: "Great! The word is 'carriage' — the ending -AGE says /ij/.",
+          questionText: '______',
+          correctAnswer: 'carriage',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'carriage',
+            intent: 'fill_blank',
+            questionLine: '______',
+            imagePrompt: "A horse-drawn carriage on a cobblestone street"
+          },
+          aiTutor: {
+            target_word: 'carriage',
+            question: '______',
+            student_entry: '',
+            topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+            spelling_pattern_or_rule: "The -AGE ending makes the /ij/ sound in words like carriage, village, and package. The silent E marks the soft G and indicates the final syllable /ij/."
+          },
+          audio: 'carriage'
+        },
       ],
   },
    'K-O.3': {
@@ -74762,7 +74899,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1,2,3,4,5,6,9],
+    prefilledIndexes: [0,1,2,3,4,5,8,9],
     aiHook: {
     targetWord: 'propulsion',
     intent: 'fill_blank',
@@ -74796,7 +74933,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1],
+    prefilledIndexes: [0,1,2,5,6],
     aiHook: {
     targetWord: 'torsion',
     intent: 'fill_blank',
@@ -74830,7 +74967,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1,2,6,7],
+    prefilledIndexes: [0,1,2,5,6],
     aiHook: {
     targetWord: 'pension',
     intent: 'fill_blank',
@@ -74842,7 +74979,7 @@ audio: 'sleigh'
     question: 'pen__on',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
-    spelling_pattern_or_rule: "In 'pension', n + sion spells /shun/. Rule: n + sion → /shun/ (pension, tension, extension, mansion). Tip: Spot the n right before the “shun” sound."
+    spelling_pattern_or_rule: "In 'pension',  n+ sion spells /shun/. Rule: n + sion → /shun/ (pension, tension, extension, mansion). Tip: Spot the n right before the “shun” sound."
     },
     audio: 'pension'
     },
@@ -74864,7 +75001,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [7],
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'mansion',
     intent: 'fill_blank',
@@ -74873,7 +75010,7 @@ audio: 'sleigh'
     },
     aiTutor: {
     target_word: 'mansion',
-    question: 'man__on',
+    question: '_ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     spelling_pattern_or_rule: "In 'mansion', n + sion spells /shun/. Rule: n + sion → /shun/ (mansion, expansion). Tip: If you hear n before “shun,” write -sion."
@@ -74898,7 +75035,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,2,3,4],
+    prefilledIndexes: [0,1,2,3,4,7,8],
     aiHook: {
     targetWord: 'excursion',
     intent: 'fill_blank',
@@ -74932,7 +75069,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [5,8,9],
+    prefilledIndexes: [0,1,2,3,4,5,8,9],
     aiHook: {
     targetWord: 'television',
     intent: 'fill_blank',
@@ -74965,8 +75102,8 @@ audio: 'sleigh'
     isSpacing: false,
     isSorting: false,
     isSpelling: true,
-    isPrefilled: true,
-    prefilledIndexes: [2,3],
+    isPrefilled: false,
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'division',
     intent: 'fill_blank',
@@ -74975,7 +75112,7 @@ audio: 'sleigh'
     },
     aiTutor: {
     target_word: 'division',
-    question: 'divi__on',
+    question: '_ _ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     spelling_pattern_or_rule: "In 'division', the base divide ends voiced (…/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (divide→division, collide→collision, erode→erosion). Tip: A buzzy last sound in the base points to /zh/."
@@ -75000,7 +75137,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1,2,3,4,5],
+    prefilledIndexes: [0,1,2,3,4,7,8],
     aiHook: {
     targetWord: 'explosion',
     intent: 'fill_blank',
@@ -75034,7 +75171,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [2],
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'erosion',
     intent: 'fill_blank',
@@ -75043,7 +75180,7 @@ audio: 'sleigh'
     },
     aiTutor: {
     target_word: 'erosion',
-    question: 'ero__on',
+    question: '_ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     spelling_pattern_or_rule: "In 'erosion', the base erode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (erode→erosion, collide→collision). Tip: Voiced base endings make the buzzy /zh/."
@@ -75068,7 +75205,7 @@ audio: 'sleigh'
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,3],
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'collision',
     intent: 'fill_blank',
@@ -75077,7 +75214,7 @@ audio: 'sleigh'
     },
     aiTutor: {
     target_word: 'collision',
-    question: 'colli__on',
+    question: '_ _ _ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     spelling_pattern_or_rule: "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
@@ -75216,7 +75353,7 @@ audio: 'sleigh'
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 4, 5, 6],
+        prefilledIndexes: [0, 3,4, 5, 6],
         aiHook: {
           targetWord: 'octopus',
           intent: 'fill_blank',
@@ -75284,7 +75421,7 @@ audio: 'sleigh'
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 1, 2, 4],
+        prefilledIndexes: [],
         aiHook: {
           targetWord: 'extinct',
           intent: 'fill_blank',
@@ -75293,7 +75430,7 @@ audio: 'sleigh'
         },
         aiTutor: {
           target_word: 'extinct',
-          question: 'ext_n__',
+          question: '_ _ _ _ _ _ _',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
@@ -75318,7 +75455,7 @@ audio: 'sleigh'
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 1, 2, 6, 7, 8],
+        prefilledIndexes: [5, 6, 7, 8],
         aiHook: {
           targetWord: 'spectator',
           intent: 'fill_blank',
@@ -75327,7 +75464,7 @@ audio: 'sleigh'
         },
         aiTutor: {
           target_word: 'spectator',
-          question: 'spe___tor',
+          question: '_ _ _ _ _ a t o r',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
@@ -75352,7 +75489,7 @@ audio: 'sleigh'
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 2, 3, 5],
+        prefilledIndexes: [0,1,2],
         aiHook: {
           targetWord: 'construct',
           intent: 'fill_blank',
@@ -75361,7 +75498,7 @@ audio: 'sleigh'
         },
         aiTutor: {
           target_word: 'construct',
-          question: 'c_ns_r___',
+          question: 'con____',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
@@ -75386,7 +75523,7 @@ audio: 'sleigh'
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 1, 3],
+        prefilledIndexes: [],
         aiHook: {
           targetWord: 'deflect',
           intent: 'fill_blank',
@@ -75395,7 +75532,7 @@ audio: 'sleigh'
         },
         aiTutor: {
           target_word: 'deflect',
-          question: 'de_l___',
+          question: '_ _ _ _ _ _ _',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
@@ -75420,16 +75557,16 @@ audio: 'sleigh'
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 2, 4],
+        prefilledIndexes: [],
         aiHook: {
           targetWord: 'conflict',
           intent: 'fill_blank',
-          questionLine: 'c_n_l___',
+          questionLine: '_ _ _ _ _ _ _',
           imagePrompt: 'Two teams in a tug-of-war showing conflict'
         },
         aiTutor: {
           target_word: 'conflict',
-          question: 'c_n_l___',
+          question: '_ _ _ _ _ _ _ _',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
@@ -75467,7 +75604,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3], // 'nego' shown; both sound chunks (ti, at) are blanked
+prefilledIndexes: [0,1,2,3,4,5,6], // 'nego' shown; both sound chunks (ti, at) are blanked
 aiHook: {
 targetWord: 'negotiation',
 intent: 'fill_blank',
@@ -75476,7 +75613,7 @@ imagePrompt: 'Two people at a table shaking hands after a negotiation'
 },
 aiTutor: {
 target_word: 'negotiation',
-question: 'nego__a__on',
+question: 'negotia____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'negotiation', the /ā-shun/ sound is spelled -ation. Rule: When you hear /a–shun/, use -ation (nation, location, celebration, negotiation). Tip: If the part before the ending sounds like a long A (ay), pick -ation."
@@ -75510,7 +75647,7 @@ imagePrompt: 'Hands holding a small plant to show conservation'
 },
 aiTutor: {
 target_word: 'conservation',
-question: 'conserv__a__on',
+question: 'conserva____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'conservation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation (vacation, rotation, conservation). Tip: Long A + /shun/ = -ation."
@@ -75535,7 +75672,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3,4,5,6,7,8], // 'transform' shown
+prefilledIndexes: [0,1,2,3,4,5,6,7,8,9], // 'transform' shown
 aiHook: {
 targetWord: 'transformation',
 intent: 'fill_blank',
@@ -75544,7 +75681,7 @@ imagePrompt: 'A caterpillar transforming into a butterfly'
 },
 aiTutor: {
 target_word: 'transformation',
-question: 'transfor__a__on',
+question: 'transforma____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'transformation', the /ā-shun/ sound is spelled -ation. Rule: If it sounds like ay-shun, write -ation (formation, transformation). Tip: Hearing MAY-shun points to -ation."
@@ -75569,7 +75706,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3], // fewer letters shown (medium)
+prefilledIndexes: [0,1,2,3,4,5], // fewer letters shown (medium)
 aiHook: {
 targetWord: 'circulation',
 intent: 'fill_blank',
@@ -75578,7 +75715,7 @@ imagePrompt: 'Arrows showing blood circulation through the body'
 },
 aiTutor: {
 target_word: 'circulation',
-question: 'circ__a__on',
+question: 'circula____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'circulation', the /ā-shun/ sound is spelled -ation. Rule: Many science/process words use -ation (circulation, respiration). Tip: AY + shun → -ation."
@@ -75603,7 +75740,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1], // just 'or' shown (medium+)
+prefilledIndexes: [0,1,2,3,4,5], // just 'or' shown (medium+)
 aiHook: {
 targetWord: 'orientation',
 intent: 'fill_blank',
@@ -75612,7 +75749,7 @@ imagePrompt: 'A map and a compass for orientation'
 },
 aiTutor: {
 target_word: 'orientation',
-question: 'or__n__a__on',
+question: 'orient_____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'orientation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation even after a base like orient. Tip: Long A before /shun/? Choose -ation."
@@ -75637,7 +75774,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0], // 'a' only (medium+)
+prefilledIndexes: [4,5], // 'a' only (medium+)
 aiHook: {
 targetWord: 'adaptation',
 intent: 'fill_blank',
@@ -75646,7 +75783,7 @@ imagePrompt: 'An animal changing to survive in its habitat (adaptation)'
 },
 aiTutor: {
 target_word: 'adaptation',
-question: 'a__p__a__on',
+question: '_____ta____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'adaptation', the /ā-shun/ sound is spelled -ation after adapt. Rule: If adding the ending after t makes ay-shun, use -ation (adapt→adaptation). Tip: Hear AY? Choose -ation."
@@ -75680,7 +75817,7 @@ imagePrompt: 'A rulebook or a checklist to show regulation'
 },
 aiTutor: {
 target_word: 'regulation',
-question: '__g__l__a__on',
+question: '_ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'regulation', the /ā-shun/ sound is spelled -ation. Rule: -ation is common for this sound (regulation, population). Tip: Long A + shun → -ation."
@@ -75714,7 +75851,7 @@ imagePrompt: 'A person exploring with a flashlight and map'
 },
 aiTutor: {
 target_word: 'exploration',
-question: 'ex__o__a__on',
+question: '_ _ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'exploration', the /ā-shun/ sound is spelled -ation. Rule: Hear AY then shun? Choose -ation. Tip: AY-shun = -ation."
@@ -75748,7 +75885,7 @@ imagePrompt: 'Two speech bubbles in different languages showing translation'
 },
 aiTutor: {
 target_word: 'translation',
-question: 'tr__s__a__on',
+question: '_ _ _ _ _ _ _ _ _ _ _ ',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'translation', the /ā-shun/ sound is spelled -ation. Rule: Many language/process words take -ation (translation, conjugation). Tip: Long A before shun → -ation."
@@ -75782,7 +75919,7 @@ imagePrompt: 'A crowd of people representing population'
 },
 aiTutor: {
 target_word: 'population',
-question: '__p__l__a__on',
+question: '_ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 spelling_pattern_or_rule: "In 'population', the /ā-shun/ sound is spelled -ation. Rule: -ation is very common for this sound (population, regulation). Tip: Hear AY? -ation is usually right."
@@ -75888,7 +76025,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3,4,5], // only last -s missing? keep two underscores for -ss → we kept both missing
+prefilledIndexes: [0,1,2,3,4], // only last -s missing? keep two underscores for -ss → we kept both missing
 aiHook: {
 targetWord: 'success',
 intent: 'fill_blank',
@@ -75956,7 +76093,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1], // few letters shown (medium+)
+prefilledIndexes: [0,1,2,3,4,5], // few letters shown (medium+)
 aiHook: {
 targetWord: 'distress',
 intent: 'fill_blank',
@@ -75965,7 +76102,7 @@ imagePrompt: 'A SOS signal or a person needing help (distress)'
 },
 aiTutor: {
 target_word: 'distress',
-question: 'di__re__',
+question: 'distre__',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 spelling_pattern_or_rule: "In 'distress', -ss marks the strong ending /s/. Rule: Words finishing with a sharp /s/ often use -ss (distress, suppress). Tip: Strong hiss at the finish? Choose -ss."
@@ -75999,7 +76136,7 @@ imagePrompt: 'Kids playing outside for recess'
 },
 aiTutor: {
 target_word: 'recess',
-question: 're__s__',
+question: '_ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 spelling_pattern_or_rule: "In 'recess', -ss shows a clear last /s/. Rule: Many everyday/school words end with -ss (recess, compass). Tip: Clear last /s/ → -ss."
@@ -76033,7 +76170,7 @@ imagePrompt: 'A hand gently stopping a bouncing ball (suppress)'
 },
 aiTutor: {
 target_word: 'suppress',
-question: 'su__re__',
+question: '_ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 spelling_pattern_or_rule: "In 'suppress', pp protects the short vowel and -ss gives a firm ending /s/. Rule: Short vowel + strong last /s/ often uses doubles (suppress). Tip: Doubles = short vowel + strong hiss."
@@ -76067,7 +76204,7 @@ imagePrompt: 'A road sign showing a city bypass'
 },
 aiTutor: {
 target_word: 'bypass',
-question: 'by__a__',
+question: '_ _ _ _ __',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 spelling_pattern_or_rule: "In 'bypass', -ss shows the clear ending /s/. Rule: One-syllable bases with a strong last /s/ often end in -ss (pass, class, bypass). Tip: Crisp last /s/? Try -ss."
@@ -76092,7 +76229,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: false,
-prefilledIndexes: [], // hard
+prefilledIndexes: [4,5,6], // hard
 aiHook: {
 targetWord: 'embarrass',
 intent: 'fill_blank',
@@ -76101,7 +76238,7 @@ imagePrompt: 'A blushing face to show embarrassment'
 },
 aiTutor: {
 target_word: 'embarrass',
-question: 'em__rra__',
+question: '_ _ _ _ r r a _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 spelling_pattern_or_rule: "In 'embarrass', -rr- helps the middle sound and -ss gives a strong final /s/. Rule: Learn the em-bar-rass pattern as a chunk. Tip: Clap the parts: em | bar | rass."
@@ -76135,7 +76272,7 @@ imagePrompt: 'A runner passing the finish line (surpass)'
 },
 aiTutor: {
 target_word: 'surpass',
-question: 's__pa__',
+question: '_ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 spelling_pattern_or_rule: "In 'surpass', -ss marks the strong ending /s/. Rule: Verbs with a firm last /s/ often use -ss (surpass, compress→compression). Tip: Notice how -ss can turn into -ssion when you add the /shun/ ending (discuss→discussion, compress→compression)."
@@ -76173,7 +76310,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2], // only the sound letters hidden (easy)
+prefilledIndexes: [0,1,2,5,6], // only the sound letters hidden (easy)
 aiHook: {
 targetWord: 'tension',
 intent: 'fill_blank',
@@ -76207,7 +76344,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1], // easy
+prefilledIndexes: [0,1,2,3,4], // easy
 aiHook: {
 targetWord: 'extension',
 intent: 'fill_blank',
@@ -76216,7 +76353,7 @@ imagePrompt: 'An extension cord plugged into a socket'
 },
 aiTutor: {
 target_word: 'extension',
-question: 'ex__n__on',
+question: 'exten____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'extension', n + sion makes /shun/. Rule: After n, choose -sion to say shun (extension, ascension). Tip: ex | TEN | shun helps you hear it."
@@ -76250,7 +76387,7 @@ imagePrompt: 'A balloon getting bigger to show expansion'
 },
 aiTutor: {
 target_word: 'expansion',
-question: 'expa__on',
+question: 'expa____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'expansion', n + sion gives /shun/. Rule: If the base ends with an n sound, -sion usually says shun (expansion). Tip: Hear N before the ending? Pick -sion."
@@ -76275,7 +76412,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3], // medium
+prefilledIndexes: [0,1,2,3,4], // medium
 aiHook: {
 targetWord: 'suspension',
 intent: 'fill_blank',
@@ -76284,7 +76421,7 @@ imagePrompt: 'Car suspension springs close-up'
 },
 aiTutor: {
 target_word: 'suspension',
-question: 'suspe__on',
+question: 'suspe____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'suspension', n + sion spells /shun/. Rule: n + sion is a common team (suspension, distension). Tip: n before the ending = shun."
@@ -76318,7 +76455,7 @@ imagePrompt: 'An arrow going upward showing ascension'
 },
 aiTutor: {
 target_word: 'ascension',
-question: 'ascen__on',
+question: 'ascen____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'ascension', n + sion → /shun/. Rule: Words from ascend use ascension with -sion. Tip: If the base connects to -end/-nd, -sion often says shun."
@@ -76343,7 +76480,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3,4,5,6], // medium+
+prefilledIndexes: [3,4,5], // medium+
 aiHook: {
 targetWord: 'propulsion',
 intent: 'fill_blank',
@@ -76352,7 +76489,7 @@ imagePrompt: 'A rocket with flames to show propulsion'
 },
 aiTutor: {
 target_word: 'propulsion',
-question: 'propul__on',
+question: '___pul____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'propulsion', a consonant + sion (…l + sion) makes /shun/. Rule: When a consonant sits right before sion, the ending often says /shun/ (propulsion, compulsion, convulsion). Tip: Hear …pul-shun? Write -sion."
@@ -76377,7 +76514,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: false,
-prefilledIndexes: [], // hard
+prefilledIndexes: [0,1,2,3,4], // hard
 aiHook: {
 targetWord: 'discussion',
 intent: 'fill_blank',
@@ -76386,7 +76523,7 @@ imagePrompt: 'Students in a circle having a discussion'
 },
 aiTutor: {
 target_word: 'discussion',
-question: 'discu__on',
+question: 'discu_____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'discussion', -ssion spells /shun/. Rule: Bases ending in -cuss change to -ssion (discuss → discussion). Tip: Two s before -ion often become the /shun/ sound."
@@ -76420,7 +76557,7 @@ imagePrompt: 'A ticket admitting a person into a museum'
 },
 aiTutor: {
 target_word: 'admission',
-question: 'admi__on',
+question: '_ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'admission', -ssion spells /shun/. Rule: Bases ending in -mit change to -mission (admit → admission, submit → submission, permit → permission). Tip: mit → mission makes /shun/."
@@ -76454,7 +76591,7 @@ imagePrompt: 'A permission slip being signed'
 },
 aiTutor: {
 target_word: 'permission',
-question: 'permi__on',
+question: '_ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'permission', -ssion spells /shun/. Rule: permit → permission follows the same mit → mission pattern (also submit → submission, admit → admission). Tip: If the base ends with mit, expect -mission."
@@ -76488,7 +76625,7 @@ imagePrompt: 'Hands pressing a sponge to show compression'
 },
 aiTutor: {
 target_word: 'compression',
-question: 'compre__on',
+question: '_ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 spelling_pattern_or_rule: "In 'compression', -ssion spells /shun/. Rule: Bases ending in -press become -pression (compress → compression, express → expression). Tip: press → pression gives the /shun/ ending."
@@ -76892,7 +77029,7 @@ audio: 'compression'
         question: '_ _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Base words before adding suffixes',
-        spelling_pattern_or_rule: "‘Hope’ ends in silent E. When adding a vowel suffix, drop the E. Example: hope → hoping, hopeful."
+        spelling_pattern_or_rule: "‘Hope’ ends in silent E."
       },
       audio: 'hope'
     },
@@ -76926,7 +77063,7 @@ audio: 'compression'
         question: 'h o p e _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Drop the final E before adding -ful',
-        spelling_pattern_or_rule: "In ‘hopeful,’ the silent E is dropped before adding -ful. Rule: Drop E before vowel suffixes like -ing, -able, -ous, -ful."
+        spelling_pattern_or_rule: "When you combine 'hope' and '-ful' it becomes 'hopeful' with a single 'l'"
       },
       audio: 'hopeful'
     },
@@ -76960,7 +77097,7 @@ audio: 'compression'
         question: 'h o p e f u l _ _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Adding two suffixes: -ful + -ness',
-        spelling_pattern_or_rule: "In ‘hopefulness,’ drop the E before -ful, then add -ness. Always add suffixes one at a time: hope → hopeful → hopefulness."
+        spelling_pattern_or_rule: "In ‘hope,’ first add  -ful, then add -ness. Always add suffixes one at a time: hope → hopeful → hopefulness."
       },
       audio: 'hopefulness'
     },
@@ -77030,7 +77167,7 @@ audio: 'compression'
         question: 'r e a d _ _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Adding -able to a base word',
-        spelling_pattern_or_rule: "In ‘readable,’ just add -able. No changes needed since the word doesn’t end in a silent E or a short vowel."
+        spelling_pattern_or_rule: "In ‘read,’ just add -able. No changes needed since the word doesn’t end in a silent E or a short vowel."
       },
       audio: 'readable'
     },
@@ -77064,7 +77201,7 @@ audio: 'compression'
         question: 'r e a d a b _ _ _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Adding two suffixes in sequence',
-        spelling_pattern_or_rule: "In ‘readability,’ first add -able, then add -ity. No letter changes are needed because the base word ends in a consonant."
+        spelling_pattern_or_rule: "In ‘read,’ first add -able, then add -ity. No letter changes are needed because the base word ends in a consonant."
       },
       audio: 'readability'
     }, {
@@ -77119,7 +77256,7 @@ audio: 'compression'
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0,1,2,3],
+      prefilledIndexes: [0,1,2],
       aiHook: {
         targetWord: 'planning',
         intent: 'fill_blank',
@@ -77127,13 +77264,13 @@ audio: 'compression'
         imagePrompt: 'Someone planning their week on a calendar'
       },
       aiTutor: {
-        target_word: 'planning',
-        question: 'p l a n _ _ _ _',
+        target_word: 'planned',
+        question: 'p l a _ _ _ _',
         student_entry: '',
-        topic_to_reinforce: '1-1-1 doubling rule before -ing',
-        spelling_pattern_or_rule: "‘Planning’ doubles the final N because ‘plan’ is a one-syllable word with one vowel before the final consonant (1-1-1 rule)."
+        topic_to_reinforce: '1-1-1 doubling rule before -ed',
+        spelling_pattern_or_rule: "‘Planned’ doubles the final N because ‘plan’ is a one-syllable word with one vowel before the final consonant (1-1-1 rule)."
       },
-      audio: 'planning'
+      audio: 'planned'
     },
     {
       id: 9,
@@ -77189,7 +77326,7 @@ audio: 'compression'
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0,2,3,4,6,8,9],
+      prefilledIndexes: [0,2,3,4,6],
       aiHook: {
         targetWord: 'beautifully',
         intent: 'fill_blank',
@@ -77198,7 +77335,7 @@ audio: 'compression'
       },
       aiTutor: {
         target_word: 'beautifully',
-        question: 'b _ a u t _ f _ l l _',
+        question: 'b _ a u t _ f _ _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Change Y to I before adding -ful and -ly',
         spelling_pattern_or_rule: "‘Beautifully’ follows the Y-to-I rule: change Y to I before adding -ful, then add -ly (beauty → beautiful → beautifully)."

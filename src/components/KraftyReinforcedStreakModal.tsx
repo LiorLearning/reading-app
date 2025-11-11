@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { ttsService } from '@/lib/tts-service';
 import { muteAllUISounds, unmuteAllUISounds, pauseAllUISounds } from '@/lib/sounds';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
+import { getPetEmotionActionMedia } from '@/lib/pet-avatar-service';
 
 interface Props {
   open: boolean;
@@ -120,6 +121,30 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
   const todayStr = getLocalTodayDateString();
   const userName = (userData?.username && userData.username.trim()) ? userData.username.trim() : 'friend';
   // Strict consecutive streak (no weekly fallback here)
+  // Compute top 3 pets by current sleep streak for GIF showcase
+  const topPetShowcase = useMemo(() => {
+    try {
+      const raw = localStorage.getItem('litkraft_pet_streaks');
+      const perPet = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+      const entries = Object.entries(perPet)
+        .filter(([, v]) => Number.isFinite(Number(v)))
+        .sort((a, b) => Number(b[1]) - Number(a[1]))
+        .slice(0, 3);
+      const names = ((userData as any)?.petnames || {}) as Record<string, string>;
+      return entries.map(([pet, streak]) => {
+        let url: string | null = null;
+        try { url = getPetEmotionActionMedia(pet, 'pat'); } catch {}
+        const fallback = (() => {
+          try { return PetProgressStorage.getPetDisplayName?.(pet); } catch { return undefined; }
+        })();
+        const displayName = (names && typeof names[pet] === 'string' && names[pet]) ? names[pet] : (fallback || pet);
+        return { pet, streak: Number(streak || 0), url: url || undefined, name: displayName };
+      });
+    } catch {
+      return [] as Array<{ pet: string; streak: number; url?: string; name?: string }>;
+    }
+  }, [open, userData]);
+
   const displayStreak = useMemo(() => {
     try {
       let s = Math.max(0, Number(currentStreak || 0));
@@ -137,32 +162,32 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
 
   // Thoughts buckets
   const oneDayThoughts = useMemo(() => [
-    `Thanks for taking care of me today, ${userName}! 💕 You just started our love streak—see you tomorrow?`,
-    `You showed up for me, ${userName}! 🐾 Day 1 of our adventure together—will you come back tomorrow?`,
-    `I loved our adventure today, ${userName}! 📚❤️ Our streak begins now—can't wait for Day 2, will you be there?`,
-    `First pawprint on our calendar! 🐾 Thanks for starting this journey with me, ${userName}! Same time tomorrow?`,
-    `You made my tail wag all day long, ${userName}! 🐶 Day 1 done—shall we continue our adventure tomorrow?`
+    `Thanks for taking care of us today, ${userName}! 💕 You just started our love streak—see you tomorrow?`,
+    `You showed up for us, ${userName}! 🐾 Day 1 of our adventure together—will you come back tomorrow?`,
+    `We loved our adventure today, ${userName}! 📚❤️ Our streak begins now—can't wait for Day 2, will you be there?`,
+    `First pawprint on our calendar! 🐾 Thanks for starting this journey with us, ${userName}! Same time tomorrow?`,
+    `You made our tail wag all day long, ${userName}! 🐶 Day 1 done—shall we continue our adventure tomorrow?`
   ], [userName]);
 
   const underSevenThoughts = useMemo(() => {
     const s = Math.max(2, displayStreak);
     return [
-      `You're on a ${s}-day love streak, ${userName}! 💖 Let's keep the adventures going tomorrow?`,
-      `${s} days in a row with me? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
-      `Our adventures are adding up—${s} days strong! ✨ See you tomorrow, ${userName}?`,
-      `I'm purring with pride, ${userName}! 😺 ${s}-day streak and growing—ready for tomorrow?`,
-      `High paws! 🐾 ${s} days of care and cuddles—shall we make it ${s + 1} tomorrow?`
+      `You're on a ${s}-heart love streak, ${userName}! 💖 Let's keep the adventures going tomorrow?`,
+      `${s} hearts in a row with us? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
+      `Our adventures are adding up—${s} hearts strong! ✨ See you tomorrow, ${userName}?`,
+      `We're purring with pride, ${userName}! 😺 ${s}-day streak and growing—ready for tomorrow?`,
+      `High paws! 🐾 ${s} hearts of care and cuddles—shall we make it ${s + 1} tomorrow?`
     ];
   }, [displayStreak, userName]);
 
   const sevenPlusThoughts = useMemo(() => {
     const s = Math.max(7, displayStreak);
     return [
-      `A whole ${s} days with you, ${userName}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
-      `${s} days strong, ${userName}! 💫 I feel so loved—shall we make it even bigger tomorrow?`,
-      `We did it—${s}-day streak! ❤️ Thanks for taking such good care of me, ${userName}! See you tomorrow?`,
-      `Woof-wow! 🐶 ${s} days of cuddles and adventures—my heart is full, ${userName}! Ready for day ${displayStreak + 1}?`,
-      `One week and beyond! 🌟 ${s} happy days together—same time tomorrow, ${userName}?`
+      `A whole ${s} hearts with you, ${userName}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
+      `${s} hearts strong, ${userName}! 💫 We feel so loved—shall we make it even bigger tomorrow?`,
+      `We did it—${s}-heart streak! ❤️ Thanks for taking such good care of us, ${userName}! See you tomorrow?`,
+      `Woof-wow! 🐶 ${s} hearts of cuddles and adventures—our hearts are full, ${userName}! Ready for day ${displayStreak + 1}?`,
+      `One week and beyond! 🌟 ${s} happy hearts together—same time tomorrow, ${userName}?`
     ];
   }, [displayStreak, userName]);
 
@@ -191,7 +216,7 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
   // Infer pet from celebrationUrl for voice override
   function inferPetIdFromGifUrl(url?: string): string | undefined {
     if (!url) return undefined;
-    const candidates = ['dog', 'cat', 'hamster', 'parrot', 'monkey', 'dragon', 'unicorn', 'bobo', 'feather', 'pikachu', 'panda', 'deer', 'labubu'];
+    const candidates = ['dog', 'cat', 'hamster', 'parrot', 'wolf', 'monkey', 'dragon', 'unicorn', 'bobo', 'feather', 'pikachu', 'panda', 'deer', 'labubu'];
     const lower = url.toLowerCase();
     for (const id of candidates) {
       if (lower.includes(id)) return id;
@@ -293,52 +318,37 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
               <div className="flex items-baseline gap-2">
                 <div className="text-5xl sm:text-5xl font-extrabold text-white drop-shadow">{Math.max(0, Number(displayStreak || 0))}</div>
                 <div className="text-xl sm:text-2xl font-semibold text-white/90 drop-shadow">
-                  {Number(displayStreak || 0) === 1 ? 'day' : 'days'}
+                  {Number(displayStreak || 0) === 1 ? '' : ''}
                 </div>
               </div>
             </div>
 
-            {/* Celebration GIF (optional) */}
-            {celebrationUrl && (
-              <div className="mt-6 sm:mt-8 flex items-center justify-center">
-                <img src={celebrationUrl} alt="Celebration" className="h-32 w-auto sm:h-40 drop-shadow-xl" draggable={false} />
+            {/* Top 3 pet GIFs by current streak; fallback to single GIF if not available */}
+            {topPetShowcase && topPetShowcase.length > 0 ? (
+              <div className="mt-6 sm:mt-8 flex items-center justify-center gap-8">
+                {topPetShowcase.map((p, i) => {
+                  const centerIndex = Math.floor(Math.max(1, topPetShowcase.length) / 2);
+                  const sizeClass = i === centerIndex ? 'h-36 sm:h-44' : 'h-28 sm:h-36';
+                  return (
+                    <div key={p.pet} className="flex flex-col items-center">
+                      {p.url ? (
+                        <img src={p.url} alt={p.pet} className={`${sizeClass} w-auto drop-shadow-xl`} draggable={false} />
+                      ) : null}
+                      <div className="mt-2 text-white/90 text-base sm:text-lg font-semibold capitalize">
+                        {p.name || p.pet}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            ) : (
+              celebrationUrl ? (
+                <div className="mt-6 sm:mt-8 flex items-center justify-center">
+                  <img src={celebrationUrl} alt="Celebration" className="h-32 w-auto sm:h-40 drop-shadow-xl" draggable={false} />
+                </div>
+              ) : null
             )}
 
-            {/* Week hearts */}
-            <div className="mt-8 sm:mt-10">
-              <div className="grid grid-cols-7 gap-3 sm:gap-3 px-6 sm:px-10">
-                {days.map((d) => (
-                  <div key={d.date} className="relative flex flex-col items-center">
-                    {/* Dev toggle button above each heart */}
-                    <button
-                      aria-label={`dev-toggle-${d.date}`}
-                      onClick={() => {
-                        try {
-                          const data = loadWeeklyHearts(monday);
-                          data[d.date] = !data[d.date];
-                          saveWeeklyHearts(monday, data);
-                          setWeekly({ ...data });
-                        } catch {}
-                      }}
-                      className="absolute -top-4 h-4 w-6 opacity-0 z-10"
-                    >
-                      dev
-                    </button>
-                    <div className="text-[12px] sm:text-sm text-white/80 mb-2">{d.label}</div>
-                    <span
-                      className={
-                        `text-4xl sm:text-5xl leading-none ` +
-                        (d.isFilled ? 'text-white' : 'text-white/60')
-                      }
-                      title={d.date}
-                    >
-                      {d.isFilled ? '❤️' : '🤍'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Pet thought (daily, randomized) */}
             <div className="mt-6 sm:mt-8 px-6 sm:px-10">

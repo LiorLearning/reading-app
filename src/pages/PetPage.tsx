@@ -34,6 +34,7 @@ import { getPetEmotionActionMedia } from '@/lib/pet-avatar-service';
 import DailySpellReviewModal from '@/components/adventure/DailySpellReviewModal';
 import { getLocalDateKey, getUniqueFirstTryCountForDate } from '@/lib/spell-review-log';
 import { CenteredLevelProgressBar, TopRightHeartsAndCoins } from '@/components/ui/TopBars';
+import PerPetStreakModal from '@/components/PerPetStreakModal';
 
 
 type Props = {
@@ -125,6 +126,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Reinforced streak modal state
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [streakForModal, setStreakForModal] = useState(0);
+  const [showPerPetStreakModal, setShowPerPetStreakModal] = useState(false);
+  const [perPetStreakModalData, setPerPetStreakModalData] = useState<{ petId: string; streak: number; slots: number[] } | null>(null);
 
   // Daily word list modal and count (local timezone)
   const [isDailyReviewOpen, setIsDailyReviewOpen] = useState(false);
@@ -1357,7 +1360,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       
       // Increment sleep clicks (max 3) - no den required
       if (sleepClicks < 3) {
-        const newSleepClicks = sleepClicks + 1;
+        const newSleepClicks = 3;
         
         // If sleep is completed (3 clicks), start the 8-hour sleep timer
         if (newSleepClicks >= 3) {
@@ -1423,14 +1426,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
             } catch {}
 
             if (anyPetDone && lastShown !== todayStr) {
-              // Read the latest streak (already updated above) for the modal
-              let modalStreak = 0;
-              try {
-                const s = Number(localStorage.getItem('litkraft_streak') || '0');
-                modalStreak = Number.isNaN(s) ? 0 : s;
-              } catch {}
-              try { setStreakForModal(modalStreak); } catch {}
-              // Fill today's weekly heart, set streak, and open modal
+              // Fill today's weekly heart
               markTodayHeartFilled();
               // Refresh local weekly hearts count immediately (works even before Firestore roundtrip)
               try { setWeeklyHeartsCount(getWeeklyHeartsCount()); } catch {}
@@ -1460,8 +1456,20 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
                   })();
                 }
               } catch {}
-              // streakForModal already set from updateStreak()
-              setShowStreakModal(true);
+              // Open per-pet streak modal for the current pet instead of the global reinforced modal
+              try {
+                const petId = currentPet;
+                const rawStreaks = localStorage.getItem('litkraft_pet_streaks') || '{}';
+                const rawSlots = localStorage.getItem('litkraft_pet_streak_slots') || '{}';
+                const mapStreaks = JSON.parse(rawStreaks) as Record<string, number>;
+                const mapSlots = JSON.parse(rawSlots) as Record<string, number[]>;
+                const slotsArr = Array.isArray(mapSlots?.[petId]) ? mapSlots[petId] : [0,0,0,0,0];
+                setPerPetStreakModalData({ petId, streak: Number(mapStreaks?.[petId] || 0), slots: slotsArr });
+                setShowPerPetStreakModal(true);
+              } catch {
+                setPerPetStreakModalData({ petId: currentPet, streak: 0, slots: [0,0,0,0,0] });
+                setShowPerPetStreakModal(true);
+              }
               localStorage.setItem(hasShownKey, todayStr);
             }
           } catch {}
@@ -2083,6 +2091,18 @@ const getSleepyPetImage = (clicks: number) => {
           sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1"
         }
       },
+      wolf: {
+        1: {
+          // Level 1 Wolf images - coin-based progression (placeholders)
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.png?alt=media&token=40eb967c-1a64-494f-afc1-11fe8f35dec1",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-normal.png?alt=media&token=fa77bae0-6a3f-4c09-8a4b-0313f3301181",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-happy.png?alt=media&token=cc960a63-b3a9-46f0-a5b4-c3087df4d324",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-superhappy.png?alt=media&token=49761d77-8a4a-4c87-8f5b-74869c2f19f1",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba"
+        }
+      },
       pikachu: {
         1: {
           // Level 1 Parrot images - coin-based progression
@@ -2410,9 +2430,10 @@ const getSleepyPetImage = (clicks: number) => {
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
-        // 3rd should store as grade3, 4th/5th as grade4
+        // 3rd should store as grade3, 4th as grade4, 5th as grade5
         if (name === '3rd Grade') return 'grade3';
-        if (name === '4th Grade' || name === '5th Grade') return 'grade4';
+        if (name === '4th Grade') return 'grade4';
+        if (name === '5th Grade') return 'grade5';
         return '';
       };
       const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
@@ -2422,10 +2443,12 @@ const getSleepyPetImage = (clicks: number) => {
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = incomingGradeDisplayName;
       // Lightweight migration: if selecting 4th/5th but previously stored as grade3, upgrade to grade4
-      if ((incomingGradeDisplayName === '4th Grade' || incomingGradeDisplayName === '5th Grade') && gradeCode === 'grade3') {
+      if ((incomingGradeDisplayName === '4th Grade') && gradeCode === 'grade3') {
         gradeCode = 'grade4';
       }
-
+      if (incomingGradeDisplayName === '5th Grade' && gradeCode === 'grade3' || gradeCode === 'grade4') {
+        gradeCode = 'grade5';
+      }
       if (gradeCode) {
         await updateUserData({
           grade: gradeCode,
@@ -2694,6 +2717,16 @@ const getSleepyPetImage = (clicks: number) => {
         isLocked: userLevel < 15,
         category: 'legendary'
       },
+      wolf: {
+        id: 'wolf',
+        emoji: '🐺',
+        name: 'Wolf',
+        owned: isPetOwned('wolf'),
+        cost: 1000,
+        requiredLevel: 15,
+        isLocked: userLevel < 15,
+        category: 'legendary'
+      },
       pikachu: {
         id: 'pikachu',
         emoji: '🦅',
@@ -2704,6 +2737,7 @@ const getSleepyPetImage = (clicks: number) => {
         isLocked: userLevel < 20,
         category: 'legendary'
       },
+      
       labubu: {
         id: 'labubu',
         emoji: '🧸',
@@ -3830,7 +3864,7 @@ const getSleepyPetImage = (clicks: number) => {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${selectedGradeAndLevel?.grade === '5th' ? 'bg-blue-100' : ''} ${isAnonymous ? 'opacity-50 pointer-events-none' : ''}`}>
                   <span className="text-lg">🎓</span>
-                  <span className="font-semibold">5th Level</span>
+                  <span className="font-semibold">5th Grade</span>
                   {selectedGradeAndLevel?.grade === '5th' && (
                     <span className="ml-auto text-blue-600 text-sm">✓</span>
                   )}
@@ -4062,7 +4096,8 @@ const getSleepyPetImage = (clicks: number) => {
       {(() => {
         const displayStreak = (() => {
           const s = Math.max(0, Number(streakForModal || 0));
-          return (s <= 0 && isTodayHeartFilled()) ? 1 : s;
+          // Show the true per-pet streak sum; do not force-minimum to 1 when daily heart is filled
+          return s;
         })();
         const onStreakClick = () => {
           try {
@@ -4945,7 +4980,7 @@ const getSleepyPetImage = (clicks: number) => {
             const levelForPet = (() => {
               try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
             })();
-            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer'].includes(petType);
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer','labubu'].includes(petType);
             // Determine per-tile care state so badge + thumbnail are consistent
             const careStateForTile = (() => {
               // 1) Sleep check via local mirror
@@ -5015,6 +5050,7 @@ const getSleepyPetImage = (clicks: number) => {
             const mood = isSleepingTile
               ? 'sleep'
               : ((isCoins50Tile || isCoins30Tile) ? 'happy' : (careStateForTile === 'coins_0' ? 'sad' : 'neutral'));
+            const isSadTile = careStateForTile === 'coins_0';
             const badge = isSleepingTile
               ? '❤️'
               : (isCoins50Tile
@@ -5028,8 +5064,21 @@ const getSleepyPetImage = (clicks: number) => {
                 ? 'bg-green-400'
                 : (isCoins30Tile
                   ? 'bg-green-500'
-                  : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-500')));
-            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
+                  : (isSadTile
+                    ? 'bg-[#D79C8C]'
+                    : (isCoins10Tile ? 'bg-[#ffd864]' : 'bg-red-600'))));
+            const bgSoft = `${bg}`;
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'wolf' ? '🐺' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : petType === 'labubu' ? '🧸' : '🐾';
+            // Per-pet sleep streak from dailyQuests (live-hydrated)
+            const petStreak = (() => {
+              try {
+                const raw = localStorage.getItem('litkraft_pet_streaks');
+                if (!raw) return 0;
+                const map = JSON.parse(raw) as Record<string, number>;
+                const v = Number(map?.[petId] || 0);
+                return Number.isFinite(v) ? v : 0;
+              } catch { return 0; }
+            })();
 
             return (
               <button
@@ -5049,29 +5098,48 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative h-20 w-20 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 md:h-20 md:w-20 lg:h-24 lg:w-24 ${
-                  isActive
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 border-white'
-                    : 'bg-white/25 backdrop-blur-md border-white/40 hover:bg-white/35'
+                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
+                  isActive ? 'border-white ring-2 ring-white/80' : 'border-white/40 hover:border-white/60'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
               >
                 <div className="relative w-full h-full">
+                  <div className="absolute inset-0 z-0 rounded-2xl blur-xl mix-blend-screen bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.85)_0%,_rgba(255,255,255,0.5)_50%,_transparent_78%)]"></div>
                   {petHasImages ? (
                     <img
                       src={petImageUrl}
                       alt={PetProgressStorage.getPetDisplayName(petId)}
-                      className="w-full h-full object-contain p-1 drop-shadow-sm"
+                      className="relative z-10 w-full h-full object-contain p-1 drop-shadow-sm"
                       loading="lazy"
                     />
                   ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
+                    <span className="absolute inset-0 z-10 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
                   )}
                 </div>
-                {/* Mood badge top-right */}
-                <div className={`pointer-events-none absolute -top-3 -right-3 ${bg} text-white rounded-full w-9 h-9 text-[18px] leading-[36px] text-center shadow-lg border-2 border-white`} aria-label={`mood-${mood}`} title={`Mood: ${mood}`}>
-                  {badge}
-                </div>
+                {/* Streak chip top-right (clickable) */}
+                <button
+                  className={`pointer-events-auto absolute -top-3 -right-3 text-white rounded-full min-w-9 h-9 px-2 text-[14px] leading-[36px] text-center shadow-lg border-2 border-white flex items-center justify-center bg-gradient-to-br from-teal-400 via-emerald-500 to-cyan-500 hover:brightness-110 active:scale-95`}
+                  title={`Sleep streak: ${petStreak}`}
+                  aria-label={`streak-${petStreak}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    try {
+                      const rawStreaks = localStorage.getItem('litkraft_pet_streaks') || '{}';
+                      const rawSlots = localStorage.getItem('litkraft_pet_streak_slots') || '{}';
+                      const mapStreaks = JSON.parse(rawStreaks) as Record<string, number>;
+                      const mapSlots = JSON.parse(rawSlots) as Record<string, number[]>;
+                      const slotsArr = Array.isArray(mapSlots?.[petId]) ? mapSlots[petId] : [0,0,0,0,0];
+                      setPerPetStreakModalData({ petId, streak: Number(mapStreaks?.[petId] || 0), slots: slotsArr });
+                      setShowPerPetStreakModal(true);
+                    } catch {
+                      setPerPetStreakModalData({ petId, streak: petStreak, slots: [0,0,0,0,0] });
+                      setShowPerPetStreakModal(true);
+                    }
+                  }}
+                >
+                  <span className="mr-1">❤️</span>
+                  <span>{petStreak}</span>
+                </button>
               </button>
             );
           })}
@@ -5213,7 +5281,7 @@ const getSleepyPetImage = (clicks: number) => {
                     
                     {/* Pet Image or Emoji (container removed for a cleaner look) */}
                     {pet.isLocked && !pet.owned ? (
-                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
                         <img
                           src={getLevelBasedPetImage(pet.id, 1, pet.id === 'labubu' ? 'coins_10' : 'coins_50')}
                           alt={`${pet.name} (locked)`}
@@ -5224,7 +5292,7 @@ const getSleepyPetImage = (clicks: number) => {
                         <div className="text-6xl grayscale opacity-70 mb-4 mx-auto">{pet.emoji}</div>
                       )
                     ) : (
-                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
                         <img
                           src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                           alt={pet.name}
@@ -5305,6 +5373,17 @@ const getSleepyPetImage = (clicks: number) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Per-Pet Streak Modal */}
+      {showPerPetStreakModal && perPetStreakModalData && (
+        <PerPetStreakModal
+          open={true}
+          onClose={() => { setShowPerPetStreakModal(false); setPerPetStreakModalData(null); }}
+          petId={perPetStreakModalData.petId}
+          streak={perPetStreakModalData.streak}
+          slots={perPetStreakModalData.slots}
+        />
       )}
 
       {/* Rename Pet Modal */}

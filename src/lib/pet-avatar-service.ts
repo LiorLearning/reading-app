@@ -117,6 +117,9 @@ export const getCurrentPetAvatarImage = (
     if (currentPet === 'parrot') {
       return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1";
     }
+    if (currentPet === 'wolf') {
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba";
+    }
     if (currentPet === 'dragon') {
       return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdragon-sleeping-unscreen.gif?alt=media&token=1fa04c6a-3099-406e-8806-8ff8fbe48402";
     }
@@ -857,6 +860,19 @@ export const useCurrentPetAvatarImage = () => {
       }
     }
     
+    // Check if Wolf is owned and being displayed - map from careState buckets (placeholders)
+    if (currentPetId === 'wolf' && isPetOwned('wolf')) {
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-superhappy.gif?alt=media&token=b05de5e4-bf7d-4649-91b5-f556db613a52";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-happy.gif?alt=media&token=8d7c54c3-d844-41d2-83c0-8f033d767830";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-normal.gif?alt=media&token=6da74eba-c1e7-4eec-b20b-ff78fde40458g";
+      } else {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.gif?alt=media&token=f4248639-f5fd-4688-9782-37a2e3f9651c";
+      }
+    }
+    
     // Check if Monkey is owned and being displayed - map from careState buckets
     if (currentPetId === 'monkey' && isPetOwned('monkey')) {
       if (gifKey === 'coins_50') {
@@ -999,6 +1015,12 @@ const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>
     pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-happy-unscreen.gif?alt=media&token=4f4df3cf-486f-4471-8fae-480775d1574d',
     needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sad-unscreen.gif?alt=media&token=05efa46e-ec9a-4aac-86ed-43dec953cb49',
   },
+  wolf: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-eating.gif?alt=media&token=8c73edbe-a714-45f1-b264-429361c977a2',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-drinking.gif?alt=media&token=399a63c2-df0c-4000-82df-a07ab2fad203',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-pet.gif?alt=media&token=7612280d-b943-4ae9-a341-ac524839a609',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.gif?alt=media&token=f4248639-f5fd-4688-9782-37a2e3f9651c',
+  },
   monkey: {
     feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-food-unscreen.gif?alt=media&token=9a12ed08-5ea3-4ecb-aa7a-bd876d4aee18',
     water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-water-unscreen.gif?alt=media&token=a1cd303c-a298-4c46-8716-8ba812189865',
@@ -1109,6 +1131,7 @@ const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
   cat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-yawn-unscreen.gif?alt=media&token=ef95740c-81e3-4928-949b-e329b1db25b3',
   hamster: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-yawn-unscreen.gif?alt=media&token=10c574d7-3bb4-43a1-b137-7fa6f00c5d21',
   parrot: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-yawn-unscreen.gif?alt=media&token=59ec008d-1f70-4bc6-9034-3b30912139d9',
+  wolf: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-yawning.gif?alt=media&token=6110bf8e-e6ac-4892-9528-93deb0dd9ea8',
   monkey: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-yawn-unscreen.gif?alt=media&token=4f1f7d6f-4dc6-46f3-b871-952b62de55d3',
   dragon: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070033_media-1--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
   unicorn: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_231434_media-9--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
