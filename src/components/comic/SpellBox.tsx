@@ -52,6 +52,19 @@ const ReadingMicButton: React.FC<{
     }
   }, [useOpenAITranscribe]);
 
+  // Fireworks (server-proxied) batch transcription toggle and backend base URL
+  const useFireworksTranscribe = React.useMemo(() => {
+    try { return Boolean((import.meta as any).env?.VITE_USE_FIREWORKS); } catch { return false; }
+  }, []);
+  const backendBaseUrl = React.useMemo(() => {
+    try {
+      const v = ((import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
+      return (v && typeof v === 'string') ? v.replace(/\/+$/, '') : '';
+    } catch {
+      return '';
+    }
+  }, []);
+
   // Normalize text for exact comparison per spec (lowercase, keep spaces, strip punctuation)
   const normalize = React.useCallback((s: string) => (s || '')
     .toLowerCase()
@@ -101,7 +114,55 @@ const ReadingMicButton: React.FC<{
     lastInterimRef.current = '';
     shouldBeRecordingRef.current = true;
     try { onRecordingChange?.(true); } catch {}
-    // Prefer OpenAI batch transcription when key is present
+    // Prefer Fireworks (via backend proxy) when enabled; else OpenAI if key present
+    if (useFireworksTranscribe) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        recordedChunksRef.current = [];
+        const mr = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        mr.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data);
+        };
+        mr.onstop = async () => {
+          setIsRecording(false);
+          try { stream.getTracks().forEach(t => t.stop()); } catch {}
+          try {
+            const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+            const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('model', 'whisper-v3-turbo');
+            fd.append('language', 'en');
+            const base = backendBaseUrl || '';
+            const url = `https://api.readkraft.com/api/fireworks/transcribe`;
+            const resp = await fetch(url, { method: 'POST', body: fd });
+            const json: any = await resp.json().catch(() => ({}));
+            const text = (json?.text || '').toString();
+            try { onTranscript?.(text, true); } catch {}
+            try { onRecordingChange?.(false, text); } catch {}
+            // quick correctness hint
+            try {
+              const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+              const words = new Set(norm(text).split(' ').filter(Boolean));
+              if (words.has(norm(targetWord))) onRecognized(true);
+            } catch {}
+          } catch (e) {
+            console.error('[ReadingMic] Fireworks transcription failed:', e);
+            try { onTranscript?.('', true); } catch {}
+            try { onRecordingChange?.(false, ''); } catch {}
+          } finally {
+            mediaRecorderRef.current = null;
+          }
+        };
+        mr.start(100);
+        mediaRecorderRef.current = mr;
+        setIsRecording(true);
+      }).catch(err => {
+        console.warn('[ReadingMic] getUserMedia failed (Fireworks path), falling back to browser SR', err);
+        // Fall through to browser SR below
+        startBrowserSR();
+      });
+      return;
+    }
     if (useOpenAITranscribe && openaiClient) {
       navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
         recordedChunksRef.current = [];
