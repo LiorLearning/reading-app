@@ -145,10 +145,11 @@ export class MultiProviderImageGenerator {
     // Basic content filtering for child-friendly content
     let refinedPrompt = originalPrompt
       .replace(/scary|frightening|terrifying|horror/gi, 'mysterious')
-      .replace(/dark|gloomy|sinister/gi, 'shadowy')
+      .replace(/dark|gloomy|sinister/gi, 'light')
       .replace(/dangerous|perilous/gi, 'challenging')
       .replace(/weapon|sword|gun/gi, 'magical tool')
-      .replace(/dress|camisole|gown|enchanting|robe|skirt|corset|cape/gi, 'casual clothes');
+      .replace(/dress|camisole|gown|enchanting|robe|skirt|corset|cape/gi, 'casual clothes')
+      .replace(/bikini/gi, 'modest clothing');
 
     // Provider-specific fallback optimizations (only used if response processor's enhanced prompt fails)
     switch (providerName) {
