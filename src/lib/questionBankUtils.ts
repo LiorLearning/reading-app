@@ -1,6 +1,6 @@
 import { sampleMCQData } from '@/data/mcq-questions';
 import { lessonScripts } from '@/data/lesson-scripts';
-import { mapSelectedGradeToContentGrade, getNextSpellboxTopic, getSpellboxTopicProgress, loadSpellboxTopicProgress, saveSpellboxTopicProgress } from './utils';
+import { mapSelectedGradeToContentGrade, getNextSpellboxTopic, getSpellboxTopicProgress, loadSpellboxTopicProgress, saveSpellboxTopicProgress, getSpellboxCap } from './utils';
 import type { SpellboxGradeProgress, SpellboxTopicProgress } from './utils';
 import { firebaseSpellboxService } from './firebase-spellbox-service';
 
@@ -419,17 +419,18 @@ export const getNextSpellboxQuestion = (
   const topicProgress = getSpellboxTopicProgress(gradeDisplayName, currentTopicId);
   const masteredCount = topicProgress?.masteredQuestionIds?.length || 0;
   const masteredIds = new Set<number>(topicProgress?.masteredQuestionIds || []);
+  const cap = getSpellboxCap(gradeDisplayName, currentTopicId);
 
   // Mastery done: selection is irrelevant; return first for safety
-  if (masteredCount >= 10) {
+  if (masteredCount >= cap) {
     console.log('[Spellbox][Select] Mastery already reached, returning first question as fallback', { currentTopicId });
     return topicQuestions[0];
   }
 
   // First pass: serve next by how many first-pass IDs we recorded
   const firstPassLen = topicProgress?.firstPassQuestionIds?.length || 0;
-  if (firstPassLen < 10) {
-    const idx = Math.min(firstPassLen, 9);
+  if (firstPassLen < cap) {
+    const idx = Math.min(firstPassLen, Math.max(0, cap - 1));
     const q = topicQuestions[idx] || topicQuestions[0];
     return q;
   }
@@ -501,7 +502,7 @@ export async function setSpellboxAnchorForLevel(
         topicId: finalAnchor,
         questionsAttempted: 0,
         firstAttemptCorrect: 0,
-        totalQuestions: 10,
+        totalQuestions: getSpellboxCap(gradeDisplayName, finalAnchor),
         isCompleted: false,
         successRate: 0
       } as SpellboxTopicProgress;
@@ -523,6 +524,8 @@ export async function setSpellboxAnchorForLevel(
       '1': '1-T.2.1',
       '2': '2-P.2',
       '3': '3-A.5',
+      '4': '4-A.20',
+      '5': '5-A.20',
     };
 
     // Desired anchor by level
@@ -592,7 +595,7 @@ export async function setSpellboxAnchorForLevel(
       topicId: finalAnchor!,
       questionsAttempted: 0,
       firstAttemptCorrect: 0,
-      totalQuestions: 10,
+      totalQuestions: getSpellboxCap(gradeDisplayName, finalAnchor!),
       isCompleted: false,
       successRate: 0
     } as SpellboxTopicProgress;

@@ -15,7 +15,10 @@ export function CenteredLevelProgressBar({
 }: CenteredLevelProgressBarProps): JSX.Element {
   const pct = Math.max(0, Math.min(100, Math.round(percent)));
   return (
-    <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none ${className || ''}`}>
+    <div
+      className={`fixed left-1/2 -translate-x-1/2 z-30 pointer-events-none ${className || ''}`}
+      style={{ top: 'calc(var(--safe-area-top, 0px) + 2rem)' }}
+    >
       <div className="rounded-xl px-2 py-1 pointer-events-auto">
         <div className="relative h-9 w-72">
           {/* Track */}
@@ -58,7 +61,13 @@ export function TopRightHeartsAndCoins({
   className,
 }: TopRightHeartsAndCoinsProps): JSX.Element {
   return (
-    <div className={`fixed top-6 right-6 z-30 flex items-center gap-5 ${className || ''}`}>
+    <div
+      className={`fixed z-30 flex items-center gap-5 ${className || ''}`}
+      style={{
+        top: 'calc(var(--safe-area-top, 0px) + 1.5rem)',
+        right: 'calc(var(--safe-area-right, 0px) + 1.5rem)',
+      }}
+    >
       {/* Streak */}
       <div
         className="rounded-xl px-4 py-2 cursor-pointer hover:bg-white/5"

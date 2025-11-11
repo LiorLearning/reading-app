@@ -30,6 +30,10 @@ export const PET_RULES: Record<string, PetRule> = {
 		description: 'a colorful parrot pet who is cheerful, talkative, and adventurous',
 		instruction: 'Replace any second-person references ("you") with the pet persona: "a colorful parrot pet who is cheerful, talkative, and adventurous" in image prompts.'
 	},
+	wolf: {
+		description: 'a brave wolf pet who is loyal, swift, and protective',
+		instruction: 'Replace any second-person references ("you") with the pet persona: "a brave wolf pet who is loyal, swift, and protective" in image prompts.'
+	},
 	dragon: {
 		description: 'a friendly dragon pet with shimmering scales and gentle firelight glow',
 		instruction: 'Replace any second-person references ("you") with the pet persona: "a friendly dragon pet with shimmering scales and gentle firelight glow" in image prompts.'
@@ -58,6 +62,10 @@ export const PET_RULES: Record<string, PetRule> = {
 	deer: {
 		description: 'a cute deer pet who is cute, cuddly, and playful',
 		instruction: 'Replace any second-person references ("you") with the pet persona: "a cute deer pet who is cute, cuddly, and playful" in image prompts.'
+	},
+	labubu: {
+		description: 'a playful Labubu pet who is mischievous, cute, and energetic',
+		instruction: 'Replace any second-person references ("you") with the pet persona: "a playful Labubu pet who is mischievous, cute, and energetic" in image prompts.'
 	},
 };
 
