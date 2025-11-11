@@ -4987,6 +4987,7 @@ const getSleepyPetImage = (clicks: number) => {
             const mood = isSleepingTile
               ? 'sleep'
               : ((isCoins50Tile || isCoins30Tile) ? 'happy' : (careStateForTile === 'coins_0' ? 'sad' : 'neutral'));
+            const isSadTile = careStateForTile === 'coins_0';
             const badge = isSleepingTile
               ? '❤️'
               : (isCoins50Tile
@@ -5000,7 +5001,9 @@ const getSleepyPetImage = (clicks: number) => {
                 ? 'bg-green-400'
                 : (isCoins30Tile
                   ? 'bg-green-500'
-                  : (isCoins10Tile ? 'bg-slate-500' : 'bg-red-600')));
+                  : (isSadTile
+                    ? 'bg-[#D79C8C]'
+                    : (isCoins10Tile ? 'bg-[#ffd864]' : 'bg-red-600'))));
             const bgSoft = `${bg}`;
             const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : '🐾';
             // Per-pet sleep streak from dailyQuests (live-hydrated)
@@ -5032,7 +5035,7 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center shadow-xl overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${
+                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
                   isActive ? 'border-white ring-2 ring-white/80' : 'border-white/40 hover:border-white/60'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
