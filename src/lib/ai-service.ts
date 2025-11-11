@@ -4188,6 +4188,102 @@ Generate a hint at level ${hintLevel}:`;
   }
 
   /**
+   * Evaluate a student's spoken response for a reading task against a target word.
+   * Uses a phoneme-first comparison via LLM with a JSON response contract.
+   * Falls back to a strict normalized letter comparison if AI is unavailable.
+   */
+  async evaluateReadingPronunciation(targetWord: string, studentResponse: string): Promise<{ status: 'correct' | 'incorrect', mismatchedIndices: number[] }> {
+    const normalize = (s: string) => (s || '')
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const normalizedTarget = normalize(targetWord);
+    const normalizedStudent = normalize(studentResponse);
+    const fallback = (): { status: 'correct' | 'incorrect', mismatchedIndices: number[] } => {
+      // Simple token inclusion check as a lenient phoneme proxy
+      const tokenSet = new Set(normalizedStudent.split(/\s+/).filter(Boolean));
+      const isCorrect = normalizedTarget && tokenSet.has(normalizedTarget);
+      if (isCorrect) {
+        return { status: 'correct', mismatchedIndices: [] };
+      }
+      // Naive per-letter mismatch indices (length-normalized to target)
+      const t = (targetWord || '').toUpperCase();
+      const s = (studentResponse || '').toUpperCase();
+      const max = t.length;
+      const mismatches: number[] = [];
+      for (let i = 0; i < max; i++) {
+        const tc = t[i] || '';
+        const sc = s[i] || '';
+        if (!tc || !sc || tc !== sc) mismatches.push(i);
+      }
+      return { status: 'incorrect', mismatchedIndices: mismatches };
+    };
+
+    if (!this.isInitialized || !this.client) {
+      return fallback();
+    }
+
+    try {
+      const systemPrompt = `You are an expert phonics evaluator. Compare the target word and the student’s response in two ways:
+
+1. Phoneme-level comparison:
+   Determine whether the two words sound the same. If they share identical or near-identical pronunciations (same phonemes), mark the "status" as "correct"; otherwise, mark it as "incorrect".
+
+2. Letter-by-letter comparison (only if incorrect):
+   If "status" is "incorrect", return a JSON array of 0-based indices where the letters in the student’s response do not match the target word.
+   - If a grapheme (like “ch”, “sh”, “th”, “ph”) is incorrect, include all its letter indices.
+   - If "status" is "correct", set "mismatchedIndices" to an empty array ([]).
+
+Output only valid minified JSON with this shape:
+{"status":"correct"|"incorrect","mismatchedIndices":[...]}
+`;
+      const userPrompt = `Evaluate:
+target_word: "${targetWord}"
+student_response: "${studentResponse}"`;
+
+      const completion: any = await this.client.chat.completions.create({
+        model: "gpt-5-nano",
+        temperature: 0,
+        max_tokens: 120,
+        // @ts-ignore some compatible backends support response_format
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      } as any);
+
+      const content: string = completion?.choices?.[0]?.message?.content || '';
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        // Try to salvage JSON from any surrounding text
+        const match = content.match(/\{[\s\S]*\}/);
+        if (match) {
+          parsed = JSON.parse(match[0]);
+        }
+      }
+      if (!parsed || (parsed.status !== 'correct' && parsed.status !== 'incorrect') || !Array.isArray(parsed.mismatchedIndices)) {
+        return fallback();
+      }
+      // Coerce indices to numbers and clamp to target length
+      const maxLen = (targetWord || '').length;
+      const indices: number[] = (parsed.mismatchedIndices as any[])
+        .map((v) => Number(v))
+        .filter((n) => Number.isFinite(n) && n >= 0 && n < maxLen);
+      return {
+        status: parsed.status,
+        mismatchedIndices: parsed.status === 'correct' ? [] : indices
+      };
+    } catch (error) {
+      console.error('AI reading evaluation failed, using fallback:', error);
+      return fallback();
+    }
+  }
+
+  /**
    * Check if automatic image generation is currently in progress
    * Used by unified system to determine coordination needs
    */

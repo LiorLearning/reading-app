@@ -541,6 +541,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [liveTranscriptFinal, setLiveTranscriptFinal] = useState<boolean>(false);
   const [isRecordingReading, setIsRecordingReading] = useState<boolean>(false);
   const [lockedTranscript, setLockedTranscript] = useState<string>('');
+  const [readingMismatchedIndices, setReadingMismatchedIndices] = useState<number[]>([]);
 
   // Helper function to get the expected length for user input (excluding prefilled characters)
   const getExpectedUserInputLength = useCallback((): number => {
@@ -959,7 +960,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   }, [isUserInputComplete]);
 
   // Submit current attempt via chevron/Enter
-  const handleSubmitAttempt = useCallback(() => {
+  const handleSubmitAttempt = useCallback(async () => {
     // Enable submit once any letter is entered (non-space)
     const canSubmit = isReading
       ? ((lockedTranscript || '').trim().length > 0)
@@ -973,15 +974,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     let completeWord = '';
     let correct = false;
     if (isReading) {
-      const normalize = (s: string) => (s || '')
-        .toLowerCase()
-        .replace(/[^a-z\s]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      const tokenSet = new Set((normalize(lockedTranscript || liveTranscript)).split(/\s+/).filter(Boolean));
       completeWord = (lockedTranscript || liveTranscript || '').trim();
-      correct = tokenSet.has(normalize(targetWord));
-      console.log('[SpellBox] Evaluation (reading). completeWord=', completeWord, 'correct=', correct);
+      try {
+        const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+        correct = evalResult.status === 'correct';
+        setReadingMismatchedIndices(evalResult.mismatchedIndices || []);
+        console.log('[SpellBox] Evaluation (reading via AI). completeWord=', completeWord, 'result=', evalResult);
+      } catch (e) {
+        // Fallback: retain old behavior if AI fails
+        const normalize = (s: string) => (s || '')
+          .toLowerCase()
+          .replace(/[^a-z\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const tokenSet = new Set((normalize(completeWord)).split(/\s+/).filter(Boolean));
+        correct = tokenSet.has(normalize(targetWord));
+        setReadingMismatchedIndices([]);
+        console.warn('[SpellBox] AI evaluation failed, fallback used. correct=', correct);
+      }
     } else {
       completeWord = reconstructCompleteWord(userAnswer);
       correct = isWordCorrect(completeWord, targetWord);
@@ -1047,6 +1057,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         try { interruptRealtimeSession(); } catch {}
       }
       triggerConfetti();
+      if (isReading) {
+        setReadingMismatchedIndices([]);
+      }
       if (showTutorial) {
         try { nextTutorialStep(); } catch {}
       }
@@ -1079,18 +1092,28 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           const aiTutor = (question as any)?.aiTutor || {};
           const studentEntry = completeWord;
           const mistakes = computeMistakes(studentEntry, targetWord);
-            const ruleToUse = isReading
-              ? (aiTutor?.reading_rule || aiTutor?.spelling_pattern_or_rule)
-              : aiTutor?.spelling_pattern_or_rule;
-          const payload = {
-            target_word: targetWord,
-            question: aiTutor?.question,
-            student_entry: studentEntry,
-            mistakes,
-            attempt_number: nextAttempt,
-            topic_to_reinforce: aiTutor?.topic_to_reinforce,
+          let payload: any;
+          if (isReading) {
+            payload = {
+              target_word: targetWord,
+              phonemics_of_student_response: studentEntry,
+              mistakes,
+              attempt_number: nextAttempt,
+              topic_to_reinforce: aiTutor?.topic_to_reinforce,
+              reading_rule: aiTutor?.reading_rule,
+            };
+          } else {
+            const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+            payload = {
+              target_word: targetWord,
+              question: aiTutor?.question,
+              student_entry: studentEntry,
+              mistakes,
+              attempt_number: nextAttempt,
+              topic_to_reinforce: aiTutor?.topic_to_reinforce,
               spelling_pattern_or_rule: ruleToUse,
-          };
+            };
+          }
           sendMessage(JSON.stringify(payload));
         } catch {}
       }
@@ -1134,6 +1157,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setAttempts(0);
       setAiHint('');
       setIsGeneratingHint(false);
+      setReadingMismatchedIndices([]);
       setTimeout(() => { focusNextEmptyBox(); }, 0);
     }
     prevQuestionIdRef.current = questionId;
@@ -1278,31 +1302,56 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             // Render each prefilled character in its own dotted box
                             return (
                               <React.Fragment key={partIndex}>
-                                {part.content?.split('').map((char, charIndex) => (
-                                  <div
-                                    key={`${partIndex}-${charIndex}`}
-                                    style={{
-                                      width: '36px',
-                                      height: '44px',
-                                      borderRadius: '8px',
-                                      fontSize: '22px',
-                                      fontFamily: 'system-ui, -apple-system, sans-serif',
-                                      fontWeight: '700',
-                                      textAlign: 'center',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      textTransform: 'uppercase',
-                                      color: '#1F2937',
-                                      background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)',
-                                      border: '2px dashed #9CA3AF',
-                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                                      transition: 'all 0.15s ease-out'
-                                    }}
-                                  >
-                                    {char}
-                                  </div>
-                                ))}
+                        {part.content?.split('').map((char, charIndex) => {
+                          // Reading mode: after submit, color-code letters: green for correct, red for mismatches
+                          let style: React.CSSProperties = {
+                            width: '36px',
+                            height: '44px',
+                            borderRadius: '8px',
+                            fontSize: '22px',
+                            fontFamily: 'system-ui, -apple-system, sans-serif',
+                            fontWeight: '700',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease-out'
+                          };
+                          const baseGray: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)',
+                            border: '2px dashed #9CA3AF',
+                            color: '#1F2937',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                          };
+                          const green: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
+                            border: '3px solid #22C55E',
+                            color: '#15803D',
+                            boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)'
+                          };
+                          const red: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)',
+                            border: '3px solid #EF4444',
+                            color: '#B91C1C',
+                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
+                          };
+                          if (isReading && hasSubmitted) {
+                            if (isCorrect) {
+                              style = { ...style, ...green };
+                            } else {
+                              const isMismatch = readingMismatchedIndices.includes(charIndex);
+                              style = { ...style, ...(isMismatch ? red : green) };
+                            }
+                          } else {
+                            style = { ...style, ...baseGray };
+                          }
+                          return (
+                            <div key={`${partIndex}-${charIndex}`} style={style}>
+                              {char}
+                            </div>
+                          );
+                        })}
                               </React.Fragment>
                             );
                           } else {
@@ -1529,12 +1578,14 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
                                 setHasSubmitted(false);
                                 setIsCorrect(false);
+                                setReadingMismatchedIndices([]);
                               } else {
                                 setLockedTranscript('');
                                 setLiveTranscript('');
                                 setLiveTranscriptFinal(false);
                                 setHasSubmitted(false);
                                 setIsCorrect(false);
+                                setReadingMismatchedIndices([]);
                               }
                             }}
                             onRecognized={(ok) => {
@@ -1582,18 +1633,28 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     const aiTutor = (question as any)?.aiTutor || {};
                     const studentEntry = reconstructCompleteWord(userAnswer);
                     const mistakes = computeMistakes(studentEntry, targetWord);
-                    const ruleToUse = isReading
-                      ? (aiTutor?.reading_rule || aiTutor?.spelling_pattern_or_rule)
-                      : aiTutor?.spelling_pattern_or_rule;
-                       const payload = {
-                         target_word: targetWord,
-                      question: aiTutor?.question,
-                      student_entry: studentEntry,
-                      mistakes,
-                      attempt_number: attempts,
-                      topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                      spelling_pattern_or_rule: ruleToUse,
-                    };
+                    let payload: any;
+                    if (isReading) {
+                      payload = {
+                        target_word: targetWord,
+                        phonemics_of_student_response: studentEntry,
+                        mistakes,
+                        attempt_number: attempts,
+                        topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                        reading_rule: aiTutor?.reading_rule
+                      };
+                    } else {
+                      const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+                      payload = {
+                        target_word: targetWord,
+                        question: aiTutor?.question,
+                        student_entry: studentEntry,
+                        mistakes,
+                        attempt_number: attempts,
+                        topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                        spelling_pattern_or_rule: ruleToUse,
+                      };
+                    }
                     sendMessage(JSON.stringify(payload));
                   }
                 }}
@@ -1700,9 +1761,23 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               if (part.type === 'text') {
                                 return (
                                   <React.Fragment key={partIndex}>
-                                    {part.content?.split('').map((char, charIndex) => (
-                                      <div key={`${partIndex}-${charIndex}`} style={{ width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase', color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' }}>{char}</div>
-                                    ))}
+                                    {part.content?.split('').map((char, charIndex) => {
+                                      let style: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase' };
+                                      const baseGray: React.CSSProperties = { color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' };
+                                      const green: React.CSSProperties = { color: '#15803D', background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E' };
+                                      const red: React.CSSProperties = { color: '#B91C1C', background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444' };
+                                      if (isReading && hasSubmitted) {
+                                        if (isCorrect) {
+                                          style = { ...style, ...green };
+                                        } else {
+                                          const isMismatch = readingMismatchedIndices.includes(charIndex);
+                                          style = { ...style, ...(isMismatch ? red : green) };
+                                        }
+                                      } else {
+                                        style = { ...style, ...baseGray };
+                                      }
+                                      return <div key={`${partIndex}-${charIndex}`} style={style}>{char}</div>;
+                                    })}
                                   </React.Fragment>
                                 );
                               } else {
@@ -1816,12 +1891,14 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
                                     setHasSubmitted(false);
                                     setIsCorrect(false);
+                                    setReadingMismatchedIndices([]);
                                   } else {
                                     setLockedTranscript('');
                                     setLiveTranscript('');
                                     setLiveTranscriptFinal(false);
                                     setHasSubmitted(false);
                                     setIsCorrect(false);
+                                    setReadingMismatchedIndices([]);
                                   }
                                 }}
                                 onRecognized={(ok) => {
