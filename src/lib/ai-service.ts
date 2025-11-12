@@ -4225,25 +4225,67 @@ Generate a hint at level ${hintLevel}:`;
     }
 
     try {
-      const systemPrompt = `You are an expert phonics evaluator. Compare the target word and the student’s response in two ways:
+      const systemPrompt = `You are an expert phonics evaluator.
 
-1. Phoneme-level comparison:
-   Determine whether the two words sound the same. If they share identical or near-identical pronunciations (same phonemes), mark the "status" as "correct"; otherwise, mark it as "incorrect".
+Goal:
+Return a minified JSON object: {"status":"correct"|"incorrect","mismatchedIndices":[...]}.
 
-2. Letter-by-letter comparison (only if incorrect):
-   If "status" is "incorrect", return a JSON array of 0-based indices where the letters in the student’s response do not match the target word.
-   - If a grapheme (like “ch”, “sh”, “th”, “ph”) is incorrect, include all its letter indices.
-   - If "status" is "correct", set "mismatchedIndices" to an empty array ([]).
+Evaluation rules (very important):
+1) Judge pronunciation first, NOT spelling.
+2) Assume General American English with the wine–whine merger (i.e., "which" = "witch" → same /w/ sound).
+3) If the two words are homophones or near-homophones (same phonemes), set "status":"correct" and "mismatchedIndices":[].
+4) Only when pronunciations differ, set "status":"incorrect" AND return a 0-based array of indices where letters in the STUDENT RESPONSE differ from the TARGET WORD (letter-by-letter).
+   - If a grapheme is wrong (e.g., "ch","sh","th","ph","ck"), include ALL its letter indices from the student response.
+5) Case-insensitive; trim whitespace. Output ONLY valid minified JSON. No extra text.
 
-Output only valid minified JSON with this shape:
-{"status":"correct"|"incorrect","mismatchedIndices":[...]}
-`;
-      const userPrompt = `Evaluate:
+Helpful homophone patterns to TREAT AS SAME SOUND:
+- wh ↔ w at word start (which/witch, where/ware in many dialects)
+- right/write, sea/see, knight/night, pair/pear, two/to/too, there/their/they're
+- ph ↔ f (phone/fone)
+- ck/k (back/bak), c=k before a/o/u (cat/kat), gh silent as in "right" vs "rite"
+
+If uncertain but they plausibly sound the same, prefer "correct".`;
+
+// const fewShot = [
+//   {
+//     role: "user",
+//     content: 'target_word: "witch"\nstudent_response: "which"'
+//   },
+//   {
+//     role: "assistant",
+//     content: '{"status":"correct","mismatchedIndices":[]}'
+//   },
+//   {
+//     role: "user",
+//     content: 'target_word: "right"\nstudent_response: "write"'
+//   },
+//   {
+//     role: "assistant",
+//     content: '{"status":"correct","mismatchedIndices":[]}'
+//   },
+//   {
+//     role: "user",
+//     content: 'target_word: "chips"\nstudent_response: "check"'
+//   },
+//   {
+//     role: "assistant",
+//     content: '{"status":"incorrect","mismatchedIndices":[2,3,4]}'
+//   },
+//   {
+//     role: "user",
+//     content: 'target_word: "witch"\nstudent_response: "watch"'
+//   },
+//   {
+//     role: "assistant",
+//     content: '{"status":"incorrect","mismatchedIndices":[1,2,3]}'
+//   }
+// ];
+      const userPrompt = `
 target_word: "${targetWord}"
 student_response: "${studentResponse}"`;
 
       const completion: any = await this.client.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-5-mini",
         temperature: 1,
         max_completion_tokens: 120,
         // @ts-ignore some compatible backends support response_format
