@@ -176,10 +176,10 @@ export class MultiProviderImageGenerator {
             return 'dog';
           }
         })();
-        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}.ART INSTRUCTION: Cinematic with bright natural lighting, warm sunlight streaming in, cheerful and safe mood, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, 24mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
+        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to flat chested, friendly single ${currentPetId} unless any other pets are mentioned. ART INSTRUCTION: Vividly realistic, Cinematic with bright natural lighting, warm sunlight streaming in, cheerful and safe mood, realistic fur, 24mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         break;
-        //Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s.
-        // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
+      //Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s.
+      // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
       case 'google-imagen':
         refinedPrompt = `${refinedPrompt}, high quality art, richly detailed, photorealistic lighting`;
         break;
@@ -208,7 +208,7 @@ export class MultiProviderImageGenerator {
       errorMessage.includes('safety system') ||
       errorMessage.includes('inappropriate') ||
       errorMessage.includes('safety') ||
-     // errorMessage.includes('moderated') ||
+      // errorMessage.includes('moderated') ||
       errorMessage.includes('policy');
   }
 
@@ -280,54 +280,54 @@ class FluxSchnellProvider implements ImageProvider {
           output_format: 'png',
           //safety_tolerance: 1,
           //prompt_upsampling: false,
-        
-        metadata: (() => {
-          const getUsername = (): string => {
-            try {
-              const fromOption = (options as any)?.username;
-              if (typeof fromOption === 'string' && fromOption.trim()) return fromOption.trim();
-            } catch {}
-            try {
-              const n = (auth?.currentUser?.displayName || '').trim();
-              if (n) return n;
-            } catch {}
-            try {
-              for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i) || '';
-                if (k.startsWith('firebase:authUser:')) {
-                  const rawUser = localStorage.getItem(k);
-                  if (rawUser) {
-                    const obj = JSON.parse(rawUser);
-                    const dn = ((obj?.displayName || (obj?.providerData?.[0]?.displayName)) || '').trim();
-                    if (dn) return dn;
+
+          metadata: (() => {
+            const getUsername = (): string => {
+              try {
+                const fromOption = (options as any)?.username;
+                if (typeof fromOption === 'string' && fromOption.trim()) return fromOption.trim();
+              } catch { }
+              try {
+                const n = (auth?.currentUser?.displayName || '').trim();
+                if (n) return n;
+              } catch { }
+              try {
+                for (let i = 0; i < localStorage.length; i++) {
+                  const k = localStorage.key(i) || '';
+                  if (k.startsWith('firebase:authUser:')) {
+                    const rawUser = localStorage.getItem(k);
+                    if (rawUser) {
+                      const obj = JSON.parse(rawUser);
+                      const dn = ((obj?.displayName || (obj?.providerData?.[0]?.displayName)) || '').trim();
+                      if (dn) return dn;
+                    }
                   }
                 }
-              }
-            } catch {}
-            return 'friend';
-          };
-          try {
-            const raw = localStorage.getItem('user_adventure');
-            const username = getUsername();
-            const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
-            if (!raw) return { username, attempt };
-            const parsed = JSON.parse(raw);
-            if (!Array.isArray(parsed)) return { username, attempt };
-            const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
-            const lastFour = visibleMessages.slice(-6);
-            const compact = lastFour.map((m: any) => ({
-              type: m?.type,
-              content: typeof m?.content === 'string' ? m.content : String(m?.content ?? ''),
-              timestamp: typeof m?.timestamp === 'number' ? m.timestamp : Date.now()
-            }));
-            return { user_adventure: compact, username, attempt };
-          } catch {
-            const username = getUsername();
-            const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
-            return { username, attempt };
-          }
-        })(),
-      },
+              } catch { }
+              return 'friend';
+            };
+            try {
+              const raw = localStorage.getItem('user_adventure');
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              if (!raw) return { username, attempt };
+              const parsed = JSON.parse(raw);
+              if (!Array.isArray(parsed)) return { username, attempt };
+              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
+              const lastFour = visibleMessages.slice(-6);
+              const compact = lastFour.map((m: any) => ({
+                type: m?.type,
+                content: typeof m?.content === 'string' ? m.content : String(m?.content ?? ''),
+                timestamp: typeof m?.timestamp === 'number' ? m.timestamp : Date.now()
+              }));
+              return { user_adventure: compact, username, attempt };
+            } catch {
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              return { username, attempt };
+            }
+          })(),
+        },
         webhook: "https://api.readkraft.com/api/discord",
         webhook_events_filter: [
           "completed"
@@ -382,55 +382,54 @@ class FluxProProvider implements ImageProvider {
           aspect_ratio: '5:4',
           output_format: 'png',
           safety_tolerance: 1,
-          prompt_upsampling: false,
-        
-        metadata: (() => {
-          const getUsername = (): string => {
-            try {
-              const fromOption = (options as any)?.username;
-              if (typeof fromOption === 'string' && fromOption.trim()) return fromOption.trim();
-            } catch {}
-            try {
-              const n = (auth?.currentUser?.displayName || '').trim();
-              if (n) return n;
-            } catch {}
-            try {
-              for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i) || '';
-                if (k.startsWith('firebase:authUser:')) {
-                  const rawUser = localStorage.getItem(k);
-                  if (rawUser) {
-                    const obj = JSON.parse(rawUser);
-                    const dn = ((obj?.displayName || (obj?.providerData?.[0]?.displayName)) || '').trim();
-                    if (dn) return dn;
+          prompt_upsampling: false,          
+          metadata: (() => {
+            const getUsername = (): string => {
+              try {
+                const fromOption = (options as any)?.username;
+                if (typeof fromOption === 'string' && fromOption.trim()) return fromOption.trim();
+              } catch { }
+              try {
+                const n = (auth?.currentUser?.displayName || '').trim();
+                if (n) return n;
+              } catch { }
+              try {
+                for (let i = 0; i < localStorage.length; i++) {
+                  const k = localStorage.key(i) || '';
+                  if (k.startsWith('firebase:authUser:')) {
+                    const rawUser = localStorage.getItem(k);
+                    if (rawUser) {
+                      const obj = JSON.parse(rawUser);
+                      const dn = ((obj?.displayName || (obj?.providerData?.[0]?.displayName)) || '').trim();
+                      if (dn) return dn;
+                    }
                   }
                 }
-              }
-            } catch {}
-            return 'friend';
-          };
-          try {
-            const raw = localStorage.getItem('user_adventure');
-            const username = getUsername();
-            const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
-            if (!raw) return { username, attempt };
-            const parsed = JSON.parse(raw);
-            if (!Array.isArray(parsed)) return { username, attempt };
-            const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
-            const lastFour = visibleMessages.slice(-6);
-            const compact = lastFour.map((m: any) => ({
-              type: m?.type,
-              content: typeof m?.content === 'string' ? m.content : String(m?.content ?? ''),
-              timestamp: typeof m?.timestamp === 'number' ? m.timestamp : Date.now()
-            }));
-            return { user_adventure: compact, username, attempt };
-          } catch {
-            const username = getUsername();
-            const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
-            return { username, attempt };
-          }
-        })(),
-      },
+              } catch { }
+              return 'friend';
+            };
+            try {
+              const raw = localStorage.getItem('user_adventure');
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              if (!raw) return { username, attempt };
+              const parsed = JSON.parse(raw);
+              if (!Array.isArray(parsed)) return { username, attempt };
+              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
+              const lastFour = visibleMessages.slice(-6);
+              const compact = lastFour.map((m: any) => ({
+                type: m?.type,
+                content: typeof m?.content === 'string' ? m.content : String(m?.content ?? ''),
+                timestamp: typeof m?.timestamp === 'number' ? m.timestamp : Date.now()
+              }));
+              return { user_adventure: compact, username, attempt };
+            } catch {
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              return { username, attempt };
+            }
+          })(),
+        },
         webhook: "https://api.readkraft.com/api/discord",
         webhook_events_filter: [
           "completed"

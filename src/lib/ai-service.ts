@@ -4243,7 +4243,7 @@ student_response: "${studentResponse}"`;
 
       const completion: any = await this.client.chat.completions.create({
         model: "gpt-5-nano",
-        temperature: 1,
+        //temperature: 1,
         max_completion_tokens: 120,
         // @ts-ignore some compatible backends support response_format
         response_format: { type: 'json_object' },
