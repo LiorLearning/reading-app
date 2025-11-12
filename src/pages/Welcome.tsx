@@ -55,11 +55,19 @@ const Welcome: React.FC = () => {
   }
 
   return (
-    <main className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+    <main className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative">
       <div className="absolute inset-0 pointer-events-none select-none opacity-25">
         <img src="/backgrounds/space.png" alt="decor" className="w-full h-full object-cover" />
       </div>
+      <Button
+        onClick={handleNewUser}
+        className="absolute top-4 right-4 z-20 h-9 sm:h-11 text-xs sm:text-sm font-bold rounded-2xl border-[3px] border-[#0B0B0B] bg-blue-500 hover:bg-blue-600 text-white shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center justify-center gap-1"
+      >
+        <Sparkles className="h-3 w-3" />
+        Explore
+      </Button>
       <Card className="relative z-10 w-full max-w-3xl bg-white/95 backdrop-blur text-gray-900 border-2 border-[#0B0B0B] rounded-3xl shadow-[0_12px_0_#0B0B0B]">
+        
         <CardHeader className="text-center pt-10">
           <div className="flex items-center justify-center gap-3 mb-2">
             <img src="/avatars/krafty.png" alt="Krafty" className="h-14 w-14 object-contain" />
@@ -72,17 +80,10 @@ const Welcome: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-8 pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button
-              onClick={handleNewUser}
-              className="h-16 text-lg font-bold rounded-2xl border-[3px] border-[#0B0B0B] bg-green-500 hover:bg-green-600 text-white shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center justify-center gap-3"
-            >
-              <Sparkles className="h-5 w-5" />
-              Try ReadKraft
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button
               onClick={handleExistingUser}
-              className="h-16 text-lg font-bold rounded-2xl border-[3px] border-[#0B0B0B] bg-blue-500 hover:bg-blue-600 text-white shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center justify-center gap-3"
+              className="h-16 text-lg font-bold rounded-2xl border-[3px] border-[#0B0B0B] bg-green-500 hover:bg-green-600 text-white shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center justify-center gap-3"
             >
               <LogIn className="h-5 w-5" />
               Log In / Sign Up
