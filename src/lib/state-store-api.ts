@@ -118,7 +118,17 @@ import {
     const result: Record<string, any> = {};
     for (const pet of pets) {
       const task = ACTIVITY_SEQUENCE[0];
-      result[pet] = { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null };
+      result[pet] = {
+        [task]: 0,
+        _activityIndex: 0,
+        _completedAt: null,
+        _cooldownUntil: null,
+        _lastCompletedActivity: null,
+        streak: 0,
+        streakSlots: [0, 0, 0, 0, 0],
+        _streakSlotPtr: 0,
+        _streakSlotsLastYmd: null,
+      };
     }
     // Initialize shared user pointer so it's always present and drives quest selection
     result._userCurrentActivity = ACTIVITY_SEQUENCE[0];
@@ -775,6 +785,7 @@ import {
     getDailyQuests,
     startPetSleep,
     clearPetSleep,
+    updateVisitAndNormalizeStreaks,
     setPetName,
     setWeeklyHeart,
     incrementStreakIfEligible,
@@ -886,18 +897,127 @@ import {
   export async function startPetSleep(input: StartPetSleepInput): Promise<void> {
     const { userId, pet, durationMs = 8 * 60 * 60 * 1000 } = input;
     const questsRef = dailyQuestsDocRef(userId);
-    const snap = await getDoc(questsRef);
-    const batch = writeBatch(db);
-    if (!snap.exists()) {
-      batch.set(questsRef, createInitialDailyQuests([pet]));
-    }
-    const endTs = Timestamp.fromMillis(Date.now() + durationMs);
-    batch.set(
-      questsRef,
-      { [pet]: { _sleepStartAt: nowServerTimestamp(), _sleepEndAt: endTs }, updatedAt: nowServerTimestamp() } as any,
-      { merge: true }
-    );
-    await batch.commit();
+
+    // Compute and persist per-pet sleep streak based on 24h gap between sleep starts
+    await runTransaction(db, async (txn) => {
+      const snap = await txn.get(questsRef);
+      const data = (snap.exists() ? (snap.data() as any) : {}) as any;
+
+      // Ensure base structure exists for this pet
+      if (!snap.exists()) {
+        txn.set(questsRef, createInitialDailyQuests([pet]));
+      } else if (!data[pet]) {
+        const task = ACTIVITY_SEQUENCE[0];
+        txn.set(
+          questsRef,
+          { [pet]: { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null, streak: 0, streakSlots: [0,0,0,0,0], _streakSlotPtr: 0, _streakSlotsLastYmd: null } } as any,
+          { merge: true }
+        );
+      }
+
+      const petObj = (data?.[pet] ?? {}) as any;
+      const prevStartAny = petObj?._sleepStartAt as any;
+
+      // Convert Timestamp-like to ms
+      const toMs = (anyTs: any): number | null => {
+        try {
+          if (!anyTs) return null;
+          if (typeof anyTs.toMillis === 'function') return Number(anyTs.toMillis());
+          const t = new Date(anyTs as any).getTime();
+          return Number.isFinite(t) ? t : null;
+        } catch {
+          return null;
+        }
+      };
+
+      const nowMs = Date.now();
+      const prevStartMs = toMs(prevStartAny);
+
+      // Helpers for local-date calculations
+      const ymdOf = (ms: number) => {
+        const d = new Date(ms);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${dd}`;
+      };
+      const parseYmd = (ymd: string) => {
+        const [y, m, d] = ymd.split('-').map((s) => Number(s));
+        return new Date(y, (m || 1) - 1, d || 1);
+      };
+      const daysDiff = (aYmd: string, bYmd: string) => {
+        const a = parseYmd(aYmd); const b = parseYmd(bYmd);
+        a.setHours(0,0,0,0); b.setHours(0,0,0,0);
+        return Math.floor((b.getTime() - a.getTime()) / (24 * 60 * 60 * 1000));
+      };
+      const isWeekend = (d: Date) => {
+        const day = d.getDay();
+        return day === 0 || day === 6; // Sun=0, Sat=6
+      };
+      const allIntermediateDaysAreWeekend = (prevYmd: string, currYmd: string) => {
+        const diffDays = daysDiff(prevYmd, currYmd);
+        if (diffDays <= 1) return false; // no intermediate days
+        const start = parseYmd(prevYmd);
+        for (let i = 1; i < diffDays; i++) {
+          const d = new Date(start);
+          d.setDate(start.getDate() + i);
+          if (!isWeekend(d)) return false;
+        }
+        return true;
+      };
+
+      const currYmd = ymdOf(nowMs);
+      const prevYmd = prevStartMs && Number.isFinite(prevStartMs) ? ymdOf(prevStartMs) : null;
+
+      let nextStreak: number;
+      if (!prevYmd) {
+        // First sleep record → start at 1
+        nextStreak = 1;
+      } else if (prevYmd === currYmd) {
+        // Same calendar day → no increment
+        nextStreak = Math.max(0, Number(petObj?.streak || 0));
+      } else {
+        const diffDays = daysDiff(prevYmd, currYmd);
+        const prevStreak = Math.max(0, Number(petObj?.streak || 0));
+        if (diffDays === 1 || allIntermediateDaysAreWeekend(prevYmd, currYmd)) {
+          nextStreak = prevStreak + 1;
+        } else {
+          // Missed weekday(s) → reset to 0
+          nextStreak = 0;
+        }
+      }
+
+      // Update circular 5-slot array (skip weekends, fill missed weekdays with 0, write 1 for today)
+      const slots: number[] = Array.isArray(petObj?.streakSlots) && petObj.streakSlots.length === 5 ? [...petObj.streakSlots] : [0,0,0,0,0];
+      let ptr: number = Number.isFinite(Number(petObj?._streakSlotPtr)) ? Number(petObj._streakSlotPtr) : 0;
+      const lastYmdRaw: string | null = (typeof petObj?._streakSlotsLastYmd === 'string' && petObj._streakSlotsLastYmd) ? String(petObj._streakSlotsLastYmd) : (prevYmd || null);
+
+      const advancePtr = () => { ptr = (ptr + 1) % 5; };
+      const dayAfter = (ymd: string) => {
+        const d = parseYmd(ymd); d.setDate(d.getDate() + 1); return ymdOf(d.getTime());
+      };
+      // Fill zeros for missed weekdays from (lastYmdRaw) exclusive to (currYmd) exclusive
+      if (lastYmdRaw) {
+        let walker = dayAfter(lastYmdRaw);
+        while (daysDiff(walker, currYmd) > 0) { // walker < currYmd
+          const d = parseYmd(walker);
+          if (!isWeekend(d)) {
+            slots[ptr] = 0; advancePtr();
+          }
+          // next day
+          walker = dayAfter(walker);
+        }
+      }
+      // Write today's success (1) at current ptr
+      slots[ptr] = 1; advancePtr();
+
+      const endTs = Timestamp.fromMillis(nowMs + durationMs);
+      txn.set(
+        questsRef,
+        { [pet]: { _sleepStartAt: Timestamp.fromMillis(nowMs), _sleepEndAt: endTs, streak: nextStreak, streakSlots: slots, _streakSlotPtr: ptr, _streakSlotsLastYmd: currYmd }, updatedAt: nowServerTimestamp() } as any,
+        { merge: true }
+      );
+    });
   }
   
   export interface ClearPetSleepInput {
@@ -915,6 +1035,120 @@ import {
       { merge: true }
     );
     await batch.commit();
+  }
+
+  // ==========================
+  // Visit tracking and streak normalization
+  // ==========================
+
+  /**
+   * Record user's visit time in dailyQuests.lastcameto and normalize per-pet sleep streaks.
+   * Rule: if (now - _sleepStartAt) > 24h, set pet.streak = 0 (no increment on visit).
+   */
+  export async function updateVisitAndNormalizeStreaks(userId: string): Promise<void> {
+    if (!userId) return;
+    const questsRef = dailyQuestsDocRef(userId);
+    const snap = await getDoc(questsRef);
+
+    if (!snap.exists()) {
+      // Create a minimal doc with lastcameto; do not initialize pets here to avoid unintended writes
+      await setDoc(questsRef, { lastcameto: nowServerTimestamp(), createdAt: nowServerTimestamp(), updatedAt: nowServerTimestamp() } as any, { merge: true });
+      return;
+    }
+
+    const data = (snap.data() as any) || {};
+    const updates: Record<string, any> = { lastcameto: nowServerTimestamp(), updatedAt: nowServerTimestamp() };
+
+    // Helper convert Timestamp-like to ms
+    const toMs = (anyTs: any): number | null => {
+      try {
+        if (!anyTs) return null;
+        if (typeof anyTs.toMillis === 'function') return Number(anyTs.toMillis());
+        const t = new Date(anyTs as any).getTime();
+        return Number.isFinite(t) ? t : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const nowMs = Date.now();
+
+    // Helpers for local-date calculations
+    const ymdOf = (ms: number) => {
+      const d = new Date(ms);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    };
+    const parseYmd = (ymd: string) => {
+      const [y, m, d] = ymd.split('-').map((s) => Number(s));
+      return new Date(y, (m || 1) - 1, d || 1);
+    };
+    const daysDiff = (aYmd: string, bYmd: string) => {
+      const a = parseYmd(aYmd); const b = parseYmd(bYmd);
+      a.setHours(0,0,0,0); b.setHours(0,0,0,0);
+      return Math.floor((b.getTime() - a.getTime()) / (24 * 60 * 60 * 1000));
+    };
+    const isWeekend = (d: Date) => {
+      const day = d.getDay();
+      return day === 0 || day === 6; // Sun=0, Sat=6
+    };
+    const allIntermediateDaysAreWeekend = (prevYmd: string, currYmd: string) => {
+      const diffDays = daysDiff(prevYmd, currYmd);
+      if (diffDays <= 1) return false; // no intermediate days
+      const start = parseYmd(prevYmd);
+      for (let i = 1; i < diffDays; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        if (!isWeekend(d)) return false;
+      }
+      return true;
+    };
+
+    // Normalize per owned pet present in dailyQuests
+    const petKeys = Object.keys(data).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !String(k).startsWith('_'));
+    for (const pet of petKeys) {
+      const petObj = (data?.[pet] ?? {}) as any;
+      const prevStartMs = toMs(petObj?._sleepStartAt);
+      if (!prevStartMs) continue;
+      const prevYmd = ymdOf(prevStartMs);
+      const currYmd = ymdOf(nowMs);
+      const diffDays = daysDiff(prevYmd, currYmd);
+      if (diffDays >= 2 && !allIntermediateDaysAreWeekend(prevYmd, currYmd)) {
+        const curr = Number(petObj?.streak || 0);
+        if (curr !== 0) updates[pet] = { ...(updates[pet] || {}), streak: 0 };
+      }
+
+      // Advance circular 5-slot array for each missed weekday up to yesterday (do not touch today)
+      const slots: number[] = Array.isArray(petObj?.streakSlots) && petObj.streakSlots.length === 5 ? [...petObj.streakSlots] : [0,0,0,0,0];
+      let ptr: number = Number.isFinite(Number(petObj?._streakSlotPtr)) ? Number(petObj._streakSlotPtr) : 0;
+      const lastYmdRaw: string | null = (typeof petObj?._streakSlotsLastYmd === 'string' && petObj._streakSlotsLastYmd) ? String(petObj._streakSlotsLastYmd) : (prevYmd || null);
+
+      const advancePtr = () => { ptr = (ptr + 1) % 5; };
+      const ymdMinusOne = (ymd: string) => { const d = parseYmd(ymd); d.setDate(d.getDate() - 1); return ymdOf(d.getTime()); };
+      const dayAfter = (ymd: string) => { const d = parseYmd(ymd); d.setDate(d.getDate() + 1); return ymdOf(d.getTime()); };
+      const yesterdayYmd = ymdMinusOne(currYmd);
+      if (lastYmdRaw) {
+        let walker = dayAfter(lastYmdRaw);
+        while (daysDiff(walker, yesterdayYmd) >= 0) { // walker <= yesterday
+          const d = parseYmd(walker);
+          if (!isWeekend(d)) { slots[ptr] = 0; advancePtr(); }
+          walker = dayAfter(walker);
+        }
+      }
+      // Only set when we actually advanced or ensure fields exist
+      updates[pet] = {
+        ...(updates[pet] || {}),
+        streakSlots: slots,
+        _streakSlotPtr: ptr,
+        _streakSlotsLastYmd: (lastYmdRaw && daysDiff(lastYmdRaw, yesterdayYmd) >= 1) ? yesterdayYmd : (petObj?._streakSlotsLastYmd || lastYmdRaw || null),
+      };
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await setDoc(questsRef, updates as any, { merge: true });
+    }
   }
 
   // ==========================

@@ -33,7 +33,7 @@ export async function handleFirstIncorrectAssignment(
 
     if (!isFirstDecision || grade !== 'assignment') return false;
 
-    // Tiers mapping 1..8
+    // Tiers mapping 1..12
     const TIERS = [
       { gdn: 'Kindergarten', grade: 'gradeK', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 1
       { gdn: 'Kindergarten', grade: 'gradeK', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 2
@@ -43,24 +43,28 @@ export async function handleFirstIncorrectAssignment(
       { gdn: '2nd Grade',    grade: 'grade2', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 6
       { gdn: '3rd Grade',    grade: 'grade3', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 7
       { gdn: '3rd Grade',    grade: 'grade3', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 8
+      { gdn: '4th Grade',    grade: 'grade4', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 9
+      { gdn: '4th Grade',    grade: 'grade4', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 10
+      { gdn: '5th Grade',    grade: 'grade5', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 11
+      { gdn: '5th Grade',    grade: 'grade5', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 12
     ];
 
     const clampTierIndex = (qid: number): number => {
-      // Simple integer clamp 1..8 without floor/ceil
+      // Simple integer clamp 1..12 without floor/ceil
       if (qid < 1) return 1;
-      if (qid > 8) return 8;
+      if (qid > 12) return 12;
       return qid;
     };
 
-    let targetTierIdx: number | null = null; // 1..8
+    let targetTierIdx: number | null = null; // 1..12
 
     if (!isCorrect) {
       // Immediate: incorrect switches to previous tier by question id (clamped)
       const currentTier = clampTierIndex(questionId);
       targetTierIdx = Math.max(1, currentTier - 1);
     } else if (isLast) {
-      // End: all-correct assignment ⇒ highest tier (3 Mid)
-      targetTierIdx = 8;
+      // End: all-correct assignment ⇒ highest tier (5 Mid)
+      targetTierIdx = 12;
     } else {
       // No-op for intermediate correct answers
       return false;

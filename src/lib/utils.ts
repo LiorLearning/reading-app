@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import analytics from "./analytics"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -679,7 +680,7 @@ export const mapSelectedGradeToContentGrade = (gradeDisplayName: string): string
   const isGrade = (n: string, targets: Array<string | number>) =>
     targets.some(t => (typeof t === 'number' ? n.includes(`${t}`) : n.includes(t.toLowerCase())));
 
-  // 4th/5th behave like grade 4 content
+  // Map display grade to content grade prefix used in topic IDs
   if (isGrade(name, ['5th', 'fifth', 'grade 5', 'grade5', '5'])) return '5';
   if (isGrade(name, ['4th', 'fourth', 'grade 4', 'grade4', '4'])) return '4';
   if (isGrade(name, ['3rd', 'third', 'grade 3', 'grade3', '3'])) return '3';
@@ -817,6 +818,7 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
     if (contentGrade === '2') return id.startsWith('2-');
     if (contentGrade === '3') return id.startsWith('3-');
     if (contentGrade === '4') return id.startsWith('4-');
+    if (contentGrade === '5') return id.startsWith('5-');
     return false;
   });
   
@@ -879,6 +881,23 @@ export const getNextTopicByPreference = (allTopicIds: string[], level: 'start' |
         if (startIndex === -1) {
           startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
           if (startIndex === -1) startIndex = 0;
+        }
+      }
+    }
+  } else if (contentGrade === '5') {
+    // Grade 5 content - find first 5- topic
+    startIndex = allTopicIds.findIndex(id => id.startsWith('5-'));
+    if (startIndex === -1) {
+      // Fallback to grade 4 → grade 3 → grade 2 → grade 1
+      startIndex = allTopicIds.findIndex(id => id.startsWith('4-'));
+      if (startIndex === -1) {
+        startIndex = allTopicIds.findIndex(id => id.startsWith('3-'));
+        if (startIndex === -1) {
+          startIndex = allTopicIds.findIndex(id => id.startsWith('2-'));
+          if (startIndex === -1) {
+            startIndex = allTopicIds.findIndex(id => id.startsWith('1-'));
+            if (startIndex === -1) startIndex = 0;
+          }
         }
       }
     }
@@ -1231,6 +1250,19 @@ export const resetSpellingProgress = (gradeDisplayName: string): void => {
   // console.log(`🔄 Reset spelling progress for grade ${gradeDisplayName}`);
 };
 
+/**
+ * Determine the SpellBox question cap for a given grade/topic context.
+ * - Assignment grade on topic 'A-' uses 12
+ * - All other cases default to 10
+ */
+export const getSpellboxCap = (gradeDisplayName?: string, topicId?: string): number => {
+  const isAssignment = (gradeDisplayName || '').toLowerCase() === 'assignment';
+  if (isAssignment && topicId === 'A-') {
+    return 12;
+  }
+  return 10;
+};
+
 // Spellbox Topic Progress System - separate from main topic progress
 const SPELLBOX_TOPIC_PROGRESS_KEY = 'readingapp_spellbox_topic_progress';
 
@@ -1393,11 +1425,12 @@ export const updateSpellboxTopicProgress = async (
   // Initialize topic progress if it doesn't exist (no reset on fail; we persist mastery across repeats)
   const existingProgress = gradeProgress.topicProgress[topicId];
   if (!existingProgress) {
+    const cap = getSpellboxCap(gradeDisplayName, topicId);
     gradeProgress.topicProgress[topicId] = {
       topicId,
       questionsAttempted: 0,
       firstAttemptCorrect: 0,
-      totalQuestions: 10, // Fixed at 10 questions per topic
+      totalQuestions: cap,
       isCompleted: false,
       successRate: 0,
       masteredQuestionIds: [],
@@ -1435,7 +1468,8 @@ export const updateSpellboxTopicProgress = async (
   // Seed first pass (lock first 10 shown) incrementally as questions are attempted
   if (typeof questionId === 'number') {
     const fp = topicProgress.firstPassQuestionIds || [];
-    if (fp.length < 10 && !fp.includes(questionId)) {
+    const cap = getSpellboxCap(gradeDisplayName, topicId);
+    if (fp.length < cap && !fp.includes(questionId)) {
       fp.push(questionId);
       topicProgress.firstPassQuestionIds = fp;
       try { console.log('[Spellbox][FirstPass] Added question to first pass', { gradeDisplayName, topicId, questionId, firstPassCount: fp.length }); } catch {}
@@ -1453,7 +1487,9 @@ export const updateSpellboxTopicProgress = async (
   }
 
   // If first pass just finished (10 collected) and round pool is not seeded yet, seed it now
-  if ((topicProgress.firstPassQuestionIds?.length || 0) >= 10) {
+  {
+    const cap = getSpellboxCap(gradeDisplayName, topicId);
+    if ((topicProgress.firstPassQuestionIds?.length || 0) >= cap) {
     if ((topicProgress.roundPoolQuestionIds?.length || 0) === 0) {
       topicProgress.roundPoolQuestionIds = [...(topicProgress.nextRoundQuestionIds || [])];
       topicProgress.roundPoolCursor = 0;
@@ -1461,10 +1497,14 @@ export const updateSpellboxTopicProgress = async (
       try { console.log('[Spellbox][Rounds] Seeded round pool from first pass incorrects', { gradeDisplayName, topicId, pool: topicProgress.roundPoolQuestionIds }); } catch {}
     }
   }
+  }
 
   // During rounds, update cursor and pools based on correctness
   const masteredCountForRound = (topicProgress.masteredQuestionIds || []).length;
-  const inRounds = (topicProgress.firstPassQuestionIds?.length || 0) >= 10 && masteredCountForRound < 10;
+  const inRounds = (() => {
+    const cap = getSpellboxCap(gradeDisplayName, topicId);
+    return (topicProgress.firstPassQuestionIds?.length || 0) >= cap && masteredCountForRound < cap;
+  })();
   if (inRounds && typeof questionId === 'number') {
     const pool = topicProgress.roundPoolQuestionIds || [];
     let cursor = typeof topicProgress.roundPoolCursor === 'number' ? topicProgress.roundPoolCursor : 0;
@@ -1498,7 +1538,8 @@ export const updateSpellboxTopicProgress = async (
 
     // If we reached end of current pool and still not mastered, rotate pools
     if (cursor >= pool.length) {
-      if ((topicProgress.masteredQuestionIds?.length || 0) >= 10) {
+      const cap = getSpellboxCap(gradeDisplayName, topicId);
+      if ((topicProgress.masteredQuestionIds?.length || 0) >= cap) {
         // mastery reached; nothing to rotate
       } else {
         const nextPool = topicProgress.nextRoundQuestionIds || [];
@@ -1518,10 +1559,23 @@ export const updateSpellboxTopicProgress = async (
 
   // New completion criteria: 10 unique words mastered first-try (aggregate over time)
   const masteredCount = (topicProgress.masteredQuestionIds || []).length;
-  if (masteredCount >= 10 && !topicProgress.isCompleted) {
+  {
+    const cap = getSpellboxCap(gradeDisplayName, topicId);
+    if (masteredCount >= cap && !topicProgress.isCompleted) {
     topicProgress.isCompleted = true;
     topicProgress.completedAt = Date.now();
     try { console.log('[Spellbox][Mastery] Topic mastered', { gradeDisplayName, topicId, masteredCount }); } catch {}
+    // Trigger topic_mastery analytics when mastery is achieved
+    try {
+      const incorrectAttempts = Math.max(0, (topicProgress.questionsAttempted || 0) - masteredCount);
+      analytics.capture('topic_mastery_new', {
+        topic_id: topicId,
+        status: 'mastered',
+        questions_attempted: topicProgress.questionsAttempted || 0,
+        incorrect_attempts: incorrectAttempts,
+      });
+    } catch {}
+  }
   }
   
   // Update current topic
@@ -1580,11 +1634,12 @@ export const markWhiteboardSeen = async (
   }
 
   if (!gradeProgress.topicProgress[topicId]) {
+    const cap = getSpellboxCap(gradeDisplayName, topicId);
     gradeProgress.topicProgress[topicId] = {
       topicId,
       questionsAttempted: 0,
       firstAttemptCorrect: 0,
-      totalQuestions: 10,
+      totalQuestions: cap,
       isCompleted: false,
       successRate: 0,
       whiteboardSeen: true
@@ -1615,7 +1670,9 @@ export const isSpellboxTopicPassingGrade = (topicProgress: SpellboxTopicProgress
   const masteredCount = Array.isArray(topicProgress.masteredQuestionIds)
     ? topicProgress.masteredQuestionIds.length
     : 0;
-  return masteredCount >= 10;
+  // Use the recorded per-topic totalQuestions to determine mastery threshold
+  const total = typeof topicProgress.totalQuestions === 'number' ? topicProgress.totalQuestions : 10;
+  return masteredCount >= total;
 };
 
 /**
@@ -1635,7 +1692,7 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
     // Respect current level anchor when no progress exists
     if (preferredLevel === 'middle') {
       const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
-      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5', '4': '4-A.20', '5': '5-A.20' };
       const desired = middleAnchors[contentGrade];
       if (desired && allTopicIds.includes(desired)) {
         return desired;
@@ -1674,7 +1731,7 @@ export const getNextSpellboxTopic = (gradeDisplayName: string, allTopicIds: stri
   if (preferredLevel === 'middle') {
     try {
       const contentGrade = mapSelectedGradeToContentGrade(gradeDisplayName);
-      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5' };
+      const middleAnchors: Record<string, string> = { K: 'K-T.1.2', '1': '1-T.2.1', '2': '2-P.2', '3': '3-A.5', '4': '4-A.20', '5': '5-A.20' };
       const anchor = middleAnchors[contentGrade];
       const anchorIdx = anchor ? scanTopicIds.indexOf(anchor) : -1;
       if (anchorIdx >= 0) {

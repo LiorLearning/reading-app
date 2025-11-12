@@ -78,14 +78,14 @@ const Welcome: React.FC = () => {
               className="h-16 text-lg font-bold rounded-2xl border-[3px] border-[#0B0B0B] bg-green-500 hover:bg-green-600 text-white shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center justify-center gap-3"
             >
               <Sparkles className="h-5 w-5" />
-              New User
+              Try ReadKraft
             </Button>
             <Button
               onClick={handleExistingUser}
               className="h-16 text-lg font-bold rounded-2xl border-[3px] border-[#0B0B0B] bg-blue-500 hover:bg-blue-600 text-white shadow-[0_6px_0_#0B0B0B] btn-animate flex items-center justify-center gap-3"
             >
               <LogIn className="h-5 w-5" />
-              Existing User / School
+              Log In / Sign Up
             </Button>
             <a
               href={teacherDashboardUrl}
