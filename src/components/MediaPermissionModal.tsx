@@ -33,16 +33,13 @@ export const MediaPermissionModal: React.FC<MediaPermissionModalProps> = ({ open
         <DialogHeader>
           <DialogTitle className="text-2xl">Enable microphone</DialogTitle>
           <DialogDescription>
-            We use your microphone for speaking with your pet.
+          Use your microphone to talk to your pet!
           </DialogDescription>
         </DialogHeader>
 
         {/* {error && (<p className="text-destructive text-sm">{error}</p>)} */}
 
         <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="secondary" onClick={onClose} disabled={isRequesting}>
-            Continue without
-          </Button>
           <Button onClick={handleEnableClick} disabled={isRequesting}>
             {isRequesting ? "Requesting…" : "Use microphone"}
           </Button>

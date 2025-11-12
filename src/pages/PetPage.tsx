@@ -385,6 +385,30 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [selectedGradeFromDropdown, setSelectedGradeFromDropdown] = useState<string | null>(null);
   const [selectedGradeAndLevel, setSelectedGradeAndLevel] = useState<{grade: string, level: 'start' | 'middle'} | null>(null);
   const [isAdventureLoading, setIsAdventureLoading] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  // Wait for initial Firestore → local hydration before showing the PetPage
+  useEffect(() => {
+    // If auth is still loading, keep hydration false
+    if (loading) {
+      setIsHydrated(false);
+      return;
+    }
+    // If daily quests state already exists (hydrated by auth), mark hydrated
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
+      if (raw) {
+        setIsHydrated(true);
+        return;
+      }
+    } catch {}
+    // Else, wait for the first dailyQuestsUpdated broadcast from auth hydration
+    const onDailyQuestsUpdated = () => setIsHydrated(true);
+    try { window.addEventListener('dailyQuestsUpdated', onDailyQuestsUpdated as EventListener); } catch {}
+    return () => {
+      try { window.removeEventListener('dailyQuestsUpdated', onDailyQuestsUpdated as EventListener); } catch {}
+    };
+  }, [loading]);
   
   // Normalize Firebase display grade to short label used by dropdown keys
   const toShortGradeLabel = (name?: string | null): string => {
@@ -3560,6 +3584,7 @@ const getSleepyPetImage = (clicks: number) => {
         paddingRight: 'calc(var(--safe-area-right, 0px))'
       }}
     >
+      <div className={`${!isHydrated ? 'filter blur-sm pointer-events-none' : ''} transition-all duration-200`}>
       {/* Invisible dev buttons (top-right) to advance time */}
       {import.meta.env && (import.meta as any).env?.DEV ? (
         <>
@@ -5599,6 +5624,17 @@ const getSleepyPetImage = (clicks: number) => {
           }
         `}
       </style>
+      </div>
+      {!isHydrated && (
+        <div className="absolute inset-0 z-[9999] bg-black/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="rounded-xl bg-gradient-to-br from-teal-500 via-emerald-500 to-cyan-500 border border-white/30 ring-1 ring-white/20 px-6 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
+            <div className="flex flex-col items-center gap-3 text-white">
+              <div className="h-12 w-12 rounded-full border-4 border-white/60 border-t-white animate-spin" />
+              <div className="text-lg">Loading your pet...</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
