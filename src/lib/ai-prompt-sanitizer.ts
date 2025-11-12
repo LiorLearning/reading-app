@@ -164,12 +164,7 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       // console.log('✅ AI Sanitizer: Received response from OpenAI');
 
       const responseText = completion.choices[0]?.message?.content?.trim() || '';
-      
-      // console.log('📨 AI Sanitizer RAW RESPONSE from GPT-4o-mini:', responseText);
-      // console.log('📊 AI Sanitizer: Response length:', responseText.length, 'characters');
-      // console.log('🔍 AI Sanitizer: Response contains "CLEANED_PROMPT":', responseText.includes('CLEANED_PROMPT'));
-      // console.log('🔍 AI Sanitizer: Response contains "---":', responseText.includes('---'));
-      
+       
       let sanitizedPrompt = '';
       let sanitizedContext = '';
       
@@ -326,7 +321,6 @@ Transform this image request:`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
         ],
-        max_tokens: 300,
         temperature: 0.7,
       });
 
