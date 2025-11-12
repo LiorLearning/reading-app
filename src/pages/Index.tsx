@@ -374,6 +374,8 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const entryMessageCycleCountRef = React.useRef<number>(0);
   // Ensure the first generated message after opening adventure is never a question
   const suppressSpellingOnceRef = React.useRef<boolean>(false);
+  // Intro: require 1 pure AI tutor message at adventure start before SpellBox cadence begins
+  const introSpellingSuppressCountRef = React.useRef<number>(0);
 
   // Realtime provider selector: 'openai' or 'gemini'
   const REALTIME_PROVIDER: 'openai' | 'gemini' = ((import.meta as any)?.env?.VITE_REALTIME_AUDIO_PROVIDER === 'gemini' ? 'gemini' : 'openai');
@@ -479,8 +481,10 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
     if (currentScreen === 1) {
       enteredAdventureAtRef.current = Date.now();
       entryMessageCycleCountRef.current = messageCycleCount;
-      // Force next generated message to be pure adventure (no spelling)
-      suppressSpellingOnceRef.current = true;
+      // Start intro phase: require one pure AI tutor message before SpellBox cadence
+      suppressSpellingOnceRef.current = false;
+      introSpellingSuppressCountRef.current = 1;
+      setMessageCycleCount(0); // baseline so the first post-intro turn begins at start of 3-1 cycle
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen]);
@@ -985,6 +989,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
           // Update message cycle count for the initial AI message
           setMessageCycleCount(prev => prev + 1);
+          // Consume intro slot so next user turn can start 3-spell run
+          try {
+            if (currentScreen === 1 && introSpellingSuppressCountRef.current > 0) {
+              introSpellingSuppressCountRef.current = Math.max(0, introSpellingSuppressCountRef.current - 1);
+            }
+          } catch {}
         } catch (error) {
           console.error('Error generating initial AI message:', error);
           
@@ -1019,6 +1029,12 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           
           // Update message cycle count for the fallback AI message
           setMessageCycleCount(prev => prev + 1);
+          // Consume intro slot so next user turn can start 3-spell run
+          try {
+            if (currentScreen === 1 && introSpellingSuppressCountRef.current > 0) {
+              introSpellingSuppressCountRef.current = Math.max(0, introSpellingSuppressCountRef.current - 1);
+            }
+          } catch {}
         } finally {
           isGeneratingInitialRef.current = false;
         }
@@ -2435,19 +2451,17 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 3-1 pattern: 3 spelling prompts followed by 1 pure adventure beat
+        // Implement intro (1 pure tutor message), then 3-1 pattern: 3 spelling prompts followed by 1 adventure beat
         let isSpellingPhase = false;
-        // One-time suppression right after entering adventure: ensure first message is not a question
-        if (suppressSpellingOnceRef.current) {
+        if (introSpellingSuppressCountRef.current > 0) {
+          // In intro phase: always pure adventure (no SpellBox)
           isSpellingPhase = false;
-          suppressSpellingOnceRef.current = false;
+          try { introSpellingSuppressCountRef.current = Math.max(0, introSpellingSuppressCountRef.current - 1); } catch {}
         } else {
-        const SPELLING_CYCLE_OFFSET = 1; // only the very first adventure message stays pure
-        const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
-        if (messageCycleCount >= SPELLING_CYCLE_OFFSET) {
+          const SPELLING_CYCLE_OFFSET = 1; // start cycle after initial greeting counted
+          const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
           const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
           isSpellingPhase = cyclePosition < 3;
-        }
         }
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
