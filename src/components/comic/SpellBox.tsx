@@ -1167,7 +1167,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 attempt_number: nextAttempt,
                 topic_to_reinforce: aiTutor?.topic_to_reinforce,
                 reading_rule: aiTutor?.reading_rule,
-                mistakes: (latestReadingMismatches.length ? latestReadingMismatches : (readingMismatchedIndices.length ? readingMismatchedIndices : computeMistakes(studentEntry, targetWord)))
               };
             } else {
               const ruleToUse = aiTutor?.spelling_pattern_or_rule;
@@ -1713,7 +1712,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         attempt_number: attempts,
                         topic_to_reinforce: aiTutor?.topic_to_reinforce,
                         reading_rule: aiTutor?.reading_rule,
-                        mistakes: readingMismatchedIndices,
                       };
                     } else {
                       const ruleToUse = aiTutor?.spelling_pattern_or_rule;
@@ -2023,7 +2021,6 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           attempt_number: attempts,
                           topic_to_reinforce: aiTutor?.topic_to_reinforce,
                           reading_rule: aiTutor?.reading_rule,
-                          mistakes: readingMismatchedIndices,
                         };
                       } else {
                         // Spelling-mode: keep existing spelling payload shape
