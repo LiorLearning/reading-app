@@ -176,8 +176,7 @@ export class MultiProviderImageGenerator {
             return 'dog';
           }
         })();
-        
-        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 24mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
+        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}.ART INSTRUCTION: Cinematic with bright natural lighting, warm sunlight streaming in, cheerful and safe mood, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, 24mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         break;
         //Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s.
         // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
