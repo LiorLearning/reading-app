@@ -172,7 +172,8 @@ export class ResponseProcessor {
         const result = await imageGenerator.generateWithFallback(enhancedFallbackPrompt, userId, {
           adventureContext,
           size: '1024x1024',
-          quality: 'hd'
+          quality: 'hd',
+          username: userData?.username
         }, sanitizedFallbackPrompt);
         
         const duration = Date.now() - startTime;
@@ -340,7 +341,8 @@ ${sanitizedConversationContext}`;
         const result = await imageGenerator.generateWithFallback(sanitizedRawPrompt, userId, {
           sanitizedConversationContext,
           size: '1024x1024',
-          quality: 'hd'
+          quality: 'hd',
+          username: userData?.username
         });
         
         const duration = Date.now() - startTime;
