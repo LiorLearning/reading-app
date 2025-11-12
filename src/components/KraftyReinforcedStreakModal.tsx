@@ -162,32 +162,32 @@ export default function KraftyReinforcedStreakModal(props: Props): JSX.Element |
 
   // Thoughts buckets
   const oneDayThoughts = useMemo(() => [
-    `Thanks for taking care of us today, ${userName}! 💕 You just started our love streak—see you tomorrow?`,
-    `You showed up for us, ${userName}! 🐾 Day 1 of our adventure together—will you come back tomorrow?`,
-    `We loved our adventure today, ${userName}! 📚❤️ Our streak begins now—can't wait for Day 2, will you be there?`,
-    `First pawprint on our calendar! 🐾 Thanks for starting this journey with us, ${userName}! Same time tomorrow?`,
-    `You made our tail wag all day long, ${userName}! 🐶 Day 1 done—shall we continue our adventure tomorrow?`
+    `Thanks for playing today, ${userName}! 💕 You just started our pet hearts—see you tomorrow?`,
+    `${userName}, you gave us our first heart! 🐾 Come back tomorrow for more?`,
+    `We loved today, ${userName}! ❤️ Our first hearts together—join us again?`,
+    `First pawprint, first heart! 🐾 Thanks for starting this with us, ${userName}!`,
+    `Tail wags, heart added! 🐶 Day 1 is done, see you tomorrow, ${userName}?`
   ], [userName]);
 
   const underSevenThoughts = useMemo(() => {
     const s = Math.max(2, displayStreak);
     return [
-      `You're on a ${s}-heart love streak, ${userName}! 💖 Let's keep the adventures going tomorrow?`,
-      `${s} hearts in a row with us? Best. Human. Ever. 🥹🐾 Will you go for the next one?`,
-      `Our adventures are adding up—${s} hearts strong! ✨ See you tomorrow, ${userName}?`,
-      `We're purring with pride, ${userName}! 😺 ${s}-day streak and growing—ready for tomorrow?`,
-      `High paws! 🐾 ${s} hearts of care and cuddles—shall we make it ${s + 1} tomorrow?`
+      `You're on a ${s}-heart streak, ${userName}! 💖 See you tomorrow?`,
+      `${s} hearts in a row! 🥹🐾 Next one tomorrow?`,
+      `That's ${s} hearts! ✨ Back tomorrow, ${userName}?`,
+      `So proud, ${userName}! 😺 ${s} days—ready for more?`,
+      `High paws! 🐾 ${s} hearts—${s + 1} tomorrow?`
     ];
   }, [displayStreak, userName]);
 
   const sevenPlusThoughts = useMemo(() => {
     const s = Math.max(7, displayStreak);
     return [
-      `A whole ${s} hearts with you, ${userName}! 🥳🎉 Love and adventures galore—coming back tomorrow?`,
-      `${s} hearts strong, ${userName}! 💫 We feel so loved—shall we make it even bigger tomorrow?`,
-      `We did it—${s}-heart streak! ❤️ Thanks for taking such good care of us, ${userName}! See you tomorrow?`,
-      `Woof-wow! 🐶 ${s} hearts of cuddles and adventures—our hearts are full, ${userName}! Ready for day ${displayStreak + 1}?`,
-      `One week and beyond! 🌟 ${s} happy hearts together—same time tomorrow, ${userName}?`
+      `${s} hearts with you, ${userName}! 🥳 Back tomorrow?`,
+      `${s} hearts strong! 💫 Thanks, ${userName}. More tomorrow?`,
+      `${s}-heart streak! ❤️ Thanks, ${userName}. See you soon?`,
+      `Woof! 🐶 ${s} hearts, ${userName}! Ready for day ${displayStreak + 1}?`,
+      `One week! 🌟 ${s} hearts together. Same time tomorrow, ${userName}?`
     ];
   }, [displayStreak, userName]);
 

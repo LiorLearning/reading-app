@@ -895,9 +895,15 @@ import {
     durationMs?: number; // default 8 hours
   }
   
-  export async function startPetSleep(input: StartPetSleepInput): Promise<void> {
+  export interface StartPetSleepResult {
+    nextStreak: number;
+    slots: number[];
+  }
+  
+  export async function startPetSleep(input: StartPetSleepInput): Promise<StartPetSleepResult> {
     const { userId, pet, durationMs = 8 * 60 * 60 * 1000 } = input;
     const questsRef = dailyQuestsDocRef(userId);
+    let computedResult: StartPetSleepResult | null = null;
 
     // Compute and persist per-pet sleep streak based on 24h gap between sleep starts
     await runTransaction(db, async (txn) => {
@@ -1024,7 +1030,13 @@ import {
         { [pet]: { _sleepStartAt: Timestamp.fromMillis(nowMs), _sleepEndAt: endTs, streak: nextStreak, streakSlots: slots, streakSlotDates: slotDates, _streakSlotPtr: ptr, _streakSlotsLastYmd: currYmd }, updatedAt: nowServerTimestamp() } as any,
         { merge: true }
       );
+      
+      // Capture the computed values to return to the caller
+      computedResult = { nextStreak, slots: [...slots] };
     });
+    
+    // Fallback to a safe default (should not happen unless txn throws before assignment)
+    return computedResult || { nextStreak: 0, slots: [0,0,0,0,0] };
   }
   
   export interface ClearPetSleepInput {

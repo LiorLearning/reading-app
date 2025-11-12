@@ -556,6 +556,11 @@ Keep tone warm, brief, and curious.`;
   const [showStep5Intro, setShowStep5Intro] = React.useState(false);
   // Step 6 adventure completion hint overlay
   const [showStep6Intro, setShowStep6Intro] = React.useState(false);
+  // Non-tutorial: session-based overlay when progress fills this session (for existing users)
+  const [showSessionFullOverlay, setShowSessionFullOverlay] = React.useState(false);
+  const sessionStartedAtFullRef = React.useRef(false);
+  const prevPersistentFractionRef = React.useRef<number | null>(null);
+  const sessionFullOverlayShownRef = React.useRef(false);
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
@@ -1226,6 +1231,74 @@ Keep tone warm, brief, and curious.`;
       } catch {}
     }
   }, [showStep6Intro]);
+
+  // Non-tutorial: Show a similar overlay when the persistent progress bar becomes full DURING this session
+  // Conditions:
+  // - Only on Adventure screen
+  // - Only for existing (signed-in) users
+  // - Do not conflict with tutorial Step 6 overlay
+  // - Trigger only on transition from <1 to exactly 1 within this session
+  React.useEffect(() => {
+    try {
+      // Initialize refs on first compute
+      if (prevPersistentFractionRef.current === null) {
+        prevPersistentFractionRef.current = persistentProgressFraction;
+        sessionStartedAtFullRef.current = persistentProgressFraction >= 1;
+        return;
+      }
+
+      const prev = prevPersistentFractionRef.current;
+      const now = persistentProgressFraction;
+      prevPersistentFractionRef.current = now;
+
+      const assignmentJustEnded = (() => {
+        const at = assignmentExitAtRef.current || 0;
+        return (Date.now() - at) < 12000;
+      })();
+      const isAuthRoute = (typeof window !== 'undefined') && (window.location?.pathname || '').startsWith('/auth');
+      // Keep gating minimal here to avoid referencing variables before declaration
+      const highPriorityActive = showStep5Intro || showStep6Intro || isAuthRoute || assignmentJustEnded;
+
+      const justFilledThisSession = prev < 1 && now === 1 && !sessionStartedAtFullRef.current;
+
+      if (
+        currentScreen === 1 &&
+        !needsAdventureStep6Intro && // ensure different from tutorial gating
+        !isAnonymous && // existing signed-in user
+        !sessionFullOverlayShownRef.current &&
+        !highPriorityActive &&
+        justFilledThisSession
+      ) {
+        sessionFullOverlayShownRef.current = true;
+        setShowSessionFullOverlay(true);
+        try {
+          ttsService.stop();
+          ttsService.setSuppressNonKrafty(true);
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+          const msg = `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
+          ttsService.speakAIMessage(msg, 'krafty-session-full').catch(() => {});
+        } catch {}
+      }
+    } catch {}
+  }, [
+    currentScreen,
+    isAnonymous,
+    persistentProgressFraction,
+    needsAdventureStep6Intro,
+    showStep5Intro,
+    showStep6Intro
+  ]);
+
+  // Enforce suppression while session overlay is visible
+  React.useEffect(() => {
+    if (showSessionFullOverlay) {
+      try {
+        ttsService.setSuppressNonKrafty(true);
+        ttsService.stop();
+      } catch {}
+    }
+  }, [showSessionFullOverlay]);
 
   // Arm Step 7 as soon as 5 correct answers (50 coins) are reached in House, independent of Step 6
   React.useEffect(() => {
@@ -7200,6 +7273,48 @@ Keep tone warm, brief, and curious.`;
             </div>
 
             {/* Removed extra emoji indicator per design feedback */}
+          </div>
+        )}
+
+        {/* Session-based completion overlay (non-tutorial) - shown only when bar fills this session for existing users */}
+        {showSessionFullOverlay && currentScreen === 1 && !showStep6Intro && (
+          <div className="fixed inset-0 z-[70]">
+            {/* Dim background */}
+            <div className="absolute inset-0 bg-black/40" />
+
+            {/* Bottom-left Krafty assistant with speech bubble (copied from Step 6) */}
+            <div className="absolute left-4 bottom-4 z-[71] flex items-start gap-5">
+              <div className="shrink-0">
+                <img
+                  src="/avatars/krafty.png"
+                  alt="Krafty"
+                  className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain"
+                />
+              </div>
+              <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+                <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl ring-1 ring-primary/40">
+                  <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
+                    {(() => {
+                      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                      const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      try { ttsService.setSuppressNonKrafty(true); } catch {}
+                      return `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
+                    })()}
+                  </p>
+                  <Button
+                    className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
+                    onClick={() => {
+                      try { ttsService.stop(); } catch {}
+                      try { ttsService.setSuppressNonKrafty(false); } catch {}
+                      setShowSessionFullOverlay(false);
+                      try { ttsService.replayLastSuppressed(); } catch {}
+                    }}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
