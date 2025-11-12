@@ -4564,16 +4564,6 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 questions_to_mastery: null,
                 mastery_threshold: '10 first-try correct',
               });
-              // Also emit topic_mastery summary (re-added)
-              try {
-                const incorrectAttempts = Math.max(0, (tp.questionsAttempted || 0) - ((tp.masteredQuestionIds || []).length || 0));
-                analytics.capture('topic_mastery', {
-                  topic_id: currentSpellQuestion.topicId,
-                  status: isSpellboxTopicPassingGrade(tp) ? 'mastered' : 'ongoing',
-                  questions_attempted: tp.questionsAttempted || 0,
-                  incorrect_attempts: incorrectAttempts,
-                });
-              } catch {}
             }
           } catch {}
         })

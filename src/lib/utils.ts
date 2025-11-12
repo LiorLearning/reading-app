@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import analytics from "./analytics"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -1564,6 +1565,16 @@ export const updateSpellboxTopicProgress = async (
     topicProgress.isCompleted = true;
     topicProgress.completedAt = Date.now();
     try { console.log('[Spellbox][Mastery] Topic mastered', { gradeDisplayName, topicId, masteredCount }); } catch {}
+    // Trigger topic_mastery analytics when mastery is achieved
+    try {
+      const incorrectAttempts = Math.max(0, (topicProgress.questionsAttempted || 0) - masteredCount);
+      analytics.capture('topic_mastery_new', {
+        topic_id: topicId,
+        status: 'mastered',
+        questions_attempted: topicProgress.questionsAttempted || 0,
+        incorrect_attempts: incorrectAttempts,
+      });
+    } catch {}
   }
   }
   
