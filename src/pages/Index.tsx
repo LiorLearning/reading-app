@@ -573,8 +573,10 @@ Keep tone warm, brief, and curious.`;
     if (currentScreen === 1) {
       enteredAdventureAtRef.current = Date.now();
       entryMessageCycleCountRef.current = messageCycleCount;
-      // Force next generated message to be pure adventure (no spelling)
-      suppressSpellingOnceRef.current = true;
+      // Do not suppress the next user turn; we want 1 intro tutor message then 3-1 cadence
+      suppressSpellingOnceRef.current = false;
+      // Realign cycle to start so that after the intro greeting increments once, we begin at cyclePosition 0
+      try { setMessageCycleCount(0); } catch {}
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen]);
@@ -2546,20 +2548,12 @@ Keep tone warm, brief, and curious.`;
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 3-1 pattern: 3 spelling prompts followed by 1 pure adventure beat
+        // Implement 3-1 pattern: 1 intro tutor message (handled by initial greeting), then 3 spelling + 1 adventure
         let isSpellingPhase = false;
-        // One-time suppression right after entering adventure: ensure first message is not a question
-        if (suppressSpellingOnceRef.current) {
-          isSpellingPhase = false;
-          suppressSpellingOnceRef.current = false;
-        } else {
-        const SPELLING_CYCLE_OFFSET = 1; // only the very first adventure message stays pure
+        const SPELLING_CYCLE_OFFSET = 1; // initial AI greeting increments to 1, making next turn cyclePosition 0
         const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
-        if (messageCycleCount >= SPELLING_CYCLE_OFFSET) {
-          const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
-          isSpellingPhase = cyclePosition < 3;
-        }
-        }
+        const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
+        isSpellingPhase = cyclePosition < 3;
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           
