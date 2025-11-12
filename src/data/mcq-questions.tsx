@@ -169,6 +169,7 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
+isReading:true,
           isPrefilled: false,
           prefilledIndexes: [0,2],
           aiHook: {
@@ -204,6 +205,7 @@ spelling_pattern_or_rule:  "Short vowel /a/ as in 'cat'."
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
+isReading:true,
           isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
@@ -239,6 +241,7 @@ spelling_pattern_or_rule:  "Short vowel /o/ as in 'dog'."
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
           isPrefilled: true,
           prefilledIndexes: [2,3],
           aiHook: {
@@ -274,6 +277,7 @@ spelling_pattern_or_rule:  "The 'st' blend joins the /s/ and /t/ sounds at the s
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
           isPrefilled: true,
           prefilledIndexes: [0, 3],
           aiHook: {
@@ -309,6 +313,7 @@ spelling_pattern_or_rule:  "The letters 'ar' make the /ar/ sound, as in 'car', '
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
         isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
@@ -344,6 +349,7 @@ spelling_pattern_or_rule:  "The silent 'e' makes the 'a' say its name in 'cake'.
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
         isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
@@ -379,6 +385,7 @@ spelling_pattern_or_rule:  "The silent 'e' makes the 'u' say its name in 'glue'.
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
         isPrefilled: true,
         prefilledIndexes: [0,4,5],
           aiHook: {
@@ -415,6 +422,7 @@ spelling_pattern_or_rule:  "The letters ‘eigh’ make the long /eɪ/ sound in 
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
         isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
@@ -452,6 +460,7 @@ spelling_pattern_or_rule:  "The word 'noodle' has the vowel team ‘oo’ that m
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
           isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
@@ -487,6 +496,7 @@ spelling_pattern_or_rule:  "TCH Rule: Use TCH to spell /ch/ right after a short 
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
           isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
@@ -523,6 +533,7 @@ spelling_pattern_or_rule:  "EAR = /er/ in 'heard'. Remember: EAR can be /ear/ (h
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
           isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
@@ -558,6 +569,7 @@ spelling_pattern_or_rule:  "In 'collision', the base collide ends voiced (/d/), 
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
+isReading:true,
           isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
