@@ -8,7 +8,7 @@ import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
-import { Volume2, Square, ChevronRight, Lightbulb, Mic } from 'lucide-react';
+import { Volume2, Square, ChevronRight, Lightbulb, Mic, Loader2 } from 'lucide-react';
 import { firebaseSpellboxLogsService } from '@/lib/firebase-spellbox-logs-service';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -408,6 +408,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [canClickNext, setCanClickNext] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<string>('');
+  const [isEvaluating, setIsEvaluating] = useState(false);
   
   // Get auth context for logging
   const { user, userData } = useAuth();
@@ -1032,155 +1033,160 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     if (!canSubmit) {
       return;
     }
-    let completeWord = '';
-    let correct = false;
-    let latestReadingMismatches: number[] = [];
-    if (isReading) {
-      completeWord = (lockedTranscript || liveTranscript || '').trim();
-      try {
-        const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
-        correct = evalResult.status === 'correct';
-        latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
-        setReadingMismatchedIndices(latestReadingMismatches);
-        console.log('[SpellBox] Evaluation (reading via AI). completeWord=', completeWord, 'result=', evalResult);
-      } catch (e) {
-        // Fallback: retain old behavior if AI fails
-        const normalize = (s: string) => (s || '')
-          .toLowerCase()
-          .replace(/[^a-z\s]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-        const tokenSet = new Set((normalize(completeWord)).split(/\s+/).filter(Boolean));
-        correct = tokenSet.has(normalize(targetWord));
-        latestReadingMismatches = [];
-        setReadingMismatchedIndices(latestReadingMismatches);
-        console.warn('[SpellBox] AI evaluation failed, fallback used. correct=', correct);
-      }
-    } else {
-      completeWord = reconstructCompleteWord(userAnswer);
-      correct = isWordCorrect(completeWord, targetWord);
-    }
-    setHasSubmitted(true);
-    setIsCorrect(correct);
-    // Record submitted answer for change detection on subsequent submits
-    const changedSinceLast = completeWord !== lastSubmittedAnswer;
-    setLastSubmittedAnswer(completeWord);
-    
-    // Log attempt to Firestore
-    // Check for valid non-empty strings
-    const hasValidUserId = effectiveUserId && effectiveUserId.trim() !== '';
-    const hasValidTopicId = effectiveTopicId && effectiveTopicId.trim() !== '';
-    const hasValidQuestion = !!question && !!question.id;
-    
-    if (hasValidUserId && hasValidTopicId && hasValidQuestion) {
-      
-      // Only log if answer changed (to avoid duplicate logs for same attempt)
-      if (changedSinceLast || correct) {
-        // Always use targetWord (full word) as primary source, fallback to question.correctAnswer if targetWord is empty
-        // targetWord is more reliable as it contains the full word (e.g., "BAG"), not just a single letter
-        const fullCorrectAnswer = (targetWord || question.correctAnswer || '').toUpperCase();
-        
-        // Generate question_blank format from current parts
-        const currentQuestionBlank = generateQuestionBlank(parts);
-        
-        
-        firebaseSpellboxLogsService.logSpellboxAttempt(
-          effectiveUserId,
-          effectiveTopicId,
-          effectiveGrade,
-          question.id,
-          fullCorrectAnswer, // Always use full word string (e.g., "BAG", not "B")
-          currentQuestionBlank, // Format like "_ _ T" where _ represents blanks
-          completeWord,
-          correct
-        ).then(() => {
-         // console.log('[SpellboxLogs] ✅ Successfully logged attempt');
-        }).catch((error) => {
-          console.error('[SpellboxLogs] ❌ Failed to log attempt:', error);
-        });
-      } else {
-      //  console.log('[SpellboxLogs] Skipping log - answer unchanged since last submission');
-      }
-    } else {
-      console.warn('[SpellboxLogs] ⚠️ Cannot log attempt - missing required data:', {
-        hasUserId: !!effectiveUserId,
-        hasTopicId: !!effectiveTopicId,
-        hasQuestion: !!question,
-        userId: effectiveUserId,
-        topicId: effectiveTopicId,
-        questionId: question?.id,
-        propUserId,
-        propTopicId,
-        questionTopicId: question?.topicId,
-        userUid: user?.uid
-      });
-    }
-    
-    if (correct) {
-      if (interruptRealtimeSession) {
-        try { interruptRealtimeSession(); } catch {}
-      }
-      triggerConfetti();
+    setIsEvaluating(true);
+    try {
+      let completeWord = '';
+      let correct = false;
+      let latestReadingMismatches: number[] = [];
       if (isReading) {
-        setReadingMismatchedIndices([]);
-      }
-      if (showTutorial) {
-        try { nextTutorialStep(); } catch {}
-      }
-      if (onComplete) {
-        const ADVANCE_DELAY_MS = 500;
-        setTimeout(() => {
-          onComplete(true, completeWord, attempts + 1);
-        }, ADVANCE_DELAY_MS);
-      }
-    } else {
-      // Only count as a new attempt if the answer changed
-      if (!changedSinceLast) {
-        return;
-      }
-      const nextAttempt = attempts + 1;
-      setAttempts(nextAttempt);
-      // Unlock the hint bulb after the first wrong checked attempt
-      setHintUnlocked(true);
-      try {
-        if (onComplete && attempts === 0) {
-          onComplete(false, completeWord, 1);
-        }
-      } catch {}
-      if (isAssignmentFlow) {
-        return;
-      }
-      generateAIHint(completeWord);
-      if (sendMessage && targetWord) {
+        completeWord = (lockedTranscript || liveTranscript || '').trim();
         try {
-          const aiTutor = (question as any)?.aiTutor || {};
-          const studentEntry = completeWord;
-          const mistakes = computeMistakes(studentEntry, targetWord);
-          let payload: any;
-          if (isReading) {
-            payload = {
-              target_word: targetWord,
-              student_response: studentEntry,
-              attempt_number: nextAttempt,
-              topic_to_reinforce: aiTutor?.topic_to_reinforce,
-              reading_rule: aiTutor?.reading_rule,
-              mistakes: (latestReadingMismatches.length ? latestReadingMismatches : (readingMismatchedIndices.length ? readingMismatchedIndices : computeMistakes(studentEntry, targetWord)))
-            };
-          } else {
-            const ruleToUse = aiTutor?.spelling_pattern_or_rule;
-            payload = {
-              target_word: targetWord,
-              question: aiTutor?.question,
-              student_entry: studentEntry,
-              mistakes,
-              attempt_number: nextAttempt,
-              topic_to_reinforce: aiTutor?.topic_to_reinforce,
-              spelling_pattern_or_rule: ruleToUse,
-            };
-          }
-          sendMessage(JSON.stringify(payload));
-        } catch {}
+          const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+          correct = evalResult.status === 'correct';
+          latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
+          setReadingMismatchedIndices(latestReadingMismatches);
+          console.log('[SpellBox] Evaluation (reading via AI). completeWord=', completeWord, 'result=', evalResult);
+        } catch (e) {
+          // Fallback: retain old behavior if AI fails
+          const normalize = (s: string) => (s || '')
+            .toLowerCase()
+            .replace(/[^a-z\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          const tokenSet = new Set((normalize(completeWord)).split(/\s+/).filter(Boolean));
+          correct = tokenSet.has(normalize(targetWord));
+          latestReadingMismatches = [];
+          setReadingMismatchedIndices(latestReadingMismatches);
+          console.warn('[SpellBox] AI evaluation failed, fallback used. correct=', correct);
+        }
+      } else {
+        completeWord = reconstructCompleteWord(userAnswer);
+        correct = isWordCorrect(completeWord, targetWord);
       }
+      setHasSubmitted(true);
+      setIsCorrect(correct);
+      // Record submitted answer for change detection on subsequent submits
+      const changedSinceLast = completeWord !== lastSubmittedAnswer;
+      setLastSubmittedAnswer(completeWord);
+      
+      // Log attempt to Firestore
+      // Check for valid non-empty strings
+      const hasValidUserId = effectiveUserId && effectiveUserId.trim() !== '';
+      const hasValidTopicId = effectiveTopicId && effectiveTopicId.trim() !== '';
+      const hasValidQuestion = !!question && !!question.id;
+      
+      if (hasValidUserId && hasValidTopicId && hasValidQuestion) {
+        
+        // Only log if answer changed (to avoid duplicate logs for same attempt)
+        if (changedSinceLast || correct) {
+          // Always use targetWord (full word) as primary source, fallback to question.correctAnswer if targetWord is empty
+          // targetWord is more reliable as it contains the full word (e.g., "BAG"), not just a single letter
+          const fullCorrectAnswer = (targetWord || question.correctAnswer || '').toUpperCase();
+          
+          // Generate question_blank format from current parts
+          const currentQuestionBlank = generateQuestionBlank(parts);
+          
+          
+          firebaseSpellboxLogsService.logSpellboxAttempt(
+            effectiveUserId,
+            effectiveTopicId,
+            effectiveGrade,
+            question.id,
+            fullCorrectAnswer, // Always use full word string (e.g., "BAG", not "B")
+            currentQuestionBlank, // Format like "_ _ T" where _ represents blanks
+            completeWord,
+            correct
+          ).then(() => {
+           // console.log('[SpellboxLogs] ✅ Successfully logged attempt');
+          }).catch((error) => {
+            console.error('[SpellboxLogs] ❌ Failed to log attempt:', error);
+          });
+        } else {
+        //  console.log('[SpellboxLogs] Skipping log - answer unchanged since last submission');
+        }
+      } else {
+        console.warn('[SpellboxLogs] ⚠️ Cannot log attempt - missing required data:', {
+          hasUserId: !!effectiveUserId,
+          hasTopicId: !!effectiveTopicId,
+          hasQuestion: !!question,
+          userId: effectiveUserId,
+          topicId: effectiveTopicId,
+          questionId: question?.id,
+          propUserId,
+          propTopicId,
+          questionTopicId: question?.topicId,
+          userUid: user?.uid
+        });
+      }
+      
+      if (correct) {
+        if (interruptRealtimeSession) {
+          try { interruptRealtimeSession(); } catch {}
+        }
+        triggerConfetti();
+        if (isReading) {
+          setReadingMismatchedIndices([]);
+        }
+        if (showTutorial) {
+          try { nextTutorialStep(); } catch {}
+        }
+        if (onComplete) {
+          const ADVANCE_DELAY_MS = 500;
+          setTimeout(() => {
+            onComplete(true, completeWord, attempts + 1);
+          }, ADVANCE_DELAY_MS);
+        }
+      } else {
+        // Only count as a new attempt if the answer changed
+        if (!changedSinceLast) {
+          return;
+        }
+        const nextAttempt = attempts + 1;
+        setAttempts(nextAttempt);
+        // Unlock the hint bulb after the first wrong checked attempt
+        setHintUnlocked(true);
+        try {
+          if (onComplete && attempts === 0) {
+            onComplete(false, completeWord, 1);
+          }
+        } catch {}
+        if (isAssignmentFlow) {
+          return;
+        }
+        generateAIHint(completeWord);
+        if (sendMessage && targetWord) {
+          try {
+            const aiTutor = (question as any)?.aiTutor || {};
+            const studentEntry = completeWord;
+            const mistakes = computeMistakes(studentEntry, targetWord);
+            let payload: any;
+            if (isReading) {
+              payload = {
+                target_word: targetWord,
+                student_response: studentEntry,
+                attempt_number: nextAttempt,
+                topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                reading_rule: aiTutor?.reading_rule,
+                mistakes: (latestReadingMismatches.length ? latestReadingMismatches : (readingMismatchedIndices.length ? readingMismatchedIndices : computeMistakes(studentEntry, targetWord)))
+              };
+            } else {
+              const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+              payload = {
+                target_word: targetWord,
+                question: aiTutor?.question,
+                student_entry: studentEntry,
+                mistakes,
+                attempt_number: nextAttempt,
+                topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                spelling_pattern_or_rule: ruleToUse,
+              };
+            }
+            sendMessage(JSON.stringify(payload));
+          } catch {}
+        }
+      }
+    } finally {
+      setIsEvaluating(false);
     }
   }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer, effectiveUserId, effectiveTopicId, effectiveGrade, parts, generateQuestionBlank]);
 
@@ -1749,7 +1755,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     handleSubmitAttempt();
                   }
                 }}
-                disabled={nextGateDisabled || submitDisabledUnattempted}
+                disabled={nextGateDisabled || submitDisabledUnattempted || isEvaluating}
                 className={cn(
                   'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                   // Keep fully opaque when delay-gated next
@@ -1759,7 +1765,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
                 )}
               >
-                <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
+                {isEvaluating ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
+                )}
               </Button>
               {highlightNext && isCorrect && (
                 <div className="ml-2 text-2xl select-none" aria-hidden="true">👉</div>
@@ -2055,14 +2065,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                       handleSubmitAttempt();
                     }
                   }}
-                  disabled={nextGateDisabled || submitDisabledUnattempted}
+                  disabled={nextGateDisabled || submitDisabledUnattempted || isEvaluating}
                   className={cn(
                     'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                     nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
                     submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
                   )}
                 >
-                  <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
+                  {isEvaluating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
+                  )}
                 </Button>
               </div>
             )}
