@@ -204,6 +204,38 @@ export const lessonScripts: Record<string, LessonScript> = {
     "Awesome! You’re getting strong at hearing and spelling short vowels."
   ],
   rewards: { coins: 1 }
+},  '1-R-H.1': {
+  topicId: '1-R-H.1',
+  title: 'Reading: Consonant blends (gr)',
+  intro: [
+    "Let’s learn how two consonants can blend together at the start of a word.",
+    "We’ll look at the blend 'gr' in the word 'grab'."
+  ],
+  modelWord: 'grab',
+  modelSteps: [
+    { highlights: [[0,1]], say: '"g" says /g/.' },
+    { highlights: [[1,2]], say: '"r" says /r/.' },
+    { highlights: [[0,2]], say: "Together, they blend as /gr/ in 'grab'." },
+  ],
+  practice: [
+    {
+      word: 'grab',
+      prompt: "Read and spell 'grab'.",
+      hints: [
+        "Blend the first two sounds: /g/ + /r/ → /gr/.",
+        "Then add /a/ and /b/ to make the whole word."
+      ],
+      reinforce: "Great! /gr/ /a/ /b/ — 'grab'.",
+      // extra fields used by WhiteboardLesson (not part of static type)
+      ...( { isReading: true } as any ),
+      ...( { isPrefilled: true, prefilledIndexes: [0,1,2, 3] } as any ),
+    },
+  ],
+  completion: [
+    "Nice job reading the blend at the start of the word!",
+    "You blended /g/ and /r/ to make /gr/ in 'grab'."
+  ],
+  rewards: { coins: 1 },
 },
   '1-H.1': {
     topicId: '1-H.1',
@@ -230,6 +262,38 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     completion: ['Nice blending! You built two words.', 'Ready to continue the adventure?'],
     rewards: { coins: 2 },
+  },
+  '1-R-H.4': {
+    topicId: '1-R-H.4',
+    title: 'Reading: Final consonant blends (nd)',
+    intro: [
+      "Let’s read a word that ends with a blend.",
+      "We’ll look at 'nd' at the end of 'pond'."
+    ],
+    modelWord: 'pond',
+    modelSteps: [
+      { highlights: [[2,3]], say: '"n" says /n/.' },
+      { highlights: [[3,4]], say: '"d" says /d/.' },
+      { highlights: [[2,4]], say: "Together, they blend as /nd/ in 'pond'." },
+    ],
+    practice: [
+      {
+        word: 'pond',
+        prompt: "Read and say 'pond'.",
+        hints: [
+          "Blend the last two sounds: /n/ + /d/ → /nd/.",
+          "Say /p/ /o/ /nd/."
+        ],
+        reinforce: "Great! /p/ /o/ /nd/ — 'pond'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2,3] } as any ),
+      },
+    ],
+    completion: [
+      "Nice reading! You blended the ending /nd/ in 'pond'.",
+      "Ready for another word?"
+    ],
+    rewards: { coins: 1 },
   },
   '1-H.4': {
     topicId: '1-H.4',
@@ -258,6 +322,41 @@ export const lessonScripts: Record<string, LessonScript> = {
     completion: ['Great job with final blends!', 'Ready for the next lesson?'],
     rewards: { coins: 2 },
   },
+
+  '1-R-I.3': {
+    topicId: '1-R-I.3',
+    title: 'Reading: Short a /ă/ (bag)',
+    intro: [
+      "Let’s read a short a word.",
+      "We’ll look at the middle /ă/ in 'bag'."
+    ],
+    modelWord: 'bag',
+    modelSteps: [
+      { highlights: [[0,1]], say: '"b" says /b/.' },
+      { highlights: [[1,2]], say: '"a" says /æ/ (short a).' },
+      { highlights: [[2,3]], say: '"g" says /g/.' },
+      { highlights: [[0,3]], say: "Blend: /b/ /æ/ /g/ — 'bag'." },
+    ],
+    practice: [
+      {
+        word: 'bag',
+        prompt: "Read and say 'bag'.",
+        hints: [
+          "Listen for the short /a/ in the middle.",
+          "Blend all sounds together to read the word."
+        ],
+        reinforce: "Nice! /b/ /a/ /g/ — 'bag'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1, 2] } as any ),
+      },
+    ],
+    completion: [
+      "Great reading! You heard the short a in 'bag'.",
+      "Let’s try more."
+    ],
+    rewards: { coins: 1 },
+  },
+ 
   '1-I.3': {
     topicId: '1-I.3',
     title: 'Short A Words',
@@ -289,6 +388,57 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     rewards: { coins: 2 },
   },
+  '1-R-T.2.1': {
+    topicId: '1-R-T.2.1',
+    title: 'Reading: ar and or',
+    intro: [
+      "Let’s read r-controlled vowel words with 'ar' and 'or'."
+    ],
+    segments: [
+      {
+        modelWord: 'car',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"c" says /k/.' },
+          { highlights: [[1,3]], say: "'ar' says /ar/." },
+          { highlights: [[0,3]], say: "Blend: /k/ /ar/ — 'car'." },
+        ],
+        practice: {
+          word: 'car',
+          prompt: "Read and say 'car'.",
+          hints: [
+            "Blend /k/ with /ar/.",
+          ],
+          reinforce: "Great! /k/ /ar/ — 'car'.",
+          ...( { isReading: true } as any ),
+          ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+        }
+      },
+      {
+        modelWord: 'horn',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"h" says /h/.' },
+          { highlights: [[1,3]], say: "'or' says /or/." },
+          { highlights: [[3,4]], say: '"n" says /n/.' },
+          { highlights: [[0,4]], say: "Blend: /h/ /or/ /n/ — 'horn'." },
+        ],
+        practice: {
+          word: 'horn',
+          prompt: "Read and say 'horn'.",
+          hints: [
+            "Blend /h/ with /or/ then /n/.",
+          ],
+          reinforce: "Nice! /h/ /or/ /n/ — 'horn'.",
+          ...( { isReading: true } as any ),
+          ...( { isPrefilled: true, prefilledIndexes: [0,1,2,3] } as any ),
+        }
+      }
+    ],
+    completion: [
+      "Awesome reading of 'ar' and 'or' words!"
+    ],
+    rewards: { coins: 1 },
+  },
+  
   '1-T.2.1': {
     topicId: '1-T.2.1',
     title: 'R-sounds with "ar" and "or"',
@@ -339,6 +489,56 @@ export const lessonScripts: Record<string, LessonScript> = {
       'Ready for the next lesson?'
     ],
     rewards: { coins: 2 },
+  },
+  '1-R-T.2.2': {
+    topicId: '1-R-T.2.2',
+    title: 'Reading: er and ir',
+    intro: [
+      "Let’s read words with 'er' and 'ir' making the same /ər/ sound."
+    ],
+    segments: [
+      {
+        modelWord: 'her',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"h" says /h/.' },
+          { highlights: [[1,3]], say: "'er' says /ər/." },
+          { highlights: [[0,3]], say: "Blend: /h/ /ər/ — 'her'." }
+        ],
+        practice: {
+          word: 'her',
+          prompt: "Read and say 'her'.",
+          hints: [
+            "Blend /h/ with /ər/."
+          ],
+          reinforce: "Great! /h/ /ər/ — 'her'.",
+          ...( { isReading: true } as any ),
+          ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+        }
+      },
+      {
+        modelWord: 'bird',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"b" says /b/.' },
+          { highlights: [[1,3]], say: "'ir' says /ər/." },
+          { highlights: [[3,4]], say: '"d" says /d/.' },
+          { highlights: [[0,4]], say: "Blend: /b/ /ər/ /d/ — 'bird'." }
+        ],
+        practice: {
+          word: 'bird',
+          prompt: "Read and say 'bird'.",
+          hints: [
+            "Blend /b/ with /ər/ then /d/."
+          ],
+          reinforce: "Nice! /b/ /ər/ /d/ — 'bird'.",
+          ...( { isReading: true } as any ),
+          ...( { isPrefilled: true, prefilledIndexes: [0,1,2,3] } as any ),
+        }
+      }
+    ],
+    completion: [
+      "Great reading of 'er' and 'ir' words!"
+    ],
+    rewards: { coins: 1 },
   },
   '1-T.2.2': {
     topicId: '1-T.2.2',
@@ -425,6 +625,37 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     rewards: { coins: 2 },
   },
+  '1-R-T.2.3': {
+    topicId: '1-R-T.2.3',
+    title: 'Reading: ur',
+    intro: [
+      "Let’s read a word with 'ur' saying /ər/."
+    ],
+    segments: [
+      {
+        modelWord: 'fur',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"f" says /f/.' },
+          { highlights: [[1,3]], say: "'ur' says /ər/." },
+          { highlights: [[0,3]], say: "Blend: /f/ /ər/ — 'fur'." }
+        ],
+        practice: {
+          word: 'fur',
+          prompt: "Read and say 'fur'.",
+          hints: [
+            "Blend /f/ with /ər/."
+          ],
+          reinforce: "Great! /f/ /ər/ — 'fur'.",
+          ...( { isReading: true } as any ),
+          ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+        }
+      }
+    ],
+    completion: [
+      "Nice reading with 'ur'!"
+    ],
+    rewards: { coins: 1 },
+  },
   '1-T.2.3': {
     topicId: '1-T.2.3',
     title: 'R-Controlled Vowels: ur',
@@ -474,6 +705,7 @@ export const lessonScripts: Record<string, LessonScript> = {
     ],
     rewards: { coins: 2 },
   },
+
   '2-J.1': {
     topicId: '2-J.1',
     title: 'Sneaky Silent E: Short and Long Vowel Sounds',
