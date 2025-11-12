@@ -1509,7 +1509,35 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
               const user = auth.currentUser;
               const petId = currentPet;
               if (user) {
-                await stateStoreApi.startPetSleep({ userId: user.uid, pet: petId, durationMs: eightHours });
+                const result = await stateStoreApi.startPetSleep({ userId: user.uid, pet: petId, durationMs: eightHours });
+                // Optimistically update localStorage and modal with returned values
+                try {
+                  const rawStreaks = localStorage.getItem('litkraft_pet_streaks') || '{}';
+                  const mapStreaks = JSON.parse(rawStreaks) as Record<string, number>;
+                  mapStreaks[petId] = Number(result?.nextStreak || 0);
+                  localStorage.setItem('litkraft_pet_streaks', JSON.stringify(mapStreaks));
+                } catch {}
+                try {
+                  const rawSlots = localStorage.getItem('litkraft_pet_streak_slots') || '{}';
+                  const mapSlots = JSON.parse(rawSlots) as Record<string, number[]>;
+                  mapSlots[petId] = Array.isArray(result?.slots) ? result.slots.map((x: any) => (Number(x) ? 1 : 0)) : [0,0,0,0,0];
+                  localStorage.setItem('litkraft_pet_streak_slots', JSON.stringify(mapSlots));
+                } catch {}
+                // Also update aggregate streak if present
+                try {
+                  const mapStreaksRaw = localStorage.getItem('litkraft_pet_streaks') || '{}';
+                  const agg = Object.values(JSON.parse(mapStreaksRaw) as Record<string, number>)
+                    .reduce((a, b) => a + (Number.isFinite(Number(b)) ? Number(b) : 0), 0);
+                  localStorage.setItem('litkraft_streak', String(agg));
+                  window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: agg } }));
+                } catch {}
+                // If the per-pet modal is open for this pet, update it with the new values
+                try {
+                  setPerPetStreakModalData((prev) => {
+                    if (!prev || prev.petId !== petId) return prev;
+                    return { petId, streak: Number(result?.nextStreak || 0), slots: Array.isArray(result?.slots) ? result.slots : [0,0,0,0,0] };
+                  });
+                } catch {}
               }
             } catch {}
           })();
