@@ -3655,9 +3655,10 @@ Keep tone warm, brief, and curious.`;
         if (name === 'Kindergarten') return 'gradeK';
         if (name === '1st Grade') return 'grade1';
         if (name === '2nd Grade') return 'grade2';
-        // 3rd should store as grade3, 4th/5th as grade4
+        // 3rd should store as grade3, 4th as grade4, 5th as grade5
         if (name === '3rd Grade') return 'grade3';
-        if (name === '4th Grade' || name === '5th Grade') return 'grade4';
+        if (name === '4th Grade') return 'grade4';
+        if (name === '5th Grade') return 'grade5';
         return '';
       };
       const incomingGradeDisplayName = gradeDisplayName || userData?.gradeDisplayName || '';
@@ -3667,8 +3668,11 @@ Keep tone warm, brief, and curious.`;
       const levelDisplayName = level === 'middle' ? 'Mid Level' : 'Start Level';
       const gradeName = incomingGradeDisplayName;
       // Lightweight migration: if selecting 4th/5th but previously stored as grade3, upgrade to grade4
-      if ((incomingGradeDisplayName === '4th Grade' || incomingGradeDisplayName === '5th Grade') && gradeCode === 'grade3') {
+      if ((incomingGradeDisplayName === '4th Grade') && gradeCode === 'grade3') {
         gradeCode = 'grade4';
+      }
+      if (incomingGradeDisplayName === '5th Grade' && gradeCode === 'grade3' || gradeCode === 'grade4') {
+        gradeCode = 'grade5';
       }
 
       if (gradeCode) {
@@ -4428,8 +4432,12 @@ Keep tone warm, brief, and curious.`;
             { gdn: '2nd Grade',    grade: 'grade2', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 6
             { gdn: '3rd Grade',    grade: 'grade3', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 7
             { gdn: '3rd Grade',    grade: 'grade3', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 8
+            { gdn: '4th Grade',    grade: 'grade4', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 9
+            { gdn: '4th Grade',    grade: 'grade4', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 10
+            { gdn: '5th Grade',    grade: 'grade5', level: 'start' as const, ldn: 'Start Level' as const, pref: 'start' as const }, // 11
+            { gdn: '5th Grade',    grade: 'grade5', level: 'mid'   as const, ldn: 'Mid Level'   as const, pref: 'middle' as const }, // 12
           ];
-        const clamp = (n: number) => (n < 1 ? 1 : (n > 8 ? 8 : n));
+        const clamp = (n: number) => (n < 1 ? 1 : (n > 12 ? 12 : n));
         const qid = typeof currentSpellQuestion?.id === 'number' ? currentSpellQuestion!.id : 1;
         const currentTier = clamp(qid);
         const targetTierIdx = Math.max(1, currentTier - 1);
@@ -4464,9 +4472,9 @@ Keep tone warm, brief, and curious.`;
         // Optimistically set dropdown to the detected tier based on assignment logic
         try {
           const qid = typeof currentSpellQuestion?.id === 'number' ? currentSpellQuestion!.id : 1;
-          const clamp = (n: number) => (n < 1 ? 1 : (n > 8 ? 8 : n));
+          const clamp = (n: number) => (n < 1 ? 1 : (n > 12 ? 12 : n));
           const currentTier = clamp(qid);
-          const targetTierIdx = Math.max(1, currentTier - 1); // 1..8
+          const targetTierIdx = Math.max(1, currentTier - 1); // 1..12
           const TIERS = [
             { gdn: 'Kindergarten', level: 'start' as const }, // 1
             { gdn: 'Kindergarten', level: 'middle' as const }, // 2
@@ -4476,6 +4484,10 @@ Keep tone warm, brief, and curious.`;
             { gdn: '2nd Grade',    level: 'middle' as const }, // 6
             { gdn: '3rd Grade',    level: 'start' as const }, // 7
             { gdn: '3rd Grade',    level: 'middle' as const }, // 8
+            { gdn: '4th Grade',    level: 'start' as const }, // 9
+            { gdn: '4th Grade',    level: 'middle' as const }, // 10
+            { gdn: '5th Grade',    level: 'start' as const }, // 11
+            { gdn: '5th Grade',    level: 'middle' as const }, // 12
           ];
           const tier = TIERS[(targetTierIdx - 1) as number];
           if (tier?.gdn) {
