@@ -1160,11 +1160,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           if (isReading) {
             payload = {
               target_word: targetWord,
-              phonemics_of_student_response: studentEntry,
-              mistakes: (latestReadingMismatches.length ? latestReadingMismatches : (readingMismatchedIndices.length ? readingMismatchedIndices : computeMistakes(studentEntry, targetWord))),
+              student_response: studentEntry,
               attempt_number: nextAttempt,
               topic_to_reinforce: aiTutor?.topic_to_reinforce,
               reading_rule: aiTutor?.reading_rule,
+              mistakes: (latestReadingMismatches.length ? latestReadingMismatches : (readingMismatchedIndices.length ? readingMismatchedIndices : computeMistakes(studentEntry, targetWord)))
             };
           } else {
             const ruleToUse = aiTutor?.spelling_pattern_or_rule;
@@ -1695,17 +1695,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   playClickSound();
                   if (sendMessage && targetWord) {
                     const aiTutor = (question as any)?.aiTutor || {};
-                    const studentEntry = reconstructCompleteWord(userAnswer);
+                    const studentEntry = isReading
+                      ? ((lockedTranscript || lastSubmittedAnswer || liveTranscript || '').trim())
+                      : reconstructCompleteWord(userAnswer);
                     const mistakes = computeMistakes(studentEntry, targetWord);
                     let payload: any;
                     if (isReading) {
                       payload = {
                         target_word: targetWord,
-                        phonemics_of_student_response: studentEntry,
-                        mistakes: readingMismatchedIndices,
+                        student_response: studentEntry,
                         attempt_number: attempts,
                         topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                        reading_rule: aiTutor?.reading_rule
+                        reading_rule: aiTutor?.reading_rule,
+                        mistakes: readingMismatchedIndices,
                       };
                     } else {
                       const ruleToUse = aiTutor?.spelling_pattern_or_rule;
@@ -1998,18 +2000,20 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     playClickSound();
                     if (sendMessage && targetWord) {
                       const aiTutor = (question as any)?.aiTutor || {};
-                      const studentEntry = reconstructCompleteWord(userAnswer);
+                      const studentEntry = isReading
+                        ? ((lockedTranscript || lastSubmittedAnswer || liveTranscript || '').trim())
+                        : reconstructCompleteWord(userAnswer);
                       const mistakes = computeMistakes(studentEntry, targetWord);
                       let payload: any;
                       if (isReading) {
                         // Reading-mode: send reading-specific fields to the reading tutor
                         payload = {
                           target_word: targetWord,
-                          phonemics_of_student_response: studentEntry,
-                          mistakes: readingMismatchedIndices,
+                          student_response: studentEntry,
                           attempt_number: attempts,
                           topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                          reading_rule: aiTutor?.reading_rule
+                          reading_rule: aiTutor?.reading_rule,
+                          mistakes: readingMismatchedIndices,
                         };
                       } else {
                         // Spelling-mode: keep existing spelling payload shape
