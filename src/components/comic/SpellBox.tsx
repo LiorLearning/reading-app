@@ -1994,7 +1994,39 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 <Button
                   variant="comic"
                   size="icon"
-                  onClick={() => { playClickSound(); if (sendMessage && targetWord) { const aiTutor = (question as any)?.aiTutor || {}; const studentEntry = reconstructCompleteWord(userAnswer); const mistakes = computeMistakes(studentEntry, targetWord); const ruleToUse = isReading ? (aiTutor?.reading_rule || aiTutor?.spelling_pattern_or_rule) : aiTutor?.spelling_pattern_or_rule; const payload = { target_word: targetWord, question: aiTutor?.question, student_entry: studentEntry, mistakes: (isReading ? readingMismatchedIndices : mistakes), attempt_number: attempts, topic_to_reinforce: aiTutor?.topic_to_reinforce, spelling_pattern_or_rule: ruleToUse }; sendMessage(JSON.stringify(payload)); } }}
+                  onClick={() => {
+                    playClickSound();
+                    if (sendMessage && targetWord) {
+                      const aiTutor = (question as any)?.aiTutor || {};
+                      const studentEntry = reconstructCompleteWord(userAnswer);
+                      const mistakes = computeMistakes(studentEntry, targetWord);
+                      let payload: any;
+                      if (isReading) {
+                        // Reading-mode: send reading-specific fields to the reading tutor
+                        payload = {
+                          target_word: targetWord,
+                          phonemics_of_student_response: studentEntry,
+                          mistakes: readingMismatchedIndices,
+                          attempt_number: attempts,
+                          topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                          reading_rule: aiTutor?.reading_rule
+                        };
+                      } else {
+                        // Spelling-mode: keep existing spelling payload shape
+                        const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+                        payload = {
+                          target_word: targetWord,
+                          question: aiTutor?.question,
+                          student_entry: studentEntry,
+                          mistakes,
+                          attempt_number: attempts,
+                          topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                          spelling_pattern_or_rule: ruleToUse
+                        };
+                      }
+                      sendMessage(JSON.stringify(payload));
+                    }
+                  }}
                   className={cn('h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 bg-yellow-300 text-yellow-900 hover:bg-yellow-400')}
                   title="Hint: listen again"
                   aria-label="Hint: listen again"
