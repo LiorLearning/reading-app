@@ -583,8 +583,10 @@ Keep tone warm, brief, and curious.`;
     if (currentScreen === 1) {
       enteredAdventureAtRef.current = Date.now();
       entryMessageCycleCountRef.current = messageCycleCount;
-      // Force next generated message to be pure adventure (no spelling)
-      suppressSpellingOnceRef.current = true;
+      // Do not suppress; we want 1 intro tutor message (AI greeting) then start 3-1 cadence
+      suppressSpellingOnceRef.current = false;
+      // Realign: greeting will increment to 1 so next user turn starts cyclePosition 0 (SpellBox)
+      try { setMessageCycleCount(0); } catch {}
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentScreen]);
