@@ -126,6 +126,7 @@ import {
         _lastCompletedActivity: null,
         streak: 0,
         streakSlots: [0, 0, 0, 0, 0],
+        streakSlotDates: [null, null, null, null, null],
         _streakSlotPtr: 0,
         _streakSlotsLastYmd: null,
       };
@@ -910,7 +911,7 @@ import {
         const task = ACTIVITY_SEQUENCE[0];
         txn.set(
           questsRef,
-          { [pet]: { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null, streak: 0, streakSlots: [0,0,0,0,0], _streakSlotPtr: 0, _streakSlotsLastYmd: null } } as any,
+          { [pet]: { [task]: 0, _activityIndex: 0, _completedAt: null, _cooldownUntil: null, _lastCompletedActivity: null, streak: 0, streakSlots: [0,0,0,0,0], streakSlotDates: [null,null,null,null,null], _streakSlotPtr: 0, _streakSlotsLastYmd: null } } as any,
           { merge: true }
         );
       }
@@ -975,7 +976,7 @@ import {
         nextStreak = 1;
       } else if (prevYmd === currYmd) {
         // Same calendar day → no increment
-        nextStreak = Math.max(0, Number(petObj?.streak || 0));
+        nextStreak = Math.max(1, Number(petObj?.streak || 0));
       } else {
         const diffDays = daysDiff(prevYmd, currYmd);
         const prevStreak = Math.max(0, Number(petObj?.streak || 0));
@@ -989,6 +990,7 @@ import {
 
       // Update circular 5-slot array (skip weekends, fill missed weekdays with 0, write 1 for today)
       const slots: number[] = Array.isArray(petObj?.streakSlots) && petObj.streakSlots.length === 5 ? [...petObj.streakSlots] : [0,0,0,0,0];
+      const slotDates: (string | null)[] = Array.isArray(petObj?.streakSlotDates) && petObj.streakSlotDates.length === 5 ? [...petObj.streakSlotDates] : [null, null, null, null, null];
       let ptr: number = Number.isFinite(Number(petObj?._streakSlotPtr)) ? Number(petObj._streakSlotPtr) : 0;
       const lastYmdRaw: string | null = (typeof petObj?._streakSlotsLastYmd === 'string' && petObj._streakSlotsLastYmd) ? String(petObj._streakSlotsLastYmd) : (prevYmd || null);
 
@@ -1002,19 +1004,23 @@ import {
         while (daysDiff(walker, currYmd) > 0) { // walker < currYmd
           const d = parseYmd(walker);
           if (!isWeekend(d)) {
-            slots[ptr] = 0; advancePtr();
+            slots[ptr] = 0;
+            slotDates[ptr] = walker;
+            advancePtr();
           }
           // next day
           walker = dayAfter(walker);
         }
       }
       // Write today's success (1) at current ptr
-      slots[ptr] = 1; advancePtr();
+      slots[ptr] = 1;
+      slotDates[ptr] = currYmd;
+      advancePtr();
 
       const endTs = Timestamp.fromMillis(nowMs + durationMs);
       txn.set(
         questsRef,
-        { [pet]: { _sleepStartAt: Timestamp.fromMillis(nowMs), _sleepEndAt: endTs, streak: nextStreak, streakSlots: slots, _streakSlotPtr: ptr, _streakSlotsLastYmd: currYmd }, updatedAt: nowServerTimestamp() } as any,
+        { [pet]: { _sleepStartAt: Timestamp.fromMillis(nowMs), _sleepEndAt: endTs, streak: nextStreak, streakSlots: slots, streakSlotDates: slotDates, _streakSlotPtr: ptr, _streakSlotsLastYmd: currYmd }, updatedAt: nowServerTimestamp() } as any,
         { merge: true }
       );
     });
@@ -1122,6 +1128,7 @@ import {
 
       // Advance circular 5-slot array for each missed weekday up to yesterday (do not touch today)
       const slots: number[] = Array.isArray(petObj?.streakSlots) && petObj.streakSlots.length === 5 ? [...petObj.streakSlots] : [0,0,0,0,0];
+      const slotDates: (string | null)[] = Array.isArray(petObj?.streakSlotDates) && petObj.streakSlotDates.length === 5 ? [...petObj.streakSlotDates] : [null, null, null, null, null];
       let ptr: number = Number.isFinite(Number(petObj?._streakSlotPtr)) ? Number(petObj._streakSlotPtr) : 0;
       const lastYmdRaw: string | null = (typeof petObj?._streakSlotsLastYmd === 'string' && petObj._streakSlotsLastYmd) ? String(petObj._streakSlotsLastYmd) : (prevYmd || null);
 
@@ -1133,7 +1140,7 @@ import {
         let walker = dayAfter(lastYmdRaw);
         while (daysDiff(walker, yesterdayYmd) >= 0) { // walker <= yesterday
           const d = parseYmd(walker);
-          if (!isWeekend(d)) { slots[ptr] = 0; advancePtr(); }
+          if (!isWeekend(d)) { slots[ptr] = 0; slotDates[ptr] = walker; advancePtr(); }
           walker = dayAfter(walker);
         }
       }
@@ -1141,6 +1148,7 @@ import {
       updates[pet] = {
         ...(updates[pet] || {}),
         streakSlots: slots,
+        streakSlotDates: slotDates,
         _streakSlotPtr: ptr,
         _streakSlotsLastYmd: (lastYmdRaw && daysDiff(lastYmdRaw, yesterdayYmd) >= 1) ? yesterdayYmd : (petObj?._streakSlotsLastYmd || lastYmdRaw || null),
       };
