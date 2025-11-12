@@ -4280,13 +4280,12 @@ If uncertain but they plausibly sound the same, prefer "correct".`;
 //     content: '{"status":"incorrect","mismatchedIndices":[1,2,3]}'
 //   }
 // ];
-      const userPrompt = `
-target_word: "${targetWord}"
-student_response: "${studentResponse}"`;
+      const userPrompt = `target_word: "${targetWord}"
+      student_response: "${studentResponse}"`;
 
       const completion: any = await this.client.chat.completions.create({
-        model: "gpt-5-mini",
-        temperature: 1,
+        model: "chatgpt-4o-latest",
+        temperature: 0.7,
         max_completion_tokens: 120,
         // @ts-ignore some compatible backends support response_format
         response_format: { type: 'json_object' },
