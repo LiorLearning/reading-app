@@ -982,8 +982,8 @@ import {
         if (diffDays === 1 || allIntermediateDaysAreWeekend(prevYmd, currYmd)) {
           nextStreak = prevStreak + 1;
         } else {
-          // Missed weekday(s) → reset to 0
-          nextStreak = 0;
+          // Missed weekday(s) → start new streak at 1 on comeback day
+          nextStreak = 1;
         }
       }
 
