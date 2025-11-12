@@ -328,6 +328,26 @@ Strictly avoid spelling pattern reinforcement if already correct done by student
     updateStatus('DISCONNECTED');
   }, [updateStatus]);
 
+  // Reconnect session if agentInstructions change (to switch between spelling/reading tutors)
+  const lastInstructionsRef = useRef<string | undefined>(agentInstructions);
+  useEffect(() => {
+    if (!enabled) return;
+    // If instructions string changed, reconnect with new agent configuration
+    const prev = lastInstructionsRef.current;
+    if (prev !== agentInstructions) {
+      lastInstructionsRef.current = agentInstructions;
+      // Disconnect current session (if any) and reconnect with updated instructions
+      if (status === 'CONNECTED' || status === 'CONNECTING') {
+        try { disconnect(); } catch {}
+      }
+      // Slight delay to allow transport close before reconnect
+      const t = setTimeout(() => {
+        try { connect(); } catch {}
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [agentInstructions, enabled, status, connect, disconnect]);
+
   useEffect(() => {
     
     if (enabled && status === 'DISCONNECTED') {
@@ -428,25 +448,31 @@ Strictly avoid spelling pattern reinforcement if already correct done by student
   const fetchEphemeralKey = async (): Promise<string | null> => {
     console.info("Fetching ephemeral key");
     try {
+      const isReadingTutor = agentName === 'readingTutor';
+      const promptId = isReadingTutor
+        ? "pmpt_690e5a1eb9208196ae0461dafdeb990902f7ad0f5ca166b4"
+        : "pmpt_68cf010256a88195a1aa36df738877ae0ec3730b96a639f7";
+      const promptVersion = isReadingTutor ? "3" : "45";
+      const betaHeader = isReadingTutor ? "Reading-AI-tutor" : "realtime=v1";
       const response = await fetch(
         "https://api.readkraft.com/api/v1/realtime/sessions",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "OpenAI-Beta": "realtime=v1"
+            "OpenAI-Beta": betaHeader
           },
           body: JSON.stringify({
             // model: "gpt-4o-realtime-preview-2025-06-03",
             "prompt": {
-              "id": "pmpt_68cf010256a88195a1aa36df738877ae0ec3730b96a639f7",
-              "version": "45"
+              "id": promptId,
+              "version": promptVersion
             }
           }),
         }
       );
       try {
-        console.info('[realtime] server prompt config:', { id: 'pmpt_68cf010256a88195a1aa36df738877ae0ec3730b96a639f7', version: '45' });
+        console.info('[realtime] server prompt config:', { id: promptId, version: promptVersion, betaHeader });
       } catch {}
       const data = await response.json();
 

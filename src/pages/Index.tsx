@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X, Palette, HelpCircle, BookOpen, Home, Image as ImageIcon, MessageCircle, ChevronLeft, ChevronRight, GraduationCap, ChevronDown, Volume2, Square, LogOut, UserPlus, LogIn } from "lucide-react";
-import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation, hasSeenWhiteboard, markWhiteboardSeen, loadSpellboxTopicProgressAsync } from "@/lib/utils";
+import { cn, formatAIMessage, ChatMessage, loadUserAdventure, saveUserAdventure, getNextTopic, saveAdventure, loadSavedAdventures, saveAdventureSummaries, loadAdventureSummaries, generateAdventureName, generateAdventureSummary, SavedAdventure, AdventureSummary, loadUserProgress, hasUserProgress, UserProgress, saveTopicPreference, loadTopicPreference, getNextTopicByPreference, mapSelectedGradeToContentGrade, saveCurrentAdventureId, loadCurrentAdventureId, saveQuestionProgress, loadQuestionProgress, clearQuestionProgress, getStartingQuestionIndex, saveGradeSelection, loadGradeSelection, SpellingProgress, saveSpellingProgress, loadSpellingProgress, clearSpellingProgress, resetSpellingProgress, SpellboxTopicProgress, SpellboxGradeProgress, updateSpellboxTopicProgress, getSpellboxTopicProgress, isSpellboxTopicPassingGrade, getNextSpellboxTopic, setCurrentTopic, clearUserAdventure, moderation, hasSeenWhiteboard, markWhiteboardSeen, loadSpellboxTopicProgressAsync, loadSpellboxTopicProgress, saveSpellboxTopicProgress } from "@/lib/utils";
 import { setSpellboxAnchorForLevel } from '@/lib/questionBankUtils';
 
 import { handleFirstIncorrectAssignment } from '@/lib/assignment-switch';
@@ -298,6 +298,93 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
 
   const images = useMemo(() => [rocket1, spaceport2, alien3, cockpit4], []);
   
+  // Reading tutor instructions (used only when a reading question is active)
+  const READING_TUTOR_PROMPT = `Role:
+You are a warm, calm, and playful phonics-based reading tutor for early elementary students.
+Sound like a buddy helping a friend notice patterns in sounds.
+
+Inputs provided:
+target_word
+phonemics_of_student_response (student’s spoken phonemes)
+attempt_number
+topic_to_reinforce
+reading_rule
+mistakes (segments or positions)
+(optional) orthography_visible (true = letters visible to student)
+
+🎧 Core Behavior
+Start by echoing how the student said the word.
+Example: “You said /tɪps/.”
+
+Diagnose internally (don’t tell student):
+Is the error a sound/phoneme problem or a reading-rule (grapheme-phoneme) problem?
+If both, handle the sound first.
+
+Student-facing move:
+If it sounds wrong, gently cue the reading rule (the letter or letter group that should make a different sound).
+Mention the grapheme, but never model the phoneme on the first attempt.
+If the student’s pronunciation sounds right, praise that and reinforce the reading rule or decoding idea.
+
+Error Source Priority:
+Use mistakes to target one sound or grapheme group per turn.
+Never correct two groups at once.
+Skip any sound or rule already correct.
+
+Hint Policy
+Attempt 1 – Reading-Rule Hint
+Give a short conceptual hint naming the grapheme(s) but not the sound.
+Ask a question to prompt the student to recall the sound.
+Example: “You said tips, but c-h makes a different sound. What sound does it make?”
+
+Attempt 2 – Reveal
+Now model and explain the phoneme tied to that rule.
+Example: “C-h makes the /ch/ sound — that gives us chips.”
+
+Internal Guard:
+When attempt_number == 1, never pronounce or model the target phoneme.
+When orthography_visible == false, say “two letters together” or spell them out instead of assuming the student can see them.
+
+Multiple Mistakes:
+Always start by echoing and acknowledging.
+Treat digraphs or vowel teams as one mistake group.
+Apply the two-step cycle (hint → reveal) to each group across turns.
+
+Scope:
+Focus only on incorrect sounds; do not comment on correct segments.
+
+Tone:
+≤ 20 words, ≤ 2 sentences.
+Be warm, calm, playful, and efficient — go straight from echo → feedback or question.
+
+Examples:
+Explain using phonics symbols (/ch/, /sh/, /ā/, /θ/).
+Avoid unrelated example words unless clarifying a rule.
+
+Homophone Rule:
+If the pronunciation matches another real word, briefly note that word only if helpful, then redirect to the target.
+
+✅ Example Behaviors
+
+Phonics / Reading-Rule Issue
+Target: chips Student: /tɪps/
+Attempt 1: “You said tips. But c-h makes a different sound. What sound does it make?”
+Attempt 2: “C-h makes the /ch/ sound — that gives us chips.”
+
+Target: ship Student: /sɪp/
+Attempt 1: “You said sip. But s-h makes another sound. What sound does it make?”
+Attempt 2: “S-h makes the /sh/ sound — that gives us ship.”
+
+Target: cake Student: /kæk/
+Attempt 1: “You said kak. The last letter is silent and makes the vowel long. What should that sound be?”
+Attempt 2: “That silent e makes the /ā/ sound — that gives us cake.”
+
+🔠 Rule Hierarchy Summary
+Always: Echo → Acknowledge → Scaffold.
+Diagnose internally: Sound → Reading Rule → Convention.
+On Attempt 1, never pronounce the target phoneme.
+Handle one sound group per turn.
+Keep tone warm, brief, and curious.`;
+
   // Background images for dynamic background selection
   const backgroundImages = useMemo(() => [
     '/backgrounds/cats.png',
@@ -378,11 +465,18 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   // Realtime provider selector: 'openai' or 'gemini'
   const REALTIME_PROVIDER: 'openai' | 'gemini' = ((import.meta as any)?.env?.VITE_REALTIME_AUDIO_PROVIDER === 'gemini' ? 'gemini' : 'openai');
 
+  // Realtime agent config is controlled via state to avoid referencing
+  // variables that are declared later in the file (lint-safe ordering).
+  const [rtAgentInstructions, setRtAgentInstructions] = useState<string | undefined>(undefined);
+  const [rtAgentName, setRtAgentName] = useState<'spellingTutor' | 'readingTutor'>('spellingTutor');
+
   // OpenAI realtime
   const openaiRT = useRealtimeSession({
     isAudioPlaybackEnabled: true,
     enabled: REALTIME_PROVIDER === 'openai',
     sessionId: currentSessionId,
+    agentName: rtAgentName,
+    agentInstructions: rtAgentInstructions,
   });
 
   // Gemini realtime
@@ -643,7 +737,22 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
   const [originalSpellingQuestion, setOriginalSpellingQuestion] = React.useState<SpellingQuestion | null>(null);
   // Track last successfully resolved spelling word to prevent immediate re-open
   const lastResolvedWordRef = React.useRef<string | null>(null);
+  // Dev reading topic state
+  const [readingDevActive, setReadingDevActive] = React.useState<boolean>(false);
+  const [readingDevIndex, setReadingDevIndex] = React.useState<number>(0);
   
+  // Switch realtime agent prompt based on whether a reading question is active
+  React.useEffect(() => {
+    const readingActive = !!(showSpellBox && currentSpellQuestion && (currentSpellQuestion as any)?.isReading);
+    if (readingActive) {
+      setRtAgentName('readingTutor');
+      setRtAgentInstructions(READING_TUTOR_PROMPT);
+    } else {
+      setRtAgentName('spellingTutor');
+      setRtAgentInstructions(undefined);
+    }
+  }, [showSpellBox, currentSpellQuestion]);
+
   // Sequential spelling progress tracking
   const [spellingProgressIndex, setSpellingProgressIndex] = React.useState<number>(() => {
     // Initialize with saved progress for current grade
@@ -803,7 +912,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         // Lookup the word in the bank to get aiTutor and prefilledIndexes
         const bankQuestion = getSpellingQuestionByWord(currentSpellingWord);
         const spellQuestion: SpellingQuestion = {
-          id: Date.now(),
+          id: (bankQuestion?.id as number) || Date.now(),
           topicId: selectedTopicId,
           topicName: selectedTopicId,
           templateType: 'spelling',
@@ -814,7 +923,9 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
           explanation: `Great job! "${currentSpellingWord}" is spelled correctly.`,
           // Only attach metadata when we found a matching spelling question in the bank
           prefilledIndexes: bankQuestion?.prefilledIndexes,
-          aiTutor: bankQuestion?.aiTutor
+          aiTutor: bankQuestion?.aiTutor,
+          // If the source question was a reading item, carry that flag through
+          ...(bankQuestion && (bankQuestion as any).isReading ? { isReading: (bankQuestion as any).isReading } : {})
         };
         
         setCurrentSpellQuestion(spellQuestion);
@@ -2520,9 +2631,21 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
               (spellingQuestion as any)?.word || (spellingQuestion as any)?.audio,
               (spellingQuestion as any)?.id ?? null
             );
-            ttsService.speakAIMessage(spellingSentenceMessage.content, messageId).catch(error => 
-              console.error('TTS error for spelling sentence:', error)
-            );
+            const targetWordForMask = (spellingQuestion as any)?.audio || (spellingQuestion as any)?.word || '';
+            if ((spellingQuestion as any)?.isReading) {
+              ttsService.speakWithPauseAtWord(spellingSentenceMessage.content, targetWordForMask, {
+                stability: 0.7,
+                similarity_boost: 0.9,
+                messageId,
+                speakAfter: false,
+              }).catch(error => {
+                console.error('TTS masking error for spelling sentence:', error);
+              });
+            } else {
+              ttsService.speakAIMessage(spellingSentenceMessage.content, messageId).catch(error => 
+                console.error('TTS error for spelling sentence:', error)
+              );
+            }
             return [...prev, spellingSentenceMessage];
           });
 
@@ -4420,6 +4543,46 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
       // Disable input until Next is clicked
       setDisableInputForSpell(true);
       // Do not highlight yet; wait for user to tap the disabled input
+      // OPTIMISTIC: Immediately record first-pass/mastery locally so the next selector advances
+      try {
+        const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+        if (currentGrade && currentSpellQuestion && typeof currentSpellQuestion.id === 'number') {
+          const topicId = currentSpellQuestion.topicId;
+          const qid = currentSpellQuestion.id;
+          let gp = loadSpellboxTopicProgress(currentGrade) || {
+            gradeDisplayName: currentGrade,
+            currentTopicId: topicId,
+            topicProgress: {},
+            timestamp: Date.now()
+          };
+          const tp = gp.topicProgress[topicId] || {
+            topicId,
+            questionsAttempted: 0,
+            firstAttemptCorrect: 0,
+            totalQuestions: 10,
+            isCompleted: false,
+            successRate: 0,
+            masteredQuestionIds: [],
+            firstPassQuestionIds: [],
+            roundPoolQuestionIds: [],
+            roundPoolCursor: 0,
+            nextRoundQuestionIds: []
+          };
+          tp.firstPassQuestionIds = Array.isArray(tp.firstPassQuestionIds) ? tp.firstPassQuestionIds : [];
+          if (!tp.firstPassQuestionIds.includes(qid)) {
+            tp.firstPassQuestionIds.push(qid);
+          }
+          if (attemptCount === 1) {
+            const set = new Set<number>(tp.masteredQuestionIds || []);
+            set.add(qid);
+            tp.masteredQuestionIds = Array.from(set);
+          }
+          gp.topicProgress[topicId] = tp;
+          gp.currentTopicId = topicId;
+          gp.timestamp = Date.now();
+          saveSpellboxTopicProgress(currentGrade, gp);
+        }
+      } catch {}
     } else {
       // Non-assignment flows: keep UI stable and avoid chat messages; no audio either
       const encouragementText = `Good try! Let's keep working on spelling "${currentSpellQuestion?.word}". You're getting better! 💪`;
@@ -4549,6 +4712,48 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
         }
       } catch {}
       updateSpellboxTopicProgress(currentGrade, currentSpellQuestion.topicId, isFirstAttempt, user?.uid, currentSpellQuestion.id)
+        // Optimistically add this question to first-pass locally so the next selector advances immediately
+        .catch(() => {}) // ignore early error; we'll still attempt optimistic local update below
+        .finally(() => {
+          try {
+            const topicId = currentSpellQuestion.topicId;
+            const qid = currentSpellQuestion.id;
+            let gp = loadSpellboxTopicProgress(currentGrade) || {
+              gradeDisplayName: currentGrade,
+              currentTopicId: topicId,
+              topicProgress: {},
+              timestamp: Date.now()
+            };
+            const tp = gp.topicProgress[topicId] || {
+              topicId,
+              questionsAttempted: 0,
+              firstAttemptCorrect: 0,
+              totalQuestions: 10,
+              isCompleted: false,
+              successRate: 0,
+              masteredQuestionIds: [],
+              firstPassQuestionIds: [],
+              roundPoolQuestionIds: [],
+              roundPoolCursor: 0,
+              nextRoundQuestionIds: []
+            };
+            if (typeof qid === 'number') {
+              tp.firstPassQuestionIds = Array.isArray(tp.firstPassQuestionIds) ? tp.firstPassQuestionIds : [];
+              if (!tp.firstPassQuestionIds.includes(qid)) {
+                tp.firstPassQuestionIds.push(qid);
+              }
+              if (isFirstAttempt) {
+                const set = new Set<number>(tp.masteredQuestionIds || []);
+                set.add(qid);
+                tp.masteredQuestionIds = Array.from(set);
+              }
+            }
+            gp.topicProgress[topicId] = tp;
+            gp.currentTopicId = topicId;
+            gp.timestamp = Date.now();
+            saveSpellboxTopicProgress(currentGrade, gp);
+          } catch {}
+        })
         .then(() => {
           // Recompute header progress after persistence
           recomputeHeaderTopicProgress();
@@ -5550,6 +5755,54 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                 <div className="flex items-center justify-center gap-2">
                   {/* Adventure Feeding Progress (per-type, daily) */}
                   <PerTypeAdventureProgressBar type={currentAdventureType} />
+                  {devToolsVisible && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        playClickSound();
+                        try { ttsService.stop(); } catch {}
+                        const READING_TOPIC_ID = '1-R-H.1';
+                        // 1) Persist SpellBox topic anchor to the reading topic for this grade
+                        const gradeName = selectedGradeFromDropdown || userData?.gradeDisplayName || '1st Grade';
+                        try {
+                          let gp = loadSpellboxTopicProgress(gradeName) || {
+                            gradeDisplayName: gradeName,
+                            currentTopicId: null,
+                            topicProgress: {},
+                            timestamp: Date.now()
+                          };
+                          gp.currentTopicId = READING_TOPIC_ID;
+                          gp.topicProgress[READING_TOPIC_ID] = gp.topicProgress[READING_TOPIC_ID] || {
+                            topicId: READING_TOPIC_ID,
+                            questionsAttempted: 0,
+                            firstAttemptCorrect: 0,
+                            totalQuestions: 10,
+                            isCompleted: false,
+                            successRate: 0
+                          };
+                          gp.timestamp = Date.now();
+                          saveSpellboxTopicProgress(gradeName, gp);
+                          if (user?.uid) {
+                            try { firebaseSpellboxService.saveSpellboxProgressFirebase(user.uid, gp); } catch {}
+                          }
+                        } catch {}
+                        // 2) Update current UI topic to match (does not reset other progress)
+                        setSelectedTopicId(READING_TOPIC_ID);
+                        try { setCurrentTopic(READING_TOPIC_ID); } catch {}
+                        try { clearQuestionProgress(); } catch {}
+                        setReadingDevActive(true);
+                        setReadingDevIndex(0);
+                        // 3) Nudge the conversation so the pet produces a fresh message with the word embedded
+                        try { devSendElse(); } catch {}
+                      }}
+                      className="px-2 py-1 text-[10px] font-bold rounded-full border-2 border-black bg-pink-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105"
+                      aria-label="Start reading dev topic"
+                      title="Start reading dev topic"
+                    >
+                      Read-DEV
+                    </Button>
+                  )}
                   {/* <Button
                     variant="outline"
                     size="icon"
@@ -6160,6 +6413,7 @@ const Index = ({ initialAdventureProps, onBackToPetPage }: IndexProps = {}) => {
                               isPrefilled: currentSpellQuestion.isPrefilled,
                               prefilledIndexes: currentSpellQuestion.prefilledIndexes,
                               topicId: currentSpellQuestion.topicId || selectedTopicId,
+                              isReading: (currentSpellQuestion as any)?.isReading,
                               aiTutor: (currentSpellQuestion as any)?.aiTutor,
                             } : null,
                             showHints: true,

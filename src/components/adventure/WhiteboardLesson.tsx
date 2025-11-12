@@ -66,6 +66,13 @@ Never initiate conversation; only speak the text you receive.`,
     agentName: 'spellingTutor',
     agentVoice: 'sage',
   });
+  // Reading tutor session (used when this whiteboard lesson is a reading lesson)
+  const { sendMessage: readingTutorSend, interruptRealtimeSession: readingTutorInterrupt } = useRealtimeSession({
+    isAudioPlaybackEnabled: true,
+    enabled: true,
+    agentName: 'readingTutor',
+    agentVoice: 'sage',
+  });
 
   // Deterministic numeric id from a string (to keep compatibility with SpellBox's numeric id)
   const computeNumericId = (str: string): number => {
@@ -163,7 +170,8 @@ Never initiate conversation; only speak the text you receive.`,
     const explanation = '';
     const isPrefilled = (currentPractice as any).isPrefilled;
     const prefilledIndexes = (currentPractice as any).prefilledIndexes;
-    return { id, word, questionText, correctAnswer, audio, explanation, isPrefilled, prefilledIndexes };
+    const isReading = !!(currentPractice as any).isReading || (topicId.includes('-R-'));
+    return { id, word, questionText, correctAnswer, audio, explanation, isPrefilled, prefilledIndexes, isReading };
   }, [modelWord, currentPractice?.word, currentPractice?.prompt, (currentPractice as any)?.isPrefilled, (currentPractice as any)?.prefilledIndexes]);
 
   // Wrapper decides between inline right panel (default) and fullscreen overlay
@@ -474,8 +482,13 @@ Never initiate conversation; only speak the text you receive.`,
                     trackEvent('lesson_completed', { topicId });
                     onCompleted();
                   }}
-                  sendMessage={parentSendMessage || (enableLocalTutor ? localTutorSend : undefined)}
-                 interruptRealtimeSession={interruptRealtimeSession || (enableLocalTutor ? localTutorInterrupt : undefined)}
+                  sendMessage={
+                    // For reading lessons, route to reading tutor agent regardless of parent agent
+                    ((spellboxQuestion as any)?.isReading ? readingTutorSend : (parentSendMessage || (enableLocalTutor ? localTutorSend : undefined)))
+                  }
+                  interruptRealtimeSession={
+                    ((spellboxQuestion as any)?.isReading ? readingTutorInterrupt : (interruptRealtimeSession || (enableLocalTutor ? localTutorInterrupt : undefined)))
+                  }
                   />
                 {/* Continue CTA aligned to bottom via outer layout; here as a fallback */}
               </div>

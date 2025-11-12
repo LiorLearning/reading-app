@@ -29,6 +29,7 @@ interface LeftPetOverlayProps {
       correctAnswer: string;
       audio: string;
       explanation: string;
+      isReading?: boolean;
       isPrefilled?: boolean;
       prefilledIndexes?: number[];
       topicId?: string; // Added for logging
@@ -419,6 +420,15 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       })();
 
       const wordToSpeak = spellInline?.word || '';
+      const isReadingInline = !!(spellInline?.question?.isReading ?? spellInline?.isReading);
+      
+      console.log('[Overlay][Speak] DEBUG inline question:', {
+        hasInlineQuestion,
+        wordToSpeak,
+        isReadingInline,
+        sentenceHtml,
+        sentenceText: sentenceText.substring(0, 100)
+      });
 
       // Derive exactly what SpellBox shows by extracting only the sentence that contains the target word
       const extractVisibleSentence = (fullText: string, targetWord: string): string => {
@@ -443,20 +453,45 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
 
       const visibleSentence = extractVisibleSentence(sentenceText, wordToSpeak);
       const textToSpeak = (visibleSentence || '').trim() || wordToSpeak;
-      try { console.log('[Overlay][Speak] Inline SpellBox speak', { textToSpeak, wordToSpeak, sentenceText, hasInlineQuestion }); } catch {}
+      
+      console.log('[Overlay][Speak] After extraction:', {
+        visibleSentence,
+        textToSpeak,
+        isReadingInline,
+        willUseMasking: isReadingInline
+      });
+      
       if (textToSpeak) {
         // Check suppression again just before speaking
         try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
         isSpeakingRef.current = true;
         try {
-          await ttsService.speak(textToSpeak, {
-            stability: 0.7,
-            similarity_boost: 0.9,
-            // Use a slightly slower speed only when we fall back to the isolated word
-            speed: visibleSentence ? undefined : 0.7,
-            messageId: currentMessageIdRef.current,
-            voice: jessicaVoiceId,
-          });
+          if (isReadingInline) {
+            console.log('[Overlay][Speak] 🎯 CALLING speakWithPauseAtWord for reading question');
+            // For reading questions, always avoid speaking the target word.
+            // Use the visible sentence when available; otherwise fall back to the raw sentence/text.
+            const sourceForMask =
+              (visibleSentence && visibleSentence.trim()) ||
+              (sentenceText && sentenceText.trim()) ||
+              (textToSpeak && textToSpeak.trim()) ||
+              '';
+            await ttsService.speakWithPauseAtWord(sourceForMask, wordToSpeak, {
+              stability: 0.7,
+              similarity_boost: 0.9,
+              messageId: currentMessageIdRef.current,
+              voice: jessicaVoiceId,
+              // Keep normal speed; we already add a short pause
+            });
+          } else {
+            await ttsService.speak(textToSpeak, {
+              stability: 0.7,
+              similarity_boost: 0.9,
+              // Use a slightly slower speed only when we fall back to the isolated word
+              speed: visibleSentence ? undefined : 0.7,
+              messageId: currentMessageIdRef.current,
+              voice: jessicaVoiceId,
+            });
+          }
         } finally {
           isSpeakingRef.current = false;
         }

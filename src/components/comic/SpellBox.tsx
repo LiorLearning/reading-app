@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import OpenAI from 'openai';
 import { cn } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
@@ -7,7 +8,7 @@ import { aiService } from '@/lib/ai-service';
 import { useFillInBlanksTutorial } from '@/hooks/use-tutorial';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
-import { Volume2, Square, ChevronRight, Lightbulb } from 'lucide-react';
+import { Volume2, Square, ChevronRight, Lightbulb, Mic } from 'lucide-react';
 import { firebaseSpellboxLogsService } from '@/lib/firebase-spellbox-logs-service';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -16,6 +17,289 @@ interface WordPart {
   content?: string;
   answer?: string;
 }
+
+// Lightweight mic button using the browser Web Speech API (easiest path for dev testing)
+const ReadingMicButton: React.FC<{
+  targetWord: string;
+  onRecognized: (isCorrect: boolean) => void;
+  onTranscript?: (text: string, isFinal: boolean) => void;
+  onRecordingChange?: (isRecording: boolean, finalText?: string) => void;
+  compact?: boolean;
+}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact }) => {
+  const [isRecording, setIsRecording] = React.useState(false);
+  const recognitionRef = React.useRef<any>(null);
+  const shouldBeRecordingRef = React.useRef<boolean>(false);
+  const aggregateRef = React.useRef<string>('');
+  const lastInterimRef = React.useRef<string>('');
+  const isTogglingRef = React.useRef<boolean>(false); // prevent rapid double-click races
+  const DEBUG_SPEECH = true;
+  const debug = (...args: any[]) => { if (DEBUG_SPEECH) console.log('[ReadingMic]', ...args); };
+  // OpenAI batch transcription (fallback-to-browser SR for interim/live)
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = React.useRef<BlobPart[]>([]);
+  const useOpenAITranscribe = React.useMemo(() => {
+    try { return Boolean(import.meta.env.VITE_OPENAI_API_KEY); } catch { return false; }
+  }, []);
+  const openaiClient = React.useMemo(() => {
+    if (!useOpenAITranscribe) return null;
+    try {
+      return new OpenAI({
+        apiKey: import.meta.env.VITE_OPENAI_API_KEY as string,
+        dangerouslyAllowBrowser: true
+      });
+    } catch {
+      return null;
+    }
+  }, [useOpenAITranscribe]);
+
+  // Fireworks (server-proxied) batch transcription toggle and backend base URL
+  const useFireworksTranscribe = React.useMemo(() => {
+    try { return Boolean((import.meta as any).env?.VITE_USE_FIREWORKS); } catch { return false; }
+  }, []);
+  const backendBaseUrl = React.useMemo(() => {
+    try {
+      const v = ((import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
+      return (v && typeof v === 'string') ? v.replace(/\/+$/, '') : '';
+    } catch {
+      return '';
+    }
+  }, []);
+
+  // Normalize text for exact comparison per spec (lowercase, keep spaces, strip punctuation)
+  const normalize = React.useCallback((s: string) => (s || '')
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim(), []);
+  const tokenize = React.useCallback((s: string) => normalize(s).split(/\s+/).filter(Boolean), [normalize]);
+
+  // Note: We intentionally avoid creating a recognizer in an effect to prevent
+  // ghost recognizers that auto-restart. The toggle now owns the recognizer lifecycle.
+
+  const handleToggle = React.useCallback(() => {
+    // Debounce rapid toggles to avoid engine InvalidStateError races
+    if (isTogglingRef.current) return;
+    isTogglingRef.current = true;
+    setTimeout(() => { isTogglingRef.current = false; }, 350);
+
+    try { ttsService.stop(); } catch {}
+    if (isRecording) {
+      debug('toggle: stopping recording. recognitionRef exists=', !!recognitionRef.current);
+      // If OpenAI recorder active, stop and process
+      if (mediaRecorderRef.current) {
+        shouldBeRecordingRef.current = false;
+        try { mediaRecorderRef.current.stop(); } catch {}
+        return;
+      }
+      const r = recognitionRef.current;
+      if (!r) return;
+      shouldBeRecordingRef.current = false;
+      // Immediately flip UI state and force-stop recognizer; some engines delay onend
+      setIsRecording(false);
+      try { r.onend = null as any; } catch {}
+      try { (r as any).onspeechend = null as any; } catch {}
+      try { (r as any).onaudioend = null as any; } catch {}
+      try { r.onresult = null as any; } catch {}
+      try { r.stop(); debug('called stop()'); } catch (e) { debug('stop() error:', e); }
+      try { r.abort(); debug('called abort()'); } catch (e) { debug('abort() error:', e); }
+      // On manual stop, surface the full aggregate transcript immediately (include last interim)
+      const finalText = `${aggregateRef.current} ${lastInterimRef.current}`.trim();
+      try { onTranscript?.(finalText, true); } catch {}
+      try { onRecordingChange?.(false, finalText); } catch {}
+      try { recognitionRef.current = null; } catch {}
+      return;
+    }
+    debug('toggle: starting recording. creating fresh recognizer');
+    aggregateRef.current = '';
+    lastInterimRef.current = '';
+    shouldBeRecordingRef.current = true;
+    try { onRecordingChange?.(true); } catch {}
+    // Prefer Fireworks (via backend proxy) when enabled; else OpenAI if key present
+    if (useFireworksTranscribe) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        recordedChunksRef.current = [];
+        const mr = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        mr.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data);
+        };
+        mr.onstop = async () => {
+          setIsRecording(false);
+          try { stream.getTracks().forEach(t => t.stop()); } catch {}
+          try {
+            const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+            const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('model', 'whisper-v3-turbo');
+            fd.append('language', 'en');
+            const base = backendBaseUrl || '';
+            const url = `https://api.readkraft.com/api/fireworks/transcribe`;
+            const resp = await fetch(url, { method: 'POST', body: fd });
+            const json: any = await resp.json().catch(() => ({}));
+            const text = (json?.text || '').toString();
+            try { onTranscript?.(text, true); } catch {}
+            try { onRecordingChange?.(false, text); } catch {}
+            // quick correctness hint
+            try {
+              const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+              const words = new Set(norm(text).split(' ').filter(Boolean));
+              if (words.has(norm(targetWord))) onRecognized(true);
+            } catch {}
+          } catch (e) {
+            console.error('[ReadingMic] Fireworks transcription failed:', e);
+            try { onTranscript?.('', true); } catch {}
+            try { onRecordingChange?.(false, ''); } catch {}
+          } finally {
+            mediaRecorderRef.current = null;
+          }
+        };
+        mr.start(100);
+        mediaRecorderRef.current = mr;
+        setIsRecording(true);
+      }).catch(err => {
+        console.warn('[ReadingMic] getUserMedia failed (Fireworks path), falling back to browser SR', err);
+        // Fall through to browser SR below
+        startBrowserSR();
+      });
+      return;
+    }
+    if (useOpenAITranscribe && openaiClient) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        recordedChunksRef.current = [];
+        const mr = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        mr.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data);
+        };
+        mr.onstop = async () => {
+          setIsRecording(false);
+          try { stream.getTracks().forEach(t => t.stop()); } catch {}
+          try {
+            const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+            const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
+            const resp: any = await (openaiClient as any).audio.transcriptions.create({
+              file,
+              model: 'gpt-4o-mini-transcribe',
+              language: 'en',
+              temperature: 0
+            } as any);
+            const text = (resp?.text || '').toString();
+            try { onTranscript?.(text, true); } catch {}
+            try { onRecordingChange?.(false, text); } catch {}
+            // quick correctness hint
+            try {
+              const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+              const words = new Set(norm(text).split(' ').filter(Boolean));
+              if (words.has(norm(targetWord))) onRecognized(true);
+            } catch {}
+          } catch (e) {
+            console.error('[ReadingMic] OpenAI transcription failed:', e);
+            try { onTranscript?.('', true); } catch {}
+            try { onRecordingChange?.(false, ''); } catch {}
+          } finally {
+            mediaRecorderRef.current = null;
+          }
+        };
+        mr.start(100);
+        mediaRecorderRef.current = mr;
+        setIsRecording(true);
+      }).catch(err => {
+        console.warn('[ReadingMic] getUserMedia failed, falling back to browser SR', err);
+        // Fall through to browser SR below
+        startBrowserSR();
+      });
+      return;
+    }
+    // Otherwise, create a fresh recognizer for every start to avoid stale engine states on some browsers
+    const startBrowserSR = () => {
+    try {
+      const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SR) return;
+      const nr = new SR();
+      nr.continuous = true;
+      nr.interimResults = true;
+      nr.lang = 'en-US';
+      nr.onstart = () => {
+        debug('nr.onstart');
+        setIsRecording(true);
+        try { onRecordingChange?.(true, undefined); } catch {}
+      };
+      const handleEngineStop = () => {
+        debug('nr.onend/onspeechend/onaudioend; shouldBeRecording=', shouldBeRecordingRef.current);
+        setIsRecording(false);
+        // If the engine stops unexpectedly while user intends to record, try to restart
+        if (shouldBeRecordingRef.current && recognitionRef.current === nr) {
+          setTimeout(() => {
+            try {
+              debug('nr auto-restart after end');
+              nr.start();
+            } catch (e) {
+              debug('nr auto-restart failed:', e);
+            }
+          }, 150);
+        }
+      };
+      nr.onend = handleEngineStop;
+      (nr as any).onspeechend = handleEngineStop;
+      (nr as any).onaudioend = handleEngineStop;
+      nr.onresult = (e: any) => {
+        try {
+          debug('nr.onresult: resultIndex=', e.resultIndex, 'len=', e.results?.length);
+          let interim = '';
+          let final = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            const res = e.results[i];
+            const txt = res[0]?.transcript || '';
+            if (res.isFinal) final += txt; else interim += txt;
+          }
+          if (final) {
+            aggregateRef.current = `${aggregateRef.current} ${final}`.trim();
+          }
+          lastInterimRef.current = interim;
+          const live = `${aggregateRef.current} ${interim}`.trim();
+          if (onTranscript) onTranscript(live, !!final && !interim);
+        } catch {}
+      };
+      nr.onerror = (err: any) => { debug('nr.onerror:', err?.error || err); setIsRecording(false); };
+      recognitionRef.current = nr;
+      const tryStart = (attempt: number) => {
+        try {
+          debug('nr.start() attempt', attempt);
+          nr.start();
+        } catch (e) {
+          debug('nr.start() failed attempt', attempt, e);
+          if (attempt < 3) {
+            const delay = [200, 400, 800][attempt] || 800;
+            setTimeout(() => tryStart(attempt + 1), delay);
+          }
+        }
+      };
+      tryStart(0);
+    } catch {}
+    };
+    startBrowserSR();
+  }, [isRecording]);
+
+  return (
+    <Button
+      variant="comic"
+      size="icon"
+      onClick={handleToggle}
+      className={cn(
+        compact ? 'ml-1 h-8 w-8 rounded-md' : 'ml-2 h-11 w-11 rounded-lg',
+        'border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
+        isRecording && 'bg-red-500 text-white hover:bg-red-600'
+      )}
+      title={isRecording ? 'Stop recording' : 'Read this word'}
+      aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+    >
+      {isRecording ? (
+        <Square className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
+      ) : (
+        <Mic className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
+      )}
+    </Button>
+  );
+};
 
 interface SpellBoxProps {
   // Basic props
@@ -43,6 +327,7 @@ interface SpellBoxProps {
     correctAnswer: string;
     audio: string;
     explanation: string;
+    isReading?: boolean;
     isPrefilled?: boolean;
     prefilledIndexes?: number[];
     topicId?: string; // Added for logging
@@ -150,6 +435,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const targetWord = question?.word || word || '';
   const questionText = question?.questionText;
   const questionId = question?.id;
+  const isReading = !!question?.isReading;
   
   // Ensure we have a valid sentence for spelling - create fallback if needed
   const ensureSpellingSentence = useCallback((word: string, sentence?: string, questionText?: string): string => {
@@ -243,6 +529,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     //   prefilledIndexes: question?.prefilledIndexes
     // });
     
+    // Reading mode: always display the full word (ignore any prefilled/blanks)
+    if (isReading) {
+      return [
+        { type: 'text', content: word.toUpperCase() }
+      ];
+    }
+    
     // Check if this question has prefilled characters
     if (question?.isPrefilled && question?.prefilledIndexes && question.prefilledIndexes.length > 0) {
       // console.log('🔤 SPELLBOX: Using prefilled mode');
@@ -298,12 +591,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       return parts;
     }
     
-    // console.log('🔤 SPELLBOX: Using default mode (all blanks)');
     // Default behavior: make the entire word a blank to spell
     return [
       { type: 'blank', answer: word.toUpperCase() }
     ];
-  }, [question]);
+  }, [question, isReading]);
+
+  // Live transcription for reading mode
+  const [liveTranscript, setLiveTranscript] = useState<string>('');
+  const [liveTranscriptFinal, setLiveTranscriptFinal] = useState<boolean>(false);
+  const [isRecordingReading, setIsRecordingReading] = useState<boolean>(false);
+  const [lockedTranscript, setLockedTranscript] = useState<string>('');
+  const [readingMismatchedIndices, setReadingMismatchedIndices] = useState<number[]>([]);
 
   // Helper function to get the expected length for user input (excluding prefilled characters)
   const getExpectedUserInputLength = useCallback((): number => {
@@ -390,7 +689,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
   // Helper function to reconstruct the complete word from user input and prefilled characters
   const reconstructCompleteWord = useCallback((userInput: string): string => {
-    if (!question?.isPrefilled || !question?.prefilledIndexes) {
+    if (isReading || !question?.isPrefilled || !question?.prefilledIndexes) {
       // console.log('🔤 SPELLBOX reconstructCompleteWord: Using default mode, returning userInput as-is:', userInput);
       return userInput;
     }
@@ -423,7 +722,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     
     // console.log('🔤 SPELLBOX reconstructCompleteWord: Final result:', result);
     return result;
-  }, [question, targetWord]);
+  }, [question, targetWord, isReading]);
 
   // Helper function to check if user input is complete (all blank positions filled)
   const isUserInputComplete = useCallback((userInput: string): boolean => {
@@ -722,14 +1021,42 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   }, [isUserInputComplete]);
 
   // Submit current attempt via chevron/Enter
-  const handleSubmitAttempt = useCallback(() => {
+  const handleSubmitAttempt = useCallback(async () => {
     // Enable submit once any letter is entered (non-space)
-    const canSubmit = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+    const canSubmit = isReading
+      ? ((lockedTranscript || '').trim().length > 0)
+      : (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+    if (isReading) {
+      console.log('[SpellBox] Submit clicked (reading mode). lockedTranscript.len=', (lockedTranscript || '').length, 'liveTranscript.len=', (liveTranscript || '').length, 'canSubmit=', canSubmit);
+    }
     if (!canSubmit) {
       return;
     }
-    const completeWord = reconstructCompleteWord(userAnswer);
-    const correct = isWordCorrect(completeWord, targetWord);
+    let completeWord = '';
+    let correct = false;
+    if (isReading) {
+      completeWord = (lockedTranscript || liveTranscript || '').trim();
+      try {
+        const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+        correct = evalResult.status === 'correct';
+        setReadingMismatchedIndices(evalResult.mismatchedIndices || []);
+        console.log('[SpellBox] Evaluation (reading via AI). completeWord=', completeWord, 'result=', evalResult);
+      } catch (e) {
+        // Fallback: retain old behavior if AI fails
+        const normalize = (s: string) => (s || '')
+          .toLowerCase()
+          .replace(/[^a-z\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const tokenSet = new Set((normalize(completeWord)).split(/\s+/).filter(Boolean));
+        correct = tokenSet.has(normalize(targetWord));
+        setReadingMismatchedIndices([]);
+        console.warn('[SpellBox] AI evaluation failed, fallback used. correct=', correct);
+      }
+    } else {
+      completeWord = reconstructCompleteWord(userAnswer);
+      correct = isWordCorrect(completeWord, targetWord);
+    }
     setHasSubmitted(true);
     setIsCorrect(correct);
     // Record submitted answer for change detection on subsequent submits
@@ -791,6 +1118,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         try { interruptRealtimeSession(); } catch {}
       }
       triggerConfetti();
+      if (isReading) {
+        setReadingMismatchedIndices([]);
+      }
       if (showTutorial) {
         try { nextTutorialStep(); } catch {}
       }
@@ -823,15 +1153,28 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           const aiTutor = (question as any)?.aiTutor || {};
           const studentEntry = completeWord;
           const mistakes = computeMistakes(studentEntry, targetWord);
-          const payload = {
-            target_word: targetWord,
-            question: aiTutor?.question,
-            student_entry: studentEntry,
-            mistakes,
-            attempt_number: nextAttempt,
-            topic_to_reinforce: aiTutor?.topic_to_reinforce,
-            spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule,
-          };
+          let payload: any;
+          if (isReading) {
+            payload = {
+              target_word: targetWord,
+              phonemics_of_student_response: studentEntry,
+              mistakes,
+              attempt_number: nextAttempt,
+              topic_to_reinforce: aiTutor?.topic_to_reinforce,
+              reading_rule: aiTutor?.reading_rule,
+            };
+          } else {
+            const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+            payload = {
+              target_word: targetWord,
+              question: aiTutor?.question,
+              student_entry: studentEntry,
+              mistakes,
+              attempt_number: nextAttempt,
+              topic_to_reinforce: aiTutor?.topic_to_reinforce,
+              spelling_pattern_or_rule: ruleToUse,
+            };
+          }
           sendMessage(JSON.stringify(payload));
         } catch {}
       }
@@ -875,6 +1218,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setAttempts(0);
       setAiHint('');
       setIsGeneratingHint(false);
+      setReadingMismatchedIndices([]);
       setTimeout(() => { focusNextEmptyBox(); }, 0);
     }
     prevQuestionIdRef.current = questionId;
@@ -929,9 +1273,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   if (!isVisible || !targetWord) return null;
 
   // Derived UI states for chevron transparency/disabled behavior
-  const hasAnyInput = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+  const hasAnyInput = isReading
+    ? (lockedTranscript.trim().length > 0)
+    : (userAnswer || '').split('').some(ch => ch && ch !== ' ');
   const isSameAsLastSubmission = hasSubmitted && reconstructCompleteWord(userAnswer) === lastSubmittedAnswer;
-  const submitDisabledUnattempted = !isCorrect && (!hasAnyInput || isSameAsLastSubmission);
+  const submitDisabledUnattempted = isReading
+    ? (!isCorrect && !hasAnyInput)
+    : (!isCorrect && (!hasAnyInput || isSameAsLastSubmission));
   const nextGateDisabled = isCorrect && !canClickNext;
 
   return (
@@ -1015,31 +1363,56 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             // Render each prefilled character in its own dotted box
                             return (
                               <React.Fragment key={partIndex}>
-                                {part.content?.split('').map((char, charIndex) => (
-                                  <div
-                                    key={`${partIndex}-${charIndex}`}
-                                    style={{
-                                      width: '36px',
-                                      height: '44px',
-                                      borderRadius: '8px',
-                                      fontSize: '22px',
-                                      fontFamily: 'system-ui, -apple-system, sans-serif',
-                                      fontWeight: '700',
-                                      textAlign: 'center',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      textTransform: 'uppercase',
-                                      color: '#1F2937',
-                                      background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)',
-                                      border: '2px dashed #9CA3AF',
-                                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                                      transition: 'all 0.15s ease-out'
-                                    }}
-                                  >
-                                    {char}
-                                  </div>
-                                ))}
+                        {part.content?.split('').map((char, charIndex) => {
+                          // Reading mode: after submit, color-code letters: green for correct, red for mismatches
+                          let style: React.CSSProperties = {
+                            width: '36px',
+                            height: '44px',
+                            borderRadius: '8px',
+                            fontSize: '22px',
+                            fontFamily: 'system-ui, -apple-system, sans-serif',
+                            fontWeight: '700',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.15s ease-out'
+                          };
+                          const baseGray: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)',
+                            border: '2px dashed #9CA3AF',
+                            color: '#1F2937',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                          };
+                          const green: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)',
+                            border: '3px solid #22C55E',
+                            color: '#15803D',
+                            boxShadow: '0 4px 12px rgba(34, 197, 94, 0.2)'
+                          };
+                          const red: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)',
+                            border: '3px solid #EF4444',
+                            color: '#B91C1C',
+                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
+                          };
+                          if (isReading && hasSubmitted) {
+                            if (isCorrect) {
+                              style = { ...style, ...green };
+                            } else {
+                              const isMismatch = readingMismatchedIndices.includes(charIndex);
+                              style = { ...style, ...(isMismatch ? red : green) };
+                            }
+                          } else {
+                            style = { ...style, ...baseGray };
+                          }
+                          return (
+                            <div key={`${partIndex}-${charIndex}`} style={style}>
+                              {char}
+                            </div>
+                          );
+                        })}
                               </React.Fragment>
                             );
                           } else {
@@ -1236,25 +1609,51 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           }
                         })}
                         
-                        {/* Audio button with ElevenLabs TTS - positioned after the complete word */}
-                        <Button
-                          id="spellbox-speaker-button"
-                          variant="comic"
-                          size="icon"
-                          onClick={playWordAudio}
-                          className={cn(
-                            'ml-2 h-11 w-11 rounded-lg border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
-                            isSpeaking && 'bg-red-500 text-white hover:bg-red-600'
-                          )}
-                          title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
-                          aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
-                        >
-                          {isSpeaking ? (
-                            <Square className="h-5 w-5" />
-                          ) : (
-                            <Volume2 className="h-5 w-5" />
-                          )}
-                        </Button>
+                        {/* Audio/Mic button - speaker for spelling, mic for reading */}
+                        {!isReading ? (
+                          <Button
+                            id="spellbox-speaker-button"
+                            variant="comic"
+                            size="icon"
+                            onClick={playWordAudio}
+                            className={cn(
+                              'ml-2 h-11 w-11 rounded-lg border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
+                              isSpeaking && 'bg-red-500 text-white hover:bg-red-600'
+                            )}
+                            title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
+                            aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
+                          >
+                            {isSpeaking ? (
+                              <Square className="h-5 w-5" />
+                            ) : (
+                              <Volume2 className="h-5 w-5" />
+                            )}
+                          </Button>
+                        ) : (
+                          <ReadingMicButton 
+                            targetWord={targetWord} 
+                            onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
+                            onRecordingChange={(rec, finalText) => {
+                              setIsRecordingReading(rec);
+                              if (!rec) {
+                                setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
+                                setHasSubmitted(false);
+                                setIsCorrect(false);
+                                setReadingMismatchedIndices([]);
+                              } else {
+                                setLockedTranscript('');
+                                setLiveTranscript('');
+                                setLiveTranscriptFinal(false);
+                                setHasSubmitted(false);
+                                setIsCorrect(false);
+                                setReadingMismatchedIndices([]);
+                              }
+                            }}
+                            onRecognized={(ok) => {
+                              // Do not finalize here; assessment happens on chevron
+                            }}
+                          />
+                        )}
                       </div>
                     ) : (
                       <span className="inline-block" 
@@ -1274,6 +1673,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
+          {isReading && liveTranscript && (
+            <div className="mt-3 text-sm text-center">
+              <span className="opacity-60 mr-1">You said:</span>
+              <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>{liveTranscript}</span>
+            </div>
+          )}
+
           
 
           {/* Hint button: appears after the first incorrect submit and persists until next question */}
@@ -1288,15 +1694,28 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     const aiTutor = (question as any)?.aiTutor || {};
                     const studentEntry = reconstructCompleteWord(userAnswer);
                     const mistakes = computeMistakes(studentEntry, targetWord);
-                       const payload = {
-                         target_word: targetWord,
-                      question: aiTutor?.question,
-                      student_entry: studentEntry,
-                      mistakes,
-                      attempt_number: attempts,
-                      topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                      spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule,
-                    };
+                    let payload: any;
+                    if (isReading) {
+                      payload = {
+                        target_word: targetWord,
+                        phonemics_of_student_response: studentEntry,
+                        mistakes,
+                        attempt_number: attempts,
+                        topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                        reading_rule: aiTutor?.reading_rule
+                      };
+                    } else {
+                      const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+                      payload = {
+                        target_word: targetWord,
+                        question: aiTutor?.question,
+                        student_entry: studentEntry,
+                        mistakes,
+                        attempt_number: attempts,
+                        topic_to_reinforce: aiTutor?.topic_to_reinforce,
+                        spelling_pattern_or_rule: ruleToUse,
+                      };
+                    }
                     sendMessage(JSON.stringify(payload));
                   }
                 }}
@@ -1403,9 +1822,23 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               if (part.type === 'text') {
                                 return (
                                   <React.Fragment key={partIndex}>
-                                    {part.content?.split('').map((char, charIndex) => (
-                                      <div key={`${partIndex}-${charIndex}`} style={{ width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase', color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' }}>{char}</div>
-                                    ))}
+                                    {part.content?.split('').map((char, charIndex) => {
+                                      let style: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase' };
+                                      const baseGray: React.CSSProperties = { color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' };
+                                      const green: React.CSSProperties = { color: '#15803D', background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E' };
+                                      const red: React.CSSProperties = { color: '#B91C1C', background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444' };
+                                      if (isReading && hasSubmitted) {
+                                        if (isCorrect) {
+                                          style = { ...style, ...green };
+                                        } else {
+                                          const isMismatch = readingMismatchedIndices.includes(charIndex);
+                                          style = { ...style, ...(isMismatch ? red : green) };
+                                        }
+                                      } else {
+                                        style = { ...style, ...baseGray };
+                                      }
+                                      return <div key={`${partIndex}-${charIndex}`} style={style}>{char}</div>;
+                                    })}
                                   </React.Fragment>
                                 );
                               } else {
@@ -1489,24 +1922,51 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 );
                               }
                             })}
-                            {/* Inline mode speaker button - after the full word cluster */}
-                            <Button
-                              variant="comic"
-                              size="icon"
-                              onClick={playWordAudio}
-                              className={cn(
-                                'ml-1 h-8 w-8 rounded-md border-2 border-black bg-white text-foreground shadow-[0_3px_0_rgba(0,0,0,0.6)]',
-                                isSpeaking ? 'bg-red-500 text-white hover:bg-red-600' : 'hover:bg-primary hover:text-primary-foreground'
-                              )}
-                              title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
-                              aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
-                            >
-                              {isSpeaking ? (
-                                <Square className="h-4 w-4" />
-                              ) : (
-                                <Volume2 className="h-4 w-4" />
-                              )}
-                            </Button>
+                            {/* Inline mode: speaker for spelling, mic for reading */}
+                            {!isReading ? (
+                              <Button
+                                variant="comic"
+                                size="icon"
+                                onClick={playWordAudio}
+                                className={cn(
+                                  'ml-1 h-8 w-8 rounded-md border-2 border-black bg-white text-foreground shadow-[0_3px_0_rgba(0,0,0,0.6)]',
+                                  isSpeaking ? 'bg-red-500 text-white hover:bg-red-600' : 'hover:bg-primary hover:text-primary-foreground'
+                                )}
+                                title={isSpeaking ? 'Stop audio' : 'Listen to this word'}
+                                aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
+                              >
+                                {isSpeaking ? (
+                                  <Square className="h-4 w-4" />
+                                ) : (
+                                  <Volume2 className="h-4 w-4" />
+                                )}
+                              </Button>
+                            ) : (
+                              <ReadingMicButton 
+                                compact
+                                targetWord={targetWord}
+                                onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
+                                onRecordingChange={(rec, finalText) => {
+                                  setIsRecordingReading(rec);
+                                  if (!rec) {
+                                    setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
+                                    setHasSubmitted(false);
+                                    setIsCorrect(false);
+                                    setReadingMismatchedIndices([]);
+                                  } else {
+                                    setLockedTranscript('');
+                                    setLiveTranscript('');
+                                    setLiveTranscriptFinal(false);
+                                    setHasSubmitted(false);
+                                    setIsCorrect(false);
+                                    setReadingMismatchedIndices([]);
+                                  }
+                                }}
+                                onRecognized={(ok) => {
+                                  // No-op for finalization in reading mode
+                                }}
+                              />
+                            )}
                           </div>
                         ) : (
                           <span className="inline-block" style={{ fontWeight: 400 }}>{word}</span>
@@ -1516,6 +1976,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     );
                   })}
                 </div>
+                {isReading && liveTranscript && (
+                  <div className="mt-2 text-xs text-center">
+                    <span className="opacity-60 mr-1">You said:</span>
+                    <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>{liveTranscript}</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1525,7 +1991,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 <Button
                   variant="comic"
                   size="icon"
-                  onClick={() => { playClickSound(); if (sendMessage && targetWord) { const aiTutor = (question as any)?.aiTutor || {}; const studentEntry = reconstructCompleteWord(userAnswer); const mistakes = computeMistakes(studentEntry, targetWord); const payload = { target_word: targetWord, question: aiTutor?.question, student_entry: studentEntry, mistakes, attempt_number: attempts, topic_to_reinforce: aiTutor?.topic_to_reinforce, spelling_pattern_or_rule: aiTutor?.spelling_pattern_or_rule }; sendMessage(JSON.stringify(payload)); } }}
+                  onClick={() => { playClickSound(); if (sendMessage && targetWord) { const aiTutor = (question as any)?.aiTutor || {}; const studentEntry = reconstructCompleteWord(userAnswer); const mistakes = computeMistakes(studentEntry, targetWord); const ruleToUse = isReading ? (aiTutor?.reading_rule || aiTutor?.spelling_pattern_or_rule) : aiTutor?.spelling_pattern_or_rule; const payload = { target_word: targetWord, question: aiTutor?.question, student_entry: studentEntry, mistakes, attempt_number: attempts, topic_to_reinforce: aiTutor?.topic_to_reinforce, spelling_pattern_or_rule: ruleToUse }; sendMessage(JSON.stringify(payload)); } }}
                   className={cn('h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 bg-yellow-300 text-yellow-900 hover:bg-yellow-400')}
                   title="Hint: listen again"
                   aria-label="Hint: listen again"
