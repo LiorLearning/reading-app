@@ -32,6 +32,7 @@ const ReadingMicButton: React.FC<{
   const aggregateRef = React.useRef<string>('');
   const lastInterimRef = React.useRef<string>('');
   const isTogglingRef = React.useRef<boolean>(false); // prevent rapid double-click races
+  const [isProcessing, setIsProcessing] = React.useState(false);
   const DEBUG_SPEECH = true;
   const debug = (...args: any[]) => { if (DEBUG_SPEECH) console.log('[ReadingMic]', ...args); };
   // OpenAI batch transcription (fallback-to-browser SR for interim/live)
@@ -79,6 +80,7 @@ const ReadingMicButton: React.FC<{
   const handleToggle = React.useCallback(() => {
     // Debounce rapid toggles to avoid engine InvalidStateError races
     if (isTogglingRef.current) return;
+    if (isProcessing) return;
     isTogglingRef.current = true;
     setTimeout(() => { isTogglingRef.current = false; }, 350);
 
@@ -110,6 +112,7 @@ const ReadingMicButton: React.FC<{
       return;
     }
     debug('toggle: starting recording. creating fresh recognizer');
+    setIsProcessing(false);
     aggregateRef.current = '';
     lastInterimRef.current = '';
     shouldBeRecordingRef.current = true;
@@ -126,6 +129,7 @@ const ReadingMicButton: React.FC<{
           setIsRecording(false);
           try { stream.getTracks().forEach(t => t.stop()); } catch {}
           try {
+            setIsProcessing(true);
             const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
             const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
             const fd = new FormData();
@@ -150,6 +154,7 @@ const ReadingMicButton: React.FC<{
             try { onTranscript?.('', true); } catch {}
             try { onRecordingChange?.(false, ''); } catch {}
           } finally {
+            setIsProcessing(false);
             mediaRecorderRef.current = null;
           }
         };
@@ -174,6 +179,7 @@ const ReadingMicButton: React.FC<{
           setIsRecording(false);
           try { stream.getTracks().forEach(t => t.stop()); } catch {}
           try {
+            setIsProcessing(true);
             const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
             const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
             const resp: any = await (openaiClient as any).audio.transcriptions.create({
@@ -196,6 +202,7 @@ const ReadingMicButton: React.FC<{
             try { onTranscript?.('', true); } catch {}
             try { onRecordingChange?.(false, ''); } catch {}
           } finally {
+            setIsProcessing(false);
             mediaRecorderRef.current = null;
           }
         };
@@ -277,7 +284,7 @@ const ReadingMicButton: React.FC<{
     } catch {}
     };
     startBrowserSR();
-  }, [isRecording]);
+  }, [isRecording, isProcessing]);
 
   return (
     <Button
@@ -289,14 +296,15 @@ const ReadingMicButton: React.FC<{
         'border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
         isRecording && 'bg-red-500 text-white hover:bg-red-600'
       )}
-      title={isRecording ? 'Stop recording' : 'Read this word'}
-      aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+      title={isProcessing ? 'Processing...' : (isRecording ? 'Stop recording' : 'Read this word')}
+      aria-label={isProcessing ? 'Processing...' : (isRecording ? 'Stop recording' : 'Start recording')}
+      disabled={isProcessing}
     >
-      {isRecording ? (
-        <Square className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
-      ) : (
-        <Mic className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
-      )}
+      {isProcessing
+        ? <Loader2 className={compact ? 'h-4 w-4 animate-spin' : 'h-5 w-5 animate-spin'} />
+        : (isRecording
+            ? <Square className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
+            : <Mic className={compact ? 'h-4 w-4' : 'h-5 w-5'} />)}
     </Button>
   );
 };
