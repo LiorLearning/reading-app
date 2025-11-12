@@ -169,8 +169,7 @@ export const sampleMCQData: MCQData = {
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
-          isReading: false,
-isPrefilled: false,
+          isPrefilled: false,
           prefilledIndexes: [0,2],
           aiHook: {
             targetWord: 'cat',
@@ -184,7 +183,7 @@ isPrefilled: false,
             student_entry: "",
             topic_to_reinforce: 'Spell the short vowel word',
             reading_rule: '',
-spelling_pattern_or_rule: "Short vowel /a/ as in 'cat'."
+spelling_pattern_or_rule:  "Short vowel /a/ as in 'cat'."
           },
           audio: "cat"
         },
@@ -205,8 +204,7 @@ spelling_pattern_or_rule: "Short vowel /a/ as in 'cat'."
           isSpacing: false,
           isSorting: true,
           isSpelling: true,
-          isReading: false,
-isPrefilled: false,
+          isPrefilled: false,
           prefilledIndexes: [],
           aiHook: {
             targetWord: 'dog',
@@ -220,7 +218,7 @@ isPrefilled: false,
             student_entry: "",
             topic_to_reinforce: 'Spell the short vowel word',
             reading_rule: '',
-spelling_pattern_or_rule: "Short vowel /o/ as in 'dog'."
+spelling_pattern_or_rule:  "Short vowel /o/ as in 'dog'."
           },
           audio: "dog"
         },
@@ -241,8 +239,7 @@ spelling_pattern_or_rule: "Short vowel /o/ as in 'dog'."
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isReading: false,
-isPrefilled: true,
+          isPrefilled: true,
           prefilledIndexes: [2,3],
           aiHook: {
             targetWord: 'blend',
@@ -256,7 +253,7 @@ isPrefilled: true,
             student_entry: '',
             topic_to_reinforce: 'Initial consonant blends',
             reading_rule: '',
-spelling_pattern_or_rule: "The 'st' blend joins the /s/ and /t/ sounds at the start of words like 'step' and 'stop'."
+spelling_pattern_or_rule:  "The 'st' blend joins the /s/ and /t/ sounds at the start of words like 'step' and 'stop'."
           },
           audio: 'step'
         },
@@ -277,8 +274,7 @@ spelling_pattern_or_rule: "The 'st' blend joins the /s/ and /t/ sounds at the st
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-          isReading: false,
-isPrefilled: true,
+          isPrefilled: true,
           prefilledIndexes: [0, 3],
           aiHook: {
             targetWord: 'bark',
@@ -292,7 +288,7 @@ isPrefilled: true,
             student_entry: '',
             topic_to_reinforce: 'R-controlled vowel sound /ar/',
             reading_rule: '',
-spelling_pattern_or_rule: "The letters 'ar' make the /ar/ sound, as in 'car', 'farm', and 'star'."
+spelling_pattern_or_rule:  "The letters 'ar' make the /ar/ sound, as in 'car', 'farm', and 'star'."
           },
           audio: 'bark'
         },
@@ -313,8 +309,7 @@ spelling_pattern_or_rule: "The letters 'ar' make the /ar/ sound, as in 'car', 'f
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isReading: false,
-isPrefilled: false,
+        isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "cake",
@@ -328,7 +323,7 @@ isPrefilled: false,
             student_entry: '',
             topic_to_reinforce: 'Spell the long A word',
             reading_rule: '',
-spelling_pattern_or_rule: "The silent 'e' makes the 'a' say its name in 'cake'."
+spelling_pattern_or_rule:  "The silent 'e' makes the 'a' say its name in 'cake'."
           },
           audio:"cake"
         },
@@ -349,8 +344,7 @@ spelling_pattern_or_rule: "The silent 'e' makes the 'a' say its name in 'cake'."
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isReading: false,
-isPrefilled: false,
+        isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "glue",
@@ -364,7 +358,7 @@ isPrefilled: false,
             student_entry: '',
             topic_to_reinforce: 'Spell the long U word',
             reading_rule: '',
-spelling_pattern_or_rule: "The silent 'e' makes the 'u' say its name in 'glue'."
+spelling_pattern_or_rule:  "The silent 'e' makes the 'u' say its name in 'glue'."
           },
           audio:"glue"
         },
@@ -385,8 +379,7 @@ spelling_pattern_or_rule: "The silent 'e' makes the 'u' say its name in 'glue'."
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isReading: false,
-isPrefilled: true,
+        isPrefilled: true,
         prefilledIndexes: [0,4,5],
           aiHook: {
             targetWord: "weight",
@@ -400,7 +393,7 @@ isPrefilled: true,
             student_entry: '',
             topic_to_reinforce: 'Spell the long A word',
             reading_rule: '',
-spelling_pattern_or_rule: "The letters ‘eigh’ make the long /eɪ/ sound in 'weight', as in 'eight' and 'neighbor'."
+spelling_pattern_or_rule:  "The letters ‘eigh’ make the long /eɪ/ sound in 'weight', as in 'eight' and 'neighbor'."
           }
           ,
           audio:"weight"
@@ -422,8 +415,7 @@ spelling_pattern_or_rule: "The letters ‘eigh’ make the long /eɪ/ sound in '
           isSpacing: false,
           isSorting: false,
           isSpelling: true,
-        isReading: false,
-isPrefilled: false,
+        isPrefilled: false,
         prefilledIndexes: [],
           aiHook: {
             targetWord: "noodle",
@@ -437,15 +429,156 @@ isPrefilled: false,
             student_entry: '',
             topic_to_reinforce: 'Spell vowel team words with long vowel sounds',
             reading_rule: '',
-spelling_pattern_or_rule: "The word 'noodle' has the vowel team ‘oo’ that makes the long /uː/ sound, as in 'moon' and 'food', followed by the final syllable ‘-le’."
+spelling_pattern_or_rule:  "The word 'noodle' has the vowel team ‘oo’ that makes the long /uː/ sound, as in 'moon' and 'food', followed by the final syllable ‘-le’."
           }
           
           ,
           audio:"noodle"
         },
+        {
+          id: 9,
+          topicId: 'A-',
+          topicName: 'Spell_the_/ch/_sound_TCH_rule',
+          progressTopicName: "The 'TCH' spelling rule",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'march',
+          imageUrl: null,
+          explanation: "Outstanding! The word is 'march' — /ch/ comes after an r-controlled vowel, so we spell it with 'ch'.",
+          questionText: 'mar__',
+          correctAnswer: 'march',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'march',
+            intent: 'fill_blank',
+            questionLine: '____',
+            imagePrompt: 'People marching or the month of March'
+          },
+          aiTutor: {
+            target_word: 'march',
+            question: 'mar__',
+            student_entry: '',
+            topic_to_reinforce: "TCH rule for /ch/",
+            reading_rule: '',
+spelling_pattern_or_rule:  "TCH Rule: Use TCH to spell /ch/ right after a short vowel (match, witch). Use CH at the beginning of a word or after a consonant, r-controlled, or long vowel (chip, rich, beach). In 'march', /ch/ comes after the r-controlled vowel 'ar', so we use CH!"
+          },
+          audio: 'march'
+        },
+        {
+          id: 10,
+          topicId: 'A-',
+          topicName: 'EAR_multiple_sounds',
+          progressTopicName: "EAR and its three sounds",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'heard',
+          imageUrl: null,
+          explanation: "Good listening — 'heard' uses EAR to make the /er/ sound (like 'her').",
+          questionText: '____',
+          correctAnswer: 'heard',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'heard',
+            intent: 'fill_blank',
+            questionLine: '____',
+            imagePrompt: 'Someone cupping their ear to show they heard a sound'
+          },
+          aiTutor: {
+            target_word: 'heard',
+            question: '____',
+            student_entry: '',
+            topic_to_reinforce: "EAR phonogram",
+            reading_rule: '',
+spelling_pattern_or_rule:  "EAR = /er/ in 'heard'. Remember: EAR can be /ear/ (hear), /air/ (bear), or /er/ (heard) — check the word and listen closely."
+          },
+          audio: 'heard'
+        },
+
+        {
+          id: 11,
+          topicId: 'A-',
+          topicName: 'Learn phonograms si',
+          progressTopicName: "Phonogram 'si': /sh/, /zh/, and /s/",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          word: 'collision',
+          imageUrl: null,
+          explanation: "Great! The word is 'collision' — we hear li-zhun because collide ends with /d/, so si says /zh/.",
+          questionText: 'colli__on',
+          correctAnswer: 'collision',
+          template: 'fill_blank',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+          targetWord: 'collision',
+          intent: 'fill_blank',
+          questionLine: 'colli__on',
+          imagePrompt: 'Two bumper cars colliding'
+          },
+          aiTutor: {
+          target_word: 'collision',
+          question: 'colli__on',
+          student_entry: '',
+          topic_to_reinforce: "Phonogram 'si'",
+          reading_rule: '',
+spelling_pattern_or_rule:  "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
+          },
+          audio: 'collision'
+          },
+        {
+          id: 12,
+          topicId: 'A-',
+          topicName: 'Spell_words_ending_in_ij_spelled_age',
+          progressTopicName: "Words ending in /ij/ spelled -AGE",
+          questionElements: 'image + audio + text',
+          answerElements: 'text',
+          templateType: 'fill_blank',
+          template: 'fill_blank',
+          word: 'carriage',
+          imageUrl: null,
+          explanation: "Great! The word is 'carriage' — the ending -AGE says /ij/.",
+          questionText: '______',
+          correctAnswer: 'carriage',
+          isSpacing: false,
+          isSorting: false,
+          isSpelling: true,
+          isPrefilled: false,
+          prefilledIndexes: [],
+          aiHook: {
+            targetWord: 'carriage',
+            intent: 'fill_blank',
+            questionLine: '______',
+            imagePrompt: "A horse-drawn carriage on a cobblestone street"
+          },
+          aiTutor: {
+            target_word: 'carriage',
+            question: '______',
+            student_entry: '',
+            topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
+            reading_rule: '',
+spelling_pattern_or_rule:  "The -AGE ending makes the /ij/ sound in words like carriage, village, and package. The silent E marks the soft G and indicates the final syllable /ij/."
+          },
+          audio: 'carriage'
+        },
       ],
   },
-  'K-R-O.3': {
+   'K-R-O.3': {
   topicInfo: {
     topicId: 'K-R-O.3',
     topicName: 'Complete_the_short_a_word',
@@ -92559,7 +92692,7 @@ spelling_pattern_or_rule: "R-controlled vowel 'AR' = /är/ in the word."
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1,2,3,4,5,6,9],
+    prefilledIndexes: [0,1,2,3,4,5,8,9],
     aiHook: {
     targetWord: 'propulsion',
     intent: 'fill_blank',
@@ -92572,7 +92705,7 @@ spelling_pattern_or_rule: "R-controlled vowel 'AR' = /är/ in the word."
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'propulsion', si comes after a consonant and before -ion, so it says /sh/. Rule: consonant + sion → /shun/ (propulsion, compulsion, convulsion). Tip: If you hear “...shun” after a consonant, choose -sion."
+spelling_pattern_or_rule:  "In 'propulsion', si comes after a consonant and before -ion, so it says /sh/. Rule: consonant + sion → /shun/ (propulsion, compulsion, convulsion). Tip: If you hear “...shun” after a consonant, choose -sion."
     },
     audio: 'propulsion'
     },
@@ -92594,7 +92727,7 @@ spelling_pattern_or_rule: "In 'propulsion', si comes after a consonant and befor
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1],
+    prefilledIndexes: [0,1,2,5,6],
     aiHook: {
     targetWord: 'torsion',
     intent: 'fill_blank',
@@ -92607,7 +92740,7 @@ spelling_pattern_or_rule: "In 'propulsion', si comes after a consonant and befor
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'torsion', si sits after a consonant and just before -ion, so it says /sh/. Rule: consonant + sion → /shun/. Tip: Listen for the “shun” ending."
+spelling_pattern_or_rule:  "In 'torsion', si sits after a consonant and just before -ion, so it says /sh/. Rule: consonant + sion → /shun/. Tip: Listen for the “shun” ending."
     },
     audio: 'torsion'
     },
@@ -92629,7 +92762,7 @@ spelling_pattern_or_rule: "In 'torsion', si sits after a consonant and just befo
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1,2,6,7],
+    prefilledIndexes: [0,1,2,5,6],
     aiHook: {
     targetWord: 'pension',
     intent: 'fill_blank',
@@ -92642,7 +92775,7 @@ spelling_pattern_or_rule: "In 'torsion', si sits after a consonant and just befo
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'pension', n + sion spells /shun/. Rule: n + sion → /shun/ (pension, tension, extension, mansion). Tip: Spot the n right before the “shun” sound."
+spelling_pattern_or_rule:  "In 'pension',  n+ sion spells /shun/. Rule: n + sion → /shun/ (pension, tension, extension, mansion). Tip: Spot the n right before the “shun” sound."
     },
     audio: 'pension'
     },
@@ -92664,7 +92797,7 @@ spelling_pattern_or_rule: "In 'pension', n + sion spells /shun/. Rule: n + sion 
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [7],
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'mansion',
     intent: 'fill_blank',
@@ -92673,11 +92806,11 @@ spelling_pattern_or_rule: "In 'pension', n + sion spells /shun/. Rule: n + sion 
     },
     aiTutor: {
     target_word: 'mansion',
-    question: 'man__on',
+    question: '_ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'mansion', n + sion spells /shun/. Rule: n + sion → /shun/ (mansion, expansion). Tip: If you hear n before “shun,” write -sion."
+spelling_pattern_or_rule:  "In 'mansion', n + sion spells /shun/. Rule: n + sion → /shun/ (mansion, expansion). Tip: If you hear n before “shun,” write -sion."
     },
     audio: 'mansion'
     },
@@ -92699,7 +92832,7 @@ spelling_pattern_or_rule: "In 'mansion', n + sion spells /shun/. Rule: n + sion 
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,2,3,4],
+    prefilledIndexes: [0,1,2,3,4,7,8],
     aiHook: {
     targetWord: 'excursion',
     intent: 'fill_blank',
@@ -92712,7 +92845,7 @@ spelling_pattern_or_rule: "In 'mansion', n + sion spells /shun/. Rule: n + sion 
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'excursion', si is hugged by vowel sounds, so it says /zh/. Rule: vowel-sound + si + vowel-sound → /zh/ (excursion, erosion, division). Tip: If it sounds like “zhŭn,” think -sion with /zh/."
+spelling_pattern_or_rule:  "In 'excursion', si is hugged by vowel sounds, so it says /zh/. Rule: vowel-sound + si + vowel-sound → /zh/ (excursion, erosion, division). Tip: If it sounds like “zhŭn,” think -sion with /zh/."
     },
     audio: 'excursion'
     },
@@ -92734,7 +92867,7 @@ spelling_pattern_or_rule: "In 'excursion', si is hugged by vowel sounds, so it s
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [5,8,9],
+    prefilledIndexes: [0,1,2,3,4,5,8,9],
     aiHook: {
     targetWord: 'television',
     intent: 'fill_blank',
@@ -92747,7 +92880,7 @@ spelling_pattern_or_rule: "In 'excursion', si is hugged by vowel sounds, so it s
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'television', vowels hug si, so it says /zh/. Rule: vowel + si + vowel → /zh/ (television, cohesion, division). Tip: Vowels around si make the buzzy /zh/ sound."
+spelling_pattern_or_rule:  "In 'television', vowels hug si, so it says /zh/. Rule: vowel + si + vowel → /zh/ (television, cohesion, division). Tip: Vowels around si make the buzzy /zh/ sound."
     },
     audio: 'television'
     },
@@ -92768,8 +92901,8 @@ spelling_pattern_or_rule: "In 'television', vowels hug si, so it says /zh/. Rule
     isSpacing: false,
     isSorting: false,
     isSpelling: true,
-    isPrefilled: true,
-    prefilledIndexes: [2,3],
+    isPrefilled: false,
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'division',
     intent: 'fill_blank',
@@ -92778,11 +92911,11 @@ spelling_pattern_or_rule: "In 'television', vowels hug si, so it says /zh/. Rule
     },
     aiTutor: {
     target_word: 'division',
-    question: 'divi__on',
+    question: '_ _ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'division', the base divide ends voiced (…/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (divide→division, collide→collision, erode→erosion). Tip: A buzzy last sound in the base points to /zh/."
+spelling_pattern_or_rule:  "In 'division', the base divide ends voiced (…/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (divide→division, collide→collision, erode→erosion). Tip: A buzzy last sound in the base points to /zh/."
     },
     audio: 'division'
     },
@@ -92804,7 +92937,7 @@ spelling_pattern_or_rule: "In 'division', the base divide ends voiced (…/d/), 
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,1,2,3,4,5],
+    prefilledIndexes: [0,1,2,3,4,7,8],
     aiHook: {
     targetWord: 'explosion',
     intent: 'fill_blank',
@@ -92817,7 +92950,7 @@ spelling_pattern_or_rule: "In 'division', the base divide ends voiced (…/d/), 
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'explosion', the base explode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (explode→explosion, erode→erosion, confuse→confusion). Tip: Hear the buzz in the base, choose /zh/."
+spelling_pattern_or_rule:  "In 'explosion', the base explode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (explode→explosion, erode→erosion, confuse→confusion). Tip: Hear the buzz in the base, choose /zh/."
     },
     audio: 'explosion'
     },
@@ -92839,7 +92972,7 @@ spelling_pattern_or_rule: "In 'explosion', the base explode ends voiced (/d/), s
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [2],
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'erosion',
     intent: 'fill_blank',
@@ -92848,11 +92981,11 @@ spelling_pattern_or_rule: "In 'explosion', the base explode ends voiced (/d/), s
     },
     aiTutor: {
     target_word: 'erosion',
-    question: 'ero__on',
+    question: '_ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'erosion', the base erode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (erode→erosion, collide→collision). Tip: Voiced base endings make the buzzy /zh/."
+spelling_pattern_or_rule:  "In 'erosion', the base erode ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (erode→erosion, collide→collision). Tip: Voiced base endings make the buzzy /zh/."
     },
     audio: 'erosion'
     },
@@ -92874,7 +93007,7 @@ spelling_pattern_or_rule: "In 'erosion', the base erode ends voiced (/d/), so -s
     isSorting: false,
     isSpelling: true,
     isPrefilled: true,
-    prefilledIndexes: [0,3],
+    prefilledIndexes: [],
     aiHook: {
     targetWord: 'collision',
     intent: 'fill_blank',
@@ -92883,11 +93016,11 @@ spelling_pattern_or_rule: "In 'erosion', the base erode ends voiced (/d/), so -s
     },
     aiTutor: {
     target_word: 'collision',
-    question: 'colli__on',
+    question: '_ _ _ _ _ _ _ _ _',
     student_entry: '',
     topic_to_reinforce: "Phonogram 'si'",
     reading_rule: '',
-spelling_pattern_or_rule: "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
+spelling_pattern_or_rule:  "In 'collision', the base collide ends voiced (/d/), so -sion says /zhun/. Rule: voiced base + -sion → /zhun/ (collide→collision, divide→division). Tip: If the base ends in a buzz sound, expect /zh/."
     },
     audio: 'collision'
     }
@@ -92934,7 +93067,7 @@ spelling_pattern_or_rule: "In 'collision', the base collide ends voiced (/d/), s
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'insect'
       },
@@ -92969,7 +93102,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'abstract'
       },
@@ -93004,7 +93137,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'vector'
       },
@@ -93026,7 +93159,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 4, 5, 6],
+        prefilledIndexes: [0, 3,4, 5, 6],
         aiHook: {
           targetWord: 'octopus',
           intent: 'fill_blank',
@@ -93039,7 +93172,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'octopus'
       },
@@ -93074,7 +93207,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'distinct'
       },
@@ -93096,7 +93229,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 1, 2, 4],
+        prefilledIndexes: [],
         aiHook: {
           targetWord: 'extinct',
           intent: 'fill_blank',
@@ -93105,11 +93238,11 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         },
         aiTutor: {
           target_word: 'extinct',
-          question: 'ext_n__',
+          question: '_ _ _ _ _ _ _',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'extinct'
       },
@@ -93131,7 +93264,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 1, 2, 6, 7, 8],
+        prefilledIndexes: [5, 6, 7, 8],
         aiHook: {
           targetWord: 'spectator',
           intent: 'fill_blank',
@@ -93140,11 +93273,11 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         },
         aiTutor: {
           target_word: 'spectator',
-          question: 'spe___tor',
+          question: '_ _ _ _ _ a t o r',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'spectator'
       },
@@ -93166,7 +93299,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 2, 3, 5],
+        prefilledIndexes: [0,1,2],
         aiHook: {
           targetWord: 'construct',
           intent: 'fill_blank',
@@ -93175,11 +93308,11 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         },
         aiTutor: {
           target_word: 'construct',
-          question: 'c_ns_r___',
+          question: 'con____',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'construct'
       },
@@ -93201,7 +93334,7 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 1, 3],
+        prefilledIndexes: [],
         aiHook: {
           targetWord: 'deflect',
           intent: 'fill_blank',
@@ -93210,11 +93343,11 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         },
         aiTutor: {
           target_word: 'deflect',
-          question: 'de_l___',
+          question: '_ _ _ _ _ _ _',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'deflect'
       },
@@ -93236,27 +93369,26 @@ spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the midd
         isSorting: false,
         isSpelling: true,
         isPrefilled: true,
-        prefilledIndexes: [0, 2, 4],
+        prefilledIndexes: [],
         aiHook: {
           targetWord: 'conflict',
           intent: 'fill_blank',
-          questionLine: 'c_n_l___',
+          questionLine: '_ _ _ _ _ _ _',
           imagePrompt: 'Two teams in a tug-of-war showing conflict'
         },
         aiTutor: {
           target_word: 'conflict',
-          question: 'c_n_l___',
+          question: '_ _ _ _ _ _ _ _',
           student_entry: '',
           topic_to_reinforce: '/kt/ spelled CT',
           reading_rule: '',
-spelling_pattern_or_rule: "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
+spelling_pattern_or_rule:  "When your ears hear /k/ then /t/ together in the middle or end of a word, write CT. Try it: say the word slowly—if you hear /k/…/t/, choose CT. Examples: act, insect, protect, active, strict."
         },
         audio: 'conflict'
       }
     ]
   },
- 
-'5-R-A.3': {
+ '5-R-A.3': {
   topicInfo: {
   topicId: '5-R-A.3',
   topicName: 'Learn_more_words_ending_in_tion',
@@ -94029,7 +94161,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3], // 'nego' shown; both sound chunks (ti, at) are blanked
+prefilledIndexes: [0,1,2,3,4,5,6], // 'nego' shown; both sound chunks (ti, at) are blanked
 aiHook: {
 targetWord: 'negotiation',
 intent: 'fill_blank',
@@ -94038,11 +94170,11 @@ imagePrompt: 'Two people at a table shaking hands after a negotiation'
 },
 aiTutor: {
 target_word: 'negotiation',
-question: 'nego__a__on',
+question: 'negotia____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'negotiation', the /ā-shun/ sound is spelled -ation. Rule: When you hear /a–shun/, use -ation (nation, location, celebration, negotiation). Tip: If the part before the ending sounds like a long A (ay), pick -ation."
+spelling_pattern_or_rule:  "In 'negotiation', the /ā-shun/ sound is spelled -ation. Rule: When you hear /a–shun/, use -ation (nation, location, celebration, negotiation). Tip: If the part before the ending sounds like a long A (ay), pick -ation."
 },
 audio: 'negotiation'
 },
@@ -94073,11 +94205,11 @@ imagePrompt: 'Hands holding a small plant to show conservation'
 },
 aiTutor: {
 target_word: 'conservation',
-question: 'conserv__a__on',
+question: 'conserva____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'conservation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation (vacation, rotation, conservation). Tip: Long A + /shun/ = -ation."
+spelling_pattern_or_rule:  "In 'conservation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation (vacation, rotation, conservation). Tip: Long A + /shun/ = -ation."
 },
 audio: 'conservation'
 },
@@ -94099,7 +94231,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3,4,5,6,7,8], // 'transform' shown
+prefilledIndexes: [0,1,2,3,4,5,6,7,8,9], // 'transform' shown
 aiHook: {
 targetWord: 'transformation',
 intent: 'fill_blank',
@@ -94108,11 +94240,11 @@ imagePrompt: 'A caterpillar transforming into a butterfly'
 },
 aiTutor: {
 target_word: 'transformation',
-question: 'transfor__a__on',
+question: 'transforma____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'transformation', the /ā-shun/ sound is spelled -ation. Rule: If it sounds like ay-shun, write -ation (formation, transformation). Tip: Hearing MAY-shun points to -ation."
+spelling_pattern_or_rule:  "In 'transformation', the /ā-shun/ sound is spelled -ation. Rule: If it sounds like ay-shun, write -ation (formation, transformation). Tip: Hearing MAY-shun points to -ation."
 },
 audio: 'transformation'
 },
@@ -94134,7 +94266,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3], // fewer letters shown (medium)
+prefilledIndexes: [0,1,2,3,4,5], // fewer letters shown (medium)
 aiHook: {
 targetWord: 'circulation',
 intent: 'fill_blank',
@@ -94143,11 +94275,11 @@ imagePrompt: 'Arrows showing blood circulation through the body'
 },
 aiTutor: {
 target_word: 'circulation',
-question: 'circ__a__on',
+question: 'circula____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'circulation', the /ā-shun/ sound is spelled -ation. Rule: Many science/process words use -ation (circulation, respiration). Tip: AY + shun → -ation."
+spelling_pattern_or_rule:  "In 'circulation', the /ā-shun/ sound is spelled -ation. Rule: Many science/process words use -ation (circulation, respiration). Tip: AY + shun → -ation."
 },
 audio: 'circulation'
 },
@@ -94169,7 +94301,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1], // just 'or' shown (medium+)
+prefilledIndexes: [0,1,2,3,4,5], // just 'or' shown (medium+)
 aiHook: {
 targetWord: 'orientation',
 intent: 'fill_blank',
@@ -94178,11 +94310,11 @@ imagePrompt: 'A map and a compass for orientation'
 },
 aiTutor: {
 target_word: 'orientation',
-question: 'or__n__a__on',
+question: 'orient_____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'orientation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation even after a base like orient. Tip: Long A before /shun/? Choose -ation."
+spelling_pattern_or_rule:  "In 'orientation', the /ā-shun/ sound is spelled -ation. Rule: /a–shun/ → -ation even after a base like orient. Tip: Long A before /shun/? Choose -ation."
 },
 audio: 'orientation'
 },
@@ -94204,7 +94336,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0], // 'a' only (medium+)
+prefilledIndexes: [4,5], // 'a' only (medium+)
 aiHook: {
 targetWord: 'adaptation',
 intent: 'fill_blank',
@@ -94213,11 +94345,11 @@ imagePrompt: 'An animal changing to survive in its habitat (adaptation)'
 },
 aiTutor: {
 target_word: 'adaptation',
-question: 'a__p__a__on',
+question: '_____ta____',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'adaptation', the /ā-shun/ sound is spelled -ation after adapt. Rule: If adding the ending after t makes ay-shun, use -ation (adapt→adaptation). Tip: Hear AY? Choose -ation."
+spelling_pattern_or_rule:  "In 'adaptation', the /ā-shun/ sound is spelled -ation after adapt. Rule: If adding the ending after t makes ay-shun, use -ation (adapt→adaptation). Tip: Hear AY? Choose -ation."
 },
 audio: 'adaptation'
 },
@@ -94248,11 +94380,11 @@ imagePrompt: 'A rulebook or a checklist to show regulation'
 },
 aiTutor: {
 target_word: 'regulation',
-question: '__g__l__a__on',
+question: '_ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'regulation', the /ā-shun/ sound is spelled -ation. Rule: -ation is common for this sound (regulation, population). Tip: Long A + shun → -ation."
+spelling_pattern_or_rule:  "In 'regulation', the /ā-shun/ sound is spelled -ation. Rule: -ation is common for this sound (regulation, population). Tip: Long A + shun → -ation."
 },
 audio: 'regulation'
 },
@@ -94283,11 +94415,11 @@ imagePrompt: 'A person exploring with a flashlight and map'
 },
 aiTutor: {
 target_word: 'exploration',
-question: 'ex__o__a__on',
+question: '_ _ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'exploration', the /ā-shun/ sound is spelled -ation. Rule: Hear AY then shun? Choose -ation. Tip: AY-shun = -ation."
+spelling_pattern_or_rule:  "In 'exploration', the /ā-shun/ sound is spelled -ation. Rule: Hear AY then shun? Choose -ation. Tip: AY-shun = -ation."
 },
 audio: 'exploration'
 },
@@ -94318,11 +94450,11 @@ imagePrompt: 'Two speech bubbles in different languages showing translation'
 },
 aiTutor: {
 target_word: 'translation',
-question: 'tr__s__a__on',
+question: '_ _ _ _ _ _ _ _ _ _ _ ',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'translation', the /ā-shun/ sound is spelled -ation. Rule: Many language/process words take -ation (translation, conjugation). Tip: Long A before shun → -ation."
+spelling_pattern_or_rule:  "In 'translation', the /ā-shun/ sound is spelled -ation. Rule: Many language/process words take -ation (translation, conjugation). Tip: Long A before shun → -ation."
 },
 audio: 'translation'
 },
@@ -94353,11 +94485,11 @@ imagePrompt: 'A crowd of people representing population'
 },
 aiTutor: {
 target_word: 'population',
-question: '__p__l__a__on',
+question: '_ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -tion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'population', the /ā-shun/ sound is spelled -ation. Rule: -ation is very common for this sound (population, regulation). Tip: Hear AY? -ation is usually right."
+spelling_pattern_or_rule:  "In 'population', the /ā-shun/ sound is spelled -ation. Rule: -ation is very common for this sound (population, regulation). Tip: Hear AY? -ation is usually right."
 },
 audio: 'population'
 }
@@ -94405,7 +94537,7 @@ question: 'acce__',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'access', cc keeps the first vowel short and -ss makes a strong ending /s/. Rule: Short first vowel + firm final /s/ often uses doubles (access, success). Tip: Doubled letters protect short vowels and keep the hissy s strong."
+spelling_pattern_or_rule:  "In 'access', cc keeps the first vowel short and -ss makes a strong ending /s/. Rule: Short first vowel + firm final /s/ often uses doubles (access, success). Tip: Doubled letters protect short vowels and keep the hissy s strong."
 },
 audio: 'access'
 },
@@ -94440,7 +94572,7 @@ question: 'proce__',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'process', the firm ending /s/ is -ss. Rule: Words with a clear, holdable last /s/ often use -ss (process, recess). Tip: If the last sound is a steady hiss, try -ss."
+spelling_pattern_or_rule:  "In 'process', the firm ending /s/ is -ss. Rule: Words with a clear, holdable last /s/ often use -ss (process, recess). Tip: If the last sound is a steady hiss, try -ss."
 },
 audio: 'process'
 },
@@ -94462,7 +94594,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3,4,5], // only last -s missing? keep two underscores for -ss → we kept both missing
+prefilledIndexes: [0,1,2,3,4], // only last -s missing? keep two underscores for -ss → we kept both missing
 aiHook: {
 targetWord: 'success',
 intent: 'fill_blank',
@@ -94475,7 +94607,7 @@ question: 'succe__',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'success', cc keeps the vowel short and -ss marks a strong final /s/. Rule: Double letters protect short vowels and mark strong endings (success, access). Tip: Short vowel + strong /s/ → expect doubles."
+spelling_pattern_or_rule:  "In 'success', cc keeps the vowel short and -ss marks a strong final /s/. Rule: Double letters protect short vowels and mark strong endings (success, access). Tip: Short vowel + strong /s/ → expect doubles."
 },
 audio: 'success'
 },
@@ -94510,7 +94642,7 @@ question: 'addre__',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'address', -ss makes the crisp ending /s/. Rule: A stressed ending with a firm /s/ often uses -ss (address, distress). Tip: If you clearly hear the hiss at the end, -ss fits."
+spelling_pattern_or_rule:  "In 'address', -ss makes the crisp ending /s/. Rule: A stressed ending with a firm /s/ often uses -ss (address, distress). Tip: If you clearly hear the hiss at the end, -ss fits."
 },
 audio: 'address'
 },
@@ -94532,7 +94664,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1], // few letters shown (medium+)
+prefilledIndexes: [0,1,2,3,4,5], // few letters shown (medium+)
 aiHook: {
 targetWord: 'distress',
 intent: 'fill_blank',
@@ -94541,11 +94673,11 @@ imagePrompt: 'A SOS signal or a person needing help (distress)'
 },
 aiTutor: {
 target_word: 'distress',
-question: 'di__re__',
+question: 'distre__',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'distress', -ss marks the strong ending /s/. Rule: Words finishing with a sharp /s/ often use -ss (distress, suppress). Tip: Strong hiss at the finish? Choose -ss."
+spelling_pattern_or_rule:  "In 'distress', -ss marks the strong ending /s/. Rule: Words finishing with a sharp /s/ often use -ss (distress, suppress). Tip: Strong hiss at the finish? Choose -ss."
 },
 audio: 'distress'
 },
@@ -94576,11 +94708,11 @@ imagePrompt: 'Kids playing outside for recess'
 },
 aiTutor: {
 target_word: 'recess',
-question: 're__s__',
+question: '_ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'recess', -ss shows a clear last /s/. Rule: Many everyday/school words end with -ss (recess, compass). Tip: Clear last /s/ → -ss."
+spelling_pattern_or_rule:  "In 'recess', -ss shows a clear last /s/. Rule: Many everyday/school words end with -ss (recess, compass). Tip: Clear last /s/ → -ss."
 },
 audio: 'recess'
 },
@@ -94611,11 +94743,11 @@ imagePrompt: 'A hand gently stopping a bouncing ball (suppress)'
 },
 aiTutor: {
 target_word: 'suppress',
-question: 'su__re__',
+question: '_ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'suppress', pp protects the short vowel and -ss gives a firm ending /s/. Rule: Short vowel + strong last /s/ often uses doubles (suppress). Tip: Doubles = short vowel + strong hiss."
+spelling_pattern_or_rule:  "In 'suppress', pp protects the short vowel and -ss gives a firm ending /s/. Rule: Short vowel + strong last /s/ often uses doubles (suppress). Tip: Doubles = short vowel + strong hiss."
 },
 audio: 'suppress'
 },
@@ -94646,11 +94778,11 @@ imagePrompt: 'A road sign showing a city bypass'
 },
 aiTutor: {
 target_word: 'bypass',
-question: 'by__a__',
+question: '_ _ _ _ __',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'bypass', -ss shows the clear ending /s/. Rule: One-syllable bases with a strong last /s/ often end in -ss (pass, class, bypass). Tip: Crisp last /s/? Try -ss."
+spelling_pattern_or_rule:  "In 'bypass', -ss shows the clear ending /s/. Rule: One-syllable bases with a strong last /s/ often end in -ss (pass, class, bypass). Tip: Crisp last /s/? Try -ss."
 },
 audio: 'bypass'
 },
@@ -94672,7 +94804,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: false,
-prefilledIndexes: [], // hard
+prefilledIndexes: [4,5,6], // hard
 aiHook: {
 targetWord: 'embarrass',
 intent: 'fill_blank',
@@ -94681,11 +94813,11 @@ imagePrompt: 'A blushing face to show embarrassment'
 },
 aiTutor: {
 target_word: 'embarrass',
-question: 'em__rra__',
+question: '_ _ _ _ r r a _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'embarrass', -rr- helps the middle sound and -ss gives a strong final /s/. Rule: Learn the em-bar-rass pattern as a chunk. Tip: Clap the parts: em | bar | rass."
+spelling_pattern_or_rule:  "In 'embarrass', -rr- helps the middle sound and -ss gives a strong final /s/. Rule: Learn the em-bar-rass pattern as a chunk. Tip: Clap the parts: em | bar | rass."
 },
 audio: 'embarrass'
 },
@@ -94716,11 +94848,11 @@ imagePrompt: 'A runner passing the finish line (surpass)'
 },
 aiTutor: {
 target_word: 'surpass',
-question: 's__pa__',
+question: '_ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'Words ending in -ss',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'surpass', -ss marks the strong ending /s/. Rule: Verbs with a firm last /s/ often use -ss (surpass, compress→compression). Tip: Notice how -ss can turn into -ssion when you add the /shun/ ending (discuss→discussion, compress→compression)."
+spelling_pattern_or_rule:  "In 'surpass', -ss marks the strong ending /s/. Rule: Verbs with a firm last /s/ often use -ss (surpass, compress→compression). Tip: Notice how -ss can turn into -ssion when you add the /shun/ ending (discuss→discussion, compress→compression)."
 },
 audio: 'surpass'
 }
@@ -94755,7 +94887,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2], // only the sound letters hidden (easy)
+prefilledIndexes: [0,1,2,5,6], // only the sound letters hidden (easy)
 aiHook: {
 targetWord: 'tension',
 intent: 'fill_blank',
@@ -94768,7 +94900,7 @@ question: 'ten__on',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'tension', n + sion spells /shun/. Rule: A consonant—especially n—right before -sion makes /shun/ (tension, pension, mansion). Tip: Spot the n before the ending."
+spelling_pattern_or_rule:  "In 'tension', n + sion spells /shun/. Rule: A consonant—especially n—right before -sion makes /shun/ (tension, pension, mansion). Tip: Spot the n before the ending."
 },
 audio: 'tension'
 },
@@ -94790,7 +94922,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1], // easy
+prefilledIndexes: [0,1,2,3,4], // easy
 aiHook: {
 targetWord: 'extension',
 intent: 'fill_blank',
@@ -94799,11 +94931,11 @@ imagePrompt: 'An extension cord plugged into a socket'
 },
 aiTutor: {
 target_word: 'extension',
-question: 'ex__n__on',
+question: 'exten____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'extension', n + sion makes /shun/. Rule: After n, choose -sion to say shun (extension, ascension). Tip: ex | TEN | shun helps you hear it."
+spelling_pattern_or_rule:  "In 'extension', n + sion makes /shun/. Rule: After n, choose -sion to say shun (extension, ascension). Tip: ex | TEN | shun helps you hear it."
 },
 audio: 'extension'
 },
@@ -94834,11 +94966,11 @@ imagePrompt: 'A balloon getting bigger to show expansion'
 },
 aiTutor: {
 target_word: 'expansion',
-question: 'expa__on',
+question: 'expa____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'expansion', n + sion gives /shun/. Rule: If the base ends with an n sound, -sion usually says shun (expansion). Tip: Hear N before the ending? Pick -sion."
+spelling_pattern_or_rule:  "In 'expansion', n + sion gives /shun/. Rule: If the base ends with an n sound, -sion usually says shun (expansion). Tip: Hear N before the ending? Pick -sion."
 },
 audio: 'expansion'
 },
@@ -94860,7 +94992,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3], // medium
+prefilledIndexes: [0,1,2,3,4], // medium
 aiHook: {
 targetWord: 'suspension',
 intent: 'fill_blank',
@@ -94869,11 +95001,11 @@ imagePrompt: 'Car suspension springs close-up'
 },
 aiTutor: {
 target_word: 'suspension',
-question: 'suspe__on',
+question: 'suspe____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'suspension', n + sion spells /shun/. Rule: n + sion is a common team (suspension, distension). Tip: n before the ending = shun."
+spelling_pattern_or_rule:  "In 'suspension', n + sion spells /shun/. Rule: n + sion is a common team (suspension, distension). Tip: n before the ending = shun."
 },
 audio: 'suspension'
 },
@@ -94904,11 +95036,11 @@ imagePrompt: 'An arrow going upward showing ascension'
 },
 aiTutor: {
 target_word: 'ascension',
-question: 'ascen__on',
+question: 'ascen____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'ascension', n + sion → /shun/. Rule: Words from ascend use ascension with -sion. Tip: If the base connects to -end/-nd, -sion often says shun."
+spelling_pattern_or_rule:  "In 'ascension', n + sion → /shun/. Rule: Words from ascend use ascension with -sion. Tip: If the base connects to -end/-nd, -sion often says shun."
 },
 audio: 'ascension'
 },
@@ -94930,7 +95062,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: true,
-prefilledIndexes: [0,1,2,3,4,5,6], // medium+
+prefilledIndexes: [3,4,5], // medium+
 aiHook: {
 targetWord: 'propulsion',
 intent: 'fill_blank',
@@ -94939,11 +95071,11 @@ imagePrompt: 'A rocket with flames to show propulsion'
 },
 aiTutor: {
 target_word: 'propulsion',
-question: 'propul__on',
+question: '___pul____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'propulsion', a consonant + sion (…l + sion) makes /shun/. Rule: When a consonant sits right before sion, the ending often says /shun/ (propulsion, compulsion, convulsion). Tip: Hear …pul-shun? Write -sion."
+spelling_pattern_or_rule:  "In 'propulsion', a consonant + sion (…l + sion) makes /shun/. Rule: When a consonant sits right before sion, the ending often says /shun/ (propulsion, compulsion, convulsion). Tip: Hear …pul-shun? Write -sion."
 },
 audio: 'propulsion'
 },
@@ -94965,7 +95097,7 @@ isSpacing: false,
 isSorting: false,
 isSpelling: true,
 isPrefilled: false,
-prefilledIndexes: [], // hard
+prefilledIndexes: [0,1,2,3,4], // hard
 aiHook: {
 targetWord: 'discussion',
 intent: 'fill_blank',
@@ -94974,11 +95106,11 @@ imagePrompt: 'Students in a circle having a discussion'
 },
 aiTutor: {
 target_word: 'discussion',
-question: 'discu__on',
+question: 'discu_____',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'discussion', -ssion spells /shun/. Rule: Bases ending in -cuss change to -ssion (discuss → discussion). Tip: Two s before -ion often become the /shun/ sound."
+spelling_pattern_or_rule:  "In 'discussion', -ssion spells /shun/. Rule: Bases ending in -cuss change to -ssion (discuss → discussion). Tip: Two s before -ion often become the /shun/ sound."
 },
 audio: 'discussion'
 },
@@ -95009,11 +95141,11 @@ imagePrompt: 'A ticket admitting a person into a museum'
 },
 aiTutor: {
 target_word: 'admission',
-question: 'admi__on',
+question: '_ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'admission', -ssion spells /shun/. Rule: Bases ending in -mit change to -mission (admit → admission, submit → submission, permit → permission). Tip: mit → mission makes /shun/."
+spelling_pattern_or_rule:  "In 'admission', -ssion spells /shun/. Rule: Bases ending in -mit change to -mission (admit → admission, submit → submission, permit → permission). Tip: mit → mission makes /shun/."
 },
 audio: 'admission'
 },
@@ -95044,11 +95176,11 @@ imagePrompt: 'A permission slip being signed'
 },
 aiTutor: {
 target_word: 'permission',
-question: 'permi__on',
+question: '_ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'permission', -ssion spells /shun/. Rule: permit → permission follows the same mit → mission pattern (also submit → submission, admit → admission). Tip: If the base ends with mit, expect -mission."
+spelling_pattern_or_rule:  "In 'permission', -ssion spells /shun/. Rule: permit → permission follows the same mit → mission pattern (also submit → submission, admit → admission). Tip: If the base ends with mit, expect -mission."
 },
 audio: 'permission'
 },
@@ -95079,11 +95211,11 @@ imagePrompt: 'Hands pressing a sponge to show compression'
 },
 aiTutor: {
 target_word: 'compression',
-question: 'compre__on',
+question: '_ _ _ _ _ _ _ _ _ _',
 student_entry: '',
 topic_to_reinforce: 'The /shŭn/ sound spelled -sion',
 reading_rule: '',
-spelling_pattern_or_rule: "In 'compression', -ssion spells /shun/. Rule: Bases ending in -press become -pression (compress → compression, express → expression). Tip: press → pression gives the /shun/ ending."
+spelling_pattern_or_rule:  "In 'compression', -ssion spells /shun/. Rule: Bases ending in -press become -pression (compress → compression, express → expression). Tip: press → pression gives the /shun/ ending."
 },
 audio: 'compression'
 }
@@ -95130,8 +95262,8 @@ audio: 'compression'
           "question": "algori__m",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "In 'algorithm', TH is between vowel sounds, so it makes the soft, buzzing TH (like a gentle /d/). We still spell it 'th'. Quick check: put a hand on your throat—if it buzzes, use the soft TH sound."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "In 'algorithm', TH is between vowel sounds, so it makes the soft, buzzing TH (like a gentle /d/). We still spell it 'th'. Quick check: put a hand on your throat—if it buzzes, use the soft TH sound."
         },
         "audio": "algorithm"
       },
@@ -95165,8 +95297,8 @@ audio: 'compression'
           "question": "loga__hm",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "When TH sits between vowel sounds, it often uses the soft, buzzing TH (feels a bit like /d/). Keep spelling 'th'. Tip: throat buzz = soft TH sound."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "When TH sits between vowel sounds, it often uses the soft, buzzing TH (feels a bit like /d/). Keep spelling 'th'. Tip: throat buzz = soft TH sound."
         },
         "audio": "logarithm"
       },
@@ -95200,8 +95332,8 @@ audio: 'compression'
           "question": "al__ough",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "In 'although', vowels on both sides keep your voice on, so the TH is the soft, buzzing kind. Write 'th'; your voice gives the gentle /d/ feel."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "In 'although', vowels on both sides keep your voice on, so the TH is the soft, buzzing kind. Write 'th'; your voice gives the gentle /d/ feel."
         },
         "audio": "although"
       },
@@ -95235,8 +95367,8 @@ audio: 'compression'
           "question": "brea__e",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "Silent e can turn quiet TH into the soft, buzzing TH: breath → breathe. Letters stay 'th'. Tip: add e, feel the buzz, sound feels closer to a gentle /d/."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "Silent e can turn quiet TH into the soft, buzzing TH: breath → breathe. Letters stay 'th'. Tip: add e, feel the buzz, sound feels closer to a gentle /d/."
         },
         "audio": "breathe"
       },
@@ -95270,8 +95402,8 @@ audio: 'compression'
           "question": "loa__e",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "Vowel + TH + silent e often makes the soft, buzzing TH: loathe, bathe, clothe. Spelling is 'th'. Tip: if an e comes after TH, try the buzzing sound."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "Vowel + TH + silent e often makes the soft, buzzing TH: loathe, bathe, clothe. Spelling is 'th'. Tip: if an e comes after TH, try the buzzing sound."
         },
         "audio": "loathe"
       },
@@ -95305,8 +95437,8 @@ audio: 'compression'
           "question": "scy__e",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "Words that end with -the often use the soft, buzzing TH: scythe, wreathe, soothe. We always write 'th'. Check with the throat-buzz test."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "Words that end with -the often use the soft, buzzing TH: scythe, wreathe, soothe. We always write 'th'. Check with the throat-buzz test."
         },
         "audio": "scythe"
       },
@@ -95340,8 +95472,8 @@ audio: 'compression'
           "question": "soo__e",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "Vowel + TH + e often sounds like the soft, buzzing TH (close to a gentle /d/): soothe, breathe, loathe. Keep spelling 'th'."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "Vowel + TH + e often sounds like the soft, buzzing TH (close to a gentle /d/): soothe, breathe, loathe. Keep spelling 'th'."
         },
         "audio": "soothe"
       },
@@ -95375,8 +95507,8 @@ audio: 'compression'
           "question": "ga__er",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "In -ther words (gather, weather, other), TH often uses the soft, buzzing sound. It may feel like a gentle /d/, but you still write 'th'."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "In -ther words (gather, weather, other), TH often uses the soft, buzzing sound. It may feel like a gentle /d/, but you still write 'th'."
         },
         "audio": "gather"
       },
@@ -95410,8 +95542,8 @@ audio: 'compression'
           "question": "wea__ering",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "In the -ther family (weather, feather, leather), TH is usually the soft, buzzing sound. Keep spelling 'th'. Quick check: hand on throat—feel the buzz."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "In the -ther family (weather, feather, leather), TH is usually the soft, buzzing sound. Keep spelling 'th'. Quick check: hand on throat—feel the buzz."
         },
         "audio": "weathering"
       },
@@ -95445,8 +95577,8 @@ audio: 'compression'
           "question": "mo__er",
           "student_entry": "",
           "topic_to_reinforce": "Buzzing TH (/ð/ ~ gentle /d/ feel)",
-          "reading_rule": "",
-"spelling_pattern_or_rule": "Between vowels (mo-ther), TH usually makes the soft, buzzing sound (like a gentle /d/). Still spell it 'th'. Tip: if it buzzes, choose the soft TH."
+          "reading_rule": '',
+"spelling_pattern_or_rule":  "Between vowels (mo-ther), TH usually makes the soft, buzzing sound (like a gentle /d/). Still spell it 'th'. Tip: if it buzzes, choose the soft TH."
         },
         "audio": "mother"
       }
@@ -95495,7 +95627,7 @@ audio: 'compression'
         student_entry: '',
         topic_to_reinforce: 'Base words before adding suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Hope’ ends in silent E. When adding a vowel suffix, drop the E. Example: hope → hoping, hopeful."
+spelling_pattern_or_rule:  "‘Hope’ ends in silent E."
       },
       audio: 'hope'
     },
@@ -95530,7 +95662,7 @@ spelling_pattern_or_rule: "‘Hope’ ends in silent E. When adding a vowel suff
         student_entry: '',
         topic_to_reinforce: 'Drop the final E before adding -ful',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘hopeful,’ the silent E is dropped before adding -ful. Rule: Drop E before vowel suffixes like -ing, -able, -ous, -ful."
+spelling_pattern_or_rule:  "When you combine 'hope' and '-ful' it becomes 'hopeful' with a single 'l'"
       },
       audio: 'hopeful'
     },
@@ -95565,7 +95697,7 @@ spelling_pattern_or_rule: "In ‘hopeful,’ the silent E is dropped before addi
         student_entry: '',
         topic_to_reinforce: 'Adding two suffixes: -ful + -ness',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘hopefulness,’ drop the E before -ful, then add -ness. Always add suffixes one at a time: hope → hopeful → hopefulness."
+spelling_pattern_or_rule:  "In ‘hope,’ first add  -ful, then add -ness. Always add suffixes one at a time: hope → hopeful → hopefulness."
       },
       audio: 'hopefulness'
     },
@@ -95602,7 +95734,7 @@ spelling_pattern_or_rule: "In ‘hopefulness,’ drop the E before -ful, then ad
         student_entry: '',
         topic_to_reinforce: 'Base words before suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Read’ is the root. No letter change is needed before adding consonant or vowel suffixes."
+spelling_pattern_or_rule:  "‘Read’ is the root. No letter change is needed before adding consonant or vowel suffixes."
       },
       audio: 'read'
     },
@@ -95637,7 +95769,7 @@ spelling_pattern_or_rule: "‘Read’ is the root. No letter change is needed be
         student_entry: '',
         topic_to_reinforce: 'Adding -able to a base word',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘readable,’ just add -able. No changes needed since the word doesn’t end in a silent E or a short vowel."
+spelling_pattern_or_rule:  "In ‘read,’ just add -able. No changes needed since the word doesn’t end in a silent E or a short vowel."
       },
       audio: 'readable'
     },
@@ -95672,7 +95804,7 @@ spelling_pattern_or_rule: "In ‘readable,’ just add -able. No changes needed 
         student_entry: '',
         topic_to_reinforce: 'Adding two suffixes in sequence',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘readability,’ first add -able, then add -ity. No letter changes are needed because the base word ends in a consonant."
+spelling_pattern_or_rule:  "In ‘read,’ first add -able, then add -ity. No letter changes are needed because the base word ends in a consonant."
       },
       audio: 'readability'
     }, {
@@ -95706,7 +95838,7 @@ spelling_pattern_or_rule: "In ‘readability,’ first add -able, then add -ity.
         student_entry: '',
         topic_to_reinforce: 'Base words before suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Plan’ is a one-syllable word with one vowel and one consonant — it follows the 1-1-1 doubling rule when adding vowel suffixes."
+spelling_pattern_or_rule:  "‘Plan’ is a one-syllable word with one vowel and one consonant — it follows the 1-1-1 doubling rule when adding vowel suffixes."
       },
       audio: 'plan'
     },
@@ -95728,7 +95860,7 @@ spelling_pattern_or_rule: "‘Plan’ is a one-syllable word with one vowel and 
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0,1,2,3],
+      prefilledIndexes: [0,1,2],
       aiHook: {
         targetWord: 'planning',
         intent: 'fill_blank',
@@ -95736,14 +95868,14 @@ spelling_pattern_or_rule: "‘Plan’ is a one-syllable word with one vowel and 
         imagePrompt: 'Someone planning their week on a calendar'
       },
       aiTutor: {
-        target_word: 'planning',
-        question: 'p l a n _ _ _ _',
+        target_word: 'planned',
+        question: 'p l a _ _ _ _',
         student_entry: '',
-        topic_to_reinforce: '1-1-1 doubling rule before -ing',
+        topic_to_reinforce: '1-1-1 doubling rule before -ed',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Planning’ doubles the final N because ‘plan’ is a one-syllable word with one vowel before the final consonant (1-1-1 rule)."
+spelling_pattern_or_rule:  "‘Planned’ doubles the final N because ‘plan’ is a one-syllable word with one vowel before the final consonant (1-1-1 rule)."
       },
-      audio: 'planning'
+      audio: 'planned'
     },
     {
       id: 9,
@@ -95776,7 +95908,7 @@ spelling_pattern_or_rule: "‘Planning’ doubles the final N because ‘plan’
         student_entry: '',
         topic_to_reinforce: 'Doubling before adding -ed and stacking -ness',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Plannedness’ shows both doubling and suffix stacking. First, double the final N for -ed, then add -ness (plan → planned → plannedness)."
+spelling_pattern_or_rule:  "‘Plannedness’ shows both doubling and suffix stacking. First, double the final N for -ed, then add -ness (plan → planned → plannedness)."
       },
       audio: 'plannedness'
     },
@@ -95800,7 +95932,7 @@ spelling_pattern_or_rule: "‘Plannedness’ shows both doubling and suffix stac
       isSorting: false,
       isSpelling: true,
       isPrefilled: true,
-      prefilledIndexes: [0,2,3,4,6,8,9],
+      prefilledIndexes: [0,2,3,4,6],
       aiHook: {
         targetWord: 'beautifully',
         intent: 'fill_blank',
@@ -95809,11 +95941,11 @@ spelling_pattern_or_rule: "‘Plannedness’ shows both doubling and suffix stac
       },
       aiTutor: {
         target_word: 'beautifully',
-        question: 'b _ a u t _ f _ l l _',
+        question: 'b _ a u t _ f _ _ _ _',
         student_entry: '',
         topic_to_reinforce: 'Change Y to I before adding -ful and -ly',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Beautifully’ follows the Y-to-I rule: change Y to I before adding -ful, then add -ly (beauty → beautiful → beautifully)."
+spelling_pattern_or_rule:  "‘Beautifully’ follows the Y-to-I rule: change Y to I before adding -ful, then add -ly (beauty → beautiful → beautifully)."
       },
       audio: 'beautifully'
     }
@@ -95860,7 +95992,7 @@ spelling_pattern_or_rule: "‘Beautifully’ follows the Y-to-I rule: change Y t
         student_entry: '',
         topic_to_reinforce: "Spelling words with /eks/ and /egs/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ex' appears before a vowel, it often says /egs/, as in 'exit' and 'extra'."
+spelling_pattern_or_rule:  "When 'ex' appears before a vowel, it often says /egs/, as in 'exit' and 'extra'."
       },
       audio: 'exit'
     },
@@ -95895,7 +96027,7 @@ spelling_pattern_or_rule: "When 'ex' appears before a vowel, it often says /egs/
         student_entry: '',
         topic_to_reinforce: "Spelling words with /eks/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ex' comes before a consonant, it makes /eks/ — as in 'extra' and 'expect'."
+spelling_pattern_or_rule:  "When 'ex' comes before a consonant, it makes /eks/ — as in 'extra' and 'expect'."
       },
       audio: 'extra'
     },
@@ -95930,7 +96062,7 @@ spelling_pattern_or_rule: "When 'ex' comes before a consonant, it makes /eks/ �
         student_entry: '',
         topic_to_reinforce: "Spelling words with /eks/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — expect, explain, express."
+spelling_pattern_or_rule:  "'Ex' says /eks/ before consonants — expect, explain, express."
       },
       audio: 'expect'
     },
@@ -95965,7 +96097,7 @@ spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — expect, explain
         student_entry: '',
         topic_to_reinforce: "Spelling words with /egs/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ex' comes before a vowel, it often says /egz/, as in 'example' and 'examine'."
+spelling_pattern_or_rule:  "When 'ex' comes before a vowel, it often says /egz/, as in 'example' and 'examine'."
       },
       audio: 'example'
     },
@@ -96000,7 +96132,7 @@ spelling_pattern_or_rule: "When 'ex' comes before a vowel, it often says /egz/, 
         student_entry: '',
         topic_to_reinforce: "Spelling words with /egs/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' says /egz/ before a vowel — examine, example, exact."
+spelling_pattern_or_rule:  "'Ex' says /egz/ before a vowel — examine, example, exact."
       },
       audio: 'examine'
     },
@@ -96035,7 +96167,7 @@ spelling_pattern_or_rule: "'Ex' says /egz/ before a vowel — examine, example, 
         student_entry: '',
         topic_to_reinforce: "Spelling words with /egs/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' before a vowel usually says /egz/, like in exist and example."
+spelling_pattern_or_rule:  "'Ex' before a vowel usually says /egz/, like in exist and example."
       },
       audio: 'exist'
     },
@@ -96070,7 +96202,7 @@ spelling_pattern_or_rule: "'Ex' before a vowel usually says /egz/, like in exist
         student_entry: '',
         topic_to_reinforce: "Spelling words with /eks/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' before consonant sounds says /eks/ — exercise, express, extra."
+spelling_pattern_or_rule:  "'Ex' before consonant sounds says /eks/ — exercise, express, extra."
       },
       audio: 'exercise'
     },
@@ -96105,7 +96237,7 @@ spelling_pattern_or_rule: "'Ex' before consonant sounds says /eks/ — exercise,
         student_entry: '',
         topic_to_reinforce: "Spelling words with /egs/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' says /egz/ before a vowel — exact, examine, example."
+spelling_pattern_or_rule:  "'Ex' says /egz/ before a vowel — exact, examine, example."
       },
       audio: 'exact'
     },
@@ -96140,7 +96272,7 @@ spelling_pattern_or_rule: "'Ex' says /egz/ before a vowel — exact, examine, ex
         student_entry: '',
         topic_to_reinforce: "Spelling words with /eks/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — excellent, express, extra."
+spelling_pattern_or_rule:  "'Ex' says /eks/ before consonants — excellent, express, extra."
       },
       audio: 'excellent'
     },
@@ -96175,7 +96307,7 @@ spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — excellent, expr
         student_entry: '',
         topic_to_reinforce: "Spelling words with /eks/ spelled ex",
         reading_rule: '',
-spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — exchange, express, explore."
+spelling_pattern_or_rule:  "'Ex' says /eks/ before consonants — exchange, express, explore."
       },
       audio: 'exchange'
     }
@@ -96222,7 +96354,7 @@ spelling_pattern_or_rule: "'Ex' says /eks/ before consonants — exchange, expre
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🩺 OR can say /er/ in unaccented syllables — doctor, actor, visitor."
+spelling_pattern_or_rule:  "🩺 OR can say /er/ in unaccented syllables — doctor, actor, visitor."
       },
       audio: 'doctor'
     },
@@ -96257,7 +96389,7 @@ spelling_pattern_or_rule: "🩺 OR can say /er/ in unaccented syllables — doct
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🎨 In unaccented syllables, OR sounds like /er/ — color, sailor, favor."
+spelling_pattern_or_rule:  "🎨 In unaccented syllables, OR sounds like /er/ — color, sailor, favor."
       },
       audio: 'color'
     },
@@ -96292,7 +96424,7 @@ spelling_pattern_or_rule: "🎨 In unaccented syllables, OR sounds like /er/ —
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "⚓ OR = /er/ in an unaccented syllable — sailor, color, doctor."
+spelling_pattern_or_rule:  "⚓ OR = /er/ in an unaccented syllable — sailor, color, doctor."
       },
       audio: 'sailor'
     },
@@ -96327,7 +96459,7 @@ spelling_pattern_or_rule: "⚓ OR = /er/ in an unaccented syllable — sailor, c
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🎭 When OR comes in an unaccented syllable, it sounds like /er/ — actor, doctor."
+spelling_pattern_or_rule:  "🎭 When OR comes in an unaccented syllable, it sounds like /er/ — actor, doctor."
       },
       audio: 'actor'
     },
@@ -96362,7 +96494,7 @@ spelling_pattern_or_rule: "🎭 When OR comes in an unaccented syllable, it soun
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🎁 In unaccented syllables, OR = /er/ — favor, color, neighbor."
+spelling_pattern_or_rule:  "🎁 In unaccented syllables, OR = /er/ — favor, color, neighbor."
       },
       audio: 'favor'
     },
@@ -96397,7 +96529,7 @@ spelling_pattern_or_rule: "🎁 In unaccented syllables, OR = /er/ — favor, co
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🚪 OR = /er/ in the last unaccented syllable — visitor, actor, doctor."
+spelling_pattern_or_rule:  "🚪 OR = /er/ in the last unaccented syllable — visitor, actor, doctor."
       },
       audio: 'visitor'
     },
@@ -96432,7 +96564,7 @@ spelling_pattern_or_rule: "🚪 OR = /er/ in the last unaccented syllable — vi
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🪞 In unaccented syllables, OR = /er/ — mirror, sailor, doctor."
+spelling_pattern_or_rule:  "🪞 In unaccented syllables, OR = /er/ — mirror, sailor, doctor."
       },
       audio: 'mirror'
     },
@@ -96467,7 +96599,7 @@ spelling_pattern_or_rule: "🪞 In unaccented syllables, OR = /er/ — mirror, s
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "📚 OR can be unaccented and sound like /er/ — author, sailor, visitor."
+spelling_pattern_or_rule:  "📚 OR can be unaccented and sound like /er/ — author, sailor, visitor."
       },
       audio: 'author'
     },
@@ -96502,7 +96634,7 @@ spelling_pattern_or_rule: "📚 OR can be unaccented and sound like /er/ — aut
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🚜 In unaccented syllables, OR = /er/ — tractor, doctor, actor."
+spelling_pattern_or_rule:  "🚜 In unaccented syllables, OR = /er/ — tractor, doctor, actor."
       },
       audio: 'tractor'
     },
@@ -96537,7 +96669,7 @@ spelling_pattern_or_rule: "🚜 In unaccented syllables, OR = /er/ — tractor, 
         student_entry: '',
         topic_to_reinforce: 'OR in unaccented syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "🏛️ OR = /er/ in the last unaccented syllable — senator, visitor, actor."
+spelling_pattern_or_rule:  "🏛️ OR = /er/ in the last unaccented syllable — senator, visitor, actor."
       },
       audio: 'senator'
     }
@@ -96586,7 +96718,7 @@ spelling_pattern_or_rule: "🏛️ OR = /er/ in the last unaccented syllable —
         student_entry: '',
         topic_to_reinforce: 'OUGH = /oʊ/ (though family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘though,’ OUGH says /oʊ/ (long O) and GH is silent. This family includes words like though and although."
+spelling_pattern_or_rule:  "In ‘though,’ OUGH says /oʊ/ (long O) and GH is silent. This family includes words like though and although."
       },
       audio: 'though'
     },
@@ -96621,7 +96753,7 @@ spelling_pattern_or_rule: "In ‘though,’ OUGH says /oʊ/ (long O) and GH is s
         student_entry: '',
         topic_to_reinforce: 'OUGH = /oʊ/ (though family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘although,’ OUGH spells /oʊ/ (long O). Memorize the THOUGH-family as one sound group: though, although."
+spelling_pattern_or_rule:  "In ‘although,’ OUGH spells /oʊ/ (long O). Memorize the THOUGH-family as one sound group: though, although."
       },
       audio: 'although'
     },
@@ -96658,7 +96790,7 @@ spelling_pattern_or_rule: "In ‘although,’ OUGH spells /oʊ/ (long O). Memori
         student_entry: '',
         topic_to_reinforce: 'OUGH = /uː/ (through family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘through,’ OUGH says /uː/ (long OO). Learn the THROUGH-family as /uː/: through, throughout."
+spelling_pattern_or_rule:  "In ‘through,’ OUGH says /uː/ (long OO). Learn the THROUGH-family as /uː/: through, throughout."
       },
       audio: 'through'
     },
@@ -96693,7 +96825,7 @@ spelling_pattern_or_rule: "In ‘through,’ OUGH says /uː/ (long OO). Learn th
         student_entry: '',
         topic_to_reinforce: 'OUGH = /uː/ (through family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘throughout,’ the OUGH chunk still says /uː/. Treat the OUGH as one sound unit from the THROUGH-family."
+spelling_pattern_or_rule:  "In ‘throughout,’ the OUGH chunk still says /uː/. Treat the OUGH as one sound unit from the THROUGH-family."
       },
       audio: 'throughout'
     },
@@ -96730,7 +96862,7 @@ spelling_pattern_or_rule: "In ‘throughout,’ the OUGH chunk still says /uː/.
         student_entry: '',
         topic_to_reinforce: 'OUGH = /ʌf/ (uff family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘rough,’ OUGH says /ʌf/ (like ‘uff’). Memorize the UFF-family: rough, tough, enough."
+spelling_pattern_or_rule:  "In ‘rough,’ OUGH says /ʌf/ (like ‘uff’). Memorize the UFF-family: rough, tough, enough."
       },
       audio: 'rough'
     },
@@ -96765,7 +96897,7 @@ spelling_pattern_or_rule: "In ‘rough,’ OUGH says /ʌf/ (like ‘uff’). Mem
         student_entry: '',
         topic_to_reinforce: 'OUGH = /ʌf/ (uff family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘tough,’ OUGH spells /ʌf/ (uff). Learn this small set: tough, rough, enough."
+spelling_pattern_or_rule:  "In ‘tough,’ OUGH spells /ʌf/ (uff). Learn this small set: tough, rough, enough."
       },
       audio: 'tough'
     },
@@ -96800,7 +96932,7 @@ spelling_pattern_or_rule: "In ‘tough,’ OUGH spells /ʌf/ (uff). Learn this s
         student_entry: '',
         topic_to_reinforce: 'OUGH = /ʌf/ (uff family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘enough,’ OUGH says /ʌf/ (uff). Practice the trio together to lock the sound: enough–rough–tough."
+spelling_pattern_or_rule:  "In ‘enough,’ OUGH says /ʌf/ (uff). Practice the trio together to lock the sound: enough–rough–tough."
       },
       audio: 'enough'
     },
@@ -96837,7 +96969,7 @@ spelling_pattern_or_rule: "In ‘enough,’ OUGH says /ʌf/ (uff). Practice the 
         student_entry: '',
         topic_to_reinforce: 'OUGH = /ɔː/ (thought family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘thought,’ OUGH says /ɔː/ (as in ‘aw’). Practice this family: thought, brought (note: OUGHT words also carry this /ɔː/ sound)."
+spelling_pattern_or_rule:  "In ‘thought,’ OUGH says /ɔː/ (as in ‘aw’). Practice this family: thought, brought (note: OUGHT words also carry this /ɔː/ sound)."
       },
       audio: 'thought'
     },
@@ -96874,7 +97006,7 @@ spelling_pattern_or_rule: "In ‘thought,’ OUGH says /ɔː/ (as in ‘aw’). 
         student_entry: '',
         topic_to_reinforce: 'OUGH = /aʊ/ (bough family)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘bough,’ OUGH says /aʊ/ (ow). Learn this small family with the same /aʊ/ sound (bough, drought in some dialects)."
+spelling_pattern_or_rule:  "In ‘bough,’ OUGH says /aʊ/ (ow). Learn this small family with the same /aʊ/ sound (bough, drought in some dialects)."
       },
       audio: 'bough'
     },
@@ -96911,7 +97043,7 @@ spelling_pattern_or_rule: "In ‘bough,’ OUGH says /aʊ/ (ow). Learn this smal
         student_entry: '',
         topic_to_reinforce: 'One spelling, many sounds',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘cough,’ OUGH says /ɒf/ (or /ɔːf/). Compare OUGH families: /oʊ/ (though), /uː/ (through), /ʌf/ (rough/tough/enough), /ɔː/ (thought), /aʊ/ (bough), and /ɒf/ (cough)."
+spelling_pattern_or_rule:  "In ‘cough,’ OUGH says /ɒf/ (or /ɔːf/). Compare OUGH families: /oʊ/ (though), /uː/ (through), /ʌf/ (rough/tough/enough), /ɔː/ (thought), /aʊ/ (bough), and /ɒf/ (cough)."
       },
       audio: 'cough'
     }
@@ -96960,7 +97092,7 @@ spelling_pattern_or_rule: "In ‘cough,’ OUGH says /ɒf/ (or /ɔːf/). Compare
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "In certain words, the vowel team 'ou' represents the short U sound /ŭ/. This happens in words like young, touch, and trouble, where the letters 'ou' do not say /ow/ or /oo/ but instead /ŭ/."
+spelling_pattern_or_rule:  "In certain words, the vowel team 'ou' represents the short U sound /ŭ/. This happens in words like young, touch, and trouble, where the letters 'ou' do not say /ow/ or /oo/ but instead /ŭ/."
       },
       audio: 'young'
     },
@@ -96995,7 +97127,7 @@ spelling_pattern_or_rule: "In certain words, the vowel team 'ou' represents the 
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "The 'ou' vowel team can represent /ŭ/ in some words, especially before N or T, like country and cousin."
+spelling_pattern_or_rule:  "The 'ou' vowel team can represent /ŭ/ in some words, especially before N or T, like country and cousin."
       },
       audio: 'country'
     },
@@ -97030,7 +97162,7 @@ spelling_pattern_or_rule: "The 'ou' vowel team can represent /ŭ/ in some words,
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "The vowel pair 'ou' can say /ŭ/ in words like cousin and country. This is a less common but regular pattern."
+spelling_pattern_or_rule:  "The vowel pair 'ou' can say /ŭ/ in words like cousin and country. This is a less common but regular pattern."
       },
       audio: 'cousin'
     },
@@ -97065,7 +97197,7 @@ spelling_pattern_or_rule: "The vowel pair 'ou' can say /ŭ/ in words like cousin
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ou' is followed by CH, it often says /ŭ/ instead of /ow/. Words like touch, young, and double follow this rule."
+spelling_pattern_or_rule:  "When 'ou' is followed by CH, it often says /ŭ/ instead of /ow/. Words like touch, young, and double follow this rule."
       },
       audio: 'touch'
     },
@@ -97100,7 +97232,7 @@ spelling_pattern_or_rule: "When 'ou' is followed by CH, it often says /ŭ/ inste
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "The letters 'ou' spell /ŭ/ before BL or other consonant clusters, as in trouble, double, and country."
+spelling_pattern_or_rule:  "The letters 'ou' spell /ŭ/ before BL or other consonant clusters, as in trouble, double, and country."
       },
       audio: 'trouble'
     },
@@ -97137,7 +97269,7 @@ spelling_pattern_or_rule: "The letters 'ou' spell /ŭ/ before BL or other conson
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "In words like double and trouble, 'ou' makes the short U sound /ŭ/. This happens especially before BL or B."
+spelling_pattern_or_rule:  "In words like double and trouble, 'ou' makes the short U sound /ŭ/. This happens especially before BL or B."
       },
       audio: 'double'
     },
@@ -97172,7 +97304,7 @@ spelling_pattern_or_rule: "In words like double and trouble, 'ou' makes the shor
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ou' comes before R, it can make the short U sound /ŭ/, as in nourish and flourish."
+spelling_pattern_or_rule:  "When 'ou' comes before R, it can make the short U sound /ŭ/, as in nourish and flourish."
       },
       audio: 'nourish'
     },
@@ -97207,7 +97339,7 @@ spelling_pattern_or_rule: "When 'ou' comes before R, it can make the short U sou
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "The letters 'ou' can make /ŭ/ before GH, as in rough and tough. The GH is silent."
+spelling_pattern_or_rule:  "The letters 'ou' can make /ŭ/ before GH, as in rough and tough. The GH is silent."
       },
       audio: 'rough'
     },
@@ -97242,7 +97374,7 @@ spelling_pattern_or_rule: "The letters 'ou' can make /ŭ/ before GH, as in rough
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ou' is followed by TH, it often makes the short U sound /ŭ/, as in southern and country."
+spelling_pattern_or_rule:  "When 'ou' is followed by TH, it often makes the short U sound /ŭ/, as in southern and country."
       },
       audio: 'southern'
     },
@@ -97277,7 +97409,7 @@ spelling_pattern_or_rule: "When 'ou' is followed by TH, it often makes the short
         student_entry: '',
         topic_to_reinforce: 'Words with short U sound spelled OU',
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ou' is followed by GH, it often represents /ŭ/. The GH is silent, as in tough, rough, and enough."
+spelling_pattern_or_rule:  "When 'ou' is followed by GH, it often represents /ŭ/. The GH is silent, as in tough, rough, and enough."
       },
       audio: 'tough'
     }
@@ -97325,7 +97457,7 @@ spelling_pattern_or_rule: "When 'ou' is followed by GH, it often represents /ŭ/
         student_entry: '',
         topic_to_reinforce: 'Phonogram UI (long oo)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘fruit,’ the vowel team UI makes the long /oo/ sound. UI is used in many words for /uː/ in the middle syllable."
+spelling_pattern_or_rule:  "In ‘fruit,’ the vowel team UI makes the long /oo/ sound. UI is used in many words for /uː/ in the middle syllable."
       },
       audio: 'fruit'
     },
@@ -97360,7 +97492,7 @@ spelling_pattern_or_rule: "In ‘fruit,’ the vowel team UI makes the long /oo/
         student_entry: '',
         topic_to_reinforce: 'Phonogram UI (long oo)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘suit,’ UI makes the /uː/ sound. Like ‘fruit’ and ‘juice,’ UI stands for the long /oo/ sound in stressed syllables."
+spelling_pattern_or_rule:  "In ‘suit,’ UI makes the /uː/ sound. Like ‘fruit’ and ‘juice,’ UI stands for the long /oo/ sound in stressed syllables."
       },
       audio: 'suit'
     },
@@ -97395,7 +97527,7 @@ spelling_pattern_or_rule: "In ‘suit,’ UI makes the /uː/ sound. Like ‘frui
         student_entry: '',
         topic_to_reinforce: 'Phonogram UI (long oo)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘juice,’ the letters UI spell /uː/. The silent E softens the C, changing /k/ to /s/."
+spelling_pattern_or_rule:  "In ‘juice,’ the letters UI spell /uː/. The silent E softens the C, changing /k/ to /s/."
       },
       audio: 'juice'
     },
@@ -97430,7 +97562,7 @@ spelling_pattern_or_rule: "In ‘juice,’ the letters UI spell /uː/. The silen
         student_entry: '',
         topic_to_reinforce: 'Phonogram UI (long oo)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘bruise,’ UI makes /uː/ as in ‘fruit.’ The final E makes the S soft, so it says /z/ instead of /s/."
+spelling_pattern_or_rule:  "In ‘bruise,’ UI makes /uː/ as in ‘fruit.’ The final E makes the S soft, so it says /z/ instead of /s/."
       },
       audio: 'bruise'
     },
@@ -97465,7 +97597,7 @@ spelling_pattern_or_rule: "In ‘bruise,’ UI makes /uː/ as in ‘fruit.’ Th
         student_entry: '',
         topic_to_reinforce: 'Phonogram UI (long oo)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘cruise,’ UI makes the /uː/ sound again. The silent E softens the ending and keeps the vowel long."
+spelling_pattern_or_rule:  "In ‘cruise,’ UI makes the /uː/ sound again. The silent E softens the ending and keeps the vowel long."
       },
       audio: 'cruise'
     },
@@ -97500,7 +97632,7 @@ spelling_pattern_or_rule: "In ‘cruise,’ UI makes the /uː/ sound again. The 
         student_entry: '',
         topic_to_reinforce: 'Phonogram GN (silent g)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘sign,’ the G is silent before N. GN spells /n/, and G reappears in sound in related words like ‘signal.’"
+spelling_pattern_or_rule:  "In ‘sign,’ the G is silent before N. GN spells /n/, and G reappears in sound in related words like ‘signal.’"
       },
       audio: 'sign'
     },
@@ -97535,7 +97667,7 @@ spelling_pattern_or_rule: "In ‘sign,’ the G is silent before N. GN spells /n
         student_entry: '',
         topic_to_reinforce: 'Phonogram GN (silent g)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘design,’ GN says /n/. The silent G reappears in ‘signature.’ GN keeps the same base meaning in both."
+spelling_pattern_or_rule:  "In ‘design,’ GN says /n/. The silent G reappears in ‘signature.’ GN keeps the same base meaning in both."
       },
       audio: 'design'
     },
@@ -97570,7 +97702,7 @@ spelling_pattern_or_rule: "In ‘design,’ GN says /n/. The silent G reappears 
         student_entry: '',
         topic_to_reinforce: 'Phonogram GN (silent g)',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Reign’ uses GN to spell /n/. The G is silent, but it reappears in pronunciation in ‘regal.’"
+spelling_pattern_or_rule:  "‘Reign’ uses GN to spell /n/. The G is silent, but it reappears in pronunciation in ‘regal.’"
       },
       audio: 'reign'
     },
@@ -97605,7 +97737,7 @@ spelling_pattern_or_rule: "‘Reign’ uses GN to spell /n/. The G is silent, bu
         student_entry: '',
         topic_to_reinforce: 'Phonogram GN (silent g)',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Foreign’ has silent G again before N. GN spells /n/, and G reappears when adding suffixes like ‘foreigner.’"
+spelling_pattern_or_rule:  "‘Foreign’ has silent G again before N. GN spells /n/, and G reappears when adding suffixes like ‘foreigner.’"
       },
       audio: 'foreign'
     },
@@ -97640,7 +97772,7 @@ spelling_pattern_or_rule: "‘Foreign’ has silent G again before N. GN spells 
         student_entry: '',
         topic_to_reinforce: 'Phonogram GN (silent g)',
         reading_rule: '',
-spelling_pattern_or_rule: "At the start of words like ‘gnaw,’ G is silent before N. GN spells /n/ in both beginning and ending positions."
+spelling_pattern_or_rule:  "At the start of words like ‘gnaw,’ G is silent before N. GN spells /n/ in both beginning and ending positions."
       },
       audio: 'gnaw'
     }
@@ -97689,7 +97821,7 @@ spelling_pattern_or_rule: "At the start of words like ‘gnaw,’ G is silent be
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "When a word begins with GN, the G is silent and the N says /n/ (gnaw, gnome, gnat)."
+spelling_pattern_or_rule:  "When a word begins with GN, the G is silent and the N says /n/ (gnaw, gnome, gnat)."
       },
       audio: 'gnaw'
     },
@@ -97724,7 +97856,7 @@ spelling_pattern_or_rule: "When a word begins with GN, the G is silent and the N
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "GN at the beginning of a word spells the /n/ sound with a silent G (gnome, gnaw, gnat)."
+spelling_pattern_or_rule:  "GN at the beginning of a word spells the /n/ sound with a silent G (gnome, gnaw, gnat)."
       },
       audio: 'gnome'
     },
@@ -97759,7 +97891,7 @@ spelling_pattern_or_rule: "GN at the beginning of a word spells the /n/ sound wi
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "When GN starts a word, the G is not pronounced; only /n/ is heard (gnat, gnome, gnaw)."
+spelling_pattern_or_rule:  "When GN starts a word, the G is not pronounced; only /n/ is heard (gnat, gnome, gnaw)."
       },
       audio: 'gnat'
     },
@@ -97796,7 +97928,7 @@ spelling_pattern_or_rule: "When GN starts a word, the G is not pronounced; only 
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "GN at the end of a word spells the /n/ sound with a silent G (sign, design, align)."
+spelling_pattern_or_rule:  "GN at the end of a word spells the /n/ sound with a silent G (sign, design, align)."
       },
       audio: 'sign'
     },
@@ -97831,7 +97963,7 @@ spelling_pattern_or_rule: "GN at the end of a word spells the /n/ sound with a s
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "At the end of a word, GN represents /n/ with a silent G (design, align, sign)."
+spelling_pattern_or_rule:  "At the end of a word, GN represents /n/ with a silent G (design, align, sign)."
       },
       audio: 'design'
     },
@@ -97866,7 +97998,7 @@ spelling_pattern_or_rule: "At the end of a word, GN represents /n/ with a silent
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "Final GN is pronounced /n/ with a silent G (align, design, sign)."
+spelling_pattern_or_rule:  "Final GN is pronounced /n/ with a silent G (align, design, sign)."
       },
       audio: 'align'
     },
@@ -97903,7 +98035,7 @@ spelling_pattern_or_rule: "Final GN is pronounced /n/ with a silent G (align, de
         student_entry: '',
         topic_to_reinforce: 'GN pronunciation change with suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "In base words like sign, GN spells /n/ with silent G. When a suffix or extra syllable is added (signal, signature), the GN pair is split across syllables and the G is pronounced."
+spelling_pattern_or_rule:  "In base words like sign, GN spells /n/ with silent G. When a suffix or extra syllable is added (signal, signature), the GN pair is split across syllables and the G is pronounced."
       },
       audio: 'signal'
     },
@@ -97938,7 +98070,7 @@ spelling_pattern_or_rule: "In base words like sign, GN spells /n/ with silent G.
         student_entry: '',
         topic_to_reinforce: 'GN pronunciation change with suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "The base sign has silent G. In signature, the GN is divided by added syllables, so the G becomes audible. This shows how adding suffixes can change pronunciation while spelling remains consistent."
+spelling_pattern_or_rule:  "The base sign has silent G. In signature, the GN is divided by added syllables, so the G becomes audible. This shows how adding suffixes can change pronunciation while spelling remains consistent."
       },
       audio: 'signature'
     },
@@ -97973,7 +98105,7 @@ spelling_pattern_or_rule: "The base sign has silent G. In signature, the GN is d
         student_entry: '',
         topic_to_reinforce: 'GN pronunciation change with suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "In resign, GN spells /n/ with silent G. In resignation, the extra syllable splits the pair so the G is pronounced. Compare sign → signal/signature; design → designate/designation."
+spelling_pattern_or_rule:  "In resign, GN spells /n/ with silent G. In resignation, the extra syllable splits the pair so the G is pronounced. Compare sign → signal/signature; design → designate/designation."
       },
       audio: 'resignation'
     },
@@ -98010,7 +98142,7 @@ spelling_pattern_or_rule: "In resign, GN spells /n/ with silent G. In resignatio
         student_entry: '',
         topic_to_reinforce: 'GN = /n/ (silent G)',
         reading_rule: '',
-spelling_pattern_or_rule: "GN within a word often still represents /n/ with a silent G (foreign, campaign, benign). Some related forms can change pronunciation when syllables are added (benign → benignity)."
+spelling_pattern_or_rule:  "GN within a word often still represents /n/ with a silent G (foreign, campaign, benign). Some related forms can change pronunciation when syllables are added (benign → benignity)."
       },
       audio: 'foreign'
     }
@@ -98058,7 +98190,7 @@ spelling_pattern_or_rule: "GN within a word often still represents /n/ with a si
         student_entry: '',
         topic_to_reinforce: "The sound of /ē/ spelled IE",
         reading_rule: '',
-spelling_pattern_or_rule: " I before E when the sound is /ē/: field, shield, yield."
+spelling_pattern_or_rule:  " I before E when the sound is /ē/: field, shield, yield."
       },
       audio: 'field'
     },
@@ -98093,7 +98225,7 @@ spelling_pattern_or_rule: " I before E when the sound is /ē/: field, shield, yi
         student_entry: '',
         topic_to_reinforce: "The sound of /ē/ spelled IE",
         reading_rule: '',
-spelling_pattern_or_rule: "IE makes the /ē/ sound: chief, thief, relief."
+spelling_pattern_or_rule:  "IE makes the /ē/ sound: chief, thief, relief."
       },
       audio: 'chief'
     },
@@ -98128,7 +98260,7 @@ spelling_pattern_or_rule: "IE makes the /ē/ sound: chief, thief, relief."
         student_entry: '',
         topic_to_reinforce: "The sound of /ē/ spelled IE",
         reading_rule: '',
-spelling_pattern_or_rule: "I before E when the sound is /ē/: believe, achieve, relief."
+spelling_pattern_or_rule:  "I before E when the sound is /ē/: believe, achieve, relief."
       },
       audio: 'believe'
     },
@@ -98163,7 +98295,7 @@ spelling_pattern_or_rule: "I before E when the sound is /ē/: believe, achieve, 
         student_entry: '',
         topic_to_reinforce: "I before E Except C",
         reading_rule: '',
-spelling_pattern_or_rule: "🎁 When the /ē/ sound comes after C, spell it with EI — receive, ceiling, receipt."
+spelling_pattern_or_rule:  "🎁 When the /ē/ sound comes after C, spell it with EI — receive, ceiling, receipt."
       },
       audio: 'receive'
     },
@@ -98198,7 +98330,7 @@ spelling_pattern_or_rule: "🎁 When the /ē/ sound comes after C, spell it with
         student_entry: '',
         topic_to_reinforce: "I before E Except C",
         reading_rule: '',
-spelling_pattern_or_rule: "🏠 After C, use EI for the /ē/ sound — ceiling, receive."
+spelling_pattern_or_rule:  "🏠 After C, use EI for the /ē/ sound — ceiling, receive."
       },
       audio: 'ceiling'
     },
@@ -98233,7 +98365,7 @@ spelling_pattern_or_rule: "🏠 After C, use EI for the /ē/ sound — ceiling, 
         student_entry: '',
         topic_to_reinforce: "I before E Generalization — Part 2",
         reading_rule: '',
-spelling_pattern_or_rule: "🎭 After C, use EI to spell the /ē/ sound — deceive, receive, conceive."
+spelling_pattern_or_rule:  "🎭 After C, use EI to spell the /ē/ sound — deceive, receive, conceive."
       },
       audio: 'deceive'
     },
@@ -98268,7 +98400,7 @@ spelling_pattern_or_rule: "🎭 After C, use EI to spell the /ē/ sound — dece
         student_entry: '',
         topic_to_reinforce: "The sound of /ē/ spelled IE",
         reading_rule: '',
-spelling_pattern_or_rule: "🏆 I before E when the sound is /ē/: achieve, believe."
+spelling_pattern_or_rule:  "🏆 I before E when the sound is /ē/: achieve, believe."
       },
       audio: 'achieve'
     },
@@ -98303,7 +98435,7 @@ spelling_pattern_or_rule: "🏆 I before E when the sound is /ē/: achieve, beli
         student_entry: '',
         topic_to_reinforce: "I before E Generalization — Part 2",
         reading_rule: '',
-spelling_pattern_or_rule: "🕵️ EI after C says /ē/: deceit, conceit, receive."
+spelling_pattern_or_rule:  "🕵️ EI after C says /ē/: deceit, conceit, receive."
       },
       audio: 'deceit'
     },
@@ -98338,7 +98470,7 @@ spelling_pattern_or_rule: "🕵️ EI after C says /ē/: deceit, conceit, receiv
         student_entry: '',
         topic_to_reinforce: "The sound of /ē/ spelled IE",
         reading_rule: '',
-spelling_pattern_or_rule: "🕵️ IE = /ē/: thief, chief, brief."
+spelling_pattern_or_rule:  "🕵️ IE = /ē/: thief, chief, brief."
       },
       audio: 'thief'
     },
@@ -98373,7 +98505,7 @@ spelling_pattern_or_rule: "🕵️ IE = /ē/: thief, chief, brief."
         student_entry: '',
         topic_to_reinforce: "I before E Generalization — Part 2",
         reading_rule: '',
-spelling_pattern_or_rule: "🔍 After C, spell /ē/ with EI — perceive, receive."
+spelling_pattern_or_rule:  "🔍 After C, spell /ē/ with EI — perceive, receive."
       },
       audio: 'perceive'
     }
@@ -98421,7 +98553,7 @@ spelling_pattern_or_rule: "🔍 After C, spell /ē/ with EI — perceive, receiv
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘protein,’ EI spells the long /ē/ in an unstressed syllable. EI keeps a steady vowel sound even without following C."
+spelling_pattern_or_rule:  "In ‘protein,’ EI spells the long /ē/ in an unstressed syllable. EI keeps a steady vowel sound even without following C."
       },
       audio: 'protein'
     },
@@ -98456,7 +98588,7 @@ spelling_pattern_or_rule: "In ‘protein,’ EI spells the long /ē/ in an unstr
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ or /ā/ long vowel team',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘freight,’ EI spells a long vowel sound (like /ā/ in eight). This pattern occurs in weight, sleigh, and freight — steady EI vowel teams."
+spelling_pattern_or_rule:  "In ‘freight,’ EI spells a long vowel sound (like /ā/ in eight). This pattern occurs in weight, sleigh, and freight — steady EI vowel teams."
       },
       audio: 'freight'
     },
@@ -98491,7 +98623,7 @@ spelling_pattern_or_rule: "In ‘freight,’ EI spells a long vowel sound (like 
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘reins,’ EI spells the long /ā/ sound. This spelling shows up in words connected to rain/ray patterns (rein, vein, neighbor)."
+spelling_pattern_or_rule:  "In ‘reins,’ EI spells the long /ā/ sound. This spelling shows up in words connected to rain/ray patterns (rein, vein, neighbor)."
       },
       audio: 'reins'
     },
@@ -98526,7 +98658,7 @@ spelling_pattern_or_rule: "In ‘reins,’ EI spells the long /ā/ sound. This s
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘either,’ EI spells /ē/ in the first syllable. EI here makes a clear long vowel team sound even though it doesn’t follow C."
+spelling_pattern_or_rule:  "In ‘either,’ EI spells /ē/ in the first syllable. EI here makes a clear long vowel team sound even though it doesn’t follow C."
       },
       audio: 'either'
     },
@@ -98561,7 +98693,7 @@ spelling_pattern_or_rule: "In ‘either,’ EI spells /ē/ in the first syllable
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘seize,’ EI spells /ē/ after S. This is one of the few steady EI words outside the “after C” rule — memorize its pattern."
+spelling_pattern_or_rule:  "In ‘seize,’ EI spells /ē/ after S. This is one of the few steady EI words outside the “after C” rule — memorize its pattern."
       },
       audio: 'seize'
     },
@@ -98596,7 +98728,7 @@ spelling_pattern_or_rule: "In ‘seize,’ EI spells /ē/ after S. This is one o
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘ceiling,’ EI follows C and spells /ē/, fitting the rule. This contrasts with other EI words that break it (protein, seize)."
+spelling_pattern_or_rule:  "In ‘ceiling,’ EI follows C and spells /ē/, fitting the rule. This contrasts with other EI words that break it (protein, seize)."
       },
       audio: 'ceiling'
     },
@@ -98631,7 +98763,7 @@ spelling_pattern_or_rule: "In ‘ceiling,’ EI follows C and spells /ē/, fitti
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ or /ā/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘neighbor,’ EI spells the long /ā/ sound. This vowel team pattern repeats in eight, weight, sleigh, and neighbor."
+spelling_pattern_or_rule:  "In ‘neighbor,’ EI spells the long /ā/ sound. This vowel team pattern repeats in eight, weight, sleigh, and neighbor."
       },
       audio: 'neighbor'
     },
@@ -98666,7 +98798,7 @@ spelling_pattern_or_rule: "In ‘neighbor,’ EI spells the long /ā/ sound. Thi
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ or /ā/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘veil,’ EI says /ā/. This vowel team spelling is shared by rein, vein, and neighbor, all using EI for long vowel sounds."
+spelling_pattern_or_rule:  "In ‘veil,’ EI says /ā/. This vowel team spelling is shared by rein, vein, and neighbor, all using EI for long vowel sounds."
       },
       audio: 'veil'
     },
@@ -98701,7 +98833,7 @@ spelling_pattern_or_rule: "In ‘veil,’ EI says /ā/. This vowel team spelling
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ after C',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘receive,’ EI follows C and spells /ē/, fitting the main spelling rule. This pattern repeats in perceive and deceive."
+spelling_pattern_or_rule:  "In ‘receive,’ EI follows C and spells /ē/, fitting the main spelling rule. This pattern repeats in perceive and deceive."
       },
       audio: 'receive'
     },
@@ -98736,7 +98868,7 @@ spelling_pattern_or_rule: "In ‘receive,’ EI follows C and spells /ē/, fitti
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ after C',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘deceive,’ EI follows C and spells /ē/, perfectly matching the rule: ‘I before E except after C.’ Compare receive, conceive, and perceive."
+spelling_pattern_or_rule:  "In ‘deceive,’ EI follows C and spells /ē/, perfectly matching the rule: ‘I before E except after C.’ Compare receive, conceive, and perceive."
       },
       audio: 'deceive'
     }
@@ -98786,7 +98918,7 @@ spelling_pattern_or_rule: "In ‘deceive,’ EI follows C and spells /ē/, perfe
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘eat,’ EA is a vowel team saying long /ē/. EA often spells /ē/ at the start or middle of words like eat and each."
+spelling_pattern_or_rule:  "In ‘eat,’ EA is a vowel team saying long /ē/. EA often spells /ē/ at the start or middle of words like eat and each."
       },
       audio: 'eat'
     },
@@ -98821,7 +98953,7 @@ spelling_pattern_or_rule: "In ‘eat,’ EA is a vowel team saying long /ē/. EA
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘team,’ EA spells long /ē/. This pattern appears in many one-syllable words ending with a single consonant, like team, dream, and clean."
+spelling_pattern_or_rule:  "In ‘team,’ EA spells long /ē/. This pattern appears in many one-syllable words ending with a single consonant, like team, dream, and clean."
       },
       audio: 'team'
     },
@@ -98856,7 +98988,7 @@ spelling_pattern_or_rule: "In ‘team,’ EA spells long /ē/. This pattern appe
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘dream,’ EA spells long /ē/ before M. EA says /ē/ in many words ending with M or N (dream, clean, mean)."
+spelling_pattern_or_rule:  "In ‘dream,’ EA spells long /ē/ before M. EA says /ē/ in many words ending with M or N (dream, clean, mean)."
       },
       audio: 'dream'
     },
@@ -98891,7 +99023,7 @@ spelling_pattern_or_rule: "In ‘dream,’ EA spells long /ē/ before M. EA says
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘reason,’ EA spells /ē/ in the first syllable. EA often makes long /ē/ in open syllables before S or Z sounds."
+spelling_pattern_or_rule:  "In ‘reason,’ EA spells /ē/ in the first syllable. EA often makes long /ē/ in open syllables before S or Z sounds."
       },
       audio: 'reason'
     },
@@ -98926,7 +99058,7 @@ spelling_pattern_or_rule: "In ‘reason,’ EA spells /ē/ in the first syllable
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘clean,’ EA spells long /ē/. EA says /ē/ in most vowel-team words ending with N (clean, mean, bean)."
+spelling_pattern_or_rule:  "In ‘clean,’ EA spells long /ē/. EA says /ē/ in most vowel-team words ending with N (clean, mean, bean)."
       },
       audio: 'clean'
     },
@@ -98961,7 +99093,7 @@ spelling_pattern_or_rule: "In ‘clean,’ EA spells long /ē/. EA says /ē/ in 
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘speak,’ EA spells long /ē/. EA usually says /ē/ before K, as in speak and streak."
+spelling_pattern_or_rule:  "In ‘speak,’ EA spells long /ē/. EA usually says /ē/ before K, as in speak and streak."
       },
       audio: 'speak'
     },
@@ -98996,7 +99128,7 @@ spelling_pattern_or_rule: "In ‘speak,’ EA spells long /ē/. EA usually says 
         student_entry: '',
         topic_to_reinforce: 'EA = long /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘teacher,’ EA says /ē/ at the start of the word. EA often spells /ē/ before CH or D in multi-syllable words (teacher, feature)."
+spelling_pattern_or_rule:  "In ‘teacher,’ EA says /ē/ at the start of the word. EA often spells /ē/ before CH or D in multi-syllable words (teacher, feature)."
       },
       audio: 'teacher'
     },
@@ -99033,7 +99165,7 @@ spelling_pattern_or_rule: "In ‘teacher,’ EA says /ē/ at the start of the wo
         student_entry: '',
         topic_to_reinforce: 'EA can spell short /ĕ/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘head,’ EA spells short /ĕ/. A few EA words have this short sound and must be memorized (head, bread, lead)."
+spelling_pattern_or_rule:  "In ‘head,’ EA spells short /ĕ/. A few EA words have this short sound and must be memorized (head, bread, lead)."
       },
       audio: 'head'
     },
@@ -99068,7 +99200,7 @@ spelling_pattern_or_rule: "In ‘head,’ EA spells short /ĕ/. A few EA words h
         student_entry: '',
         topic_to_reinforce: 'EA can spell short /ĕ/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘bread,’ EA spells short /ĕ/. EA can make /ĕ/ before D, as in bread, lead, and dead."
+spelling_pattern_or_rule:  "In ‘bread,’ EA spells short /ĕ/. EA can make /ĕ/ before D, as in bread, lead, and dead."
       },
       audio: 'bread'
     },
@@ -99103,7 +99235,7 @@ spelling_pattern_or_rule: "In ‘bread,’ EA spells short /ĕ/. EA can make /ĕ
         student_entry: '',
         topic_to_reinforce: 'EA can spell short /ĕ/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘ready,’ EA spells short /ĕ/ in the first syllable. Many two-syllable words with EA + consonant + Y use the short /ĕ/ sound (ready, heavy)."
+spelling_pattern_or_rule:  "In ‘ready,’ EA spells short /ĕ/ in the first syllable. Many two-syllable words with EA + consonant + Y use the short /ĕ/ sound (ready, heavy)."
       },
       audio: 'ready'
     }
@@ -99150,7 +99282,7 @@ spelling_pattern_or_rule: "In ‘ready,’ EA spells short /ĕ/ in the first syl
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "Silent E keeps the words relative from ending in V (the -ive ending)."
+spelling_pattern_or_rule:  "Silent E keeps the words relative from ending in V (the -ive ending)."
       },
       audio: 'relative'
     },
@@ -99185,7 +99317,7 @@ spelling_pattern_or_rule: "Silent E keeps the words relative from ending in V (t
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "Silent E keeps the words prove from ending in V (have, give, prove)."
+spelling_pattern_or_rule:  "Silent E keeps the words prove from ending in V (have, give, prove)."
       },
       audio: 'prove'
     },
@@ -99220,7 +99352,7 @@ spelling_pattern_or_rule: "Silent E keeps the words prove from ending in V (have
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "Silent E helps the word engine from ending in N"
+spelling_pattern_or_rule:  "Silent E helps the word engine from ending in N"
       },
       audio: 'engine'
     },
@@ -99255,7 +99387,7 @@ spelling_pattern_or_rule: "Silent E helps the word engine from ending in N"
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "Silent E helps the word promise from ending in S"
+spelling_pattern_or_rule:  "Silent E helps the word promise from ending in S"
       },
       audio: 'promise'
     },
@@ -99290,7 +99422,7 @@ spelling_pattern_or_rule: "Silent E helps the word promise from ending in S"
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "Silent E helps the word move from ending in V"
+spelling_pattern_or_rule:  "Silent E helps the word move from ending in V"
       },
       audio: 'move'
     },
@@ -99325,7 +99457,7 @@ spelling_pattern_or_rule: "Silent E helps the word move from ending in V"
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "🎯 Silent E can help keep C soft (service)."
+spelling_pattern_or_rule:  "🎯 Silent E can help keep C soft (service)."
       },
       audio: 'service'
     },
@@ -99360,7 +99492,7 @@ spelling_pattern_or_rule: "🎯 Silent E can help keep C soft (service)."
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "📣 Silent E keeps the word debate from ending in T"
+spelling_pattern_or_rule:  "📣 Silent E keeps the word debate from ending in T"
       },
       audio: 'debate'
     },
@@ -99395,7 +99527,7 @@ spelling_pattern_or_rule: "📣 Silent E keeps the word debate from ending in T"
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "🔒 Silent E keeps English words from ending in V (the -ive ending)."
+spelling_pattern_or_rule:  "🔒 Silent E keeps English words from ending in V (the -ive ending)."
       },
       audio: 'captive'
     },
@@ -99430,7 +99562,7 @@ spelling_pattern_or_rule: "🔒 Silent E keeps English words from ending in V (t
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "🏃 Silent E keeps words from ending in V (the -ive ending)."
+spelling_pattern_or_rule:  "🏃 Silent E keeps words from ending in V (the -ive ending)."
       },
       audio: 'active'
     },
@@ -99465,7 +99597,7 @@ spelling_pattern_or_rule: "🏃 Silent E keeps words from ending in V (the -ive 
         student_entry: '',
         topic_to_reinforce: 'Jobs of Silent E',
         reading_rule: '',
-spelling_pattern_or_rule: "🫒 Silent E keeps English words from ending in V (the -ive ending)."
+spelling_pattern_or_rule:  "🫒 Silent E keeps English words from ending in V (the -ive ending)."
       },
       audio: 'olive'
     }
@@ -99512,7 +99644,7 @@ spelling_pattern_or_rule: "🫒 Silent E keeps English words from ending in V (t
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "👃 S between vowels or voiced sounds often says /z/ — as in nose, rose, music."
+spelling_pattern_or_rule:  "👃 S between vowels or voiced sounds often says /z/ — as in nose, rose, music."
       },
       audio: 'nose'
     },
@@ -99547,7 +99679,7 @@ spelling_pattern_or_rule: "👃 S between vowels or voiced sounds often says /z/
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🌹 The S says /z/ in rose, nose, and those."
+spelling_pattern_or_rule:  "🌹 The S says /z/ in rose, nose, and those."
       },
       audio: 'rose'
     },
@@ -99582,7 +99714,7 @@ spelling_pattern_or_rule: "🌹 The S says /z/ in rose, nose, and those."
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "💡 When S comes between vowels, it usually says /z/ — reason, season, music."
+spelling_pattern_or_rule:  "💡 When S comes between vowels, it usually says /z/ — reason, season, music."
       },
       audio: 'reason'
     },
@@ -99617,7 +99749,7 @@ spelling_pattern_or_rule: "💡 When S comes between vowels, it usually says /z/
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🎵 S between vowels often says /z/ — music, reason, desert."
+spelling_pattern_or_rule:  "🎵 S between vowels often says /z/ — music, reason, desert."
       },
       audio: 'music'
     },
@@ -99652,7 +99784,7 @@ spelling_pattern_or_rule: "🎵 S between vowels often says /z/ — music, reaso
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🏜️ In the noun 'desert', the S says /z/. Compare to the verb 'desert' (/s/)."
+spelling_pattern_or_rule:  "🏜️ In the noun 'desert', the S says /z/. Compare to the verb 'desert' (/s/)."
       },
       audio: 'desert'
     },
@@ -99687,7 +99819,7 @@ spelling_pattern_or_rule: "🏜️ In the noun 'desert', the S says /z/. Compare
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🎨 S says /z/ between vowels — design, reason, music."
+spelling_pattern_or_rule:  "🎨 S says /z/ between vowels — design, reason, music."
       },
       audio: 'design'
     },
@@ -99722,7 +99854,7 @@ spelling_pattern_or_rule: "🎨 S says /z/ between vowels — design, reason, mu
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🎁 When S is between vowels, it says /z/ — present, reason, cousin."
+spelling_pattern_or_rule:  "🎁 When S is between vowels, it says /z/ — present, reason, cousin."
       },
       audio: 'present'
     },
@@ -99757,7 +99889,7 @@ spelling_pattern_or_rule: "🎁 When S is between vowels, it says /z/ — presen
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "👨‍👩‍👧‍👦 S between vowels = /z/ — cousin, reason, present."
+spelling_pattern_or_rule:  "👨‍👩‍👧‍👦 S between vowels = /z/ — cousin, reason, present."
       },
       audio: 'cousin'
     },
@@ -99792,7 +99924,7 @@ spelling_pattern_or_rule: "👨‍👩‍👧‍👦 S between vowels = /z/ — 
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🍂 S between vowels says /z/ — season, reason, music."
+spelling_pattern_or_rule:  "🍂 S between vowels says /z/ — season, reason, music."
       },
       audio: 'season'
     },
@@ -99827,7 +99959,7 @@ spelling_pattern_or_rule: "🍂 S between vowels says /z/ — season, reason, mu
         student_entry: '',
         topic_to_reinforce: "Sound of /z/ spelled S",
         reading_rule: '',
-spelling_pattern_or_rule: "🦉 S before voiced sounds like /d/ or /m/ often says /z/ — wisdom, music."
+spelling_pattern_or_rule:  "🦉 S before voiced sounds like /d/ or /m/ often says /z/ — wisdom, music."
       },
       audio: 'wisdom'
     }
@@ -99874,7 +100006,7 @@ spelling_pattern_or_rule: "🦉 S before voiced sounds like /d/ or /m/ often say
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "When a word ends in the sound /ij/, it is often spelled with the suffix -AGE. The final -E is silent, and the letters AGE together make the /ij/ sound, as in village, package, and message."
+spelling_pattern_or_rule:  "When a word ends in the sound /ij/, it is often spelled with the suffix -AGE. The final -E is silent, and the letters AGE together make the /ij/ sound, as in village, package, and message."
       },
       audio: 'village'
     },
@@ -99909,7 +100041,7 @@ spelling_pattern_or_rule: "When a word ends in the sound /ij/, it is often spell
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The letters AGE at the end of a word make the /ij/ sound. This pattern is common in words with a short vowel before the G, such as package, baggage, and village."
+spelling_pattern_or_rule:  "The letters AGE at the end of a word make the /ij/ sound. This pattern is common in words with a short vowel before the G, such as package, baggage, and village."
       },
       audio: 'package'
     },
@@ -99944,7 +100076,7 @@ spelling_pattern_or_rule: "The letters AGE at the end of a word make the /ij/ so
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The ending -AGE represents the sound /ij/. The final E is silent, and the preceding vowel is short. Examples include message, village, and package."
+spelling_pattern_or_rule:  "The ending -AGE represents the sound /ij/. The final E is silent, and the preceding vowel is short. Examples include message, village, and package."
       },
       audio: 'message'
     },
@@ -99979,7 +100111,7 @@ spelling_pattern_or_rule: "The ending -AGE represents the sound /ij/. The final 
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The suffix -AGE spells the sound /ij/ at the end of many words. The base word often has a short vowel, and the E is silent. Examples: courage, storage, package."
+spelling_pattern_or_rule:  "The suffix -AGE spells the sound /ij/ at the end of many words. The base word often has a short vowel, and the E is silent. Examples: courage, storage, package."
       },
       audio: 'courage'
     },
@@ -100014,7 +100146,7 @@ spelling_pattern_or_rule: "The suffix -AGE spells the sound /ij/ at the end of m
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "When you hear the sound /ij/ at the end of a word, it is often spelled with the letters AGE. The final E is silent. Examples: storage, courage, and message."
+spelling_pattern_or_rule:  "When you hear the sound /ij/ at the end of a word, it is often spelled with the letters AGE. The final E is silent. Examples: storage, courage, and message."
       },
       audio: 'storage'
     },
@@ -100049,7 +100181,7 @@ spelling_pattern_or_rule: "When you hear the sound /ij/ at the end of a word, it
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The -AGE ending can make the sound /ij/ in words of French origin, such as garage and collage. The final E is silent."
+spelling_pattern_or_rule:  "The -AGE ending can make the sound /ij/ in words of French origin, such as garage and collage. The final E is silent."
       },
       audio: 'garage'
     },
@@ -100084,7 +100216,7 @@ spelling_pattern_or_rule: "The -AGE ending can make the sound /ij/ in words of F
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The ending -AGE makes the /ij/ sound and is used to form nouns. Postage means the cost or act of sending mail. Similar words include message and package."
+spelling_pattern_or_rule:  "The ending -AGE makes the /ij/ sound and is used to form nouns. Postage means the cost or act of sending mail. Similar words include message and package."
       },
       audio: 'postage'
     },
@@ -100119,7 +100251,7 @@ spelling_pattern_or_rule: "The ending -AGE makes the /ij/ sound and is used to f
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The letters AGE spell the /ij/ sound at the end of many verbs that become nouns or adjectives by adding -age, such as manage, carriage, and passage."
+spelling_pattern_or_rule:  "The letters AGE spell the /ij/ sound at the end of many verbs that become nouns or adjectives by adding -age, such as manage, carriage, and passage."
       },
       audio: 'manage'
     },
@@ -100154,7 +100286,7 @@ spelling_pattern_or_rule: "The letters AGE spell the /ij/ sound at the end of ma
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The -AGE ending makes the /ij/ sound in words like carriage, village, and package. The silent E marks the soft G and indicates the final syllable /ij/."
+spelling_pattern_or_rule:  "The -AGE ending makes the /ij/ sound in words like carriage, village, and package. The silent E marks the soft G and indicates the final syllable /ij/."
       },
       audio: 'carriage'
     },
@@ -100189,7 +100321,7 @@ spelling_pattern_or_rule: "The -AGE ending makes the /ij/ sound in words like ca
         student_entry: '',
         topic_to_reinforce: "Words ending in /ij/ spelled -AGE",
         reading_rule: '',
-spelling_pattern_or_rule: "The ending -AGE says /ij/ and often appears in nouns formed from verbs, describing an act or result. The G is soft because of the final E, and the vowel before G is short, as in passage, message, and village."
+spelling_pattern_or_rule:  "The ending -AGE says /ij/ and often appears in nouns formed from verbs, describing an act or result. The G is soft because of the final E, and the vowel before G is short, as in passage, message, and village."
       },
       audio: 'passage'
     }
@@ -100236,7 +100368,7 @@ spelling_pattern_or_rule: "The ending -AGE says /ij/ and often appears in nouns 
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "The vowel team 'ui' represents the long /oo/ sound, usually found in the middle of a stressed syllable. Examples: fruit, juice, suit, cruise."
+spelling_pattern_or_rule:  "The vowel team 'ui' represents the long /oo/ sound, usually found in the middle of a stressed syllable. Examples: fruit, juice, suit, cruise."
       },
       audio: 'fruit'
     },
@@ -100271,7 +100403,7 @@ spelling_pattern_or_rule: "The vowel team 'ui' represents the long /oo/ sound, u
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "When 'ui' appears before a soft C or S, it still says /oo/. Examples: juice, bruise."
+spelling_pattern_or_rule:  "When 'ui' appears before a soft C or S, it still says /oo/. Examples: juice, bruise."
       },
       audio: 'juice'
     },
@@ -100306,7 +100438,7 @@ spelling_pattern_or_rule: "When 'ui' appears before a soft C or S, it still says
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "The letters 'ui' often spell the long /oo/ sound in stressed syllables, as in suit, fruit, and cruise."
+spelling_pattern_or_rule:  "The letters 'ui' often spell the long /oo/ sound in stressed syllables, as in suit, fruit, and cruise."
       },
       audio: 'suit'
     },
@@ -100341,7 +100473,7 @@ spelling_pattern_or_rule: "The letters 'ui' often spell the long /oo/ sound in s
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "The vowel team 'ui' says /oo/ in the middle of stressed syllables, often before voiced consonants. Examples: cruise, bruise."
+spelling_pattern_or_rule:  "The vowel team 'ui' says /oo/ in the middle of stressed syllables, often before voiced consonants. Examples: cruise, bruise."
       },
       audio: 'cruise'
     },
@@ -100376,7 +100508,7 @@ spelling_pattern_or_rule: "The vowel team 'ui' says /oo/ in the middle of stress
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "The combination 'ui' makes the /oo/ sound in words like bruise and cruise. The silent E keeps the S soft and helps mark the long vowel sound."
+spelling_pattern_or_rule:  "The combination 'ui' makes the /oo/ sound in words like bruise and cruise. The silent E keeps the S soft and helps mark the long vowel sound."
       },
       audio: 'bruise'
     },
@@ -100411,7 +100543,7 @@ spelling_pattern_or_rule: "The combination 'ui' makes the /oo/ sound in words li
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "In pursuit, the letters 'ui' make the long /oo/ sound in the stressed syllable. Similar patterns appear in recruit and fruit."
+spelling_pattern_or_rule:  "In pursuit, the letters 'ui' make the long /oo/ sound in the stressed syllable. Similar patterns appear in recruit and fruit."
       },
       audio: 'pursuit'
     },
@@ -100446,7 +100578,7 @@ spelling_pattern_or_rule: "In pursuit, the letters 'ui' make the long /oo/ sound
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "In recruit, 'ui' represents the /oo/ sound in a stressed syllable. The letters 'ui' typically appear between two consonants."
+spelling_pattern_or_rule:  "In recruit, 'ui' represents the /oo/ sound in a stressed syllable. The letters 'ui' typically appear between two consonants."
       },
       audio: 'recruit'
     },
@@ -100481,7 +100613,7 @@ spelling_pattern_or_rule: "In recruit, 'ui' represents the /oo/ sound in a stres
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "The word suitcase combines suit (/soo-t/) and case. The 'ui' keeps its long /oo/ sound, as in fruit and cruise."
+spelling_pattern_or_rule:  "The word suitcase combines suit (/soo-t/) and case. The 'ui' keeps its long /oo/ sound, as in fruit and cruise."
       },
       audio: 'suitcase'
     },
@@ -100516,7 +100648,7 @@ spelling_pattern_or_rule: "The word suitcase combines suit (/soo-t/) and case. T
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "The vowel team 'ui' spells the long /oo/ sound in stressed syllables, as in ruin and fruit. The two vowels work together to represent one sound."
+spelling_pattern_or_rule:  "The vowel team 'ui' spells the long /oo/ sound in stressed syllables, as in ruin and fruit. The two vowels work together to represent one sound."
       },
       audio: 'ruin'
     },
@@ -100551,7 +100683,7 @@ spelling_pattern_or_rule: "The vowel team 'ui' spells the long /oo/ sound in str
         student_entry: '',
         topic_to_reinforce: "Words with /oo/ sound spelled UI",
         reading_rule: '',
-spelling_pattern_or_rule: "In suitable, the 'ui' vowel team spells the long /oo/ sound, just as in suit and fruit. The suffix '-able' forms an adjective meaning 'fit or right for a purpose.'"
+spelling_pattern_or_rule:  "In suitable, the 'ui' vowel team spells the long /oo/ sound, just as in suit and fruit. The suffix '-able' forms an adjective meaning 'fit or right for a purpose.'"
       },
       audio: 'suitable'
     },
@@ -100603,7 +100735,7 @@ spelling_pattern_or_rule: "In suitable, the 'ui' vowel team spells the long /oo/
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "When A comes before L, it often changes its sound from /ă/ to /aw/, as in walk, talk, and chalk. This vowel change makes the word sound broader, not short like 'cat'."
+spelling_pattern_or_rule:  "When A comes before L, it often changes its sound from /ă/ to /aw/, as in walk, talk, and chalk. This vowel change makes the word sound broader, not short like 'cat'."
       },
       audio: 'walk'
     },
@@ -100638,7 +100770,7 @@ spelling_pattern_or_rule: "When A comes before L, it often changes its sound fro
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "A before L often changes its sound from /ă/ to /aw/. In talk, the A does not say /ă/ but /aw/ instead."
+spelling_pattern_or_rule:  "A before L often changes its sound from /ă/ to /aw/. In talk, the A does not say /ă/ but /aw/ instead."
       },
       audio: 'talk'
     },
@@ -100673,7 +100805,7 @@ spelling_pattern_or_rule: "A before L often changes its sound from /ă/ to /aw/.
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "When A is followed by L and K, it often changes from /ă/ to /aw/. This happens in words like chalk, walk, and talk."
+spelling_pattern_or_rule:  "When A is followed by L and K, it often changes from /ă/ to /aw/. This happens in words like chalk, walk, and talk."
       },
       audio: 'chalk'
     },
@@ -100708,7 +100840,7 @@ spelling_pattern_or_rule: "When A is followed by L and K, it often changes from 
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "When A comes before L and K, the sound usually changes to /aw/. Examples: stalk, talk, walk."
+spelling_pattern_or_rule:  "When A comes before L and K, the sound usually changes to /aw/. Examples: stalk, talk, walk."
       },
       audio: 'stalk'
     },
@@ -100743,7 +100875,7 @@ spelling_pattern_or_rule: "When A comes before L and K, the sound usually change
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "When A is followed by LL, it often changes to /aw/. Words like small, ball, and tall share this sound shift."
+spelling_pattern_or_rule:  "When A is followed by LL, it often changes to /aw/. Words like small, ball, and tall share this sound shift."
       },
       audio: 'small'
     },
@@ -100780,7 +100912,7 @@ spelling_pattern_or_rule: "When A is followed by LL, it often changes to /aw/. W
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "In words like salt and almost, A before L does not change its sound. Not every A before L says /aw/ — some stay short /ă/."
+spelling_pattern_or_rule:  "In words like salt and almost, A before L does not change its sound. Not every A before L says /aw/ — some stay short /ă/."
       },
       audio: 'salt'
     },
@@ -100815,7 +100947,7 @@ spelling_pattern_or_rule: "In words like salt and almost, A before L does not ch
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "Some words with A before L do not change the vowel sound, such as almost, algebra, and balcony."
+spelling_pattern_or_rule:  "Some words with A before L do not change the vowel sound, such as almost, algebra, and balcony."
       },
       audio: 'almost'
     },
@@ -100850,7 +100982,7 @@ spelling_pattern_or_rule: "Some words with A before L do not change the vowel so
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "In algebra, the A before L keeps its regular short sound /ă/, not /aw/. The rule has exceptions — learners sort these to notice the difference."
+spelling_pattern_or_rule:  "In algebra, the A before L keeps its regular short sound /ă/, not /aw/. The rule has exceptions — learners sort these to notice the difference."
       },
       audio: 'algebra'
     },
@@ -100885,7 +101017,7 @@ spelling_pattern_or_rule: "In algebra, the A before L keeps its regular short so
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "In balcony, the A before L does not change its sound. It stays short /ă/ because it’s part of an unstressed syllable."
+spelling_pattern_or_rule:  "In balcony, the A before L does not change its sound. It stays short /ă/ because it’s part of an unstressed syllable."
       },
       audio: 'balcony'
     },
@@ -100920,7 +101052,7 @@ spelling_pattern_or_rule: "In balcony, the A before L does not change its sound.
         student_entry: '',
         topic_to_reinforce: 'A before L',
         reading_rule: '',
-spelling_pattern_or_rule: "In alphabet, the A before L keeps its normal /ă/ sound. It does not change because it’s not followed by a silent L or a consonant cluster like LK or LL."
+spelling_pattern_or_rule:  "In alphabet, the A before L keeps its normal /ă/ sound. It does not change because it’s not followed by a silent L or a consonant cluster like LK or LL."
       },
       audio: 'alphabet'
     }
@@ -100969,7 +101101,7 @@ spelling_pattern_or_rule: "In alphabet, the A before L keeps its normal /ă/ sou
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "In certain words, the letters OUR represent the reduced /ər/ sound in an unstressed syllable. Examples include courage, nourish, flourish, courtesy, and journey."
+spelling_pattern_or_rule:  "In certain words, the letters OUR represent the reduced /ər/ sound in an unstressed syllable. Examples include courage, nourish, flourish, courtesy, and journey."
       },
       audio: 'courage'
     },
@@ -101004,7 +101136,7 @@ spelling_pattern_or_rule: "In certain words, the letters OUR represent the reduc
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "When OUR appears in an unstressed syllable, it often spells /ər/. In courtesy, the vowel is reduced and pronounced /ər/."
+spelling_pattern_or_rule:  "When OUR appears in an unstressed syllable, it often spells /ər/. In courtesy, the vowel is reduced and pronounced /ər/."
       },
       audio: 'courtesy'
     },
@@ -101039,7 +101171,7 @@ spelling_pattern_or_rule: "When OUR appears in an unstressed syllable, it often 
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "In nourish, OUR spells the reduced /ər/ sound because the syllable is unstressed. Compare flourish and courage."
+spelling_pattern_or_rule:  "In nourish, OUR spells the reduced /ər/ sound because the syllable is unstressed. Compare flourish and courage."
       },
       audio: 'nourish'
     },
@@ -101076,7 +101208,7 @@ spelling_pattern_or_rule: "In nourish, OUR spells the reduced /ər/ sound becaus
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "OUR can represent /ər/ in an unstressed syllable, as in flourish, nourish, and courage."
+spelling_pattern_or_rule:  "OUR can represent /ər/ in an unstressed syllable, as in flourish, nourish, and courage."
       },
       audio: 'flourish'
     },
@@ -101111,7 +101243,7 @@ spelling_pattern_or_rule: "OUR can represent /ər/ in an unstressed syllable, as
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "In journey, OUR spells /ər/ in the first syllable due to vowel reduction in an unstressed position."
+spelling_pattern_or_rule:  "In journey, OUR spells /ər/ in the first syllable due to vowel reduction in an unstressed position."
       },
       audio: 'journey'
     },
@@ -101146,7 +101278,7 @@ spelling_pattern_or_rule: "In journey, OUR spells /ər/ in the first syllable du
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "The base word courage has OUR = /ər/. Adding the prefix en- keeps the OUR pronounced /ər/: en + courage → encourage."
+spelling_pattern_or_rule:  "The base word courage has OUR = /ər/. Adding the prefix en- keeps the OUR pronounced /ər/: en + courage → encourage."
       },
       audio: 'encourage'
     },
@@ -101181,7 +101313,7 @@ spelling_pattern_or_rule: "The base word courage has OUR = /ər/. Adding the pre
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "Derived from courage; the OUR remains /ər/ when prefixes or suffixes are added: discourage, encouraged, encouragement."
+spelling_pattern_or_rule:  "Derived from courage; the OUR remains /ər/ when prefixes or suffixes are added: discourage, encouraged, encouragement."
       },
       audio: 'discourage'
     },
@@ -101216,7 +101348,7 @@ spelling_pattern_or_rule: "Derived from courage; the OUR remains /ər/ when pref
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "The word nourishment comes from nourish. In both, OUR spells the reduced /ər/ sound in an unstressed syllable."
+spelling_pattern_or_rule:  "The word nourishment comes from nourish. In both, OUR spells the reduced /ər/ sound in an unstressed syllable."
       },
       audio: 'nourishment'
     },
@@ -101251,7 +101383,7 @@ spelling_pattern_or_rule: "The word nourishment comes from nourish. In both, OUR
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "Courteous is built from courtesy. In both forms, OUR spells the /ər/ sound in an unstressed syllable."
+spelling_pattern_or_rule:  "Courteous is built from courtesy. In both forms, OUR spells the /ər/ sound in an unstressed syllable."
       },
       audio: 'courteous'
     },
@@ -101286,7 +101418,7 @@ spelling_pattern_or_rule: "Courteous is built from courtesy. In both forms, OUR 
         student_entry: '',
         topic_to_reinforce: 'OUR = /ər/',
         reading_rule: '',
-spelling_pattern_or_rule: "In journal and journey, the sequence OUR is pronounced /ər/ in an unstressed syllable at the beginning of the word."
+spelling_pattern_or_rule:  "In journal and journey, the sequence OUR is pronounced /ər/ in an unstressed syllable at the beginning of the word."
       },
       audio: 'journal'
     }
@@ -101335,7 +101467,7 @@ spelling_pattern_or_rule: "In journal and journey, the sequence OUR is pronounce
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "When two O’s appear together in the middle of a word, they often spell the long /oo/ sound, as in food, moon, and school."
+spelling_pattern_or_rule:  "When two O’s appear together in the middle of a word, they often spell the long /oo/ sound, as in food, moon, and school."
       },
       audio: 'food'
     },
@@ -101370,7 +101502,7 @@ spelling_pattern_or_rule: "When two O’s appear together in the middle of a wor
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "OO often spells the long /oo/ sound, as in moon, food, and broom."
+spelling_pattern_or_rule:  "OO often spells the long /oo/ sound, as in moon, food, and broom."
       },
       audio: 'moon'
     },
@@ -101405,7 +101537,7 @@ spelling_pattern_or_rule: "OO often spells the long /oo/ sound, as in moon, food
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "When OO comes after CH or SCH, it usually says long /oo/, as in school, choose, and broom."
+spelling_pattern_or_rule:  "When OO comes after CH or SCH, it usually says long /oo/, as in school, choose, and broom."
       },
       audio: 'school'
     },
@@ -101440,7 +101572,7 @@ spelling_pattern_or_rule: "When OO comes after CH or SCH, it usually says long /
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "OO in broom says long /oo/. Double O between consonants often makes this sound."
+spelling_pattern_or_rule:  "OO in broom says long /oo/. Double O between consonants often makes this sound."
       },
       audio: 'broom'
     },
@@ -101475,7 +101607,7 @@ spelling_pattern_or_rule: "OO in broom says long /oo/. Double O between consonan
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "OO in boost spells the long /oo/ sound, like in food and moon."
+spelling_pattern_or_rule:  "OO in boost spells the long /oo/ sound, like in food and moon."
       },
       audio: 'boost'
     },
@@ -101512,7 +101644,7 @@ spelling_pattern_or_rule: "OO in boost spells the long /oo/ sound, like in food 
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "OO between consonants can make a long /oo/ sound as in smooth, broom, and moon."
+spelling_pattern_or_rule:  "OO between consonants can make a long /oo/ sound as in smooth, broom, and moon."
       },
       audio: 'smooth'
     },
@@ -101547,7 +101679,7 @@ spelling_pattern_or_rule: "OO between consonants can make a long /oo/ sound as i
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "OO spells the long /oo/ sound in words like spoon, moon, and food."
+spelling_pattern_or_rule:  "OO spells the long /oo/ sound in words like spoon, moon, and food."
       },
       audio: 'spoon'
     },
@@ -101582,7 +101714,7 @@ spelling_pattern_or_rule: "OO spells the long /oo/ sound in words like spoon, mo
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "Double O can make a long /oo/ sound in roof, food, and moon. Learners can sort words with short and long OO sounds."
+spelling_pattern_or_rule:  "Double O can make a long /oo/ sound in roof, food, and moon. Learners can sort words with short and long OO sounds."
       },
       audio: 'roof'
     },
@@ -101617,7 +101749,7 @@ spelling_pattern_or_rule: "Double O can make a long /oo/ sound in roof, food, an
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "When OO is followed by SE, it keeps its long /oo/ sound, as in goose and choose."
+spelling_pattern_or_rule:  "When OO is followed by SE, it keeps its long /oo/ sound, as in goose and choose."
       },
       audio: 'goose'
     },
@@ -101652,7 +101784,7 @@ spelling_pattern_or_rule: "When OO is followed by SE, it keeps its long /oo/ sou
         student_entry: '',
         topic_to_reinforce: 'OO = long /oo/',
         reading_rule: '',
-spelling_pattern_or_rule: "In choose, OO spells the long /oo/ sound. Compare with book and good, where OO says short /ŭ/."
+spelling_pattern_or_rule:  "In choose, OO spells the long /oo/ sound. Compare with book and good, where OO says short /ŭ/."
       },
       audio: 'choose'
     }
@@ -101701,7 +101833,7 @@ spelling_pattern_or_rule: "In choose, OO spells the long /oo/ sound. Compare wit
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "OUGHT says /awt/ in bought, thought, and brought. The GH is silent but affects the vowel sound."
+spelling_pattern_or_rule:  "OUGHT says /awt/ in bought, thought, and brought. The GH is silent but affects the vowel sound."
       },
       audio: 'bought'
     },
@@ -101736,7 +101868,7 @@ spelling_pattern_or_rule: "OUGHT says /awt/ in bought, thought, and brought. The
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "In brought, OUGHT says /awt/. This pattern appears in a small family of words where GH is silent."
+spelling_pattern_or_rule:  "In brought, OUGHT says /awt/. This pattern appears in a small family of words where GH is silent."
       },
       audio: 'brought'
     },
@@ -101771,7 +101903,7 @@ spelling_pattern_or_rule: "In brought, OUGHT says /awt/. This pattern appears in
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "Forethought keeps the same /awt/ sound from thought. The GH stays silent in both words."
+spelling_pattern_or_rule:  "Forethought keeps the same /awt/ sound from thought. The GH stays silent in both words."
       },
       audio: 'forethought'
     },  {
@@ -101806,7 +101938,7 @@ spelling_pattern_or_rule: "Forethought keeps the same /awt/ sound from thought. 
       student_entry: '',
       topic_to_reinforce: 'OUGHT = /awt/',
       reading_rule: '',
-spelling_pattern_or_rule: "In the OUGHT family, the letters OUGHT say /awt/ while GH is silent. This pattern holds in words like thought, thoughtful, brought, and bought."
+spelling_pattern_or_rule:  "In the OUGHT family, the letters OUGHT say /awt/ while GH is silent. This pattern holds in words like thought, thoughtful, brought, and bought."
     },
     audio: 'thoughtful'
   },  
@@ -101841,7 +101973,7 @@ spelling_pattern_or_rule: "In the OUGHT family, the letters OUGHT say /awt/ whil
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "Overwrought combines the prefix over- and wrought (meaning shaped). In both, OUGHT = /awt/."
+spelling_pattern_or_rule:  "Overwrought combines the prefix over- and wrought (meaning shaped). In both, OUGHT = /awt/."
       },
       audio: 'overwrought'
     },    {
@@ -101875,7 +102007,7 @@ spelling_pattern_or_rule: "Overwrought combines the prefix over- and wrought (me
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "OUGHT says /awt/ in thought, bought, and brought. The GH is silent but affects the vowel sound."
+spelling_pattern_or_rule:  "OUGHT says /awt/ in thought, bought, and brought. The GH is silent but affects the vowel sound."
       },
       audio: 'thought'
     },
@@ -101910,7 +102042,7 @@ spelling_pattern_or_rule: "OUGHT says /awt/ in thought, bought, and brought. The
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "The OUGHT spelling pattern says /awt/ in fought, sought, and thought. The GH is silent but lengthens the vowel."
+spelling_pattern_or_rule:  "The OUGHT spelling pattern says /awt/ in fought, sought, and thought. The GH is silent but lengthens the vowel."
       },
       audio: 'fought'
     },
@@ -101945,7 +102077,7 @@ spelling_pattern_or_rule: "The OUGHT spelling pattern says /awt/ in fought, soug
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "In sought, OUGHT says /awt/. This family of words includes bought, thought, and brought."
+spelling_pattern_or_rule:  "In sought, OUGHT says /awt/. This family of words includes bought, thought, and brought."
       },
       audio: 'sought'
     },
@@ -101982,7 +102114,7 @@ spelling_pattern_or_rule: "In sought, OUGHT says /awt/. This family of words inc
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "Wrought means shaped or formed. It belongs to the same OUGHT = /awt/ family as bought and thought."
+spelling_pattern_or_rule:  "Wrought means shaped or formed. It belongs to the same OUGHT = /awt/ family as bought and thought."
       },
       audio: 'wrought'
     },
@@ -102017,7 +102149,7 @@ spelling_pattern_or_rule: "Wrought means shaped or formed. It belongs to the sam
         student_entry: '',
         topic_to_reinforce: 'OUGHT = /awt/',
         reading_rule: '',
-spelling_pattern_or_rule: "In nought and ought, OUGHT spells /awt/. The GH is silent and the vowel says /aw/."
+spelling_pattern_or_rule:  "In nought and ought, OUGHT spells /awt/. The GH is silent and the vowel says /aw/."
       },
       audio: 'nought'
     }
@@ -102066,7 +102198,7 @@ spelling_pattern_or_rule: "In nought and ought, OUGHT spells /awt/. The GH is si
         student_entry: '',
         topic_to_reinforce: 'Pluralizing F-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell the base word: l–ea–f. Focus on the final letter F — it makes the /f/ sound. We’ll change that F when we make it plural."
+spelling_pattern_or_rule:  "Spell the base word: l–ea–f. Focus on the final letter F — it makes the /f/ sound. We’ll change that F when we make it plural."
       },
       audio: 'leaf'
     },
@@ -102101,7 +102233,7 @@ spelling_pattern_or_rule: "Spell the base word: l–ea–f. Focus on the final l
         student_entry: '',
         topic_to_reinforce: 'Pluralizing F-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "To form the plural, the final F changes to V and we add ES → leaves. Compare: leaf → leaves (F → VES)."
+spelling_pattern_or_rule:  "To form the plural, the final F changes to V and we add ES → leaves. Compare: leaf → leaves (F → VES)."
       },
       audio: 'leaves'
     },
@@ -102138,7 +102270,7 @@ spelling_pattern_or_rule: "To form the plural, the final F changes to V and we a
         student_entry: '',
         topic_to_reinforce: 'Pluralizing F-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell it carefully: w–o–l–f. The last letter F says /f/. When you make it plural, the F will change to VES."
+spelling_pattern_or_rule:  "Spell it carefully: w–o–l–f. The last letter F says /f/. When you make it plural, the F will change to VES."
       },
       audio: 'wolf'
     },
@@ -102173,7 +102305,7 @@ spelling_pattern_or_rule: "Spell it carefully: w–o–l–f. The last letter F 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing F-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "When pluralized, the final F becomes V and add ES → wolves. Compare: wolf → wolves (F → VES)."
+spelling_pattern_or_rule:  "When pluralized, the final F becomes V and add ES → wolves. Compare: wolf → wolves (F → VES)."
       },
       audio: 'wolves'
     },
@@ -102210,7 +102342,7 @@ spelling_pattern_or_rule: "When pluralized, the final F becomes V and add ES →
         student_entry: '',
         topic_to_reinforce: 'Pluralizing FE-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell it carefully: k–ni–fe. The word ends with FE, where F still says /f/. In plurals, FE will change to VES."
+spelling_pattern_or_rule:  "Spell it carefully: k–ni–fe. The word ends with FE, where F still says /f/. In plurals, FE will change to VES."
       },
       audio: 'knife'
     },
@@ -102245,7 +102377,7 @@ spelling_pattern_or_rule: "Spell it carefully: k–ni–fe. The word ends with F
         student_entry: '',
         topic_to_reinforce: 'Pluralizing FE-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "When pluralized, FE becomes V and we add ES → knives. Compare: knife → knives (FE → VES)."
+spelling_pattern_or_rule:  "When pluralized, FE becomes V and we add ES → knives. Compare: knife → knives (FE → VES)."
       },
       audio: 'knives'
     },
@@ -102282,7 +102414,7 @@ spelling_pattern_or_rule: "When pluralized, FE becomes V and we add ES → knive
         student_entry: '',
         topic_to_reinforce: 'Pluralizing FE-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell the base: l–i–fe. The FE at the end gives the /f/ sound. FE will change when we make it plural."
+spelling_pattern_or_rule:  "Spell the base: l–i–fe. The FE at the end gives the /f/ sound. FE will change when we make it plural."
       },
       audio: 'life'
     },
@@ -102317,7 +102449,7 @@ spelling_pattern_or_rule: "Spell the base: l–i–fe. The FE at the end gives t
         student_entry: '',
         topic_to_reinforce: 'Pluralizing FE-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Make it plural: change FE to V and add ES → lives. Compare: life → lives (FE → VES)."
+spelling_pattern_or_rule:  "Make it plural: change FE to V and add ES → lives. Compare: life → lives (FE → VES)."
       },
       audio: 'lives'
     },
@@ -102354,7 +102486,7 @@ spelling_pattern_or_rule: "Make it plural: change FE to V and add ES → lives. 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing FE-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell it: w–i–fe. The FE ending represents /f/. Remember this pattern; it will change to VES in the plural."
+spelling_pattern_or_rule:  "Spell it: w–i–fe. The FE ending represents /f/. Remember this pattern; it will change to VES in the plural."
       },
       audio: 'wife'
     },
@@ -102389,7 +102521,7 @@ spelling_pattern_or_rule: "Spell it: w–i–fe. The FE ending represents /f/. R
         student_entry: '',
         topic_to_reinforce: 'Pluralizing FE-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "To make the plural, **change FE to V** and **add ES** → wives. Compare: wife → wives (FE → VES)."
+spelling_pattern_or_rule:  "To make the plural, **change FE to V** and **add ES** → wives. Compare: wife → wives (FE → VES)."
       },
       audio: 'wives'
     }
@@ -102438,7 +102570,7 @@ spelling_pattern_or_rule: "To make the plural, **change FE to V** and **add ES**
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell it carefully: p–o–t–a–t–o. The word ends with a consonant (t) + o. When a word ends this way, we usually add -ES to make it plural."
+spelling_pattern_or_rule:  "Spell it carefully: p–o–t–a–t–o. The word ends with a consonant (t) + o. When a word ends this way, we usually add -ES to make it plural."
       },
       audio: 'potato'
     },
@@ -102473,7 +102605,7 @@ spelling_pattern_or_rule: "Spell it carefully: p–o–t–a–t–o. The word e
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "To make it plural, add -ES because the base ends with a consonant + o → potatoes. Compare: potato → potatoes."
+spelling_pattern_or_rule:  "To make it plural, add -ES because the base ends with a consonant + o → potatoes. Compare: potato → potatoes."
       },
       audio: 'potatoes'
     },
@@ -102509,7 +102641,7 @@ spelling_pattern_or_rule: "To make it plural, add -ES because the base ends with
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell it: t–or–pe–do. The word ends with a consonant + o. For such endings, we add -ES to make it plural."
+spelling_pattern_or_rule:  "Spell it: t–or–pe–do. The word ends with a consonant + o. For such endings, we add -ES to make it plural."
       },
       audio: 'torpedo'
     },
@@ -102544,7 +102676,7 @@ spelling_pattern_or_rule: "Spell it: t–or–pe–do. The word ends with a cons
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Make the plural by adding -ES because it ends with a consonant + o → torpedoes. Compare: torpedo → torpedoes."
+spelling_pattern_or_rule:  "Make the plural by adding -ES because it ends with a consonant + o → torpedoes. Compare: torpedo → torpedoes."
       },
       audio: 'torpedoes'
     },
@@ -102581,7 +102713,7 @@ spelling_pattern_or_rule: "Make the plural by adding -ES because it ends with a 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell it: t–o–m–a–t–o. Ends with t + o, a consonant + o. This kind of word takes -ES to make it plural."
+spelling_pattern_or_rule:  "Spell it: t–o–m–a–t–o. Ends with t + o, a consonant + o. This kind of word takes -ES to make it plural."
       },
       audio: 'tomato'
     },
@@ -102616,7 +102748,7 @@ spelling_pattern_or_rule: "Spell it: t–o–m–a–t–o. Ends with t + o, a c
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "To make it plural, add -ES because the word ends with consonant + o → tomatoes. Compare: tomato → tomatoes."
+spelling_pattern_or_rule:  "To make it plural, add -ES because the word ends with consonant + o → tomatoes. Compare: tomato → tomatoes."
       },
       audio: 'tomatoes'
     },
@@ -102653,7 +102785,7 @@ spelling_pattern_or_rule: "To make it plural, add -ES because the word ends with
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "The base word ends with consonant + o. Most words like this add -ES to form the plural."
+spelling_pattern_or_rule:  "The base word ends with consonant + o. Most words like this add -ES to form the plural."
       },
       audio: 'hero'
     },
@@ -102688,7 +102820,7 @@ spelling_pattern_or_rule: "The base word ends with consonant + o. Most words lik
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "When pluralized, add -ES because the base ends in consonant + o → heroes. Compare: hero → heroes."
+spelling_pattern_or_rule:  "When pluralized, add -ES because the base ends in consonant + o → heroes. Compare: hero → heroes."
       },
       audio: 'heroes'
     },
@@ -102725,7 +102857,7 @@ spelling_pattern_or_rule: "When pluralized, add -ES because the base ends in con
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Spell the base word: e–ch–o. It ends with a consonant + o, so it will add -ES in plural."
+spelling_pattern_or_rule:  "Spell the base word: e–ch–o. It ends with a consonant + o, so it will add -ES in plural."
       },
       audio: 'echo'
     },
@@ -102760,7 +102892,7 @@ spelling_pattern_or_rule: "Spell the base word: e–ch–o. It ends with a conso
         student_entry: '',
         topic_to_reinforce: 'Pluralizing O-ending words',
         reading_rule: '',
-spelling_pattern_or_rule: "Add -ES because the base ends with a consonant + o → echoes. Compare: echo → echoes."
+spelling_pattern_or_rule:  "Add -ES because the base ends with a consonant + o → echoes. Compare: echo → echoes."
       },
       audio: 'echoes'
     },
@@ -102810,7 +102942,7 @@ spelling_pattern_or_rule: "Add -ES because the base ends with a consonant + o �
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Cat’ ends with a regular consonant sound /t/. To make it plural, just add -S → cats."
+spelling_pattern_or_rule:  "‘Cat’ ends with a regular consonant sound /t/. To make it plural, just add -S → cats."
       },
       audio: 'cat'
     },
@@ -102845,7 +102977,7 @@ spelling_pattern_or_rule: "‘Cat’ ends with a regular consonant sound /t/. To
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "Words like 'cat' take a simple -S to make them plural → cats. Most nouns follow this regular -S pattern."
+spelling_pattern_or_rule:  "Words like 'cat' take a simple -S to make them plural → cats. Most nouns follow this regular -S pattern."
       },
       audio: 'cats'
     },
@@ -102882,7 +103014,7 @@ spelling_pattern_or_rule: "Words like 'cat' take a simple -S to make them plural
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "Words like 'dog' take a simple -S to make them plural → dogs. Most nouns follow this regular -S pattern."
+spelling_pattern_or_rule:  "Words like 'dog' take a simple -S to make them plural → dogs. Most nouns follow this regular -S pattern."
       },
       audio: 'dog'
     },
@@ -102917,7 +103049,7 @@ spelling_pattern_or_rule: "Words like 'dog' take a simple -S to make them plural
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "Words like 'dog' take a simple -S to make them plural → dogs. Most nouns follow this regular -S pattern."
+spelling_pattern_or_rule:  "Words like 'dog' take a simple -S to make them plural → dogs. Most nouns follow this regular -S pattern."
       },
       audio: 'dogs'
     },
@@ -102954,7 +103086,7 @@ spelling_pattern_or_rule: "Words like 'dog' take a simple -S to make them plural
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "The word 'box' ends with /ks/. Because of the X, add -ES in plural → boxes."
+spelling_pattern_or_rule:  "The word 'box' ends with /ks/. Because of the X, add -ES in plural → boxes."
       },
       audio: 'box'
     },
@@ -102989,7 +103121,7 @@ spelling_pattern_or_rule: "The word 'box' ends with /ks/. Because of the X, add 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "Add -ES after X for plural forms → box → boxes. The E helps pronounce /ɪz/ clearly."
+spelling_pattern_or_rule:  "Add -ES after X for plural forms → box → boxes. The E helps pronounce /ɪz/ clearly."
       },
       audio: 'boxes'
     },
@@ -103026,7 +103158,7 @@ spelling_pattern_or_rule: "Add -ES after X for plural forms → box → boxes. T
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Dish’ ends with /ʃ/. Words ending in SH need -ES for plural to sound clear → dishes."
+spelling_pattern_or_rule:  "‘Dish’ ends with /ʃ/. Words ending in SH need -ES for plural to sound clear → dishes."
       },
       audio: 'dish'
     },
@@ -103061,7 +103193,7 @@ spelling_pattern_or_rule: "‘Dish’ ends with /ʃ/. Words ending in SH need -E
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "Add -ES to words ending with SH to form the plural. Compare: dish → dishes. The E keeps pronunciation smooth."
+spelling_pattern_or_rule:  "Add -ES to words ending with SH to form the plural. Compare: dish → dishes. The E keeps pronunciation smooth."
       },
       audio: 'dishes'
     },
@@ -103098,7 +103230,7 @@ spelling_pattern_or_rule: "Add -ES to words ending with SH to form the plural. C
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Brush’ ends with the SH sound. For such endings, add -ES to form plural → brushes."
+spelling_pattern_or_rule:  "‘Brush’ ends with the SH sound. For such endings, add -ES to form plural → brushes."
       },
       audio: 'brush'
     },
@@ -103133,7 +103265,7 @@ spelling_pattern_or_rule: "‘Brush’ ends with the SH sound. For such endings,
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -S and -ES',
         reading_rule: '',
-spelling_pattern_or_rule: "Words ending in SH or CH add -ES to form plurals → brush → brushes. The E keeps the sound /ɪz/ clear."
+spelling_pattern_or_rule:  "Words ending in SH or CH add -ES to form plurals → brush → brushes. The E keeps the sound /ɪz/ clear."
       },
       audio: 'brushes'
     }
@@ -103182,7 +103314,7 @@ spelling_pattern_or_rule: "Words ending in SH or CH add -ES to form plurals → 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -IES',
         reading_rule: '',
-spelling_pattern_or_rule: "The word 'baby' ends with a consonant (b) before y. When pluralized, the y changes to i before adding -ES → babies."
+spelling_pattern_or_rule:  "The word 'baby' ends with a consonant (b) before y. When pluralized, the y changes to i before adding -ES → babies."
       },
       audio: 'baby'
     },
@@ -103217,7 +103349,7 @@ spelling_pattern_or_rule: "The word 'baby' ends with a consonant (b) before y. W
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -IES',
         reading_rule: '',
-spelling_pattern_or_rule: "When a word ends in consonant + y, change the y to i and add -ES → babies. Compare: baby → babies."
+spelling_pattern_or_rule:  "When a word ends in consonant + y, change the y to i and add -ES → babies. Compare: baby → babies."
       },
       audio: 'babies'
     },
@@ -103254,7 +103386,7 @@ spelling_pattern_or_rule: "When a word ends in consonant + y, change the y to i 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -IES',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Lady’ ends with the /d/ sound followed by y. When pluralizing, y changes to i, then add -ES → ladies."
+spelling_pattern_or_rule:  "‘Lady’ ends with the /d/ sound followed by y. When pluralizing, y changes to i, then add -ES → ladies."
       },
       audio: 'lady'
     },
@@ -103289,7 +103421,7 @@ spelling_pattern_or_rule: "‘Lady’ ends with the /d/ sound followed by y. Whe
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -IES',
         reading_rule: '',
-spelling_pattern_or_rule: "To pluralize words ending in consonant + y, change y → i and add -ES. Example: lady → ladies."
+spelling_pattern_or_rule:  "To pluralize words ending in consonant + y, change y → i and add -ES. Example: lady → ladies."
       },
       audio: 'ladies'
     },
@@ -103326,7 +103458,7 @@ spelling_pattern_or_rule: "To pluralize words ending in consonant + y, change y 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -IES',
         reading_rule: '',
-spelling_pattern_or_rule: "When a word like 'city' ends with a consonant before y, change y → i and add -ES → cities."
+spelling_pattern_or_rule:  "When a word like 'city' ends with a consonant before y, change y → i and add -ES → cities."
       },
       audio: 'city'
     },
@@ -103361,7 +103493,7 @@ spelling_pattern_or_rule: "When a word like 'city' ends with a consonant before 
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -IES',
         reading_rule: '',
-spelling_pattern_or_rule: "In plural forms, words ending with consonant + y change y → i, then add -ES → cities."
+spelling_pattern_or_rule:  "In plural forms, words ending with consonant + y change y → i, then add -ES → cities."
       },
       audio: 'cities'
     },
@@ -103398,7 +103530,7 @@ spelling_pattern_or_rule: "In plural forms, words ending with consonant + y chan
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -EN',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Child’ is a special irregular word. It changes completely when pluralized — not just by adding -S or -ES."
+spelling_pattern_or_rule:  "‘Child’ is a special irregular word. It changes completely when pluralized — not just by adding -S or -ES."
       },
       audio: 'child'
     },
@@ -103433,7 +103565,7 @@ spelling_pattern_or_rule: "‘Child’ is a special irregular word. It changes c
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -EN',
         reading_rule: '',
-spelling_pattern_or_rule: "Some irregular words form plurals with -EN, not -S or -ES. Example: child → children."
+spelling_pattern_or_rule:  "Some irregular words form plurals with -EN, not -S or -ES. Example: child → children."
       },
       audio: 'children'
     },
@@ -103470,7 +103602,7 @@ spelling_pattern_or_rule: "Some irregular words form plurals with -EN, not -S or
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -EN',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Ox’ is short and ends with the /ks/ sound. Its plural form adds -EN → oxen, not -ES."
+spelling_pattern_or_rule:  "‘Ox’ is short and ends with the /ks/ sound. Its plural form adds -EN → oxen, not -ES."
       },
       audio: 'ox'
     },
@@ -103505,7 +103637,7 @@ spelling_pattern_or_rule: "‘Ox’ is short and ends with the /ks/ sound. Its p
         student_entry: '',
         topic_to_reinforce: 'Pluralizing with -EN',
         reading_rule: '',
-spelling_pattern_or_rule: "A few English words use -EN for plural. ‘Ox’ follows this old English rule → oxen."
+spelling_pattern_or_rule:  "A few English words use -EN for plural. ‘Ox’ follows this old English rule → oxen."
       },
       audio: 'oxen'
     }
@@ -103554,7 +103686,7 @@ spelling_pattern_or_rule: "A few English words use -EN for plural. ‘Ox’ foll
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Run’ is a one-syllable word with one vowel followed by one consonant (n). When adding a vowel suffix like -ing, double the final consonant → running."
+spelling_pattern_or_rule:  "‘Run’ is a one-syllable word with one vowel followed by one consonant (n). When adding a vowel suffix like -ing, double the final consonant → running."
       },
       audio: 'run'
     },
@@ -103589,7 +103721,7 @@ spelling_pattern_or_rule: "‘Run’ is a one-syllable word with one vowel follo
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "When adding -ing to ‘run,’ double the final consonant (n) because it’s a 1-1-1 word: one syllable, one vowel, one consonant → running."
+spelling_pattern_or_rule:  "When adding -ing to ‘run,’ double the final consonant (n) because it’s a 1-1-1 word: one syllable, one vowel, one consonant → running."
       },
       audio: 'running'
     },
@@ -103626,7 +103758,7 @@ spelling_pattern_or_rule: "When adding -ing to ‘run,’ double the final conso
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Hop’ is a 1-1-1 word, is a one-syllable word with one vowel followed by one consonant (n).. When adding -ing, double the last consonant to keep the short vowel sound → hopping."
+spelling_pattern_or_rule:  "‘Hop’ is a 1-1-1 word, is a one-syllable word with one vowel followed by one consonant (n).. When adding -ing, double the last consonant to keep the short vowel sound → hopping."
       },
       audio: 'hop'
     },
@@ -103661,7 +103793,7 @@ spelling_pattern_or_rule: "‘Hop’ is a 1-1-1 word, is a one-syllable word wit
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Hop’ becomes ‘hopping’ when adding -ing because you double the final p — one syllable, one vowel, one consonant."
+spelling_pattern_or_rule:  "‘Hop’ becomes ‘hopping’ when adding -ing because you double the final p — one syllable, one vowel, one consonant."
       },
       audio: 'hopping'
     },
@@ -103698,7 +103830,7 @@ spelling_pattern_or_rule: "‘Hop’ becomes ‘hopping’ when adding -ing beca
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Big’ fits the 1-1-1 rule (one vowel, one consonant). When adding a vowel suffix like -er, double the g → bigger."
+spelling_pattern_or_rule:  "‘Big’ fits the 1-1-1 rule (one vowel, one consonant). When adding a vowel suffix like -er, double the g → bigger."
       },
       audio: 'big'
     },
@@ -103733,7 +103865,7 @@ spelling_pattern_or_rule: "‘Big’ fits the 1-1-1 rule (one vowel, one consona
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘bigger,’ the g doubles before adding -er. The 1-1-1 pattern helps keep the short vowel sound from changing."
+spelling_pattern_or_rule:  "In ‘bigger,’ the g doubles before adding -er. The 1-1-1 pattern helps keep the short vowel sound from changing."
       },
       audio: 'bigger'
     },
@@ -103770,7 +103902,7 @@ spelling_pattern_or_rule: "In ‘bigger,’ the g doubles before adding -er. The
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Plan’ ends with one consonant after one vowel, so when adding -ed, the n doubles → planned."
+spelling_pattern_or_rule:  "‘Plan’ ends with one consonant after one vowel, so when adding -ed, the n doubles → planned."
       },
       audio: 'plan'
     },
@@ -103805,7 +103937,7 @@ spelling_pattern_or_rule: "‘Plan’ ends with one consonant after one vowel, s
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "For short words like ‘plan,’ double the final consonant before adding vowel suffixes like -ed. It keeps the short vowel sound steady → planned."
+spelling_pattern_or_rule:  "For short words like ‘plan,’ double the final consonant before adding vowel suffixes like -ed. It keeps the short vowel sound steady → planned."
       },
       audio: 'planned'
     },
@@ -103842,7 +103974,7 @@ spelling_pattern_or_rule: "For short words like ‘plan,’ double the final con
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Fit’ is a one-syllable word ending in one vowel and one consonant. When adding -ed, double the t → fitted."
+spelling_pattern_or_rule:  "‘Fit’ is a one-syllable word ending in one vowel and one consonant. When adding -ed, double the t → fitted."
       },
       audio: 'fit'
     },
@@ -103877,7 +104009,7 @@ spelling_pattern_or_rule: "‘Fit’ is a one-syllable word ending in one vowel 
         student_entry: '',
         topic_to_reinforce: 'Doubling Rule for vowel suffixes',
         reading_rule: '',
-spelling_pattern_or_rule: "When adding -ed to short 1-1-1 words like ‘fit,’ double the final consonant to keep the vowel short → fitted."
+spelling_pattern_or_rule:  "When adding -ed to short 1-1-1 words like ‘fit,’ double the final consonant to keep the vowel short → fitted."
       },
       audio: 'fitted'
     }
@@ -103926,7 +104058,7 @@ spelling_pattern_or_rule: "When adding -ed to short 1-1-1 words like ‘fit,’ 
         student_entry: '',
         topic_to_reinforce: 'Phonogram OUR (/ər/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘courage,’ the letters OUR spell the /ər/ sound. OUR often sounds like ER in unstressed syllables (courage, nourish)."
+spelling_pattern_or_rule:  "In ‘courage,’ the letters OUR spell the /ər/ sound. OUR often sounds like ER in unstressed syllables (courage, nourish)."
       },
       audio: 'courage'
     },
@@ -103961,7 +104093,7 @@ spelling_pattern_or_rule: "In ‘courage,’ the letters OUR spell the /ər/ sou
         student_entry: '',
         topic_to_reinforce: 'Phonogram OUR (/ər/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘nourish,’ OUR spells /ər/. This is common when OUR is in an unstressed syllable before a soft ending like –ish."
+spelling_pattern_or_rule:  "In ‘nourish,’ OUR spells /ər/. This is common when OUR is in an unstressed syllable before a soft ending like –ish."
       },
       audio: 'nourish'
     },
@@ -103996,7 +104128,7 @@ spelling_pattern_or_rule: "In ‘nourish,’ OUR spells /ər/. This is common wh
         student_entry: '',
         topic_to_reinforce: 'Phonogram OUR (/ər/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘flourish,’ the letters OUR spell /ər/. The vowel sound changes because OUR appears in an unstressed syllable."
+spelling_pattern_or_rule:  "In ‘flourish,’ the letters OUR spell /ər/. The vowel sound changes because OUR appears in an unstressed syllable."
       },
       audio: 'flourish'
     },
@@ -104031,7 +104163,7 @@ spelling_pattern_or_rule: "In ‘flourish,’ the letters OUR spell /ər/. The v
         student_entry: '',
         topic_to_reinforce: 'Phonogram OUR (/ər/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘journey,’ OUR spells the /ər/ sound. The word’s first syllable is unstressed, which makes the vowel sound softer."
+spelling_pattern_or_rule:  "In ‘journey,’ OUR spells the /ər/ sound. The word’s first syllable is unstressed, which makes the vowel sound softer."
       },
       audio: 'journey'
     },
@@ -104066,7 +104198,7 @@ spelling_pattern_or_rule: "In ‘journey,’ OUR spells the /ər/ sound. The wor
         student_entry: '',
         topic_to_reinforce: 'Phonogram OUR (/ər/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘courtesy,’ the letters OUR say /ər/. This pattern occurs in words where OUR appears before T or D in unstressed syllables."
+spelling_pattern_or_rule:  "In ‘courtesy,’ the letters OUR say /ər/. This pattern occurs in words where OUR appears before T or D in unstressed syllables."
       },
       audio: 'courtesy'
     },
@@ -104101,7 +104233,7 @@ spelling_pattern_or_rule: "In ‘courtesy,’ the letters OUR say /ər/. This pa
         student_entry: '',
         topic_to_reinforce: 'Phonogram CI (/ʃ/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘special,’ CI spells /ʃ/ before a vowel. When C is followed by I, it usually changes to the soft /ʃ/ sound."
+spelling_pattern_or_rule:  "In ‘special,’ CI spells /ʃ/ before a vowel. When C is followed by I, it usually changes to the soft /ʃ/ sound."
       },
       audio: 'special'
     },
@@ -104136,7 +104268,7 @@ spelling_pattern_or_rule: "In ‘special,’ CI spells /ʃ/ before a vowel. When
         student_entry: '',
         topic_to_reinforce: 'Phonogram CI (/ʃ/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘musician,’ CI makes /ʃ/. It connects to ‘music,’ where the C is hard but becomes soft before I or A."
+spelling_pattern_or_rule:  "In ‘musician,’ CI makes /ʃ/. It connects to ‘music,’ where the C is hard but becomes soft before I or A."
       },
       audio: 'musician'
     },
@@ -104171,7 +104303,7 @@ spelling_pattern_or_rule: "In ‘musician,’ CI makes /ʃ/. It connects to ‘m
         student_entry: '',
         topic_to_reinforce: 'Phonogram CI (/ʃ/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘magician,’ CI spells /ʃ/. The root ‘magic’ changes from hard /k/ to soft /ʃ/ when the suffix –ian is added."
+spelling_pattern_or_rule:  "In ‘magician,’ CI spells /ʃ/. The root ‘magic’ changes from hard /k/ to soft /ʃ/ when the suffix –ian is added."
       },
       audio: 'magician'
     },
@@ -104206,7 +104338,7 @@ spelling_pattern_or_rule: "In ‘magician,’ CI spells /ʃ/. The root ‘magic�
         student_entry: '',
         topic_to_reinforce: 'Phonogram CI (/ʃ/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘physician,’ CI spells /ʃ/. It comes from the same root as ‘physics,’ but the ending –cian softens the sound."
+spelling_pattern_or_rule:  "In ‘physician,’ CI spells /ʃ/. It comes from the same root as ‘physics,’ but the ending –cian softens the sound."
       },
       audio: 'physician'
     },
@@ -104241,7 +104373,7 @@ spelling_pattern_or_rule: "In ‘physician,’ CI spells /ʃ/. It comes from the
         student_entry: '',
         topic_to_reinforce: 'Phonogram CI (/ʃ/)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘electrician,’ CI makes /ʃ/ before A. It follows the same pattern as ‘magician’ and ‘musician.’"
+spelling_pattern_or_rule:  "In ‘electrician,’ CI makes /ʃ/ before A. It follows the same pattern as ‘magician’ and ‘musician.’"
       },
       audio: 'electrician'
     }
@@ -104290,7 +104422,7 @@ spelling_pattern_or_rule: "In ‘electrician,’ CI makes /ʃ/ before A. It foll
         student_entry: '',
         topic_to_reinforce: 'ER = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘her,’ the letters ER spell the /er/ sound. ER is the most common way to spell /er/ at the end or middle of a word."
+spelling_pattern_or_rule:  "In ‘her,’ the letters ER spell the /er/ sound. ER is the most common way to spell /er/ at the end or middle of a word."
       },
       audio: 'her'
     },
@@ -104325,7 +104457,7 @@ spelling_pattern_or_rule: "In ‘her,’ the letters ER spell the /er/ sound. ER
         student_entry: '',
         topic_to_reinforce: 'ER = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘fern,’ ER spells /er/ again. ER is used in many words with the stressed /er/ sound, like her, term, and serve."
+spelling_pattern_or_rule:  "In ‘fern,’ ER spells /er/ again. ER is used in many words with the stressed /er/ sound, like her, term, and serve."
       },
       audio: 'fern'
     },
@@ -104360,7 +104492,7 @@ spelling_pattern_or_rule: "In ‘fern,’ ER spells /er/ again. ER is used in ma
         student_entry: '',
         topic_to_reinforce: 'ER = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘herd,’ ER makes /er/. It often appears before D or T, as in herd, term, and clerk."
+spelling_pattern_or_rule:  "In ‘herd,’ ER makes /er/. It often appears before D or T, as in herd, term, and clerk."
       },
       audio: 'herd'
     },
@@ -104397,7 +104529,7 @@ spelling_pattern_or_rule: "In ‘herd,’ ER makes /er/. It often appears before
         student_entry: '',
         topic_to_reinforce: 'IR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘bird,’ the letters IR spell /er/. IR often appears before D, L, or T — bird, girl, first."
+spelling_pattern_or_rule:  "In ‘bird,’ the letters IR spell /er/. IR often appears before D, L, or T — bird, girl, first."
       },
       audio: 'bird'
     },
@@ -104432,7 +104564,7 @@ spelling_pattern_or_rule: "In ‘bird,’ the letters IR spell /er/. IR often ap
         student_entry: '',
         topic_to_reinforce: 'IR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘shirt,’ IR spells /er/. IR often appears in the middle of one-syllable words like bird, shirt, and dirt."
+spelling_pattern_or_rule:  "In ‘shirt,’ IR spells /er/. IR often appears in the middle of one-syllable words like bird, shirt, and dirt."
       },
       audio: 'shirt'
     },
@@ -104467,7 +104599,7 @@ spelling_pattern_or_rule: "In ‘shirt,’ IR spells /er/. IR often appears in t
         student_entry: '',
         topic_to_reinforce: 'IR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘girl,’ IR makes /er/. IR is the second most common way to spell /er/ after ER."
+spelling_pattern_or_rule:  "In ‘girl,’ IR makes /er/. IR is the second most common way to spell /er/ after ER."
       },
       audio: 'girl'
     },
@@ -104504,7 +104636,7 @@ spelling_pattern_or_rule: "In ‘girl,’ IR makes /er/. IR is the second most c
         student_entry: '',
         topic_to_reinforce: 'UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘nurse,’ UR spells /er/. UR is often used before S, T, or D as in nurse, hurt, and burst."
+spelling_pattern_or_rule:  "In ‘nurse,’ UR spells /er/. UR is often used before S, T, or D as in nurse, hurt, and burst."
       },
       audio: 'nurse'
     },
@@ -104539,7 +104671,7 @@ spelling_pattern_or_rule: "In ‘nurse,’ UR spells /er/. UR is often used befo
         student_entry: '',
         topic_to_reinforce: 'UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘curl,’ UR spells /er/. UR can appear before L or N in short one-syllable words."
+spelling_pattern_or_rule:  "In ‘curl,’ UR spells /er/. UR can appear before L or N in short one-syllable words."
       },
       audio: 'curl'
     },
@@ -104574,7 +104706,7 @@ spelling_pattern_or_rule: "In ‘curl,’ UR spells /er/. UR can appear before L
         student_entry: '',
         topic_to_reinforce: 'UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘hurt,’ UR spells /er/. UR often appears before T or D and makes the same /er/ sound as ER and IR."
+spelling_pattern_or_rule:  "In ‘hurt,’ UR spells /er/. UR often appears before T or D and makes the same /er/ sound as ER and IR."
       },
       audio: 'hurt'
     },
@@ -104611,7 +104743,7 @@ spelling_pattern_or_rule: "In ‘hurt,’ UR spells /er/. UR often appears befor
         student_entry: '',
         topic_to_reinforce: 'ER / IR / UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘thirsty,’ IR spells /er/. Remember: ER, IR, and UR all say /er/ — learn which one fits by pattern and position."
+spelling_pattern_or_rule:  "In ‘thirsty,’ IR spells /er/. Remember: ER, IR, and UR all say /er/ — learn which one fits by pattern and position."
       },
       audio: 'thirsty'
     }
@@ -104660,7 +104792,7 @@ spelling_pattern_or_rule: "In ‘thirsty,’ IR spells /er/. Remember: ER, IR, a
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘actor,’ the suffix -or is unstressed and the letters OR say /ər/. Use OR to spell /er/ in agent nouns ending with -or (actor, doctor)."
+spelling_pattern_or_rule:  "In ‘actor,’ the suffix -or is unstressed and the letters OR say /ər/. Use OR to spell /er/ in agent nouns ending with -or (actor, doctor)."
       },
       audio: 'actor'
     },
@@ -104695,7 +104827,7 @@ spelling_pattern_or_rule: "In ‘actor,’ the suffix -or is unstressed and the 
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘doctor,’ -or is an unstressed ending; OR says /ər/. Choose OR for occupational nouns ending in -or (doctor, inventor)."
+spelling_pattern_or_rule:  "In ‘doctor,’ -or is an unstressed ending; OR says /ər/. Choose OR for occupational nouns ending in -or (doctor, inventor)."
       },
       audio: 'doctor'
     },
@@ -104730,7 +104862,7 @@ spelling_pattern_or_rule: "In ‘doctor,’ -or is an unstressed ending; OR says
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Visitor’ = visit + -or. In this unstressed final syllable, OR spells /ər/. Use OR to spell /er/ in -or endings attached to verbs (visit → visitor)."
+spelling_pattern_or_rule:  "‘Visitor’ = visit + -or. In this unstressed final syllable, OR spells /ər/. Use OR to spell /er/ in -or endings attached to verbs (visit → visitor)."
       },
       audio: 'visitor'
     },
@@ -104767,7 +104899,7 @@ spelling_pattern_or_rule: "‘Visitor’ = visit + -or. In this unstressed final
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘learn,’ EAR is an r-controlled vowel that says /ər/ (not /ear/). EAR commonly spells /er/ before RN or RT (learn, earth)."
+spelling_pattern_or_rule:  "In ‘learn,’ EAR is an r-controlled vowel that says /ər/ (not /ear/). EAR commonly spells /er/ before RN or RT (learn, earth)."
       },
       audio: 'learn'
     },
@@ -104802,7 +104934,7 @@ spelling_pattern_or_rule: "In ‘learn,’ EAR is an r-controlled vowel that say
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Heard’ (past of ‘hear’) uses EAR to say /ər/ before -d. EAR can shift from /ear/ to /er/ in inflected forms (hear → hEArd)."
+spelling_pattern_or_rule:  "‘Heard’ (past of ‘hear’) uses EAR to say /ər/ before -d. EAR can shift from /ear/ to /er/ in inflected forms (hear → hEArd)."
       },
       audio: 'heard'
     },
@@ -104837,7 +104969,7 @@ spelling_pattern_or_rule: "‘Heard’ (past of ‘hear’) uses EAR to say /ər
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘earth,’ EAR is r-controlled and says /ər/ before -th. EAR frequently spells /er/ in EAR+TH and EAR+RN patterns."
+spelling_pattern_or_rule:  "In ‘earth,’ EAR is r-controlled and says /ər/ before -th. EAR frequently spells /er/ in EAR+TH and EAR+RN patterns."
       },
       audio: 'earth'
     },
@@ -104874,7 +105006,7 @@ spelling_pattern_or_rule: "In ‘earth,’ EAR is r-controlled and says /ər/ be
         student_entry: '',
         topic_to_reinforce: 'OUR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘courage,’ the unstressed syllable uses OUR to say /ər/ before -age. Choose OUR for /er/ in words like courage, nourish, flourish."
+spelling_pattern_or_rule:  "In ‘courage,’ the unstressed syllable uses OUR to say /ər/ before -age. Choose OUR for /er/ in words like courage, nourish, flourish."
       },
       audio: 'courage'
     },
@@ -104909,7 +105041,7 @@ spelling_pattern_or_rule: "In ‘courage,’ the unstressed syllable uses OUR to
         student_entry: '',
         topic_to_reinforce: 'OUR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘nourish,’ OUR appears in an unstressed first syllable and says /ər/ before -ish. Use OUR + (ish/age/ish-type endings) for /er/."
+spelling_pattern_or_rule:  "In ‘nourish,’ OUR appears in an unstressed first syllable and says /ər/ before -ish. Use OUR + (ish/age/ish-type endings) for /er/."
       },
       audio: 'nourish'
     },
@@ -104944,7 +105076,7 @@ spelling_pattern_or_rule: "In ‘nourish,’ OUR appears in an unstressed first 
         student_entry: '',
         topic_to_reinforce: 'OUR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘flourish,’ the OUR in the first (unstressed) syllable spells /ər/ before -ish. OUR commonly says /er/ in similar word shapes."
+spelling_pattern_or_rule:  "In ‘flourish,’ the OUR in the first (unstressed) syllable spells /ər/ before -ish. OUR commonly says /er/ in similar word shapes."
       },
       audio: 'flourish'
     },
@@ -104981,7 +105113,7 @@ spelling_pattern_or_rule: "In ‘flourish,’ the OUR in the first (unstressed) 
         student_entry: '',
         topic_to_reinforce: 'OR / EAR / OUR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Mentor’ uses final -or where OR says /ər/ in an unstressed ending. Compare within-topic patterns: OR (mentor), EAR (earth), OUR (courage) — all spell /er/ in different contexts."
+spelling_pattern_or_rule:  "‘Mentor’ uses final -or where OR says /ər/ in an unstressed ending. Compare within-topic patterns: OR (mentor), EAR (earth), OUR (courage) — all spell /er/ in different contexts."
       },
       audio: 'mentor'
     }
@@ -105030,7 +105162,7 @@ spelling_pattern_or_rule: "‘Mentor’ uses final -or where OR says /ər/ in an
         student_entry: '',
         topic_to_reinforce: 'ER = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "ER is the most common way to spell the /er/ sound in stressed syllables, as in her, fern, and serve."
+spelling_pattern_or_rule:  "ER is the most common way to spell the /er/ sound in stressed syllables, as in her, fern, and serve."
       },
       audio: 'her'
     },
@@ -105065,7 +105197,7 @@ spelling_pattern_or_rule: "ER is the most common way to spell the /er/ sound in 
         student_entry: '',
         topic_to_reinforce: 'ER = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘fern,’ ER makes the /er/ sound in the middle of the word. ER commonly appears before N or V (fern, serve)."
+spelling_pattern_or_rule:  "In ‘fern,’ ER makes the /er/ sound in the middle of the word. ER commonly appears before N or V (fern, serve)."
       },
       audio: 'fern'
     },
@@ -105100,7 +105232,7 @@ spelling_pattern_or_rule: "In ‘fern,’ ER makes the /er/ sound in the middle 
         student_entry: '',
         topic_to_reinforce: 'ER = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘term,’ ER makes the /er/ sound at the end of the syllable. ER is often found at the end of single-syllable words."
+spelling_pattern_or_rule:  "In ‘term,’ ER makes the /er/ sound at the end of the syllable. ER is often found at the end of single-syllable words."
       },
       audio: 'term'
     },
@@ -105137,7 +105269,7 @@ spelling_pattern_or_rule: "In ‘term,’ ER makes the /er/ sound at the end of 
         student_entry: '',
         topic_to_reinforce: 'IR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "IR makes the /er/ sound in many words like bird, first, and girl. It is often used before consonants like D, L, or ST."
+spelling_pattern_or_rule:  "IR makes the /er/ sound in many words like bird, first, and girl. It is often used before consonants like D, L, or ST."
       },
       audio: 'bird'
     },
@@ -105172,7 +105304,7 @@ spelling_pattern_or_rule: "IR makes the /er/ sound in many words like bird, firs
         student_entry: '',
         topic_to_reinforce: 'IR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "IR spells /er/ in ‘shirt.’ It often occurs before T or D. The vowel sound is controlled by the R."
+spelling_pattern_or_rule:  "IR spells /er/ in ‘shirt.’ It often occurs before T or D. The vowel sound is controlled by the R."
       },
       audio: 'shirt'
     },
@@ -105207,7 +105339,7 @@ spelling_pattern_or_rule: "IR spells /er/ in ‘shirt.’ It often occurs before
         student_entry: '',
         topic_to_reinforce: 'IR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "IR spells /er/ in ‘first,’ especially before consonant clusters like ST. Common in one-syllable words (bird, first, third)."
+spelling_pattern_or_rule:  "IR spells /er/ in ‘first,’ especially before consonant clusters like ST. Common in one-syllable words (bird, first, third)."
       },
       audio: 'first'
     },
@@ -105244,7 +105376,7 @@ spelling_pattern_or_rule: "IR spells /er/ in ‘first,’ especially before cons
         student_entry: '',
         topic_to_reinforce: 'UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "UR spells /er/ in many words like nurse and turn. It is often used before S, N, or L."
+spelling_pattern_or_rule:  "UR spells /er/ in many words like nurse and turn. It is often used before S, N, or L."
       },
       audio: 'nurse'
     },
@@ -105279,7 +105411,7 @@ spelling_pattern_or_rule: "UR spells /er/ in many words like nurse and turn. It 
         student_entry: '',
         topic_to_reinforce: 'UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "UR spells /er/ in ‘turn.’ This pattern appears often before N or L (turn, curl, burn)."
+spelling_pattern_or_rule:  "UR spells /er/ in ‘turn.’ This pattern appears often before N or L (turn, curl, burn)."
       },
       audio: 'turn'
     },
@@ -105314,7 +105446,7 @@ spelling_pattern_or_rule: "UR spells /er/ in ‘turn.’ This pattern appears of
         student_entry: '',
         topic_to_reinforce: 'UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘burn,’ UR spells /er/. UR is common before N or D in one-syllable words."
+spelling_pattern_or_rule:  "In ‘burn,’ UR spells /er/. UR is common before N or D in one-syllable words."
       },
       audio: 'burn'
     },
@@ -105351,7 +105483,7 @@ spelling_pattern_or_rule: "In ‘burn,’ UR spells /er/. UR is common before N 
         student_entry: '',
         topic_to_reinforce: 'ER, IR, UR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Third’ reviews the IR spelling for /er/. ER, IR, and UR all say /er/, and must be memorized by pattern and word family."
+spelling_pattern_or_rule:  "‘Third’ reviews the IR spelling for /er/. ER, IR, and UR all say /er/, and must be memorized by pattern and word family."
       },
       audio: 'third'
     }
@@ -105400,7 +105532,7 @@ spelling_pattern_or_rule: "‘Third’ reviews the IR spelling for /er/. ER, IR,
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘actor,’ OR says /er/ in an unstressed syllable at the end. This is common in words ending in -or, like actor and doctor."
+spelling_pattern_or_rule:  "In ‘actor,’ OR says /er/ in an unstressed syllable at the end. This is common in words ending in -or, like actor and doctor."
       },
       audio: 'actor'
     },
@@ -105435,7 +105567,7 @@ spelling_pattern_or_rule: "In ‘actor,’ OR says /er/ in an unstressed syllabl
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘sailor,’ OR says /er/ in an unstressed syllable. Many words for people end with -or or -er, like sailor and teacher."
+spelling_pattern_or_rule:  "In ‘sailor,’ OR says /er/ in an unstressed syllable. Many words for people end with -or or -er, like sailor and teacher."
       },
       audio: 'sailor'
     },
@@ -105470,7 +105602,7 @@ spelling_pattern_or_rule: "In ‘sailor,’ OR says /er/ in an unstressed syllab
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘doctor,’ OR spells /er/ at the end of a word. The OR ending often says /er/ in occupations and roles (doctor, actor)."
+spelling_pattern_or_rule:  "In ‘doctor,’ OR spells /er/ at the end of a word. The OR ending often says /er/ in occupations and roles (doctor, actor)."
       },
       audio: 'doctor'
     },
@@ -105507,7 +105639,7 @@ spelling_pattern_or_rule: "In ‘doctor,’ OR spells /er/ at the end of a word.
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘learn,’ EAR says /er/. EAR can spell the /er/ sound instead of the long /ē/ sound in certain words (learn, earth)."
+spelling_pattern_or_rule:  "In ‘learn,’ EAR says /er/. EAR can spell the /er/ sound instead of the long /ē/ sound in certain words (learn, earth)."
       },
       audio: 'learn'
     },
@@ -105542,7 +105674,7 @@ spelling_pattern_or_rule: "In ‘learn,’ EAR says /er/. EAR can spell the /er/
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘pearl,’ EAR makes the /er/ sound before L. This spelling appears in few words (pearl, early, learn)."
+spelling_pattern_or_rule:  "In ‘pearl,’ EAR makes the /er/ sound before L. This spelling appears in few words (pearl, early, learn)."
       },
       audio: 'pearl'
     },
@@ -105577,7 +105709,7 @@ spelling_pattern_or_rule: "In ‘pearl,’ EAR makes the /er/ sound before L. Th
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘earth,’ EAR spells the /er/ sound. EAR can spell either /ɜːr/ or /ər/, depending on accent and stress."
+spelling_pattern_or_rule:  "In ‘earth,’ EAR spells the /er/ sound. EAR can spell either /ɜːr/ or /ər/, depending on accent and stress."
       },
       audio: 'earth'
     },
@@ -105614,7 +105746,7 @@ spelling_pattern_or_rule: "In ‘earth,’ EAR spells the /er/ sound. EAR can sp
         student_entry: '',
         topic_to_reinforce: 'OR and EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘word,’ OR says /er/ instead of /ɔː/. It’s an irregular but common pattern similar to work and world."
+spelling_pattern_or_rule:  "In ‘word,’ OR says /er/ instead of /ɔː/. It’s an irregular but common pattern similar to work and world."
       },
       audio: 'word'
     },
@@ -105649,7 +105781,7 @@ spelling_pattern_or_rule: "In ‘word,’ OR says /er/ instead of /ɔː/. It’s
         student_entry: '',
         topic_to_reinforce: 'EAR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "‘Early’ uses EAR to spell /er/. EAR often appears before L or TH (early, earth)."
+spelling_pattern_or_rule:  "‘Early’ uses EAR to spell /er/. EAR often appears before L or TH (early, earth)."
       },
       audio: 'early'
     },
@@ -105684,7 +105816,7 @@ spelling_pattern_or_rule: "‘Early’ uses EAR to spell /er/. EAR often appears
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘color,’ OR says /er/ in an unstressed final syllable. The /er/ sound often occurs at the end of words like color and actor."
+spelling_pattern_or_rule:  "In ‘color,’ OR says /er/ in an unstressed final syllable. The /er/ sound often occurs at the end of words like color and actor."
       },
       audio: 'color'
     },
@@ -105719,7 +105851,7 @@ spelling_pattern_or_rule: "In ‘color,’ OR says /er/ in an unstressed final s
         student_entry: '',
         topic_to_reinforce: 'OR = /er/',
         reading_rule: '',
-spelling_pattern_or_rule: "‘World’ uses OR for /er/ before L and D, similar to word and work. These are irregular but high-frequency patterns."
+spelling_pattern_or_rule:  "‘World’ uses OR for /er/ before L and D, similar to word and work. These are irregular but high-frequency patterns."
       },
       audio: 'world'
     }
@@ -105767,7 +105899,7 @@ spelling_pattern_or_rule: "‘World’ uses OR for /er/ before L and D, similar 
         student_entry: '',
         topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘solar,’ the AR in the unstressed final syllable sounds like /ər/. AR says /ar/ when stressed (car) but /ər/ when unstressed (solar)."
+spelling_pattern_or_rule:  "In ‘solar,’ the AR in the unstressed final syllable sounds like /ər/. AR says /ar/ when stressed (car) but /ər/ when unstressed (solar)."
       },
       audio: 'solar'
     },
@@ -105802,7 +105934,7 @@ spelling_pattern_or_rule: "In ‘solar,’ the AR in the unstressed final syllab
         student_entry: '',
         topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘polar,’ AR is in an unstressed syllable and says /ər/. Compare stressed AR in car vs. unstressed AR in polar."
+spelling_pattern_or_rule:  "In ‘polar,’ AR is in an unstressed syllable and says /ər/. Compare stressed AR in car vs. unstressed AR in polar."
       },
       audio: 'polar'
     },
@@ -105837,7 +105969,7 @@ spelling_pattern_or_rule: "In ‘polar,’ AR is in an unstressed syllable and s
         student_entry: '',
         topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘collar,’ AR comes after a double L in an unstressed syllable and says /ər/. When AR is not stressed, the vowel weakens to /ər/."
+spelling_pattern_or_rule:  "In ‘collar,’ AR comes after a double L in an unstressed syllable and says /ər/. When AR is not stressed, the vowel weakens to /ər/."
       },
       audio: 'collar'
     },
@@ -105872,7 +106004,7 @@ spelling_pattern_or_rule: "In ‘collar,’ AR comes after a double L in an unst
         student_entry: '',
         topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘grammar,’ AR at the end is unstressed and says /ər/. This pattern appears in words ending with -ar after a doubled consonant."
+spelling_pattern_or_rule:  "In ‘grammar,’ AR at the end is unstressed and says /ər/. This pattern appears in words ending with -ar after a doubled consonant."
       },
       audio: 'grammar'
     }, {
@@ -105906,7 +106038,7 @@ spelling_pattern_or_rule: "In ‘grammar,’ AR at the end is unstressed and say
         student_entry: '',
         topic_to_reinforce: 'AR = /ar/ in stressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘car,’ the AR is stressed and says /ar/. When AR carries the main stress, the vowel sound is strong /ar/, not weakened /ər/."
+spelling_pattern_or_rule:  "In ‘car,’ the AR is stressed and says /ar/. When AR carries the main stress, the vowel sound is strong /ar/, not weakened /ər/."
       },
       audio: 'car'
     },
@@ -105941,7 +106073,7 @@ spelling_pattern_or_rule: "In ‘car,’ the AR is stressed and says /ar/. When 
         student_entry: '',
         topic_to_reinforce: 'AR = /ar/ in stressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘garden,’ AR is in the stressed first syllable and says /ar/. When AR starts the word or has emphasis, it keeps its full /ar/ sound."
+spelling_pattern_or_rule:  "In ‘garden,’ AR is in the stressed first syllable and says /ar/. When AR starts the word or has emphasis, it keeps its full /ar/ sound."
       },
       audio: 'garden'
     },
@@ -105976,7 +106108,7 @@ spelling_pattern_or_rule: "In ‘garden,’ AR is in the stressed first syllable
         student_entry: '',
         topic_to_reinforce: 'AR = /ar/ in stressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘harvest,’ AR carries stress and says /ar/. AR stays /ar/ when it’s the strong, spoken part of a word."
+spelling_pattern_or_rule:  "In ‘harvest,’ AR carries stress and says /ar/. AR stays /ar/ when it’s the strong, spoken part of a word."
       },
       audio: 'harvest'
     }, 
@@ -106011,7 +106143,7 @@ spelling_pattern_or_rule: "In ‘harvest,’ AR carries stress and says /ar/. AR
         student_entry: '',
         topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘beggar,’ AR follows a doubled consonant and forms an unstressed /ər/. Words ending with -gar or -lar often have AR sounding like /ər/."
+spelling_pattern_or_rule:  "In ‘beggar,’ AR follows a doubled consonant and forms an unstressed /ər/. Words ending with -gar or -lar often have AR sounding like /ər/."
       },
       audio: 'beggar'
     },
@@ -106046,7 +106178,7 @@ spelling_pattern_or_rule: "In ‘beggar,’ AR follows a doubled consonant and f
         student_entry: '',
         topic_to_reinforce: 'AR = /ar/ in stressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘start,’ AR is stressed and says /ar/. When AR follows a single consonant and carries stress, it keeps the full /ar/ sound."
+spelling_pattern_or_rule:  "In ‘start,’ AR is stressed and says /ar/. When AR follows a single consonant and carries stress, it keeps the full /ar/ sound."
       },
       audio: 'start'
     },
@@ -106083,7 +106215,7 @@ spelling_pattern_or_rule: "In ‘start,’ AR is stressed and says /ar/. When AR
         student_entry: '',
         topic_to_reinforce: 'AR = /ər/ in unstressed syllables',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘dollar,’ AR occurs in an unstressed syllable after LL and sounds like /ər/. Similar to collar and grammar — AR weakens in unstressed endings."
+spelling_pattern_or_rule:  "In ‘dollar,’ AR occurs in an unstressed syllable after LL and sounds like /ər/. Similar to collar and grammar — AR weakens in unstressed endings."
       },
       audio: 'dollar'
     }
@@ -106136,7 +106268,7 @@ spelling_pattern_or_rule: "In ‘dollar,’ AR occurs in an unstressed syllable 
         student_entry: '',
         topic_to_reinforce: 'Long E spelled single E',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘me,’ a single final E in an open syllable says /ē/. This is the simplest long E spelling pattern."
+spelling_pattern_or_rule:  "In ‘me,’ a single final E in an open syllable says /ē/. This is the simplest long E spelling pattern."
       },
       audio: 'me'
     },
@@ -106171,7 +106303,7 @@ spelling_pattern_or_rule: "In ‘me,’ a single final E in an open syllable say
         student_entry: '',
         topic_to_reinforce: 'Long E spelled single E',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘he,’ the E at the end is long /ē/ because it is in an open syllable. Words like me, he, and we follow this rule."
+spelling_pattern_or_rule:  "In ‘he,’ the E at the end is long /ē/ because it is in an open syllable. Words like me, he, and we follow this rule."
       },
       audio: 'he'
     },
@@ -106206,7 +106338,7 @@ spelling_pattern_or_rule: "In ‘he,’ the E at the end is long /ē/ because it
         student_entry: '',
         topic_to_reinforce: 'Long E spelled single E',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘she,’ a single final E in an open syllable spells the /ē/ sound, just like in he and me."
+spelling_pattern_or_rule:  "In ‘she,’ a single final E in an open syllable spells the /ē/ sound, just like in he and me."
       },
       audio: 'she'
     },
@@ -106243,7 +106375,7 @@ spelling_pattern_or_rule: "In ‘she,’ a single final E in an open syllable sp
         student_entry: '',
         topic_to_reinforce: 'Long E spelled EA',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘eat,’ EA spells the long /ē/ sound. EA is one of the most common long E spellings in English words like eat, team, and dream."
+spelling_pattern_or_rule:  "In ‘eat,’ EA spells the long /ē/ sound. EA is one of the most common long E spellings in English words like eat, team, and dream."
       },
       audio: 'eat'
     },
@@ -106278,7 +106410,7 @@ spelling_pattern_or_rule: "In ‘eat,’ EA spells the long /ē/ sound. EA is on
         student_entry: '',
         topic_to_reinforce: 'Long E spelled EA',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘team,’ EA makes the /ē/ sound in the middle. EA is a vowel team that often represents the long E sound in words like team and dream."
+spelling_pattern_or_rule:  "In ‘team,’ EA makes the /ē/ sound in the middle. EA is a vowel team that often represents the long E sound in words like team and dream."
       },
       audio: 'team'
     },
@@ -106313,7 +106445,7 @@ spelling_pattern_or_rule: "In ‘team,’ EA makes the /ē/ sound in the middle.
         student_entry: '',
         topic_to_reinforce: 'Long E spelled EA',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘dream,’ EA spells /ē/. EA is a common vowel team used to show the long E sound before consonants like M or T."
+spelling_pattern_or_rule:  "In ‘dream,’ EA spells /ē/. EA is a common vowel team used to show the long E sound before consonants like M or T."
       },
       audio: 'dream'
     },
@@ -106350,7 +106482,7 @@ spelling_pattern_or_rule: "In ‘dream,’ EA spells /ē/. EA is a common vowel 
         student_entry: '',
         topic_to_reinforce: 'Long E spelled EY',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘key,’ EY says /ē/ at the end of a word. EY and Y both often show the long E sound in final position."
+spelling_pattern_or_rule:  "In ‘key,’ EY says /ē/ at the end of a word. EY and Y both often show the long E sound in final position."
       },
       audio: 'key'
     },
@@ -106385,7 +106517,7 @@ spelling_pattern_or_rule: "In ‘key,’ EY says /ē/ at the end of a word. EY a
         student_entry: '',
         topic_to_reinforce: 'Long E spelled EY',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘money,’ EY at the end says /ē/. EY often spells /ē/ in two-syllable words like honey and turkey."
+spelling_pattern_or_rule:  "In ‘money,’ EY at the end says /ē/. EY often spells /ē/ in two-syllable words like honey and turkey."
       },
       audio: 'money'
     },
@@ -106420,7 +106552,7 @@ spelling_pattern_or_rule: "In ‘money,’ EY at the end says /ē/. EY often spe
         student_entry: '',
         topic_to_reinforce: 'Long E spelled EY',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘turkey,’ EY spells /ē/ at the end. Words ending in EY often have the long E sound, such as key and monkey."
+spelling_pattern_or_rule:  "In ‘turkey,’ EY spells /ē/ at the end. Words ending in EY often have the long E sound, such as key and monkey."
       },
       audio: 'turkey'
     },
@@ -106457,7 +106589,7 @@ spelling_pattern_or_rule: "In ‘turkey,’ EY spells /ē/ at the end. Words end
         student_entry: '',
         topic_to_reinforce: 'Review of long E spellings: e, ea, ey',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘each,’ EA says /ē/. EA, E, and EY are all common ways to spell the long E sound. EA is the most frequent of these three."
+spelling_pattern_or_rule:  "In ‘each,’ EA says /ē/. EA, E, and EY are all common ways to spell the long E sound. EA is the most frequent of these three."
       },
       audio: 'each'
     }
@@ -106506,7 +106638,7 @@ spelling_pattern_or_rule: "In ‘each,’ EA says /ē/. EA, E, and EY are all co
         student_entry: '',
         topic_to_reinforce: 'EE = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘see,’ the vowel team EE spells /ē/. EE commonly appears in one-syllable words like see, bee, and feet."
+spelling_pattern_or_rule:  "In ‘see,’ the vowel team EE spells /ē/. EE commonly appears in one-syllable words like see, bee, and feet."
       },
       audio: 'see'
     },
@@ -106541,7 +106673,7 @@ spelling_pattern_or_rule: "In ‘see,’ the vowel team EE spells /ē/. EE commo
         student_entry: '',
         topic_to_reinforce: 'EE = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘tree,’ EE spells /ē/ at the end of the word. EE is a reliable long E spelling in words like tree, green, and three."
+spelling_pattern_or_rule:  "In ‘tree,’ EE spells /ē/ at the end of the word. EE is a reliable long E spelling in words like tree, green, and three."
       },
       audio: 'tree'
     },
@@ -106576,7 +106708,7 @@ spelling_pattern_or_rule: "In ‘tree,’ EE spells /ē/ at the end of the word.
         student_entry: '',
         topic_to_reinforce: 'EE = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘green,’ the EE vowel team spells /ē/ between consonants. EE is common before N or D (green, seed)."
+spelling_pattern_or_rule:  "In ‘green,’ the EE vowel team spells /ē/ between consonants. EE is common before N or D (green, seed)."
       },
       audio: 'green'
     },
@@ -106613,7 +106745,7 @@ spelling_pattern_or_rule: "In ‘green,’ the EE vowel team spells /ē/ between
         student_entry: '',
         topic_to_reinforce: 'IE = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘piece,’ the vowel team IE spells /ē/. IE commonly spells /ē/ in words like piece, field, and chief."
+spelling_pattern_or_rule:  "In ‘piece,’ the vowel team IE spells /ē/. IE commonly spells /ē/ in words like piece, field, and chief."
       },
       audio: 'piece'
     },
@@ -106648,7 +106780,7 @@ spelling_pattern_or_rule: "In ‘piece,’ the vowel team IE spells /ē/. IE com
         student_entry: '',
         topic_to_reinforce: 'IE = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘field,’ IE spells /ē/ before the consonant cluster LD. IE spells /ē/ in field, shield, and piece."
+spelling_pattern_or_rule:  "In ‘field,’ IE spells /ē/ before the consonant cluster LD. IE spells /ē/ in field, shield, and piece."
       },
       audio: 'field'
     },
@@ -106685,7 +106817,7 @@ spelling_pattern_or_rule: "In ‘field,’ IE spells /ē/ before the consonant c
         student_entry: '',
         topic_to_reinforce: 'IE = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘chief,’ IE spells the long E sound /ē/. IE is a frequent long E spelling in words like chief, thief, and brief."
+spelling_pattern_or_rule:  "In ‘chief,’ IE spells the long E sound /ē/. IE is a frequent long E spelling in words like chief, thief, and brief."
       },
       audio: 'chief'
     },
@@ -106722,7 +106854,7 @@ spelling_pattern_or_rule: "In ‘chief,’ IE spells the long E sound /ē/. IE i
         student_entry: '',
         topic_to_reinforce: 'Final Y = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘happy,’ final Y says /ē/ because the word has two syllables. Final Y often says /ē/ in words like happy, candy, and puppy."
+spelling_pattern_or_rule:  "In ‘happy,’ final Y says /ē/ because the word has two syllables. Final Y often says /ē/ in words like happy, candy, and puppy."
       },
       audio: 'happy'
     },
@@ -106757,7 +106889,7 @@ spelling_pattern_or_rule: "In ‘happy,’ final Y says /ē/ because the word ha
         student_entry: '',
         topic_to_reinforce: 'Final Y = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘candy,’ the final Y says /ē/ in an unstressed ending. Many two-syllable nouns use final Y as /ē/ (candy, bunny, puppy)."
+spelling_pattern_or_rule:  "In ‘candy,’ the final Y says /ē/ in an unstressed ending. Many two-syllable nouns use final Y as /ē/ (candy, bunny, puppy)."
       },
       audio: 'candy'
     },
@@ -106792,7 +106924,7 @@ spelling_pattern_or_rule: "In ‘candy,’ the final Y says /ē/ in an unstresse
         student_entry: '',
         topic_to_reinforce: 'Final Y = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘funny,’ final Y spells /ē/. This Y-as-/ē/ ending is frequent in two-syllable words like funny, sunny, and jelly."
+spelling_pattern_or_rule:  "In ‘funny,’ final Y spells /ē/. This Y-as-/ē/ ending is frequent in two-syllable words like funny, sunny, and jelly."
       },
       audio: 'funny'
     },
@@ -106829,7 +106961,7 @@ spelling_pattern_or_rule: "In ‘funny,’ final Y spells /ē/. This Y-as-/ē/ e
         student_entry: '',
         topic_to_reinforce: 'Long E endings (Y / EY)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘monkey,’ the ending EY spells /ē/. This reviews that both Y and EY can make long E at the end of words."
+spelling_pattern_or_rule:  "In ‘monkey,’ the ending EY spells /ē/. This reviews that both Y and EY can make long E at the end of words."
       },
       audio: 'monkey'
     }
@@ -106878,7 +107010,7 @@ spelling_pattern_or_rule: "In ‘monkey,’ the ending EY spells /ē/. This revi
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ (often after C)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘receive,’ EI spells the long E sound /ē/ because it follows C. This matches the common guideline: after C, use EI for /ē/ (receive, ceiling)."
+spelling_pattern_or_rule:  "In ‘receive,’ EI spells the long E sound /ē/ because it follows C. This matches the common guideline: after C, use EI for /ē/ (receive, ceiling)."
       },
       audio: 'receive'
     },
@@ -106913,7 +107045,7 @@ spelling_pattern_or_rule: "In ‘receive,’ EI spells the long E sound /ē/ bec
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ (often after C)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘ceiling,’ EI spells /ē/ right after C. Learn the EI-after-C family: receive, ceiling, conceive."
+spelling_pattern_or_rule:  "In ‘ceiling,’ EI spells /ē/ right after C. Learn the EI-after-C family: receive, ceiling, conceive."
       },
       audio: 'ceiling'
     },
@@ -106948,7 +107080,7 @@ spelling_pattern_or_rule: "In ‘ceiling,’ EI spells /ē/ right after C. Learn
         student_entry: '',
         topic_to_reinforce: 'EI = /ē/ (often after C)',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘deceit,’ EI spells /ē/ after C. This reinforces the EI-after-C pattern for long E (deceit, receive, ceiling)."
+spelling_pattern_or_rule:  "In ‘deceit,’ EI spells /ē/ after C. This reinforces the EI-after-C pattern for long E (deceit, receive, ceiling)."
       },
       audio: 'deceit'
     },
@@ -106985,7 +107117,7 @@ spelling_pattern_or_rule: "In ‘deceit,’ EI spells /ē/ after C. This reinfor
         student_entry: '',
         topic_to_reinforce: 'I = /ē/ in certain borrowed/Latinate words',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘machine,’ the I says /ē/ due to its French/Latinate origin. Learn this small pattern set: machine, police, magazine."
+spelling_pattern_or_rule:  "In ‘machine,’ the I says /ē/ due to its French/Latinate origin. Learn this small pattern set: machine, police, magazine."
       },
       audio: 'machine'
     },
@@ -107020,7 +107152,7 @@ spelling_pattern_or_rule: "In ‘machine,’ the I says /ē/ due to its French/L
         student_entry: '',
         topic_to_reinforce: 'I = /ē/ in certain borrowed/Latinate words',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘police,’ I says /ē/ in an unstressed syllable because of its borrowed origin. Pair with machine and magazine."
+spelling_pattern_or_rule:  "In ‘police,’ I says /ē/ in an unstressed syllable because of its borrowed origin. Pair with machine and magazine."
       },
       audio: 'police'
     },
@@ -107057,7 +107189,7 @@ spelling_pattern_or_rule: "In ‘police,’ I says /ē/ in an unstressed syllabl
         student_entry: '',
         topic_to_reinforce: 'I = /ē/ in certain borrowed/Latinate words',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘magazine,’ the single I represents /ē/ due to its word origin. Group with machine and police as an I = /ē/ set."
+spelling_pattern_or_rule:  "In ‘magazine,’ the single I represents /ē/ due to its word origin. Group with machine and police as an I = /ē/ set."
       },
       audio: 'magazine'
     },
@@ -107094,7 +107226,7 @@ spelling_pattern_or_rule: "In ‘magazine,’ the single I represents /ē/ due t
         student_entry: '',
         topic_to_reinforce: 'E-consonant-E = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘these,’ the E-consonant-E pattern makes the first E long (/ē/). This pattern also appears in theme and complete."
+spelling_pattern_or_rule:  "In ‘these,’ the E-consonant-E pattern makes the first E long (/ē/). This pattern also appears in theme and complete."
       },
       audio: 'these'
     },
@@ -107129,7 +107261,7 @@ spelling_pattern_or_rule: "In ‘these,’ the E-consonant-E pattern makes the f
         student_entry: '',
         topic_to_reinforce: 'E-consonant-E = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘theme,’ E-consonant-E makes the first E long (/ē/). This silent-E pattern can signal long vowels in words like theme and these."
+spelling_pattern_or_rule:  "In ‘theme,’ E-consonant-E makes the first E long (/ē/). This silent-E pattern can signal long vowels in words like theme and these."
       },
       audio: 'theme'
     },
@@ -107164,7 +107296,7 @@ spelling_pattern_or_rule: "In ‘theme,’ E-consonant-E makes the first E long 
         student_entry: '',
         topic_to_reinforce: 'E-consonant-E = /ē/',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘complete,’ the final silent-E creates the long E sound in the last syllable (/plēt/). This is the E-consonant-E long-vowel pattern."
+spelling_pattern_or_rule:  "In ‘complete,’ the final silent-E creates the long E sound in the last syllable (/plēt/). This is the E-consonant-E long-vowel pattern."
       },
       audio: 'complete'
     },
@@ -107201,7 +107333,7 @@ spelling_pattern_or_rule: "In ‘complete,’ the final silent-E creates the lon
         student_entry: '',
         topic_to_reinforce: 'Mixed review of long-E endings',
         reading_rule: '',
-spelling_pattern_or_rule: "In ‘family,’ final Y represents /ē/ (fa-mi-ly). This mixed item reminds learners that long-E can also be spelled with Y at the end."
+spelling_pattern_or_rule:  "In ‘family,’ final Y represents /ē/ (fa-mi-ly). This mixed item reminds learners that long-E can also be spelled with Y at the end."
       },
       audio: 'family'
     }
