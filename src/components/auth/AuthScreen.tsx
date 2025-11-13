@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { getFriendlyAuthError } from '@/lib/firebase-auth-errors';
 
 export const AuthScreen: React.FC = () => {
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail, initializeOneTapSignIn, hasGoogleAccount } = useAuth();
+  const { signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, initializeOneTapSignIn, hasGoogleAccount } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -60,6 +60,35 @@ export const AuthScreen: React.FC = () => {
       navigate(redirect);
     } catch (error: any) {
       setError(getFriendlyAuthError(error, 'google'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    // Prevent multiple simultaneous sign-in attempts
+    if (loading) {
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    playClickSound();
+    
+    try {
+      await signInWithApple();
+      // Only navigate if sign-in was successful
+      // Don't navigate if user cancelled (popup closed)
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/';
+      navigate(redirect);
+    } catch (error: any) {
+      // Don't show error if user cancelled
+      if (error.message && error.message.includes('cancelled')) {
+        setError('');
+      } else {
+        setError(getFriendlyAuthError(error, 'apple') || error.message || 'Failed to sign in with Apple');
+      }
     } finally {
       setLoading(false);
     }
@@ -142,6 +171,7 @@ export const AuthScreen: React.FC = () => {
 
             {/* Primary Google Sign-In Button */}
             <Button 
+              type="button"
               onClick={handleGoogleSignIn}
               size="lg"
               className="w-full h-14 bg-white text-gray-700 hover:bg-gray-50 border-0 text-lg font-medium shadow-md"
@@ -166,6 +196,30 @@ export const AuthScreen: React.FC = () => {
                 We detected you've used Google sign-in before
               </p>
             )}
+
+            {/* Apple Sign-In Button */}
+            <Button 
+              type="button"
+              onClick={handleAppleSignIn}
+              size="lg"
+              className="w-full h-14 bg-black text-white hover:bg-gray-900 border-0 text-lg font-medium shadow-md"
+              disabled={loading}
+              aria-busy={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  Continue with Apple
+                </>
+              )}
+            </Button>
 
             {/* Divider */}
             <div className="relative">

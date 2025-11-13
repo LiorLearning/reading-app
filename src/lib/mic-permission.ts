@@ -1,6 +1,32 @@
 // Centralized microphone permission helper
 // Requests mic access on a user gesture and returns whether it is granted.
 
+/**
+ * Check microphone permission status without requesting it.
+ * Returns true if permission is already granted, false otherwise.
+ * This function does not trigger a permission prompt.
+ */
+export async function checkMicPermissionStatus(): Promise<boolean> {
+  if (typeof navigator === 'undefined') return true;
+
+  // Use Permissions API to check status without requesting
+  try {
+    const permissions: any = (navigator as any).permissions;
+    if (permissions && permissions.query) {
+      const status: any = await permissions.query({ name: 'microphone' as any });
+      if (status && status.state === 'granted') return true;
+      // If 'denied' or 'prompt', return false
+      return false;
+    }
+  } catch {
+    // Permissions API not supported or failed
+  }
+
+  // If Permissions API is not available, we can't check without requesting
+  // Return false to be safe (will show modal)
+  return false;
+}
+
 export async function ensureMicPermission(): Promise<boolean> {
   if (typeof navigator === 'undefined') return true;
 

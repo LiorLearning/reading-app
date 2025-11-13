@@ -21,6 +21,7 @@ import { useDeviceGate } from "@/hooks/use-device-gate";
 import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
+import { checkMicPermissionStatus } from "@/lib/mic-permission";
 
 const queryClient = new QueryClient();
 
@@ -123,12 +124,32 @@ const UnifiedPetAdventureApp = () => {
   }, [shouldShowGate]);
 
   // One-time microphone+camera prompt for new users
+  // Skip if microphone permission already exists
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
-    try {
-      const seen = localStorage.getItem('media_prompt_seen');
-      if (!seen) setShowMediaPrompt(true);
-    } catch {}
+    
+    const checkAndShowModal = async () => {
+      try {
+        const seen = localStorage.getItem('media_prompt_seen');
+        if (seen) return; // Already shown before
+        
+        // Check if microphone permission is already granted
+        const micGranted = await checkMicPermissionStatus();
+        if (micGranted) {
+          // Permission already exists, mark as seen and don't show modal
+          localStorage.setItem('media_prompt_seen', '1');
+          return;
+        }
+        
+        // Permission not granted, show modal
+        setShowMediaPrompt(true);
+      } catch {
+        // On error, show modal to be safe
+        setShowMediaPrompt(true);
+      }
+    };
+    
+    checkAndShowModal();
   }, []);
 
   const handleMediaPromptClose = React.useCallback(() => {
