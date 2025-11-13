@@ -31,6 +31,7 @@ export interface GenerationOptions {
  */
 export class MultiProviderImageGenerator {
   private readonly providers: ImageProvider[];
+  private nextStartingProviderIndex: 0 | 1 = 0;
 
   constructor() {
     this.providers = [
@@ -56,7 +57,8 @@ export class MultiProviderImageGenerator {
     const startTime = Date.now();
 
     // Try each provider in order
-    let providerStartingIndex = Math.random() < 0.6 ? 1 : 0;
+    const providerStartingIndex = this.nextStartingProviderIndex;
+    this.nextStartingProviderIndex = this.nextStartingProviderIndex === 0 ? 1 : 0;
     for (let attempt = 0; attempt < this.providers.length; attempt++) {
       const provider = this.providers[(providerStartingIndex+attempt)%2];
       const providerStartTime = Date.now();

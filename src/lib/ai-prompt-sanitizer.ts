@@ -296,6 +296,7 @@ CRITICAL RULES:
 6. Describe images so that the outputs are hyper vivid and realistic
 7. Return ONLY the cleaned prompt, no explanations
 8. Avoid clothing description unless mentioned by user.
+9. Reinterpret any whimsical or fantastical elements in a physically realistic, live-action way, avoiding painterly glow, soft illustration lighting, or stylized textures.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
@@ -343,7 +344,7 @@ Transform this image request:`;
 ${backgroundSection}
       
 Prompt to sanitize (final target content): ${originalPrompt}
-If any conflict, prioritize PRIMARY and Safety rules over BACKGROUND. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic.`;
+If any conflict, prioritize PRIMARY and Safety rules over BACKGROUND. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic. Convert any whimsical or magical elements into grounded, live-action realism with no painterly or stylized effects.`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest", // Fast and cost-effective for this task
