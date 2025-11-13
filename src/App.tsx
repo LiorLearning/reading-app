@@ -21,6 +21,7 @@ import { useDeviceGate } from "@/hooks/use-device-gate";
 import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
+import { checkMicPermissionStatus } from "@/lib/mic-permission";
 
 const queryClient = new QueryClient();
 
@@ -123,17 +124,49 @@ const UnifiedPetAdventureApp = () => {
   }, [shouldShowGate]);
 
   // One-time microphone+camera prompt for new users
+  // Skip if microphone permission already exists
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
-    try {
-      const seen = localStorage.getItem('media_prompt_seen');
-      if (!seen) setShowMediaPrompt(true);
-    } catch {}
+    
+    const checkAndShowModal = async () => {
+      try {
+        const seen = localStorage.getItem('media_prompt_seen');
+        if (seen) return; // Already shown before
+        
+        // Check if microphone permission is already granted
+        const micGranted = await checkMicPermissionStatus();
+        if (micGranted) {
+          // Permission already exists, mark as seen and don't show modal
+          localStorage.setItem('media_prompt_seen', '1');
+          return;
+        }
+        
+        // Permission not granted, show modal
+        setShowMediaPrompt(true);
+      } catch {
+        // On error, show modal to be safe
+        setShowMediaPrompt(true);
+      }
+    };
+    
+    checkAndShowModal();
   }, []);
 
   const handleMediaPromptClose = React.useCallback(() => {
     setShowMediaPrompt(false);
     try { localStorage.setItem('media_prompt_seen', '1'); } catch {}
+  }, []);
+
+  const handleMediaEnabled = React.useCallback((result: { micGranted: boolean; camGranted: boolean }) => {
+    // If microphone permission was granted, mark it so we don't show the modal again
+    if (result.micGranted) {
+      try {
+        localStorage.setItem('media_prompt_seen', '1');
+        // Also store that permission was actually granted (not just seen)
+        localStorage.setItem('media_permission_granted', '1');
+      } catch {}
+    }
+    setShowMediaPrompt(false);
   }, []);
 
   const handleContinueAnyway = React.useCallback(() => {
@@ -212,6 +245,7 @@ const UnifiedPetAdventureApp = () => {
       <MediaPermissionModal
         open={showMediaPrompt}
         onClose={handleMediaPromptClose}
+        onEnabled={handleMediaEnabled}
       />
       <PetPage 
         onStartAdventure={handleStartAdventure}
