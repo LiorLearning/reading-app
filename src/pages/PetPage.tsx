@@ -2118,13 +2118,25 @@ const getSleepyPetImage = (clicks: number) => {
       wolf: {
         1: {
           // Level 1 Wolf images - coin-based progression (placeholders)
-          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.png?alt=media&token=40eb967c-1a64-494f-afc1-11fe8f35dec1",
-          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-normal.png?alt=media&token=fa77bae0-6a3f-4c09-8a4b-0313f3301181",
-          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-happy.png?alt=media&token=cc960a63-b3a9-46f0-a5b4-c3087df4d324",
-          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-superhappy.png?alt=media&token=49761d77-8a4a-4c87-8f5b-74869c2f19f1",
-          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba",
-          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba",
-          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba"
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sad.png?alt=media&token=63833587-2161-4a0a-9e3e-a7f184d72918",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-normal.png?alt=media&token=d8bf9d49-8623-4843-bff7-c2803589869e",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-happy.png?alt=media&token=552812bf-c56a-49df-a1e2-5d0aab45d450",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-superhappy.png?alt=media&token=e413e6d5-2828-40ff-abb1-9f2802309c6e",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sleep.gif?alt=media&token=4b259fe8-ed6c-41e5-b3cf-94961f26e1f9",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sleep.gif?alt=media&token=4b259fe8-ed6c-41e5-b3cf-94961f26e1f9",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sleep.gif?alt=media&token=4b259fe8-ed6c-41e5-b3cf-94961f26e1f9"
+        }
+      },
+      raccoon: {
+        1: {
+          // Level 1 Raccoon images - coin-based progression (placeholders)
+          coins_0: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sad.png?alt=media&token=77d5d255-18c7-43ff-9976-5858850da881",
+          coins_10: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-normal.png?alt=media&token=3a6d8176-af79-4758-afcf-6e10ce6f1b2a",
+          coins_30: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-happy.png?alt=media&token=e24e46bf-a151-4f78-9fe5-2d57821b7ffa",
+          coins_50: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-super-happy.png?alt=media&token=366b3078-0a3d-4846-91d8-158356882bb0",
+          sleep1: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sleeping-unscreen.gif?alt=media&token=0448c9f6-f7ef-456b-acc0-8ed8d0fb30ca",
+          sleep2: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sleeping-unscreen.gif?alt=media&token=0448c9f6-f7ef-456b-acc0-8ed8d0fb30ca",
+          sleep3: "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sleeping-unscreen.gif?alt=media&token=0448c9f6-f7ef-456b-acc0-8ed8d0fb30ca"
         }
       },
       pikachu: {
@@ -2746,6 +2758,16 @@ const getSleepyPetImage = (clicks: number) => {
         emoji: '🐺',
         name: 'Wolf',
         owned: isPetOwned('wolf'),
+        cost: 1000,
+        requiredLevel: 15,
+        isLocked: userLevel < 15,
+        category: 'legendary'
+      },
+      raccoon: {
+        id: 'raccoon',
+        emoji: '🦝',
+        name: 'Raccoon',
+        owned: isPetOwned('raccoon'),
         cost: 1000,
         requiredLevel: 15,
         isLocked: userLevel < 15,
@@ -5005,7 +5027,7 @@ const getSleepyPetImage = (clicks: number) => {
             const levelForPet = (() => {
               try { return PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel; } catch { return 1; }
             })();
-            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer','labubu'].includes(petType);
+            const petHasImages = ['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','raccoon','pikachu','panda','deer','labubu'].includes(petType);
             // Determine per-tile care state so badge + thumbnail are consistent
             const careStateForTile = (() => {
               // 1) Sleep check via local mirror
@@ -5093,7 +5115,7 @@ const getSleepyPetImage = (clicks: number) => {
                     ? 'bg-[#D79C8C]'
                     : (isCoins10Tile ? 'bg-[#ffd864]' : 'bg-red-600'))));
             const bgSoft = `${bg}`;
-            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'wolf' ? '🐺' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : petType === 'labubu' ? '🧸' : '🐾';
+            const petEmoji = petType === 'cat' ? '🐱' : petType === 'hamster' ? '🐹' : petType === 'dragon' ? '🐉' : petType === 'unicorn' ? '🦄' : petType === 'monkey' ? '🐵' : petType === 'parrot' ? '🦜' : petType === 'wolf' ? '🐺' : petType === 'raccoon' ? '🦝' : petType === 'pikachu' ? '🦅' : petType === 'panda' ? '🐼' : petType === 'deer' ? '🦌' : petType === 'labubu' ? '🧸' : '🐾';
             // Per-pet sleep streak from dailyQuests (live-hydrated)
             const petStreak = (() => {
               try {
@@ -5306,7 +5328,7 @@ const getSleepyPetImage = (clicks: number) => {
                     
                     {/* Pet Image or Emoji (container removed for a cleaner look) */}
                     {pet.isLocked && !pet.owned ? (
-                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                    (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','raccoon','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
                         <img
                           src={getLevelBasedPetImage(pet.id, 1, pet.id === 'labubu' ? 'coins_10' : 'coins_50')}
                           alt={`${pet.name} (locked)`}
@@ -5317,7 +5339,7 @@ const getSleepyPetImage = (clicks: number) => {
                         <div className="text-6xl grayscale opacity-70 mb-4 mx-auto">{pet.emoji}</div>
                       )
                     ) : (
-                      (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
+                    (['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','raccoon','pikachu','panda','deer', 'labubu'] as string[]).includes(pet.id) ? (
                         <img
                           src={getLevelBasedPetImage(pet.id, 1, 'coins_50')}
                           alt={pet.name}
