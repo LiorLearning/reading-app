@@ -556,6 +556,8 @@ Keep tone warm, brief, and curious.`;
   const [showStep5Intro, setShowStep5Intro] = React.useState(false);
   // Step 6 adventure completion hint overlay
   const [showStep6Intro, setShowStep6Intro] = React.useState(false);
+  // Returning-user Step 6 overlay (non-tutorial, repeatable per quest)
+  const [showReturningStep6Intro, setShowReturningStep6Intro] = React.useState(false);
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>("");
   const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   
@@ -583,9 +585,9 @@ Keep tone warm, brief, and curious.`;
     if (currentScreen === 1) {
       enteredAdventureAtRef.current = Date.now();
       entryMessageCycleCountRef.current = messageCycleCount;
-      // Do not suppress; we want 1 intro tutor message (AI greeting) then start 3-1 cadence
+      // Do not suppress the next user turn; we want 1 intro tutor message then 3-1 cadence
       suppressSpellingOnceRef.current = false;
-      // Realign: greeting will increment to 1 so next user turn starts cyclePosition 0 (SpellBox)
+      // Realign cycle to start so that after the intro greeting increments once, we begin at cyclePosition 0
       try { setMessageCycleCount(0); } catch {}
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1182,6 +1184,9 @@ Keep tone warm, brief, and curious.`;
 
   // Track persistent adventure progress (for UI bar) and session coins (for Step 6 trigger)
   const { progressFraction: persistentProgressFraction, activity: persistentActivity, coinsSoFar: persistentCoinsSoFar, targetCoins: persistentTargetCoins } = useAdventurePersistentProgress();
+  // Returning Step 6 helpers
+  const prevReturningSessionCoinsRef = React.useRef<number>(0);
+  const returningStep6QuestKeyRef = React.useRef<string | null>(null);
 
   // Show Step 6 overlay when session has 5 correct answers (50 coins) within same quest
   React.useEffect(() => {
@@ -1226,6 +1231,83 @@ Keep tone warm, brief, and curious.`;
       } catch {}
     }
   }, [showStep6Intro]);
+
+  // Returning-user Step 6 trigger (non-tutorial, repeatable per quest)
+  React.useEffect(() => {
+    try {
+      if (currentScreen !== 1) return;
+      // Only for existing users; keep tutorial version for first-timers
+      if (isFirstTimeAdventurer) return;
+      // Avoid overlapping with other high-priority UI
+      const assignmentJustEnded = (() => {
+        const at = assignmentExitAtRef.current || 0;
+        return (Date.now() - at) < 12000;
+      })();
+      const isAuthRoute = (typeof window !== 'undefined') && (window.location?.pathname || '').startsWith('/auth');
+      const highPriorityActive =
+        showStep5Intro ||
+        isWhiteboardPromptActive ||
+        isWhiteboardLessonActive ||
+        !!levelSwitchModal ||
+        isAuthRoute ||
+        assignmentJustEnded ||
+        showStep6Intro || // do not clash with tutorial Step 6
+        showReturningStep6Intro;
+      if (highPriorityActive) return;
+
+      // Edge detection on session coins crossing 50
+      // Reset edge detector when quest changes
+      const questId = currentAdventureId || selectedTopicId || 'unknown';
+      if (returningStep6QuestKeyRef.current !== questId) {
+        returningStep6QuestKeyRef.current = null; // clear shown marker for new quest
+        prevReturningSessionCoinsRef.current = sessionCoins || 0;
+      }
+      const prev = prevReturningSessionCoinsRef.current || 0;
+      const crossedInSession = prev < 50 && sessionCoins >= 50;
+      prevReturningSessionCoinsRef.current = sessionCoins;
+
+      // Also allow "full on entry" via persisted progress (questions-based)
+      const persistentCoinsEquivalent = (typeof persistentTargetCoins === 'number' && persistentTargetCoins <= 10)
+        ? (persistentCoinsSoFar * 10)
+        : persistentCoinsSoFar;
+      const fullOnEntry = persistentCoinsEquivalent >= 50;
+
+      const alreadyShownForThisQuest = returningStep6QuestKeyRef.current === questId;
+      if (!alreadyShownForThisQuest && (crossedInSession || fullOnEntry)) {
+        setShowReturningStep6Intro(true);
+        returningStep6QuestKeyRef.current = questId;
+        try {
+          ttsService.stop();
+          ttsService.setSuppressNonKrafty(true);
+          const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+          const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+          const msg = `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
+          ttsService.speakAIMessage(msg, 'krafty-returning-step6-intro').catch(() => {});
+        } catch {}
+      }
+    } catch {}
+  }, [
+    currentScreen,
+    sessionCoins,
+    isFirstTimeAdventurer,
+    showStep5Intro,
+    persistentCoinsSoFar,
+    persistentTargetCoins,
+    currentAdventureId,
+    selectedTopicId,
+    showStep6Intro,
+    showReturningStep6Intro,
+  ]);
+
+  // Enforce suppression while Returning Step 6 overlay is visible
+  React.useEffect(() => {
+    if (showReturningStep6Intro) {
+      try {
+        ttsService.setSuppressNonKrafty(true);
+        ttsService.stop();
+      } catch {}
+    }
+  }, [showReturningStep6Intro]);
 
   // Arm Step 7 as soon as 5 correct answers (50 coins) are reached in House, independent of Step 6
   React.useEffect(() => {
@@ -2558,20 +2640,12 @@ Keep tone warm, brief, and curious.`;
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 3-1 pattern: 3 spelling prompts followed by 1 pure adventure beat
+        // Implement 3-1 pattern: 1 intro tutor message (handled by initial greeting), then 3 spelling + 1 adventure
         let isSpellingPhase = false;
-        // One-time suppression right after entering adventure: ensure first message is not a question
-        if (suppressSpellingOnceRef.current) {
-          isSpellingPhase = false;
-          suppressSpellingOnceRef.current = false;
-        } else {
-        const SPELLING_CYCLE_OFFSET = 1; // only the very first adventure message stays pure
+        const SPELLING_CYCLE_OFFSET = 1; // initial AI greeting increments to 1, making next turn cyclePosition 0
         const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
-        if (messageCycleCount >= SPELLING_CYCLE_OFFSET) {
-          const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
-          isSpellingPhase = cyclePosition < 3;
-        }
-        }
+        const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
+        isSpellingPhase = cyclePosition < 3;
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           
@@ -6895,6 +6969,85 @@ Keep tone warm, brief, and curious.`;
             }}
             currentSessionId={currentSessionId}
           />
+        )}
+
+        {/* Returning Step 6 Overlay - repeatable for existing users when progress bar fills */}
+        {showReturningStep6Intro && currentScreen === 1 && (
+          <div className="fixed inset-0 z-[70]">
+            {/* Dim background */}
+            <div className="absolute inset-0 bg-black/40" />
+
+            {/* Bottom-left Krafty assistant with speech bubble (match Step 5/6) */}
+            <div className="absolute left-4 bottom-4 z-[71] flex items-start gap-5">
+              <div className="shrink-0">
+                <img
+                  src="/avatars/krafty.png"
+                  alt="Krafty"
+                  className="w-28 sm:w-32 md:w-40 lg:w-48 object-contain"
+                />
+              </div>
+              <div className="max-w-2xl mt-10 sm:mt-14 md:mt-16 lg:mt-20">
+                <div className="bg-white/95 border border-primary/20 rounded-2xl px-7 py-6 flex items-center gap-4 shadow-2xl ring-1 ring-primary/40">
+                  <p className="flex-1 text-base sm:text-lg md:text-xl leading-relaxed font-kids">
+                    {(() => {
+                      const currentPetId = PetProgressStorage.getCurrentSelectedPet();
+                      const petType = PetProgressStorage.getPetType(currentPetId) || 'pet';
+                      // Suppress non-Krafty speech while overlay is visible
+                      try { ttsService.setSuppressNonKrafty(true); } catch {}
+                      return `Happiness bar is full! Your ${petType} feels good. You can continue creating or go back home.`;
+                    })()}
+                  </p>
+                  {isAnonymous ? (
+                    <Button
+                      className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={() => {
+                        try { ttsService.stop(); } catch {}
+                        // Unsuppress before navigation in case user returns
+                        try { ttsService.setSuppressNonKrafty(false); } catch {}
+                        navigate('/auth?redirect=/app');
+                      }}
+                    >
+                      Sign up
+                    </Button>
+                  ) : (
+                    <Button
+                      className="px-5 bg-primary hover:bg-primary/90 text-primary-foreground"
+                      onClick={() => {
+                        try { ttsService.stop(); } catch {}
+                        // Allow pet speech again after overlay
+                        try { ttsService.setSuppressNonKrafty(false); } catch {}
+                        setShowReturningStep6Intro(false);
+                        // Set pending Step 7 trigger only when today's quest was House
+                        // and only if Step 7 is actually needed
+                        try {
+                          const pendingActivity = persistentActivity;
+                          if (pendingActivity === 'house') {
+                            // Avoid re-arming Step 7 if already completed
+                            const stateStr = localStorage.getItem('reading-app-tutorial-state');
+                            let alreadyCompleted = false;
+                            if (stateStr) {
+                              try {
+                                const s = JSON.parse(stateStr);
+                                alreadyCompleted = !!s.adventureStep7HomeMoreIntroCompleted;
+                              } catch {}
+                            }
+                            if (!alreadyCompleted) {
+                              localStorage.setItem('pending_step7_home_more', 'true');
+                            }
+                          }
+                        } catch {}
+                        // Continue normal adventure flow
+                        // If any pet line was suppressed while the overlay was visible, replay it now
+                        try { ttsService.replayLastSuppressed(); } catch {}
+                      }}
+                    >
+                      Next
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Level Switch Modal */}

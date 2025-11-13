@@ -3909,7 +3909,6 @@ Return ONLY the one-liner text:`;
             content: prompt
           }
         ],
-        max_tokens: 30,
         temperature: 0.7,
       });
 

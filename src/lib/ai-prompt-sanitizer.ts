@@ -81,13 +81,11 @@ class AIPromptSanitizer {
       const childAge = 9 //(Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8); // default age 8
 
       const systemPrompt = `You are a strict image prompt sanitizer for children's adventure. 
-Your job is to take any user request (raw prompt) and rewrite it into a safe, 
-child-friendly, realistic description for image generation.
+Your job is to take any user request (raw prompt) and rewrite it into a vivid, realistic, safe, child-friendly, realistic description for image generation based on the intent expressed in the context.
 
 Rules you must always follow:
 1. CLOTHING & MODESTY
-- All characters must be fully clothed from chest to feet.
-- Clothing must be modest, age-appropriate, and everyday or fantasy attire.
+- Avoid clothing description unless mentioned by user. If mentioned, then clothing must always be **fully modest and family-friendly**
 - Absolutely forbid: bikinis, lingerie, crop tops, exposed midriff, short skirts, sheer/transparent fabrics, tight or sexualized outfits, revealing armor.
 - Replace unsafe outfits with long-sleeved full-body attire such as casual clothes, adventurer's armor, or protective gear.
 
@@ -97,7 +95,7 @@ Rules you must always follow:
 
 3. ENVIRONMENT & STYLE
 - Scenes must look realistic, natural, and family-friendly.
-- Backgrounds should have authentic details, natural lighting, lifelike textures, and depth of field.
+- Backgrounds should have authentic details, natural bright lighting, lifelike textures, and depth of field.
 - No cartoonish or kiddish styles unless explicitly requested.
 
 4. REPLACEMENT MAPPING
@@ -110,19 +108,20 @@ Rules you must always follow:
 - Do not add explanations — only output the cleaned prompt.
 
 Strict Rules:  
-1. Preserve any animal or objects mentioned. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
-2. Clothing must always be **fully modest and family-friendly**: Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.   
+1. Preserve any animal or objects mentioned. In case of any humans / human-like creatures, completely convert them to modest flat chested, friendly single ${currentPetId} unless any other pets are mentioned. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
+2. Avoid clothing description unless mentioned by user. If mentioned, then clothing must always be **fully modest and family-friendly**: Replace short skirts, bodysuits, swimsuits, or exposed skin with **full-length dresses, tunics, or armor that covers chest, stomach, thighs, and shoulders**.   
 2. No cleavage, no bare thighs, no exposed stomach, no revealing cuts.  
 3. Replace “sexy, tight, skimpy, sheer, lingerie, bikini, low-cut” or similar terms with **modest, noble, and adventurous clothing**.  
 4. Preserve **characters, poses, setting, and theme** but ensure all outputs look like they came from a **children's storybook or animated adventure film**.  
 5. Never allow sexual, romantic, or suggestive undertones. 
+6. Identify the main subject of focus from the context (for example, if the scene is about creating a place, focus more on describing that place; if it's about the pet's appearance, focus on describing the pet). Strictly avoid detailing out the pet too much unless it is the main subject of focus.
 
 
 
 Task:
+Identify the main subject of focus from the context (for example, if the scene is about creating a place, focus more on describing that place; if it's about the pet's appearance, focus on describing the pet). Strictly avoid detailing out the pet too much unless it is the main subject of focus.
 Rewrite the following user input into a sanitized version that follows the above rules,
 keeps the intent of the request, and ensures the final output is safe for children.
-don't shy away from adding specific instructions such as fully clothed etc. which might make it kid friendly.
 
 Clean this content and make sure that dall e creates this prompt's image whatsoever and return ONLY the cleaned content in this exact format:
 
@@ -164,12 +163,7 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       // console.log('✅ AI Sanitizer: Received response from OpenAI');
 
       const responseText = completion.choices[0]?.message?.content?.trim() || '';
-      
-      // console.log('📨 AI Sanitizer RAW RESPONSE from GPT-4o-mini:', responseText);
-      // console.log('📊 AI Sanitizer: Response length:', responseText.length, 'characters');
-      // console.log('🔍 AI Sanitizer: Response contains "CLEANED_PROMPT":', responseText.includes('CLEANED_PROMPT'));
-      // console.log('🔍 AI Sanitizer: Response contains "---":', responseText.includes('---'));
-      
+       
       let sanitizedPrompt = '';
       let sanitizedContext = '';
       
@@ -291,16 +285,18 @@ Adventure Context: ${adventureContext || 'No additional context provided'}`;
       const parsedAge = Number(childProfile?.age);
       const childAge = 9 //(Number.isFinite(parsedAge) && parsedAge > 0 ? parsedAge : 8); // default age 8
 
-      const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for DALL-E while preserving the visual excitement and intent.
+      const systemPrompt = `You are a content sanitizer for a children's adventure app. Your job is to take image generation prompts and make them 100% safe for flux model while preserving the visual excitement and intent.
 
 CRITICAL RULES:
-1. Strict rules: Preserve any animal or objects mentioned. In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
+1. Strict rules: Preserve any animal or objects mentioned. In case of any humans / human-like creatures, replace them with a single${currentPetId} unless any other pets are mentioned. Remove all people, humans, boys, girls, men and women strictly. Only animals or pets are allowed.
 2. Tone down violent language (fighting → competing, battle → contest, violent → intense)
-3. Keep the visual excitement and epic nature
+3. Keep the visual excitement and epic nature. Identify the main subject of focus from the context (for example, if the scene is about creating a place, focus more on describing that place; if it's about the pet's appearance, focus on describing the pet). Strictly avoid detailing out the pet too much unless it is the main subject of focus.
 4. Make it completely family-friendly for ages 8-13  
 5. Preserve character names and main visual elements
-6. Use heroic, adventurous, and magical language instead
+6. Describe images so that the outputs are hyper vivid and realistic
 7. Return ONLY the cleaned prompt, no explanations
+8. Avoid clothing description unless mentioned by user.
+9. Reinterpret any whimsical or fantastical elements in a physically realistic, live-action way, avoiding painterly glow, soft illustration lighting, or stylized textures.
 
 EXAMPLES:
 - "charizard violently fighting" → "charizard in an epic heroic pose with dynamic energy"
@@ -313,21 +309,50 @@ Transform this image request:`;
 // 8. PET PERSONA MAPPING: ${petInstruction}
 
       const adventureMessages = loadUserAdventure();
-      let messages = adventureMessages.filter((msg) => !msg?.hiddenInChat).slice(-3, -1);
-      let lastUserMessage = `${messages?.[0]?.content ? `last ${messages[0]?.type} message: ${messages[0]?.content}.` : ''}
-      ${messages?.[1]?.content ? `last ${messages[1]?.type} message: ${messages[1]?.content}.` : ''}`;
-      const userMessage = context 
-      ? `Context: ${context}\n\nPrompt to sanitize: ${lastUserMessage ? `Last user message: ${lastUserMessage} user message: ` : ''}${originalPrompt}`
-      : `${lastUserMessage ? `${lastUserMessage} user message: ` : ''}${originalPrompt}`;
+      const visibleMessages = Array.isArray(adventureMessages) ? adventureMessages.filter((msg) => !msg?.hiddenInChat) : [];
+      
+      // Take the most recent two visible messages as PRIMARY context (typically last user + last assistant)
+      const recentMessages = visibleMessages.slice(-2);
+      const primaryRecentText = recentMessages
+        .map((m) => {
+          const roleLabel = m?.type ? `last ${m.type} message:` : 'last message:';
+          const content = (m?.content || '').toString().trim();
+          return content ? `${roleLabel} ${content}` : '';
+        })
+        .filter(Boolean)
+        .join(' ');
+      
+      // Build a compact BACKGROUND (up to ~300 chars) from earlier messages plus optional external context
+      const backgroundPool = visibleMessages.slice(0, Math.max(0, visibleMessages.length - recentMessages.length));
+      const backgroundJoined = [
+        context ? `Context: ${context}` : '',
+        backgroundPool.slice(-6).map((m) => (m?.content || '').toString().trim()).filter(Boolean).join(' ')
+      ].filter(Boolean).join('\n');
+      const backgroundSummary = backgroundJoined.length > 300 ? `${backgroundJoined.slice(0, 300)}...` : backgroundJoined;
+      
+      // Compose weighted, explicitly prioritized sections (80/20)
+      const primarySection = primaryRecentText
+        ? `PRIMARY (80% priority) — Use these details to define the scene:\n${primaryRecentText}`
+        : `PRIMARY (80% priority) — Use this to define the scene:\nuser message: ${originalPrompt}`;
+      
+      const backgroundSection = backgroundSummary
+        ? `BACKGROUND (20% priority) — Use only if it clarifies setting; otherwise ignore:\n${backgroundSummary}`
+        : `BACKGROUND (20% priority): none`;
+      
+      const userMessage = `${primarySection}
+      
+${backgroundSection}
+      
+Prompt to sanitize (final target content): ${originalPrompt}
+If any conflict, prioritize PRIMARY and Safety rules over BACKGROUND. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic. Convert any whimsical or magical elements into grounded, live-action realism with no painterly or stylized effects.`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
       const completion = await this.client.chat.completions.create({
-        model: "gpt-4o-mini", // Fast and cost-effective for this task
+        model: "chatgpt-4o-latest", // Fast and cost-effective for this task
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
         ],
-        max_tokens: 300,
-        temperature: 0.7,
+        // temperature: 0.7,
       });
 
       let sanitizedPrompt = completion.choices[0]?.message?.content?.trim() || '';

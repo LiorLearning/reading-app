@@ -4,6 +4,7 @@ import { ChatMessage } from './utils';
 import { toast } from 'sonner'
 import analytics from '@/lib/analytics';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
+import { auth } from '@/lib/firebase';
 
 export interface ImageGenerationResult {
   success: boolean;
@@ -20,6 +21,8 @@ export interface GenerationOptions {
   style?: 'vivid' | 'natural';
   adventureContext?: ChatMessage[];
   sanitizedConversationContext?: string;
+  attemptNumber?: number;
+  username?: string;
 }
 
 /**
@@ -28,12 +31,13 @@ export interface GenerationOptions {
  */
 export class MultiProviderImageGenerator {
   private readonly providers: ImageProvider[];
+  private nextStartingProviderIndex: 0 | 1 = 0;
 
   constructor() {
     this.providers = [
       new FluxSchnellProvider(),
-      new FluxSchnellProvider(),
       new FluxProProvider(),
+      new FluxSchnellProvider(),
       new FluxProProvider(),
       // new OpenAIProvider(),
       // new GoogleImagenProvider(),
@@ -42,9 +46,6 @@ export class MultiProviderImageGenerator {
     ];
   }
 
-  /**
-   * Generate image with automatic fallback across providers
-   */
   async generateWithFallback(
     prompt: string,
     userId: string,
@@ -56,8 +57,10 @@ export class MultiProviderImageGenerator {
     const startTime = Date.now();
 
     // Try each provider in order
+    const providerStartingIndex = this.nextStartingProviderIndex;
+    this.nextStartingProviderIndex = this.nextStartingProviderIndex === 0 ? 1 : 0;
     for (let attempt = 0; attempt < this.providers.length; attempt++) {
-      const provider = this.providers[attempt];
+      const provider = this.providers[(providerStartingIndex+attempt)%2];
       const providerStartTime = Date.now();
 
       // Skip providers that aren't configured
@@ -67,8 +70,6 @@ export class MultiProviderImageGenerator {
       }
 
       try {
-        // console.log(`🔄 [MultiProviderImageGenerator.generateWithFallback()] Attempting image generation with ${provider.name}... (attempt ${attempt + 1}/${this.providers.length})`);
-
         // Refine prompt for this specific provider
         const promptForProvider = (provider.name === 'flux-schnell' || provider.name === 'flux-pro') && sanitizedFallbackPrompt
           ? sanitizedFallbackPrompt
@@ -79,6 +80,7 @@ export class MultiProviderImageGenerator {
         // Generate image with current provider
         const imageUrl = await provider.generate(refinedPrompt, userId, {
           ...options,
+          attemptNumber: attempt + 1,
           adventureContext: options.adventureContext || [],
           sanitizedConversationContext: options.sanitizedConversationContext
         });
@@ -145,10 +147,11 @@ export class MultiProviderImageGenerator {
     // Basic content filtering for child-friendly content
     let refinedPrompt = originalPrompt
       .replace(/scary|frightening|terrifying|horror/gi, 'mysterious')
-      .replace(/dark|gloomy|sinister/gi, 'shadowy')
+      .replace(/dark|gloomy|sinister/gi, 'light')
       .replace(/dangerous|perilous/gi, 'challenging')
       .replace(/weapon|sword|gun/gi, 'magical tool')
-      .replace(/dress|camisole|gown|enchanting|robe|skirt|corset|cape/gi, 'casual clothes');
+      .replace(/dress|camisole|gown|enchanting|robe|skirt|corset|cape/gi, 'casual clothes')
+      .replace(/bikini/gi, 'modest clothing');
 
     // Provider-specific fallback optimizations (only used if response processor's enhanced prompt fails)
     switch (providerName) {
@@ -171,10 +174,10 @@ export class MultiProviderImageGenerator {
             return 'dog';
           }
         })();
-        
-        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s. ART INSTRUCTION: Cinematic lighting, photorealistic faces, realistic fur, textured fabrics, natural skin tones, real-world materials, volumetric light, shallow depth of field, 35mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
+        refinedPrompt = `${refinedPrompt}. Strict rules: In case of any humans / human-like creatures, completely convert them to flat chested, friendly single ${currentPetId} unless any other pets are mentioned. ART INSTRUCTION: Vividly realistic, Cinematic with bright natural lighting, warm sunlight streaming in, cheerful and safe mood, realistic fur, 24mm film look, grounded realism — live-action adventure still from Uncharted or Avengers, not stylized, not animated.`;
         break;
-        // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
+      //Strict rules: In case of any humans / human-like creatures, completely convert them to fully clothed, modest flat chested, family friendly ${currentPetId}s.
+      // Strict Rules: shoulders of all characters should be fully covered with clothes, with no bare skin visible. All characters are strictly 9 years old or less. All girls are strictly flat chested. 
       case 'google-imagen':
         refinedPrompt = `${refinedPrompt}, high quality art, richly detailed, photorealistic lighting`;
         break;
@@ -203,7 +206,7 @@ export class MultiProviderImageGenerator {
       errorMessage.includes('safety system') ||
       errorMessage.includes('inappropriate') ||
       errorMessage.includes('safety') ||
-     // errorMessage.includes('moderated') ||
+      // errorMessage.includes('moderated') ||
       errorMessage.includes('policy');
   }
 
@@ -272,9 +275,56 @@ class FluxSchnellProvider implements ImageProvider {
           output_quality: 100,
           num_inference_steps: 4,
           aspect_ratio: '5:4',
-          output_format: 'png'
+          output_format: 'png',
           //safety_tolerance: 1,
           //prompt_upsampling: false,
+
+          metadata: (() => {
+            const getUsername = (): string => {
+              try {
+                const fromOption = (options as any)?.username;
+                if (typeof fromOption === 'string' && fromOption.trim()) return fromOption.trim();
+              } catch { }
+              try {
+                const n = (auth?.currentUser?.displayName || '').trim();
+                if (n) return n;
+              } catch { }
+              try {
+                for (let i = 0; i < localStorage.length; i++) {
+                  const k = localStorage.key(i) || '';
+                  if (k.startsWith('firebase:authUser:')) {
+                    const rawUser = localStorage.getItem(k);
+                    if (rawUser) {
+                      const obj = JSON.parse(rawUser);
+                      const dn = ((obj?.displayName || (obj?.providerData?.[0]?.displayName)) || '').trim();
+                      if (dn) return dn;
+                    }
+                  }
+                }
+              } catch { }
+              return 'friend';
+            };
+            try {
+              const raw = localStorage.getItem('user_adventure');
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              if (!raw) return { username, attempt };
+              const parsed = JSON.parse(raw);
+              if (!Array.isArray(parsed)) return { username, attempt };
+              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
+              const lastFour = visibleMessages.slice(-6);
+              const compact = lastFour.map((m: any) => ({
+                type: m?.type,
+                content: typeof m?.content === 'string' ? m.content : String(m?.content ?? ''),
+                timestamp: typeof m?.timestamp === 'number' ? m.timestamp : Date.now()
+              }));
+              return { user_adventure: compact, username, attempt };
+            } catch {
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              return { username, attempt };
+            }
+          })(),
         },
         webhook: "https://api.readkraft.com/api/discord",
         webhook_events_filter: [
@@ -330,7 +380,53 @@ class FluxProProvider implements ImageProvider {
           aspect_ratio: '5:4',
           output_format: 'png',
           safety_tolerance: 1,
-          prompt_upsampling: false,
+          prompt_upsampling: false,          
+          metadata: (() => {
+            const getUsername = (): string => {
+              try {
+                const fromOption = (options as any)?.username;
+                if (typeof fromOption === 'string' && fromOption.trim()) return fromOption.trim();
+              } catch { }
+              try {
+                const n = (auth?.currentUser?.displayName || '').trim();
+                if (n) return n;
+              } catch { }
+              try {
+                for (let i = 0; i < localStorage.length; i++) {
+                  const k = localStorage.key(i) || '';
+                  if (k.startsWith('firebase:authUser:')) {
+                    const rawUser = localStorage.getItem(k);
+                    if (rawUser) {
+                      const obj = JSON.parse(rawUser);
+                      const dn = ((obj?.displayName || (obj?.providerData?.[0]?.displayName)) || '').trim();
+                      if (dn) return dn;
+                    }
+                  }
+                }
+              } catch { }
+              return 'friend';
+            };
+            try {
+              const raw = localStorage.getItem('user_adventure');
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              if (!raw) return { username, attempt };
+              const parsed = JSON.parse(raw);
+              if (!Array.isArray(parsed)) return { username, attempt };
+              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
+              const lastFour = visibleMessages.slice(-6);
+              const compact = lastFour.map((m: any) => ({
+                type: m?.type,
+                content: typeof m?.content === 'string' ? m.content : String(m?.content ?? ''),
+                timestamp: typeof m?.timestamp === 'number' ? m.timestamp : Date.now()
+              }));
+              return { user_adventure: compact, username, attempt };
+            } catch {
+              const username = getUsername();
+              const attempt = typeof (options as any)?.attemptNumber === 'number' ? (options as any).attemptNumber : 1;
+              return { username, attempt };
+            }
+          })(),
         },
         webhook: "https://api.readkraft.com/api/discord",
         webhook_events_filter: [
