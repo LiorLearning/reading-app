@@ -380,10 +380,10 @@ Remember: I'm your pet companion - speak as "I" and refer to the student as "you
     ];
     
     const response = await this.client.chat.completions.create({
-      model: "gpt-4o", // Use GPT-4o for best image decision making
+      model: "gpt-4.1-nano", // Use GPT-4o for best image decision making
       messages: messages as any,
-      temperature: 1.0, // Higher creativity for adventures
-      max_tokens: 300,
+      // temperature: 1.0, // Higher creativity for adventures
+      // max_tokens: 300,
       presence_penalty: 0.3,
       frequency_penalty: 0.3
     }, { signal });

@@ -35,8 +35,8 @@ export class MultiProviderImageGenerator {
   constructor() {
     this.providers = [
       new FluxSchnellProvider(),
-      new FluxSchnellProvider(),
       new FluxProProvider(),
+      new FluxSchnellProvider(),
       new FluxProProvider(),
       // new OpenAIProvider(),
       // new GoogleImagenProvider(),
@@ -45,9 +45,6 @@ export class MultiProviderImageGenerator {
     ];
   }
 
-  /**
-   * Generate image with automatic fallback across providers
-   */
   async generateWithFallback(
     prompt: string,
     userId: string,
@@ -59,8 +56,9 @@ export class MultiProviderImageGenerator {
     const startTime = Date.now();
 
     // Try each provider in order
+    let providerStartingIndex = Math.random() < 0.6 ? 1 : 0;
     for (let attempt = 0; attempt < this.providers.length; attempt++) {
-      const provider = this.providers[attempt];
+      const provider = this.providers[(providerStartingIndex+attempt)%2];
       const providerStartTime = Date.now();
 
       // Skip providers that aren't configured
@@ -70,8 +68,6 @@ export class MultiProviderImageGenerator {
       }
 
       try {
-        // console.log(`🔄 [MultiProviderImageGenerator.generateWithFallback()] Attempting image generation with ${provider.name}... (attempt ${attempt + 1}/${this.providers.length})`);
-
         // Refine prompt for this specific provider
         const promptForProvider = (provider.name === 'flux-schnell' || provider.name === 'flux-pro') && sanitizedFallbackPrompt
           ? sanitizedFallbackPrompt

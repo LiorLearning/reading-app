@@ -343,10 +343,10 @@ Transform this image request:`;
 ${backgroundSection}
       
 Prompt to sanitize (final target content): ${originalPrompt}
-If any conflict, prioritize PRIMARY and Safety rules over BACKGROUND. Return only the cleaned prompt.`;
+If any conflict, prioritize PRIMARY and Safety rules over BACKGROUND. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic.`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
       const completion = await this.client.chat.completions.create({
-        model: "gpt-4.1-nano", // Fast and cost-effective for this task
+        model: "chatgpt-4o-latest", // Fast and cost-effective for this task
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
