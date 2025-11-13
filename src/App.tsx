@@ -157,6 +157,18 @@ const UnifiedPetAdventureApp = () => {
     try { localStorage.setItem('media_prompt_seen', '1'); } catch {}
   }, []);
 
+  const handleMediaEnabled = React.useCallback((result: { micGranted: boolean; camGranted: boolean }) => {
+    // If microphone permission was granted, mark it so we don't show the modal again
+    if (result.micGranted) {
+      try {
+        localStorage.setItem('media_prompt_seen', '1');
+        // Also store that permission was actually granted (not just seen)
+        localStorage.setItem('media_permission_granted', '1');
+      } catch {}
+    }
+    setShowMediaPrompt(false);
+  }, []);
+
   const handleContinueAnyway = React.useCallback(() => {
     suppressForDays(3);
     setGateOpen(false);
@@ -233,6 +245,7 @@ const UnifiedPetAdventureApp = () => {
       <MediaPermissionModal
         open={showMediaPrompt}
         onClose={handleMediaPromptClose}
+        onEnabled={handleMediaEnabled}
       />
       <PetPage 
         onStartAdventure={handleStartAdventure}
