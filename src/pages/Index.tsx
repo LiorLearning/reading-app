@@ -2640,12 +2640,10 @@ Keep tone warm, brief, and curious.`;
         // Generate AI response using the current message history
         const currentMessages = [...chatMessages, userMessage];
         
-        // Implement 3-1 pattern: 1 intro tutor message (handled by initial greeting), then 3 spelling + 1 adventure
-        let isSpellingPhase = false;
-        const SPELLING_CYCLE_OFFSET = 1; // initial AI greeting increments to 1, making next turn cyclePosition 0
-        const SPELLING_CYCLE_LENGTH = 4; // 3 spelling + 1 adventure
-        const cyclePosition = ((messageCycleCount - SPELLING_CYCLE_OFFSET) % SPELLING_CYCLE_LENGTH + SPELLING_CYCLE_LENGTH) % SPELLING_CYCLE_LENGTH;
-        isSpellingPhase = cyclePosition < 3;
+        // New cadence: first visible AI message is normal (greeting), then always SpellBox
+        // Detect if we've already shown a visible AI message in chat (not counting hidden SpellBox lines)
+        const hasVisibleAIGreeting = chatMessages.some(m => m.type === 'ai' && !(m as any).hiddenInChat);
+        const isSpellingPhase = hasVisibleAIGreeting;
           
         // Use selectedGradeFromDropdown if available, otherwise fall back to userData.gradeDisplayName
           
