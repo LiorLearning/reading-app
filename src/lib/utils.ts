@@ -1909,6 +1909,21 @@ const PROFANITY_SET: Set<string> = (() => {
  * - Treats dots/slashes/hyphens as separators
  * Returns true if any word matches; otherwise false.
  */
+export function containsProfanity(text: string | null | undefined): boolean {
+  if (!text) return false;
+  const normalized = text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+  if (!normalized) return false;
+  const tokens = normalized.split(/\s+/);
+  for (const token of tokens) {
+    if (PROFANITY_SET.has(token)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 export function openaiClient() {
   return new OpenAI({

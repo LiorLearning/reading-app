@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import OpenAI from 'openai';
-import { cn } from '@/lib/utils';
+import { cn, containsProfanity } from '@/lib/utils';
 import { playClickSound } from '@/lib/sounds';
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2, Square, ChevronRight, Lightbulb, Mic, Loader2 } from 'lucide-react';
 import { firebaseSpellboxLogsService } from '@/lib/firebase-spellbox-logs-service';
 import { useAuth } from '@/hooks/use-auth';
+import { toast } from 'sonner';
 
 interface WordPart {
   type: 'text' | 'blank';
@@ -141,6 +142,10 @@ const ReadingMicButton: React.FC<{
             const resp = await fetch(url, { method: 'POST', body: fd });
             const json: any = await resp.json().catch(() => ({}));
             const text = (json?.text || '').toString();
+            if (containsProfanity(text)) {
+              toast.warning('Message is not safe, Please try again.', { duration: 6000 });
+              return;
+            }
             try { onTranscript?.(text, true); } catch {}
             try { onRecordingChange?.(false, text); } catch {}
             // quick correctness hint
@@ -189,6 +194,10 @@ const ReadingMicButton: React.FC<{
               temperature: 0
             } as any);
             const text = (resp?.text || '').toString();
+            if (containsProfanity(text)) {
+              toast.warning('Message is not safe, Please try again.', { duration: 6000 });
+              return;
+            }
             try { onTranscript?.(text, true); } catch {}
             try { onRecordingChange?.(false, text); } catch {}
             // quick correctness hint
