@@ -198,7 +198,7 @@ export const AuthScreen: React.FC = () => {
             )}
 
             {/* Apple Sign-In Button */}
-            <Button 
+            {/* <Button 
               type="button"
               onClick={handleAppleSignIn}
               size="lg"
@@ -219,7 +219,7 @@ export const AuthScreen: React.FC = () => {
                   Continue with Apple
                 </>
               )}
-            </Button>
+            </Button> */}
 
             {/* Divider */}
             <div className="relative">
