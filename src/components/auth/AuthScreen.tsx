@@ -24,25 +24,51 @@ export const AuthScreen: React.FC = () => {
     setShowAppleButton(isAppleDeviceOrMobile());
   }, []);
 
-  // Handle Apple Sign-In callback if redirected back
+  // Handle Apple Sign-In callback if redirected back from Apple
   useEffect(() => {
     const handleAppleCallback = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const idToken = urlParams.get('id_token');
-      const code = urlParams.get('code');
       
-      // If we have Apple callback params, process them
-      if (idToken || code) {
-        // The signInWithApple function should handle this, but if we're here
-        // it means we were redirected back - clear the URL params
-        if (idToken || code) {
-          window.history.replaceState({}, document.title, window.location.pathname);
+      // If we have Apple callback token, process the sign-in automatically
+      if (idToken) {
+        // Prevent any form submissions while processing
+        const preventSubmit = (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        };
+        
+        // Add preventDefault to all forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+          form.addEventListener('submit', preventSubmit, { capture: true });
+        });
+        
+        setLoading(true);
+        setError('');
+        
+        try {
+          // This will process the callback and handle redirect internally
+          await signInWithApple();
+          // Note: signInWithApple will handle navigation internally for callbacks
+        } catch (error: any) {
+          console.error('Apple callback error:', error);
+          setError(getFriendlyAuthError(error, 'apple') || 'Failed to sign in with Apple');
+          setLoading(false);
+          
+          // Remove preventDefault after error
+          forms.forEach(form => {
+            form.removeEventListener('submit', preventSubmit, { capture: true });
+          });
         }
       }
     };
 
+    // Run immediately on mount to catch callback
     handleAppleCallback();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Sign in form state
   const [signInData, setSignInData] = useState({

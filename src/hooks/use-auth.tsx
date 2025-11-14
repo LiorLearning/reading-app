@@ -705,7 +705,125 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Helper function to process Apple ID token and sign in
+  const processAppleSignIn = async (idToken: string, userInfo?: { email?: string; name?: { firstName?: string; lastName?: string } }) => {
+    // Create Firebase credential from Apple ID token
+    const provider = new OAuthProvider('apple.com');
+    const credential = provider.credential({
+      idToken: idToken,
+    });
+
+    const current = auth.currentUser;
+    let finalUser: User;
+
+    if (current && current.isAnonymous) {
+      try {
+        // Link Apple to the current anonymous user to preserve UID
+        const linkedCred = await linkWithCredential(current, credential);
+        finalUser = linkedCred.user;
+      } catch (error: any) {
+        // If the Apple credential already belongs to an existing account, sign into it
+        const code = (error && (error.code || error?.message)) || '';
+        if (
+          String(code).includes('auth/credential-already-in-use') ||
+          String(code).includes('auth/email-already-in-use') ||
+          String(code).includes('auth/account-exists-with-different-credential')
+        ) {
+          // Sign out the anonymous user first, then sign in with Apple
+          try {
+            await firebaseSignOut(auth);
+          } catch {}
+          const userCred = await signInWithCredential(auth, credential);
+          finalUser = userCred.user;
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      // Sign in normally if not anonymous
+      const userCred = await signInWithCredential(auth, credential);
+      finalUser = userCred.user;
+    }
+
+    // Reload user to get latest info
+    try {
+      await reload(finalUser);
+    } catch {}
+
+    // Update user profile and Firestore document
+    const userDocRef = doc(db, 'users', finalUser.uid);
+    const updates: any = { lastLoginAt: new Date() };
+    
+    // Get email from Firebase user or Apple response
+    const emailNow = (finalUser.email || userInfo?.email || '').trim();
+    if (emailNow) {
+      updates.email = emailNow;
+    }
+
+    // Update display name if available from Apple response
+    if (userInfo?.name) {
+      const firstName = userInfo.name.firstName || '';
+      const lastName = userInfo.name.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      if (fullName) {
+        try {
+          await updateProfile(finalUser, { displayName: fullName });
+          updates.username = fullName;
+        } catch (e) {
+          console.warn('Failed to update display name:', e);
+        }
+      }
+    } else if (finalUser.displayName) {
+      // Use existing display name if Apple didn't provide one
+      updates.username = finalUser.displayName;
+    }
+
+    // Check if user document exists, if not create it with proper defaults
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) {
+      // New user - create complete userData document
+      const newUserData: UserData = {
+        uid: finalUser.uid,
+        username: updates.username || finalUser.displayName || '',
+        email: emailNow || '',
+        grade: 'assignment',
+        gradeDisplayName: 'assignment',
+        level: 'start',
+        levelDisplayName: 'Start Level',
+        isFirstTime: true,
+        createdAt: new Date(),
+        lastLoginAt: new Date()
+      };
+      await setDoc(userDocRef, newUserData);
+    } else {
+      // Existing user - just update the fields
+      await updateDoc(userDocRef, updates);
+    }
+  };
+
   const signInWithApple = async () => {
+    // Check if we're handling a callback from URL redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const idTokenFromUrl = urlParams.get('id_token');
+    
+    if (idTokenFromUrl) {
+      // We're being called back from Apple redirect - process it
+      try {
+        // Clear URL params immediately to prevent form submission
+        const redirectParam = urlParams.get('redirect') || '/app';
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        await processAppleSignIn(idTokenFromUrl);
+        
+        // Navigate after successful sign-in
+        window.location.href = redirectParam;
+        return;
+      } catch (error: any) {
+        console.error('Error processing Apple callback:', error);
+        throw error;
+      }
+    }
+
     // Check if Apple Sign-In is available
     if (!window.AppleID) {
       throw new Error('Apple Sign-In is not available. Please ensure you are on a supported device.');
@@ -713,12 +831,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const appleClientId = 'com.readkraft.login';
-      // Use origin + pathname to avoid query params interfering
-      // On iOS/iPad Safari, this will use native modal instead of redirect
-      const redirectURI = `${window.location.origin}${window.location.pathname}`;
+      // Use the current URL as redirectURI (including query params like redirect=/app)
+      const redirectURI = window.location.href+'/app';
 
       // Initialize Apple Sign-In only once
-      // On iOS/iPad Safari, signIn() will show native modal (no browser redirect)
       if (!(window as any).__appleSignInInitialized) {
         try {
           window.AppleID.auth.init({
@@ -738,109 +854,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Call native Apple Sign-In
       // On iOS/iPad: Shows native modal, returns Promise with response
-      // On desktop: May redirect, but we handle callback via URL params
+      // On desktop: Will redirect to redirectURI with id_token parameter
       const response = await window.AppleID.auth.signIn({
         requestedScopes: 'name email',
       });
 
-      if (!response?.authorization?.id_token) {
+      // If we get a response directly (native modal), process it
+      if (response?.authorization?.id_token) {
+        await processAppleSignIn(
+          response.authorization.id_token,
+          response.user
+        );
+      } else {
         throw new Error('Apple Sign-In failed: No ID token received');
       }
-
-      // Create Firebase credential from Apple ID token
-      const provider = new OAuthProvider('apple.com');
-      const credential = provider.credential({
-        idToken: response.authorization.id_token,
-      });
-
-      const current = auth.currentUser;
-      let finalUser: User;
-
-      if (current && current.isAnonymous) {
-        try {
-          // Link Apple to the current anonymous user to preserve UID
-          const linkedCred = await linkWithCredential(current, credential);
-          finalUser = linkedCred.user;
-        } catch (error: any) {
-          // If the Apple credential already belongs to an existing account, sign into it
-          const code = (error && (error.code || error?.message)) || '';
-          if (
-            String(code).includes('auth/credential-already-in-use') ||
-            String(code).includes('auth/email-already-in-use') ||
-            String(code).includes('auth/account-exists-with-different-credential')
-          ) {
-            // Sign out the anonymous user first, then sign in with Apple
-            try {
-              await firebaseSignOut(auth);
-            } catch {}
-            const userCred = await signInWithCredential(auth, credential);
-            finalUser = userCred.user;
-          } else {
-            throw error;
-          }
-        }
-      } else {
-        // Sign in normally if not anonymous
-        const userCred = await signInWithCredential(auth, credential);
-        finalUser = userCred.user;
-      }
-
-      // Reload user to get latest info
-      try {
-        await reload(finalUser);
-      } catch {}
-
-      // Update user profile and Firestore document
-      const userDocRef = doc(db, 'users', finalUser.uid);
-      const updates: any = { lastLoginAt: new Date() };
-      
-      // Get email from Firebase user or Apple response
-      const emailNow = (finalUser.email || response.user?.email || '').trim();
-      if (emailNow) {
-        updates.email = emailNow;
-      }
-
-      // Update display name if available from Apple response
-      if (response.user?.name) {
-        const firstName = response.user.name.firstName || '';
-        const lastName = response.user.name.lastName || '';
-        const fullName = `${firstName} ${lastName}`.trim();
-        if (fullName) {
-          try {
-            await updateProfile(finalUser, { displayName: fullName });
-            updates.username = fullName;
-          } catch (e) {
-            console.warn('Failed to update display name:', e);
-          }
-        }
-      } else if (finalUser.displayName) {
-        // Use existing display name if Apple didn't provide one
-        updates.username = finalUser.displayName;
-      }
-
-      // Check if user document exists, if not create it with proper defaults
-      const userDoc = await getDoc(userDocRef);
-      if (!userDoc.exists()) {
-        // New user - create complete userData document
-        const newUserData: UserData = {
-          uid: finalUser.uid,
-          username: updates.username || finalUser.displayName || '',
-          email: emailNow || '',
-          grade: 'assignment',
-          gradeDisplayName: 'assignment',
-          level: 'start',
-          levelDisplayName: 'Start Level',
-          isFirstTime: true,
-          createdAt: new Date(),
-          lastLoginAt: new Date()
-        };
-        await setDoc(userDocRef, newUserData);
-      } else {
-        // Existing user - just update the fields
-        await updateDoc(userDocRef, updates);
-      }
-
-      // The onAuthStateChanged handler will pick up the userData automatically
     } catch (error: any) {
       // Handle user cancellation
       if (
