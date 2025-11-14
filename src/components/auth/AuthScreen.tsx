@@ -204,7 +204,7 @@ export const AuthScreen: React.FC = () => {
             )}
 
             {/* Apple Sign-In Button - Only shown on iOS/iPad/mobile devices */}
-            {showAppleButton && (
+            {!showAppleButton && (
               <Button 
                 type="button"
                 onClick={handleAppleSignIn}

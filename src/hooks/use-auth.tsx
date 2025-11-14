@@ -38,6 +38,32 @@ declare global {
         };
       };
     };
+    AppleID: {
+      auth: {
+        init: (config: {
+          clientId: string;
+          scope: string;
+          redirectURI: string;
+          usePopup?: boolean;
+        }) => void;
+        signIn: (config?: {
+          requestedScopes?: string;
+        }) => Promise<{
+          authorization: {
+            id_token: string;
+            code: string;
+            state?: string;
+          };
+          user?: {
+            email?: string;
+            name?: {
+              firstName?: string;
+              lastName?: string;
+            };
+          };
+        }>;
+      };
+    };
   }
 }
 
@@ -681,34 +707,86 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithApple = async () => {
-    const provider = new OAuthProvider('apple.com');
-    
-    // Add scopes for name and email
-    provider.addScope('email');
-    provider.addScope('name');
-    
+    // Check if Apple Sign-In is available
+    if (!window.AppleID) {
+      throw new Error('Apple Sign-In is not available. Please ensure you are on a supported device.');
+    }
+
     try {
+      // Get Apple client ID from environment or use a default
+      // Note: You need to configure this in your Apple Developer Console
+      const appleClientId = 'com.readkraft.login';
+      const redirectURI = `${window.location.origin}/auth?redirect=/app`;
+
+      // Initialize Apple Sign-In if not already initialized
+      // On iOS/iPad, signIn() will automatically use native UI
+      try {
+        window.AppleID.auth.init({
+          clientId: appleClientId,
+          scope: 'name email',
+          redirectURI: redirectURI,
+        });
+      } catch (initError) {
+        // Already initialized, continue
+        console.log('Apple Sign-In already initialized');
+      }
+
+      // Call native Apple Sign-In (shows native UI, no popup)
+      const response = await window.AppleID.auth.signIn({
+        requestedScopes: 'name email',
+      });
+
+      if (!response?.authorization?.id_token) {
+        throw new Error('Apple Sign-In failed: No ID token received');
+      }
+
+      // Create Firebase credential from Apple ID token
+      const provider = new OAuthProvider('apple.com');
+      const credential = provider.credential({
+        idToken: response.authorization.id_token,
+        rawNonce: response.authorization.state, // Optional: if you're using nonce
+      });
+
       const current = auth.currentUser;
+
       if (current && current.isAnonymous) {
         try {
           // Link Apple to the current anonymous user to preserve UID
-          const linkedCred = await linkWithPopup(current, provider);
-          
-          // Ensure email is persisted to Firestore immediately on upgrade
-          try {
-            await reload(linkedCred.user);
-          } catch {}
-          try {
-            const userDocRef = doc(db, 'users', linkedCred.user.uid);
-            const emailNow = (linkedCred.user.email || '').trim();
-            if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+          const linkedCred = await linkWithCredential(current, credential);
+
+          // Handle user info from Apple response
+          if (response.user?.email || response.user?.name) {
+            try {
+              await reload(linkedCred.user);
+            } catch {}
+
+            try {
+              const userDocRef = doc(db, 'users', linkedCred.user.uid);
+              const updates: any = { lastLoginAt: new Date() };
+              
+              const emailNow = (linkedCred.user.email || response.user?.email || '').trim();
+              if (emailNow) {
+                updates.email = emailNow;
+              }
+
+              // Update display name if available
+              if (response.user?.name) {
+                const firstName = response.user.name.firstName || '';
+                const lastName = response.user.name.lastName || '';
+                const fullName = `${firstName} ${lastName}`.trim();
+                if (fullName) {
+                  await updateProfile(linkedCred.user, { displayName: fullName });
+                  updates.username = fullName;
+                }
+              }
+
+              await updateDoc(userDocRef, updates);
+            } catch (e) {
+              console.warn('Failed to persist user info after Apple link:', e);
             }
-          } catch (e) {
-            console.warn('Failed to persist email after Apple link:', e);
           }
         } catch (error: any) {
-          // If the Apple credential already belongs to an existing account, just sign into it
+          // If the Apple credential already belongs to an existing account, sign into it
           const code = (error && (error.code || error?.message)) || '';
           if (
             String(code).includes('auth/credential-already-in-use') ||
@@ -719,30 +797,77 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
               await firebaseSignOut(auth);
             } catch {}
-            await signInWithPopup(auth, provider);
+            const userCred = await signInWithCredential(auth, credential);
+            
+            // Update user info if available
+            if (response.user?.email || response.user?.name) {
+              try {
+                await reload(userCred.user);
+                const userDocRef = doc(db, 'users', userCred.user.uid);
+                const updates: any = { lastLoginAt: new Date() };
+                
+                const emailNow = (userCred.user.email || response.user?.email || '').trim();
+                if (emailNow) {
+                  updates.email = emailNow;
+                }
+
+                if (response.user?.name) {
+                  const firstName = response.user.name.firstName || '';
+                  const lastName = response.user.name.lastName || '';
+                  const fullName = `${firstName} ${lastName}`.trim();
+                  if (fullName) {
+                    await updateProfile(userCred.user, { displayName: fullName });
+                    updates.username = fullName;
+                  }
+                }
+
+                await updateDoc(userDocRef, updates);
+              } catch (e) {
+                console.warn('Failed to persist user info:', e);
+              }
+            }
             return;
-          }
-          // Handle popup closed by user or other cancellations
-          if (
-            String(code).includes('auth/popup-closed-by-user') ||
-            String(code).includes('auth/cancelled-popup-request') ||
-            String(code).includes('auth/popup-blocked')
-          ) {
-            throw new Error('Sign-in cancelled');
           }
           throw error;
         }
       } else {
         // Sign in normally if not anonymous
-        await signInWithPopup(auth, provider);
+        const userCred = await signInWithCredential(auth, credential);
+
+        // Update user info if available
+        if (response.user?.email || response.user?.name) {
+          try {
+            await reload(userCred.user);
+            const userDocRef = doc(db, 'users', userCred.user.uid);
+            const updates: any = { lastLoginAt: new Date() };
+            
+            const emailNow = (userCred.user.email || response.user?.email || '').trim();
+            if (emailNow) {
+              updates.email = emailNow;
+            }
+
+            if (response.user?.name) {
+              const firstName = response.user.name.firstName || '';
+              const lastName = response.user.name.lastName || '';
+              const fullName = `${firstName} ${lastName}`.trim();
+              if (fullName) {
+                await updateProfile(userCred.user, { displayName: fullName });
+                updates.username = fullName;
+              }
+            }
+
+            await updateDoc(userDocRef, updates);
+          } catch (e) {
+            console.warn('Failed to persist user info:', e);
+          }
+        }
       }
     } catch (error: any) {
-      // Handle popup closed by user or other cancellations
-      const code = (error && (error.code || error?.message)) || '';
+      // Handle user cancellation
       if (
-        String(code).includes('auth/popup-closed-by-user') ||
-        String(code).includes('auth/cancelled-popup-request') ||
-        String(code).includes('auth/popup-blocked')
+        error?.message?.includes('cancelled') ||
+        error?.message?.includes('user_cancelled') ||
+        error?.code === 'user_cancelled'
       ) {
         throw new Error('Sign-in cancelled');
       }
