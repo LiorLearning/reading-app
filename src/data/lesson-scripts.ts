@@ -220,7 +220,7 @@ export const lessonScripts: Record<string, LessonScript> = {
   practice: [
     {
       word: 'grab',
-      prompt: "Read and spell 'grab'.",
+      prompt: "Read the word 'grab'.",
       hints: [
         "Blend the first two sounds: /g/ + /r/ → /gr/.",
         "Then add /a/ and /b/ to make the whole word."
@@ -279,7 +279,7 @@ export const lessonScripts: Record<string, LessonScript> = {
     practice: [
       {
         word: 'pond',
-        prompt: "Read and say 'pond'.",
+        prompt: "Read the word 'pond'.",
         hints: [
           "Blend the last two sounds: /n/ + /d/ → /nd/.",
           "Say /p/ /o/ /nd/."
@@ -340,7 +340,7 @@ export const lessonScripts: Record<string, LessonScript> = {
     practice: [
       {
         word: 'bag',
-        prompt: "Read and say 'bag'.",
+        prompt: "Read the word 'bag'.",
         hints: [
           "Listen for the short /a/ in the middle.",
           "Blend all sounds together to read the word."
@@ -404,7 +404,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'car',
-          prompt: "Read and say 'car'.",
+          prompt: "Read the word 'car'.",
           hints: [
             "Blend /k/ with /ar/.",
           ],
@@ -506,7 +506,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'her',
-          prompt: "Read and say 'her'.",
+          prompt: "Read the word 'her'.",
           hints: [
             "Blend /h/ with /ər/."
           ],
@@ -641,7 +641,7 @@ export const lessonScripts: Record<string, LessonScript> = {
         ],
         practice: {
           word: 'fur',
-          prompt: "Read and say 'fur'.",
+          prompt: "Read the word 'fur'.",
           hints: [
             "Blend /f/ with /ər/."
           ],

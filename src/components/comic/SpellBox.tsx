@@ -1187,14 +1187,26 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               };
             } else {
               const ruleToUse = aiTutor?.spelling_pattern_or_rule;
+              // Diagnose the precise OG mistake and whether it relates to the rule (GPT-5.1)
+              let aiDiagnosis: { mistake: string; spelling_pattern_issue: 'yes' | 'no' } | null = null;
+              try {
+                aiDiagnosis = await aiService.diagnoseSpellingMistake(targetWord, studentEntry, ruleToUse);
+              } catch (diagErr) {
+                aiDiagnosis = null;
+              }
               payload = {
                 target_word: targetWord,
                 question: aiTutor?.question,
                 student_entry: studentEntry,
-                mistakes,
+                ...(aiDiagnosis ? {
+                  mistake: aiDiagnosis.mistake
+                } : {}),
                 attempt_number: nextAttempt,
                 topic_to_reinforce: aiTutor?.topic_to_reinforce,
                 spelling_pattern_or_rule: ruleToUse,
+                ...(aiDiagnosis ? {
+                  spelling_pattern_issue: aiDiagnosis.spelling_pattern_issue
+                } : {})
               };
             }
             sendMessage(JSON.stringify(payload));
