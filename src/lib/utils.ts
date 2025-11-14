@@ -6,6 +6,37 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Check if the device is iOS, iPad, or mobile (but not desktop browser)
+ * Returns true for iOS/iPad/mobile devices, false for desktop browsers
+ */
+export function isAppleDeviceOrMobile(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return false;
+  }
+
+  const ua = navigator.userAgent.toLowerCase();
+  const platform = navigator.platform?.toLowerCase() || '';
+  const maxTouchPoints = navigator.maxTouchPoints || 0;
+
+  // Detect iOS devices (iPhone, iPod)
+  const isIOS = /iphone|ipod/.test(ua);
+
+  // Detect iPad (including iPadOS 13+ which reports as Mac with touch)
+  const isIPad = /ipad/.test(ua) || (platform === 'macintel' && maxTouchPoints > 1);
+
+  // Detect mobile devices (Android phones, etc.)
+  const isMobile = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua);
+
+  // If it's iOS, iPad, or mobile, show the button
+  if (isIOS || isIPad || isMobile) {
+    return true;
+  }
+
+  // Otherwise, it's likely a desktop browser - don't show
+  return false;
+}
+
 // Local storage key for user adventure messages
 const USER_ADVENTURE_KEY = "user_adventure";
 // Local storage key for current adventure ID
