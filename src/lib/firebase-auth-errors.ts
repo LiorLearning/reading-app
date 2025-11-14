@@ -1,6 +1,6 @@
 // Utility to convert Firebase Auth errors into user-friendly messages
 
-type AuthContext = 'signin' | 'signup' | 'google' | 'default';
+type AuthContext = 'signin' | 'signup' | 'google' | 'apple' | 'default';
 
 function extractAuthCode(error: unknown): string | null {
   try {
@@ -40,11 +40,13 @@ export function getFriendlyAuthError(error: unknown, context: AuthContext = 'def
 
   switch (context) {
     case 'signup':
-      return 'Couldn’t create your account. Please check your details and try again.';
+      return "Couldn't create your account. Please check your details and try again.";
     case 'google':
-      return 'We couldn’t sign you in with Google. Please try again.';
+      return "Couldn't sign you in with Google. Please try again.";
+    case 'apple':
+      return "Couldn't sign you in with Apple. Please try again.";
     case 'signin':
-      return 'We couldn’t sign you in. Please try again.';
+      return "Couldn't sign you in. Please try again.";
     default:
       return 'Something went wrong. Please try again.';
   }

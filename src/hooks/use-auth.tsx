@@ -3,6 +3,7 @@ import {
   User, 
   signInWithPopup, 
   GoogleAuthProvider, 
+  OAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
@@ -63,6 +64,7 @@ interface AuthContextType {
   userData: UserData | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -678,6 +680,77 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const signInWithApple = async () => {
+    const provider = new OAuthProvider('apple.com');
+    
+    // Add scopes for name and email
+    provider.addScope('email');
+    provider.addScope('name');
+    
+    try {
+      const current = auth.currentUser;
+      if (current && current.isAnonymous) {
+        try {
+          // Link Apple to the current anonymous user to preserve UID
+          const linkedCred = await linkWithPopup(current, provider);
+          
+          // Ensure email is persisted to Firestore immediately on upgrade
+          try {
+            await reload(linkedCred.user);
+          } catch {}
+          try {
+            const userDocRef = doc(db, 'users', linkedCred.user.uid);
+            const emailNow = (linkedCred.user.email || '').trim();
+            if (emailNow) {
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            }
+          } catch (e) {
+            console.warn('Failed to persist email after Apple link:', e);
+          }
+        } catch (error: any) {
+          // If the Apple credential already belongs to an existing account, just sign into it
+          const code = (error && (error.code || error?.message)) || '';
+          if (
+            String(code).includes('auth/credential-already-in-use') ||
+            String(code).includes('auth/email-already-in-use') ||
+            String(code).includes('auth/account-exists-with-different-credential')
+          ) {
+            // Sign out the anonymous user first, then sign in with Apple
+            try {
+              await firebaseSignOut(auth);
+            } catch {}
+            await signInWithPopup(auth, provider);
+            return;
+          }
+          // Handle popup closed by user or other cancellations
+          if (
+            String(code).includes('auth/popup-closed-by-user') ||
+            String(code).includes('auth/cancelled-popup-request') ||
+            String(code).includes('auth/popup-blocked')
+          ) {
+            throw new Error('Sign-in cancelled');
+          }
+          throw error;
+        }
+      } else {
+        // Sign in normally if not anonymous
+        await signInWithPopup(auth, provider);
+      }
+    } catch (error: any) {
+      // Handle popup closed by user or other cancellations
+      const code = (error && (error.code || error?.message)) || '';
+      if (
+        String(code).includes('auth/popup-closed-by-user') ||
+        String(code).includes('auth/cancelled-popup-request') ||
+        String(code).includes('auth/popup-blocked')
+      ) {
+        throw new Error('Sign-in cancelled');
+      }
+      console.error('Error signing in with Apple:', error);
+      throw error;
+    }
+  };
+
   const signInWithEmail = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -869,6 +942,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     userData,
     loading,
     signInWithGoogle,
+    signInWithApple,
     signInWithEmail,
     signUpWithEmail,
     signOut,
