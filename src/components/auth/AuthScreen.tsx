@@ -24,6 +24,26 @@ export const AuthScreen: React.FC = () => {
     setShowAppleButton(isAppleDeviceOrMobile());
   }, []);
 
+  // Handle Apple Sign-In callback if redirected back
+  useEffect(() => {
+    const handleAppleCallback = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const idToken = urlParams.get('id_token');
+      const code = urlParams.get('code');
+      
+      // If we have Apple callback params, process them
+      if (idToken || code) {
+        // The signInWithApple function should handle this, but if we're here
+        // it means we were redirected back - clear the URL params
+        if (idToken || code) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    };
+
+    handleAppleCallback();
+  }, []);
+
   // Sign in form state
   const [signInData, setSignInData] = useState({
     email: '',
