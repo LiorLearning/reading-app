@@ -6,6 +6,7 @@ import { trackEvent } from '@/lib/feedback-service';
 import { useRealtimeSession } from '@/hooks/useRealtimeSession';
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { getGlobalSpellingLessonNumber } from '@/lib/questionBankUtils';
+import { READING_TUTOR_PROMPT } from '@/lib/reading-tutor-prompt';
 
 interface WhiteboardLessonProps {
   topicId: string;
@@ -72,6 +73,7 @@ Never initiate conversation; only speak the text you receive.`,
     enabled: true,
     agentName: 'readingTutor',
     agentVoice: 'sage',
+    agentInstructions: READING_TUTOR_PROMPT,
   });
 
   // Deterministic numeric id from a string (to keep compatibility with SpellBox's numeric id)

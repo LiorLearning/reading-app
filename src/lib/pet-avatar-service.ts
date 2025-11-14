@@ -118,7 +118,10 @@ export const getCurrentPetAvatarImage = (
       return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sleeping-unscreen.gif?alt=media&token=8971174c-20b4-46e2-bb64-e9be6f35d3d1";
     }
     if (currentPet === 'wolf') {
-      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sleeping.gif?alt=media&token=589ff6e7-2dd4-4437-9cd8-2dd32de3ccba";
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sleep.gif?alt=media&token=4b259fe8-ed6c-41e5-b3cf-94961f26e1f9";
+    }
+    if (currentPet === 'raccoon') {
+      return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sleeping-unscreen.gif?alt=media&token=0448c9f6-f7ef-456b-acc0-8ed8d0fb30ca";
     }
     if (currentPet === 'dragon') {
       return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fdragon-sleeping-unscreen.gif?alt=media&token=1fa04c6a-3099-406e-8806-8ff8fbe48402";
@@ -863,13 +866,26 @@ export const useCurrentPetAvatarImage = () => {
     // Check if Wolf is owned and being displayed - map from careState buckets (placeholders)
     if (currentPetId === 'wolf' && isPetOwned('wolf')) {
       if (gifKey === 'coins_50') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-superhappy.gif?alt=media&token=b05de5e4-bf7d-4649-91b5-f556db613a52";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-superhappy.gif?alt=media&token=7011decf-be81-43dc-85c0-2b3d054c35d9";
       } else if (gifKey === 'coins_30') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-happy.gif?alt=media&token=8d7c54c3-d844-41d2-83c0-8f033d767830";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-pet.gif?alt=media&token=d68f2bb2-1596-42cb-b3ae-cc0cd077eb2e";
       } else if (gifKey === 'coins_10') {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-normal.gif?alt=media&token=6da74eba-c1e7-4eec-b20b-ff78fde40458g";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-norrmal.gif?alt=media&token=41c8fbfb-c624-4d23-afe7-7f5fc50c6741";
       } else {
-        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.gif?alt=media&token=f4248639-f5fd-4688-9782-37a2e3f9651c";
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sad.gif?alt=media&token=e49eaff9-582f-423a-9855-fe8d3f8fe989";
+      }
+    }
+    
+    // Placeholder handling for raccoon until images are uploaded
+    if (currentPetId === 'raccoon' && isPetOwned('raccoon')) {
+      if (gifKey === 'coins_50') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-superhappy-unscreen.gif?alt=media&token=bd2706ad-1fa0-401d-b861-2b0b61602281";
+      } else if (gifKey === 'coins_30') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-happy-unscreen.gif?alt=media&token=079408b3-14cb-4b39-8b0e-ed522e037b17";
+      } else if (gifKey === 'coins_10') {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-normal-unscreen.gif?alt=media&token=fea58476-c564-41ac-905b-7799cf9c6219";
+      } else {
+        return "https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sad-unscreen.gif?alt=media&token=1df7c4bc-772b-43e9-a946-36845cdf10cf";
       }
     }
     
@@ -1016,10 +1032,16 @@ const ACTION_MEDIA_PLACEHOLDERS: Record<string, Record<PetEmotionAction, string>
     needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-sad-unscreen.gif?alt=media&token=05efa46e-ec9a-4aac-86ed-43dec953cb49',
   },
   wolf: {
-    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-eating.gif?alt=media&token=8c73edbe-a714-45f1-b264-429361c977a2',
-    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-drinking.gif?alt=media&token=399a63c2-df0c-4000-82df-a07ab2fad203',
-    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-pet.gif?alt=media&token=7612280d-b943-4ae9-a341-ac524839a609',
-    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-sad.gif?alt=media&token=f4248639-f5fd-4688-9782-37a2e3f9651c',
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhiye-wolf-eating.gif?alt=media&token=fc066964-1387-4842-a054-1edca211a8a5',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-drinking.gif?alt=media&token=52d3e43c-1731-4958-9968-4729f590b358',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-pet.gif?alt=media&token=d68f2bb2-1596-42cb-b3ae-cc0cd077eb2e',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sad.gif?alt=media&token=e49eaff9-582f-423a-9855-fe8d3f8fe989',
+  },
+  raccoon: {
+    feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-eating-unscreen.gif?alt=media&token=8e55dbd9-83f5-48d1-acc4-58658e377f78',
+    water: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-drinking-unscreen.gif?alt=media&token=fb9add5a-120a-4769-b7ff-a3786ea8a125',
+    pat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-pet.gif?alt=media&token=bae7d5e6-5f34-41da-af3e-6e2094e8b00d',
+    needy: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sad-unscreen.gif?alt=media&token=1df7c4bc-772b-43e9-a946-36845cdf10cf',
   },
   monkey: {
     feed: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-food-unscreen.gif?alt=media&token=9a12ed08-5ea3-4ecb-aa7a-bd876d4aee18',
@@ -1131,7 +1153,8 @@ const YAWN_MEDIA_PLACEHOLDERS: Record<string, string> = {
   cat: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fcat-yawn-unscreen.gif?alt=media&token=ef95740c-81e3-4928-949b-e329b1db25b3',
   hamster: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fhamster-yawn-unscreen.gif?alt=media&token=10c574d7-3bb4-43a1-b137-7fa6f00c5d21',
   parrot: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fparrot-yawn-unscreen.gif?alt=media&token=59ec008d-1f70-4bc6-9034-3b30912139d9',
-  wolf: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwolf-baby-yawning.gif?alt=media&token=6110bf8e-e6ac-4892-9528-93deb0dd9ea8',
+  wolf: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fwhite-wolf-sad.gif?alt=media&token=e49eaff9-582f-423a-9855-fe8d3f8fe989',
+  raccoon: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fracoon-sad-unscreen.gif?alt=media&token=1df7c4bc-772b-43e9-a946-36845cdf10cf',
   monkey: 'https://firebasestorage.googleapis.com/v0/b/litkraft-8d090.firebasestorage.app/o/videos%2Fmonkey-yawn-unscreen.gif?alt=media&token=4f1f7d6f-4dc6-46f3-b871-952b62de55d3',
   dragon: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_070033_media-1--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',
   unicorn: 'https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251010_231434_media-9--unscreen.gif&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN',

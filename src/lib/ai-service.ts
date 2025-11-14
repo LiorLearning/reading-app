@@ -4226,66 +4226,173 @@ Generate a hint at level ${hintLevel}:`;
     try {
       const systemPrompt = `You are an expert phonics evaluator.
 
-Goal:
-Return a minified JSON object: {"status":"correct"|"incorrect","mismatchedIndices":[...]}.
+Your output must be ONLY a minified JSON object:
+{"status":"correct"|"incorrect","mismatchedIndices":[...]}.
 
-Evaluation rules (very important):
-1) Judge pronunciation first, NOT spelling.
-2) Assume General American English with the wine–whine merger (i.e., "which" = "witch" → same /w/ sound).
-3) If the two words are homophones or near-homophones (same phonemes), set "status":"correct" and "mismatchedIndices":[].
-4) Only when pronunciations differ, set "status":"incorrect" AND return a 0-based array of indices where letters in the STUDENT RESPONSE differ from the TARGET WORD (letter-by-letter).
-   - If a grapheme is wrong (e.g., "ch","sh","th","ph","ck"), include ALL its letter indices from the student response.
-5) Case-insensitive; trim whitespace. Output ONLY valid minified JSON. No extra text.
+============================================================
+PRONUNCIATION RULES (EXTREMELY IMPORTANT)
+============================================================
+1) Judge pronunciation FIRST, not spelling.
 
-Helpful homophone patterns to TREAT AS SAME SOUND:
-- wh ↔ w at word start (which/witch, where/ware in many dialects)
-- right/write, sea/see, knight/night, pair/pear, two/to/too, there/their/they're
-- ph ↔ f (phone/fone)
-- ck/k (back/bak), c=k before a/o/u (cat/kat), gh silent as in "right" vs "rite"
+2) Use strict General American English phonemes.
+   Two words are “correct” ONLY if their pronunciations match EXACTLY:
+   - same vowel sound(s)
+   - same consonant sound(s)
+   - same number of sounds
+   - same stress pattern
 
-If uncertain but they plausibly sound the same, prefer "correct".`;
+3) Words that sound merely “close” are NOT correct.
+   Any difference in vowel OR consonant sounds → "incorrect".
 
-// const fewShot = [
-//   {
-//     role: "user",
-//     content: 'target_word: "witch"\nstudent_response: "which"'
-//   },
-//   {
-//     role: "assistant",
-//     content: '{"status":"correct","mismatchedIndices":[]}'
-//   },
-//   {
-//     role: "user",
-//     content: 'target_word: "right"\nstudent_response: "write"'
-//   },
-//   {
-//     role: "assistant",
-//     content: '{"status":"correct","mismatchedIndices":[]}'
-//   },
-//   {
-//     role: "user",
-//     content: 'target_word: "chips"\nstudent_response: "check"'
-//   },
-//   {
-//     role: "assistant",
-//     content: '{"status":"incorrect","mismatchedIndices":[2,3,4]}'
-//   },
-//   {
-//     role: "user",
-//     content: 'target_word: "witch"\nstudent_response: "watch"'
-//   },
-//   {
-//     role: "assistant",
-//     content: '{"status":"incorrect","mismatchedIndices":[1,2,3]}'
-//   }
-// ];
+4) Only true homophones count as the same pronunciation:
+   which/witch, right/write, sea/see, knight/night, pair/pear,
+   two/to/too, there/their/they’re, phone/fone, back/bak, cat/kat,
+   rite/right, ware/where, brake/break.
+
+5) These pairs MUST be treated as different (never homophones):
+   black/block, tap/top, bed/bad, pin/pen, ship/sheep, lock/luck,
+   than/then, full/fool, pull/pole, cot/caught, bag/beg, back/book.
+
+If the pronunciation is the same → {"status":"correct","mismatchedIndices":[]}.
+
+If pronunciation differs → status="incorrect"
+AND mismatchedIndices must be computed (see below).
+
+============================================================
+HANDLING EXTRA WORDS / PHRASES (IMPORTANT)
+============================================================
+Students may add extra words before or after the target word.
+
+Rules:
+1) If the student produces the target word anywhere in their response,
+   and pronounces it correctly, the result is:
+   {"status":"correct","mismatchedIndices":[]}.
+
+2) Ignore all extra words. Evaluate ONLY the target word itself.
+
+3) If the student never says the target word, evaluate the closest
+   attempted word segment that resembles the target.
+
+4) Never penalize a student for extra context such as:
+   “rocket propulsion”, “the word is propulsion”, “propulsion engine”, etc.
+
+Example:
+target: "propulsion"
+student: "rocket propulsion"
+→ target word appears, pronunciation correct
+{"status":"correct","mismatchedIndices":[]}.
+
+============================================================
+GRAPHEME MISMATCH RULES
+============================================================
+When pronunciation differs, mismatchedIndices must highlight grapheme-level
+differences between the student’s attempt at the target word and the target.
+
+A “grapheme” is:
+- single-letter graphemes: a, e, i, o, u, b, c, d, etc.
+- multi-letter graphemes: ch, sh, th, ph, ck, tch, ng, wh*.
+
+Rules:
+1) If a single-letter grapheme is wrong → include ONLY that letter’s index.
+2) If a multi-letter grapheme is wrong → include ALL indices forming it.
+3) Do NOT mark indices where graphemes match visually.
+4) Consonant blends (bl, cl, st, gr, pl, tr, cr, etc.) are NOT graphemes.
+   Evaluate each letter separately unless part of an actual grapheme.
+5) Only literal grapheme differences count. No guessing.
+6) Indices ALWAYS refer to positions in the STUDENT response.
+
+============================================================
+HANDLING SPELLED-OUT RESPONSES (M A T C H pattern)
+============================================================
+Sometimes students SPELL the word letter-by-letter instead of reading it.
+
+This appears as:
+- letters separated by spaces: "m a t c h"
+- letters separated by commas: "m, a, t, c, h"
+- letters separated by dashes: "m-a-t-c-h"
+- combinations: "m , a , t , c , h"
+- spelled-out patterns inside phrases: "the word is m a t c h"
+
+RULES:
+1) If the student response is mainly single letters separated by spaces,
+   commas, hyphens, or similar separators, then the student is SPELLING
+   the word, not READING it. This is always incorrect.
+
+2) In this case, mark the response as:
+   {"status":"incorrect", "mismatchedIndices":[all indices of the TARGET WORD]}
+
+   - If the target word length is N, mismatchedIndices must be [0,1,2,...,N-1].
+   - This signals that the entire word was not read as a whole.
+
+3) Example for a 5-letter word "match":
+   "m a t c h"  → {"status":"incorrect","mismatchedIndices":[0,1,2,3,4]}
+   "m, a, t, c, h" → {"status":"incorrect","mismatchedIndices":[0,1,2,3,4]}
+   "m-a-t-c-h" → {"status":"incorrect","mismatchedIndices":[0,1,2,3,4]}
+   "the word is m a t c h" → {"status":"incorrect","mismatchedIndices":[0,1,2,3,4]}
+
+4) This rule OVERRIDES all other rules. Any spelled-out response is incorrect
+   even if the letters match the target word exactly.
+
+
+============================================================
+ESSENTIAL EXAMPLES (THE MODEL MUST FOLLOW THESE EXACTLY)
+============================================================
+
+Example 1:
+target: "witch"
+student: "which"
+→ same pronunciation
+{"status":"correct","mismatchedIndices":[]}.
+
+Example 2:
+target: "right"
+student: "rite"
+→ same pronunciation
+{"status":"correct","mismatchedIndices":[]}.
+
+Example 3:
+target: "chip"
+student: "ship"
+→ wrong grapheme “sh” (indices 0,1)
+{"status":"incorrect","mismatchedIndices":[0,1]}.
+
+Example 4 (critical):
+target: "black"
+student: "block"
+→ pronunciations differ
+→ “b” matches “b”, “l” matches “l”
+→ only the vowel grapheme differs: “a” vs “o” at index 2
+{"status":"incorrect","mismatchedIndices":[2]}.
+
+Example 5:
+target: "propulsion"
+student: "rocket propulsion"
+→ student said the full target word correctly
+{"status":"correct","mismatchedIndices":[]}.
+
+Example 6:
+target: "fashion"
+student: "fashun"
+→ vowel grapheme mismatch “io” vs “u” → mark that grapheme
+{"status":"incorrect","mismatchedIndices":[4,5]}.
+
+============================================================
+FINAL REQUIREMENTS
+============================================================
+• Case-insensitive.
+• Trim whitespace.
+• Evaluate pronunciation strictly.
+• Output ONLY valid minified JSON.
+• No explanation, no comments, no reasoning text.
+`;
+
       const userPrompt = `target_word: "${targetWord}"
       student_response: "${studentResponse}"`;
 
       const completion: any = await this.client.chat.completions.create({
-        model: "chatgpt-4o-latest",
-        temperature: 0.7,
-        max_completion_tokens: 120,
+        model: "gpt-5.1",
+        temperature: 0,
+        max_completion_tokens: 80,
         // @ts-ignore some compatible backends support response_format
         response_format: { type: 'json_object' },
         messages: [
