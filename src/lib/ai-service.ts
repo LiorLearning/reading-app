@@ -2104,14 +2104,16 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
    */
   private canCreateFillInTheBlanks(sentence: string, targetWord: string): boolean {
     if (!sentence || !targetWord) return false;
-    
-    // Split sentence by spaces and check if any word matches the target word
-    const words = sentence.split(' ');
-    return words.some(word => {
-      const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
-      const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');
-      return normalizedWord === normalizedTarget;
-    });
+    // Normalize by replacing punctuation with spaces to avoid joining words around hyphens/em-dashes
+    const normalize = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    const tokens = normalize(sentence).split(' ').filter(Boolean);
+    const normalizedTarget = normalize(targetWord);
+    return tokens.includes(normalizedTarget);
   }
 
 

@@ -468,7 +468,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     const normalize = (s: string) => {
       // First strip HTML tags, then normalize
       const stripped = s.replace(/<[^>]*>/g, '');
-      return stripped.toLowerCase().replace(/[^\w\s]/g, '');
+      // Replace punctuation with spaces (not removal) to avoid word-joins like "aeroplane-i" → "aeroplanei"
+      return stripped
+        .toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
     };
     
     const containsWord = (s?: string, checkStrict: boolean = true) => {
@@ -482,7 +487,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         return re.test(normSentence);
       } else {
         // More lenient check for longer passages
-        return normSentence.includes(normWord);
+        return normSentence.split(' ').includes(normWord);
       }
     };
 
