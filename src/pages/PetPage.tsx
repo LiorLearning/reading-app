@@ -17,6 +17,7 @@ import PetNamingModal from '@/components/PetNamingModal';
 import analytics from '@/lib/analytics';
 //
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
 import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn, PencilLine } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
@@ -367,6 +368,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   // Rename modal state
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [renamingPetId, setRenamingPetId] = useState<string | null>(null);
+  const [isNamingAfterPurchase, setIsNamingAfterPurchase] = useState(false);
+  // Purchase success dialog
+  const [showPurchaseSuccess, setShowPurchaseSuccess] = useState(false);
+  const [purchasedPetId, setPurchasedPetId] = useState<string | null>(null);
   
   // Pet selection flow state
   const [showPetSelection, setShowPetSelection] = useState(false);
@@ -2612,36 +2617,9 @@ const getSleepyPetImage = (clicks: number) => {
     // Mark ownership in per-pet storage as well
     PetProgressStorage.setPetOwnership(petType, true);
 
-    // Generic success message, then prompt user to name the pet
-    alert('🎉 Congratulations! You bought a new pet!');
-
-    const chosenName = window.prompt('What would you like to name your new pet?', '');
-    if (chosenName && chosenName.trim()) {
-      PetProgressStorage.setPetName(petType, chosenName.trim());
-      try {
-        if (user?.uid) {
-          stateStoreApi.setPetName({ userId: user.uid, pet: petType, name: chosenName.trim() });
-          try { analytics.capture('pet_named', { pet_id: petType, pet_name: chosenName.trim(), pet_type: petType, pet_coins_spent: cost, pet_level: getLevelInfo().currentLevel }); } catch {}
-          // Make purchased pet sad immediately without consuming assignment cap
-          stateStoreApi.forcePetSadOnPurchase({ userId: user.uid, pet: petType });
-          // Mirror locally for immediate UI without waiting for RT update
-          try {
-            const today = new Date().toISOString().slice(0, 10);
-            const raw = localStorage.getItem('litkraft_forced_sad_pets');
-            let list: { date: string; pets: string[] } = { date: today, pets: [] };
-            if (raw) {
-              const parsed = JSON.parse(raw);
-              if (parsed && parsed.date === today && Array.isArray(parsed.pets)) {
-                list = parsed;
-              }
-            }
-            if (!list.pets.includes(petType)) list.pets.push(petType);
-            localStorage.setItem('litkraft_forced_sad_pets', JSON.stringify(list));
-            window.dispatchEvent(new CustomEvent('dailyForcedSadUpdated', { detail: list }));
-          } catch {}
-        }
-      } catch {}
-    }
+    // Show purchase success dialog first; proceed to naming on OK
+    setPurchasedPetId(petType);
+    setShowPurchaseSuccess(true);
 
     try {
       analytics.capture('pet_bought', {
@@ -5433,6 +5411,44 @@ const getSleepyPetImage = (clicks: number) => {
         />
       )}
 
+      {/* Purchase Success Modal */}
+      {showPurchaseSuccess && purchasedPetId && (() => {
+        const data: any = (getPetStoreData() as any)[purchasedPetId];
+        const species = purchasedPetId.charAt(0).toUpperCase() + purchasedPetId.slice(1);
+        return (
+          <Dialog open={true} onOpenChange={(v) => { if (!v) { setShowPurchaseSuccess(false); setPurchasedPetId(null); } }}>
+            <DialogContent className="w-full max-w-md mx-auto bg-white/95 backdrop-blur text-card-foreground overflow-hidden border border-primary/20 shadow-2xl ring-1 ring-primary/40 rounded-3xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">🎉 Congratulations!</DialogTitle>
+                <DialogDescription>
+                  You bought a new {species}! Let's give your pet a name.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-2 flex items-center gap-3">
+                <div className="text-3xl">{data?.emoji || '🐾'}</div>
+                <div className="text-lg font-medium">{species}</div>
+              </div>
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <Button
+                  onClick={() => {
+                    const id = purchasedPetId;
+                    setShowPurchaseSuccess(false);
+                    setPurchasedPetId(null);
+                    if (id) {
+                      setIsNamingAfterPurchase(true);
+                      setRenamingPetId(id);
+                      setIsRenameModalOpen(true);
+                    }
+                  }}
+                >
+                  OK
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
+
       {/* Rename Pet Modal */}
       {isRenameModalOpen && renamingPetId && (() => {
         const data: any = (getPetStoreData() as any)[renamingPetId];
@@ -5440,7 +5456,7 @@ const getSleepyPetImage = (clicks: number) => {
         return (
           <PetNamingModal
             isOpen={true}
-            onClose={() => { setIsRenameModalOpen(false); setRenamingPetId(null); }}
+            onClose={() => { setIsRenameModalOpen(false); setRenamingPetId(null); setIsNamingAfterPurchase(false); }}
             petId={renamingPetId}
             petEmoji={data?.emoji || '🐾'}
             petSpeciesName={species}
@@ -5450,11 +5466,33 @@ const getSleepyPetImage = (clicks: number) => {
               try {
                 if (user?.uid) {
                   await stateStoreApi.setPetName({ userId: user.uid, pet: renamingPetId as any, name: newName });
-                  try { analytics.capture('pet_renamed', { pet_id: renamingPetId, pet_name: newName, pet_type: renamingPetId, pet_level: getLevelInfo().currentLevel }); } catch {}
+                  if (isNamingAfterPurchase) {
+                    try { analytics.capture('pet_named', { pet_id: renamingPetId, pet_name: newName, pet_type: renamingPetId, pet_level: getLevelInfo().currentLevel }); } catch {}
+                    // Make purchased pet sad immediately without consuming assignment cap
+                    try { stateStoreApi.forcePetSadOnPurchase({ userId: user.uid, pet: renamingPetId }); } catch {}
+                    // Mirror locally for immediate UI without waiting for RT update
+                    try {
+                      const today = new Date().toISOString().slice(0, 10);
+                      const raw = localStorage.getItem('litkraft_forced_sad_pets');
+                      let list: { date: string; pets: string[] } = { date: today, pets: [] };
+                      if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && parsed.date === today && Array.isArray(parsed.pets)) {
+                          list = parsed;
+                        }
+                      }
+                      if (!list.pets.includes(renamingPetId)) list.pets.push(renamingPetId);
+                      localStorage.setItem('litkraft_forced_sad_pets', JSON.stringify(list));
+                      window.dispatchEvent(new CustomEvent('dailyForcedSadUpdated', { detail: list }));
+                    } catch {}
+                  } else {
+                    try { analytics.capture('pet_renamed', { pet_id: renamingPetId, pet_name: newName, pet_type: renamingPetId, pet_level: getLevelInfo().currentLevel }); } catch {}
+                  }
                 }
               } catch {}
               setIsRenameModalOpen(false);
               setRenamingPetId(null);
+              setIsNamingAfterPurchase(false);
               setStoreRefreshTrigger(prev => prev + 1);
             }}
           />
