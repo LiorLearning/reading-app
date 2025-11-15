@@ -4529,6 +4529,104 @@ spelling_pattern_or_rule: ${JSON.stringify(spellingPatternOrRule || '')}`;
   }
 
   /**
+   * Diagnose a student's reading (spoken) mistake at a phoneme level with respect to a rule.
+   * Returns a concise phoneme→grapheme mistake description and whether it relates to the rule.
+   */
+  async diagnoseReadingMistake(targetWord: string, studentEntry: string, readingPatternOrRule?: string): Promise<{ mistake: string; reading_pattern_issue: 'yes' | 'no' }> {
+    const fallback = (): { mistake: string; reading_pattern_issue: 'yes' | 'no' } => {
+      const t = (targetWord || '').trim();
+      const s = (studentEntry || '').trim();
+      const mistake = t && s ? `Student pronounced "${s}" instead of "${t}".` : 'Unable to diagnose.';
+      return { mistake, reading_pattern_issue: 'no' };
+    };
+    if (!this.isInitialized || !this.client) {
+      return fallback();
+    }
+    try {
+      const systemPrompt = `you are an expert Orton-Gillingham reading diagnostician. Given a target word, the student’s spoken transcription (student_entry), and a reading pattern or rule, identify the precise phoneme-level mistake the student made while saying the word and whether that mistake relates to the rule.
+
+Inputs:
+
+target_word
+
+student_entry (phonetic transcription of what they said)
+
+reading_pattern_or_rule
+
+Your Outputs:
+
+mistake:
+
+A short, exact, phoneme-to-grapheme description of the student’s error while reading the word.
+
+Describe precisely what sound they produced versus the expected sound (e.g., “replaced /ă/ with /ĕ/,” “reduced the final syllable,” “turned the /sh/ into /s/,” “deleted the /t/ sound,” etc.).
+
+Always reference the phonics sound(s) involved in the error and relate them to the correct graphemes in the target word.
+
+Strict rules: highlight the most prominent mistake in case of multiple mistakes
+
+reading_pattern_issue:
+
+• yes → only if the student’s spoken error shows lack of understanding of the specific pattern/rule provided
+
+• no → if the rule was not violated or if the mistake is unrelated
+
+Output format (JSON ONLY):
+{"mistake":"<precise phoneme→grapheme description>","reading_pattern_issue":"yes"|"no"}`;
+      const userPrompt = `target_word: ${JSON.stringify(targetWord || '')}
+student_entry: ${JSON.stringify(studentEntry || '')}
+reading_pattern_or_rule: ${JSON.stringify(readingPatternOrRule || '')}`;
+      // Debug: log what we are sending
+      try {
+        console.log('[AIService.diagnoseReadingMistake] Sending to GPT-5.1', {
+          model: 'gpt-5.1',
+          temperature: 1,
+          userPrompt
+        });
+      } catch {}
+      const completion: any = await this.client.chat.completions.create({
+        model: "gpt-5.1",
+        temperature: 1,
+        max_completion_tokens: 240,
+        // @ts-ignore compatible backends may support this
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ]
+      } as any);
+      const content: string = completion?.choices?.[0]?.message?.content || '';
+      // Debug: log what we received
+      try {
+        console.log('[AIService.diagnoseReadingMistake] Received from GPT-5.1', { content });
+      } catch {}
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        const match = content.match(/\{[\s\S]*\}/);
+        if (match) {
+          parsed = JSON.parse(match[0]);
+        }
+      }
+      // Debug: parsed
+      try {
+        console.log('[AIService.diagnoseReadingMistake] Parsed response', parsed);
+      } catch {}
+      const mistakeOk = parsed && typeof parsed.mistake === 'string' && parsed.mistake.trim().length > 0;
+      const issue = (parsed?.reading_pattern_issue || '').toString().toLowerCase();
+      const issueOk = issue === 'yes' || issue === 'no';
+      if (!mistakeOk || !issueOk) {
+        return fallback();
+      }
+      return { mistake: parsed.mistake.trim(), reading_pattern_issue: issue };
+    } catch (error) {
+      console.error('AI reading diagnosis failed, using fallback:', error);
+      return fallback();
+    }
+  }
+
+  /**
    * Check if automatic image generation is currently in progress
    * Used by unified system to determine coordination needs
    */

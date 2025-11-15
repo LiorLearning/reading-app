@@ -621,6 +621,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [isRecordingReading, setIsRecordingReading] = useState<boolean>(false);
   const [lockedTranscript, setLockedTranscript] = useState<string>('');
   const [readingMismatchedIndices, setReadingMismatchedIndices] = useState<number[]>([]);
+  const [lastReadingDiagnosis, setLastReadingDiagnosis] = useState<{ mistake: string; reading_pattern_issue: 'yes' | 'no' } | null>(null);
+  const [lastSpellingDiagnosis, setLastSpellingDiagnosis] = useState<{ mistake: string; spelling_pattern_issue: 'yes' | 'no' } | null>(null);
 
   // Helper function to get the expected length for user input (excluding prefilled characters)
   const getExpectedUserInputLength = useCallback((): number => {
@@ -1178,12 +1180,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             const mistakes = computeMistakes(studentEntry, targetWord);
             let payload: any;
             if (isReading) {
+              // Diagnose reading mistake via GPT-5.1 when incorrect
+              let readingDiagnosis: { mistake: string; reading_pattern_issue: 'yes' | 'no' } | null = null;
+              try {
+                readingDiagnosis = await aiService.diagnoseReadingMistake(targetWord, studentEntry, aiTutor?.reading_rule);
+              } catch (diagErr) {
+                readingDiagnosis = null;
+              }
+              setLastReadingDiagnosis(readingDiagnosis);
               payload = {
                 target_word: targetWord,
                 student_response: studentEntry,
                 attempt_number: nextAttempt,
                 topic_to_reinforce: aiTutor?.topic_to_reinforce,
                 reading_rule: aiTutor?.reading_rule,
+                ...(readingDiagnosis ? {
+                  mistake: readingDiagnosis.mistake,
+                  reading_pattern_issue: readingDiagnosis.reading_pattern_issue
+                } : {})
               };
             } else {
               const ruleToUse = aiTutor?.spelling_pattern_or_rule;
@@ -1194,6 +1208,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               } catch (diagErr) {
                 aiDiagnosis = null;
               }
+              setLastSpellingDiagnosis(aiDiagnosis);
               payload = {
                 target_word: targetWord,
                 question: aiTutor?.question,
@@ -1256,6 +1271,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setAiHint('');
       setIsGeneratingHint(false);
       setReadingMismatchedIndices([]);
+      setLastReadingDiagnosis(null);
+      setLastSpellingDiagnosis(null);
       setTimeout(() => { focusNextEmptyBox(); }, 0);
     }
     prevQuestionIdRef.current = questionId;
@@ -1434,12 +1451,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             color: '#B91C1C',
                             boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
                           };
+                          const yellow: React.CSSProperties = {
+                            background: 'linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%)',
+                            border: '3px solid #F59E0B',
+                            color: '#B45309',
+                            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)'
+                          };
                           if (isReading && hasSubmitted) {
                             if (isCorrect) {
                               style = { ...style, ...green };
                             } else {
-                              const isMismatch = readingMismatchedIndices.includes(charIndex);
-                              style = { ...style, ...(isMismatch ? red : green) };
+                              // For reading incorrect, show caution (yellow) for all indices
+                              style = { ...style, ...yellow };
                             }
                           } else {
                             style = { ...style, ...baseGray };
@@ -1740,7 +1763,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         student_response: studentEntry,
                         attempt_number: attempts,
                         topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                        reading_rule: aiTutor?.reading_rule,
+                          reading_rule: aiTutor?.reading_rule,
+                          ...(lastReadingDiagnosis ? {
+                            mistake: lastReadingDiagnosis.mistake,
+                            reading_pattern_issue: lastReadingDiagnosis.reading_pattern_issue
+                          } : {})
                       };
                     } else {
                       const ruleToUse = aiTutor?.spelling_pattern_or_rule;
@@ -1751,7 +1778,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         mistakes,
                         attempt_number: attempts,
                         topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                        spelling_pattern_or_rule: ruleToUse,
+                          spelling_pattern_or_rule: ruleToUse,
+                          ...(lastSpellingDiagnosis ? {
+                            mistake: lastSpellingDiagnosis.mistake,
+                            spelling_pattern_issue: lastSpellingDiagnosis.spelling_pattern_issue
+                          } : {})
                       };
                     }
                     sendMessage(JSON.stringify(payload));
@@ -1869,12 +1900,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       const baseGray: React.CSSProperties = { color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' };
                                       const green: React.CSSProperties = { color: '#15803D', background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E' };
                                       const red: React.CSSProperties = { color: '#B91C1C', background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444' };
+                                      const yellow: React.CSSProperties = { color: '#B45309', background: 'linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%)', border: '2px solid #F59E0B' };
                                       if (isReading && hasSubmitted) {
                                         if (isCorrect) {
                                           style = { ...style, ...green };
                                         } else {
-                                          const isMismatch = readingMismatchedIndices.includes(charIndex);
-                                          style = { ...style, ...(isMismatch ? red : green) };
+                                          // For reading incorrect, show caution (yellow) for all indices
+                                          style = { ...style, ...yellow };
                                         }
                                       } else {
                                         style = { ...style, ...baseGray };
@@ -2050,6 +2082,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           attempt_number: attempts,
                           topic_to_reinforce: aiTutor?.topic_to_reinforce,
                           reading_rule: aiTutor?.reading_rule,
+                          ...(lastReadingDiagnosis ? {
+                            mistake: lastReadingDiagnosis.mistake,
+                            reading_pattern_issue: lastReadingDiagnosis.reading_pattern_issue
+                          } : {})
                         };
                       } else {
                         // Spelling-mode: keep existing spelling payload shape
@@ -2061,7 +2097,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           mistakes,
                           attempt_number: attempts,
                           topic_to_reinforce: aiTutor?.topic_to_reinforce,
-                          spelling_pattern_or_rule: ruleToUse
+                          spelling_pattern_or_rule: ruleToUse,
+                          ...(lastSpellingDiagnosis ? {
+                            mistake: lastSpellingDiagnosis.mistake,
+                            spelling_pattern_issue: lastSpellingDiagnosis.spelling_pattern_issue
+                          } : {})
                         };
                       }
                       sendMessage(JSON.stringify(payload));

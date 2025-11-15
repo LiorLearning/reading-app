@@ -485,7 +485,7 @@ Keep tone kind, concise, warm.`} = callbacks;
       const promptId = isReadingTutor
         ? "pmpt_690e5a1eb9208196ae0461dafdeb990902f7ad0f5ca166b4"
         : "pmpt_68cf010256a88195a1aa36df738877ae0ec3730b96a639f7";
-      const promptVersion = isReadingTutor ? "12" : "51";
+      const promptVersion = isReadingTutor ? "14" : "51";
       const betaHeader = isReadingTutor ? "Reading-AI-tutor" : "realtime=v1";
       const response = await fetch(
         "https://api.readkraft.com/api/v1/realtime/sessions",
