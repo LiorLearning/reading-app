@@ -296,25 +296,32 @@ const ReadingMicButton: React.FC<{
   }, [isRecording, isProcessing]);
 
   return (
+    <>
     <Button
-      variant="comic"
+      variant="ghost"
       size="icon"
       onClick={handleToggle}
       className={cn(
-        compact ? 'ml-1 h-8 w-8 rounded-md' : 'ml-2 h-11 w-11 rounded-lg',
-        'border-2 border-black bg-white text-foreground shadow-[0_4px_0_rgba(0,0,0,0.6)] transition-transform hover:scale-105',
+        compact ? 'ml-1 h-6 w-6 rounded-md self-center' : 'ml-2 h-11 w-11 rounded-lg',
+        'border-2 border-black bg-white text-foreground shadow-none transition-transform hover:scale-105',
         isRecording && 'bg-red-500 text-white hover:bg-red-600'
       )}
       title={isProcessing ? 'Processing...' : (isRecording ? 'Stop recording' : 'Read this word')}
       aria-label={isProcessing ? 'Processing...' : (isRecording ? 'Stop recording' : 'Start recording')}
       disabled={isProcessing}
+      style={isRecording ? { animation: 'micPulse 1.2s ease-in-out infinite' } : undefined}
     >
       {isProcessing
-        ? <Loader2 className={compact ? 'h-4 w-4 animate-spin' : 'h-5 w-5 animate-spin'} />
-        : (isRecording
-            ? <Square className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
-            : <Mic className={compact ? 'h-4 w-4' : 'h-5 w-5'} />)}
+        ? <Loader2 className={compact ? 'h-3 w-3 animate-spin' : 'h-5 w-5 animate-spin'} />
+        : isRecording ? <Square className="h-2 w-2" /> : <Mic className={compact ? 'h-3 w-3' : 'h-5 w-5'} />}
     </Button>
+    <style>{`
+      @keyframes micPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+    `}</style>
+    </>
   );
 };
 
@@ -454,6 +461,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const questionText = question?.questionText;
   const questionId = question?.id;
   const isReading = !!question?.isReading;
+  const showReadingTapHint = !!(isReading && Number(questionId) === 1);
   
   // Ensure we have a valid sentence for spelling - create fallback if needed
   const ensureSpellingSentence = useCallback((word: string, sentence?: string, questionText?: string): string => {
@@ -1363,7 +1371,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
         )}
         >
-        <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'Fredoka, system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
             { /* CONTENT START */ }
 
           {/* Question text */}
@@ -1404,13 +1412,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
                       <div style={{ 
                         display: 'inline-flex',
-                        gap: '6px',
+                        alignItems: 'center',
+                        gap: isReading ? '2px' : '6px',
                         padding: '8px',
-                        background: 'linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)',
+                        background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)',
                         borderRadius: '12px',
-                        boxShadow: '0 4px 8px rgba(109, 40, 217, 0.1)',
-                        border: '2px solid rgba(109, 40, 217, 0.2)',
-                        margin: '0 4px'
+                        boxShadow: '0 4px 8px hsl(var(--primary) / 0.15)',
+                        border: '2px solid hsl(var(--primary) / 0.30)',
+                        margin: '0 4px',
+                        position: 'relative',
+                        paddingBottom: showReadingTapHint ? '22px' : '8px'
                       }}>
                         {parts.map((part, partIndex) => {
                           if (part.type === 'text') {
@@ -1424,8 +1435,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             height: '44px',
                             borderRadius: '8px',
                             fontSize: '22px',
-                            fontFamily: 'system-ui, -apple-system, sans-serif',
-                            fontWeight: '700',
+                            fontFamily: 'Fredoka, system-ui, -apple-system, sans-serif',
+                            fontWeight: '600',
                             textAlign: 'center',
                             display: 'flex',
                             alignItems: 'center',
@@ -1454,7 +1465,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           const yellow: React.CSSProperties = {
                             background: 'linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%)',
                             border: '3px solid #F59E0B',
-                            color: '#B45309',
+                            color: '#ffe169',
                             boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)'
                           };
                           if (isReading && hasSubmitted) {
@@ -1466,6 +1477,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             }
                           } else {
                             style = { ...style, ...baseGray };
+                          }
+                          // Hide rectangles in reading mode while preserving text color feedback
+                          if (isReading) {
+                            style = { ...style, background: 'transparent', border: 'none', boxShadow: 'none', width: '12px' };
                           }
                           return (
                             <div key={`${partIndex}-${charIndex}`} style={style}>
@@ -1479,7 +1494,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             const expectedLength = part.answer?.length || 5;
                             const baseIndex = getBlankBaseIndexForPart(parts, partIndex);
                             return (
-                              <div key={partIndex} className="flex items-center gap-2">
+                              <div key={partIndex} className={cn('flex items-center gap-2', isReading && 'gap-1')}>
                                 {Array.from({ length: expectedLength }, (_, letterIndex) => {
                                   const globalIndex = baseIndex + letterIndex;
                                   const letterValue = getUserInputAtBlankIndex(globalIndex);
@@ -1498,7 +1513,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     padding: '0',
                                     borderRadius: '8px',
                                     fontSize: '22px',
-                                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                                    fontFamily: 'Fredoka, system-ui, -apple-system, sans-serif',
                                     fontWeight: '600',
                                     textAlign: 'center',
                                     outline: 'none',
@@ -1537,13 +1552,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
                                     };
                                   } else if (letterValue) {
-                                    // Letter has value but word not complete yet - blue
+                                    // Letter has value but word not complete yet - theme tint
                                     boxStyle = {
                                       ...boxStyle,
-                                      background: 'linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%)',
-                                      border: '3px solid #0EA5E9',
-                                      color: '#0369A1',
-                                      boxShadow: '0 4px 12px rgba(14, 165, 233, 0.2)'
+                                      background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.22) 100%)',
+                                      border: '3px solid hsl(var(--primary))',
+                                      color: 'hsl(var(--primary) / 0.9)',
+                                      boxShadow: '0 4px 12px hsl(var(--primary) / 0.20)'
                                     };
                                   } else {
                                     // Empty letter - gray
@@ -1553,6 +1568,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       border: '3px dashed #94A3B8',
                                       color: '#64748B',
                                       boxShadow: '0 4px 12px rgba(148, 163, 184, 0.1)'
+                                    };
+                                  }
+
+                                  // In reading mode, hide the per-letter rectangles while preserving layout/spacing
+                                  if (isReading) {
+                                    boxStyle = {
+                                      ...boxStyle,
+                                      width: '26px',
+                                      background: 'transparent',
+                                      border: 'none',
+                                      boxShadow: 'none',
+                                      cursor: 'default'
                                     };
                                   }
 
@@ -1625,18 +1652,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       }}
                                       style={boxStyle}
                                       onFocus={(e) => {
+                                        if (isReading) {
+                                          return;
+                                        }
                                         if (isWordCorrectNow) {
                                           e.target.blur();
                                           return;
                                         }
                                         if (!isWordCorrectNow && !isWordIncorrectNow) {
                                           e.target.style.borderStyle = 'solid';
-                                          e.target.style.borderColor = '#8B5CF6';
-                                          e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.2)';
+                                          e.target.style.borderColor = 'hsl(var(--primary))';
+                                          e.target.style.boxShadow = '0 0 0 3px hsl(var(--primary) / 0.2)';
                                           e.target.style.transform = 'scale(1.02)';
                                         }
                                       }}
                                       onBlur={(e) => {
+                                        if (isReading) {
+                                          return;
+                                        }
                                         const hasValue = e.target.value.trim() !== '';
                                         const showEvaluation = hasSubmitted;
                                         const correctLetterBlur = part.answer?.[letterIndex]?.toUpperCase() || '';
@@ -1653,8 +1686,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                           e.target.style.borderColor = '#EF4444';
                                           e.target.style.boxShadow = '0 2px 4px rgba(239, 68, 68, 0.2)';
                                         } else if (hasValue) {
-                                          e.target.style.borderColor = '#0EA5E9';
-                                          e.target.style.boxShadow = '0 2px 4px rgba(14, 165, 233, 0.2)';
+                                          e.target.style.borderColor = 'hsl(var(--primary))';
+                                          e.target.style.boxShadow = '0 2px 4px hsl(var(--primary) / 0.2)';
                                         } else {
                                           e.target.style.borderColor = '#94A3B8';
                                           e.target.style.boxShadow = '0 1px 2px rgba(148, 163, 184, 0.1)';
@@ -1691,6 +1724,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           </Button>
                         ) : (
                           <ReadingMicButton 
+                            compact
                             targetWord={targetWord} 
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                             onRecordingChange={(rec, finalText) => {
@@ -1713,6 +1747,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               // Do not finalize here; assessment happens on chevron
                             }}
                           />
+                        )}
+                        {showReadingTapHint && (
+                          <div style={{
+                            position: 'absolute',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            bottom: '2px',
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            color: 'hsl(var(--primary))',
+                            opacity: 0.95,
+                            pointerEvents: 'none',
+                            zIndex: 60,
+                            width: '100%',
+                            textAlign: 'center'
+                          }}>
+                            Tap to speak
+                          </div>
                         )}
                       </div>
                     ) : (
@@ -1875,7 +1927,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       ) : (
         // Inline variant for embedding inside other UI (e.g., pet bubble)
         <div ref={containerRef} className={cn("spellbox-inline-container", className)}>
-          <div className="rounded-xl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+          <div className="rounded-xl" style={{ fontFamily: 'Fredoka, system-ui, -apple-system, sans-serif' }}>
             { /* CONTENT START */ }
             
             {/* Question text and interactive inputs reused as-is */}
@@ -1890,17 +1942,17 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     return (
                       <React.Fragment key={idx}>
                         {isTargetWord ? (
-                          <div style={{ display: 'inline-flex', gap: '6px', padding: '6px', background: 'linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)', borderRadius: '10px', border: '2px solid rgba(109,40,217,0.2)', margin: '0 2px' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: isReading ? '2px' : '6px', padding: '6px', background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)', borderRadius: '10px', border: '2px solid hsl(var(--primary) / 0.30)', margin: '0 2px', position: 'relative', paddingBottom: showReadingTapHint ? '16px' : '6px' }}>
                             {parts.map((part, partIndex) => {
                               if (part.type === 'text') {
                                 return (
                                   <React.Fragment key={partIndex}>
                                     {part.content?.split('').map((char, charIndex) => {
-                                      let style: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase' };
+                                      let style: React.CSSProperties = { width: '28px', height: '36px', borderRadius: '8px', fontSize: '18px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', textTransform: 'uppercase' };
                                       const baseGray: React.CSSProperties = { color: '#1F2937', background: 'linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)', border: '2px dashed #9CA3AF' };
-                                      const green: React.CSSProperties = { color: '#15803D', background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E' };
+                                      const green: React.CSSProperties = { color: '#57A773', background: 'linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)', border: '2px solid #22C55E' };
                                       const red: React.CSSProperties = { color: '#B91C1C', background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444' };
-                                      const yellow: React.CSSProperties = { color: '#B45309', background: 'linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%)', border: '2px solid #F59E0B' };
+                                      const yellow: React.CSSProperties = { color: '#FF5E5B', background: 'linear-gradient(135deg, #FEF9C3 0%, #FDE68A 100%)', border: '2px solid #F59E0B' };
                                       if (isReading && hasSubmitted) {
                                         if (isCorrect) {
                                           style = { ...style, ...green };
@@ -1911,6 +1963,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       } else {
                                         style = { ...style, ...baseGray };
                                       }
+                                      // Hide rectangles in reading mode while preserving text color feedback
+                                      if (isReading) {
+                                        style = { ...style, background: 'transparent', border: 'none', width: '12px' };
+                                      }
                                       return <div key={`${partIndex}-${charIndex}`} style={style}>{char}</div>;
                                     })}
                                   </React.Fragment>
@@ -1919,7 +1975,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 const expectedLength = part.answer?.length || 5;
                                 const baseIndex = getBlankBaseIndexForPart(parts, partIndex);
                                 return (
-                                  <div key={partIndex} className="flex items-center gap-1">
+                                  <div key={partIndex} className={cn('flex items-center gap-1', isReading && 'gap-0.5')}>
                                     {Array.from({ length: expectedLength }, (_, letterIndex) => {
                                       const globalIndex = baseIndex + letterIndex;
                                       const letterValue = getUserInputAtBlankIndex(globalIndex);
@@ -1937,9 +1993,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                       } else if (isWordIncorrectNow && letterValue) {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)', border: '2px solid #EF4444', color: '#B91C1C' };
                                       } else if (letterValue) {
-                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%)', border: '2px solid #0EA5E9', color: '#0369A1' };
+                                        boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.22) 100%)', border: '2px solid hsl(var(--primary))', color: 'hsl(var(--primary) / 0.9)' };
                                       } else {
                                         boxStyle = { ...boxStyle, background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)', border: '2px dashed #94A3B8', color: '#64748B' };
+                                      }
+                                      // Hide rectangles in reading mode while keeping spacing
+                                      if (isReading) {
+                                        boxStyle = { ...boxStyle, width: '22px', background: 'transparent', border: 'none', cursor: 'default' };
                                       }
                                       return (
                                         <input
@@ -2040,6 +2100,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                   // No-op for finalization in reading mode
                                 }}
                               />
+                            )}
+                            {showReadingTapHint && (
+                              <div style={{
+                                position: 'absolute',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                bottom: '2px',
+                                fontSize: '10px',
+                                fontWeight: 600,
+                                color: 'hsl(var(--primary))',
+                                opacity: 0.95,
+                                pointerEvents: 'none',
+                                zIndex: 60,
+                                width: '100%',
+                                textAlign: 'center'
+                              }}>
+                                Tap to speak
+                              </div>
                             )}
                           </div>
                         ) : (
