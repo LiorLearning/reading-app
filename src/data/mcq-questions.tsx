@@ -18448,6 +18448,1950 @@ spelling_pattern_or_rule: ''
     }
   ]
 },
+
+'1-A.23': {
+  topicInfo: {
+    topicId: '1-A.23',
+    topicName: 'Form_Compound_Words',
+    progressTopicName: 'Compound Words',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+
+    // -------------------------
+    // COMPOUND WORD 1 — SUNSET
+    // -------------------------
+
+    {
+      id: 1,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'This is the base word: sun.',
+      questionText: 'sun',
+      correctAnswer: 'sun',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'sun',
+        imagePrompt: 'Educational scene showing base word for compound word formation'
+      },
+      aiTutor: {
+        target_word: 'sun',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Sun\' ends with a single consonant after a short vowel, and no doubling is needed because nothing is added to the end of the word.'
+      },
+      audio: 'sun'
+    },
+
+    {
+      id: 2,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'This is the base word: set.',
+      questionText: '_ _ _',
+      correctAnswer: 'set',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: '_ _ _',
+        imagePrompt: 'Educational scene showing base word for compound word formation'
+      },
+      aiTutor: {
+        target_word: 'set',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'Short-vowel CVC words like \'set\' never double the final consonant unless a vowel suffix is added.'
+      },
+      audio: 'set'
+    },
+
+    {
+      id: 3,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Great job! The compound word is \'sunset\'.',
+      questionText: 'sun _ _ _ Combine the two words to spell the compound word: _____',
+      correctAnswer: 'sun set combine',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'sun set combine',
+        imagePrompt: 'Educational scene showing compound word formation from sun and set'
+      },
+      aiTutor: {
+        target_word: 'sunset',
+        question: '_ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'In compound words like \'sunset\', both base words keep their original spelling and join to make one new word.'
+      },
+      audio: 'sunset'
+    },
+
+    // -------------------------
+    // COMPOUND WORD 2 — MAILBOX
+    // -------------------------
+
+    {
+      id: 4,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: mail.',
+      questionText: 'mail',
+      correctAnswer: 'mail',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'mail',
+        imagePrompt: 'Educational scene showing base word mail'
+      },
+      aiTutor: {
+        target_word: 'mail',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Mail\' uses the vowel team \'ai\' to spell long /ā/ in the middle of a word; \"ai\" never appears at the end of an English word.'
+      },
+      audio: 'mail'
+    },
+
+    {
+      id: 5,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: box.',
+      questionText: 'box',
+      correctAnswer: 'box',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'box',
+        imagePrompt: 'Educational base word box scene'
+      },
+      aiTutor: {
+        target_word: 'box',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'The letter X already spells /ks/, so words like \'box\' do not add any extra consonants to show that sound.'
+      },
+      audio: 'box'
+    },
+
+    {
+      id: 6,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Great! The compound word is \'mailbox\'.',
+      questionText: 'mail\nbox\nCombine the two words to spell the compound word: _____',
+      correctAnswer: 'mailbox',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'mail box combine',
+        imagePrompt: 'Educational compound mailbox formation scene'
+      },
+      aiTutor: {
+        target_word: 'mailbox',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'When two words join to make a compound like \'mailbox\', both parts keep their spelling and meaning.'
+      },
+      audio: 'mailbox'
+    },
+
+    // -------------------------
+    // COMPOUND WORD 3 — FOOTBALL
+    // -------------------------
+
+    {
+      id: 7,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: foot.',
+      questionText: 'foot',
+      correctAnswer: 'foot',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'foot',
+        imagePrompt: 'Educational scene showing base word foot'
+      },
+      aiTutor: {
+        target_word: 'foot',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Foot\' uses the double-o phonogram to spell the long /oo/ sound, as in words like \'moon\' and \'food\'.'
+      },
+      audio: 'foot'
+    },
+
+    {
+      id: 8,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: ball.',
+      questionText: 'ball',
+      correctAnswer: 'ball',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [0],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'ball',
+        imagePrompt: 'Educational scene showing base word ball'
+      },
+      aiTutor: {
+        target_word: 'ball',
+        question: 'b _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Ball\' doubles the final L because of the Floss Rule: after a short vowel, final f, l, and s are doubled.'
+      },
+      audio: 'ball'
+    },
+
+    {
+      id: 9,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Great! The compound word is \'football\'.',
+      questionText: 'foot\nball\nCombine the two words to spell the compound word: _____',
+      correctAnswer: 'football',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'foot ball combine',
+        imagePrompt: 'Educational scene showing the formation of the compound word football'
+      },
+      aiTutor: {
+        target_word: 'football',
+        question: '_ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'Compound words like \'football\' keep both base words spelled exactly the same inside the larger word.'
+      },
+      audio: 'football'
+    },
+
+    // -------------------------
+    // EXTRA STANDALONE BASE WORD
+    // -------------------------
+
+    {
+      id: 10,
+      topicId: '1-A.23',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'This is a standalone base word: tree.',
+      questionText: 'tree',
+      correctAnswer: 'tree',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'tree',
+        imagePrompt: 'Educational scene showing standalone base word'
+      },
+      aiTutor: {
+        target_word: 'tree',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Tree\' uses the vowel team \'ee\' to spell the long /ē/ sound, which is a stable vowel team inside words.'
+      },
+      audio: 'tree'
+    }
+
+  ]
+},
+'1-A.24': {
+  topicInfo: {
+    topicId: '1-A.24',
+    topicName: 'Form_Compound_Words',
+    progressTopicName: 'Compound Words',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+
+    // -------------------------
+    // COMPOUND WORD 1 — RAINBOW
+    // -------------------------
+
+    {
+      id: 1,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'This is the base word: rain.',
+      questionText: 'rain',
+      correctAnswer: 'rain',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'rain',
+        imagePrompt: 'Educational scene showing base word for compound word formation'
+      },
+      aiTutor: {
+        target_word: 'rain',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Rain\' uses the vowel team \'ai\' to spell long /ā/ in the middle of a word; \"ai\" never appears at the end of an English word.'
+      },
+      audio: 'rain'
+    },
+
+    {
+      id: 2,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'This is the base word: bow.',
+      questionText: 'bow',
+      correctAnswer: 'bow',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'bow',
+        imagePrompt: 'Educational base word scene'
+      },
+      aiTutor: {
+        target_word: 'bow',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Bow\' ends with the stable vowel team \'ow\', which can spell long /ō/ at the end of words.'
+      },
+      audio: 'bow'
+    },
+
+    {
+      id: 3,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Great job! The compound word is \'rainbow\'.',
+      questionText: 'rain\nbow\nCombine the two words to spell the compound word: _____',
+      correctAnswer: 'rainbow',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'rain bow combine',
+        imagePrompt: 'Educational compound word formation scene'
+      },
+      aiTutor: {
+        target_word: 'rainbow',
+        question: '_ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'In compound words like \'rainbow\', both base words keep their original spelling and join as one unit.'
+      },
+      audio: 'rainbow'
+    },
+
+    // -------------------------
+    // COMPOUND WORD 2 — STARFISH
+    // -------------------------
+
+    {
+      id: 4,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: star.',
+      questionText: 'star',
+      correctAnswer: 'star',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'star',
+        imagePrompt: 'Educational base word star scene'
+      },
+      aiTutor: {
+        target_word: 'star',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Star\' ends with r-controlled \'ar\', which spells the /ar/ sound consistently in English.'
+      },
+      audio: 'star'
+    },
+
+    {
+      id: 5,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: fish.',
+      questionText: 'fish',
+      correctAnswer: 'fish',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'fish',
+        imagePrompt: 'Educational scene showing base word fish'
+      },
+      aiTutor: {
+        target_word: 'fish',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Fish\' uses the consonant digraph \'sh\' to spell the /sh/ sound at the end of the word.'
+      },
+      audio: 'fish'
+    },
+
+    {
+      id: 6,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Great! The compound word is \'starfish\'.',
+      questionText: 'star\nfish\nCombine the two words to spell the compound word: _____',
+      correctAnswer: 'starfish',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'star fish combine',
+        imagePrompt: 'Educational scene showing compound word starfish'
+      },
+      aiTutor: {
+        target_word: 'starfish',
+        question: '_ _ _ _ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'Compound words like \'starfish\' join two whole words without changing any letters.'
+      },
+      audio: 'starfish'
+    },
+
+    // -------------------------
+    // COMPOUND WORD 3 — BASKETBALL
+    // -------------------------
+
+    {
+      id: 7,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: basket.',
+      questionText: 'basket',
+      correctAnswer: 'basket',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [3,4,5],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'basket',
+        imagePrompt: 'Educational base word basket scene'
+      },
+      aiTutor: {
+        target_word: 'basket',
+        question: '_ _ _ k e t',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Basket\' uses a closed syllable \'bas-\' and an unaccented syllable \'-ket\', keeping its spelling stable inside compound words.'
+      },
+      audio: 'basket'
+    },
+
+    {
+      id: 8,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Base word: ball.',
+      questionText: 'ball',
+      correctAnswer: 'ball',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'ball',
+        imagePrompt: 'Educational base word scene'
+      },
+      aiTutor: {
+        target_word: 'ball',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'Because of the Floss Rule, \'ball\' keeps its doubled L even when forming longer words like \'basketball\'.'
+      },
+      audio: 'ball'
+    },
+
+    {
+      id: 9,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'Great! The compound word is \'basketball\'.',
+      questionText: 'basket\nball\nCombine the two words to spell the compound word: _____',
+      correctAnswer: 'basketball',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [3,4,5],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'basket ball combine',
+        imagePrompt: 'Educational compound word basketball scene'
+      },
+      aiTutor: {
+        target_word: 'basketball',
+        question: '_ _ _ k e t _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'In \'basketball\', both base words join without changing any letters, keeping the meaning of each part.'
+      },
+      audio: 'basketball'
+    },
+
+    // -------------------------
+    // EXTRA BASE WORD
+    // -------------------------
+
+    {
+      id: 10,
+      topicId: '1-A.24',
+      topicName: 'Form_Compound_Words',
+      progressTopicName: 'Compound Words',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'compound word',
+      imageUrl: null,
+      explanation: 'This is a standalone base word: cloud.',
+      questionText: 'cloud',
+      correctAnswer: 'cloud',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'compound word',
+        intent: 'fill_blank',
+        questionLine: 'cloud',
+        imagePrompt: 'Educational scene showing standalone base word'
+      },
+      aiTutor: {
+        target_word: 'cloud',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Compound Words',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Cloud\' ends with the vowel team \'ou\', which often spells the /ow/ sound inside English words.'
+      },
+      audio: 'cloud'
+    }
+
+  ]
+},
+'1-A.25': {
+  topicInfo: {
+    topicId: '1-A.25',
+    topicName: 'Add_S_to_Make_Plurals',
+    progressTopicName: 'Regular Plural -s',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+
+    // cat → cats
+    {
+      id: 1,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'This is the base word: cat.',
+      questionText: 'cat',
+      correctAnswer: 'cat',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'cat',
+        imagePrompt: 'Educational scene showing a single cat as the base word'
+      },
+      aiTutor: {
+        target_word: 'cat',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Cat\' is a CVC word (consonant–vowel–consonant), so the single \'a\' in the middle spells the short /ă/ sound.'
+      },
+      audio: 'cat'
+    },
+    {
+      id: 2,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'Great job! The plural of \'cat\' is \'cats\'.',
+      questionText: 'cat\nAdd -s to make the plural: _____',
+      correctAnswer: 'cats',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'cat → plural',
+        imagePrompt: 'Educational scene showing several cats to represent the plural'
+      },
+      aiTutor: {
+        target_word: 'cats',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'To make the CVC noun \'cat\' plural, we simply add -s at the end to show more than one: cat → cats.'
+      },
+      audio: 'cats'
+    },
+
+    // dog → dogs
+    {
+      id: 3,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'This is the base word: dog.',
+      questionText: 'dog',
+      correctAnswer: 'dog',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'dog',
+        imagePrompt: 'Educational scene showing a single dog as the base word'
+      },
+      aiTutor: {
+        target_word: 'dog',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Dog\' is a CVC word, so the single \'o\' in the middle spells the short vowel sound.'
+      },
+      audio: 'dog'
+    },
+    {
+      id: 4,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'Nice work! The plural of \'dog\' is \'dogs\'.',
+      questionText: 'dog\nAdd -s to make the plural: _____',
+      correctAnswer: 'dogs',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'dog → plural',
+        imagePrompt: 'Educational scene showing several dogs to illustrate the plural'
+      },
+      aiTutor: {
+        target_word: 'dogs',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'For a regular CVC noun like \'dog\', we keep the base spelling and add -s to make the plural dogs.'
+      },
+      audio: 'dogs'
+    },
+
+    // hat → hats
+    {
+      id: 5,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'This is the base word: hat.',
+      questionText: 'hat',
+      correctAnswer: 'hat',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'hat',
+        imagePrompt: 'Educational scene showing a single hat as the base word'
+      },
+      aiTutor: {
+        target_word: 'hat',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Hat\' is a CVC word, so the middle \'a\' stays short /ă/ before we add anything to it.'
+      },
+      audio: 'hat'
+    },
+    {
+      id: 6,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'Correct! The plural of \'hat\' is \'hats\'.',
+      questionText: 'hat\nAdd -s to make the plural: _____',
+      correctAnswer: 'hats',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'hat → plural',
+        imagePrompt: 'Educational scene showing several hats to represent the plural form'
+      },
+      aiTutor: {
+        target_word: 'hats',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'Because \'hat\' is a simple CVC noun, we form its plural by adding -s at the end: hat → hats.'
+      },
+      audio: 'hats'
+    },
+
+    // pen → pens
+    {
+      id: 7,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'This is the base word: pen.',
+      questionText: 'pen',
+      correctAnswer: 'pen',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'pen',
+        imagePrompt: 'Educational scene showing a single pen as the base word'
+      },
+      aiTutor: {
+        target_word: 'pen',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Pen\' is a CVC word, so the single \'e\' in the middle spells the short /ĕ/ sound.'
+      },
+      audio: 'pen'
+    },
+    {
+      id: 8,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'Nice work! The plural of \'pen\' is \'pens\'.',
+      questionText: 'pen\nAdd -s to make the plural: _____',
+      correctAnswer: 'pens',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'pen → plural',
+        imagePrompt: 'Educational scene showing multiple pens to illustrate the plural'
+      },
+      aiTutor: {
+        target_word: 'pens',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'For a CVC noun like \'pen\', we keep the short-vowel spelling and add -s to show more than one: pens.'
+      },
+      audio: 'pens'
+    },
+
+    // book → books
+    {
+      id: 9,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'This is the base word: book.',
+      questionText: 'book',
+      correctAnswer: 'book',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'book',
+        imagePrompt: 'Educational scene showing a single book as the base word'
+      },
+      aiTutor: {
+        target_word: 'book',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: '\'Book\' uses the vowel team \'oo\' to spell the long /oo/ sound in the middle of the word.'
+      },
+      audio: 'book'
+    },
+    {
+      id: 10,
+      topicId: '1-A.25',
+      topicName: 'Add_S_to_Make_Plurals',
+      progressTopicName: 'Regular Plural -s',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural',
+      imageUrl: null,
+      explanation: 'Correct! The plural of \'book\' is \'books\'.',
+      questionText: 'book\nAdd -s to make the plural: _____',
+      correctAnswer: 'books',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural',
+        intent: 'fill_blank',
+        questionLine: 'book → plural',
+        imagePrompt: 'Educational scene showing a stack of books to represent the plural'
+      },
+      aiTutor: {
+        target_word: 'books',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Regular Plural -s',
+        reading_rule: '',
+        spelling_pattern_or_rule: 'To form \'books\', we keep the vowel team \'oo\' in the base word book and simply add -s to show more than one.'
+      },
+      audio: 'books'
+    }
+
+  ]
+},
+'1-A.26': {
+  topicInfo: {
+    topicId: '1-A.26',
+    topicName: 'Add_ES_to_Make_Plurals',
+    progressTopicName: 'Plural words ending in -es',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // ------------------------ PAIR 1: bus → buses ------------------------
+    {
+      id: 1,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Great! This is the base word: bus.',
+      questionText: 'bus',
+      correctAnswer: 'bus',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'bus',
+        imagePrompt: 'Educational scene showing base word before plural change'
+      },
+      aiTutor: {
+        target_word: 'bus',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Bus' ends with the consonant S, and short-vowel CVC patterns keep a single final consonant."
+      },
+      audio: 'bus'
+    },
+    {
+      id: 2,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Great job! The plural of bus is buses.',
+      questionText: 'bus\nAdd -es to make the plural: _____',
+      correctAnswer: 'buses',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'bus → plural',
+        imagePrompt: 'Educational scene showing es plural rule'
+      },
+      aiTutor: {
+        target_word: 'buses',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Words ending in S add -es because adding only -s would not change the sound clearly."
+      },
+      audio: 'buses'
+    },
+
+    // ------------------------ PAIR 2: box → boxes ------------------------
+    {
+      id: 3,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'This is the base word: box.',
+      questionText: 'box',
+      correctAnswer: 'box',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'box',
+        imagePrompt: 'Educational scene showing base word box'
+      },
+      aiTutor: {
+        target_word: 'box',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Box' ends in X, which already stands for /ks/, so no extra consonants are added."
+      },
+      audio: 'box'
+    },
+    {
+      id: 4,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Nice! The plural of box is boxes.',
+      questionText: 'box\nAdd -es to make the plural: _____',
+      correctAnswer: 'boxes',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'box → plural',
+        imagePrompt: 'Educational scene showing es plural rule'
+      },
+      aiTutor: {
+        target_word: 'boxes',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Words ending in X always take -es because X ends in the /ks/ sound, and -s alone would be unclear."
+      },
+      audio: 'boxes'
+    },
+
+    // ------------------------ PAIR 3: dish → dishes ------------------------
+    {
+      id: 5,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Base word: dish.',
+      questionText: 'dish',
+      correctAnswer: 'dish',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'dish',
+        imagePrompt: 'Educational scene showing dish base word'
+      },
+      aiTutor: {
+        target_word: 'dish',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Dish' ends in the digraph SH, which spells /sh/ as a single consonant team."
+      },
+      audio: 'dish'
+    },
+    {
+      id: 6,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Great! The plural of dish is dishes.',
+      questionText: 'dish\nAdd -es to make the plural: _____',
+      correctAnswer: 'dishes',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'dish → plural',
+        imagePrompt: 'Educational scene showing es plural rule'
+      },
+      aiTutor: {
+        target_word: 'dishes',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Words ending in SH must add -es because SH already ends in a sibilant sound."
+      },
+      audio: 'dishes'
+    },
+
+    // ------------------------ PAIR 4: wish → wishes ------------------------
+    {
+      id: 7,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Base word: wish.',
+      questionText: 'wish',
+      correctAnswer: 'wish',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'wish',
+        imagePrompt: 'Educational scene showing wish base'
+      },
+      aiTutor: {
+        target_word: 'wish',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Wish' ends with the SH digraph, which always stays together to spell /sh/."
+      },
+      audio: 'wish'
+    },
+    {
+      id: 8,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Nice work! The plural of wish is wishes.',
+      questionText: 'wish\nAdd -es to make the plural: _____',
+      correctAnswer: 'wishes',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'wish → plural',
+        imagePrompt: 'Educational scene showing es plural rule'
+      },
+      aiTutor: {
+        target_word: 'wishes',
+        question: '_ _ _ _ _ _',
+        student_entry: '', 
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Words ending in SH add -es for clarity when forming the plural."
+      },
+      audio: 'wishes'
+    },
+
+    // ------------------------ PAIR 5: fox → foxes ------------------------
+    {
+      id: 9,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Base word: fox.',
+      questionText: 'fox',
+      correctAnswer: 'fox',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'fox',
+        imagePrompt: 'Educational animal scene showing fox'
+      },
+      aiTutor: {
+        target_word: 'fox',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Fox' ends in X, a single letter that stands for two sounds (/k/ + /s/)."
+      },
+      audio: 'fox'
+    },
+    {
+      id: 10,
+      topicId: '1-A.26',
+      topicName: 'Add_ES_to_Make_Plurals',
+      progressTopicName: 'Plural words ending in -es',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'plural es',
+      imageUrl: null,
+      explanation: 'Correct! The plural of fox is foxes.',
+      questionText: 'fox\nAdd -es to make the plural: _____',
+      correctAnswer: 'foxes',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'plural es',
+        intent: 'fill_blank',
+        questionLine: 'fox → plural',
+        imagePrompt: 'Educational animal scene showing plural foxes'
+      },
+      aiTutor: {
+        target_word: 'foxes',
+        question: '_ _ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'Plural words ending in -es',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Words ending in X always add -es to form the plural because X ends in a sibilant /ks/ sound."
+      },
+      audio: 'foxes'
+    }
+  ]
+},
+'1-A.27': {
+  topicInfo: {
+    topicId: '1-A.27',
+    topicName: 'Silent_E_Long_Vowel_Rule',
+    progressTopicName: 'VCe long vowel spelling',
+    questionElements: 'image + text',
+    answerElements: 'text',
+    templateType: 'fill_blank'
+  },
+  questions: [
+    // --------------------- PAIR 1: cap → cape ---------------------
+    {
+      id: 1,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'This is the base word: cap.',
+      questionText: 'cap',
+      correctAnswer: 'cap',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'cap',
+        imagePrompt: 'Educational scene showing base short vowel word'
+      },
+      aiTutor: {
+        target_word: 'cap',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Cap' is a CVC word with a short vowel /a/, and no final e is added because it would change the vowel sound."
+      },
+      audio: 'cap'
+    },
+    {
+      id: 2,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'Great job! The long-vowel form of cap is cape.',
+      questionText: 'cap\nAdd silent-e to make the vowel long: _____',
+      correctAnswer: 'cape',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'cap → long vowel',
+        imagePrompt: 'Educational scene showing silent e making long a'
+      },
+      aiTutor: {
+        target_word: 'cape',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Silent e makes the a say /ā/ in 'cape', creating the VCe pattern (vowel–consonant–e)."
+      },
+      audio: 'cape'
+    },
+
+    // --------------------- PAIR 2: kit → kite ---------------------
+    {
+      id: 3,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'This is the base word: kit.',
+      questionText: 'kit',
+      correctAnswer: 'kit',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'kit',
+        imagePrompt: 'Educational scene showing short vowel base word'
+      },
+      aiTutor: {
+        target_word: 'kit',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Kit' is a CVC word ending in a single consonant, giving the vowel a short /i/ sound."
+      },
+      audio: 'kit'
+    },
+    {
+      id: 4,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'Correct! The long vowel form is kite.',
+      questionText: 'kit\nAdd silent-e to make the vowel long: _____',
+      correctAnswer: 'kite',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'kit → long vowel',
+        imagePrompt: 'Educational scene showing silent e making long i'
+      },
+      aiTutor: {
+        target_word: 'kite',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Adding silent e turns the short /i/ in 'kit' into long /ī/ in 'kite' (VCe pattern)."
+      },
+      audio: 'kite'
+    },
+
+    // --------------------- PAIR 3: hop → hope ---------------------
+    {
+      id: 5,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'This is the base word: hop.',
+      questionText: 'hop',
+      correctAnswer: 'hop',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'hop',
+        imagePrompt: 'Educational scene showing short vowel base'
+      },
+      aiTutor: {
+        target_word: 'hop',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Hop' is a short vowel CVC word, and adding e would change the vowel sound."
+      },
+      audio: 'hop'
+    },
+    {
+      id: 6,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'Well done! Hop becomes hope with silent-e.',
+      questionText: 'hop\nAdd silent-e to make the vowel long: _____',
+      correctAnswer: 'hope',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'hop → long vowel',
+        imagePrompt: 'Educational scene showing silent e making long o'
+      },
+      aiTutor: {
+        target_word: 'hope',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Silent e makes the o say /ō/ in 'hope', forming the vowel–consonant–e pattern."
+      },
+      audio: 'hope'
+    },
+
+    // --------------------- PAIR 4: cub → cube ---------------------
+    {
+      id: 7,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'This is the base word: cub.',
+      questionText: 'cub',
+      correctAnswer: 'cub',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'cub',
+        imagePrompt: 'Educational bear cub base word'
+      },
+      aiTutor: {
+        target_word: 'cub',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Cub' ends with a single consonant after a short vowel, giving it a short /u/ sound."
+      },
+      audio: 'cub'
+    },
+    {
+      id: 8,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'Great! Cub becomes cube with silent-e.',
+      questionText: 'cub\nAdd silent-e to make the vowel long: _____',
+      correctAnswer: 'cube',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'cub → long vowel',
+        imagePrompt: 'Educational scene showing silent e making long u'
+      },
+      aiTutor: {
+        target_word: 'cube',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Adding silent e makes the u say /ū/ in 'cube', forming the VCe long vowel pattern."
+      },
+      audio: 'cube'
+    },
+
+    // --------------------- PAIR 5: pin → pine ---------------------
+    {
+      id: 9,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'This is the base word: pin.',
+      questionText: 'pin',
+      correctAnswer: 'pin',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'pin',
+        imagePrompt: 'Educational pin object scene'
+      },
+      aiTutor: {
+        target_word: 'pin',
+        question: '_ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "'Pin' is a CVC short vowel word with a single final consonant."
+      },
+      audio: 'pin'
+    },
+    {
+      id: 10,
+      topicId: '1-A.27',
+      topicName: 'Silent_E_Long_Vowel_Rule',
+      progressTopicName: 'VCe long vowel spelling',
+      questionElements: 'image + text',
+      answerElements: 'text',
+      templateType: 'fill_blank',
+      word: 'silent e',
+      imageUrl: null,
+      explanation: 'Nice work! Pin becomes pine when we add silent-e.',
+      questionText: 'pin\nAdd silent-e to make the vowel long: _____',
+      correctAnswer: 'pine',
+      template: 'fill_blank',
+      isSpacing: false,
+      isSorting: false,
+      isSpelling: true,
+      isReading: false,
+      isPrefilled: false,
+      prefilledIndexes: [],
+      aiHook: {
+        targetWord: 'silent e',
+        intent: 'fill_blank',
+        questionLine: 'pin → long vowel',
+        imagePrompt: 'Educational scene showing silent e making long i'
+      },
+      aiTutor: {
+        target_word: 'pine',
+        question: '_ _ _ _',
+        student_entry: '',
+        topic_to_reinforce: 'VCe long vowel spelling',
+        reading_rule: '',
+        spelling_pattern_or_rule: "Silent e makes the i say /ī/ in 'pine', creating the long vowel VCe pattern."
+      },
+      audio: 'pine'
+    }
+  ]
+},
 '1-R-H.1': {
   topicInfo: {
     topicId: '1-R-H.1',
