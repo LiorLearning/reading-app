@@ -788,7 +788,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           clientId: clientId,
           scope: 'name email',
           redirectURI: redirectURI,
-          usePopup: true // Use popup for better UX, but it's still native on Safari/iOS
+          usePopup: false // Use popup for better UX, but it's still native on Safari/iOS
         });
       } catch (initError) {
         console.warn('Apple Sign In initialization warning:', initError);
