@@ -83,6 +83,7 @@ export const AuthScreen: React.FC = () => {
       const redirect = params.get('redirect') || '/';
       navigate(redirect);
     } catch (error: any) {
+      console.error('Error signing in with Apple:', error);
       // Don't show error if user cancelled
       if (error.message && error.message.includes('cancelled')) {
         setError('');
