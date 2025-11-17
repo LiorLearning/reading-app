@@ -2103,7 +2103,7 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
    * This mimics the logic used in SpellBox component
    */
   private canCreateFillInTheBlanks(sentence: string, targetWord: string): boolean {
-    if (!sentence || !targetWord) return false;
+    if (!sentence || !.) return false;
     
     // Split sentence by spaces and check if any word matches the target word
     const words = sentence.split(' ');

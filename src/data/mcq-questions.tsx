@@ -14287,7 +14287,7 @@ isPrefilled: true,
         student_entry: '',
         topic_to_reinforce: 'Final consonant blends',
         reading_rule: 'The /lt/ blend joins /l/ and /t/ sounds in clothing and object words.',
-spelling_pattern_or_rule: ''
+        spelling_pattern_or_rule: ''
       },
       audio: 'belt'
     },
