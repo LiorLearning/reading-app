@@ -29,7 +29,12 @@ export const MediaPermissionModal: React.FC<MediaPermissionModalProps> = ({ open
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <DialogContent className="w-full max-w-md mx-auto bg-card border-2 border-primary/30 shadow-2xl rounded-3xl">
+      <DialogContent
+        className="w-full max-w-md mx-auto bg-card border-2 border-primary/30 shadow-2xl rounded-3xl"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">Enable microphone</DialogTitle>
           <DialogDescription>

@@ -32,7 +32,12 @@ export const MicPermissionModal: React.FC<MicPermissionModalProps> = ({ open, on
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <DialogContent className="w-full max-w-md mx-auto bg-card border-2 border-primary/30 shadow-2xl rounded-3xl">
+      <DialogContent
+        className="w-full max-w-md mx-auto bg-card border-2 border-primary/30 shadow-2xl rounded-3xl"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">Enable your microphone</DialogTitle>
           <DialogDescription>
@@ -47,9 +52,6 @@ export const MicPermissionModal: React.FC<MicPermissionModalProps> = ({ open, on
         </div> */}
 
         <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="secondary" onClick={onClose} disabled={isRequesting}>
-            Maybe later
-          </Button>
           <Button onClick={handleEnableClick} disabled={isRequesting}>
             {isRequesting ? "Requesting…" : "Enable microphone"}
           </Button>
