@@ -37,13 +37,13 @@ export const AVAILABLE_VOICES: Voice[] = [
     id: 'cgSgspJ2msm6clMCkdW9',
     name: 'Jessica',
     description: 'Warm and friendly tone, perfect for children',
-    previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
+    previewText: "You're my favorite human, and I'll always stay by your side."
   },
   {
     id: 'ocZQ262SsZb9RIxcQBOj',
     name: 'Cat',
     description: 'Calm and curious, purrfect for gentle guidance',
-    previewText: "Meow! I'm a curious cat, here to guide you softly through new stories."
+    previewText: "I don't need treats… just stay close. That's enough."
   },
   // {
   //   id: 'mdzEgLpu0FjTwYs5oot0',
@@ -80,9 +80,69 @@ export const AVAILABLE_VOICES: Voice[] = [
     id: '7fbQ7yJuEo56rYjrYaEh',
     name: 'John Doe',
     description: 'Deep, mature voice perfect for audiobooks and storytelling',
-    previewText: "Hello there! I'm John Doe, and I bring stories to life with my deep, resonant voice. Let's dive into an amazing adventure together!"
+    previewText: "You're my favorite human, and I'll always stay by your side."
+  },
+  {
+    id: 'BlgEcC0TfWpBak7FmvHW',
+    name: 'Fena',
+    description: 'Amazing for parrots, unicorns, cats and other animal characters',
+    previewText: "If you feel sad, curl up with me — we'll be okay together."
+  },
+  {
+    id: 'Bj9UqZbhQsanLzgalpEG',
+    name: 'Austin',
+    description: 'Great for monkeys, pandas, wolves and other animal characters',
+    previewText: "You're my favorite human, and I'll always stay by your side."
+  },
+  {
+    id: 'DTKMou8ccj1ZaWGBiotd',
+    name: 'Jamahal',
+    description: 'Great for raccoons, pandas, monkeys and other animal characters',
+    previewText: "Adventure time! I packed… zero things. But I brought loyalty."
+  },
+  {
+    id: 'QzTKubutNn9TjrB7Xb2Q',
+    name: 'Jerry B.',
+    description: 'Great for wolves, dragons, dogs and other animal characters',
+    previewText: "If you feel sad, curl up with me — we'll be okay together."
+  },
+  {
+    id: 'piI8Kku0DcvcL6TTSeQt',
+    name: 'Flicker',
+    description: 'Great for unicorns, deer, pikachu and other animal characters',
+    previewText: "You're my favorite human, and I'll always stay by your side."
+  },
+  {
+    id: 'Z7RrOqZFTyLpIlzCgfsp',
+    name: 'Creature',
+    description: 'Great for labubu, fox, and other animal characters',
+    previewText: "Hey there! You're my favorite human... for now."
+  },
+  {
+    id: 'CeNX9CMwmxDxUF5Q2Inm',
+    name: 'Johny D.',
+    description: 'Great for raccoons, adults dogs, monkeys and other animal characters',
+    previewText: "Adventure time! I packed… zero things. But I brought loyalty."
   }
 ];
+
+// Fallback and pet default mapping
+const JESSICA_VOICE = AVAILABLE_VOICES.find(v => v.name === 'Jessica');
+const JESSICA_VOICE_ID = JESSICA_VOICE ? JESSICA_VOICE.id : 'cgSgspJ2msm6clMCkdW9';
+const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+  raccoon: 'CeNX9CMwmxDxUF5Q2Inm', // Johny D.
+  panda: 'DTKMou8ccj1ZaWGBiotd', // Jamahal
+  unicorn: 'piI8Kku0DcvcL6TTSeQt', // Flicker
+  pikachu: 'piI8Kku0DcvcL6TTSeQt', // Flicker
+  hamster: 'piI8Kku0DcvcL6TTSeQt', // Flicker
+  monkey: 'QzTKubutNn9TjrB7Xb2Q', // Jerry B.
+  wolf: 'Bj9UqZbhQsanLzgalpEG', // Austin
+  parrot: 'BlgEcC0TfWpBak7FmvHW', // Fena
+  deer: 'BlgEcC0TfWpBak7FmvHW', // Fena
+  dragon: '7fbQ7yJuEo56rYjrYaEh', // John Doe
+  cat: 'ocZQ262SsZb9RIxcQBOj', // Cat
+  dog: 'cgSgspJ2msm6clMCkdW9', // Jessica
+};
 
 // Kept for backward compatibility but no longer used for selection
 const SELECTED_VOICE_KEY = 'reading_app_selected_voice';
@@ -156,20 +216,14 @@ class TextToSpeechService {
     // Pet default mapping
     try {
       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-      const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-        dog: 'cgSgspJ2msm6clMCkdW9',
-        cat: 'ocZQ262SsZb9RIxcQBOj',
-        hamster: 'ocZQ262SsZb9RIxcQBOj',
-      };
       const defaultVoiceId = currentPetId ? PET_DEFAULT_VOICE_ID[currentPetId] : undefined;
-      if (defaultVoiceId) {
-        const petDefault = AVAILABLE_VOICES.find(v => v.id === defaultVoiceId);
-        if (petDefault) return petDefault;
-      }
+      const candidateId = defaultVoiceId || JESSICA_VOICE_ID;
+      const petDefault = AVAILABLE_VOICES.find(v => v.id === candidateId);
+      if (petDefault) return petDefault;
     } catch {}
 
-    // Fallback to first voice in the list
-    return AVAILABLE_VOICES[0];
+    // Fallback to Jessica (or first voice if unavailable)
+    return JESSICA_VOICE || AVAILABLE_VOICES[0];
   }
 
   private loadSelectedSpeed(): number {
@@ -218,14 +272,11 @@ class TextToSpeechService {
           if (v) return v;
         }
         // Fall back to pet default mapping
-        const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-          dog: 'cgSgspJ2msm6clMCkdW9',
-          cat: 'ocZQ262SsZb9RIxcQBOj',
-          hamster: 'ocZQ262SsZb9RIxcQBOj',
-        };
         const defaultVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
-        const petDefault = AVAILABLE_VOICES.find(v => v.id === defaultVoiceId);
+        const candidateId = defaultVoiceId || JESSICA_VOICE_ID;
+        const petDefault = AVAILABLE_VOICES.find(v => v.id === candidateId);
         if (petDefault) return petDefault;
+        if (JESSICA_VOICE) return JESSICA_VOICE;
       }
     } catch {}
     return this.selectedVoice;
@@ -364,11 +415,6 @@ class TextToSpeechService {
               if (preferred) {
                 resolvedVoiceId = preferred;
               } else {
-                const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-                  dog: 'cgSgspJ2msm6clMCkdW9',
-                  cat: 'ocZQ262SsZb9RIxcQBOj',
-                  hamster: 'ocZQ262SsZb9RIxcQBOj',
-                };
                 resolvedVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
               }
             }
@@ -380,21 +426,47 @@ class TextToSpeechService {
         }
       }
 
-      const voiceId = resolvedVoiceId as string;
+      // Ensure resolved voice exists, else fallback to Jessica
+      if (!AVAILABLE_VOICES.some(v => v.id === resolvedVoiceId)) {
+        resolvedVoiceId = JESSICA_VOICE_ID;
+      }
+      let voiceId = resolvedVoiceId as string;
 
       // Generate audio using selected voice
-      const audioStream = await this.client.textToSpeech.convert(
-        voiceId,  // First parameter: voice ID as string
-        {         // Second parameter: options object
-          text: cleanText,
-          modelId: options?.model || 'eleven_flash_v2_5',
-          voiceSettings: {
-            stability: options?.stability || 0.5,
-            similarityBoost: options?.similarity_boost || 0.75,
-            speed: options?.speed || this.selectedSpeed,
-          },
+      let audioStream;
+      try {
+        audioStream = await this.client.textToSpeech.convert(
+          voiceId,
+          {
+            text: cleanText,
+            modelId: options?.model || 'eleven_flash_v2_5',
+            voiceSettings: {
+              stability: options?.stability || 0.5,
+              similarityBoost: options?.similarity_boost || 0.75,
+              speed: options?.speed || this.selectedSpeed,
+            },
+          }
+        );
+      } catch (e) {
+        // Retry once with Jessica as a final fallback
+        if (voiceId !== JESSICA_VOICE_ID) {
+          voiceId = JESSICA_VOICE_ID;
+          audioStream = await this.client.textToSpeech.convert(
+            voiceId,
+            {
+              text: cleanText,
+              modelId: options?.model || 'eleven_flash_v2_5',
+              voiceSettings: {
+                stability: options?.stability || 0.5,
+                similarityBoost: options?.similarity_boost || 0.75,
+                speed: options?.speed || this.selectedSpeed,
+              },
+            }
+          );
+        } else {
+          throw e;
         }
-      );
+      }
 
       // Convert the stream to audio blob
       const chunks: BlobPart[] = [];
