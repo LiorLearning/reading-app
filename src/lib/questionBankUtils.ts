@@ -17,6 +17,8 @@ export interface SpellingQuestion {
   templateType: string;
   /** When true, this is a reading-aloud question (mic instead of typing) */
   isReading?: boolean;
+  /** When true, this is a reading fluency item (dynamic line generation) */
+  isReadingFluency?: boolean;
   isPrefilled?: boolean;
   prefilledIndexes?: number[];
   /** Optional: metadata for the realtime spelling tutor prompt */
@@ -26,6 +28,10 @@ export interface SpellingQuestion {
     student_entry?: string;
     topic_to_reinforce?: string;
     spelling_pattern_or_rule?: string;
+    // Reading fluency context (passed through when present in data)
+    Reading_Mastered_Level?: string;
+    Target_line_length?: string;
+    Example_target_line?: string;
   };
 }
 
@@ -45,8 +51,8 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
   
   Object.values(sampleMCQData.topics).forEach(topic => {
     topic.questions.forEach(question => {
-      // Include both spelling and reading questions in the SpellBox pipeline
-      if (question.isSpelling === true || question.isReading === true) {
+      // Include spelling, reading, and reading-fluency questions in the SpellBox pipeline
+      if (question.isSpelling === true || question.isReading === true || (question as any).isReadingFluency === true) {
         // Determine the actual spelling target word
         let spellingTarget = question.audio || question.word;
         
@@ -66,6 +72,7 @@ export const getAllSpellingQuestions = (): SpellingQuestion[] => {
           explanation: question.explanation,
           templateType: question.templateType,
           isReading: question.isReading === true,
+          isReadingFluency: (question as any).isReadingFluency === true,
           isPrefilled: question.isPrefilled,
           prefilledIndexes: question.prefilledIndexes,
           // Pass through any aiTutor metadata from the MCQ source so SpellBox can enrich the realtime prompt

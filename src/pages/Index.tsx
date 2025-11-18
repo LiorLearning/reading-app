@@ -759,7 +759,7 @@ Keep tone warm, brief, and curious.`;
   
   // Switch realtime agent prompt based on whether a reading question is active
   React.useEffect(() => {
-    const readingActive = !!(showSpellBox && currentSpellQuestion && (currentSpellQuestion as any)?.isReading);
+    const readingActive = !!(showSpellBox && currentSpellQuestion && ((currentSpellQuestion as any)?.isReading || (currentSpellQuestion as any)?.isReadingFluency));
     if (readingActive) {
       setRtAgentName('readingTutor');
       setRtAgentInstructions(READING_TUTOR_PROMPT);
@@ -5889,6 +5889,51 @@ Keep tone warm, brief, and curious.`;
                       Read-DEV
                     </Button>
                   )}
+                  {devToolsVisible && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        playClickSound();
+                        try { ttsService.stop(); } catch {}
+                        const FLUENCY_TOPIC_ID = '1-RL-A.10';
+                        const gradeName = selectedGradeFromDropdown || userData?.gradeDisplayName || '1st Grade';
+                        try {
+                          let gp = loadSpellboxTopicProgress(gradeName) || {
+                            gradeDisplayName: gradeName,
+                            currentTopicId: null,
+                            topicProgress: {},
+                            timestamp: Date.now()
+                          };
+                          gp.currentTopicId = FLUENCY_TOPIC_ID;
+                          gp.topicProgress[FLUENCY_TOPIC_ID] = gp.topicProgress[FLUENCY_TOPIC_ID] || {
+                            topicId: FLUENCY_TOPIC_ID,
+                            questionsAttempted: 0,
+                            firstAttemptCorrect: 0,
+                            totalQuestions: 10,
+                            isCompleted: false,
+                            successRate: 0
+                          };
+                          gp.timestamp = Date.now();
+                          saveSpellboxTopicProgress(gradeName, gp);
+                          if (user?.uid) {
+                            try { firebaseSpellboxService.saveSpellboxProgressFirebase(user.uid, gp); } catch {}
+                          }
+                        } catch {}
+                        setSelectedTopicId(FLUENCY_TOPIC_ID);
+                        try { setCurrentTopic(FLUENCY_TOPIC_ID); } catch {}
+                        try { clearQuestionProgress(); } catch {}
+                        setReadingDevActive(true);
+                        setReadingDevIndex(0);
+                        try { devSendElse(); } catch {}
+                      }}
+                      className="px-2 py-1 text-[10px] font-bold rounded-full border-2 border-black bg-teal-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105"
+                      aria-label="Start reading fluency dev topic"
+                      title="Start reading fluency dev topic"
+                    >
+                      Fluency-DEV
+                    </Button>
+                  )}
                   {/* <Button
                     variant="outline"
                     size="icon"
@@ -6500,6 +6545,8 @@ Keep tone warm, brief, and curious.`;
                               prefilledIndexes: currentSpellQuestion.prefilledIndexes,
                               topicId: currentSpellQuestion.topicId || selectedTopicId,
                               isReading: (currentSpellQuestion as any)?.isReading,
+                              // Pass through reading fluency flag to SpellBox
+                              isReadingFluency: (currentSpellQuestion as any)?.isReadingFluency,
                               aiTutor: (currentSpellQuestion as any)?.aiTutor,
                             } : null,
                             showHints: true,

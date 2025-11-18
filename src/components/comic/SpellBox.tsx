@@ -352,6 +352,7 @@ interface SpellBoxProps {
     audio: string;
     explanation: string;
     isReading?: boolean;
+    isReadingFluency?: boolean;
     isPrefilled?: boolean;
     prefilledIndexes?: number[];
     topicId?: string; // Added for logging
@@ -361,6 +362,9 @@ interface SpellBoxProps {
       student_entry?: string; // not used from bank; computed at runtime
       topic_to_reinforce?: string;
       spelling_pattern_or_rule?: string;
+      Reading_Mastered_Level?: string;
+      Target_line_length?: string;
+      Example_target_line?: string;
     };
   };
   
@@ -461,6 +465,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const questionText = question?.questionText;
   const questionId = question?.id;
   const isReading = !!question?.isReading;
+  const isReadingFluency = !!(question as any)?.isReadingFluency;
+  const isReadingEffective = isReading || isReadingFluency;
   const showReadingTapHint = !!(isReading && Number(questionId) === 1);
   
   // Ensure we have a valid sentence for spelling - create fallback if needed
@@ -534,8 +540,41 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return "Let's spell this word together!";
   }, [question]);
 
+  // Reading fluency: generate a dynamic line at runtime
+  const [fluencyLine, setFluencyLine] = useState<string>('');
+  const [isGeneratingFluency, setIsGeneratingFluency] = useState<boolean>(false);
+  useEffect(() => {
+    let cancelled = false;
+    async function gen() {
+      if (!isReadingFluency) { setFluencyLine(''); return; }
+      const ai = (question as any)?.aiTutor || {};
+      const target = ai?.target_word || targetWord;
+      if (!target) { setFluencyLine(''); return; }
+      try {
+        setIsGeneratingFluency(true);
+        const line = await aiService.generateReadingFluencyLine({
+          targetWord: target,
+          topicToReinforce: ai?.topic_to_reinforce,
+          readingMasteredLevel: ai?.Reading_Mastered_Level,
+          targetLineLength: ai?.Target_line_length,
+          exampleTargetLine: ai?.Example_target_line
+        });
+        if (!cancelled) setFluencyLine(line);
+      } catch {
+        if (!cancelled) setFluencyLine(ai?.Example_target_line || '');
+      } finally {
+        if (!cancelled) setIsGeneratingFluency(false);
+      }
+    }
+    gen();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReadingFluency, questionId]);
+
+  // Prefer the generated fluency line when applicable
+  const sentenceForWorking = isReadingFluency ? (fluencyLine || '') : sentence;
   // Get the working sentence - this ensures we always have something to work with
-  const workingSentence = ensureSpellingSentence(targetWord, sentence, questionText);
+  const workingSentence = ensureSpellingSentence(targetWord, sentenceForWorking, questionText);
   
   // Debug: Check if target word is found in working sentence
   const wordFoundInSentence = workingSentence && targetWord && 
@@ -1056,10 +1095,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Submit current attempt via chevron/Enter
   const handleSubmitAttempt = useCallback(async () => {
     // Enable submit once any letter is entered (non-space)
-    const canSubmit = isReading
+    const canSubmit = (isReading || isReadingFluency)
       ? ((lockedTranscript || '').trim().length > 0)
       : (userAnswer || '').split('').some(ch => ch && ch !== ' ');
-    if (isReading) {
+    if (isReading || isReadingFluency) {
       console.log('[SpellBox] Submit clicked (reading mode). lockedTranscript.len=', (lockedTranscript || '').length, 'liveTranscript.len=', (liveTranscript || '').length, 'canSubmit=', canSubmit);
     }
     if (!canSubmit) {
@@ -1070,7 +1109,38 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       let completeWord = '';
       let correct = false;
       let latestReadingMismatches: number[] = [];
-      if (isReading) {
+      let fluencyAccuracy: number | undefined = undefined;
+      if (isReadingFluency) {
+        completeWord = (lockedTranscript || liveTranscript || '').trim();
+        try {
+          const evalResult = await aiService.evaluateReadingFluency(workingSentence || '', completeWord, targetWord);
+          const correctNow = evalResult.status === 'pass';
+          correct = correctNow;
+          fluencyAccuracy = typeof evalResult.accuracy === 'number' ? evalResult.accuracy : undefined;
+          // For now, we do not apply word-level highlighting inline; store mismatches if needed later
+          latestReadingMismatches = [];
+          setReadingMismatchedIndices(latestReadingMismatches);
+          console.log('[SpellBox] Evaluation (reading fluency). accuracy=', evalResult.accuracy, 'status=', evalResult.status);
+        } catch (e) {
+          // Fallback to token overlap
+          const normalize = (s: string) => (s || '')
+            .toLowerCase()
+            .replace(/[^a-z\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          const targetWords = new Set((normalize(workingSentence)).split(/\s+/).filter(Boolean));
+          const saidWords = new Set((normalize(completeWord)).split(/\s+/).filter(Boolean));
+          let matched = 0;
+          targetWords.forEach(w => { if (saidWords.has(w)) matched++; });
+          const acc = targetWords.size ? matched / targetWords.size : 0;
+          fluencyAccuracy = acc;
+          const hasTarget = normalize(completeWord).split(' ').includes(normalize(targetWord));
+          correct = acc >= 0.7 && hasTarget;
+          latestReadingMismatches = [];
+          setReadingMismatchedIndices(latestReadingMismatches);
+          console.warn('[SpellBox] Fluency evaluation fallback used. accuracy=', acc, 'pass=', correct);
+        }
+      } else if (isReading) {
         completeWord = (lockedTranscript || liveTranscript || '').trim();
         try {
           const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
@@ -1127,7 +1197,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             fullCorrectAnswer, // Always use full word string (e.g., "BAG", not "B")
             currentQuestionBlank, // Format like "_ _ T" where _ represents blanks
             completeWord,
-            correct
+            correct,
+            isReadingFluency ? {
+              isReadingFluency: true,
+              generatedLine: workingSentence,
+              transcript: completeWord,
+              accuracy: typeof fluencyAccuracy === 'number' ? Math.round(fluencyAccuracy * 100) / 100 : undefined
+            } : undefined
           ).then(() => {
            // console.log('[SpellboxLogs] ✅ Successfully logged attempt');
           }).catch((error) => {
@@ -1340,11 +1416,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   if (!isVisible || !targetWord) return null;
 
   // Derived UI states for chevron transparency/disabled behavior
-  const hasAnyInput = isReading
-    ? (lockedTranscript.trim().length > 0)
+  const hasAnyInput = (isReading || isReadingFluency)
+    ? ((lockedTranscript || liveTranscript || '').trim().length > 0)
     : (userAnswer || '').split('').some(ch => ch && ch !== ' ');
   const isSameAsLastSubmission = hasSubmitted && reconstructCompleteWord(userAnswer) === lastSubmittedAnswer;
-  const submitDisabledUnattempted = isReading
+  const submitDisabledUnattempted = (isReading || isReadingFluency)
     ? (!isCorrect && !hasAnyInput)
     : (!isCorrect && (!hasAnyInput || isSameAsLastSubmission));
   const nextGateDisabled = isCorrect && !canClickNext;
@@ -1707,8 +1783,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           }
                         })}
                         
-                        {/* Audio/Mic button - speaker for spelling, mic for reading */}
-                        {!isReading ? (
+                        {/* Audio/Mic button - speaker for spelling, mic for reading/fluency */}
+                        {!isReadingEffective ? (
                           <Button
                             id="spellbox-speaker-button"
                             variant="comic"
@@ -1790,7 +1866,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
-          {isReading && liveTranscript && (
+          {(isReading || isReadingFluency) && liveTranscript && (
             <div className="mt-3 text-sm text-center">
               <span className="opacity-60 mr-1">You said:</span>
               <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>{liveTranscript}</span>
@@ -1939,7 +2015,51 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             {workingSentence && (
               <div className="text-center">
                 <div className="text-base text-gray-800" style={{ lineHeight: 1.5 }}>
-                  {workingSentence.split(' ').map((word, idx) => {
+                  {isReadingFluency ? (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px', background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)', borderRadius: '10px', border: '2px solid hsl(var(--primary) / 0.30)', margin: '0 2px', position: 'relative', paddingBottom: showReadingTapHint ? '16px' : '6px' }}>
+                      <span className="inline-block" style={{ fontWeight: 600 }}>{workingSentence}</span>
+                      <ReadingMicButton 
+                        compact
+                        targetWord={targetWord}
+                        onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
+                        onRecordingChange={(rec, finalText) => {
+                          setIsRecordingReading(rec);
+                          if (!rec) {
+                            setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
+                            setHasSubmitted(false);
+                            setIsCorrect(false);
+                            setReadingMismatchedIndices([]);
+                          } else {
+                            setLockedTranscript('');
+                            setLiveTranscript('');
+                            setLiveTranscriptFinal(false);
+                            setHasSubmitted(false);
+                            setIsCorrect(false);
+                            setReadingMismatchedIndices([]);
+                          }
+                        }}
+                        onRecognized={() => {}}
+                      />
+                      {showReadingTapHint && (
+                        <div style={{
+                          position: 'absolute',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          bottom: '2px',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          color: 'hsl(var(--primary))',
+                          opacity: 0.95,
+                          pointerEvents: 'none',
+                          zIndex: 60,
+                          width: '100%',
+                          textAlign: 'center'
+                        }}>
+                          Tap to speak
+                        </div>
+                      )}
+                    </div>
+                  ) : workingSentence.split(' ').map((word, idx) => {
                     const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
                     const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');
                     const isTargetWord = normalizedWord === normalizedTarget || 
@@ -2061,8 +2181,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 );
                               }
                             })}
-                            {/* Inline mode: speaker for spelling, mic for reading */}
-                            {!isReading ? (
+                            {/* Inline mode: speaker for spelling, mic for reading/fluency */}
+                            {!isReadingEffective ? (
                               <Button
                                 variant="comic"
                                 size="icon"
@@ -2133,7 +2253,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     );
                   })}
                 </div>
-                {isReading && liveTranscript && (
+                {(isReading || isReadingFluency) && liveTranscript && (
                   <div className="mt-2 text-xs text-center">
                     <span className="opacity-60 mr-1">You said:</span>
                     <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>{liveTranscript}</span>

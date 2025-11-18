@@ -37,13 +37,13 @@ export const AVAILABLE_VOICES: Voice[] = [
     id: 'cgSgspJ2msm6clMCkdW9',
     name: 'Jessica',
     description: 'Warm and friendly tone, perfect for children',
-    previewText: "Hi there! I'm Jessica, and I love helping kids learn through stories and adventures. Let's explore together!"
+    previewText: "You're my favorite human, and I'll always stay by your side."
   },
   {
     id: 'ocZQ262SsZb9RIxcQBOj',
     name: 'Cat',
     description: 'Calm and curious, purrfect for gentle guidance',
-    previewText: "Meow! I'm a curious cat, here to guide you softly through new stories."
+    previewText: "I don't need treats… just stay close. That's enough."
   },
   // {
   //   id: 'mdzEgLpu0FjTwYs5oot0',
@@ -80,7 +80,49 @@ export const AVAILABLE_VOICES: Voice[] = [
     id: '7fbQ7yJuEo56rYjrYaEh',
     name: 'John Doe',
     description: 'Deep, mature voice perfect for audiobooks and storytelling',
-    previewText: "Hello there! I'm John Doe, and I bring stories to life with my deep, resonant voice. Let's dive into an amazing adventure together!"
+    previewText: "You're my favorite human, and I'll always stay by your side."
+  },
+  {
+    id: 'BlgEcC0TfWpBak7FmvHW',
+    name: 'Fena',
+    description: 'Amazing for parrots, unicorns, cats and other animal characters',
+    previewText: "If you feel sad, curl up with me — we'll be okay together."
+  },
+  {
+    id: 'Bj9UqZbhQsanLzgalpEG',
+    name: 'Austin',
+    description: 'Great for monkeys, pandas, wolves and other animal characters',
+    previewText: "You're my favorite human, and I'll always stay by your side."
+  },
+  {
+    id: 'DTKMou8ccj1ZaWGBiotd',
+    name: 'Jamahal',
+    description: 'Great for raccoons, pandas, monkeys and other animal characters',
+    previewText: "Adventure time! I packed… zero things. But I brought loyalty."
+  },
+  {
+    id: 'QzTKubutNn9TjrB7Xb2Q',
+    name: 'Jerry B.',
+    description: 'Great for wolves, dragons, dogs and other animal characters',
+    previewText: "If you feel sad, curl up with me — we'll be okay together."
+  },
+  {
+    id: 'piI8Kku0DcvcL6TTSeQt',
+    name: 'Flicker',
+    description: 'Great for unicorns, deer, pikachu and other animal characters',
+    previewText: "You're my favorite human, and I'll always stay by your side."
+  },
+  {
+    id: 'Z7RrOqZFTyLpIlzCgfsp',
+    name: 'Creature',
+    description: 'Great for labubu, fox, and other animal characters',
+    previewText: "Hey there! You're my favorite human... for now."
+  },
+  {
+    id: 'CeNX9CMwmxDxUF5Q2Inm',
+    name: 'Johny D.',
+    description: 'Great for raccoons, adults dogs, monkeys and other animal characters',
+    previewText: "Adventure time! I packed… zero things. But I brought loyalty."
   }
 ];
 

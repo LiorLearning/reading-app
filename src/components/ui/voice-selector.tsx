@@ -67,7 +67,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
           <Volume2 className="h-5 w-5" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-4 border border-white/40 bg-white/95 text-slate-900 rounded-2xl shadow-xl" align="end">
+      <PopoverContent className="w-80 p-4 border border-white/40 bg-white/95 text-slate-900 rounded-2xl shadow-xl max-h-[70vh] overflow-y-auto" align="end">
         <div className="space-y-3">
           <h3 className="font-semibold text-sm">Choose a Voice</h3>
           <div className="space-y-2">

@@ -4433,6 +4433,130 @@ FINAL REQUIREMENTS
   }
 
   /**
+   * Generate a decodable reading-fluency line that MUST include the target word.
+   * The line should respect the student's Reading_Mastered_Level and target line length.
+   * If AI is unavailable, fall back to Example_target_line or a simple template.
+   */
+  async generateReadingFluencyLine(params: {
+    targetWord: string;
+    topicToReinforce?: string;
+    readingMasteredLevel?: string;
+    targetLineLength?: string | number;
+    exampleTargetLine?: string;
+  }): Promise<string> {
+    const { targetWord, topicToReinforce, readingMasteredLevel, targetLineLength, exampleTargetLine } = params;
+    const fallback = () => {
+      if ((exampleTargetLine || '').toString().trim()) return (exampleTargetLine || '').toString().trim();
+      return `The ${targetWord.toLowerCase()} is on the mat.`; // safe simple fallback
+    };
+    if (!this.isInitialized || !this.client) return fallback();
+    try {
+      const sys = `You create one short decodable line for early readers. Requirements:
+- Include the target word exactly once in a natural way.
+- Keep vocabulary consistent with the provided reading mastery description.
+- Aim for ${String(targetLineLength || '5-10')} words total.
+- Keep it positive, concrete, and child-friendly.
+- Return ONLY the sentence text, no quotes, no extra symbols.`;
+      const user = `Target word: ${targetWord}
+Reading_Mastered_Level: ${readingMasteredLevel || 'Simple CVC words.'}
+Topic_to_reinforce: ${topicToReinforce || ''}
+Example_target_line: ${exampleTargetLine || ''}`;
+      const resp = await this.client.chat.completions.create({
+        model: 'gpt-4o-mini',
+        temperature: 0.3,
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: user }
+        ]
+      });
+      const raw = (resp.choices?.[0]?.message?.content || '').toString().trim();
+      const cleaned = raw.replace(/^["“”]+|["“”]+$/g, '').replace(/\s+/g, ' ').trim();
+      // Ensure target word is present; if not, append minimally
+      const norm = (s: string) => s.toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!norm(cleaned).split(' ').includes(norm(targetWord))) {
+        const appended = `${cleaned} ${targetWord}`.replace(/\s+/g, ' ');
+        return appended.trim();
+      }
+      return cleaned;
+    } catch {
+      return fallback();
+    }
+  }
+
+  /**
+   * Evaluate a student's fluency reading of a generated line.
+   * Returns pass/fail, accuracy (0..1), and mismatched word indices.
+   * Fallback uses token overlap; AI path may provide better alignment when available.
+   */
+  async evaluateReadingFluency(targetLine: string, studentTranscript: string, targetWord?: string): Promise<{
+    status: 'pass' | 'fail';
+    accuracy: number;
+    mismatchedWordIndices: number[];
+  }> {
+    const normalize = (s: string) => (s || '')
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const targetWords = normalize(targetLine).split(' ').filter(Boolean);
+    const saidWords = normalize(studentTranscript).split(' ').filter(Boolean);
+    const fallback = (): { status: 'pass' | 'fail'; accuracy: number; mismatchedWordIndices: number[] } => {
+      if (targetWords.length === 0) return { status: 'fail', accuracy: 0, mismatchedWordIndices: [] };
+      // Simple accuracy: proportion of target words that appear in order-insensitive manner
+      const saidSet = new Set(saidWords);
+      let matched = 0;
+      const mismatches: number[] = [];
+      targetWords.forEach((w, idx) => {
+        if (saidSet.has(w)) matched++; else mismatches.push(idx);
+      });
+      const accuracy = matched / targetWords.length;
+      const pass = accuracy >= 0.7 && (!targetWord || saidSet.has(normalize(targetWord)));
+      const status: 'pass' | 'fail' = pass ? 'pass' : 'fail';
+      return { status, accuracy, mismatchedWordIndices: status === 'pass' ? [] : mismatches };
+    };
+    if (!this.isInitialized || !this.client) return fallback();
+    try {
+      const sys = `You evaluate a child's oral reading of a short target sentence using PHONETICS (IPA/ARPAbet). Return minified JSON only:
+{"status":"pass"|"fail","accuracy":number,"mismatchedWordIndices":[number,...]}
+
+Rules:
+- Case- and punctuation-insensitive. Ignore punctuation and casing entirely.
+- Allow extra words, repetitions, hesitations, and self‑corrections. Insertions never penalize.
+- Build a left‑to‑right alignment of TARGET words to SAID tokens by best phonetic equality.
+- A target word is CORRECT if there exists at least one token in SAID (at or after its position) whose pronunciation equals the target word’s pronunciation (homophones count). If both wrong and correct versions appear, treat it as correct (self‑correction).
+- A target word is INCORRECT only if no phonetically equal token appears anywhere in SAID.
+- accuracy = (# correct target words) / (# target words). Clamp to [0,1], 2 decimals.
+- mismatchedWordIndices are 0‑based indices of TARGET words that were never pronounced correctly.
+- status = "pass" if accuracy == 1.0; otherwise "fail".
+- Output JSON only, no text.`;
+      const user = `TARGET: ${targetLine}
+SAID: ${studentTranscript}
+TARGET_WORD: ${targetWord || ''}`;
+      const resp = await this.client.chat.completions.create({
+        model: 'gpt-5.1',
+        temperature: 0,
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: user }
+        ]
+      });
+      const text = (resp.choices?.[0]?.message?.content || '').toString().trim();
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}');
+      if (jsonStart >= 0 && jsonEnd > jsonStart) {
+        const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+        const status = (parsed.status === 'pass' ? 'pass' : 'fail') as 'pass' | 'fail';
+        const accuracy = Math.max(0, Math.min(1, Number(parsed.accuracy) || 0));
+        const mismatchedWordIndices = Array.isArray(parsed.mismatchedWordIndices) ? parsed.mismatchedWordIndices.map((n: any) => Number(n) || 0) : [];
+        return { status, accuracy, mismatchedWordIndices };
+      }
+      return fallback();
+    } catch {
+      return fallback();
+    }
+  }
+
+  /**
    * Diagnose a student's spelling attempt with respect to a given rule.
    * Returns a concise pedagogical mistake description and whether it relates to the rule.
    */

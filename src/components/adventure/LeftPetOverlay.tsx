@@ -421,6 +421,12 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
 
       const wordToSpeak = spellInline?.word || '';
       const isReadingInline = !!(spellInline?.question?.isReading ?? spellInline?.isReading);
+      // Reading fluency: never speak the target line (no masking; complete silence)
+      const isReadingFluencyInline = !!(((spellInline as any)?.question?.isReadingFluency) ?? ((spellInline as any)?.isReadingFluency));
+      if (isReadingFluencyInline) {
+        // Explicitly do nothing for fluency lines
+        return;
+      }
       
       console.log('[Overlay][Speak] DEBUG inline question:', {
         hasInlineQuestion,
