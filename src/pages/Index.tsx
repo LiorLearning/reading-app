@@ -1963,6 +1963,58 @@ Keep tone warm, brief, and curious.`;
   const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion | null): Promise<AdventureResponse> => {
 
     try {
+      // Helper: parse fluency markers from AI message and strip them for display
+      const parseFluencyMarkers = (text: string | null | undefined): {
+        cleaned: string;
+        targetLine?: string;
+        targetWord?: string;
+        prefix?: string;
+        suffix?: string;
+      } => {
+        if (!text) return { cleaned: '' };
+        let cleaned = text;
+        let targetLine: string | undefined;
+        let targetWord: string | undefined;
+        let prefix: string | undefined;
+        let suffix: string | undefined;
+        try {
+          const lineMatch = cleaned.match(/(.*?)(<<target-line>>(.+?)<<\/target-line>>)(.*)$/s);
+          if (lineMatch && lineMatch[1]) {
+            const stripMarkers = (s?: string) => (s || '')
+              .replace(/\{\{tw\}\}/g, '')
+              .replace(/\{\{\/tw\}\}/g, '')
+              .replace(/<<target-line>>/g, '')
+              .replace(/<<\/target-line>>/g, '')
+              .trim();
+            prefix = stripMarkers(lineMatch[1]);
+            const fullMarked = lineMatch[2] || '';
+            const rawLine = lineMatch[3] || '';
+            suffix = stripMarkers(lineMatch[4]);
+            const wordMatch = rawLine.match(/\{\{tw\}\}(.*?)\{\{\/tw\}\}/s);
+            if (wordMatch && wordMatch[1]) {
+              targetWord = (wordMatch[1] || '').trim();
+            }
+            // Strip word markers inside the line
+            const strippedLine = rawLine.replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim();
+            targetLine = strippedLine;
+            // Remove the full marked segment from cleaned text
+            cleaned = cleaned.replace(fullMarked, targetLine);
+          }
+          // Strip both line and word markers from the visible message
+          cleaned = cleaned
+            .replace(/<<target-line>>/g, '')
+            .replace(/<<?\/target-line>>/g, '')
+            .replace(/\{\{tw\}\}/g, '')
+            .replace(/\{\{\/tw\}\}/g, '');
+        } catch {}
+        try {
+          console.log('[FluencyParse] original:', (text || '').slice(0, 200));
+          console.log('[FluencyParse] cleaned:', (cleaned || '').slice(0, 200));
+          console.log('[FluencyParse] targetLine:', targetLine, 'targetWord:', targetWord, 'prefix:', prefix, 'suffix:', suffix);
+        } catch {}
+        return { cleaned: (cleaned || '').trim(), targetLine, targetWord, prefix, suffix };
+      };
+
       // Load current chat summary from session (if available)
       let currentSummary: string | undefined = undefined;
       if (currentSessionId) {
@@ -1985,11 +2037,45 @@ Keep tone warm, brief, and curious.`;
       
       // console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType, adventureType: currentAdventureType });
       
-      const result = await aiService.generateResponse(
+      // Augment userData with reading-fluency config when applicable
+      const augmentedUserData = (() => {
+        const q: any = spellingQuestion as any;
+        const isFluency = !!q?.isReadingFluency;
+        if (!isFluency) {
+          // Ensure username is present to satisfy type
+          return userData ? { username: userData.username || 'adventurer', ...userData } : { username: 'adventurer' };
+        }
+        const aiTutor = (q?.aiTutor || {}) as any;
+        // Parse a min–max words range like "3–7" or "3-7 words"
+        const parseRange = (s?: string): { min?: number; max?: number } => {
+          if (!s || typeof s !== 'string') return {};
+          const m = s.match(/(\d+)\s*[–-]\s*(\d+)/);
+          if (m) return { min: Number(m[1]), max: Number(m[2]) };
+          const n = s.match(/(\d+)/g);
+          if (n && n.length >= 2) return { min: Number(n[0]), max: Number(n[1]) };
+          if (n && n.length === 1) return { min: Number(n[0]) };
+          return {};
+        };
+        const { min, max } = parseRange(aiTutor?.Target_line_length);
+        const readingFluency = {
+          enabled: true,
+          gradeLevel: userData?.gradeDisplayName || userData?.grade || undefined,
+          ruleName: undefined, // optional; rule description not always available in bank
+          allowedTargetWords: q?.word ? [q.word] : undefined,
+          excludeWords: undefined, // optional; can be supplied if tracked
+          masteredReadingLevel: aiTutor?.Reading_Mastered_Level,
+          exampleTargetLine: aiTutor?.Example_target_line,
+          targetLineMinWords: typeof min === 'number' ? min : 3,
+          targetLineMaxWords: typeof max === 'number' ? max : 7,
+        };
+        return { username: userData?.username || 'adventurer', ...(userData || {}), readingFluency };
+      })();
+
+      let result = await aiService.generateResponse(
         userText, 
         messageHistory, 
         spellingQuestion, 
-        userData,
+        augmentedUserData,
         undefined, // adventureState
         undefined, // currentAdventure  
         undefined, // storyEventsContext
@@ -1999,6 +2085,35 @@ Keep tone warm, brief, and curious.`;
         currentAdventureType // adventureType - now dynamic!
       );
       
+      // If this is a reading-fluency question, try to extract the target line from the AI message
+      const isReadingFluency = !!((spellingQuestion as any)?.isReadingFluency);
+      if (isReadingFluency && result?.adventure_story) {
+        const parsed = parseFluencyMarkers(result.adventure_story);
+        // Use parsed cleaned message for bubble
+        {
+          const newResult: any = {
+            ...result,
+            adventure_story: parsed.cleaned || result.adventure_story,
+            // Provide the extracted target line so the inline SpellBox can show it
+            spelling_sentence: parsed.targetLine || result.spelling_sentence || null,
+          };
+          // Also carry prefix/suffix for inline behavior
+          newResult.fluency_prefix = parsed.prefix;
+          newResult.fluency_suffix = parsed.suffix;
+          result = newResult;
+        }
+        try {
+          console.log('[FluencyParse] Applied to result:', {
+            adventure_story_first200: (result.adventure_story || '').slice(0, 200),
+            spelling_sentence: result.spelling_sentence,
+            fluency_prefix: (result as any)?.fluency_prefix,
+            fluency_suffix: (result as any)?.fluency_suffix,
+          });
+        } catch {}
+        // Optionally: we could also verify parsed.targetWord === spellingQuestion.word
+        // and log discrepancies for debugging.
+      }
+
       // console.log('✅ AI service returned:', result);
       return result;
     } catch (error) {
@@ -2704,6 +2819,8 @@ Keep tone warm, brief, and curious.`;
             spelling_word: spellingQuestion.audio,
             spelling_sentence: aiResponse.spelling_sentence,
             content_after_spelling: contentAfterSpelling, // Always present: AI story or synthesized fallback
+            fluency_prefix: (aiResponse as any)?.fluency_prefix,
+            fluency_suffix: (aiResponse as any)?.fluency_suffix,
             hiddenInChat: true
           };
           
@@ -2718,7 +2835,21 @@ Keep tone warm, brief, and curious.`;
               (spellingQuestion as any)?.id ?? null
             );
             const targetWordForMask = (spellingQuestion as any)?.audio || (spellingQuestion as any)?.word || '';
-            if ((spellingQuestion as any)?.isReading) {
+            const isReading = !!(spellingQuestion as any)?.isReading;
+            const isReadingFluency = !!(spellingQuestion as any)?.isReadingFluency;
+            // For reading-fluency items, speak only the prefix before the target line
+            if (isReadingFluency) {
+              const prefix = (aiResponse as any)?.fluency_prefix || '';
+              if (prefix && String(prefix).trim().length > 0) {
+                ttsService.speak(String(prefix), {
+                  stability: 0.7,
+                  similarity_boost: 0.9,
+                  messageId,
+                }).catch(error => {
+                  console.error('TTS error for fluency prefix:', error);
+                });
+              }
+            } else if (isReading) {
               ttsService.speakWithPauseAtWord(spellingSentenceMessage.content, targetWordForMask, {
                 stability: 0.7,
                 similarity_boost: 0.9,
@@ -6534,7 +6665,8 @@ Keep tone warm, brief, and curious.`;
                             show: !lessonEnabled && (showSpellBox && !!currentSpellQuestion),
                             word: overlayWord,
                             sentence: overlaySentence,
-                            question: currentSpellQuestion ? {
+                            prefix: (lastAi as any)?.fluency_prefix || null,
+                            question: currentSpellQuestion ? ({
                               id: currentSpellQuestion.id,
                               word: currentSpellQuestion.word,
                               questionText: currentSpellQuestion.questionText || '',
@@ -6548,7 +6680,7 @@ Keep tone warm, brief, and curious.`;
                               // Pass through reading fluency flag to SpellBox
                               isReadingFluency: (currentSpellQuestion as any)?.isReadingFluency,
                               aiTutor: (currentSpellQuestion as any)?.aiTutor,
-                            } : null,
+                            } as any) : null,
                             showHints: true,
                             showExplanation: true,
                             onComplete: handleSpellComplete,

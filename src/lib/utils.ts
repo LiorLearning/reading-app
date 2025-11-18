@@ -19,6 +19,9 @@ export interface ChatMessage {
   spelling_sentence?: string;
   spelling_word?: string;
   content_after_spelling?: string;
+  // Reading fluency support: parts around the target line
+  fluency_prefix?: string;
+  fluency_suffix?: string;
   hiddenInChat?: boolean;
 }
 

@@ -22,6 +22,8 @@ interface LeftPetOverlayProps {
   spellInline?: {
     word?: string | null;
     sentence?: string | null;
+    /** Optional prefix text that appears before the target line for fluency */
+    prefix?: string | null;
     question?: {
       id: number;
       word: string;
@@ -30,6 +32,8 @@ interface LeftPetOverlayProps {
       audio: string;
       explanation: string;
       isReading?: boolean;
+      /** When true, this is a reading fluency item (dynamic line generation) */
+      isReadingFluency?: boolean;
       isPrefilled?: boolean;
       prefilledIndexes?: number[];
       topicId?: string; // Added for logging
@@ -424,7 +428,22 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       // Reading fluency: never speak the target line (no masking; complete silence)
       const isReadingFluencyInline = !!(((spellInline as any)?.question?.isReadingFluency) ?? ((spellInline as any)?.isReadingFluency));
       if (isReadingFluencyInline) {
-        // Explicitly do nothing for fluency lines
+        // For reading fluency: speak only the prefix if present, never the target line
+        const fluencyPrefix = (spellInline as any)?.prefix || '';
+        if (fluencyPrefix && String(fluencyPrefix).trim().length > 0) {
+          try { if (ttsService.isNonKraftySuppressed()) return; } catch {}
+          isSpeakingRef.current = true;
+          try {
+            await ttsService.speak(String(fluencyPrefix), {
+              stability: 0.7,
+              similarity_boost: 0.9,
+              messageId: currentMessageIdRef.current,
+              voice: jessicaVoiceId,
+            });
+          } finally {
+            isSpeakingRef.current = false;
+          }
+        }
         return;
       }
       
@@ -631,6 +650,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                         isVisible={true}
                         word={spellInline.word || undefined}
                         sentence={spellInline.sentence || undefined}
+                        prefix={spellInline.prefix || undefined}
                         question={spellInline.question || undefined}
                         onComplete={spellInline.onComplete}
                         onSkip={spellInline.onSkip}

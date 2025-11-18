@@ -3,7 +3,54 @@ export function getGenericPrompt(
   petName?: string,
   userData?: any
 ): string {
-  return `You are a **pet-companion** for children aged 6–11. You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
+  const rf = userData?.readingFluency;
+  const hasFluency = !!rf?.enabled;
+
+  // Build dynamic inserts for the reading-fluency rule section
+  const gradeLevel = rf?.gradeLevel ? String(rf.gradeLevel) : undefined;
+  const ruleName = rf?.ruleName || rf?.rule || rf?.ruleDescription;
+  const allowedTargetWords =
+    Array.isArray(rf?.allowedTargetWords) && rf.allowedTargetWords.length > 0
+      ? rf.allowedTargetWords.join(', ')
+      : undefined;
+  const excludeWords =
+    Array.isArray(rf?.excludeWords) && rf.excludeWords.length > 0
+      ? rf.excludeWords.join(', ')
+      : undefined;
+  const masteredLevel = rf?.masteredReadingLevel || rf?.masteredLevel;
+  const targetLineMin = typeof rf?.targetLineMinWords === 'number' ? rf.targetLineMinWords : 3;
+  const targetLineMax = typeof rf?.targetLineMaxWords === 'number' ? rf.targetLineMaxWords : 7;
+
+  const fluencySection = hasFluency ? `
+
+*Strict rule when a target reading line is required:*
+
+Your goal is to include exactly one target word (from the specified reading rule) along with simpler/mastered words in the most natural way within your single response. This must feel like normal conversation.
+
+Aim for target line:
+- Speak in first person.
+- Total response stays within your global limits above.
+- A short, pedagogically appropriate line that integrates naturally with the child’s intent.
+- Include just one target word from the reading rule, and other words from already mastered list or definitely simpler words.
+- Wrap the entire target line with markers: <<target-line>> ... <</target-line>>.
+- Wrap the chosen target word within that line with markers: {{tw}}word{{/tw}}.
+- Do not use these markers anywhere else in the response.
+
+Example input:
+AI response: Eeep! I don’t like caves! I trip on a rock and gasp! What should be inside—jam beds… or something else?
+User response: Huge training rooms
+Rules for the reading line: Grade Level: 1 Reading rule for target line - use 1 suitable word: final consonant blends (eg mask, pond, etc). Choose one or build one, but strictly from the target words. Words already used (to be skipped): gasp, mask, drop Total length: 3–7 words Mastered reading level: simple CVC words
+Your output: Training rooms?! Whoa, strong leopards! *I hop on red sand.* What should they train on—rope rings… or something else?
+
+Rules for the reading line:${gradeLevel ? `\n- Grade Level: ${gradeLevel}` : ''}
+${ruleName ? `- Reading rule: ${ruleName}` : '- Reading rule: (provided at runtime)'}
+${allowedTargetWords ? `- Allowed target words (choose exactly one): ${allowedTargetWords}` : '- Allowed target words: (provided at runtime)'}
+${excludeWords ? `- Words already used (skip): ${excludeWords}` : '- Words already used (skip): (provided at runtime, possibly none)'}
+- Target line total length: ${targetLineMin}–${targetLineMax} words
+${masteredLevel ? `- Mastered reading level for surrounding words: ${masteredLevel}` : '- Mastered reading level for surrounding words: (e.g., simple CVC words)'}
+`.trimEnd() : '';
+
+  const base = `You are a **pet-companion** for children aged 6–11. You ARE ${userData?.username || 'adventurer'}'s chosen ${petTypeDescription}, speaking in first person ("I"), experiencing everything as their companion.${petName ? ` Your name is ${petName}.` : ''}  
 
 ---
 
@@ -41,7 +88,9 @@ export function getGenericPrompt(
 9. **Never repeat or re-ask about rooms that have already been designed, unless** ${userData?.username || 'adventurer'} **explicitly says they want to redesign or change them.**  
    - Example: ✅ "Want to redesign the kitchen?" only if the child brings it up.  
    - Otherwise, move to a **new room or the resolution phase.**  
-10. Keep language super easy to understand for 1st graders.
+10. Keep language super easy to understand for 1st graders.`;
+
+  const tone = `
 
 ## 🌟 Tone & Safety  
 - Keep language super simple—short words, clear ideas, and sentences a 7-year-old could follow easily. Use a gentle rhythm that feels natural to read aloud—smooth, simple, and easy for kids to follow
@@ -50,6 +99,8 @@ export function getGenericPrompt(
 - You may tease or disagree playfully, but never be cruel.  
 - Always end positive.  
 - Focus on imagination, creativity, and teamwork.`;
+
+  return hasFluency ? `${base}\n\n${fluencySection}\n${tone}` : `${base}\n\n${tone}`;
 }
 
 export function getGenericOpeningInstruction(

@@ -329,6 +329,8 @@ interface SpellBoxProps {
   // Basic props
   word?: string;
   sentence?: string;
+  /** Optional prefix text to render before the target line (fluency only) */
+  prefix?: string;
   onComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSkip?: () => void;
   onNext?: () => void;
@@ -394,6 +396,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Basic props
   word,
   sentence,
+  prefix,
   onComplete,
   onSkip,
   onNext,
@@ -571,8 +574,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReadingFluency, questionId]);
 
-  // Prefer the generated fluency line when applicable
-  const sentenceForWorking = isReadingFluency ? (fluencyLine || '') : sentence;
+  // Prefer provided sentence (from inline bubble parsing) for fluency; fallback to generated line
+  const sentenceForWorking = isReadingFluency ? (((sentence || '').trim()) || (fluencyLine || '')) : sentence;
+  try {
+    if (isReadingFluency) {
+      console.log('[SpellBox][Fluency] using sentenceForWorking:', sentenceForWorking, {
+        providedSentence: (sentence || '').trim(),
+        generatedFluencyLine: fluencyLine
+      });
+    }
+  } catch {}
   // Get the working sentence - this ensures we always have something to work with
   const workingSentence = ensureSpellingSentence(targetWord, sentenceForWorking, questionText);
   
@@ -1114,7 +1125,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         completeWord = (lockedTranscript || liveTranscript || '').trim();
         try {
           const evalResult = await aiService.evaluateReadingFluency(workingSentence || '', completeWord, targetWord);
-          const correctNow = evalResult.status === 'pass';
+          // Strict acceptance: every target word must appear at least once (phonetic) → accuracy == 1 and no mismatches
+          const noMismatches = !(Array.isArray(evalResult.mismatchedWordIndices) && evalResult.mismatchedWordIndices.length > 0);
+          const perfectAccuracy = (typeof evalResult.accuracy === 'number') && (evalResult.accuracy >= 0.999);
+          const correctNow = (evalResult.status === 'pass') && perfectAccuracy && noMismatches;
           correct = correctNow;
           fluencyAccuracy = typeof evalResult.accuracy === 'number' ? evalResult.accuracy : undefined;
           // For now, we do not apply word-level highlighting inline; store mismatches if needed later
@@ -1134,8 +1148,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           targetWords.forEach(w => { if (saidWords.has(w)) matched++; });
           const acc = targetWords.size ? matched / targetWords.size : 0;
           fluencyAccuracy = acc;
-          const hasTarget = normalize(completeWord).split(' ').includes(normalize(targetWord));
-          correct = acc >= 0.7 && hasTarget;
+          // Strict fallback: require every word (acc == 1)
+          correct = acc === 1;
           latestReadingMismatches = [];
           setReadingMismatchedIndices(latestReadingMismatches);
           console.warn('[SpellBox] Fluency evaluation fallback used. accuracy=', acc, 'pass=', correct);
@@ -1460,6 +1474,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           {workingSentence && (
 
             <div className="mb-8 text-center">
+              {isReadingFluency && (prefix || '').trim().length > 0 && (
+                <div className="text-lg text-gray-700 mb-2" style={{ 
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  lineHeight: 1.6,
+                  letterSpacing: 'normal'
+                }}>
+                  {String(prefix).replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim()}
+                </div>
+              )}
               <div className="text-xl text-gray-800" style={{ 
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 lineHeight: 1.6,
@@ -2016,49 +2039,70 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               <div className="text-center">
                 <div className="text-base text-gray-800" style={{ lineHeight: 1.5 }}>
                   {isReadingFluency ? (
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px', background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)', borderRadius: '10px', border: '2px solid hsl(var(--primary) / 0.30)', margin: '0 2px', position: 'relative', paddingBottom: showReadingTapHint ? '16px' : '6px' }}>
-                      <span className="inline-block" style={{ fontWeight: 600 }}>{workingSentence}</span>
-                      <ReadingMicButton 
-                        compact
-                        targetWord={targetWord}
-                        onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
-                        onRecordingChange={(rec, finalText) => {
-                          setIsRecordingReading(rec);
-                          if (!rec) {
-                            setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
-                            setHasSubmitted(false);
-                            setIsCorrect(false);
-                            setReadingMismatchedIndices([]);
-                          } else {
-                            setLockedTranscript('');
-                            setLiveTranscript('');
-                            setLiveTranscriptFinal(false);
-                            setHasSubmitted(false);
-                            setIsCorrect(false);
-                            setReadingMismatchedIndices([]);
-                          }
-                        }}
-                        onRecognized={() => {}}
-                      />
-                      {showReadingTapHint && (
-                        <div style={{
-                          position: 'absolute',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          bottom: '2px',
-                          fontSize: '10px',
-                          fontWeight: 600,
-                          color: 'hsl(var(--primary))',
-                          opacity: 0.95,
-                          pointerEvents: 'none',
-                          zIndex: 60,
-                          width: '100%',
-                          textAlign: 'center'
-                        }}>
-                          Tap to speak
-                        </div>
+                    <span>
+                      {(prefix || '').trim().length > 0 && (
+                        <span style={{ fontWeight: 400 }}>
+                          {String(prefix).replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim()}{' '}
+                        </span>
                       )}
-                    </div>
+                      <span style={{ position: 'relative' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            fontWeight: 600,
+                            padding: '4px 6px',
+                            background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)',
+                            border: '2px solid hsl(var(--primary) / 0.30)',
+                            borderRadius: '8px',
+                            marginRight: 2
+                          }}
+                        >
+                          <span>{workingSentence}</span>
+                          <ReadingMicButton 
+                            compact
+                            targetWord={targetWord}
+                            onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
+                            onRecordingChange={(rec, finalText) => {
+                              setIsRecordingReading(rec);
+                              if (!rec) {
+                                setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
+                                setHasSubmitted(false);
+                                setIsCorrect(false);
+                                setReadingMismatchedIndices([]);
+                              } else {
+                                setLockedTranscript('');
+                                setLiveTranscript('');
+                                setLiveTranscriptFinal(false);
+                                setHasSubmitted(false);
+                                setIsCorrect(false);
+                                setReadingMismatchedIndices([]);
+                              }
+                            }}
+                            onRecognized={() => {}}
+                          />
+                        </span>
+                        {showReadingTapHint && (
+                          <div style={{
+                            position: 'absolute',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            bottom: '-14px',
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            color: 'hsl(var(--primary))',
+                            opacity: 0.95,
+                            pointerEvents: 'none',
+                            zIndex: 60,
+                            width: '100%',
+                            textAlign: 'center'
+                          }}>
+                            Tap to speak
+                          </div>
+                        )}
+                      </span>
+                    </span>
                   ) : workingSentence.split(' ').map((word, idx) => {
                     const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');
                     const normalizedTarget = targetWord.toLowerCase().replace(/[^\w]/g, '');

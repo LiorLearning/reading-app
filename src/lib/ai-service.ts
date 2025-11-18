@@ -2068,6 +2068,18 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
           adventureState
         );
 
+    try {
+      const rfEnabled = !!(userData as any)?.readingFluency?.enabled;
+      console.log('[AIService][buildChatContext] Fluency enabled:', rfEnabled, rfEnabled ? {
+        gradeLevel: (userData as any)?.readingFluency?.gradeLevel,
+        masteredReadingLevel: (userData as any)?.readingFluency?.masteredReadingLevel,
+        targetLineMinWords: (userData as any)?.readingFluency?.targetLineMinWords,
+        targetLineMaxWords: (userData as any)?.readingFluency?.targetLineMaxWords,
+        allowedTargetWordsCount: Array.isArray((userData as any)?.readingFluency?.allowedTargetWords) ? (userData as any)?.readingFluency?.allowedTargetWords.length : 0,
+      } : null);
+      console.log('[AIService][buildChatContext] System prompt (first 500 chars):', (systemPrompt || '').slice(0, 500));
+    } catch {}
+
 
     const systemMessage = {
       role: "system",
@@ -4502,7 +4514,7 @@ Example_target_line: ${exampleTargetLine || ''}`;
     const saidWords = normalize(studentTranscript).split(' ').filter(Boolean);
     const fallback = (): { status: 'pass' | 'fail'; accuracy: number; mismatchedWordIndices: number[] } => {
       if (targetWords.length === 0) return { status: 'fail', accuracy: 0, mismatchedWordIndices: [] };
-      // Simple accuracy: proportion of target words that appear in order-insensitive manner
+      // Strict lexical fallback: require every target word be present at least once (insertions ignored).
       const saidSet = new Set(saidWords);
       let matched = 0;
       const mismatches: number[] = [];
@@ -4510,9 +4522,9 @@ Example_target_line: ${exampleTargetLine || ''}`;
         if (saidSet.has(w)) matched++; else mismatches.push(idx);
       });
       const accuracy = matched / targetWords.length;
-      const pass = accuracy >= 0.7 && (!targetWord || saidSet.has(normalize(targetWord)));
-      const status: 'pass' | 'fail' = pass ? 'pass' : 'fail';
-      return { status, accuracy, mismatchedWordIndices: status === 'pass' ? [] : mismatches };
+      const passAll = accuracy === 1;
+      const status: 'pass' | 'fail' = passAll ? 'pass' : 'fail';
+      return { status, accuracy, mismatchedWordIndices: passAll ? [] : mismatches };
     };
     if (!this.isInitialized || !this.client) return fallback();
     try {
