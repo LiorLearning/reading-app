@@ -126,6 +126,24 @@ export const AVAILABLE_VOICES: Voice[] = [
   }
 ];
 
+// Fallback and pet default mapping
+const JESSICA_VOICE = AVAILABLE_VOICES.find(v => v.name === 'Jessica');
+const JESSICA_VOICE_ID = JESSICA_VOICE ? JESSICA_VOICE.id : 'cgSgspJ2msm6clMCkdW9';
+const PET_DEFAULT_VOICE_ID: Record<string, string> = {
+  raccoon: 'CeNX9CMwmxDxUF5Q2Inm', // Johny D.
+  panda: 'DTKMou8ccj1ZaWGBiotd', // Jamahal
+  unicorn: 'piI8Kku0DcvcL6TTSeQt', // Flicker
+  pikachu: 'piI8Kku0DcvcL6TTSeQt', // Flicker
+  hamster: 'piI8Kku0DcvcL6TTSeQt', // Flicker
+  monkey: 'QzTKubutNn9TjrB7Xb2Q', // Jerry B.
+  wolf: 'Bj9UqZbhQsanLzgalpEG', // Austin
+  parrot: 'BlgEcC0TfWpBak7FmvHW', // Fena
+  deer: 'BlgEcC0TfWpBak7FmvHW', // Fena
+  dragon: '7fbQ7yJuEo56rYjrYaEh', // John Doe
+  cat: 'ocZQ262SsZb9RIxcQBOj', // Cat
+  dog: 'cgSgspJ2msm6clMCkdW9', // Jessica
+};
+
 // Kept for backward compatibility but no longer used for selection
 const SELECTED_VOICE_KEY = 'reading_app_selected_voice';
 const SELECTED_SPEED_KEY = 'reading_app_voice_speed';
@@ -198,20 +216,14 @@ class TextToSpeechService {
     // Pet default mapping
     try {
       const currentPetId = PetProgressStorage.getCurrentSelectedPet();
-      const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-        dog: 'cgSgspJ2msm6clMCkdW9',
-        cat: 'ocZQ262SsZb9RIxcQBOj',
-        hamster: 'ocZQ262SsZb9RIxcQBOj',
-      };
       const defaultVoiceId = currentPetId ? PET_DEFAULT_VOICE_ID[currentPetId] : undefined;
-      if (defaultVoiceId) {
-        const petDefault = AVAILABLE_VOICES.find(v => v.id === defaultVoiceId);
-        if (petDefault) return petDefault;
-      }
+      const candidateId = defaultVoiceId || JESSICA_VOICE_ID;
+      const petDefault = AVAILABLE_VOICES.find(v => v.id === candidateId);
+      if (petDefault) return petDefault;
     } catch {}
 
-    // Fallback to first voice in the list
-    return AVAILABLE_VOICES[0];
+    // Fallback to Jessica (or first voice if unavailable)
+    return JESSICA_VOICE || AVAILABLE_VOICES[0];
   }
 
   private loadSelectedSpeed(): number {
@@ -260,14 +272,11 @@ class TextToSpeechService {
           if (v) return v;
         }
         // Fall back to pet default mapping
-        const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-          dog: 'cgSgspJ2msm6clMCkdW9',
-          cat: 'ocZQ262SsZb9RIxcQBOj',
-          hamster: 'ocZQ262SsZb9RIxcQBOj',
-        };
         const defaultVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
-        const petDefault = AVAILABLE_VOICES.find(v => v.id === defaultVoiceId);
+        const candidateId = defaultVoiceId || JESSICA_VOICE_ID;
+        const petDefault = AVAILABLE_VOICES.find(v => v.id === candidateId);
         if (petDefault) return petDefault;
+        if (JESSICA_VOICE) return JESSICA_VOICE;
       }
     } catch {}
     return this.selectedVoice;
@@ -406,11 +415,6 @@ class TextToSpeechService {
               if (preferred) {
                 resolvedVoiceId = preferred;
               } else {
-                const PET_DEFAULT_VOICE_ID: Record<string, string> = {
-                  dog: 'cgSgspJ2msm6clMCkdW9',
-                  cat: 'ocZQ262SsZb9RIxcQBOj',
-                  hamster: 'ocZQ262SsZb9RIxcQBOj',
-                };
                 resolvedVoiceId = PET_DEFAULT_VOICE_ID[currentPetId];
               }
             }
@@ -422,21 +426,47 @@ class TextToSpeechService {
         }
       }
 
-      const voiceId = resolvedVoiceId as string;
+      // Ensure resolved voice exists, else fallback to Jessica
+      if (!AVAILABLE_VOICES.some(v => v.id === resolvedVoiceId)) {
+        resolvedVoiceId = JESSICA_VOICE_ID;
+      }
+      let voiceId = resolvedVoiceId as string;
 
       // Generate audio using selected voice
-      const audioStream = await this.client.textToSpeech.convert(
-        voiceId,  // First parameter: voice ID as string
-        {         // Second parameter: options object
-          text: cleanText,
-          modelId: options?.model || 'eleven_flash_v2_5',
-          voiceSettings: {
-            stability: options?.stability || 0.5,
-            similarityBoost: options?.similarity_boost || 0.75,
-            speed: options?.speed || this.selectedSpeed,
-          },
+      let audioStream;
+      try {
+        audioStream = await this.client.textToSpeech.convert(
+          voiceId,
+          {
+            text: cleanText,
+            modelId: options?.model || 'eleven_flash_v2_5',
+            voiceSettings: {
+              stability: options?.stability || 0.5,
+              similarityBoost: options?.similarity_boost || 0.75,
+              speed: options?.speed || this.selectedSpeed,
+            },
+          }
+        );
+      } catch (e) {
+        // Retry once with Jessica as a final fallback
+        if (voiceId !== JESSICA_VOICE_ID) {
+          voiceId = JESSICA_VOICE_ID;
+          audioStream = await this.client.textToSpeech.convert(
+            voiceId,
+            {
+              text: cleanText,
+              modelId: options?.model || 'eleven_flash_v2_5',
+              voiceSettings: {
+                stability: options?.stability || 0.5,
+                similarityBoost: options?.similarity_boost || 0.75,
+                speed: options?.speed || this.selectedSpeed,
+              },
+            }
+          );
+        } else {
+          throw e;
         }
-      );
+      }
 
       // Convert the stream to audio blob
       const chunks: BlobPart[] = [];
