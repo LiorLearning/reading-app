@@ -19,12 +19,66 @@ interface WordPart {
   answer?: string;
 }
 
+// Small circular accuracy meter used for reading pronunciation score
+const AccuracyCircle: React.FC<{ score: number; size?: number }> = ({ score, size = 32 }) => {
+  const clamped = Math.max(0, Math.min(100, score));
+  const radius = (size - 6) / 2; // leave padding for stroke
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - clamped / 100);
+
+  let strokeColor = 'stroke-green-500';
+  if (clamped < 40) {
+    strokeColor = 'stroke-red-500';
+  } else if (clamped < 70) {
+    strokeColor = 'stroke-yellow-400';
+  }
+
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+      aria-label={`Accuracy ${Math.round(clamped)}%`}
+    >
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          className="text-slate-200"
+          stroke="currentColor"
+          strokeWidth={4}
+          fill="transparent"
+          r={radius}
+          cx={size / 2}
+          cy={size / 2}
+        />
+        <circle
+          className={strokeColor}
+          stroke="currentColor"
+          strokeWidth={4}
+          strokeLinecap="round"
+          fill="transparent"
+          r={radius}
+          cx={size / 2}
+          cy={size / 2}
+          style={{
+            strokeDasharray: `${circumference} ${circumference}`,
+            strokeDashoffset: offset,
+            transition: 'stroke-dashoffset 0.4s ease, stroke 0.3s ease',
+          }}
+        />
+      </svg>
+      <span className="absolute text-[10px] font-extrabold text-slate-900">
+        {Math.round(clamped)}%
+      </span>
+    </div>
+  );
+};
+
 // Lightweight mic button using the browser Web Speech API (easiest path for dev testing)
 const ReadingMicButton: React.FC<{
   targetWord: string;
   onRecognized: (isCorrect: boolean) => void;
   onTranscript?: (text: string, isFinal: boolean) => void;
-  onRecordingChange?: (isRecording: boolean, finalText?: string) => void;
+  // second arg may be a plain string (backwards compatible) or an object with Azure meta
+  onRecordingChange?: (isRecording: boolean, final?: string | { text?: string; accuracyScore?: number }) => void;
   compact?: boolean;
 }> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact }) => {
   const [isRecording, setIsRecording] = React.useState(false);
@@ -166,26 +220,64 @@ const ReadingMicButton: React.FC<{
             const usedSampleRate = ctx?.sampleRate || 16000;
             const wavBlob = encodeWavFromPCM(chunks, usedSampleRate);
             const file = new File([wavBlob], 'speech.wav', { type: 'audio/wav' });
+            const base = backendBaseUrl || '';
+            const azureUrl = `${base}/api/azure/pronunciation`;
+
+            // Kick off Azure pronunciation + Whisper v3 Turbo transcription in parallel
+            const [azureJson, whisperJson] = await Promise.all([
+              (async () => {
+                try {
             const fd = new FormData();
             fd.append('file', file);
             fd.append('reference_text', targetWord);
             fd.append('language', 'en-US');
-            const base = backendBaseUrl || '';
-            const url = `${base}/api/azure/pronunciation`;
-            const resp = await fetch(url, { method: 'POST', body: fd });
-            const json: any = await resp.json().catch(() => ({}));
-            const text = (json?.text || '').toString();
+                  const resp = await fetch(azureUrl, { method: 'POST', body: fd });
+                  return await resp.json().catch(() => ({}));
+                } catch (err) {
+                  console.error('[ReadingMic] Azure pronunciation request failed:', err);
+                  return {};
+                }
+              })(),
+              (async () => {
+                try {
+                  const fd = new FormData();
+                  fd.append('file', file);
+                  // model/language optional; backend has sane defaults
+                  fd.append('model', 'whisper-v3-turbo');
+                  fd.append('language', 'en');
+                  const fwUrl = `${base}/api/fireworks/transcribe`;
+                  const resp = await fetch(fwUrl, { method: 'POST', body: fd });
+                  return await resp.json().catch(() => ({}));
+                } catch (err) {
+                  console.error('[ReadingMic] Fireworks transcription (Azure path) failed:', err);
+                  return {};
+                }
+              })()
+            ]);
+
+            const accuracyScore = typeof (azureJson as any)?.accuracyScore === 'number'
+              ? (azureJson as any).accuracyScore
+              : null;
+            const azureText = (((azureJson as any)?.text || '') as string).toString();
+            const whisperText = (((whisperJson as any)?.text || '') as string).toString();
+            const text = (whisperText || azureText || '').toString();
+
             if (containsProfanity(text)) {
               toast.warning('Message is not safe, Please try again.', { duration: 6000 });
               return;
             }
             try { onTranscript?.(text, true); } catch {}
-            try { onRecordingChange?.(false, text); } catch {}
-            // Quick correctness hint based on transcript
+            try { onRecordingChange?.(false, { text, accuracyScore: accuracyScore ?? undefined }); } catch {}
+            // Quick correctness hint based on Azure accuracyScore when available,
+            // falling back to transcript-based heuristic when Azure isn't available.
             try {
+              if (typeof accuracyScore === 'number') {
+                onRecognized(accuracyScore >= 70);
+              } else {
               const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
               const words = new Set(norm(text).split(' ').filter(Boolean));
               if (words.has(norm(targetWord))) onRecognized(true);
+              }
             } catch {}
           } catch (e) {
             console.error('[ReadingMic] Azure pronunciation failed:', e);
@@ -283,10 +375,11 @@ const ReadingMicButton: React.FC<{
             const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
             const fd = new FormData();
             fd.append('file', file);
+            // model/language optional; backend has sane defaults
             fd.append('model', 'whisper-v3-turbo');
             fd.append('language', 'en');
             const base = backendBaseUrl || '';
-            const url = `https://api.readkraft.com/api/fireworks/transcribe`;
+            const url = `${base}/api/fireworks/transcribe`;
             const resp = await fetch(url, { method: 'POST', body: fd });
             const json: any = await resp.json().catch(() => ({}));
             const text = (json?.text || '').toString();
@@ -581,6 +674,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [lastSubmittedAnswer, setLastSubmittedAnswer] = useState<string>('');
   const [isEvaluating, setIsEvaluating] = useState(false);
+  // After an incorrect submit or hint tap, show a tiny "waiting for coach" loader
+  // beside the yellow bulb until the AI tutor starts speaking (or a short timeout).
+  const [isWaitingForCoach, setIsWaitingForCoach] = useState(false);
   
   // Get auth context for logging
   const { user, userData } = useAuth();
@@ -610,6 +706,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const questionId = question?.id;
   const isReading = !!question?.isReading;
   const showReadingTapHint = !!(isReading && Number(questionId) === 1);
+  const [showReadingMicGuide, setShowReadingMicGuide] = useState<boolean>(false);
   
   // Ensure we have a valid sentence for spelling - create fallback if needed
   const ensureSpellingSentence = useCallback((word: string, sentence?: string, questionText?: string): string => {
@@ -784,6 +881,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [readingMismatchedIndices, setReadingMismatchedIndices] = useState<number[]>([]);
   const [lastReadingDiagnosis, setLastReadingDiagnosis] = useState<{ mistake: string; reading_pattern_issue: 'yes' | 'no' } | null>(null);
   const [lastSpellingDiagnosis, setLastSpellingDiagnosis] = useState<{ mistake: string; spelling_pattern_issue: 'yes' | 'no' } | null>(null);
+  // Latest Azure pronunciation accuracyScore (if available) for the current attempt
+  const [lastAzureAccuracyScore, setLastAzureAccuracyScore] = useState<number | null>(null);
 
   // Helper function to get the expected length for user input (excluding prefilled characters)
   const getExpectedUserInputLength = useCallback((): number => {
@@ -972,6 +1071,37 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     return jessica?.id || 'cgSgspJ2msm6clMCkdW9';
   }, []);
 
+  // Gentle mic guide for the first reading question (id = 1)
+  useEffect(() => {
+    if (!showReadingTapHint) {
+      setShowReadingMicGuide(false);
+      return;
+    }
+
+    setShowReadingMicGuide(true);
+
+    try {
+      ttsService.stop();
+    } catch {}
+
+    const instructionText =
+      'Click on the mic button and speak the word once clearly and slowly.';
+
+    (async () => {
+      try {
+        await ttsService.speak(instructionText, {
+          messageId: 'reading-mic-guide',
+          voice: jessicaVoiceId,
+          stability: 0.7,
+          similarity_boost: 0.9,
+          speed: 0.85,
+        });
+      } catch (error) {
+        console.error('Reading mic guide TTS error:', error);
+      }
+    })();
+  }, [showReadingTapHint, jessicaVoiceId]);
+
   // Calculate speaker button position dynamically
   // const calculateSpeakerButtonPosition = useCallback(() => {
   //   const speakerButton = document.getElementById('spellbox-speaker-button');
@@ -1145,6 +1275,56 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     }
   }, [instructionMessageId]);
 
+  // When we're "waiting for coach", clear that state as soon as any TTS starts
+  // speaking (the next AI tutor response) or after a short safety timeout.
+  useEffect(() => {
+    if (!isWaitingForCoach) return;
+
+    let cancelled = false;
+
+    const handleSpeakingStateChange = () => {
+      if (cancelled) return;
+      try {
+        if (ttsService.getIsSpeaking()) {
+          setIsWaitingForCoach(false);
+        }
+      } catch {
+        // If TTS is unavailable, just fall through to timeout.
+      }
+    };
+
+    try {
+      ttsService.addSpeakingStateListener(handleSpeakingStateChange);
+    } catch {
+      // If listener registration fails, rely on timeout below.
+    }
+
+    // In case speech already started before we subscribed
+    try {
+      if (ttsService.getIsSpeaking()) {
+        setIsWaitingForCoach(false);
+      }
+    } catch {
+      // Ignore
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (!cancelled) {
+        setIsWaitingForCoach(false);
+      }
+    }, 12000); // 12s safety window so the spinner never gets stuck
+
+    return () => {
+      cancelled = true;
+      try {
+        ttsService.removeSpeakingStateListener(handleSpeakingStateChange);
+      } catch {
+        // Ignore cleanup failures
+      }
+      window.clearTimeout(timeoutId);
+    };
+  }, [isWaitingForCoach]);
+
   // Play word audio using ElevenLabs TTS
   const playWordAudio = useCallback(async () => {
     // console.log('🎵 SPELLBOX SPEAKER BUTTON: Click detected', {
@@ -1201,25 +1381,76 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     setIsCorrect(false);
   }, [isUserInputComplete]);
 
-  // Submit current attempt via chevron/Enter
-  const handleSubmitAttempt = useCallback(async () => {
-    // Enable submit once any letter is entered (non-space)
-    const canSubmit = isReading
-      ? ((lockedTranscript || '').trim().length > 0)
-      : (userAnswer || '').split('').some(ch => ch && ch !== ' ');
+  // Submit current attempt via chevron/Enter.
+  // For reading questions, an optional transcriptOverride lets us submit immediately
+  // using the just-finished recording, without waiting for state to update.
+  const handleSubmitAttempt = useCallback(async (transcriptOverride?: string, accuracyOverride?: number) => {
+    let canSubmit = false;
+    let readingTranscript: string | null = null;
+
     if (isReading) {
-      console.log('[SpellBox] Submit clicked (reading mode). lockedTranscript.len=', (lockedTranscript || '').length, 'liveTranscript.len=', (liveTranscript || '').length, 'canSubmit=', canSubmit);
+      const rawTranscript = (transcriptOverride ?? lockedTranscript ?? liveTranscript ?? '').trim();
+      readingTranscript = rawTranscript || null;
+      canSubmit = !!readingTranscript;
+      console.log(
+        '[SpellBox] Submit clicked (reading mode). transcript.len=',
+        (readingTranscript || '').length,
+        'source=',
+        transcriptOverride ? 'override' : 'state',
+        'canSubmit=',
+        canSubmit
+      );
+    } else {
+      // Enable submit once any letter is entered (non-space)
+      canSubmit = (userAnswer || '').split('').some(ch => ch && ch !== ' ');
     }
-    if (!canSubmit) {
-      return;
-    }
+
+    if (!canSubmit) return;
     setIsEvaluating(true);
     try {
       let completeWord = '';
       let correct = false;
       let latestReadingMismatches: number[] = [];
       if (isReading) {
-        completeWord = (lockedTranscript || liveTranscript || '').trim();
+        completeWord = (readingTranscript || '').trim();
+
+        // Prefer Azure pronunciation accuracyScore when available:
+        // if score >= 70, treat as correct; otherwise incorrect.
+        const azureScore = typeof accuracyOverride === 'number'
+          ? accuracyOverride
+          : (typeof lastAzureAccuracyScore === 'number' ? lastAzureAccuracyScore : null);
+
+        if (typeof azureScore === 'number') {
+          // Use Azure score strictly: >=70 is correct, otherwise incorrect (fallback to AI only for feedback).
+          const normalize = (s: string) => (s || '')
+            .toLowerCase()
+            .replace(/[^a-z\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          const normalizedTarget = normalize(targetWord);
+          const tokens = normalize(completeWord).split(/\s+/).filter(Boolean);
+
+          if (azureScore >= 70) {
+            correct = true;
+            latestReadingMismatches = [];
+            setReadingMismatchedIndices(latestReadingMismatches);
+            console.log('[SpellBox] Evaluation (reading via Azure). score=', azureScore, 'correct=', correct, 'word=', completeWord);
+          } else {
+            // Azure below threshold: strictly incorrect. Optionally use LLM only to compute mismatches,
+            // but do NOT override correctness.
+            correct = false;
+            try {
+              const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+              latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
+              setReadingMismatchedIndices(latestReadingMismatches);
+              console.log('[SpellBox] Evaluation (reading via AI, after low Azure score). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
+            } catch (e) {
+              latestReadingMismatches = [];
+              setReadingMismatchedIndices(latestReadingMismatches);
+              console.warn('[SpellBox] AI evaluation failed after low Azure score; keeping incorrect. azureScore=', azureScore);
+            }
+          }
+        } else {
         try {
           const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
           correct = evalResult.status === 'correct';
@@ -1238,6 +1469,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           latestReadingMismatches = [];
           setReadingMismatchedIndices(latestReadingMismatches);
           console.warn('[SpellBox] AI evaluation failed, fallback used. correct=', correct);
+          }
         }
       } else {
         completeWord = reconstructCompleteWord(userAnswer);
@@ -1335,6 +1567,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         }
         generateAIHint(completeWord);
         if (sendMessage && targetWord) {
+          // Start a brief "waiting for coach" state until the AI tutor starts speaking.
+          setIsWaitingForCoach(true);
           try {
             const aiTutor = (question as any)?.aiTutor || {};
             const studentEntry = completeWord;
@@ -1386,13 +1620,41 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               };
             }
             sendMessage(JSON.stringify(payload));
-          } catch {}
+          } catch {
+            // If something goes wrong before the tutor speaks, don't leave the spinner stuck.
+            setIsWaitingForCoach(false);
+          }
         }
       }
     } finally {
       setIsEvaluating(false);
     }
-  }, [userAnswer, reconstructCompleteWord, isWordCorrect, targetWord, interruptRealtimeSession, triggerConfetti, showTutorial, nextTutorialStep, onComplete, attempts, isAssignmentFlow, generateAIHint, sendMessage, question, lastSubmittedAnswer, effectiveUserId, effectiveTopicId, effectiveGrade, parts, generateQuestionBlank]);
+  }, [
+    userAnswer,
+    reconstructCompleteWord,
+    isWordCorrect,
+    targetWord,
+    interruptRealtimeSession,
+    triggerConfetti,
+    showTutorial,
+    nextTutorialStep,
+    onComplete,
+    attempts,
+    isAssignmentFlow,
+    generateAIHint,
+    sendMessage,
+    question,
+    lastSubmittedAnswer,
+    effectiveUserId,
+    effectiveTopicId,
+    effectiveGrade,
+    parts,
+    generateQuestionBlank,
+    // Reading mode state that the submit uses; including these avoids stale closures
+    isReading,
+    lockedTranscript,
+    liveTranscript
+  ]);
 
   // Focus next empty box (scoped to this component)
   const focusNextEmptyBox = useCallback(() => {
@@ -1434,6 +1696,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       setReadingMismatchedIndices([]);
       setLastReadingDiagnosis(null);
       setLastSpellingDiagnosis(null);
+      setIsWaitingForCoach(false);
       setTimeout(() => { focusNextEmptyBox(); }, 0);
     }
     prevQuestionIdRef.current = questionId;
@@ -1524,6 +1787,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           showTutorial && tutorialStep === 'glow' && "tutorial-glow tutorial-highlight"
         )}
         >
+        {showReadingMicGuide && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderRadius: 'inherit',
+              pointerEvents: 'none',
+              zIndex: 10,
+            }}
+          />
+        )}
         <div style={{ fontFamily: 'Fredoka, system-ui, -apple-system, sans-serif', fontSize: 20, fontWeight: 500, lineHeight: 1.6 }}>
             { /* CONTENT START */ }
 
@@ -1570,11 +1845,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         padding: '8px',
                         background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)',
                         borderRadius: '12px',
-                        boxShadow: '0 4px 8px hsl(var(--primary) / 0.15)',
-                        border: '2px solid hsl(var(--primary) / 0.30)',
+                        boxShadow: showReadingMicGuide
+                          ? '0 0 0 2px rgba(250, 204, 21, 0.9), 0 0 16px rgba(250, 204, 21, 0.8)'
+                          : '0 4px 8px hsl(var(--primary) / 0.15)',
+                        border: showReadingMicGuide
+                          ? '2px solid rgba(250, 204, 21, 1)'
+                          : '2px solid hsl(var(--primary) / 0.30)',
                         margin: '0 4px',
                         position: 'relative',
-                        paddingBottom: showReadingTapHint ? '22px' : '8px'
+                        paddingBottom: showReadingTapHint ? '22px' : '8px',
+                        zIndex: showReadingMicGuide ? 20 : 1
                       }}>
                         {parts.map((part, partIndex) => {
                           if (part.type === 'text') {
@@ -1880,13 +2160,29 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             compact
                             targetWord={targetWord} 
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
-                            onRecordingChange={(rec, finalText) => {
+                            onRecordingChange={(rec, meta) => {
+                              if (rec && showReadingMicGuide) {
+                                setShowReadingMicGuide(false);
+                                try {
+                                  ttsService.stop();
+                                } catch {}
+                              }
                               setIsRecordingReading(rec);
                               if (!rec) {
-                                setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
+                                const text = typeof meta === 'string' ? meta : (meta?.text ?? '');
+                                const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
+                                  ? (meta as any).accuracyScore as number | undefined
+                                  : undefined;
+                                const final = ((text ?? liveTranscript) || '').trim();
+                                setLockedTranscript(final);
+                                setLastAzureAccuracyScore(typeof accuracyScore === 'number' ? accuracyScore : null);
                                 setHasSubmitted(false);
                                 setIsCorrect(false);
                                 setReadingMismatchedIndices([]);
+                                // Auto-submit for reading questions when recording stops, using the final transcript directly
+                                if (final) {
+                                  try { handleSubmitAttempt(final, accuracyScore); } catch {}
+                                }
                               } else {
                                 setLockedTranscript('');
                                 setLiveTranscript('');
@@ -1894,6 +2190,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 setHasSubmitted(false);
                                 setIsCorrect(false);
                                 setReadingMismatchedIndices([]);
+                                setLastAzureAccuracyScore(null);
                               }
                             }}
                             onRecognized={(ok) => {
@@ -1938,18 +2235,27 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
-          {isReading && liveTranscript && (
+          {isReading && hasSubmitted && !isCorrect && (lockedTranscript || liveTranscript) && (
             <div className="mt-3 text-sm text-center">
               <span className="opacity-60 mr-1">You said:</span>
-              <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>{liveTranscript}</span>
+              <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>
+                {lockedTranscript || liveTranscript}
+              </span>
             </div>
           )}
 
           
 
-          {/* Hint button: appears after the first incorrect submit and persists until next question */}
-          {hintUnlocked && showHints && (
-            <div className="absolute top-2 right-2 z-20">
+          {/* Hint + accuracy + coach cluster (top-right) */}
+          {(((hintUnlocked && showHints) || (isReading && hasSubmitted && typeof lastAzureAccuracyScore === 'number'))) && (
+          <div className="absolute top-2 right-2 z-20 flex items-center gap-2">
+            {/* If correct: place accuracy circle where the bulb would be */}
+            {isReading && hasSubmitted && isCorrect && typeof lastAzureAccuracyScore === 'number' ? (
+              <AccuracyCircle score={lastAzureAccuracyScore} size={34} />
+            ) : (
+              <>
+                {/* Lightbulb only when hints are enabled/visible */}
+                {(hintUnlocked && showHints) && (
               <Button
                 variant="comic"
                 size="icon"
@@ -1990,15 +2296,35 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           } : {})
                       };
                     }
+                  setIsWaitingForCoach(true);
+                  try {
                     sendMessage(JSON.stringify(payload));
+                  } catch {
+                    setIsWaitingForCoach(false);
+                  }
                   }
                 }}
-                className={cn('h-9 w-9 rounded-full border-2 border-black bg-yellow-300 text-yellow-900 shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 hover:bg-yellow-400')}
-                title="Hint: listen again"
-                aria-label="Hint: listen again"
+                    className={cn(
+                      'h-9 w-9 rounded-full border-2 border-black shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105',
+                      isWaitingForCoach ? 'bg-white text-yellow-700' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
+                    )}
+                    title={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
+                    aria-label={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
+                    disabled={isWaitingForCoach}
               >
+                    {isWaitingForCoach ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-yellow-600" />
+                    ) : (
                 <Lightbulb className="h-5 w-5" />
+                    )}
               </Button>
+                )}
+                {/* Accuracy circle appears after submit; when incorrect, it sits between bulb and coach */}
+                {(isReading && hasSubmitted && typeof lastAzureAccuracyScore === 'number') && (
+                  <AccuracyCircle score={lastAzureAccuracyScore} size={34} />
+                )}
+              </>
+            )}
             </div>
           )}
 
@@ -2233,13 +2559,23 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 compact
                                 targetWord={targetWord}
                                 onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
-                                onRecordingChange={(rec, finalText) => {
+                                onRecordingChange={(rec, meta) => {
                                   setIsRecordingReading(rec);
                                   if (!rec) {
-                                    setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
+                                    const text = typeof meta === 'string' ? meta : (meta?.text ?? '');
+                                    const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
+                                      ? (meta as any).accuracyScore as number | undefined
+                                      : undefined;
+                                    const final = ((text ?? liveTranscript) || '').trim();
+                                    setLockedTranscript(final);
+                                    setLastAzureAccuracyScore(typeof accuracyScore === 'number' ? accuracyScore : null);
                                     setHasSubmitted(false);
                                     setIsCorrect(false);
                                     setReadingMismatchedIndices([]);
+                                    // Auto-submit for reading questions when recording stops, using the final transcript directly
+                                    if (final) {
+                                      try { handleSubmitAttempt(final, accuracyScore); } catch {}
+                                    }
                                   } else {
                                     setLockedTranscript('');
                                     setLiveTranscript('');
@@ -2247,6 +2583,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     setHasSubmitted(false);
                                     setIsCorrect(false);
                                     setReadingMismatchedIndices([]);
+                                    setLastAzureAccuracyScore(null);
                                   }
                                 }}
                                 onRecognized={(ok) => {
@@ -2281,18 +2618,24 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     );
                   })}
                 </div>
-                {isReading && liveTranscript && (
+                {isReading && hasSubmitted && !isCorrect && (lockedTranscript || liveTranscript) && (
                   <div className="mt-2 text-xs text-center">
                     <span className="opacity-60 mr-1">You said:</span>
-                    <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>{liveTranscript}</span>
+                    <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>
+                      {lockedTranscript || liveTranscript}
+                    </span>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Inline hint button: persists after first wrong submit */}
-            {hintUnlocked && showHints && (
-              <div style={{ padding: '8px 0' }}>
+            {/* Inline: show row when hints are visible OR when we have a reading accuracy score after submit */}
+            {( (isReading && hasSubmitted && typeof lastAzureAccuracyScore === 'number') || (hintUnlocked && showHints) ) && (
+              <div className="flex items-center justify-start gap-2 py-2">
+                {/* If correct: show accuracy circle in place of bulb */}
+                {isReading && hasSubmitted && isCorrect && typeof lastAzureAccuracyScore === 'number' ? (
+                  <AccuracyCircle score={lastAzureAccuracyScore} size={30} />
+                ) : (
                 <Button
                   variant="comic"
                   size="icon"
@@ -2335,15 +2678,33 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           } : {})
                         };
                       }
+                      setIsWaitingForCoach(true);
+                      try {
                       sendMessage(JSON.stringify(payload));
+                      } catch {
+                        setIsWaitingForCoach(false);
+                      }
                     }
-                  }}
-                  className={cn('h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 bg-yellow-300 text-yellow-900 hover:bg-yellow-400')}
-                  title="Hint: listen again"
-                  aria-label="Hint: listen again"
-                >
+                    }}
+                    className={cn(
+                      'h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105',
+                      isWaitingForCoach ? 'bg-white text-yellow-700' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
+                    )}
+                    title={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
+                    aria-label={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
+                    disabled={isWaitingForCoach}
+                  >
+                    {isWaitingForCoach ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-yellow-600" />
+                    ) : (
                   <Lightbulb className="h-3.5 w-3.5" />
+                    )}
                 </Button>
+                )}
+                {/* When incorrect, place accuracy circle between bulb and coach */}
+                {isReading && hasSubmitted && !isCorrect && typeof lastAzureAccuracyScore === 'number' && (
+                  <AccuracyCircle score={lastAzureAccuracyScore} size={30} />
+                )}
               </div>
             )}
 
