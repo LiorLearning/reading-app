@@ -75,9 +75,18 @@ export const uploadImage = onRequest(
       console.log(`📥 Downloading image from DALL-E for user ${userId}...`);
 
       // Download image from DALL-E URL (server-side, no CORS issues)
-      const imageResponse = await fetch(imageUrl);
+      // Add headers to avoid being blocked by image hosting services
+      const imageResponse = await fetch(imageUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Accept': 'image/*,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': 'https://www.google.com/',
+        },
+      });
       if (!imageResponse.ok) {
-        throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+        const errorText = await imageResponse.text().catch(() => imageResponse.statusText);
+        throw new Error(`Failed to fetch image (${imageResponse.status}): ${errorText}`);
       }
 
       const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
@@ -105,10 +114,9 @@ export const uploadImage = onRequest(
         },
       });
 
-      // Make file publicly readable
-      await file.makePublic();
-
-      // Get download URL
+      // Get public URL (works with uniform bucket-level access)
+      // Note: With uniform bucket-level access, public access is controlled via bucket IAM policy
+      // Ensure your bucket has public read access configured in IAM
       const firebaseImageUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
 
       // Save metadata to Firestore
@@ -211,7 +219,9 @@ export const uploadImagen = onRequest(
         },
       });
 
-      await file.makePublic();
+      // Get public URL (works with uniform bucket-level access)
+      // Note: With uniform bucket-level access, public access is controlled via bucket IAM policy
+      // Ensure your bucket has public read access configured in IAM
       const firebaseImageUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
 
       const imageMetadata = {
