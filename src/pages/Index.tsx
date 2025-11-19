@@ -6601,7 +6601,7 @@ Keep tone warm, brief, and curious.`;
       })();
     }, 1500);
                           }}
-                          sendMessage={sendMessage}
+                          sendMessage={((currentSpellQuestion as any)?.isReadingFluency ? undefined : sendMessage)}
                           interruptRealtimeSession={interruptRealtimeSession}
                         />
                       );
@@ -6691,7 +6691,7 @@ Keep tone warm, brief, and curious.`;
                             userId: user?.uid,
                             topicId: currentSpellQuestion?.topicId || selectedTopicId,
                             grade: selectedGradeFromDropdown || userData?.gradeDisplayName,
-                            sendMessage,
+                            sendMessage: ((currentSpellQuestion as any)?.isReadingFluency ? undefined : sendMessage),
                             isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
                     }

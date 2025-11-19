@@ -1131,8 +1131,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           const correctNow = (evalResult.status === 'pass') && perfectAccuracy && noMismatches;
           correct = correctNow;
           fluencyAccuracy = typeof evalResult.accuracy === 'number' ? evalResult.accuracy : undefined;
-          // For now, we do not apply word-level highlighting inline; store mismatches if needed later
-          latestReadingMismatches = [];
+          // Capture mismatches for inline highlighting and click-to-speak
+          latestReadingMismatches = Array.isArray(evalResult?.mistakes)
+            ? evalResult.mistakes.map(m => m.index).filter((i) => Number.isFinite(i) && i >= 0)
+            : (Array.isArray(evalResult.mismatchedWordIndices) ? evalResult.mismatchedWordIndices : []);
           setReadingMismatchedIndices(latestReadingMismatches);
           console.log('[SpellBox] Evaluation (reading fluency). accuracy=', evalResult.accuracy, 'status=', evalResult.status);
         } catch (e) {
@@ -1510,11 +1512,21 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   
                   // console.log(`🔤 Word comparison: "${word}" (normalized: "${normalizedWord}") vs target "${targetWord}" (normalized: "${normalizedTarget}") = ${isTargetWord}`);
                   
+                  const isMistake = hasSubmitted && Array.isArray(readingMismatchedIndices) && readingMismatchedIndices.includes(idx);
+                  const speakWord = () => {
+                    try { ttsService.speakCorrectionWord(word); } catch {}
+                  };
+                  
                   return (
                   <React.Fragment key={idx}>
                     {isTargetWord ? (
 
-                      <div style={{ 
+                      <div
+                        onClick={isMistake ? speakWord : undefined}
+                        role={isMistake ? 'button' : undefined}
+                        aria-label={isMistake ? `Hear correct pronunciation: ${word}` : undefined}
+                        tabIndex={isMistake ? 0 : -1}
+                        style={{ 
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: isReading ? '2px' : '6px',
@@ -1522,10 +1534,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08) 0%, hsl(var(--primary) / 0.16) 100%)',
                         borderRadius: '12px',
                         boxShadow: '0 4px 8px hsl(var(--primary) / 0.15)',
-                        border: '2px solid hsl(var(--primary) / 0.30)',
+                        border: isMistake ? '2px solid #EF4444' : '2px solid hsl(var(--primary) / 0.30)',
                         margin: '0 4px',
                         position: 'relative',
-                        paddingBottom: showReadingTapHint ? '22px' : '8px'
+                        paddingBottom: showReadingTapHint ? '22px' : '8px',
+                        cursor: isMistake ? 'pointer' : 'default'
                       }}>
                         {parts.map((part, partIndex) => {
                           if (part.type === 'text') {
@@ -1872,9 +1885,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                         )}
                       </div>
                     ) : (
-                      <span className="inline-block" 
+                      <span
+                        onClick={isMistake ? speakWord : undefined}
+                        role={isMistake ? 'button' : undefined}
+                        aria-label={isMistake ? `Hear correct pronunciation: ${word}` : undefined}
+                        tabIndex={isMistake ? 0 : -1}
+                        className="inline-block" 
                         style={{ 
-                          fontWeight: '400'
+                          fontWeight: '400',
+                          color: isMistake ? '#B91C1C' : undefined,
+                          textDecoration: isMistake ? 'underline' : undefined,
+                          textDecorationColor: isMistake ? '#EF4444' : undefined,
+                          textUnderlineOffset: isMistake ? 3 : undefined,
+                          cursor: isMistake ? 'pointer' : 'default'
                         }}>
                         {word}
                       </span>
@@ -2059,7 +2082,32 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                             marginRight: 2
                           }}
                         >
-                          <span>{workingSentence}</span>
+                          <span>
+                            {workingSentence.split(' ').map((word, idx) => {
+                              const isMistake = hasSubmitted && Array.isArray(readingMismatchedIndices) && readingMismatchedIndices.includes(idx);
+                              const speakWord = () => { try { ttsService.speakCorrectionWord(word); } catch {} };
+                              return (
+                                <React.Fragment key={`inline-word-${idx}`}>
+                                  <span
+                                    onClick={isMistake ? speakWord : undefined}
+                                    role={isMistake ? 'button' : undefined}
+                                    aria-label={isMistake ? `Hear correct pronunciation: ${word}` : undefined}
+                                    tabIndex={isMistake ? 0 : -1}
+                                    style={{
+                                      color: isMistake ? '#B91C1C' : undefined,
+                                      textDecoration: isMistake ? 'underline' : undefined,
+                                      textDecorationColor: isMistake ? '#EF4444' : undefined,
+                                      textUnderlineOffset: isMistake ? 3 : undefined,
+                                      cursor: isMistake ? 'pointer' : 'default'
+                                    }}
+                                  >
+                                    {word}
+                                  </span>
+                                  {idx < workingSentence.split(' ').length - 1 && ' '}
+                                </React.Fragment>
+                              );
+                            })}
+                          </span>
                           <ReadingMicButton 
                             compact
                             targetWord={targetWord}

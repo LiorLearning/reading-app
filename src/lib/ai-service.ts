@@ -4497,13 +4497,14 @@ Example_target_line: ${exampleTargetLine || ''}`;
 
   /**
    * Evaluate a student's fluency reading of a generated line.
-   * Returns pass/fail, accuracy (0..1), and mismatched word indices.
+   * Returns pass/fail, accuracy (0..1), mismatched word indices, and mistakes array.
    * Fallback uses token overlap; AI path may provide better alignment when available.
    */
   async evaluateReadingFluency(targetLine: string, studentTranscript: string, targetWord?: string): Promise<{
     status: 'pass' | 'fail';
     accuracy: number;
     mismatchedWordIndices: number[];
+    mistakes?: Array<{ index: number; word: string }>;
   }> {
     const normalize = (s: string) => (s || '')
       .toLowerCase()
@@ -4512,8 +4513,8 @@ Example_target_line: ${exampleTargetLine || ''}`;
       .trim();
     const targetWords = normalize(targetLine).split(' ').filter(Boolean);
     const saidWords = normalize(studentTranscript).split(' ').filter(Boolean);
-    const fallback = (): { status: 'pass' | 'fail'; accuracy: number; mismatchedWordIndices: number[] } => {
-      if (targetWords.length === 0) return { status: 'fail', accuracy: 0, mismatchedWordIndices: [] };
+    const fallback = (): { status: 'pass' | 'fail'; accuracy: number; mismatchedWordIndices: number[]; mistakes: Array<{ index: number; word: string }> } => {
+      if (targetWords.length === 0) return { status: 'fail', accuracy: 0, mismatchedWordIndices: [], mistakes: [] };
       // Strict lexical fallback: require every target word be present at least once (insertions ignored).
       const saidSet = new Set(saidWords);
       let matched = 0;
@@ -4524,12 +4525,13 @@ Example_target_line: ${exampleTargetLine || ''}`;
       const accuracy = matched / targetWords.length;
       const passAll = accuracy === 1;
       const status: 'pass' | 'fail' = passAll ? 'pass' : 'fail';
-      return { status, accuracy, mismatchedWordIndices: passAll ? [] : mismatches };
+      const mistakes = (passAll ? [] : mismatches).map((i) => ({ index: i, word: targetWords[i] || '' }));
+      return { status, accuracy, mismatchedWordIndices: passAll ? [] : mismatches, mistakes };
     };
     if (!this.isInitialized || !this.client) return fallback();
     try {
       const sys = `You evaluate a child's oral reading of a short target sentence using PHONETICS (IPA/ARPAbet). Return minified JSON only:
-{"status":"pass"|"fail","accuracy":number,"mismatchedWordIndices":[number,...]}
+{"status":"pass"|"fail","accuracy":number,"mismatchedWordIndices":[number,...],"mistakes":[{"index":number,"word":string},...]}
 
 Rules:
 - Case- and punctuation-insensitive. Ignore punctuation and casing entirely.
@@ -4539,6 +4541,7 @@ Rules:
 - A target word is INCORRECT only if no phonetically equal token appears anywhere in SAID.
 - accuracy = (# correct target words) / (# target words). Clamp to [0,1], 2 decimals.
 - mismatchedWordIndices are 0‑based indices of TARGET words that were never pronounced correctly.
+- mistakes: for each mismatched target word, include an object with its 0-based "index" and the normalized target "word" string used in alignment.
 - status = "pass" if accuracy == 1.0; otherwise "fail".
 - Output JSON only, no text.`;
       const user = `TARGET: ${targetLine}
@@ -4560,7 +4563,18 @@ TARGET_WORD: ${targetWord || ''}`;
         const status = (parsed.status === 'pass' ? 'pass' : 'fail') as 'pass' | 'fail';
         const accuracy = Math.max(0, Math.min(1, Number(parsed.accuracy) || 0));
         const mismatchedWordIndices = Array.isArray(parsed.mismatchedWordIndices) ? parsed.mismatchedWordIndices.map((n: any) => Number(n) || 0) : [];
-        return { status, accuracy, mismatchedWordIndices };
+        let mistakes: Array<{ index: number; word: string }> = [];
+        if (Array.isArray(parsed.mistakes)) {
+          mistakes = parsed.mistakes
+            .map((m: any) => ({
+              index: Number(m?.index) || 0,
+              word: typeof m?.word === 'string' ? (m.word || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim() : ''
+            }))
+            .filter((m: any) => Number.isFinite(m.index) && m.index >= 0);
+        } else if (mismatchedWordIndices.length > 0) {
+          mistakes = mismatchedWordIndices.map((i: number) => ({ index: i, word: targetWords[i] || '' }));
+        }
+        return { status, accuracy, mismatchedWordIndices, mistakes };
       }
       return fallback();
     } catch {

@@ -31,6 +31,8 @@ Aim for target line:
 - Speak in first person.
 - Total response stays within your global limits above.
 - A short, pedagogically appropriate line that integrates naturally with the child’s intent.
+- There should be exactly one target line. It could also be a group of words in a phrase, not necessarily an end to end line.
+- Strictly avoid restating target line or a near‑duplicate of it elsewhere in the message.  Other sentences may include the target word only if they are clearly different and not full‑line repetitions.
 - Include just one target word from the reading rule, and other words from already mastered list or definitely simpler words.
 - Wrap the entire target line with markers: <<target-line>> ... <</target-line>>.
 - Wrap the chosen target word within that line with markers: {{tw}}word{{/tw}}.
