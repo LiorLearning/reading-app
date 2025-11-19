@@ -331,6 +331,8 @@ interface SpellBoxProps {
   sentence?: string;
   /** Optional prefix text to render before the target line (fluency only) */
   prefix?: string;
+  /** Optional suffix text to render after the target line (fluency only) */
+  suffix?: string;
   onComplete?: (isCorrect: boolean, userAnswer?: string, attemptCount?: number) => void;
   onSkip?: () => void;
   onNext?: () => void;
@@ -397,6 +399,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   word,
   sentence,
   prefix,
+  suffix,
   onComplete,
   onSkip,
   onNext,
@@ -2150,6 +2153,11 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           </div>
                         )}
                       </span>
+                      {(suffix || '').trim().length > 0 && (
+                        <span style={{ fontWeight: 400 }}>
+                          {' '}{String(suffix).replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim()}
+                        </span>
+                      )}
                     </span>
                   ) : workingSentence.split(' ').map((word, idx) => {
                     const normalizedWord = word.toLowerCase().replace(/[^\w]/g, '');

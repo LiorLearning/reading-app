@@ -2108,6 +2108,13 @@ Keep tone warm, brief, and curious.`;
           const totalLength = (targetLineLengthRaw && String(targetLineLengthRaw).trim()) ? targetLineLengthRaw : derivedLen;
           const gradeLevel = rf?.gradeLevel || userData?.gradeDisplayName || userData?.grade;
           // Inputs for guardrail - use the cleaned parsed values
+          // Derive previous AI message and last user reply
+          const previousAiMessage = (() => {
+            const reversed = [...messageHistory].reverse();
+            const prevAi = reversed.find(m => m.type === 'ai');
+            return prevAi?.content || '';
+          })();
+          const lastUserReply = userText || '';
           const guardrailParams = {
             gradeLevel: gradeLevel,
             targetWord: (qAny?.word || '').toString(),
@@ -2115,6 +2122,8 @@ Keep tone warm, brief, and curious.`;
             masteredReadingLevel: aiTutor?.Reading_Mastered_Level,
             initialPetMessage: (initialParsed.cleaned || result.adventure_story || '').toString(),
             initialTargetLine: ((initialParsed.targetLine || result.spelling_sentence || '') as string).toString(),
+            previousAiMessage,
+            lastUserReply,
           };
           const refined = await aiService.refineFluencyMessage(guardrailParams);
           if (refined && refined.finalMessage && refined.finalTargetLine) {
@@ -2128,14 +2137,26 @@ Keep tone warm, brief, and curious.`;
             const cleanedMessageFromGuardrail = stripAllMarkers(refined.finalMessage);
             const cleanedLine = stripAllMarkers(refined.finalTargetLine);
             
-            // Compose the final message by replacing ONLY the original target line
+            // Compose the final message by replacing the original target phrase using a tolerant match
             const baseMessage = (initialParsed.cleaned || result.adventure_story || '').toString();
             const originalLine = (initialParsed.targetLine || result.spelling_sentence || '').toString();
+            const escapeForRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             let composedMessage = baseMessage;
-            if (originalLine && baseMessage.includes(originalLine)) {
-              composedMessage = baseMessage.replace(originalLine, cleanedLine);
-            } else if (cleanedMessageFromGuardrail && cleanedMessageFromGuardrail.includes(cleanedLine)) {
-              // Fallback: if original line not found, use guardrail message as base (already coherent)
+            if (originalLine) {
+              const base = originalLine.replace(/[.?!…]+$/g, '').trim();
+              if (base.length > 0) {
+                // Allow immediate punctuation after the phrase, or continuation with whitespace
+                const tolerantPunct = new RegExp(`\\b${escapeForRegex(base)}(?:\\s*[.?!…]|[—–\\-,:;])?`, 'i');
+                const tolerantWhitespaceFollow = new RegExp(`\\b${escapeForRegex(base)}(?=\\s)`, 'i');
+                if (tolerantPunct.test(baseMessage)) {
+                  composedMessage = baseMessage.replace(tolerantPunct, cleanedLine);
+                } else if (tolerantWhitespaceFollow.test(baseMessage)) {
+                  composedMessage = baseMessage.replace(tolerantWhitespaceFollow, cleanedLine);
+                }
+              }
+            }
+            // If tolerant replacement did not happen, prefer guardrailed message if it already includes the cleaned line
+            if (composedMessage === baseMessage && cleanedMessageFromGuardrail && cleanedMessageFromGuardrail.includes(cleanedLine)) {
               composedMessage = cleanedMessageFromGuardrail;
             }
 
@@ -2880,12 +2901,29 @@ Keep tone warm, brief, and curious.`;
             if (idx !== -1) {
               const before = contentAfterSpellingForDisplay.slice(0, idx);
               const after = contentAfterSpellingForDisplay.slice(idx + target.length);
-              contentAfterSpellingForDisplay = (before + after)
-                .replace(/\s{2,}/g, ' ')
-                .replace(/ \,/g, ',')
-                .replace(/ \./g, '.')
-                .trim();
+              contentAfterSpellingForDisplay = (before + after);
+            } else {
+              // Tolerant fallback: allow immediate punctuation (em dash, comma, etc.) after the line
+              // and allow the target line to omit its terminal period.
+              const escapeForRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const base = target.replace(/[.?!…]+$/g, '').trim();
+              if (base) {
+                const tolerantPattern = new RegExp(`\\b${escapeForRegex(base)}(?:\\s*[.?!…]|[—–\\-,:;])?`);
+        const replacedOnce = tolerantPattern.test(contentAfterSpellingForDisplay);
+        contentAfterSpellingForDisplay = contentAfterSpellingForDisplay.replace(tolerantPattern, ' ');
+        // If still not removed, allow continuation without punctuation (phrase followed by whitespace)
+        if (!replacedOnce) {
+                  const whitespaceFollow = new RegExp(`\\b${escapeForRegex(base)}(?=\\s)`);
+                  contentAfterSpellingForDisplay = contentAfterSpellingForDisplay.replace(whitespaceFollow, ' ');
+        }
+              }
             }
+            // Normalize leftover spacing and stray spaces before punctuation
+            contentAfterSpellingForDisplay = contentAfterSpellingForDisplay
+              .replace(/\s{2,}/g, ' ')
+              .replace(/ \,/g, ',')
+              .replace(/ \./g, '.')
+              .trim();
           }
 
           const spellingSentenceMessage: ChatMessage = {
@@ -6746,6 +6784,7 @@ Keep tone warm, brief, and curious.`;
                             word: overlayWord,
                             sentence: overlaySentence,
                             prefix: (lastAi as any)?.fluency_prefix || null,
+                            suffix: (lastAi as any)?.fluency_suffix || null,
                             question: currentSpellQuestion ? ({
                               id: currentSpellQuestion.id,
                               word: currentSpellQuestion.word,

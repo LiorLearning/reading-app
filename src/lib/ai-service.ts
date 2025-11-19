@@ -4506,6 +4506,8 @@ Example_target_line: ${exampleTargetLine || ''}`;
     masteredReadingLevel?: string;
     initialPetMessage: string;
     initialTargetLine: string;
+    previousAiMessage?: string;
+    lastUserReply?: string;
   }): Promise<{ finalMessage: string; finalTargetLine: string }> {
     const {
       gradeLevel,
@@ -4514,6 +4516,8 @@ Example_target_line: ${exampleTargetLine || ''}`;
       masteredReadingLevel,
       initialPetMessage,
       initialTargetLine,
+      previousAiMessage,
+      lastUserReply,
     } = params;
 
     const fallback = () => ({
@@ -4530,6 +4534,8 @@ Example_target_line: ${exampleTargetLine || ''}`;
         `Target word: ${targetWord}`,
         `Total length for target line: ${typeof totalLength === 'number' ? totalLength : (totalLength || '')}`,
         `Mastered reading level: ${masteredReadingLevel || ''}`,
+        `Previous AI message: ${previousAiMessage || ''}`,
+        `Last user reply: ${lastUserReply || ''}`,
         `Initial pet message: ${initialPetMessage || ''}`,
         `Target line used in initial pet message: ${initialTargetLine || ''}`,
       ].join('\n');

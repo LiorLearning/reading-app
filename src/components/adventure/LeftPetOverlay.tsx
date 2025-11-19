@@ -24,6 +24,11 @@ interface LeftPetOverlayProps {
     sentence?: string | null;
     /** Optional prefix text that appears before the target line for fluency */
     prefix?: string | null;
+    /** Optional suffix text that appears after the target line for fluency */
+    suffix?: string | null;
+    /** Optional flags mirrored from question for convenience */
+    isReading?: boolean;
+    isReadingFluency?: boolean;
     question?: {
       id: number;
       word: string;
@@ -651,6 +656,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                         word={spellInline.word || undefined}
                         sentence={spellInline.sentence || undefined}
                         prefix={spellInline.prefix || undefined}
+                        suffix={spellInline.suffix || undefined}
                         question={spellInline.question || undefined}
                         onComplete={spellInline.onComplete}
                         onSkip={spellInline.onSkip}
