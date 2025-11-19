@@ -43,6 +43,187 @@ export type LessonScript = {
 };
 
 export const lessonScripts: Record<string, LessonScript> = {
+  'K-R-O.3': {
+    topicId: 'K-R-O.3',
+    title: "Reading: Short a /ă/ (ran)",
+    intro: [
+      "Let’s read a short a word.",
+      "We’ll look at the middle /ă/ in 'ran'."
+    ],
+    modelWord: 'ran',
+    modelSteps: [
+      { highlights: [[0,1]], say: '"r" says /r/.' },
+      { highlights: [[1,2]], say: '"a" says /ă/ (short a).' },
+      { highlights: [[2,3]], say: '"n" says /n/.' },
+      { highlights: [[0,3]], say: "Blend: /r/ /ă/ /n/ — 'ran'." }
+    ],
+    practice: [
+      {
+        word: 'ran',
+        prompt: "Read the word 'ran'.",
+        hints: [
+          "Listen for the short /a/ in the middle.",
+          "Blend all sounds together to read the word."
+        ],
+        reinforce: "Nice! /r/ /ă/ /n/ — 'ran'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      },
+    ],
+    completion: [
+      "Great reading! You heard the short a in 'ran'.",
+      "Let’s try more."
+    ],
+    rewards: { coins: 1 },
+  },  'K-R-P.2': {
+    topicId: 'K-R-P.2',
+    title: "Reading: Short e /ĕ/ (red)",
+    intro: [
+      "Let’s read a short e word.",
+      "We’ll look at the middle /ĕ/ in 'red'."
+    ],
+    modelWord: 'red',
+    modelSteps: [
+      { highlights: [[0,1]], say: '"r" says /r/.' },
+      { highlights: [[1,2]], say: '"e" says /ĕ/ (short e).' },
+      { highlights: [[2,3]], say: '"d" says /d/.' },
+      { highlights: [[0,3]], say: "Blend: /r/ /ĕ/ /d/ — 'red'." }
+    ],
+    practice: [
+      {
+        word: 'red',
+        prompt: "Read the word 'red'.",
+        hints: [
+          "Listen for the short /e/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Great! /r/ /ĕ/ /d/ — 'red'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      },
+    ],
+    completion: [
+      "Nice reading! You heard the short e in 'red'.",
+      "Ready for another word?"
+    ],
+    rewards: { coins: 1 },
+  },  'K-R-Q.2': {
+    topicId: 'K-R-Q.2',
+    title: "Reading: Short i /ĭ/ (rip)",
+    intro: [
+      "Let’s read a short i word.",
+      "We’ll look at the middle /ĭ/ in 'rip'."
+    ],
+    modelWord: 'rip',
+    modelSteps: [
+      { highlights: [[0,1]], say: '"r" says /r/.' },
+      { highlights: [[1,2]], say: '"i" says /ĭ/ (short i).' },
+      { highlights: [[2,3]], say: '"p" says /p/.' },
+      { highlights: [[0,3]], say: "Blend: /r/ /ĭ/ /p/ — 'rip'." }
+    ],
+    practice: [
+      {
+        word: 'rip',
+        prompt: "Read the word 'rip'.",
+        hints: [
+          "Listen for the short /i/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Good! /r/ /ĭ/ /p/ — 'rip'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      },
+    ],
+    completion: [
+      "Great reading! You heard the short i in 'rip'.",
+      "Let’s try more."
+    ],
+    rewards: { coins: 1 },
+  },  'K-R-R.2': {
+    topicId: 'K-R-R.2',
+    title: "Reading: Short o /ŏ/ (top)",
+    intro: [
+      "Let’s read a short o word.",
+      "We’ll look at the middle /ŏ/ in 'top'."
+    ],
+    modelWord: 'top',
+    modelSteps: [
+      { highlights: [[0,1]], say: '"t" says /t/.' },
+      { highlights: [[1,2]], say: '"o" says /ŏ/ (short o).' },
+      { highlights: [[2,3]], say: '"p" says /p/.' },
+      { highlights: [[0,3]], say: "Blend: /t/ /ŏ/ /p/ — 'top'." }
+    ],
+    practice: [
+      {
+        word: 'top',
+        prompt: "Read the word 'top'.",
+        hints: [
+          "Listen for the short /o/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Nice! /t/ /ŏ/ /p/ — 'top'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      },
+    ],
+    completion: [
+      "Great reading! You heard the short o in 'top'.",
+      "Ready for another word?"
+    ],
+    rewards: { coins: 1 },
+  },  'K-R.2': {
+    topicId: 'K-R.2',
+    title: "Short o /ŏ/: CVC (top)",
+    intro: [
+      "You will practice the short o sound in words like top."
+    ],
+    segments: [
+      {
+        modelWord: 'top',
+        emoji: '🌀',
+        modelSteps: [
+          { highlights: [],       say: "In short o words, the vowel 'o' says /ŏ/." },
+          { highlights: [[0,1]],  say: '"t" says /t/.' },
+          { highlights: [[1,2]],  say: '"o" says /ŏ/.' },
+          { highlights: [[2,3]],  say: '"p" says /p/.' },
+          { highlights: [[0,3]],  say: "/t/ /ŏ/ /p/ — 'top'." }
+        ],
+        practice: {
+          word: 'top',
+          prompt: "Let’s spell 'top'.",
+          hints: [
+            "Listen for /t/ /ŏ/ /p/.",
+            "Fill the middle vowel with 'o'."
+          ],
+          reinforce: "Nice! /t/ /ŏ/ /p/ — 'top'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+          meta: {
+            explanation: "Great! The short o /ŏ/ is in the middle of the CVC word 'top'.",
+            aiHook: {
+              targetWord: 'top',
+              intent: 'fill_blank',
+              questionLine: 't_p',
+              imagePrompt: 'A colorful spinning top on a table'
+            },
+            aiTutor: {
+              target_word: 'top',
+              question: 't_p',
+              student_entry: '',
+              topic_to_reinforce: 'Complete the short o word',
+              spelling_pattern_or_rule:
+                "In CVC short o words, the middle 'o' says /ŏ/. Blend the sounds to spell the word."
+            },
+            audio: 'top'
+          }
+        }
+      }
+    ],
+    completion: [
+      "Pattern check: In CVC words like 'top', the middle 'o' says short /ŏ/.",
+      "Awesome work—ready for more short o words next?"
+    ],
+    rewards: { coins: 1 }
+  },
   'K-O.3': {
   topicId: 'K-O.3',
   title: "Short a /ă/: CVC (cat)",
@@ -204,7 +385,603 @@ export const lessonScripts: Record<string, LessonScript> = {
     "Awesome! You’re getting strong at hearing and spelling short vowels."
   ],
   rewards: { coins: 1 }
-},  '1-R-H.1': {
+}, 'K-R-S.2': {
+  topicId: 'K-R-S.2',
+  title: "Reading: Short u /ŭ/ (bug, rug)",
+  intro: [
+    "Let’s read two short u words."
+  ],
+  segments: [
+    {
+      modelWord: 'bug',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"b" says /b/.' },
+        { highlights: [[1,2]], say: '"u" says /ŭ/ (short u).' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /b/ /ŭ/ /g/ — 'bug'." }
+      ],
+      practice: {
+        word: 'bug',
+        prompt: "Read the word 'bug'.",
+        hints: [
+          "Listen for the short /ŭ/ in the middle.",
+          "Blend all three sounds."
+        ],
+        reinforce: "Nice! /b/ /ŭ/ /g/ — 'bug'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'rug',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"r" says /r/.' },
+        { highlights: [[1,2]], say: '"u" says /ŭ/ (short u).' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /r/ /ŭ/ /g/ — 'rug'." }
+      ],
+      practice: {
+        word: 'rug',
+        prompt: "Read the word 'rug'.",
+        hints: [
+          "Listen for the short /ŭ/ in the middle.",
+          "Blend all three sounds."
+        ],
+        reinforce: "Great! /r/ /ŭ/ /g/ — 'rug'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Strong reading! You heard the short u /ŭ/ in both words."
+  ],
+  rewards: { coins: 1 }
+},  'K-R-T.1.1': {
+  topicId: 'K-R-T.1.1',
+  title: "Reading: Choose short a or o (bag, dog)",
+  intro: [
+    "Let’s read two words and focus on the right short vowel (a vs o)."
+  ],
+  segments: [
+    {
+      modelWord: 'bag',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"b" says /b/.' },
+        { highlights: [[1,2]], say: '"a" says /ă/ (short a).' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /b/ /ă/ /g/ — 'bag'." }
+      ],
+      practice: {
+        word: 'bag',
+        prompt: "Read the word 'bag'.",
+        hints: [
+          "Listen for the short /ă/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Yes! /b/ /ă/ /g/ — 'bag'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'dog',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"d" says /d/.' },
+        { highlights: [[1,2]], say: '"o" says /ŏ/ (short o).' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /d/ /ŏ/ /g/ — 'dog'." }
+      ],
+      practice: {
+        word: 'dog',
+        prompt: "Read the word 'dog'.",
+        hints: [
+          "Listen for the short /ŏ/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Great! /d/ /ŏ/ /g/ — 'dog'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Nice reading with short a and short o!"
+  ],
+  rewards: { coins: 1 }
+},  'K-S.2': {
+  topicId: 'K-S.2',
+  title: "Short u /ŭ/: CVC (mug)",
+  intro: [
+    "You will practice the short u sound in words like 'mug'."
+  ],
+  segments: [
+    {
+      modelWord: 'mug',
+      modelSteps: [
+        { highlights: [],       say: "In short u words, the vowel 'u' says /ŭ/." },
+        { highlights: [[0,1]],  say: '"m" says /m/.' },
+        { highlights: [[1,2]],  say: '"u" says /ŭ/.' },
+        { highlights: [[2,3]],  say: '"g" says /g/.' },
+        { highlights: [[0,3]],  say: "/m/ /ŭ/ /g/ — 'mug'." }
+      ],
+      practice: {
+        word: 'mug',
+        prompt: "Let’s spell 'mug'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ŭ/ goes in the middle."
+        ],
+        reinforce: "Nice! /m/ /ŭ/ /g/ — 'mug'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Great job hearing and spelling short u!"
+  ],
+  rewards: { coins: 1 }
+},  'K-T.1.1': {
+  topicId: 'K-T.1.1',
+  title: "Spell: short a or o (bag, dog)",
+  intro: [
+    "You will spell two words by choosing the right short vowel (a vs o)."
+  ],
+  segments: [
+    {
+      modelWord: 'bag',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"b" says /b/.' },
+        { highlights: [[1,2]], say: '"a" says /ă/.' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /b/ /ă/ /g/ — 'bag'." }
+      ],
+      practice: {
+        word: 'bag',
+        prompt: "Spell the word 'bag'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ă/ goes in the middle."
+        ],
+        reinforce: "Great! /b/ /ă/ /g/ — 'bag'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'dog',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"d" says /d/.' },
+        { highlights: [[1,2]], say: '"o" says /ŏ/.' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /d/ /ŏ/ /g/ — 'dog'." }
+      ],
+      practice: {
+        word: 'dog',
+        prompt: "Spell the word 'dog'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ŏ/ goes in the middle."
+        ],
+        reinforce: "Nice! /d/ /ŏ/ /g/ — 'dog'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Awesome! You spelled with short a and short o."
+  ],
+  rewards: { coins: 1 }
+},  'K-R-T.1.2': {
+  topicId: 'K-R-T.1.2',
+  title: "Reading: e vs i (pen, pig)",
+  intro: [
+    "Let’s read two words and notice the middle vowel sounds /ĕ/ and /ĭ/."
+  ],
+  segments: [
+    {
+      modelWord: 'pen',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"p" says /p/.' },
+        { highlights: [[1,2]], say: '"e" says /ĕ/ (short e).' },
+        { highlights: [[2,3]], say: '"n" says /n/.' },
+        { highlights: [[0,3]], say: "Blend: /p/ /ĕ/ /n/ — 'pen'." }
+      ],
+      practice: {
+        word: 'pen',
+        prompt: "Read the word 'pen'.",
+        hints: [
+          "Listen for the short /ĕ/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Great! /p/ /ĕ/ /n/ — 'pen'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'pig',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"p" says /p/.' },
+        { highlights: [[1,2]], say: '"i" says /ĭ/ (short i).' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /p/ /ĭ/ /g/ — 'pig'." }
+      ],
+      practice: {
+        word: 'pig',
+        prompt: "Read the word 'pig'.",
+        hints: [
+          "Listen for the short /ĭ/ in the middle.",
+          "Blend all sounds to read the word."
+        ],
+        reinforce: "Nice! /p/ /ĭ/ /g/ — 'pig'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Well done distinguishing /ĕ/ and /ĭ/!"
+  ],
+  rewards: { coins: 1 }
+},  'K-R-T.1.3': {
+  topicId: 'K-R-T.1.3',
+  title: "Reading: Fill the right short vowel (tag, sun)",
+  intro: [
+    "Let’s read two words by listening for the correct short vowel."
+  ],
+  segments: [
+    {
+      modelWord: 'tag',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"t" says /t/.' },
+        { highlights: [[1,2]], say: '"a" says /ă/ (short a).' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /t/ /ă/ /g/ — 'tag'." }
+      ],
+      practice: {
+        word: 'tag',
+        prompt: "Read the word 'tag'.",
+        hints: [
+          "Listen for short /ă/ in the middle.",
+          "Blend the sounds together."
+        ],
+        reinforce: "Good! /t/ /ă/ /g/ — 'tag'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'sun',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"s" says /s/.' },
+        { highlights: [[1,2]], say: '"u" says /ŭ/ (short u).' },
+        { highlights: [[2,3]], say: '"n" says /n/.' },
+        { highlights: [[0,3]], say: "Blend: /s/ /ŭ/ /n/ — 'sun'." }
+      ],
+      practice: {
+        word: 'sun',
+        prompt: "Read the word 'sun'.",
+        hints: [
+          "Listen for short /ŭ/ in the middle.",
+          "Blend the sounds together."
+        ],
+        reinforce: "Great! /s/ /ŭ/ /n/ — 'sun'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Nice work choosing the right short vowels!"
+  ],
+  rewards: { coins: 1 }
+},  'K-T.1.2': {
+  topicId: 'K-T.1.2',
+  title: "Spell: e vs i (pen, pig)",
+  intro: [
+    "You will spell two words focusing on short e and short i."
+  ],
+  segments: [
+    {
+      modelWord: 'pen',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"p" says /p/.' },
+        { highlights: [[1,2]], say: '"e" says /ĕ/.' },
+        { highlights: [[2,3]], say: '"n" says /n/.' },
+        { highlights: [[0,3]], say: "Blend: /p/ /ĕ/ /n/ — 'pen'." }
+      ],
+      practice: {
+        word: 'pen',
+        prompt: "Spell the word 'pen'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ĕ/ goes in the middle."
+        ],
+        reinforce: "Great! /p/ /ĕ/ /n/ — 'pen'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'pig',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"p" says /p/.' },
+        { highlights: [[1,2]], say: '"i" says /ĭ/.' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /p/ /ĭ/ /g/ — 'pig'." }
+      ],
+      practice: {
+        word: 'pig',
+        prompt: "Spell the word 'pig'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ĭ/ goes in the middle."
+        ],
+        reinforce: "Nice! /p/ /ĭ/ /g/ — 'pig'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Awesome spelling with short e and short i!"
+  ],
+  rewards: { coins: 1 }
+},  'K-T.1.3': {
+  topicId: 'K-T.1.3',
+  title: "Spell: choose the right short vowel (tag, sun)",
+  intro: [
+    "You will spell two words by listening for the correct short vowel."
+  ],
+  segments: [
+    {
+      modelWord: 'tag',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"t" says /t/.' },
+        { highlights: [[1,2]], say: '"a" says /ă/.' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /t/ /ă/ /g/ — 'tag'." }
+      ],
+      practice: {
+        word: 'tag',
+        prompt: "Spell the word 'tag'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ă/ goes in the middle."
+        ],
+        reinforce: "Yes — short /ă/ makes 'tag'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'sun',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"s" says /s/.' },
+        { highlights: [[1,2]], say: '"u" says /ŭ/.' },
+        { highlights: [[2,3]], say: '"n" says /n/.' },
+        { highlights: [[0,3]], say: "Blend: /s/ /ŭ/ /n/ — 'sun'." }
+      ],
+      practice: {
+        word: 'sun',
+        prompt: "Spell the word 'sun'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ŭ/ goes in the middle."
+        ],
+        reinforce: "Yes — short /ŭ/ makes 'sun'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Great spelling! You filled the short vowels correctly."
+  ],
+  rewards: { coins: 1 }
+},  'K-R-T.2': {
+  topicId: 'K-R-T.2',
+  title: "Reading: Read the short vowel word (cop, pig)",
+  intro: [
+    "Let’s read two short vowel words."
+  ],
+  segments: [
+    {
+      modelWord: 'cop',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"c" says /k/.' },
+        { highlights: [[1,2]], say: '"o" says /ŏ/.' },
+        { highlights: [[2,3]], say: '"p" says /p/.' },
+        { highlights: [[0,3]], say: "Blend: /k/ /ŏ/ /p/ — 'cop'." }
+      ],
+      practice: {
+        word: 'cop',
+        prompt: "Read the word 'cop'.",
+        hints: [
+          "Say each sound of the letters",
+          "Short /ŏ/ goes in the middle."
+        ],
+        reinforce: "Nice! /k/ /ŏ/ /p/ — 'cop'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'pig',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"p" says /p/.' },
+        { highlights: [[1,2]], say: '"i" says /ĭ/.' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /p/ /ĭ/ /g/ — 'pig'." }
+      ],
+      practice: {
+        word: 'pig',
+        prompt: "Read the word 'pig'.",
+        hints: [
+          "Say each sound of the letters",
+          "Short /ĭ/ goes in the middle."
+        ],
+        reinforce: "Great! /p/ /ĭ/ /g/ — 'pig'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Awesome! You read two short vowel words."
+  ],
+  rewards: { coins: 1 }
+},  'K-T.2': {
+  topicId: 'K-T.2',
+  title: "Spell the short vowel word (cop, pig)",
+  intro: [
+    "You will spell two short vowel words."
+  ],
+  segments: [
+    {
+      modelWord: 'cop',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"c" says /k/.' },
+        { highlights: [[1,2]], say: '"o" says /ŏ/.' },
+        { highlights: [[2,3]], say: '"p" says /p/.' },
+        { highlights: [[0,3]], say: "Blend: /k/ /ŏ/ /p/ — 'cop'." }
+      ],
+      practice: {
+        word: 'cop',
+        prompt: "Spell the word 'cop'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ŏ/ goes in the middle."
+        ],
+        reinforce: "Nice! /k/ /ŏ/ /p/ — 'cop'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    },
+    {
+      modelWord: 'pig',
+      modelSteps: [
+        { highlights: [[0,1]], say: '"p" says /p/.' },
+        { highlights: [[1,2]], say: '"i" says /ĭ/.' },
+        { highlights: [[2,3]], say: '"g" says /g/.' },
+        { highlights: [[0,3]], say: "Blend: /p/ /ĭ/ /g/ — 'pig'." }
+      ],
+      practice: {
+        word: 'pig',
+        prompt: "Spell the word 'pig'.",
+        hints: [
+          "Say each sound and write the matching letter.",
+          "Short /ĭ/ goes in the middle."
+        ],
+        reinforce: "Great! /p/ /ĭ/ /g/ — 'pig'.",
+        ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Great spelling! Keep practicing short vowel words."
+  ],
+  rewards: { coins: 1 }
+}, 
+'1-R-A.1': {
+  topicId: '1-R-A.1',
+  title: "Reading: First 10 Phonograms (a–j)",
+  intro: [
+    "You will practice reading with the first 10 phonograms."
+  ],
+  segments: [
+    {
+      modelWord: 'cat',
+      emoji: '🐱',
+      modelSteps: [
+        { highlights: [[0,1]],  say: '"c" says /k/.' },
+        { highlights: [[1,2]],  say: '"a" says /ă/.' },
+        { highlights: [[2,3]],  say: '"t" says /t/.' },
+        { highlights: [[0,3]],  say: "Blend: /k/ /ă/ /t/ — 'cat'." }
+      ],
+      practice: {
+        word: 'cat',
+        prompt: "Read the word 'cat'.",
+        hints: [
+          "Use the phonogram sounds you know.",
+          "Blend /k/ /ă/ /t/ to read the word."
+        ],
+        reinforce: "Great job! /k/ /ă/ /t/ — 'cat'.",
+        ...( { isReading: true } as any ),
+        ...( { isPrefilled: true, prefilledIndexes: [0,1,2] } as any ),
+      }
+    }
+  ],
+  completion: [
+    "Pattern check: In CVC words like 'cat', the middle 'a' says short /æ/.",
+    "Awesome work—ready for more short a words next?"
+  ],
+  rewards: { coins: 1 }
+},
+'1-R-A.2': {
+    topicId: '1-R-A.2',
+    title: "Reading: Phonograms k–t",
+    intro: [
+      "You will practice reading with phonograms k through t."
+    ],
+    segments: [
+      {
+        modelWord: 'kite',
+        modelSteps: [
+          { highlights: [[0,1]], say: '"k" says /k/.' },
+          { highlights: [[1,2]], say: '"i" says /ī/ (long i).' },
+          { highlights: [[2,3]], say: '"t" says /t/.' },
+          { highlights: [[3,4]], say: '"e" is silent but makes the i long.' },
+          { highlights: [[0,4]], say: "Blend: /k/ /ī/ /t/ — 'kite'." }
+        ],
+        practice: {
+          word: 'kite',
+          prompt: "Read the word 'kite'.",
+          hints: [
+            "The letter 'k' says /k/ before i, e, or y.",
+            "The silent 'e' at the end makes the vowel say its long sound: /ī/."
+          ],
+          reinforce: "Great job! /k/ /ī/ /t/ — 'kite'.",
+          ...( { isReading: true } as any ),
+          ...( { isPrefilled: true, prefilledIndexes: [0,1,2,3] } as any ),
+        }
+      }
+    ],
+    completion: [
+      "Nice work reading with the hard-k spelling rule!",
+      "Ready for more phonogram practice?"
+    ],
+    rewards: { coins: 1 }
+  },
+  '1-A.1': {
+    topicId: '1-A.1',
+    title: "First 10 Phonograms (a–j)",
+    intro: [
+      "You will practice the first 10 phonograms with the word cat."
+    ],
+    segments: [
+      {
+        modelWord: 'cat',
+        emoji: '🐱',
+        modelSteps: [
+          { highlights: [[0,1]],  say: '"c" says /k/.' },
+          { highlights: [[1,2]],  say: '"a" says /æ/.' },
+          { highlights: [[2,3]],  say: '"t" says /t/.' },
+          { highlights: [[0,3]],  say: "/k/ /æ/ /t/ 'cat'." }
+        ],
+        practice: {
+          word: 'cat',
+          prompt: "Complete the word to make the short /a/ sound: c_t",
+          hints: [
+            "Listen for /k/ /æ/ /t/.",
+            "Short /a/ in CVC words is spelled with 'a'."
+          ],
+          reinforce: "Great job! The word is 'cat'.",
+          ...( { isPrefilled: true, prefilledIndexes: [0,2] } as any ),
+          ...( { isSpelling: true } as any ),
+        }
+      }
+    ],
+    completion: [
+      "Pattern check: Short /a/ in CVC words is spelled with 'a', as in cat, bag, and map.",
+      "Great work with the first 10 phonograms!"
+    ],
+    rewards: { coins: 1 }
+  },
+ '1-R-H.1': {
   topicId: '1-R-H.1',
   title: 'Reading: Consonant blends (gr)',
   intro: [
