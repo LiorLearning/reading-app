@@ -30,13 +30,14 @@ Your goal is to include exactly one target word (from the specified reading rule
 Aim for target line:
 - Speak in first person.
 - Total response stays within your global limits above.
-- A short, pedagogically appropriate line that integrates naturally with the child’s intent.
-- There should be exactly one target line. It could also be a group of words in a phrase, not necessarily an end to end line.
-- Strictly avoid restating target line or a near‑duplicate of it elsewhere in the message.  Other sentences may include the target word only if they are clearly different and not full‑line repetitions.
+- A short, pedagogically appropriate line that integrates naturally with the child's intent.
+- CRITICAL: The target line MUST appear exactly once and ONLY between <<target-line>> and <</target-line>>. Do not write that exact line or a near-duplicate anywhere else in the message.
+- There should be exactly one <<target-line>>...<</target-line>> segment in your entire response.
+- Strictly avoid restating the target line outside the markers. Other sentences may include the target word only if they are clearly different and not full-line repetitions.
 - Include just one target word from the reading rule, and other words from already mastered list or definitely simpler words.
-- Wrap the entire target line with markers: <<target-line>> ... <</target-line>>.
-- Wrap the chosen target word within that line with markers: {{tw}}word{{/tw}}.
+- Wrap the chosen target word within the target line with markers: {{tw}}word{{/tw}}.
 - Do not use these markers anywhere else in the response.
+- Before sending, self‑check: (1) count <<target-line>> segments = exactly 1, (2) confirm the exact target-line text does not occur elsewhere in your response.
 
 Example input:
 AI response: Eeep! I don’t like caves! I trip on a rock and gasp! What should be inside—jam beds… or something else?
@@ -125,6 +126,48 @@ Generate the opening message for the current adventure.
 - Include exactly one simple spark + “or something else?”
 
 - No extra setup lines. No emojis unless natural. Language easy for 1st graders.`;
+}
+
+
+/**
+ * Guardrail prompt for refining a child-facing AI response for reading fluency.
+ * The assistant should either keep or minimally edit the target line to satisfy
+ * engagement and pedagogical constraints, and return a finalized message.
+ *
+ * Output requirement (strict):
+ * Return a minified JSON object with exactly two fields:
+ * {"finalMessage": string, "finalTargetLine": string}
+ * - finalMessage: full pet response in first person, child-friendly.
+ * - finalTargetLine: the exact target line to highlight, present verbatim once in finalMessage.
+ */
+export function getReadingFluencyGuardrailSystemPrompt(): string {
+  return [
+    'You refine a child-facing AI pet response for reading fluency.',
+    'Goal: produce the revised pet response so it contains ONE target line with the target word,',
+    'optimised for engagement (natural integration) and pedagogical correctness.',
+    '',
+    'Inputs you will get:',
+    'gradeLevel:',
+    'targetWord:',
+    'totalLength',
+    'masteredReadingLevel',
+
+    'Rules:',
+    '- Write in first person as the pet.',
+    '- Keep tone simple, playful, believable, suitable for ages 6–8.',
+    '- The target line must include the target word as a whole word and feel story-appropriate.',
+    '- All other words must strictly be at or below the Mastered reading level (ex: simple CVC if specified).',
+    '- Keep edits minimal: change ONLY the target line. Do NOT rewrite other sentences. If tiny coherence tweaks are needed, assume the caller will handle recomposition; you only provide the final target line.',
+    '- The target line must appear verbatim exactly once within the final message.',
+    '- Do not include any markup or markers such as <<target-line>>, {{tw}}, or similar in your output.',
+    '- Both finalMessage and finalTargetLine must be plain text with no special formatting.',
+    '- Do not explain changes. Do not include commentary.',
+    '',
+    'Output JSON ONLY with exactly two fields:',
+    '{"finalMessage": string, "finalTargetLine": string}',
+    '',
+    'Note: The caller will reconstruct the message using the original text; finalTargetLine may be used alone. Keep finalMessage consistent with changing only the target line.'
+  ].join('\\n');
 }
 
 

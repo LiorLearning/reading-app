@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { composePrompt } from './prompt';
-import { getGenericOpeningInstruction } from './prompt/GenericPrompt';
+import { getGenericOpeningInstruction, getReadingFluencyGuardrailSystemPrompt } from './prompt/GenericPrompt';
 import { SpellingQuestion } from './questionBankUtils';
 import { UnifiedAIStreamingService, UnifiedAIResponse } from './unified-ai-streaming-service';
 
@@ -4490,6 +4490,71 @@ Example_target_line: ${exampleTargetLine || ''}`;
         return appended.trim();
       }
       return cleaned;
+    } catch {
+      return fallback();
+    }
+  }
+
+  /**
+   * Synchronous guardrail to refine the pet message and target line for reading fluency.
+   * Returns the finalized message and target line. Falls back to inputs on failure.
+   */
+  async refineFluencyMessage(params: {
+    gradeLevel?: string;
+    targetWord: string;
+    totalLength?: string | number; // applies to target line (words or chars as provided)
+    masteredReadingLevel?: string;
+    initialPetMessage: string;
+    initialTargetLine: string;
+  }): Promise<{ finalMessage: string; finalTargetLine: string }> {
+    const {
+      gradeLevel,
+      targetWord,
+      totalLength,
+      masteredReadingLevel,
+      initialPetMessage,
+      initialTargetLine,
+    } = params;
+
+    const fallback = () => ({
+      finalMessage: (initialPetMessage || '').toString(),
+      finalTargetLine: (initialTargetLine || '').toString(),
+    });
+
+    if (!this.isInitialized || !this.client) return fallback();
+
+    try {
+      const sys = getReadingFluencyGuardrailSystemPrompt();
+      const inputBlock = [
+        `Grade Level: ${gradeLevel || ''}`,
+        `Target word: ${targetWord}`,
+        `Total length for target line: ${typeof totalLength === 'number' ? totalLength : (totalLength || '')}`,
+        `Mastered reading level: ${masteredReadingLevel || ''}`,
+        `Initial pet message: ${initialPetMessage || ''}`,
+        `Target line used in initial pet message: ${initialTargetLine || ''}`,
+      ].join('\n');
+
+      const resp = await this.client.chat.completions.create({
+        model: 'gpt-5.1',
+        temperature: 0.2,
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: inputBlock }
+        ]
+      });
+
+      const text = (resp.choices?.[0]?.message?.content || '').toString().trim();
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}');
+      if (jsonStart >= 0 && jsonEnd > jsonStart) {
+        const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+        const finalMessage = typeof parsed?.finalMessage === 'string' ? parsed.finalMessage : '';
+        const finalTargetLine = typeof parsed?.finalTargetLine === 'string' ? parsed.finalTargetLine : '';
+        if (finalMessage && finalTargetLine) {
+          return { finalMessage, finalTargetLine };
+        }
+      }
+      return fallback();
     } catch {
       return fallback();
     }

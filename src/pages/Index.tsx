@@ -1972,40 +1972,46 @@ Keep tone warm, brief, and curious.`;
         suffix?: string;
       } => {
         if (!text) return { cleaned: '' };
-        let cleaned = text;
-        let targetLine: string | undefined;
-        let targetWord: string | undefined;
-        let prefix: string | undefined;
-        let suffix: string | undefined;
+          let cleaned = text;
+          let targetLine: string | undefined;
+          let targetWord: string | undefined;
+          let prefix: string | undefined;
+          let suffix: string | undefined;
         try {
-          const lineMatch = cleaned.match(/(.*?)(<<target-line>>(.+?)<<\/target-line>>)(.*)$/s);
-          if (lineMatch && lineMatch[1]) {
-            const stripMarkers = (s?: string) => (s || '')
-              .replace(/\{\{tw\}\}/g, '')
-              .replace(/\{\{\/tw\}\}/g, '')
-              .replace(/<<target-line>>/g, '')
-              .replace(/<<\/target-line>>/g, '')
-              .trim();
-            prefix = stripMarkers(lineMatch[1]);
-            const fullMarked = lineMatch[2] || '';
-            const rawLine = lineMatch[3] || '';
-            suffix = stripMarkers(lineMatch[4]);
-            const wordMatch = rawLine.match(/\{\{tw\}\}(.*?)\{\{\/tw\}\}/s);
-            if (wordMatch && wordMatch[1]) {
-              targetWord = (wordMatch[1] || '').trim();
+            // Find ALL target-line matches first
+            const allMatches = Array.from(cleaned.matchAll(/<<target-line>>([\s\S]*?)<<\/target-line>>/g));
+            if (allMatches.length > 0) {
+              const first = allMatches[0];
+              const before = cleaned.slice(0, first.index || 0);
+              const rawLine = first[1] || '';
+              const after = cleaned.slice((first.index || 0) + first[0].length);
+              const stripMarkers = (s?: string) => (s || '')
+                .replace(/\{\{tw\}\}/g, '')
+                .replace(/\{\{\/tw\}\}/g, '')
+                .replace(/<<target-line>>/g, '')
+                .replace(/<<\/target-line>>/g, '')
+                .trim();
+              prefix = stripMarkers(before);
+              suffix = stripMarkers(
+                // Also remove any additional marked segments from the suffix entirely
+                after.replace(/<<target-line>>[\s\S]*?<<\/target-line>>/g, '')
+              );
+              const wordMatch = rawLine.match(/\{\{tw\}\}(.*?)\{\{\/tw\}\}/s);
+              if (wordMatch && wordMatch[1]) {
+                targetWord = (wordMatch[1] || '').trim();
+              }
+              // Strip word markers inside the selected target line
+              const strippedLine = rawLine.replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim();
+              targetLine = strippedLine;
+              // Rebuild cleaned as prefix + first target line + suffix (drop all other target lines)
+              cleaned = [prefix, targetLine, suffix].filter(Boolean).join(' ').replace(/\s{2,}/g, ' ').trim();
+            } else {
+              // No marked lines; just strip any stray word markers if present
+              cleaned = cleaned
+                .replace(/\{\{tw\}\}/g, '')
+                .replace(/\{\{\/tw\}\}/g, '')
+                .trim();
             }
-            // Strip word markers inside the line
-            const strippedLine = rawLine.replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim();
-            targetLine = strippedLine;
-            // Remove the full marked segment from cleaned text
-            cleaned = cleaned.replace(fullMarked, targetLine);
-          }
-          // Strip both line and word markers from the visible message
-          cleaned = cleaned
-            .replace(/<<target-line>>/g, '')
-            .replace(/<<?\/target-line>>/g, '')
-            .replace(/\{\{tw\}\}/g, '')
-            .replace(/\{\{\/tw\}\}/g, '');
         } catch {}
         try {
           console.log('[FluencyParse] original:', (text || '').slice(0, 200));
@@ -2085,33 +2091,85 @@ Keep tone warm, brief, and curious.`;
         currentAdventureType // adventureType - now dynamic!
       );
       
-      // If this is a reading-fluency question, try to extract the target line from the AI message
+      // If this is a reading-fluency question, run guardrail first, then parse
       const isReadingFluency = !!((spellingQuestion as any)?.isReadingFluency);
       if (isReadingFluency && result?.adventure_story) {
-        const parsed = parseFluencyMarkers(result.adventure_story);
-        // Use parsed cleaned message for bubble
-        {
-          const newResult: any = {
-            ...result,
-            adventure_story: parsed.cleaned || result.adventure_story,
-            // Provide the extracted target line so the inline SpellBox can show it
-            spelling_sentence: parsed.targetLine || result.spelling_sentence || null,
-          };
-          // Also carry prefix/suffix for inline behavior
-          newResult.fluency_prefix = parsed.prefix;
-          newResult.fluency_suffix = parsed.suffix;
-          result = newResult;
-        }
+        // First, parse the original to extract initial values (for fallback)
+        const initialParsed = parseFluencyMarkers(result.adventure_story);
+        
+        // Synchronous guardrail: refine final message + target line before rendering (no race/timeout)
         try {
-          console.log('[FluencyParse] Applied to result:', {
-            adventure_story_first200: (result.adventure_story || '').slice(0, 200),
-            spelling_sentence: result.spelling_sentence,
-            fluency_prefix: (result as any)?.fluency_prefix,
-            fluency_suffix: (result as any)?.fluency_suffix,
-          });
-        } catch {}
-        // Optionally: we could also verify parsed.targetWord === spellingQuestion.word
-        // and log discrepancies for debugging.
+          const qAny: any = spellingQuestion as any;
+          const aiTutor = (qAny?.aiTutor || {}) as any;
+          // Prefer original target_line_length string if available; else derive from parsed config
+          const targetLineLengthRaw: string | undefined = aiTutor?.Target_line_length;
+          const { readingFluency: rf } = (augmentedUserData || {}) as any;
+          const derivedLen = rf ? `${rf.targetLineMinWords || 3}-${rf.targetLineMaxWords || 7} words` : undefined;
+          const totalLength = (targetLineLengthRaw && String(targetLineLengthRaw).trim()) ? targetLineLengthRaw : derivedLen;
+          const gradeLevel = rf?.gradeLevel || userData?.gradeDisplayName || userData?.grade;
+          // Inputs for guardrail - use the cleaned parsed values
+          const guardrailParams = {
+            gradeLevel: gradeLevel,
+            targetWord: (qAny?.word || '').toString(),
+            totalLength: totalLength,
+            masteredReadingLevel: aiTutor?.Reading_Mastered_Level,
+            initialPetMessage: (initialParsed.cleaned || result.adventure_story || '').toString(),
+            initialTargetLine: ((initialParsed.targetLine || result.spelling_sentence || '') as string).toString(),
+          };
+          const refined = await aiService.refineFluencyMessage(guardrailParams);
+          if (refined && refined.finalMessage && refined.finalTargetLine) {
+            // Strip all markers from guardrail outputs before using them
+            const stripAllMarkers = (s: string) => (s || '')
+              .replace(/<<target-line>>/g, '')
+              .replace(/<<\/target-line>>/g, '')
+              .replace(/\{\{tw\}\}/g, '')
+              .replace(/\{\{\/tw\}\}/g, '')
+              .trim();
+            const cleanedMessageFromGuardrail = stripAllMarkers(refined.finalMessage);
+            const cleanedLine = stripAllMarkers(refined.finalTargetLine);
+            
+            // Compose the final message by replacing ONLY the original target line
+            const baseMessage = (initialParsed.cleaned || result.adventure_story || '').toString();
+            const originalLine = (initialParsed.targetLine || result.spelling_sentence || '').toString();
+            let composedMessage = baseMessage;
+            if (originalLine && baseMessage.includes(originalLine)) {
+              composedMessage = baseMessage.replace(originalLine, cleanedLine);
+            } else if (cleanedMessageFromGuardrail && cleanedMessageFromGuardrail.includes(cleanedLine)) {
+              // Fallback: if original line not found, use guardrail message as base (already coherent)
+              composedMessage = cleanedMessageFromGuardrail;
+            }
+
+            // Update result with guardrailed line and composed message
+            (result as any).adventure_story = composedMessage;
+            (result as any).spelling_sentence = cleanedLine;
+            
+            // Compute new prefix/suffix based on where the target line appears in the final message
+            const lineIdx = composedMessage.indexOf(cleanedLine);
+            if (lineIdx !== -1) {
+              (result as any).fluency_prefix = composedMessage.slice(0, lineIdx).trim();
+              (result as any).fluency_suffix = composedMessage.slice(lineIdx + cleanedLine.length).trim();
+            } else {
+              // Fallback: use the whole message as prefix if line not found
+              (result as any).fluency_prefix = composedMessage;
+              (result as any).fluency_suffix = '';
+            }
+          }
+          try {
+            console.log('[FluencyGuardrail] applied:', {
+              finalMessage_first200: ((result as any).adventure_story || '').slice(0, 200),
+              finalTargetLine: (result as any).spelling_sentence,
+              fluency_prefix: (result as any)?.fluency_prefix,
+              fluency_suffix: (result as any)?.fluency_suffix,
+            });
+          } catch {}
+        } catch (e) {
+          console.warn('[FluencyGuardrail] Failed, using original parsed message/line', e);
+          // Fallback to parsed values
+          (result as any).adventure_story = initialParsed.cleaned || result.adventure_story;
+          (result as any).spelling_sentence = initialParsed.targetLine || result.spelling_sentence || null;
+          (result as any).fluency_prefix = initialParsed.prefix;
+          (result as any).fluency_suffix = initialParsed.suffix;
+        }
       }
 
       // console.log('✅ AI service returned:', result);
@@ -2808,9 +2866,27 @@ Keep tone warm, brief, and curious.`;
           // Ensure we always have a continuation for after spelling.
           // If the AI didn't provide an adventure story, synthesize a gentle prompt
           // by appending a follow-up question to the spelling sentence.
-          const contentAfterSpelling: string = (aiResponse.adventure_story && aiResponse.adventure_story.trim())
+          const fullContentAfterSpelling: string = (aiResponse.adventure_story && aiResponse.adventure_story.trim())
             ? aiResponse.adventure_story
             : `${(aiResponse.spelling_sentence || '').trim()} ${'What should we do next?'}`.trim();
+          
+          // Build the message shown in the bubble during the spelling step.
+          // For reading-fluency, strip the first exact occurrence of the target line from the AI message
+          // to avoid showing it twice (once as chip, once in the bubble). TTS remains unaffected.
+          let contentAfterSpellingForDisplay: string = fullContentAfterSpelling;
+          if ((spellingQuestion as any)?.isReadingFluency && aiResponse.spelling_sentence) {
+            const target = (aiResponse.spelling_sentence || '').toString().trim();
+            const idx = contentAfterSpellingForDisplay.indexOf(target);
+            if (idx !== -1) {
+              const before = contentAfterSpellingForDisplay.slice(0, idx);
+              const after = contentAfterSpellingForDisplay.slice(idx + target.length);
+              contentAfterSpellingForDisplay = (before + after)
+                .replace(/\s{2,}/g, ' ')
+                .replace(/ \,/g, ',')
+                .replace(/ \./g, '.')
+                .trim();
+            }
+          }
 
           const spellingSentenceMessage: ChatMessage = {
             type: 'ai',
@@ -2818,7 +2894,8 @@ Keep tone warm, brief, and curious.`;
             timestamp: Date.now(),
             spelling_word: spellingQuestion.audio,
             spelling_sentence: aiResponse.spelling_sentence,
-            content_after_spelling: contentAfterSpelling, // Always present: AI story or synthesized fallback
+            content_after_spelling: contentAfterSpellingForDisplay, // Display version (line stripped for fluency)
+            content_after_spelling_full: fullContentAfterSpelling, // Full version for chat history (includes line)
             fluency_prefix: (aiResponse as any)?.fluency_prefix,
             fluency_suffix: (aiResponse as any)?.fluency_suffix,
             hiddenInChat: true
@@ -5036,8 +5113,11 @@ Keep tone warm, brief, and curious.`;
           && (!exitAt || (typeof ai.timestamp === 'number' ? ai.timestamp > exitAt : true));
       }) as any;
       const latestWithContinuation = reverse.find(m => (m.type === 'ai' && (m as any).content_after_spelling)) as any;
-      const continuation = (lastForCurrentWord?.content_after_spelling
+      // Use full version (with target line) for chat history; fall back to display version if full not available
+      const continuation = (lastForCurrentWord?.content_after_spelling_full
+        || lastForCurrentWord?.content_after_spelling
         || lastForCurrentWord?.spelling_sentence
+        || latestWithContinuation?.content_after_spelling_full
         || latestWithContinuation?.content_after_spelling
         || (nowWord ? `Great job spelling "${currentSpellQuestion?.word || currentSpellQuestion?.audio}"!` : "Great job! Let's continue our adventure! ✨"));
 
@@ -7348,7 +7428,10 @@ Keep tone warm, brief, and curious.`;
                           const latestWithContinuation = prev
                             .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
                             .slice(-1)[0] as any;
-                          const continuation = latestWithContinuation?.content_after_spelling || "Great job! Let's continue our adventure! ✨";
+                          // Use full version (with target line) for chat history
+                          const continuation = latestWithContinuation?.content_after_spelling_full 
+                            || latestWithContinuation?.content_after_spelling 
+                            || "Great job! Let's continue our adventure! ✨";
                           const adventureStoryMessage: ChatMessage = {
                             type: 'ai',
                             content: continuation,
