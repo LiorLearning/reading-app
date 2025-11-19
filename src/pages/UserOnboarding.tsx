@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { playClickSound } from "@/lib/sounds";
-import { ChevronRight, User, GraduationCap, Sparkles } from "lucide-react";
+import { ChevronRight, User, GraduationCap, Sparkles, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import analytics from '@/lib/analytics';
 import { useAuth } from "@/hooks/use-auth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { db } from "@/lib/firebase";
+import { collection, query, where, getDocs, Timestamp } from "firebase/firestore";
 
 interface UserOnboardingProps {
   onComplete: () => void;
@@ -27,6 +29,8 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
   const [age, setAge] = useState<string>("");
   const [ageError, setAgeError] = useState<string>("");
   const [gender, setGender] = useState<string>("");
+  const [schoolCode, setSchoolCode] = useState<string>("");
+  const [schoolCodeError, setSchoolCodeError] = useState<string>("");
   const [step, setStep] = useState(1); // 1 = username, 2 = grade
   const [loading, setLoading] = useState(false);
 
@@ -73,6 +77,13 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     }
   }, [userData]);
 
+  // Prefill school code from existing user data if present
+  React.useEffect(() => {
+    if (userData?.schoolCode) {
+      setSchoolCode(String(userData.schoolCode));
+    }
+  }, [userData?.schoolCode]);
+
   const handleComplete = async () => {
     const parsedAge = Number(age);
     const isValidAge = Number.isFinite(parsedAge) && parsedAge > 3 && parsedAge < 15;
@@ -80,6 +91,35 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
     if (!isValidAge) {
       setAgeError("Please enter an age between 4 and 14.");
       return;
+    }
+
+    // Validate school code if provided (optional field)
+    setSchoolCodeError("");
+    let schoolCodeInt: number | undefined = undefined;
+    const trimmedSchoolCode = schoolCode.trim();
+    
+    if (trimmedSchoolCode) {
+      schoolCodeInt = parseInt(trimmedSchoolCode, 10);
+      if (isNaN(schoolCodeInt)) {
+        setSchoolCodeError('School code must be a valid number');
+        return;
+      }
+
+      // Verify school code exists in Firestore (check code field)
+      try {
+        const schoolsRef = collection(db, 'schools');
+        const q = query(schoolsRef, where('code', '==', schoolCodeInt));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+          setSchoolCodeError('School code not found. Please verify and try again.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error verifying school code:', error);
+        setSchoolCodeError('Failed to verify school code');
+        return;
+      }
     }
 
     if (username.trim()) {
@@ -96,6 +136,11 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
         };
         if (gender === 'male' || gender === 'female') {
           payload.gender = gender;
+        }
+        if (schoolCodeInt !== undefined) {
+          const now = Timestamp.now();
+          payload.schoolCode = schoolCodeInt;
+          payload.schoolCodeSetAt = now.toDate();
         }
         if (!userData?.grade) {
           payload.grade = selectedGrade || "assignment";
@@ -342,6 +387,39 @@ const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
                         <SelectItem value="female">Female</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="school-code" className="block text-lg font-semibold text-gray-700 mb-3">
+                      School Code <span className="text-sm font-normal text-gray-500">(Optional)</span>
+                    </label>
+                    <div className="relative">
+                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="school-code"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="Enter school code"
+                        value={schoolCode}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Only allow numeric input (integers only)
+                          if (value === '' || /^\d+$/.test(value)) {
+                            setSchoolCode(value);
+                            setSchoolCodeError(''); // Clear error when user types
+                          }
+                        }}
+                        onKeyPress={handleKeyPress}
+                        className={cn(
+                          "h-14 text-lg border-3 border-black rounded-xl bg-white focus:bg-gray-50 pl-12",
+                          schoolCodeError ? "border-red-500 focus-visible:ring-red-500" : ""
+                        )}
+                        style={{ boxShadow: '0 4px 0 black' }}
+                      />
+                    </div>
+                    {schoolCodeError && (
+                      <p className="mt-2 text-sm text-red-600 font-semibold" aria-live="polite">{schoolCodeError}</p>
+                    )}
                   </div>
 
                   <Button
