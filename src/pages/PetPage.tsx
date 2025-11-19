@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { deductCoinsOnPurchase } from '@/lib/state-store-api';
 import { useNavigate } from 'react-router-dom';
 import { useCoins, CoinSystem } from '@/pages/coinSystem';
@@ -19,7 +20,8 @@ import analytics from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
-import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn, PencilLine } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { GraduationCap, ChevronDown, ChevronUp, LogOut, ShoppingCart,Rocket, MoreHorizontal, TrendingUp, Clock, Camera, BookOpen, UserPlus, LogIn, PencilLine, Building2 } from 'lucide-react';
 import { playClickSound } from '@/lib/sounds';
 import { sampleMCQData } from '../data/mcq-questions';
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
@@ -129,6 +131,11 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const [streakForModal, setStreakForModal] = useState(0);
   const [showPerPetStreakModal, setShowPerPetStreakModal] = useState(false);
   const [perPetStreakModalData, setPerPetStreakModalData] = useState<{ petId: string; streak: number; slots: number[] } | null>(null);
+
+  // School code modal state
+  const [showSchoolCodeModal, setShowSchoolCodeModal] = useState(false);
+  const [schoolCodeInput, setSchoolCodeInput] = useState('');
+  const [schoolCodeError, setSchoolCodeError] = useState('');
 
   // Daily word list modal and count (local timezone)
   const [isDailyReviewOpen, setIsDailyReviewOpen] = useState(false);
@@ -1306,6 +1313,57 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const handleProgressTrackingClick = () => {
     playClickSound();
     navigate('/progress');
+  };
+
+  const handleSchoolCodeSubmit = async () => {
+    if (!user || isAnonymous) {
+      navigate('/auth?redirect=/app');
+      return;
+    }
+
+    // Clear previous errors
+    setSchoolCodeError('');
+
+    try {
+      playClickSound();
+      
+      // Parse input as integer
+      const trimmedInput = schoolCodeInput.trim();
+      if (!trimmedInput) {
+        setSchoolCodeError('Please enter a school code');
+        return;
+      }
+
+      const schoolCodeInt = parseInt(trimmedInput, 10);
+      if (isNaN(schoolCodeInt)) {
+        setSchoolCodeError('School code must be a valid number');
+        return;
+      }
+
+      // Verify school code exists in Firestore (check code field)
+      const schoolsRef = collection(db, 'schools');
+      const q = query(schoolsRef, where('code', '==', schoolCodeInt));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        setSchoolCodeError('School code not found. Please verify and try again.');
+        return;
+      }
+
+      // Store schoolCode as integer and schoolCodeSetAt as timestamp
+      const now = Timestamp.now();
+      await updateUserData({ 
+        schoolCode: schoolCodeInt,
+        schoolCodeSetAt: now.toDate()
+      });
+      
+      setShowSchoolCodeModal(false);
+      setSchoolCodeInput('');
+      setSchoolCodeError('');
+    } catch (error) {
+      console.error('Error updating school code:', error);
+      setSchoolCodeError('Failed to update school code');
+    }
   };
 
   const handleActionClick = async (actionId: string) => {
@@ -3934,6 +3992,27 @@ const getSleepyPetImage = (clicks: number) => {
                 </div>
               </DropdownMenuItem>
               
+              {/* Change School Code Button */}
+              <DropdownMenuItem 
+                className={`flex items-center gap-2 px-4 py-3 hover:bg-blue-50 cursor-pointer rounded-lg ${isAnonymous ? 'opacity-50' : ''}`}
+                onClick={() => { 
+                  if (isAnonymous) { 
+                    navigate('/auth?redirect=/app'); 
+                    return; 
+                  } 
+                  playClickSound();
+                  setSchoolCodeInput(userData?.schoolCode ? String(userData.schoolCode) : '');
+                  setSchoolCodeError('');
+                  setShowSchoolCodeModal(true);
+                }}
+              >
+                <Building2 className="h-4 w-4 text-blue-600" />
+                <div>
+                  <div className="font-semibold text-blue-600">Change School Code</div>
+                  <div className="text-sm text-gray-500">Update your school code</div>
+                </div>
+              </DropdownMenuItem>
+              
               {/* Auth CTA / Logout */}
               <div className="border-t border-gray-200 mt-2 pt-2">
                 {isAnonymous ? (
@@ -3971,6 +4050,14 @@ const getSleepyPetImage = (clicks: number) => {
               <BookOpen className="h-5 w-5" />
               <span className="text-base leading-none">{todayWordCount}</span>
             </Button>
+            {userData?.schoolCode && (
+              <div className="flex items-center gap-1.5 bg-gray-100/80 backdrop-blur-sm border border-gray-200 rounded-lg px-3 py-1.5">
+                <Building2 className="h-3.5 w-3.5 text-gray-600" />
+                <span className="text-xs font-semibold text-gray-700 tracking-wide">
+                  {userData.schoolCode}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -4707,6 +4794,71 @@ const getSleepyPetImage = (clicks: number) => {
         open={isDailyReviewOpen}
         onOpenChange={setIsDailyReviewOpen}
       />
+
+      {/* School Code Modal */}
+      <Dialog open={showSchoolCodeModal} onOpenChange={setShowSchoolCodeModal}>
+        <DialogContent className="w-full max-w-md mx-auto bg-white/95 backdrop-blur text-card-foreground overflow-hidden border border-primary/20 shadow-2xl ring-1 ring-primary/40 rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <Building2 className="h-6 w-6 text-blue-600" />
+              Change School Code
+            </DialogTitle>
+            <DialogDescription>
+              Enter your school code to update your profile.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 space-y-4">
+            <div>
+              <label htmlFor="school-code-input" className="block text-sm font-medium text-gray-700 mb-2">
+                School Code
+              </label>
+              <Input
+                id="school-code-input"
+                type="text"
+                inputMode="numeric"
+                value={schoolCodeInput}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow numeric input (integers only)
+                  if (value === '' || /^\d+$/.test(value)) {
+                    setSchoolCodeInput(value);
+                    setSchoolCodeError(''); // Clear error when user types
+                  }
+                }}
+                placeholder="Enter school code"
+                className={`w-full ${schoolCodeError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSchoolCodeSubmit();
+                  }
+                }}
+              />
+              {schoolCodeError && (
+                <p className="text-sm text-red-600 mt-1.5">{schoolCodeError}</p>
+              )}
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowSchoolCodeModal(false);
+                  setSchoolCodeInput('');
+                  setSchoolCodeError('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSchoolCodeSubmit}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Invisible dev-only buttons */}
       {/* Top-center: increment streak */}
