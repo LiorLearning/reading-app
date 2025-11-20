@@ -883,6 +883,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [lastSpellingDiagnosis, setLastSpellingDiagnosis] = useState<{ mistake: string; spelling_pattern_issue: 'yes' | 'no' } | null>(null);
   // Latest Azure pronunciation accuracyScore (if available) for the current attempt
   const [lastAzureAccuracyScore, setLastAzureAccuracyScore] = useState<number | null>(null);
+  // Lightweight OpenAI client for simple GPT checks (e.g., target word presence)
+  const gptClient = React.useMemo(() => {
+    try {
+      const key = (import.meta as any).env?.VITE_OPENAI_API_KEY as string | undefined;
+      if (!key) return null;
+      return new OpenAI({ apiKey: key, dangerouslyAllowBrowser: true });
+    } catch {
+      return null;
+    }
+  }, []);
 
   // Helper function to get the expected length for user input (excluding prefilled characters)
   const getExpectedUserInputLength = useCallback((): number => {
@@ -1421,7 +1431,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           : (typeof lastAzureAccuracyScore === 'number' ? lastAzureAccuracyScore : null);
 
         if (typeof azureScore === 'number') {
-          // Use Azure score strictly: >=70 is correct, otherwise incorrect (fallback to AI only for feedback).
+          // Use Azure score: >=70 is correct. If <70, consult GPT as an override for word presence.
           const normalize = (s: string) => (s || '')
             .toLowerCase()
             .replace(/[^a-z\s]/g, ' ')
@@ -1436,18 +1446,62 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             setReadingMismatchedIndices(latestReadingMismatches);
             console.log('[SpellBox] Evaluation (reading via Azure). score=', azureScore, 'correct=', correct, 'word=', completeWord);
           } else {
-            // Azure below threshold: strictly incorrect. Optionally use LLM only to compute mismatches,
-            // but do NOT override correctness.
-            correct = false;
+            // Azure below threshold: attempt GPT-5.1 override to check permissive word presence.
+            let gptOverride = false;
             try {
-              const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
-              latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
-              setReadingMismatchedIndices(latestReadingMismatches);
-              console.log('[SpellBox] Evaluation (reading via AI, after low Azure score). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
-            } catch (e) {
+              if (gptClient) {
+                const system = 'You are a strict verifier that decides if a target word appears anywhere in a transcript. Case-insensitive, ignore punctuation, allow repetition and surrounding sentence context. If the student spells the word letter-by-letter (e.g., "P E N", "p e n", or "p, e, n"), this does not counts as containing the target word. Respond ONLY with a minified JSON object like {"match":true} or {"match":false}.';
+                const user = `Target word: "${targetWord}"\nTranscript: "${completeWord}"\nDoes the transcript contain the target word (anywhere, any number of times, case-insensitive, punctuation ignored, and treating letter-by-letter spelling like "P E N" or "p, e, n" as not a match)? Reply with {"match":true} or {"match":false} only.`;
+                const resp = await gptClient.chat.completions.create({
+                  model: 'gpt-5.1',
+                  temperature: 0,
+                  max_tokens: 5,
+                  messages: [
+                    { role: 'system', content: system },
+                    { role: 'user', content: user }
+                  ]
+                } as any);
+                const content = (resp as any)?.choices?.[0]?.message?.content || '';
+                const jsonStart = content.indexOf('{');
+                const jsonEnd = content.lastIndexOf('}');
+                if (jsonStart >= 0 && jsonEnd > jsonStart) {
+                  const parsed = JSON.parse(content.slice(jsonStart, jsonEnd + 1));
+                  gptOverride = Boolean(parsed?.match === true);
+                } else {
+                  // Fallback parsing: treat "true" presence as a YES
+                  gptOverride = /\btrue\b/i.test(content);
+                }
+              } else {
+                // No GPT available; fallback to lenient token presence check
+                const tokenSet = new Set(tokens);
+                gptOverride = normalizedTarget && tokenSet.has(normalizedTarget);
+              }
+            } catch {
+              // As a last resort, do simple presence check
+              const tokenSet = new Set(tokens);
+              gptOverride = normalizedTarget && tokenSet.has(normalizedTarget);
+            }
+
+            if (gptOverride) {
+              // Override: mark correct and surface a 90% accuracy for the circle
+              correct = true;
               latestReadingMismatches = [];
               setReadingMismatchedIndices(latestReadingMismatches);
-              console.warn('[SpellBox] AI evaluation failed after low Azure score; keeping incorrect. azureScore=', azureScore);
+              setLastAzureAccuracyScore(90);
+              console.log('[SpellBox] GPT override applied after low Azure score. Setting accuracy to 90 and marking correct.');
+            } else {
+              // Keep incorrect; optionally compute mismatches for feedback
+              correct = false;
+              try {
+                const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+                latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
+                setReadingMismatchedIndices(latestReadingMismatches);
+                console.log('[SpellBox] Evaluation (reading via AI, after low Azure score, no GPT override). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
+              } catch (e) {
+                latestReadingMismatches = [];
+                setReadingMismatchedIndices(latestReadingMismatches);
+                console.warn('[SpellBox] AI evaluation failed after low Azure score; keeping incorrect. azureScore=', azureScore);
+              }
             }
           }
         } else {
