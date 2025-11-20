@@ -587,7 +587,7 @@ class TextToSpeechService {
         model: 'eleven_flash_v2_5',
         stability: 0.6,
         similarity_boost: 0.85,
-        speed: this.selectedSpeed
+        speed: 0.7
       });
     } else {
       await this.speak(text);

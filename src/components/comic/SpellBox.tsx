@@ -20,7 +20,7 @@ interface WordPart {
 }
 
 // Small circular accuracy meter used for reading pronunciation score
-const AccuracyCircle: React.FC<{ score: number; size?: number }> = ({ score, size = 32 }) => {
+const AccuracyCircle: React.FC<{ score: number; size?: number; isFluency?: boolean }> = ({ score, size = 32, isFluency = false }) => {
   const clamped = Math.max(0, Math.min(100, score));
   const radius = (size - 6) / 2; // leave padding for stroke
   const circumference = 2 * Math.PI * radius;
@@ -29,7 +29,7 @@ const AccuracyCircle: React.FC<{ score: number; size?: number }> = ({ score, siz
   let strokeColor = 'stroke-green-500';
   if (clamped < 40) {
     strokeColor = 'stroke-red-500';
-  } else if (clamped < 70) {
+  } else if (isFluency ? (clamped < 80) : (clamped < 70)) {
     strokeColor = 'stroke-yellow-400';
   }
 
@@ -75,12 +75,16 @@ const AccuracyCircle: React.FC<{ score: number; size?: number }> = ({ score, siz
 // Lightweight mic button using the browser Web Speech API (easiest path for dev testing)
 const ReadingMicButton: React.FC<{
   targetWord: string;
+  /** Reference text for Azure pronunciation assessment (word for reading; full line for fluency) */
+  referenceText?: string;
   onRecognized: (isCorrect: boolean) => void;
   onTranscript?: (text: string, isFinal: boolean) => void;
   // second arg may be a plain string (backwards compatible) or an object with Azure meta
-  onRecordingChange?: (isRecording: boolean, final?: string | { text?: string; accuracyScore?: number }) => void;
+  onRecordingChange?: (isRecording: boolean, final?: string | { text?: string; accuracyScore?: number; azure?: any }) => void;
+  /** If true, treat this as reading fluency (use higher Azure threshold) */
+  isFluency?: boolean;
   compact?: boolean;
-}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact }) => {
+}> = ({ targetWord, referenceText, onRecognized, onTranscript, onRecordingChange, isFluency, compact }) => {
   const [isRecording, setIsRecording] = React.useState(false);
   const recognitionRef = React.useRef<any>(null);
   const shouldBeRecordingRef = React.useRef<boolean>(false);
@@ -229,7 +233,8 @@ const ReadingMicButton: React.FC<{
                 try {
             const fd = new FormData();
             fd.append('file', file);
-            fd.append('reference_text', targetWord);
+            // For reading fluency, send the entire target line as reference; fallback to the word
+            fd.append('reference_text', (referenceText || targetWord) as string);
             fd.append('language', 'en-US');
                   const resp = await fetch(azureUrl, { method: 'POST', body: fd });
                   return await resp.json().catch(() => ({}));
@@ -267,12 +272,12 @@ const ReadingMicButton: React.FC<{
               return;
             }
             try { onTranscript?.(text, true); } catch {}
-            try { onRecordingChange?.(false, { text, accuracyScore: accuracyScore ?? undefined }); } catch {}
+            try { onRecordingChange?.(false, { text, accuracyScore: accuracyScore ?? undefined, azure: azureJson }); } catch {}
             // Quick correctness hint based on Azure accuracyScore when available,
             // falling back to transcript-based heuristic when Azure isn't available.
             try {
               if (typeof accuracyScore === 'number') {
-                onRecognized(accuracyScore >= 70);
+                onRecognized(accuracyScore >= (isFluency ? 80 : 70));
               } else {
               const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
               const words = new Set(norm(text).split(' ').filter(Boolean));
@@ -936,6 +941,40 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [lastSpellingDiagnosis, setLastSpellingDiagnosis] = useState<{ mistake: string; spelling_pattern_issue: 'yes' | 'no' } | null>(null);
   // Latest Azure pronunciation accuracyScore (if available) for the current attempt
   const [lastAzureAccuracyScore, setLastAzureAccuracyScore] = useState<number | null>(null);
+  // Helper: derive fluency word-level mismatches from Azure service JSON
+  const extractFluencyMismatchesFromAzure = useCallback((azure: any, line: string): number[] => {
+    try {
+      const wordsArr: any[] =
+        azure?.serviceJson?.NBest?.[0]?.Words ||
+        azure?.Words ||
+        [];
+      if (!Array.isArray(wordsArr) || wordsArr.length === 0) return [];
+      const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      const normWord = (s: string) => (s || '').toLowerCase().replace(/[^a-z]/g, '');
+      const workingTokens = (line || '')
+        .split(' ')
+        .map(w => normWord(w));
+      const mismatches: number[] = [];
+      let cursor = 0;
+      for (const w of wordsArr) {
+        const aw = normWord(w?.Word || '');
+        // Find next matching token index in working sentence
+        let foundIdx = -1;
+        for (let j = cursor; j < workingTokens.length; j++) {
+          if (workingTokens[j] === aw && aw) { foundIdx = j; cursor = j + 1; break; }
+        }
+        const errorType = (w?.PronunciationAssessment?.ErrorType || '').toString();
+        const hasError = errorType && errorType.toLowerCase() !== 'none';
+        if (foundIdx >= 0 && hasError) mismatches.push(foundIdx);
+      }
+      // Deduplicate and clamp
+      const unique = Array.from(new Set(mismatches))
+        .filter(i => Number.isFinite(i) && i >= 0 && i < workingTokens.length);
+      return unique;
+    } catch {
+      return [];
+    }
+  }, []);
 
   // Helper function to get the expected length for user input (excluding prefilled characters)
   const getExpectedUserInputLength = useCallback((): number => {
@@ -1484,24 +1523,27 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           const normalizedTarget = normalize(targetWord);
           const tokens = normalize(completeWord).split(/\s+/).filter(Boolean);
 
-          if (azureScore >= 70) {
+          if (azureScore >= (isReadingFluency ? 80 : 70)) {
             correct = true;
             latestReadingMismatches = [];
             setReadingMismatchedIndices(latestReadingMismatches);
             console.log('[SpellBox] Evaluation (reading via Azure). score=', azureScore, 'correct=', correct, 'word=', completeWord);
           } else {
-            // Azure below threshold: strictly incorrect. Optionally use LLM only to compute mismatches,
-            // but do NOT override correctness.
+            // Azure below threshold: strictly incorrect.
             correct = false;
-            try {
-              const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
-              latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
-              setReadingMismatchedIndices(latestReadingMismatches);
-              console.log('[SpellBox] Evaluation (reading via AI, after low Azure score). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
-            } catch (e) {
-              latestReadingMismatches = [];
-              setReadingMismatchedIndices(latestReadingMismatches);
-              console.warn('[SpellBox] AI evaluation failed after low Azure score; keeping incorrect. azureScore=', azureScore);
+            // For reading fluency, keep Azure-derived word-level highlights already computed on mic stop.
+            // For single-word reading, optionally compute mismatches via AI for feedback.
+            if (!isReadingFluency) {
+              try {
+                const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+                latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
+                setReadingMismatchedIndices(latestReadingMismatches);
+                console.log('[SpellBox] Evaluation (reading via AI, after low Azure score). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
+              } catch (e) {
+                latestReadingMismatches = [];
+                setReadingMismatchedIndices(latestReadingMismatches);
+                console.warn('[SpellBox] AI evaluation failed after low Azure score; keeping incorrect. azureScore=', azureScore);
+              }
             }
           }
         } else {
@@ -1613,6 +1655,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
         if (!changedSinceLast) {
           return;
         }
+        // Reading fluency: speak guidance to click highlighted words for pronunciation
+        try {
+          if (isReadingFluency) {
+            ttsService.stop();
+            await ttsService.speak('Click on the highlighted words to hear their pronunciation.', {
+              stability: 0.7,
+              similarity_boost: 0.9,
+              speed: 0.9,
+              voice: jessicaVoiceId
+            });
+          }
+        } catch {}
         const nextAttempt = attempts + 1;
         setAttempts(nextAttempt);
         // Unlock the hint bulb after the first wrong checked attempt
@@ -2238,6 +2292,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           <ReadingMicButton 
                             compact
                             targetWord={targetWord} 
+                            referenceText={isReadingFluency ? (workingSentence || targetWord) : targetWord}
+                            isFluency={isReadingFluency}
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                             onRecordingChange={(rec, meta) => {
                               if (rec && showReadingMicGuide) {
@@ -2255,9 +2311,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 const final = ((text ?? liveTranscript) || '').trim();
                                 setLockedTranscript(final);
                                 setLastAzureAccuracyScore(typeof accuracyScore === 'number' ? accuracyScore : null);
+                                // For fluency: compute word-level mismatches from Azure JSON if available
+                                if (isReadingFluency && typeof meta === 'object' && meta && (meta as any).azure) {
+                                  const indices = extractFluencyMismatchesFromAzure((meta as any).azure, workingSentence || '');
+                                  setReadingMismatchedIndices(indices);
+                                }
                                 setHasSubmitted(false);
                                 setIsCorrect(false);
-                                setReadingMismatchedIndices([]);
                                 // Auto-submit for reading questions when recording stops, using the final transcript directly
                                 if (final) {
                                   try { handleSubmitAttempt(final, accuracyScore); } catch {}
@@ -2336,15 +2396,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           
 
           {/* Hint + accuracy + coach cluster (top-right) */}
-          {(((hintUnlocked && showHints) || (isReading && hasSubmitted && typeof lastAzureAccuracyScore === 'number'))) && (
+          {(((hintUnlocked && showHints) || ((isReading || isReadingFluency)  && hasSubmitted && typeof lastAzureAccuracyScore === 'number'))) && (
           <div className="absolute top-2 right-2 z-20 flex items-center gap-2">
             {/* If correct: place accuracy circle where the bulb would be */}
-            {isReading && hasSubmitted && isCorrect && typeof lastAzureAccuracyScore === 'number' ? (
-              <AccuracyCircle score={lastAzureAccuracyScore} size={34} />
+            {(isReading || isReadingFluency) && hasSubmitted && isCorrect && typeof lastAzureAccuracyScore === 'number' ? (
+              <AccuracyCircle score={lastAzureAccuracyScore} size={34} isFluency={isReadingFluency} />
             ) : (
               <>
                 {/* Lightbulb only when hints are enabled/visible */}
-                {(hintUnlocked && showHints) && (
+                {(hintUnlocked && showHints && !isReadingFluency) && (
               <Button
                 variant="comic"
                 size="icon"
@@ -2409,8 +2469,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               </Button>
                 )}
                 {/* Accuracy circle appears after submit; when incorrect, it sits between bulb and coach */}
-                {(isReading && hasSubmitted && typeof lastAzureAccuracyScore === 'number') && (
-                  <AccuracyCircle score={lastAzureAccuracyScore} size={34} />
+                {((isReading || isReadingFluency) && hasSubmitted && typeof lastAzureAccuracyScore === 'number') && (
+                  <AccuracyCircle score={lastAzureAccuracyScore} size={34} isFluency={isReadingFluency} />
                 )}
               </>
             )}
@@ -2552,14 +2612,31 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           <ReadingMicButton 
                             compact
                             targetWord={targetWord}
+                            referenceText={isReadingFluency ? (workingSentence || targetWord) : targetWord}
+                            isFluency={isReadingFluency}
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
-                            onRecordingChange={(rec, finalText) => {
+                              onRecordingChange={(rec, meta) => {
                               setIsRecordingReading(rec);
                               if (!rec) {
-                                setLockedTranscript(((finalText ?? liveTranscript) || '').trim());
-                                setHasSubmitted(false);
-                                setIsCorrect(false);
-                                setReadingMismatchedIndices([]);
+                                  const finalText = typeof meta === 'string' ? meta : (meta?.text ?? '');
+                                  const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
+                                    ? (meta as any).accuracyScore as number | undefined
+                                    : undefined;
+                                  const final = ((finalText ?? liveTranscript) || '').trim();
+                                  setLockedTranscript(final);
+                                  setLastAzureAccuracyScore(typeof accuracyScore === 'number' ? accuracyScore : null);
+                                  if (isReadingFluency && typeof meta === 'object' && meta && (meta as any).azure) {
+                                    const indices = extractFluencyMismatchesFromAzure((meta as any).azure, workingSentence || '');
+                                    setReadingMismatchedIndices(indices);
+                                  } else {
+                                    setReadingMismatchedIndices([]);
+                                  }
+                                  setHasSubmitted(false);
+                                  setIsCorrect(false);
+                                  // Auto-submit with accuracy override when we have a final transcript
+                                  if (final) {
+                                    try { handleSubmitAttempt(final, accuracyScore); } catch {}
+                                  }
                               } else {
                                 setLockedTranscript('');
                                 setLiveTranscript('');
@@ -2742,6 +2819,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               <ReadingMicButton 
                                 compact
                                 targetWord={targetWord}
+                              referenceText={isReadingFluency ? (workingSentence || targetWord) : targetWord}
+                                isFluency={isReadingFluency}
                                 onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                                 onRecordingChange={(rec, meta) => {
                                   setIsRecordingReading(rec);
@@ -2813,13 +2892,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               </div>
             )}
 
-            {/* Inline: show row when hints are visible OR when we have a reading accuracy score after submit */}
-            {( (isReading && hasSubmitted && typeof lastAzureAccuracyScore === 'number') || (hintUnlocked && showHints) ) && (
+            {/* Inline: show row when hints are visible OR when we have a reading/fluency accuracy score after submit */}
+            {( ((isReading || isReadingFluency) && hasSubmitted && typeof lastAzureAccuracyScore === 'number') || (hintUnlocked && showHints) ) && (
               <div className="flex items-center justify-start gap-2 py-2">
                 {/* If correct: show accuracy circle in place of bulb */}
-                {isReading && hasSubmitted && isCorrect && typeof lastAzureAccuracyScore === 'number' ? (
-                  <AccuracyCircle score={lastAzureAccuracyScore} size={30} />
+                {(isReading || isReadingFluency) && hasSubmitted && isCorrect && typeof lastAzureAccuracyScore === 'number' ? (
+                  <AccuracyCircle score={lastAzureAccuracyScore} size={30} isFluency={isReadingFluency} />
                 ) : (
+                <>
+                {(hintUnlocked && showHints && !isReadingFluency) && (
                 <Button
                   variant="comic"
                   size="icon"
@@ -2886,8 +2967,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 </Button>
                 )}
                 {/* When incorrect, place accuracy circle between bulb and coach */}
-                {isReading && hasSubmitted && !isCorrect && typeof lastAzureAccuracyScore === 'number' && (
-                  <AccuracyCircle score={lastAzureAccuracyScore} size={30} />
+                {((isReading || isReadingFluency) && hasSubmitted && !isCorrect && typeof lastAzureAccuracyScore === 'number') && (
+                  <AccuracyCircle score={lastAzureAccuracyScore} size={30} isFluency={isReadingFluency} />
+                )}
+                </>
                 )}
               </div>
             )}
