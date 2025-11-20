@@ -5,7 +5,6 @@ import { Mic, Send, Image as ImageIcon, Square, X } from "lucide-react";
 import { toast } from "sonner";
 import { playClickSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
-import OpenAI from 'openai';
 import { ttsService } from "@/lib/tts-service";
 import analytics from "@/lib/analytics";
 
@@ -28,19 +27,19 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   const recognitionRef = useRef<any | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const [useWhisper, setUseWhisper] = useState(false);
+  const [useWhisper, setUseWhisper] = useState(true);
   const isCancelledRef = useRef(false);
   const pendingActionRef = useRef<'send' | 'image' | null>(null);
   
-  // Initialize OpenAI client for Whisper
-  const openaiClient = React.useMemo(() => {
-      setUseWhisper(true);
-      return new OpenAI({
-        dangerouslyAllowBrowser: true,
-        apiKey: null,
-        baseURL: 'https://api.readkraft.com/api/v1',
-        });
-    }, []);
+  // Backend base URL (same approach as Reading/SpellBox)
+  const backendBaseUrl = React.useMemo(() => {
+    try {
+      const v = ((import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
+      return (v && typeof v === 'string') ? v.replace(/\/+$/, '') : '';
+    } catch {
+      return '';
+    }
+  }, []);
 
   // Waveform Visualizer Component
   const WaveformVisualizer = () => {
@@ -63,26 +62,24 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
 
   // Whisper API transcription
   const transcribeWithWhisper = useCallback(async (audioBlob: Blob) => {
-    if (!openaiClient) {
-      throw new Error('OpenAI client not initialized');
-    }
-
     try {
-      // Create a File object from the blob
-      const audioFile = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
-      
-      const transcription = await openaiClient.audio.transcriptions.create({
-        file: audioFile,
-        model: 'whisper-1',
-        language: 'en',
-      });
-
-      return transcription.text;
+      // Match Reading flow: POST to backend /api/fireworks/transcribe with whisper-v3-turbo
+      const file = new File([audioBlob], 'speech.webm', { type: 'audio/webm' });
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('model', 'whisper-v3-turbo');
+      fd.append('language', 'en');
+      const base = backendBaseUrl || '';
+      const url = `${base}/api/fireworks/transcribe`;
+      const resp = await fetch(url, { method: 'POST', body: fd });
+      const json: any = await resp.json().catch(() => ({}));
+      const text = (json?.text || '').toString();
+      return text;
     } catch (error) {
-      console.error('Whisper transcription error:', error);
+      console.error('Whisper transcription error (Fireworks):', error);
       throw error;
     }
-  }, [openaiClient]);
+  }, [backendBaseUrl]);
 
   // Start recording with MediaRecorder for Whisper
   const startWhisperRecording = useCallback(() => {
@@ -273,12 +270,12 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     setText("");
     
     // Use Whisper if available, otherwise fallback to browser speech recognition
-    if (useWhisper && openaiClient) {
+    if (useWhisper) {
       startWhisperRecording();
     } else {
       startBrowserSpeechRecognition();
     }
-  }, [isMicActive, isSubmitting, useWhisper, openaiClient, startWhisperRecording, startBrowserSpeechRecognition]);
+  }, [isMicActive, isSubmitting, useWhisper, startWhisperRecording, startBrowserSpeechRecognition]);
 
 
   // Function to handle canceling the recording
