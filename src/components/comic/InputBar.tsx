@@ -7,6 +7,7 @@ import { playClickSound } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import { ttsService } from "@/lib/tts-service";
 import analytics from "@/lib/analytics";
+import { useAuth } from "@/hooks/use-auth";
 
 interface InputBarProps {
   onGenerate: (text: string) => void;
@@ -30,6 +31,15 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   const [useWhisper, setUseWhisper] = useState(true);
   const isCancelledRef = useRef(false);
   const pendingActionRef = useRef<'send' | 'image' | null>(null);
+  const { user, userData } = useAuth();
+  const displayName = React.useMemo(() => {
+    try {
+      const nm = (userData?.username || user?.displayName || '').trim();
+      return nm || 'Anonymous';
+    } catch {
+      return 'Anonymous';
+    }
+  }, [userData?.username, user?.displayName]);
   
   // Backend base URL (same approach as Reading/SpellBox)
   const backendBaseUrl = React.useMemo(() => {
@@ -69,6 +79,8 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
       fd.append('file', file);
       fd.append('model', 'whisper-v3-turbo');
       fd.append('language', 'en');
+      // Forward username so backend can include it in Discord payload
+      fd.append('username', displayName);
       const base = backendBaseUrl || '';
       const url = `${base}/api/fireworks/transcribe`;
       const resp = await fetch(url, { method: 'POST', body: fd });
@@ -79,7 +91,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
       console.error('Whisper transcription error (Fireworks):', error);
       throw error;
     }
-  }, [backendBaseUrl]);
+  }, [backendBaseUrl, displayName]);
 
   // Start recording with MediaRecorder for Whisper
   const startWhisperRecording = useCallback(() => {
