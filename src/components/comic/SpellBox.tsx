@@ -82,7 +82,8 @@ const ReadingMicButton: React.FC<{
   compact?: boolean;
   // Interrupt the reading tutor realtime session (if speaking) when user retries
   interruptRealtimeSession?: () => void;
-}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact, interruptRealtimeSession }) => {
+  disabled?: boolean;
+}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact, interruptRealtimeSession, disabled = false }) => {
   const [isRecording, setIsRecording] = React.useState(false);
   const recognitionRef = React.useRef<any>(null);
   const shouldBeRecordingRef = React.useRef<boolean>(false);
@@ -191,6 +192,7 @@ const ReadingMicButton: React.FC<{
     // Debounce rapid toggles to avoid engine InvalidStateError races
     if (isTogglingRef.current) return;
     if (isProcessing) return;
+    if (disabled) return;
     isTogglingRef.current = true;
     setTimeout(() => { isTogglingRef.current = false; }, 350);
 
@@ -538,7 +540,7 @@ const ReadingMicButton: React.FC<{
     } catch {}
     };
     startBrowserSR();
-  }, [isRecording, isProcessing, interruptRealtimeSession]);
+  }, [isRecording, isProcessing, interruptRealtimeSession, disabled]);
 
   return (
     <>
@@ -551,9 +553,9 @@ const ReadingMicButton: React.FC<{
         'border-2 border-black bg-white text-foreground shadow-none transition-transform hover:scale-105',
         isRecording && 'bg-red-500 text-white hover:bg-red-600'
       )}
-      title={isProcessing ? 'Processing...' : (isRecording ? 'Stop recording' : 'Read this word')}
-      aria-label={isProcessing ? 'Processing...' : (isRecording ? 'Stop recording' : 'Start recording')}
-      disabled={isProcessing}
+      title={isProcessing ? 'Processing...' : (disabled ? 'Please wait…' : (isRecording ? 'Stop recording' : 'Read this word'))}
+      aria-label={isProcessing ? 'Processing...' : (disabled ? 'Please wait…' : (isRecording ? 'Stop recording' : 'Start recording'))}
+      disabled={isProcessing || disabled}
       style={isRecording ? { animation: 'micPulse 1.2s ease-in-out infinite' } : undefined}
     >
       {isProcessing
@@ -2217,6 +2219,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           <ReadingMicButton 
                             compact
                             targetWord={targetWord} 
+                            disabled={isEvaluating}
                             interruptRealtimeSession={interruptRealtimeSession}
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                             onRecordingChange={(rec, meta) => {
@@ -2617,6 +2620,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               <ReadingMicButton 
                                 compact
                                 targetWord={targetWord}
+                                disabled={isEvaluating}
                               interruptRealtimeSession={interruptRealtimeSession}
                                 onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                                 onRecordingChange={(rec, meta) => {
