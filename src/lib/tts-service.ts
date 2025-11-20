@@ -575,6 +575,25 @@ class TextToSpeechService {
     await this.speak(payload.text, payload.options);
   }
 
+  // Speak a single correction word using the dedicated Jessica voice (on-demand)
+  async speakCorrectionWord(word: string): Promise<void> {
+    const text = (word || '').toString().trim();
+    if (!text) return;
+    // Prefer Jessica for correction playback; fall back to default voice if unavailable
+    const jessica = AVAILABLE_VOICES.find(v => v.name === 'Jessica');
+    if (jessica) {
+      await this.speak(text, {
+        voice: jessica.id,
+        model: 'eleven_flash_v2_5',
+        stability: 0.6,
+        similarity_boost: 0.85,
+        speed: 0.7
+      });
+    } else {
+      await this.speak(text);
+    }
+  }
+
   // Clean text for better speech synthesis
   private cleanTextForSpeech(text: string): string {
     return text

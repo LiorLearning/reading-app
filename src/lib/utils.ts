@@ -19,6 +19,11 @@ export interface ChatMessage {
   spelling_sentence?: string;
   spelling_word?: string;
   content_after_spelling?: string;
+  // Full version of content_after_spelling with target line included (for chat history after completion)
+  content_after_spelling_full?: string;
+  // Reading fluency support: parts around the target line
+  fluency_prefix?: string;
+  fluency_suffix?: string;
   hiddenInChat?: boolean;
 }
 

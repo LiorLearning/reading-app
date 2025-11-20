@@ -759,7 +759,7 @@ Keep tone warm, brief, and curious.`;
   
   // Switch realtime agent prompt based on whether a reading question is active
   React.useEffect(() => {
-    const readingActive = !!(showSpellBox && currentSpellQuestion && (currentSpellQuestion as any)?.isReading);
+    const readingActive = !!(showSpellBox && currentSpellQuestion && ((currentSpellQuestion as any)?.isReading || (currentSpellQuestion as any)?.isReadingFluency));
     if (readingActive) {
       setRtAgentName('readingTutor');
       setRtAgentInstructions(READING_TUTOR_PROMPT);
@@ -1963,6 +1963,64 @@ Keep tone warm, brief, and curious.`;
   const generateAIResponse = useCallback(async (userText: string, messageHistory: ChatMessage[], spellingQuestion: SpellingQuestion | null): Promise<AdventureResponse> => {
 
     try {
+      // Helper: parse fluency markers from AI message and strip them for display
+      const parseFluencyMarkers = (text: string | null | undefined): {
+        cleaned: string;
+        targetLine?: string;
+        targetWord?: string;
+        prefix?: string;
+        suffix?: string;
+      } => {
+        if (!text) return { cleaned: '' };
+          let cleaned = text;
+          let targetLine: string | undefined;
+          let targetWord: string | undefined;
+          let prefix: string | undefined;
+          let suffix: string | undefined;
+        try {
+            // Find ALL target-line matches first
+            const allMatches = Array.from(cleaned.matchAll(/<<target-line>>([\s\S]*?)<<\/target-line>>/g));
+            if (allMatches.length > 0) {
+              const first = allMatches[0];
+              const before = cleaned.slice(0, first.index || 0);
+              const rawLine = first[1] || '';
+              const after = cleaned.slice((first.index || 0) + first[0].length);
+              const stripMarkers = (s?: string) => (s || '')
+                .replace(/\{\{tw\}\}/g, '')
+                .replace(/\{\{\/tw\}\}/g, '')
+                .replace(/<<target-line>>/g, '')
+                .replace(/<<\/target-line>>/g, '')
+                .trim();
+              prefix = stripMarkers(before);
+              suffix = stripMarkers(
+                // Also remove any additional marked segments from the suffix entirely
+                after.replace(/<<target-line>>[\s\S]*?<<\/target-line>>/g, '')
+              );
+              const wordMatch = rawLine.match(/\{\{tw\}\}(.*?)\{\{\/tw\}\}/s);
+              if (wordMatch && wordMatch[1]) {
+                targetWord = (wordMatch[1] || '').trim();
+              }
+              // Strip word markers inside the selected target line
+              const strippedLine = rawLine.replace(/\{\{tw\}\}/g, '').replace(/\{\{\/tw\}\}/g, '').trim();
+              targetLine = strippedLine;
+              // Rebuild cleaned as prefix + first target line + suffix (drop all other target lines)
+              cleaned = [prefix, targetLine, suffix].filter(Boolean).join(' ').replace(/\s{2,}/g, ' ').trim();
+            } else {
+              // No marked lines; just strip any stray word markers if present
+              cleaned = cleaned
+                .replace(/\{\{tw\}\}/g, '')
+                .replace(/\{\{\/tw\}\}/g, '')
+                .trim();
+            }
+        } catch {}
+        try {
+          console.log('[FluencyParse] original:', (text || '').slice(0, 200));
+          console.log('[FluencyParse] cleaned:', (cleaned || '').slice(0, 200));
+          console.log('[FluencyParse] targetLine:', targetLine, 'targetWord:', targetWord, 'prefix:', prefix, 'suffix:', suffix);
+        } catch {}
+        return { cleaned: (cleaned || '').trim(), targetLine, targetWord, prefix, suffix };
+      };
+
       // Load current chat summary from session (if available)
       let currentSummary: string | undefined = undefined;
       if (currentSessionId) {
@@ -1985,11 +2043,45 @@ Keep tone warm, brief, and curious.`;
       
       // console.log('🔍 Calling AI service with:', { userText, spellingQuestion, hasUserData: !!userData, petName, petType, adventureType: currentAdventureType });
       
-      const result = await aiService.generateResponse(
+      // Augment userData with reading-fluency config when applicable
+      const augmentedUserData = (() => {
+        const q: any = spellingQuestion as any;
+        const isFluency = !!q?.isReadingFluency;
+        if (!isFluency) {
+          // Ensure username is present to satisfy type
+          return userData ? { username: userData.username || 'adventurer', ...userData } : { username: 'adventurer' };
+        }
+        const aiTutor = (q?.aiTutor || {}) as any;
+        // Parse a min–max words range like "3–7" or "3-7 words"
+        const parseRange = (s?: string): { min?: number; max?: number } => {
+          if (!s || typeof s !== 'string') return {};
+          const m = s.match(/(\d+)\s*[–-]\s*(\d+)/);
+          if (m) return { min: Number(m[1]), max: Number(m[2]) };
+          const n = s.match(/(\d+)/g);
+          if (n && n.length >= 2) return { min: Number(n[0]), max: Number(n[1]) };
+          if (n && n.length === 1) return { min: Number(n[0]) };
+          return {};
+        };
+        const { min, max } = parseRange(aiTutor?.Target_line_length);
+        const readingFluency = {
+          enabled: true,
+          gradeLevel: userData?.gradeDisplayName || userData?.grade || undefined,
+          ruleName: undefined, // optional; rule description not always available in bank
+          allowedTargetWords: q?.word ? [q.word] : undefined,
+          excludeWords: undefined, // optional; can be supplied if tracked
+          masteredReadingLevel: aiTutor?.Reading_Mastered_Level,
+          exampleTargetLine: aiTutor?.Example_target_line,
+          targetLineMinWords: typeof min === 'number' ? min : 3,
+          targetLineMaxWords: typeof max === 'number' ? max : 7,
+        };
+        return { username: userData?.username || 'adventurer', ...(userData || {}), readingFluency };
+      })();
+
+      let result = await aiService.generateResponse(
         userText, 
         messageHistory, 
         spellingQuestion, 
-        userData,
+        augmentedUserData,
         undefined, // adventureState
         undefined, // currentAdventure  
         undefined, // storyEventsContext
@@ -1999,6 +2091,108 @@ Keep tone warm, brief, and curious.`;
         currentAdventureType // adventureType - now dynamic!
       );
       
+      // If this is a reading-fluency question, run guardrail first, then parse
+      const isReadingFluency = !!((spellingQuestion as any)?.isReadingFluency);
+      if (isReadingFluency && result?.adventure_story) {
+        // First, parse the original to extract initial values (for fallback)
+        const initialParsed = parseFluencyMarkers(result.adventure_story);
+        
+        // Synchronous guardrail: refine final message + target line before rendering (no race/timeout)
+        try {
+          const qAny: any = spellingQuestion as any;
+          const aiTutor = (qAny?.aiTutor || {}) as any;
+          // Prefer original target_line_length string if available; else derive from parsed config
+          const targetLineLengthRaw: string | undefined = aiTutor?.Target_line_length;
+          const { readingFluency: rf } = (augmentedUserData || {}) as any;
+          const derivedLen = rf ? `${rf.targetLineMinWords || 3}-${rf.targetLineMaxWords || 7} words` : undefined;
+          const totalLength = (targetLineLengthRaw && String(targetLineLengthRaw).trim()) ? targetLineLengthRaw : derivedLen;
+          const gradeLevel = rf?.gradeLevel || userData?.gradeDisplayName || userData?.grade;
+          // Inputs for guardrail - use the cleaned parsed values
+          // Derive previous AI message and last user reply
+          const previousAiMessage = (() => {
+            const reversed = [...messageHistory].reverse();
+            const prevAi = reversed.find(m => m.type === 'ai');
+            return prevAi?.content || '';
+          })();
+          const lastUserReply = userText || '';
+          const guardrailParams = {
+            gradeLevel: gradeLevel,
+            targetWord: (qAny?.word || '').toString(),
+            totalLength: totalLength,
+            masteredReadingLevel: aiTutor?.Reading_Mastered_Level,
+            initialPetMessage: (initialParsed.cleaned || result.adventure_story || '').toString(),
+            initialTargetLine: ((initialParsed.targetLine || result.spelling_sentence || '') as string).toString(),
+            previousAiMessage,
+            lastUserReply,
+          };
+          const refined = await aiService.refineFluencyMessage(guardrailParams);
+          if (refined && refined.finalMessage && refined.finalTargetLine) {
+            // Strip all markers from guardrail outputs before using them
+            const stripAllMarkers = (s: string) => (s || '')
+              .replace(/<<target-line>>/g, '')
+              .replace(/<<\/target-line>>/g, '')
+              .replace(/\{\{tw\}\}/g, '')
+              .replace(/\{\{\/tw\}\}/g, '')
+              .trim();
+            const cleanedMessageFromGuardrail = stripAllMarkers(refined.finalMessage);
+            const cleanedLine = stripAllMarkers(refined.finalTargetLine);
+            
+            // Compose the final message by replacing the original target phrase using a tolerant match
+            const baseMessage = (initialParsed.cleaned || result.adventure_story || '').toString();
+            const originalLine = (initialParsed.targetLine || result.spelling_sentence || '').toString();
+            const escapeForRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            let composedMessage = baseMessage;
+            if (originalLine) {
+              const base = originalLine.replace(/[.?!…]+$/g, '').trim();
+              if (base.length > 0) {
+                // Allow immediate punctuation after the phrase, or continuation with whitespace
+                const tolerantPunct = new RegExp(`\\b${escapeForRegex(base)}(?:\\s*[.?!…]|[—–\\-,:;])?`, 'i');
+                const tolerantWhitespaceFollow = new RegExp(`\\b${escapeForRegex(base)}(?=\\s)`, 'i');
+                if (tolerantPunct.test(baseMessage)) {
+                  composedMessage = baseMessage.replace(tolerantPunct, cleanedLine);
+                } else if (tolerantWhitespaceFollow.test(baseMessage)) {
+                  composedMessage = baseMessage.replace(tolerantWhitespaceFollow, cleanedLine);
+                }
+              }
+            }
+            // If tolerant replacement did not happen, prefer guardrailed message if it already includes the cleaned line
+            if (composedMessage === baseMessage && cleanedMessageFromGuardrail && cleanedMessageFromGuardrail.includes(cleanedLine)) {
+              composedMessage = cleanedMessageFromGuardrail;
+            }
+
+            // Update result with guardrailed line and composed message
+            (result as any).adventure_story = composedMessage;
+            (result as any).spelling_sentence = cleanedLine;
+            
+            // Compute new prefix/suffix based on where the target line appears in the final message
+            const lineIdx = composedMessage.indexOf(cleanedLine);
+            if (lineIdx !== -1) {
+              (result as any).fluency_prefix = composedMessage.slice(0, lineIdx).trim();
+              (result as any).fluency_suffix = composedMessage.slice(lineIdx + cleanedLine.length).trim();
+            } else {
+              // Fallback: use the whole message as prefix if line not found
+              (result as any).fluency_prefix = composedMessage;
+              (result as any).fluency_suffix = '';
+            }
+          }
+          try {
+            console.log('[FluencyGuardrail] applied:', {
+              finalMessage_first200: ((result as any).adventure_story || '').slice(0, 200),
+              finalTargetLine: (result as any).spelling_sentence,
+              fluency_prefix: (result as any)?.fluency_prefix,
+              fluency_suffix: (result as any)?.fluency_suffix,
+            });
+          } catch {}
+        } catch (e) {
+          console.warn('[FluencyGuardrail] Failed, using original parsed message/line', e);
+          // Fallback to parsed values
+          (result as any).adventure_story = initialParsed.cleaned || result.adventure_story;
+          (result as any).spelling_sentence = initialParsed.targetLine || result.spelling_sentence || null;
+          (result as any).fluency_prefix = initialParsed.prefix;
+          (result as any).fluency_suffix = initialParsed.suffix;
+        }
+      }
+
       // console.log('✅ AI service returned:', result);
       return result;
     } catch (error) {
@@ -2693,9 +2887,44 @@ Keep tone warm, brief, and curious.`;
           // Ensure we always have a continuation for after spelling.
           // If the AI didn't provide an adventure story, synthesize a gentle prompt
           // by appending a follow-up question to the spelling sentence.
-          const contentAfterSpelling: string = (aiResponse.adventure_story && aiResponse.adventure_story.trim())
+          const fullContentAfterSpelling: string = (aiResponse.adventure_story && aiResponse.adventure_story.trim())
             ? aiResponse.adventure_story
             : `${(aiResponse.spelling_sentence || '').trim()} ${'What should we do next?'}`.trim();
+          
+          // Build the message shown in the bubble during the spelling step.
+          // For reading-fluency, strip the first exact occurrence of the target line from the AI message
+          // to avoid showing it twice (once as chip, once in the bubble). TTS remains unaffected.
+          let contentAfterSpellingForDisplay: string = fullContentAfterSpelling;
+          if ((spellingQuestion as any)?.isReadingFluency && aiResponse.spelling_sentence) {
+            const target = (aiResponse.spelling_sentence || '').toString().trim();
+            const idx = contentAfterSpellingForDisplay.indexOf(target);
+            if (idx !== -1) {
+              const before = contentAfterSpellingForDisplay.slice(0, idx);
+              const after = contentAfterSpellingForDisplay.slice(idx + target.length);
+              contentAfterSpellingForDisplay = (before + after);
+            } else {
+              // Tolerant fallback: allow immediate punctuation (em dash, comma, etc.) after the line
+              // and allow the target line to omit its terminal period.
+              const escapeForRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const base = target.replace(/[.?!…]+$/g, '').trim();
+              if (base) {
+                const tolerantPattern = new RegExp(`\\b${escapeForRegex(base)}(?:\\s*[.?!…]|[—–\\-,:;])?`);
+        const replacedOnce = tolerantPattern.test(contentAfterSpellingForDisplay);
+        contentAfterSpellingForDisplay = contentAfterSpellingForDisplay.replace(tolerantPattern, ' ');
+        // If still not removed, allow continuation without punctuation (phrase followed by whitespace)
+        if (!replacedOnce) {
+                  const whitespaceFollow = new RegExp(`\\b${escapeForRegex(base)}(?=\\s)`);
+                  contentAfterSpellingForDisplay = contentAfterSpellingForDisplay.replace(whitespaceFollow, ' ');
+        }
+              }
+            }
+            // Normalize leftover spacing and stray spaces before punctuation
+            contentAfterSpellingForDisplay = contentAfterSpellingForDisplay
+              .replace(/\s{2,}/g, ' ')
+              .replace(/ \,/g, ',')
+              .replace(/ \./g, '.')
+              .trim();
+          }
 
           const spellingSentenceMessage: ChatMessage = {
             type: 'ai',
@@ -2703,7 +2932,10 @@ Keep tone warm, brief, and curious.`;
             timestamp: Date.now(),
             spelling_word: spellingQuestion.audio,
             spelling_sentence: aiResponse.spelling_sentence,
-            content_after_spelling: contentAfterSpelling, // Always present: AI story or synthesized fallback
+            content_after_spelling: contentAfterSpellingForDisplay, // Display version (line stripped for fluency)
+            content_after_spelling_full: fullContentAfterSpelling, // Full version for chat history (includes line)
+            fluency_prefix: (aiResponse as any)?.fluency_prefix,
+            fluency_suffix: (aiResponse as any)?.fluency_suffix,
             hiddenInChat: true
           };
           
@@ -2718,7 +2950,21 @@ Keep tone warm, brief, and curious.`;
               (spellingQuestion as any)?.id ?? null
             );
             const targetWordForMask = (spellingQuestion as any)?.audio || (spellingQuestion as any)?.word || '';
-            if ((spellingQuestion as any)?.isReading) {
+            const isReading = !!(spellingQuestion as any)?.isReading;
+            const isReadingFluency = !!(spellingQuestion as any)?.isReadingFluency;
+            // For reading-fluency items, speak only the prefix before the target line
+            if (isReadingFluency) {
+              const prefix = (aiResponse as any)?.fluency_prefix || '';
+              if (prefix && String(prefix).trim().length > 0) {
+                ttsService.speak(String(prefix), {
+                  stability: 0.7,
+                  similarity_boost: 0.9,
+                  messageId,
+                }).catch(error => {
+                  console.error('TTS error for fluency prefix:', error);
+                });
+              }
+            } else if (isReading) {
               ttsService.speakWithPauseAtWord(spellingSentenceMessage.content, targetWordForMask, {
                 stability: 0.7,
                 similarity_boost: 0.9,
@@ -4905,8 +5151,11 @@ Keep tone warm, brief, and curious.`;
           && (!exitAt || (typeof ai.timestamp === 'number' ? ai.timestamp > exitAt : true));
       }) as any;
       const latestWithContinuation = reverse.find(m => (m.type === 'ai' && (m as any).content_after_spelling)) as any;
-      const continuation = (lastForCurrentWord?.content_after_spelling
+      // Use full version (with target line) for chat history; fall back to display version if full not available
+      const continuation = (lastForCurrentWord?.content_after_spelling_full
+        || lastForCurrentWord?.content_after_spelling
         || lastForCurrentWord?.spelling_sentence
+        || latestWithContinuation?.content_after_spelling_full
         || latestWithContinuation?.content_after_spelling
         || (nowWord ? `Great job spelling "${currentSpellQuestion?.word || currentSpellQuestion?.audio}"!` : "Great job! Let's continue our adventure! ✨"));
 
@@ -5889,6 +6138,51 @@ Keep tone warm, brief, and curious.`;
                       Read-DEV
                     </Button>
                   )}
+                  {devToolsVisible && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        playClickSound();
+                        try { ttsService.stop(); } catch {}
+                        const FLUENCY_TOPIC_ID = '1-RL-A.10';
+                        const gradeName = selectedGradeFromDropdown || userData?.gradeDisplayName || '1st Grade';
+                        try {
+                          let gp = loadSpellboxTopicProgress(gradeName) || {
+                            gradeDisplayName: gradeName,
+                            currentTopicId: null,
+                            topicProgress: {},
+                            timestamp: Date.now()
+                          };
+                          gp.currentTopicId = FLUENCY_TOPIC_ID;
+                          gp.topicProgress[FLUENCY_TOPIC_ID] = gp.topicProgress[FLUENCY_TOPIC_ID] || {
+                            topicId: FLUENCY_TOPIC_ID,
+                            questionsAttempted: 0,
+                            firstAttemptCorrect: 0,
+                            totalQuestions: 10,
+                            isCompleted: false,
+                            successRate: 0
+                          };
+                          gp.timestamp = Date.now();
+                          saveSpellboxTopicProgress(gradeName, gp);
+                          if (user?.uid) {
+                            try { firebaseSpellboxService.saveSpellboxProgressFirebase(user.uid, gp); } catch {}
+                          }
+                        } catch {}
+                        setSelectedTopicId(FLUENCY_TOPIC_ID);
+                        try { setCurrentTopic(FLUENCY_TOPIC_ID); } catch {}
+                        try { clearQuestionProgress(); } catch {}
+                        setReadingDevActive(true);
+                        setReadingDevIndex(0);
+                        try { devSendElse(); } catch {}
+                      }}
+                      className="px-2 py-1 text-[10px] font-bold rounded-full border-2 border-black bg-teal-300 shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:brightness-105"
+                      aria-label="Start reading fluency dev topic"
+                      title="Start reading fluency dev topic"
+                    >
+                      Fluency-DEV
+                    </Button>
+                  )}
                   {/* <Button
                     variant="outline"
                     size="icon"
@@ -6425,7 +6719,7 @@ Keep tone warm, brief, and curious.`;
       })();
     }, 1500);
                           }}
-                          sendMessage={sendMessage}
+                          sendMessage={((currentSpellQuestion as any)?.isReadingFluency ? undefined : sendMessage)}
                           interruptRealtimeSession={interruptRealtimeSession}
                         />
                       );
@@ -6489,7 +6783,9 @@ Keep tone warm, brief, and curious.`;
                             show: !lessonEnabled && (showSpellBox && !!currentSpellQuestion),
                             word: overlayWord,
                             sentence: overlaySentence,
-                            question: currentSpellQuestion ? {
+                            prefix: (lastAi as any)?.fluency_prefix || null,
+                            suffix: (lastAi as any)?.fluency_suffix || null,
+                            question: currentSpellQuestion ? ({
                               id: currentSpellQuestion.id,
                               word: currentSpellQuestion.word,
                               questionText: currentSpellQuestion.questionText || '',
@@ -6500,8 +6796,10 @@ Keep tone warm, brief, and curious.`;
                               prefilledIndexes: currentSpellQuestion.prefilledIndexes,
                               topicId: currentSpellQuestion.topicId || selectedTopicId,
                               isReading: (currentSpellQuestion as any)?.isReading,
+                              // Pass through reading fluency flag to SpellBox
+                              isReadingFluency: (currentSpellQuestion as any)?.isReadingFluency,
                               aiTutor: (currentSpellQuestion as any)?.aiTutor,
-                            } : null,
+                            } as any) : null,
                             showHints: true,
                             showExplanation: true,
                             onComplete: handleSpellComplete,
@@ -6512,7 +6810,7 @@ Keep tone warm, brief, and curious.`;
                             userId: user?.uid,
                             topicId: currentSpellQuestion?.topicId || selectedTopicId,
                             grade: selectedGradeFromDropdown || userData?.gradeDisplayName,
-                            sendMessage,
+                            sendMessage: ((currentSpellQuestion as any)?.isReadingFluency ? undefined : sendMessage),
                             isAssignmentFlow: ((selectedGradeFromDropdown || userData?.gradeDisplayName) || '').toLowerCase() === 'assignment',
                           }
                     }
@@ -7169,7 +7467,10 @@ Keep tone warm, brief, and curious.`;
                           const latestWithContinuation = prev
                             .filter(msg => msg.type === 'ai' && (msg as any).content_after_spelling)
                             .slice(-1)[0] as any;
-                          const continuation = latestWithContinuation?.content_after_spelling || "Great job! Let's continue our adventure! ✨";
+                          // Use full version (with target line) for chat history
+                          const continuation = latestWithContinuation?.content_after_spelling_full 
+                            || latestWithContinuation?.content_after_spelling 
+                            || "Great job! Let's continue our adventure! ✨";
                           const adventureStoryMessage: ChatMessage = {
                             type: 'ai',
                             content: continuation,

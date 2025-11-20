@@ -11,6 +11,10 @@ import { db } from './firebase';
 
 export interface SpellboxAttempt {
   value: string;
+  // Optional extras for reading fluency or rich attempts
+  transcript?: string;
+  accuracy?: number; // 0..1
+  isReadingFluency?: boolean;
 }
 
 export interface SpellboxQuestionAttempt {
@@ -18,6 +22,9 @@ export interface SpellboxQuestionAttempt {
   correctAnswer: string;
   question_blank: string; // Format like "_ _ T" where _ represents blanks
   attempts: SpellboxAttempt[];
+  // Optional metadata
+  questionId?: number;
+  generated_line?: string; // For reading fluency: store the dynamic line used
 }
 
 export interface SpellboxLogDocument {
@@ -44,7 +51,8 @@ class FirebaseSpellboxLogsService {
     correctAnswer: string,
     questionBlank: string,
     userAttempt: string,
-    isCorrect: boolean
+    isCorrect: boolean,
+    extras?: { isReadingFluency?: boolean; generatedLine?: string; transcript?: string; accuracy?: number }
   ): Promise<void> {
     try {
       if (!userId || !topicId) {
@@ -97,7 +105,12 @@ class FirebaseSpellboxLogsService {
           // Handle both old format (string) and new format (object with value property)
           const lastAttemptValue = lastAttempt && typeof lastAttempt === 'object' ? lastAttempt.value : lastAttempt;
           if (lastAttemptValue !== userAttempt) {
-            attempts.push({ value: userAttempt });
+            attempts.push({
+              value: userAttempt,
+              ...(extras?.transcript ? { transcript: extras.transcript } : {}),
+              ...(typeof extras?.accuracy === 'number' ? { accuracy: extras.accuracy } : {}),
+              ...(extras?.isReadingFluency ? { isReadingFluency: true } : {})
+            });
           } 
           
           // Update the question in the array
@@ -105,6 +118,9 @@ class FirebaseSpellboxLogsService {
             ...existingQuestion,
             attempts: attempts,
             question_blank: existingQuestion.question_blank || questionBlank, // Preserve existing or use new
+            // For fluency, persist the generated line if provided
+            generated_line: existingQuestion.generated_line || extras?.generatedLine || undefined,
+            questionId: existingQuestion.questionId || questionId,
             // Preserve existing created_at timestamp, don't overwrite it
             // Use number (milliseconds) since serverTimestamp() can't be used in arrays
             created_at: existingQuestion.created_at || nowMillis
@@ -114,8 +130,15 @@ class FirebaseSpellboxLogsService {
           const newQuestion: SpellboxQuestionAttempt = {
             created_at: nowMillis, // Use milliseconds since serverTimestamp() can't be used in arrays
             correctAnswer: correctAnswer, // Full word string
-            question_blank: questionBlank, // Format like "_ _ T"
-            attempts: [{ value: userAttempt }]
+            question_blank: questionBlank, // For fluency, this can store the line as well
+            attempts: [{
+              value: userAttempt,
+              ...(extras?.transcript ? { transcript: extras.transcript } : {}),
+              ...(typeof extras?.accuracy === 'number' ? { accuracy: extras.accuracy } : {}),
+              ...(extras?.isReadingFluency ? { isReadingFluency: true } : {})
+            }],
+            questionId,
+            generated_line: extras?.generatedLine || undefined
           };
           
           questions.push(newQuestion);

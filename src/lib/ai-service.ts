@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { composePrompt } from './prompt';
-import { getGenericOpeningInstruction } from './prompt/GenericPrompt';
+import { getGenericOpeningInstruction, getReadingFluencyGuardrailSystemPrompt } from './prompt/GenericPrompt';
 import { SpellingQuestion } from './questionBankUtils';
 import { UnifiedAIStreamingService, UnifiedAIResponse } from './unified-ai-streaming-service';
 
@@ -2067,6 +2067,18 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
           spellingWord,
           adventureState
         );
+
+    try {
+      const rfEnabled = !!(userData as any)?.readingFluency?.enabled;
+      console.log('[AIService][buildChatContext] Fluency enabled:', rfEnabled, rfEnabled ? {
+        gradeLevel: (userData as any)?.readingFluency?.gradeLevel,
+        masteredReadingLevel: (userData as any)?.readingFluency?.masteredReadingLevel,
+        targetLineMinWords: (userData as any)?.readingFluency?.targetLineMinWords,
+        targetLineMaxWords: (userData as any)?.readingFluency?.targetLineMaxWords,
+        allowedTargetWordsCount: Array.isArray((userData as any)?.readingFluency?.allowedTargetWords) ? (userData as any)?.readingFluency?.allowedTargetWords.length : 0,
+      } : null);
+      console.log('[AIService][buildChatContext] System prompt (first 500 chars):', (systemPrompt || '').slice(0, 500));
+    } catch {}
 
 
     const systemMessage = {
@@ -4428,6 +4440,215 @@ FINAL REQUIREMENTS
       };
     } catch (error) {
       console.error('AI reading evaluation failed, using fallback:', error);
+      return fallback();
+    }
+  }
+
+  /**
+   * Generate a decodable reading-fluency line that MUST include the target word.
+   * The line should respect the student's Reading_Mastered_Level and target line length.
+   * If AI is unavailable, fall back to Example_target_line or a simple template.
+   */
+  async generateReadingFluencyLine(params: {
+    targetWord: string;
+    topicToReinforce?: string;
+    readingMasteredLevel?: string;
+    targetLineLength?: string | number;
+    exampleTargetLine?: string;
+  }): Promise<string> {
+    const { targetWord, topicToReinforce, readingMasteredLevel, targetLineLength, exampleTargetLine } = params;
+    const fallback = () => {
+      if ((exampleTargetLine || '').toString().trim()) return (exampleTargetLine || '').toString().trim();
+      return `The ${targetWord.toLowerCase()} is on the mat.`; // safe simple fallback
+    };
+    if (!this.isInitialized || !this.client) return fallback();
+    try {
+      const sys = `You create one short decodable line for early readers. Requirements:
+- Include the target word exactly once in a natural way.
+- Keep vocabulary consistent with the provided reading mastery description.
+- Aim for ${String(targetLineLength || '5-10')} words total.
+- Keep it positive, concrete, and child-friendly.
+- Return ONLY the sentence text, no quotes, no extra symbols.`;
+      const user = `Target word: ${targetWord}
+Reading_Mastered_Level: ${readingMasteredLevel || 'Simple CVC words.'}
+Topic_to_reinforce: ${topicToReinforce || ''}
+Example_target_line: ${exampleTargetLine || ''}`;
+      const resp = await this.client.chat.completions.create({
+        model: 'gpt-4o-mini',
+        temperature: 0.3,
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: user }
+        ]
+      });
+      const raw = (resp.choices?.[0]?.message?.content || '').toString().trim();
+      const cleaned = raw.replace(/^["“”]+|["“”]+$/g, '').replace(/\s+/g, ' ').trim();
+      // Ensure target word is present; if not, append minimally
+      const norm = (s: string) => s.toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!norm(cleaned).split(' ').includes(norm(targetWord))) {
+        const appended = `${cleaned} ${targetWord}`.replace(/\s+/g, ' ');
+        return appended.trim();
+      }
+      return cleaned;
+    } catch {
+      return fallback();
+    }
+  }
+
+  /**
+   * Synchronous guardrail to refine the pet message and target line for reading fluency.
+   * Returns the finalized message and target line. Falls back to inputs on failure.
+   */
+  async refineFluencyMessage(params: {
+    gradeLevel?: string;
+    targetWord: string;
+    totalLength?: string | number; // applies to target line (words or chars as provided)
+    masteredReadingLevel?: string;
+    initialPetMessage: string;
+    initialTargetLine: string;
+    previousAiMessage?: string;
+    lastUserReply?: string;
+  }): Promise<{ finalMessage: string; finalTargetLine: string }> {
+    const {
+      gradeLevel,
+      targetWord,
+      totalLength,
+      masteredReadingLevel,
+      initialPetMessage,
+      initialTargetLine,
+      previousAiMessage,
+      lastUserReply,
+    } = params;
+
+    const fallback = () => ({
+      finalMessage: (initialPetMessage || '').toString(),
+      finalTargetLine: (initialTargetLine || '').toString(),
+    });
+
+    if (!this.isInitialized || !this.client) return fallback();
+
+    try {
+      const sys = getReadingFluencyGuardrailSystemPrompt();
+      const inputBlock = [
+        `Grade Level: ${gradeLevel || ''}`,
+        `Target word: ${targetWord}`,
+        `Total length for target line: ${typeof totalLength === 'number' ? totalLength : (totalLength || '')}`,
+        `Mastered reading level: ${masteredReadingLevel || ''}`,
+        `Previous AI message: ${previousAiMessage || ''}`,
+        `Last user reply: ${lastUserReply || ''}`,
+        `Initial pet message: ${initialPetMessage || ''}`,
+        `Target line used in initial pet message: ${initialTargetLine || ''}`,
+      ].join('\n');
+
+      const resp = await this.client.chat.completions.create({
+        model: 'gpt-5.1',
+        temperature: 0.2,
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: inputBlock }
+        ]
+      });
+
+      const text = (resp.choices?.[0]?.message?.content || '').toString().trim();
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}');
+      if (jsonStart >= 0 && jsonEnd > jsonStart) {
+        const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+        const finalMessage = typeof parsed?.finalMessage === 'string' ? parsed.finalMessage : '';
+        const finalTargetLine = typeof parsed?.finalTargetLine === 'string' ? parsed.finalTargetLine : '';
+        if (finalMessage && finalTargetLine) {
+          return { finalMessage, finalTargetLine };
+        }
+      }
+      return fallback();
+    } catch {
+      return fallback();
+    }
+  }
+
+  /**
+   * Evaluate a student's fluency reading of a generated line.
+   * Returns pass/fail, accuracy (0..1), mismatched word indices, and mistakes array.
+   * Fallback uses token overlap; AI path may provide better alignment when available.
+   */
+  async evaluateReadingFluency(targetLine: string, studentTranscript: string, targetWord?: string): Promise<{
+    status: 'pass' | 'fail';
+    accuracy: number;
+    mismatchedWordIndices: number[];
+    mistakes?: Array<{ index: number; word: string }>;
+  }> {
+    const normalize = (s: string) => (s || '')
+      .toLowerCase()
+      .replace(/[^a-z\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const targetWords = normalize(targetLine).split(' ').filter(Boolean);
+    const saidWords = normalize(studentTranscript).split(' ').filter(Boolean);
+    const fallback = (): { status: 'pass' | 'fail'; accuracy: number; mismatchedWordIndices: number[]; mistakes: Array<{ index: number; word: string }> } => {
+      if (targetWords.length === 0) return { status: 'fail', accuracy: 0, mismatchedWordIndices: [], mistakes: [] };
+      // Strict lexical fallback: require every target word be present at least once (insertions ignored).
+      const saidSet = new Set(saidWords);
+      let matched = 0;
+      const mismatches: number[] = [];
+      targetWords.forEach((w, idx) => {
+        if (saidSet.has(w)) matched++; else mismatches.push(idx);
+      });
+      const accuracy = matched / targetWords.length;
+      const passAll = accuracy === 1;
+      const status: 'pass' | 'fail' = passAll ? 'pass' : 'fail';
+      const mistakes = (passAll ? [] : mismatches).map((i) => ({ index: i, word: targetWords[i] || '' }));
+      return { status, accuracy, mismatchedWordIndices: passAll ? [] : mismatches, mistakes };
+    };
+    if (!this.isInitialized || !this.client) return fallback();
+    try {
+      const sys = `You evaluate a child's oral reading of a short target sentence using PHONETICS (IPA/ARPAbet). Return minified JSON only:
+{"status":"pass"|"fail","accuracy":number,"mismatchedWordIndices":[number,...],"mistakes":[{"index":number,"word":string},...]}
+
+Rules:
+- Case- and punctuation-insensitive. Ignore punctuation and casing entirely.
+- Allow extra words, repetitions, hesitations, and self‑corrections. Insertions never penalize.
+- Build a left‑to‑right alignment of TARGET words to SAID tokens by best phonetic equality.
+- A target word is CORRECT if there exists at least one token in SAID (at or after its position) whose pronunciation equals the target word’s pronunciation (homophones count). If both wrong and correct versions appear, treat it as correct (self‑correction).
+- A target word is INCORRECT only if no phonetically equal token appears anywhere in SAID.
+- accuracy = (# correct target words) / (# target words). Clamp to [0,1], 2 decimals.
+- mismatchedWordIndices are 0‑based indices of TARGET words that were never pronounced correctly.
+- mistakes: for each mismatched target word, include an object with its 0-based "index" and the normalized target "word" string used in alignment.
+- status = "pass" if accuracy == 1.0; otherwise "fail".
+- Output JSON only, no text.`;
+      const user = `TARGET: ${targetLine}
+SAID: ${studentTranscript}
+TARGET_WORD: ${targetWord || ''}`;
+      const resp = await this.client.chat.completions.create({
+        model: 'gpt-5.1',
+        temperature: 0,
+        messages: [
+          { role: 'system', content: sys },
+          { role: 'user', content: user }
+        ]
+      });
+      const text = (resp.choices?.[0]?.message?.content || '').toString().trim();
+      const jsonStart = text.indexOf('{');
+      const jsonEnd = text.lastIndexOf('}');
+      if (jsonStart >= 0 && jsonEnd > jsonStart) {
+        const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+        const status = (parsed.status === 'pass' ? 'pass' : 'fail') as 'pass' | 'fail';
+        const accuracy = Math.max(0, Math.min(1, Number(parsed.accuracy) || 0));
+        const mismatchedWordIndices = Array.isArray(parsed.mismatchedWordIndices) ? parsed.mismatchedWordIndices.map((n: any) => Number(n) || 0) : [];
+        let mistakes: Array<{ index: number; word: string }> = [];
+        if (Array.isArray(parsed.mistakes)) {
+          mistakes = parsed.mistakes
+            .map((m: any) => ({
+              index: Number(m?.index) || 0,
+              word: typeof m?.word === 'string' ? (m.word || '').toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim() : ''
+            }))
+            .filter((m: any) => Number.isFinite(m.index) && m.index >= 0);
+        } else if (mismatchedWordIndices.length > 0) {
+          mistakes = mismatchedWordIndices.map((i: number) => ({ index: i, word: targetWords[i] || '' }));
+        }
+        return { status, accuracy, mismatchedWordIndices, mistakes };
+      }
+      return fallback();
+    } catch {
       return fallback();
     }
   }
