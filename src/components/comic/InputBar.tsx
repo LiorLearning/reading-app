@@ -28,6 +28,12 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   const recognitionRef = useRef<any | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  // 16 kHz mono WAV capture via AudioContext
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const pcmChunksRef = useRef<Float32Array[]>([]);
   const [useWhisper, setUseWhisper] = useState(true);
   const isCancelledRef = useRef(false);
   const pendingActionRef = useRef<'send' | 'image' | null>(null);
@@ -74,7 +80,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   const transcribeWithWhisper = useCallback(async (audioBlob: Blob) => {
     try {
       // Match Reading flow: POST to backend /api/fireworks/transcribe with whisper-v3-turbo
-      const file = new File([audioBlob], 'speech.webm', { type: 'audio/webm' });
+      const file = new File([audioBlob], 'speech.wav', { type: 'audio/wav' });
       const fd = new FormData();
       fd.append('file', file);
       fd.append('model', 'whisper-v3-turbo');
@@ -98,7 +104,29 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
         audioChunksRef.current = [];
-        
+        pcmChunksRef.current = [];
+        mediaStreamRef.current = stream;
+
+        // Create a 16kHz mono AudioContext and capture PCM frames
+        const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+        const ctx: AudioContext = new Ctx({ sampleRate: 16000 });
+        const source = ctx.createMediaStreamSource(stream);
+        const processor = ctx.createScriptProcessor(4096, 1, 1);
+        processor.onaudioprocess = (e: AudioProcessingEvent) => {
+          try {
+            const input = e.inputBuffer.getChannelData(0);
+            const copy = new Float32Array(input.length);
+            copy.set(input);
+            pcmChunksRef.current.push(copy);
+          } catch {}
+        };
+        source.connect(processor);
+        processor.connect(ctx.destination);
+        audioContextRef.current = ctx;
+        audioSourceRef.current = source;
+        scriptProcessorRef.current = processor;
+
+        // Use MediaRecorder only to control start/stop UX; data is ignored
         const mediaRecorder = new MediaRecorder(stream);
         mediaRecorderRef.current = mediaRecorder;
 
@@ -109,10 +137,20 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
         };
 
         mediaRecorder.onstop = async () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          // Encode 16kHz mono WAV from captured PCM frames
+          const usedSampleRate = audioContextRef.current?.sampleRate || 16000;
+          const wavBlob = encodeWavFromPCM(pcmChunksRef.current, usedSampleRate);
           
           // Stop all tracks first
-          stream.getTracks().forEach(track => track.stop());
+          try { stream.getTracks().forEach(track => track.stop()); } catch {}
+          // Disconnect audio graph and close context
+          try { scriptProcessorRef.current?.disconnect(); } catch {}
+          try { audioSourceRef.current?.disconnect(); } catch {}
+          try { await audioContextRef.current?.close(); } catch {}
+          audioContextRef.current = null;
+          audioSourceRef.current = null;
+          scriptProcessorRef.current = null;
+          mediaStreamRef.current = null;
           
           // Check if recording was cancelled
           if (isCancelledRef.current) {
@@ -122,7 +160,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           }
           
           try {
-            const transcription = await transcribeWithWhisper(audioBlob);
+            const transcription = await transcribeWithWhisper(wavBlob);
             
             if (transcription && transcription.trim()) {
               console.log('Whisper transcription completed:', transcription.trim());
@@ -173,6 +211,49 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
         toast.error("Microphone access denied. Please allow microphone access.");
       });
   }, [transcribeWithWhisper, onGenerate]);
+
+  // Minimal WAV encoder for Float32 PCM chunks (mono)
+  const encodeWavFromPCM = React.useCallback((chunks: Float32Array[], sampleRate: number): Blob => {
+    const totalLength = chunks.reduce((acc, c) => acc + c.length, 0);
+    const buffer = new ArrayBuffer(44 + totalLength * 2);
+    const view = new DataView(buffer);
+
+    // RIFF header
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + totalLength * 2, true);
+    writeString(view, 8, 'WAVE');
+    // fmt chunk
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true); // PCM
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, 1, true); // mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true); // byte rate (16-bit mono)
+    view.setUint16(32, 2, true); // block align
+    view.setUint16(34, 16, true); // bits per sample
+    // data chunk
+    writeString(view, 36, 'data');
+    view.setUint32(40, totalLength * 2, true);
+
+    // Write PCM samples
+    let offset = 44;
+    const clamp = (n: number) => Math.max(-1, Math.min(1, n));
+    for (const chunk of chunks) {
+      for (let i = 0; i < chunk.length; i++) {
+        const s = clamp(chunk[i]);
+        const val = s < 0 ? s * 0x8000 : s * 0x7fff;
+        view.setInt16(offset, val, true);
+        offset += 2;
+      }
+    }
+    return new Blob([view], { type: 'audio/wav' });
+  }, []);
+
+  function writeString(view: DataView, offset: number, str: string) {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset + i, str.charCodeAt(i));
+    }
+  }
 
   // Browser speech recognition fallback
   const startBrowserSpeechRecognition = useCallback(() => {
