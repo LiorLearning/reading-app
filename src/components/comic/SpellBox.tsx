@@ -80,7 +80,9 @@ const ReadingMicButton: React.FC<{
   // second arg may be a plain string (backwards compatible) or an object with Azure meta
   onRecordingChange?: (isRecording: boolean, final?: string | { text?: string; accuracyScore?: number }) => void;
   compact?: boolean;
-}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact }) => {
+  // Interrupt the reading tutor realtime session (if speaking) when user retries
+  interruptRealtimeSession?: () => void;
+}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact, interruptRealtimeSession }) => {
   const [isRecording, setIsRecording] = React.useState(false);
   const recognitionRef = React.useRef<any>(null);
   const shouldBeRecordingRef = React.useRef<boolean>(false);
@@ -192,7 +194,9 @@ const ReadingMicButton: React.FC<{
     isTogglingRef.current = true;
     setTimeout(() => { isTogglingRef.current = false; }, 350);
 
+    // Stop any ongoing local TTS and interrupt the realtime reading tutor immediately
     try { ttsService.stop(); } catch {}
+    try { interruptRealtimeSession && interruptRealtimeSession(); } catch {}
     if (isRecording) {
       debug('toggle: stopping recording. recognitionRef exists=', !!recognitionRef.current);
       // If Azure WAV capture path is active, finalize and upload
@@ -534,7 +538,7 @@ const ReadingMicButton: React.FC<{
     } catch {}
     };
     startBrowserSR();
-  }, [isRecording, isProcessing]);
+  }, [isRecording, isProcessing, interruptRealtimeSession]);
 
   return (
     <>
@@ -2213,6 +2217,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           <ReadingMicButton 
                             compact
                             targetWord={targetWord} 
+                            interruptRealtimeSession={interruptRealtimeSession}
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                             onRecordingChange={(rec, meta) => {
                               if (rec && showReadingMicGuide) {
@@ -2612,6 +2617,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               <ReadingMicButton 
                                 compact
                                 targetWord={targetWord}
+                              interruptRealtimeSession={interruptRealtimeSession}
                                 onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                                 onRecordingChange={(rec, meta) => {
                                   setIsRecordingReading(rec);
