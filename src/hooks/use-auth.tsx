@@ -57,6 +57,8 @@ export interface UserData {
   lastLoginAt: Date;
   country?: string;
   countryCode?: string;
+  schoolCode?: number;
+  schoolCodeSetAt?: Date;
 }
 
 interface AuthContextType {

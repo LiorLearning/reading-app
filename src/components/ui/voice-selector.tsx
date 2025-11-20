@@ -70,7 +70,7 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
       <PopoverContent className="w-80 p-4 border border-white/40 bg-white/95 text-slate-900 rounded-2xl shadow-xl max-h-[70vh] overflow-y-auto" align="end">
         <div className="space-y-3">
           <h3 className="font-semibold text-sm">Choose a Voice</h3>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-1 -mr-1">
             {AVAILABLE_VOICES.map((voice) => (
               <div
                 key={voice.id}
@@ -135,7 +135,6 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({ className = '' }) => {
           
           {!ttsService.isConfigured() && (
             <p className="text-xs text-gray-500 mt-2">
-              TTS API key required for voice functionality
             </p>
           )}
         </div>
