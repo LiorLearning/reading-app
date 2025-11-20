@@ -325,9 +325,17 @@ class TextToSpeechService {
     const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
     
     if (apiKey) {
-      this.client = new ElevenLabsClient({
+      const clientOptions: { apiKey: string; baseUrl?: string } = {
         apiKey: apiKey,
-      });
+      };
+      
+      // Allow custom base URL (e.g., for EU data residency: https://api.eu.residency.elevenlabs.io)
+      const customBaseUrl = "https://api.readkraft.com/api/elevenlabs/" //import.meta.env.VITE_ELEVENLABS_BASE_URL;
+      if (customBaseUrl) {
+        clientOptions.baseUrl = customBaseUrl;
+      }
+      
+      this.client = new ElevenLabsClient(clientOptions);
       this.isInitialized = true;
     } else {
       console.warn('TTS API key not found. TTS service will not be available.');
