@@ -1334,6 +1334,12 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
 
+      // Must be exactly 6 digits
+      if (trimmedInput.length !== 6) {
+        setSchoolCodeError('School code must be exactly 6 digits');
+        return;
+      }
+
       const schoolCodeInt = parseInt(trimmedInput, 10);
       if (isNaN(schoolCodeInt)) {
         setSchoolCodeError('School code must be a valid number');
@@ -4819,8 +4825,8 @@ const getSleepyPetImage = (clicks: number) => {
                 value={schoolCodeInput}
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Only allow numeric input (integers only)
-                  if (value === '' || /^\d+$/.test(value)) {
+                  // Only allow numeric input, max 6 digits
+                  if (/^\d*$/.test(value) && value.length <= 6) {
                     setSchoolCodeInput(value);
                     setSchoolCodeError(''); // Clear error when user types
                   }
