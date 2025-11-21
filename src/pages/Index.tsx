@@ -25,6 +25,7 @@ import { useComic, ComicPanel } from "@/hooks/use-comic";
 import { AdventureResponse, aiService } from "@/lib/ai-service";
 import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
 import { bubbleMessageIdFromHtml, inlineSpellboxMessageId, extractTextFromHtml } from "@/lib/tts-message-id";
+import SpellBox from "@/components/comic/SpellBox";
 import { ensureMicPermission } from "@/lib/mic-permission";
 import { toast } from "sonner";
 import VoiceSelector from "@/components/ui/voice-selector";
@@ -2658,7 +2659,8 @@ Keep tone warm, brief, and curious.`;
         // NEW: Use topic-based question selection for Spellbox progression
           
         const preferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
-        const spellingQuestion = isSpellingPhase ? getNextSpellboxQuestion(currentGrade, completedSpellingIds, preferredLevel) : null;
+        const isChitChat = (currentAdventureType || 'food') === 'chit-chat';
+        const spellingQuestion = (isSpellingPhase && !isChitChat) ? getNextSpellboxQuestion(currentGrade, completedSpellingIds, preferredLevel) : null;
         
         // Store the original spelling question (with prefilled data) for later use
           
@@ -2718,19 +2720,22 @@ Keep tone warm, brief, and curious.`;
               (spellingQuestion as any)?.id ?? null
             );
             const targetWordForMask = (spellingQuestion as any)?.audio || (spellingQuestion as any)?.word || '';
-            if ((spellingQuestion as any)?.isReading) {
-              ttsService.speakWithPauseAtWord(spellingSentenceMessage.content, targetWordForMask, {
-                stability: 0.7,
-                similarity_boost: 0.9,
-                messageId,
-                speakAfter: false,
-              }).catch(error => {
-                console.error('TTS masking error for spelling sentence:', error);
-              });
-            } else {
-              ttsService.speakAIMessage(spellingSentenceMessage.content, messageId).catch(error => 
-                console.error('TTS error for spelling sentence:', error)
-              );
+            // In chit-chat mode, do not speak the sentence; show only the word inside SpellBox
+            if ((currentAdventureType || 'food') !== 'chit-chat') {
+              if ((spellingQuestion as any)?.isReading) {
+                ttsService.speakWithPauseAtWord(spellingSentenceMessage.content, targetWordForMask, {
+                  stability: 0.7,
+                  similarity_boost: 0.9,
+                  messageId,
+                  speakAfter: false,
+                }).catch(error => {
+                  console.error('TTS masking error for spelling sentence:', error);
+                });
+              } else {
+                ttsService.speakAIMessage(spellingSentenceMessage.content, messageId).catch(error => 
+                  console.error('TTS error for spelling sentence:', error)
+                );
+              }
             }
             return [...prev, spellingSentenceMessage];
           });
@@ -4437,6 +4442,10 @@ Keep tone warm, brief, and curious.`;
   const isAdvancingSpellRef = useRef<boolean>(false);
   // When a SpellBox answer is correct and waiting for Next, disable input bar
   const [disableInputForSpell, setDisableInputForSpell] = useState<boolean>(false);
+  // Chit-chat: inline input gate (MCQ) shown above input after first user turn
+  const [isChitChatGateActive, setIsChitChatGateActive] = React.useState<boolean>(false);
+  const [chitChatQuestion, setChitChatQuestion] = React.useState<SpellingQuestion | null>(null);
+  const lastChitChatAICountRef = React.useRef<number>(0);
   // When user clicks disabled input, highlight the Next chevron
   const [highlightSpellNext, setHighlightSpellNext] = useState<boolean>(false);
   const [isWhiteboardPromptActive, setIsWhiteboardPromptActive] = React.useState(false);
@@ -5117,6 +5126,31 @@ Keep tone warm, brief, and curious.`;
     } catch {}
   }, [isWhiteboardPromptActive, isWhiteboardLessonActive, disableInputForSpell]);
 
+  // Chit-chat: arm and show inline input gate after the first user message and each subsequent assistant reply
+  React.useEffect(() => {
+    const type = (currentAdventureType || 'food');
+    if (type !== 'chit-chat') {
+      if (isChitChatGateActive) setIsChitChatGateActive(false);
+      return;
+    }
+    const aiVisibleCount = chatMessages.filter(m => m.type === 'ai' && !(m as any).hiddenInChat).length;
+    const userCount = chatMessages.filter(m => m.type === 'user').length;
+    if (userCount >= 1 && aiVisibleCount > lastChitChatAICountRef.current && !isChitChatGateActive) {
+      const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName;
+      const preferredLevel = (userData?.level === 'mid') ? 'middle' : (userData?.level as ('start' | 'middle') | undefined);
+      try {
+        const q = currentGrade ? getNextSpellboxQuestion(currentGrade, completedSpellingIds, preferredLevel) : null;
+        if (q) {
+          setChitChatQuestion(q);
+          setIsChitChatGateActive(true);
+        }
+      } catch {}
+      lastChitChatAICountRef.current = aiVisibleCount;
+    } else if (aiVisibleCount > lastChitChatAICountRef.current) {
+      lastChitChatAICountRef.current = aiVisibleCount;
+    }
+  }, [chatMessages.length, currentAdventureType, selectedGradeFromDropdown, userData?.gradeDisplayName, completedSpellingIds, isChitChatGateActive]);
+
   React.useEffect(() => {
     if (!whiteboardGradeEligible) return;
     if (!selectedTopicId || selectedTopicId !== WHITEBOARD_LESSON_TOPIC) return;
@@ -5362,7 +5396,7 @@ Keep tone warm, brief, and curious.`;
     }
   }, [whiteboardGradeEligible, grade1DisplayedTopicId, currentSpellQuestion?.topicId]);
 
-  const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
+  const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive || (isChitChatGateActive && !!chitChatQuestion);
   const adventureInputDisabledReason = isAdventureInputDisabled
     ? (disableInputForSpell
         ? 'SpellBox awaiting Next'
@@ -6488,7 +6522,8 @@ Keep tone warm, brief, and curious.`;
                         : {
                             show: !lessonEnabled && (showSpellBox && !!currentSpellQuestion),
                             word: overlayWord,
-                            sentence: overlaySentence,
+                            // For chit-chat, hide the sentence so only the target word is shown in SpellBox
+                            sentence: ((currentAdventureType || 'food') === 'chit-chat') ? null : overlaySentence,
                             question: currentSpellQuestion ? {
                               id: currentSpellQuestion.id,
                               word: currentSpellQuestion.word,
@@ -6725,6 +6760,50 @@ Keep tone warm, brief, and curious.`;
                             "flex-shrink-0 p-3 border-t border-primary/30 bg-gradient-to-r from-primary/5 to-transparent",
                             isAdventureInputDisabled && "opacity-60 pointer-events-none"
                           )}>
+                            {/* Chit-chat inline gate above input */}
+                            {(currentAdventureType === 'chit-chat' && isChitChatGateActive && chitChatQuestion) && (
+                              <div className="mb-2">
+                                <SpellBox
+                                  variant="inline"
+                                  isVisible
+                                  word={(chitChatQuestion as any)?.word || (chitChatQuestion as any)?.audio}
+                                  sentence={null}
+                                  question={{
+                                    id: chitChatQuestion.id,
+                                    word: chitChatQuestion.word,
+                                    questionText: chitChatQuestion.questionText || '',
+                                    correctAnswer: chitChatQuestion.correctAnswer,
+                                    audio: chitChatQuestion.audio,
+                                    explanation: chitChatQuestion.explanation,
+                                    isPrefilled: chitChatQuestion.isPrefilled,
+                                    prefilledIndexes: chitChatQuestion.prefilledIndexes,
+                                    topicId: chitChatQuestion.topicId || selectedTopicId,
+                                    isReading: (chitChatQuestion as any)?.isReading,
+                                    aiTutor: (chitChatQuestion as any)?.aiTutor
+                                  } as any}
+                                  showHints
+                                  showExplanation
+                                  onComplete={(isCorrect: boolean, _?: string, attemptCount: number = 1) => {
+                                    if (!isCorrect) return;
+                                    try { addAdventureCoins(10, currentAdventureType); } catch {}
+                                    try {
+                                      const currentPetId = PetProgressStorage.getCurrentSelectedPet() || 'dog';
+                                      const petType = PetProgressStorage.getPetType(currentPetId) || currentPetId;
+                                      if (user?.uid) {
+                                        stateStoreApi.updateProgressOnQuestionSolved({
+                                          userId: user.uid,
+                                          pet: petType,
+                                          questionsSolved: 1,
+                                          adventureKey: currentAdventureType || undefined,
+                                        }).catch(() => {});
+                                      }
+                                    } catch {}
+                                    setIsChitChatGateActive(false);
+                                    setChitChatQuestion(null);
+                                  }}
+                                />
+                              </div>
+                            )}
                             {unifiedAIStreaming.isStreaming && (
           <div className="mb-2 flex items-center gap-2 text-xs text-blue-600 bg-blue-50 rounded-full px-3 py-1">
             <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>

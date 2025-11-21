@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { composePrompt } from './prompt';
 import { getGenericOpeningInstruction } from './prompt/GenericPrompt';
+import { getChitChatPrompt } from './prompt/ChitChatPrompt';
 import { SpellingQuestion } from './questionBankUtils';
 import { UnifiedAIStreamingService, UnifiedAIResponse } from './unified-ai-streaming-service';
 
@@ -2055,18 +2056,21 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       'house','food','dressing-competition','travel','friend','who-made-the-pets-sick',
       'pet-school','pet-theme-park','pet-mall','pet-care','plant-dreams','story'
     ];
-    const systemPrompt = structuredAdventures.includes(adventureType)
-      ? composePrompt(adventureType, petTypeDescription, petName, userData)
-      : config.systemPromptTemplate(
-          petTypeDescription,
-          petName,
-          userData,
-          adventureState,
-          currentAdventure,
-          summary,
-          spellingWord,
-          adventureState
-        );
+    const systemPrompt =
+      adventureType === 'chit-chat'
+        ? getChitChatPrompt(petTypeDescription, petName, userData || undefined)
+        : (structuredAdventures.includes(adventureType)
+            ? composePrompt(adventureType, petTypeDescription, petName, userData)
+            : config.systemPromptTemplate(
+                petTypeDescription,
+                petName,
+                userData,
+                adventureState,
+                currentAdventure,
+                summary,
+                spellingWord,
+                adventureState
+              ));
 
 
     const systemMessage = {
@@ -2085,9 +2089,12 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     }));
 
     // Add current user message with spelling context if needed
-    const enhancedUserMessage = spellingWord ? 
-      `[SPELLING MODE: Include "${spellingWord}" in sentence 1 or 2] ${currentUserMessage}` : 
-      currentUserMessage;
+    const enhancedUserMessage =
+      (adventureType === 'chit-chat')
+        ? currentUserMessage // Do not inject spelling-mode prefix for chit-chat
+        : (spellingWord
+            ? `[SPELLING MODE: Include "${spellingWord}" in sentence 1 or 2] ${currentUserMessage}`
+            : currentUserMessage);
       
     const currentMessage = {
       role: "user" as const,
@@ -2136,6 +2143,24 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
     // 🧹 NEW: Sanitize the user prompt upfront for legacy AI service too
     // console.log('🧹 Legacy AI Service: Sanitizing user prompt...');
     const { aiPromptSanitizer } = await import('./ai-prompt-sanitizer');
+    // Deterministic interest extraction and write-through (throttled)
+    try {
+      const { extractInterestsFromText } = await import('@/lib/interest-extractor');
+      const { upsertUserInterests } = await import('@/lib/user-profile-service');
+      const extracted = extractInterestsFromText(userText || '');
+      const uid = (userData && (userData as any).uid) ? String((userData as any).uid) : '';
+      if (uid && Array.isArray(extracted) && extracted.length > 0) {
+        const existing = Array.isArray((userData as any)?.interests) ? ((userData as any).interests as string[]) : [];
+        const novel = extracted.filter(x => !existing.includes(x));
+        if (novel.length > 0) {
+          // Best-effort, do not block response if it fails
+          upsertUserInterests({ userId: uid, newInterests: novel, weightIncrement: 1 }).catch(() => {});
+        }
+      }
+    } catch (e) {
+      // Non-fatal
+      // console.warn('Interest extraction/write skipped:', e);
+    }
     
     let sanitizedUserText = userText;
     try {
@@ -2189,9 +2214,20 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
       if (response) {
         let adventureText = response.trim();
         
-        // For spelling questions, ensure the word is included BEFORE extraction
+        // For spelling questions, ensure the word handling
         if (spellingQuestion && spellingQuestion.audio) {
           const spellingWord = spellingQuestion.audio;
+          
+          // Special case: chit-chat should keep pet reply independent of target word.
+          // Do NOT inject the word into adventureText and do NOT try to extract a sentence from it.
+          // Still return a non-empty spelling_sentence to trigger the SpellBox gate.
+          if (adventureType === 'chit-chat') {
+            return {
+              // For chit-chat, keep pet reply independent; no sentence/word for overlay paths
+              spelling_sentence: null,
+              adventure_story: adventureText
+            };
+          }
           
           // PRE-PROCESSING: Ensure word is included before extraction
           if (!adventureText.toLowerCase().includes(spellingWord.toLowerCase())) {
@@ -2401,16 +2437,19 @@ TARGET WORD: "${spellingWord}" ← MUST BE IN FIRST TWO SENTENCES`
         'house','food','dressing-competition','travel','friend','who-made-the-pets-sick',
         'pet-school','pet-theme-park','pet-mall','pet-care','plant-dreams','story'
       ];
-      const systemContent = structuredInitial.includes(adventureType)
-        ? `${composePrompt(adventureType, petTypeDescription, petName, userData)}\n\n${getGenericOpeningInstruction(petTypeDescription, petName, userData)}`
-        : config.initialMessageTemplate(
-            adventureMode,
-            petTypeDescription,
-            petName,
-            userData,
-            currentAdventure,
-            summary
-          );
+      const systemContent =
+        adventureType === 'chit-chat'
+          ? getChitChatPrompt(petTypeDescription, petName, userData || undefined)
+          : (structuredInitial.includes(adventureType)
+              ? `${composePrompt(adventureType, petTypeDescription, petName, userData)}\n\n${getGenericOpeningInstruction(petTypeDescription, petName, userData)}`
+              : config.initialMessageTemplate(
+                  adventureMode,
+                  petTypeDescription,
+                  petName,
+                  userData,
+                  currentAdventure,
+                  summary
+                ));
 
 
       const systemMessage = {

@@ -47,7 +47,9 @@ export interface UserData {
   username: string;
   email: string;
   age?: number;
-  gender?: 'male' | 'female';
+  gender?: 'male' | 'female' | 'nonbinary' | 'unspecified';
+  interests?: string[]; // normalized, lowercase, de-duped
+  interestWeights?: Record<string, number>; // optional usage/recency weights
   grade: string;
   gradeDisplayName: string;
   level: string;
@@ -347,7 +349,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Live listeners (real-time updates)
         try {
-          const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
+          const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story', 'chit-chat'];
           const target = 5;
           let ownedPets: string[] = [];
           let didTriggerPostLoginMigration = false;

@@ -1115,7 +1115,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     ];
     
     // Determine current item to display with 8-hour hold behavior (story excluded)
-    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care'];
+    const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'chit-chat'];
     const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
     
     const statusFor = (type: string): ActionStatus => {
@@ -1125,7 +1125,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     };
     
     // Only show the current sad item in the bottom bar
-    baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'pet-school' ? '🏫' : sadType === 'pet-theme-park' ? '🎢' : sadType === 'pet-mall' ? '🏬' : sadType === 'pet-care' ? '🧼' : sadType === 'story' ? '📚' : '🌙', status: statusFor(sadType), label: (
+    baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'pet-school' ? '🏫' : sadType === 'pet-theme-park' ? '🎢' : sadType === 'pet-mall' ? '🏬' : sadType === 'pet-care' ? '🧼' : sadType === 'story' ? '📚' : sadType === 'chit-chat' ? '💬' : '🌙', status: statusFor(sadType), label: (
       sadType === 'plant-dreams' ? 'Plant Dreams' : sadType === 'pet-school' ? 'Pet School' : sadType === 'pet-theme-park' ? 'Pet Theme Park' : sadType === 'pet-mall' ? 'Pet Mall' : sadType === 'pet-care' ? 'Pet Care' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
     ) });
     
@@ -1738,6 +1738,17 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
         return;
       }
       handleAdventureClick('pet-care');
+      return;
+    }
+
+    // Handle chit-chat action
+    if (actionId === 'chit-chat') {
+      const granted = await ensureMicPermission();
+      if (!granted) {
+        toast.error('Enable Mic Access');
+        return;
+      }
+      handleAdventureClick('chit-chat');
       return;
     }
 
@@ -3031,7 +3042,7 @@ const getSleepyPetImage = (clicks: number) => {
     // Before other generic care-based thoughts, align the thought with the current Daily Quest.
     // Primary source: Firestore `dailyQuests` (hydrated into localStorage by auth listener).
     // Fallback: local PetProgressStorage sequencing so the bubble never goes blank.
-    const todoSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
+    const todoSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story', 'chit-chat'];
     let activityFromFirestore: string | null = null;
     let doneFromFirestore = false;
     let petHasActiveCooldown = false;
@@ -4496,7 +4507,7 @@ const getSleepyPetImage = (clicks: number) => {
                 } catch {}
 
                 // Fallbacks when Firestore hasn't hydrated yet
-                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall'];
+                const questSequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'chit-chat'];
                 // Always prefer per-pet assignment from Firestore; fall back to user-scoped pointer only if missing
                 const preferred = activityFromFirestore || userActivity || null;
                 const currentQuestType = preferred || PetProgressStorage.getCurrentTodoDisplayType(currentPet, questSequence, 50);
@@ -4514,6 +4525,7 @@ const getSleepyPetImage = (clicks: number) => {
                     case 'dressing-competition': return '👗';
                     case 'food': return '🍪';
                     case 'plant-dreams': return '🌙';
+                    case 'chit-chat': return '💬';
                     default: return '✨';
                   }
                 };
@@ -4647,7 +4659,7 @@ const getSleepyPetImage = (clicks: number) => {
       {/* More Overlay */}
       {showMoreOverlay && (() => {
         // Canonical sequence aligned with backend ACTIVITY_SEQUENCE (story handled separately):
-        const coreSeq = ['house','friend','dressing-competition','who-made-the-pets-sick','travel','food','plant-dreams','pet-school','pet-theme-park','pet-mall','pet-care'];
+        const coreSeq = ['house','friend','dressing-competition','who-made-the-pets-sick','travel','food','plant-dreams','pet-school','pet-theme-park','pet-mall','pet-care','chit-chat'];
         // Prefer Firestore daily quest assignment (hydrated into localStorage by auth listener)
         let assignedDailyType: string | null = null;
         let assignedDailyDone: boolean = false;
@@ -4713,6 +4725,7 @@ const getSleepyPetImage = (clicks: number) => {
             type === 'pet-theme-park' ? '🎢' :
             type === 'pet-mall' ? '🏬' :
             type === 'pet-care' ? '🧼' :
+            type === 'chit-chat' ? '💬' :
             type === 'story' ? '📚' : '🌙';
           const label =
             type === 'plant-dreams' ? 'Plant Dreams' :
