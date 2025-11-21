@@ -5364,11 +5364,9 @@ Keep tone warm, brief, and curious.`;
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
   const adventureInputDisabledReason = isAdventureInputDisabled
-    ? (disableInputForSpell
-        ? 'SpellBox awaiting Next'
-        : (isWhiteboardPromptActive
-            ? 'Whiteboard prompt'
-            : (isWhiteboardLessonActive ? 'Whiteboard lesson' : 'Disabled')))
+    ? (isWhiteboardPromptActive
+        ? 'Whiteboard prompt'
+        : (isWhiteboardLessonActive ? 'Whiteboard lesson' : undefined))
     : undefined;
 
   return (

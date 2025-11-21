@@ -1312,7 +1312,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       if (!cancelled) {
         setIsWaitingForCoach(false);
       }
-    }, 12000); // 12s safety window so the spinner never gets stuck
+    }, 5000); // 5s safety window so the button never gets stuck
 
     return () => {
       cancelled = true;
@@ -2306,17 +2306,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 }}
                     className={cn(
                       'h-9 w-9 rounded-full border-2 border-black shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105',
-                      isWaitingForCoach ? 'bg-white text-yellow-700' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
+                      isWaitingForCoach ? 'bg-white text-yellow-700 opacity-60 cursor-not-allowed' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
                     )}
                     title={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
                     aria-label={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
                     disabled={isWaitingForCoach}
               >
-                    {isWaitingForCoach ? (
-                      <Loader2 className="h-5 w-5 animate-spin text-yellow-600" />
-                    ) : (
                 <Lightbulb className="h-5 w-5" />
-                    )}
               </Button>
                 )}
                 {/* Accuracy circle appears after submit; when incorrect, it sits between bulb and coach */}
@@ -2349,16 +2345,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                   // Keep fully opaque when delay-gated next
                   nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
-                  // Make slightly transparent when unattempted/unchanged
-                  submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
+                  // Make slightly transparent when unattempted/unchanged or evaluating
+                  (submitDisabledUnattempted || isEvaluating) && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
                   highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
                 )}
               >
-                {isEvaluating ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
-                )}
+                <ChevronRight className={cn('h-6 w-6', (submitDisabledUnattempted || isEvaluating) && 'opacity-60')} />
               </Button>
               {highlightNext && isCorrect && (
                 <div className="ml-2 text-2xl select-none" aria-hidden="true">👉</div>
@@ -2688,17 +2680,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     }}
                     className={cn(
                       'h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105',
-                      isWaitingForCoach ? 'bg-white text-yellow-700' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
+                      isWaitingForCoach ? 'bg-white text-yellow-700 opacity-60 cursor-not-allowed' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
                     )}
                     title={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
                     aria-label={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
                     disabled={isWaitingForCoach}
                   >
-                    {isWaitingForCoach ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-yellow-600" />
-                    ) : (
                   <Lightbulb className="h-3.5 w-3.5" />
-                    )}
                 </Button>
                 )}
                 {/* When incorrect, place accuracy circle between bulb and coach */}
@@ -2727,14 +2715,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   className={cn(
                     'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                     nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
-                    submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
+                    (submitDisabledUnattempted || isEvaluating) && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
                   )}
                 >
-                  {isEvaluating ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
-                  )}
+                  <ChevronRight className={cn('h-4 w-4', (submitDisabledUnattempted || isEvaluating) && 'opacity-60')} />
                 </Button>
               </div>
             )}

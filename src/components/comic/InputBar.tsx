@@ -203,12 +203,14 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
         };
 
         mediaRecorder.start();
-        setIsMicActive(true);
-        isCancelledRef.current = false; // Reset cancelled flag
+        // Note: isMicActive is already set to true in startVoice for instant UI feedback
+        // isCancelledRef.current is already reset in startVoice
       })
       .catch(error => {
         console.error('Error accessing microphone:', error);
         toast.error("Microphone access denied. Please allow microphone access.");
+        // Reset mic active state if microphone access fails
+        setIsMicActive(false);
       });
   }, [transcribeWithWhisper, onGenerate]);
 
@@ -260,6 +262,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition not supported in this browser.");
+      setIsMicActive(false); // Reset state if not supported
       return;
     }
     
@@ -272,9 +275,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     let finalTranscriptText = '';
     
     rec.onstart = () => {
-      setIsMicActive(true);
+      // Note: isMicActive is already set to true in startVoice for instant UI feedback
       finalTranscriptText = ''; // Reset when starting
-      isCancelledRef.current = false; // Reset cancelled flag
+      // isCancelledRef.current is already reset in startVoice
     };
     
     rec.onresult = (event: any) => {
@@ -296,7 +299,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
       setText(finalTranscriptText + interimTranscript);
     };
     
-    rec.onerror = () => {
+    rec.onerror = (event: any) => {
       toast.error("Microphone error – please try again.");
       setIsMicActive(false);
       setIsSubmitting(false);
@@ -362,6 +365,10 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     // Clear any existing text before starting new recording
     setText("");
     
+    // Set mic active state IMMEDIATELY for instant UI feedback
+    setIsMicActive(true);
+    isCancelledRef.current = false;
+    
     // Use Whisper if available, otherwise fallback to browser speech recognition
     if (useWhisper) {
       startWhisperRecording();
@@ -405,6 +412,9 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   const handleSendDuringRecording = useCallback(() => {
     playClickSound();
     console.log('Send button clicked during recording - stopping and sending...');
+    
+    // Immediately hide recording UI for instant feedback
+    setIsMicActive(false);
     
     // Immediately add "transcribing..." message for instant feedback
     onAddMessage({
@@ -473,6 +483,20 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
     <section aria-label="Create next panel" className="bg-transparent relative">
       <form onSubmit={submit} className="flex items-stretch gap-2 bg-transparent">
         {isMicActive ? (
+          // Recording state: Cancel button on left
+          <Button
+            type="button"
+            variant="comic"
+            size="icon"
+            onClick={disabled ? undefined : handleCancelRecording}
+            aria-label="Cancel recording"
+            className="flex-shrink-0 bg-red-500 hover:bg-red-600 text-white border-red-500 active:translate-y-0 active:shadow-solid"
+            disabled={disabled}
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        ) : null}
+        {isMicActive ? (
           <WaveformVisualizer />
         ) : (
           <Input
@@ -485,61 +509,60 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           />
         )}
         {isMicActive ? (
-          // Recording state: Show only Cancel button (now placed near Send on the right)
-          <Button
+          // Recording state: Send button in middle (where mic was)
+          <Button 
             type="button"
             variant="comic"
             size="icon"
-            onClick={disabled ? undefined : handleCancelRecording}
-            aria-label="Cancel recording"
-            className="flex-shrink-0 btn-animate bg-red-500 hover:bg-red-600 text-white border-red-500"
+            onClick={(e) => {
+              if (disabled) {
+                e.preventDefault();
+                onDisabledClick?.();
+                return;
+              }
+              e.preventDefault();
+              handleSendDuringRecording();
+            }}
+            aria-label="Stop recording and send"
+            className="flex-shrink-0 active:translate-y-0 active:shadow-solid"
             disabled={disabled}
           >
-            <X className="h-5 w-5" />
+            <Send className="h-5 w-5" />
+          </Button>
+        ) : text.trim() ? (
+          // User has typed text: Mic button becomes Send button
+          <Button
+            type="submit"
+            variant="comic"
+            size="icon"
+            onClick={(e) => {
+              if (disabled) {
+                e.preventDefault();
+                onDisabledClick?.();
+                return;
+              }
+              submit(e);
+            }}
+            aria-label="Send message"
+            className="flex-shrink-0 active:translate-y-0 active:shadow-solid"
+            disabled={disabled}
+          >
+            <Send className="h-5 w-5" />
           </Button>
         ) : (
-          // Normal state: Show Mic button (moved to the right near Send)
+          // Default state: Only Mic button
           <Button
             type="button"
             variant="comic"
             size="icon"
             onClick={disabled ? undefined : startVoice}
             aria-label="Voice input"
-            className="flex-shrink-0 btn-animate"
+            className="flex-shrink-0 active:translate-y-0 active:shadow-solid"
             disabled={disabled}
           >
             <Mic className="h-5 w-5" />
           </Button>
         )}
-        {/* Image button removed */}
-        <Button 
-          type="button"
-          variant="outline" 
-          size="icon" 
-          disabled={disabled || (!text.trim() && !isMicActive)}
-          onClick={(e) => {
-            if (disabled) {
-              e.preventDefault();
-              onDisabledClick?.();
-              return;
-            }
-            if (isMicActive) {
-              // During recording: stop and send directly
-              e.preventDefault();
-              handleSendDuringRecording();
-            } else {
-              // Normal mode: use regular submit logic
-              submit(e);
-            }
-          }}
-          aria-label={isMicActive ? "Stop recording and send" : "Send message"}
-          className={cn(
-            "h-10 w-10 bg-white/90 hover:bg-primary hover:text-primary-foreground shadow-sm hover:shadow-md flex-shrink-0 btn-animate border-0 backdrop-blur-sm",
-            (disabled || (!text.trim() && !isMicActive)) && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          <Send className="h-4 w-4" />
-        </Button>
       </form>
       {disabled && disabledReason && (import.meta as any)?.env?.DEV && (
         <div

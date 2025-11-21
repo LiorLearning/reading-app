@@ -74,6 +74,7 @@ const initClickSound = (): HTMLAudioElement => {
  * Play click sound effect for button interactions
  */
 export const playClickSound = (): void => {
+  return
   try {
     if (isUISoundsMuted) return;
     if (clickAudio) {

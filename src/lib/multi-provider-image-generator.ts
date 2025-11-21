@@ -275,7 +275,8 @@ class FluxSchnellProvider implements ImageProvider {
           output_quality: 100,
           num_inference_steps: 4,
           aspect_ratio: '5:4',
-          output_format: 'png',
+          output_format: 'webp',
+          megapixels: "1",
           //safety_tolerance: 1,
           //prompt_upsampling: false,
 
@@ -378,7 +379,7 @@ class FluxProProvider implements ImageProvider {
           prompt,
           output_quality: 100,
           aspect_ratio: '5:4',
-          output_format: 'png',
+          output_format: 'webp',
           safety_tolerance: 1,
           prompt_upsampling: false,          
           metadata: (() => {
