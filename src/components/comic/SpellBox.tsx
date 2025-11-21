@@ -78,7 +78,7 @@ const ReadingMicButton: React.FC<{
   onRecognized: (isCorrect: boolean) => void;
   onTranscript?: (text: string, isFinal: boolean) => void;
   // second arg may be a plain string (backwards compatible) or an object with Azure meta
-  onRecordingChange?: (isRecording: boolean, final?: string | { text?: string; accuracyScore?: number }) => void;
+  onRecordingChange?: (isRecording: boolean, final?: string | { text?: string; accuracyScore?: number; serviceJson?: any }) => void;
   compact?: boolean;
   // Interrupt the reading tutor realtime session (if speaking) when user retries
   interruptRealtimeSession?: () => void;
@@ -273,7 +273,7 @@ const ReadingMicButton: React.FC<{
               return;
             }
             try { onTranscript?.(text, true); } catch {}
-            try { onRecordingChange?.(false, { text, accuracyScore: accuracyScore ?? undefined }); } catch {}
+            try { onRecordingChange?.(false, { text, accuracyScore: accuracyScore ?? undefined, serviceJson: azureJson }); } catch {}
             // Quick correctness hint based on Azure accuracyScore when available,
             // falling back to transcript-based heuristic when Azure isn't available.
             try {
@@ -889,6 +889,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   const [lastSpellingDiagnosis, setLastSpellingDiagnosis] = useState<{ mistake: string; spelling_pattern_issue: 'yes' | 'no' } | null>(null);
   // Latest Azure pronunciation accuracyScore (if available) for the current attempt
   const [lastAzureAccuracyScore, setLastAzureAccuracyScore] = useState<number | null>(null);
+  // Raw Azure service JSON (for phoneme-level checks)
+  const [lastAzureServiceJson, setLastAzureServiceJson] = useState<any | null>(null);
   // Lightweight OpenAI client for simple GPT checks (e.g., target word presence)
   const gptClient = React.useMemo(() => {
     try {
@@ -1400,7 +1402,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // Submit current attempt via chevron/Enter.
   // For reading questions, an optional transcriptOverride lets us submit immediately
   // using the just-finished recording, without waiting for state to update.
-  const handleSubmitAttempt = useCallback(async (transcriptOverride?: string, accuracyOverride?: number) => {
+  const handleSubmitAttempt = useCallback(async (transcriptOverride?: string, accuracyOverride?: number, azureServiceJsonOverride?: any) => {
     let canSubmit = false;
     let readingTranscript: string | null = null;
 
@@ -1437,7 +1439,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           : (typeof lastAzureAccuracyScore === 'number' ? lastAzureAccuracyScore : null);
 
         if (typeof azureScore === 'number') {
-          // Use Azure score: >=70 is correct. If <70, consult GPT as an override for word presence.
+          // Use Azure score: >=70 is correct unless any phoneme < 50.
+          // If <70, consult GPT as an override for word presence.
           const normalize = (s: string) => (s || '')
             .toLowerCase()
             .replace(/[^a-z\s]/g, ' ')
@@ -1446,13 +1449,29 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           const normalizedTarget = normalize(targetWord);
           const tokens = normalize(completeWord).split(/\s+/).filter(Boolean);
 
-          if (azureScore >= 70) {
-            correct = true;
-            latestReadingMismatches = [];
-            setReadingMismatchedIndices(latestReadingMismatches);
-            console.log('[SpellBox] Evaluation (reading via Azure). score=', azureScore, 'correct=', correct, 'word=', completeWord);
-          } else {
-            // Azure below threshold: attempt GPT-5.1 override to check permissive word presence.
+          // New rule: fail if any phoneme accuracy is < 50
+          let phonemeFail = false;
+          try {
+            const azureJson = azureServiceJsonOverride ?? lastAzureServiceJson;
+            const core = (azureJson && (azureJson as any).serviceJson) ? (azureJson as any).serviceJson : azureJson;
+            const phonemes = (core?.NBest?.[0]?.Words?.[0]?.Phonemes) || [];
+            if (Array.isArray(phonemes)) {
+              const scores = phonemes.map((p: any, idx: number) => {
+                const score = Number(p?.PronunciationAssessment?.AccuracyScore ?? 100);
+                const isLast = idx === phonemes.length - 1;
+                const threshold = isLast ? 0 : 50;
+                const belowThreshold = !Number.isNaN(score) && score < threshold;
+                return { phoneme: p?.Phoneme, score, threshold, belowThreshold };
+              });
+              phonemeFail = scores.some(s => s.belowThreshold);
+              try {
+                console.log('[SpellBox] Azure phoneme scores with thresholds:', scores, 'overallAccuracy=', azureScore, 'phonemeFail=', phonemeFail, 'hasServiceJsonWrapper=', Boolean((azureJson as any)?.serviceJson));
+              } catch {}
+            }
+          } catch {}
+
+          if (phonemeFail) {
+            // Only when phonemeFail=true do we attempt GPT override
             let gptOverride = false;
             try {
               if (gptClient) {
@@ -1489,12 +1508,10 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             }
 
             if (gptOverride) {
-              // Override: mark correct and surface a 90% accuracy for the circle
               correct = true;
               latestReadingMismatches = [];
               setReadingMismatchedIndices(latestReadingMismatches);
-              setLastAzureAccuracyScore(90);
-              console.log('[SpellBox] GPT override applied after low Azure score. Setting accuracy to 90 and marking correct.');
+              console.log('[SpellBox] GPT override applied due to phonemeFail. Marking correct.');
             } else {
               // Keep incorrect; optionally compute mismatches for feedback
               correct = false;
@@ -1502,12 +1519,31 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
                 latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
                 setReadingMismatchedIndices(latestReadingMismatches);
-                console.log('[SpellBox] Evaluation (reading via AI, after low Azure score, no GPT override). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
+                console.log('[SpellBox] PhonemeFail with no GPT override match. AI diagnosis computed. Marking incorrect.');
               } catch (e) {
                 latestReadingMismatches = [];
                 setReadingMismatchedIndices(latestReadingMismatches);
-                console.warn('[SpellBox] AI evaluation failed after low Azure score; keeping incorrect. azureScore=', azureScore);
+                console.warn('[SpellBox] AI diagnosis failed under phonemeFail; keeping incorrect.');
               }
+            }
+          } else if (azureScore >= 70) {
+            // No phoneme fail and accuracy is sufficient
+            correct = true;
+            latestReadingMismatches = [];
+            setReadingMismatchedIndices(latestReadingMismatches);
+            console.log('[SpellBox] Evaluation (reading via Azure). score=', azureScore, 'correct=', correct, 'word=', completeWord);
+          } else {
+            // No phoneme fail but accuracy below threshold; treat as incorrect (no GPT override here)
+            correct = false;
+            try {
+              const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+              latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
+              setReadingMismatchedIndices(latestReadingMismatches);
+              console.log('[SpellBox] Evaluation (reading via AI, below threshold, no phoneme fail). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
+            } catch (e) {
+              latestReadingMismatches = [];
+              setReadingMismatchedIndices(latestReadingMismatches);
+              console.warn('[SpellBox] AI evaluation failed (no phoneme fail, below threshold); keeping incorrect. azureScore=', azureScore);
             }
           }
         } else {
@@ -1713,7 +1749,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
     // Reading mode state that the submit uses; including these avoids stale closures
     isReading,
     lockedTranscript,
-    liveTranscript
+    liveTranscript,
+    lastAzureServiceJson
   ]);
 
   // Focus next empty box (scoped to this component)
@@ -2235,15 +2272,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
                                   ? (meta as any).accuracyScore as number | undefined
                                   : undefined;
+                                const serviceJson = typeof meta === 'object' && meta
+                                  ? (('serviceJson' in (meta as any)) ? (meta as any).serviceJson : (meta as any))
+                                  : null;
                                 const final = ((text ?? liveTranscript) || '').trim();
                                 setLockedTranscript(final);
                                 setLastAzureAccuracyScore(typeof accuracyScore === 'number' ? accuracyScore : null);
+                                setLastAzureServiceJson(serviceJson);
                                 setHasSubmitted(false);
                                 setIsCorrect(false);
                                 setReadingMismatchedIndices([]);
                                 // Auto-submit for reading questions when recording stops, using the final transcript directly
                                 if (final) {
-                                  try { handleSubmitAttempt(final, accuracyScore); } catch {}
+                                  try { handleSubmitAttempt(final, accuracyScore, serviceJson); } catch {}
                                 }
                               } else {
                                 setLockedTranscript('');
@@ -2253,6 +2294,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                 setIsCorrect(false);
                                 setReadingMismatchedIndices([]);
                                 setLastAzureAccuracyScore(null);
+                                setLastAzureServiceJson(null);
                               }
                             }}
                             onRecognized={(ok) => {
@@ -2630,15 +2672,19 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
                                       ? (meta as any).accuracyScore as number | undefined
                                       : undefined;
+                                    const serviceJson = typeof meta === 'object' && meta
+                                      ? (('serviceJson' in (meta as any)) ? (meta as any).serviceJson : (meta as any))
+                                      : null;
                                     const final = ((text ?? liveTranscript) || '').trim();
                                     setLockedTranscript(final);
                                     setLastAzureAccuracyScore(typeof accuracyScore === 'number' ? accuracyScore : null);
+                                    setLastAzureServiceJson(serviceJson);
                                     setHasSubmitted(false);
                                     setIsCorrect(false);
                                     setReadingMismatchedIndices([]);
                                     // Auto-submit for reading questions when recording stops, using the final transcript directly
                                     if (final) {
-                                      try { handleSubmitAttempt(final, accuracyScore); } catch {}
+                                      try { handleSubmitAttempt(final, accuracyScore, serviceJson); } catch {}
                                     }
                                   } else {
                                     setLockedTranscript('');
@@ -2648,6 +2694,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                                     setIsCorrect(false);
                                     setReadingMismatchedIndices([]);
                                     setLastAzureAccuracyScore(null);
+                                    setLastAzureServiceJson(null);
                                   }
                                 }}
                                 onRecognized={(ok) => {
