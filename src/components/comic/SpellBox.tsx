@@ -83,7 +83,11 @@ const ReadingMicButton: React.FC<{
   // Interrupt the reading tutor realtime session (if speaking) when user retries
   interruptRealtimeSession?: () => void;
   disabled?: boolean;
-}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact, interruptRealtimeSession, disabled = false }) => {
+  // Notify parent when background processing (upload/transcribe) starts/ends
+  onProcessingChange?: (processing: boolean) => void;
+  // Let parent suppress mic spinner while processing
+  hideProcessingIndicator?: boolean;
+}> = ({ targetWord, onRecognized, onTranscript, onRecordingChange, compact, interruptRealtimeSession, disabled = false, onProcessingChange, hideProcessingIndicator }) => {
   const [isRecording, setIsRecording] = React.useState(false);
   const recognitionRef = React.useRef<any>(null);
   const shouldBeRecordingRef = React.useRef<boolean>(false);
@@ -223,6 +227,7 @@ const ReadingMicButton: React.FC<{
         (async () => {
           try {
             setIsProcessing(true);
+            try { onProcessingChange?.(true); } catch {}
             const usedSampleRate = ctx?.sampleRate || 16000;
             const wavBlob = encodeWavFromPCM(chunks, usedSampleRate);
             const file = new File([wavBlob], 'speech.wav', { type: 'audio/wav' });
@@ -291,6 +296,7 @@ const ReadingMicButton: React.FC<{
             try { onRecordingChange?.(false, ''); } catch {}
           } finally {
             setIsProcessing(false);
+            try { onProcessingChange?.(false); } catch {}
           }
         })();
         return;
@@ -377,6 +383,7 @@ const ReadingMicButton: React.FC<{
           try { stream.getTracks().forEach(t => t.stop()); } catch {}
           try {
             setIsProcessing(true);
+            try { onProcessingChange?.(true); } catch {}
             const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
             const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
             const fd = new FormData();
@@ -407,6 +414,7 @@ const ReadingMicButton: React.FC<{
             try { onRecordingChange?.(false, ''); } catch {}
           } finally {
             setIsProcessing(false);
+            try { onProcessingChange?.(false); } catch {}
             mediaRecorderRef.current = null;
           }
         };
@@ -432,6 +440,7 @@ const ReadingMicButton: React.FC<{
           try { stream.getTracks().forEach(t => t.stop()); } catch {}
           try {
             setIsProcessing(true);
+            try { onProcessingChange?.(true); } catch {}
             const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
             const file = new File([blob], 'speech.webm', { type: 'audio/webm' });
             const resp: any = await (openaiClient as any).audio.transcriptions.create({
@@ -459,6 +468,7 @@ const ReadingMicButton: React.FC<{
             try { onRecordingChange?.(false, ''); } catch {}
           } finally {
             setIsProcessing(false);
+            try { onProcessingChange?.(false); } catch {}
             mediaRecorderRef.current = null;
           }
         };
@@ -558,7 +568,7 @@ const ReadingMicButton: React.FC<{
       disabled={isProcessing || disabled}
       style={isRecording ? { animation: 'micPulse 1.2s ease-in-out infinite' } : undefined}
     >
-      {isProcessing
+      {isProcessing && !hideProcessingIndicator
         ? <Loader2 className={compact ? 'h-3 w-3 animate-spin' : 'h-5 w-5 animate-spin'} />
         : isRecording ? <Square className="h-2 w-2" /> : <Mic className={compact ? 'h-3 w-3' : 'h-5 w-5'} />}
     </Button>
@@ -683,6 +693,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
   // After an incorrect submit or hint tap, show a tiny "waiting for coach" loader
   // beside the yellow bulb until the AI tutor starts speaking (or a short timeout).
   const [isWaitingForCoach, setIsWaitingForCoach] = useState(false);
+  // Unified 'Thinking…' phase: from stop-click until transcript is ready
+  const [isTranscriptProcessing, setIsTranscriptProcessing] = useState(false);
   
   // Get auth context for logging
   const { user, userData } = useAuth();
@@ -2256,7 +2268,9 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                           <ReadingMicButton 
                             compact
                             targetWord={targetWord} 
-                            disabled={isEvaluating}
+                            disabled={isEvaluating || isTranscriptProcessing}
+                            hideProcessingIndicator
+                            onProcessingChange={(p) => setIsTranscriptProcessing(p)}
                             interruptRealtimeSession={interruptRealtimeSession}
                             onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                             onRecordingChange={(rec, meta) => {
@@ -2268,6 +2282,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               }
                               setIsRecordingReading(rec);
                               if (!rec) {
+                                // Transcript ready; stop unified 'Thinking…'
+                                try { setIsTranscriptProcessing(false); } catch {}
                                 const text = typeof meta === 'string' ? meta : (meta?.text ?? '');
                                 const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
                                   ? (meta as any).accuracyScore as number | undefined
@@ -2339,12 +2355,36 @@ const SpellBox: React.FC<SpellBoxProps> = ({
             </div>
           )}
 
-          {isReading && hasSubmitted && !isCorrect && (lockedTranscript || liveTranscript) && (
+          {isReading && isTranscriptProcessing && (
+            <div className="mt-3 text-sm text-center">
+              <span className="opacity-60 italic text-gray-600">
+                Thinking
+                <span className="thinking-dots">
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                </span>
+              </span>
+            </div>
+          )}
+          {isReading && !isTranscriptProcessing && !isCorrect && (lockedTranscript || liveTranscript) && (
             <div className="mt-3 text-sm text-center">
               <span className="opacity-60 mr-1">You said:</span>
               <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>
                 {lockedTranscript || liveTranscript}
               </span>
+              {isEvaluating && (
+                <div className="mt-3 text-sm text-center">
+                  <span className="opacity-60 italic text-gray-600">
+                    Thinking
+                    <span className="thinking-dots">
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                      <span className="dot">.</span>
+                    </span>
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
@@ -2410,17 +2450,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 }}
                     className={cn(
                       'h-9 w-9 rounded-full border-2 border-black shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105',
-                      isWaitingForCoach ? 'bg-white text-yellow-700' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
+                      'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
                     )}
-                    title={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
-                    aria-label={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
-                    disabled={isWaitingForCoach}
+                    title={'Hint: listen again'}
+                    aria-label={'Hint: listen again'}
               >
-                    {isWaitingForCoach ? (
-                      <Loader2 className="h-5 w-5 animate-spin text-yellow-600" />
-                    ) : (
-                <Lightbulb className="h-5 w-5" />
-                    )}
+                    <Lightbulb className="h-5 w-5" />
               </Button>
                 )}
                 {/* Accuracy circle appears after submit; when incorrect, it sits between bulb and coach */}
@@ -2448,7 +2483,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     handleSubmitAttempt();
                   }
                 }}
-                disabled={nextGateDisabled || submitDisabledUnattempted || isEvaluating}
+                disabled={nextGateDisabled || submitDisabledUnattempted || isEvaluating || isTranscriptProcessing}
                 className={cn(
                   'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                   // Keep fully opaque when delay-gated next
@@ -2458,11 +2493,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
                 )}
               >
-                {isEvaluating ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
-                )}
+                <ChevronRight className={cn('h-6 w-6', submitDisabledUnattempted && 'opacity-60')} />
               </Button>
               {highlightNext && isCorrect && (
                 <div className="ml-2 text-2xl select-none" aria-hidden="true">👉</div>
@@ -2490,6 +2521,16 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
             @keyframes wiggle { 0%,100% { transform: rotate(0deg);} 25% { transform: rotate(6deg);} 75% { transform: rotate(-6deg);} }
 
+            /* Animated thinking dots */
+            .thinking-dots { display: inline-block; margin-left: 2px; }
+            .thinking-dots .dot { display: inline-block; animation: thinkingDot 1.2s infinite; opacity: 0.2; }
+            .thinking-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+            .thinking-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+            @keyframes thinkingDot { 
+              0% { opacity: 0.2; } 
+              20% { opacity: 1; } 
+              100% { opacity: 0.2; } 
+            }
           `}</style>
             { /* CONTENT END */ }
         </div>
@@ -2662,12 +2703,15 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                               <ReadingMicButton 
                                 compact
                                 targetWord={targetWord}
-                                disabled={isEvaluating}
+                                disabled={isEvaluating || isTranscriptProcessing}
+                                hideProcessingIndicator
+                                onProcessingChange={(p) => setIsTranscriptProcessing(p)}
                               interruptRealtimeSession={interruptRealtimeSession}
                                 onTranscript={(text, isFinal) => { setLiveTranscript(text); setLiveTranscriptFinal(isFinal); }}
                                 onRecordingChange={(rec, meta) => {
                                   setIsRecordingReading(rec);
                                   if (!rec) {
+                                    try { setIsTranscriptProcessing(false); } catch {}
                                     const text = typeof meta === 'string' ? meta : (meta?.text ?? '');
                                     const accuracyScore = typeof meta === 'object' && meta && 'accuracyScore' in meta
                                       ? (meta as any).accuracyScore as number | undefined
@@ -2729,12 +2773,36 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     );
                   })}
                 </div>
-                {isReading && hasSubmitted && !isCorrect && (lockedTranscript || liveTranscript) && (
+                {isReading && isTranscriptProcessing && (
+                  <div className="mt-3 text-sm text-center">
+                    <span className="opacity-60 italic text-gray-600">
+                      Thinking
+                      <span className="thinking-dots">
+                        <span className="dot">.</span>
+                        <span className="dot">.</span>
+                        <span className="dot">.</span>
+                      </span>
+                    </span>
+                  </div>
+                )}
+                {isReading && !isTranscriptProcessing && !isCorrect && (lockedTranscript || liveTranscript) && (
                   <div className="mt-2 text-xs text-center">
                     <span className="opacity-60 mr-1">You said:</span>
                     <span className={cn(liveTranscriptFinal ? 'font-semibold text-primary' : 'italic text-gray-600')}>
                       {lockedTranscript || liveTranscript}
                     </span>
+                    {isEvaluating && (
+                      <div className="mt-3 text-sm text-center">
+                        <span className="opacity-60 italic text-gray-600">
+                          Thinking
+                          <span className="thinking-dots">
+                            <span className="dot">.</span>
+                            <span className="dot">.</span>
+                            <span className="dot">.</span>
+                          </span>
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -2799,17 +2867,12 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                     }}
                     className={cn(
                       'h-7 w-7 rounded-full border-2 border-black shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105',
-                      isWaitingForCoach ? 'bg-white text-yellow-700' : 'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
+                      'bg-yellow-300 text-yellow-900 hover:bg-yellow-400'
                     )}
-                    title={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
-                    aria-label={isWaitingForCoach ? 'Coach is responding...' : 'Hint: listen again'}
-                    disabled={isWaitingForCoach}
+                    title={'Hint: listen again'}
+                    aria-label={'Hint: listen again'}
                   >
-                    {isWaitingForCoach ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-yellow-600" />
-                    ) : (
-                  <Lightbulb className="h-3.5 w-3.5" />
-                    )}
+                    <Lightbulb className="h-3.5 w-3.5" />
                 </Button>
                 )}
                 {/* When incorrect, place accuracy circle between bulb and coach */}
@@ -2834,22 +2897,30 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                       handleSubmitAttempt();
                     }
                   }}
-                  disabled={nextGateDisabled || submitDisabledUnattempted || isEvaluating}
+                  disabled={nextGateDisabled || submitDisabledUnattempted || isEvaluating || isTranscriptProcessing}
                   className={cn(
                     'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                     nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
                     submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
                   )}
                 >
-                  {isEvaluating ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
-                  )}
+                  <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />
                 </Button>
               </div>
             )}
 
+            {/* Inline CSS for thinking dots animation (inline variant) */}
+            <style>{`
+              .thinking-dots { display: inline-block; margin-left: 2px; }
+              .thinking-dots .dot { display: inline-block; animation: thinkingDot 1.2s infinite; opacity: 0.2; }
+              .thinking-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+              .thinking-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+              @keyframes thinkingDot {
+                0% { opacity: 0.2; }
+                20% { opacity: 1; }
+                100% { opacity: 0.2; }
+              }
+            `}</style>
     </div>
         </div>
       )}
