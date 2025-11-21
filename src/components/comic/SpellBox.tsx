@@ -2367,6 +2367,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
               </span>
             </div>
           )}
+          {!isReading && (isEvaluating || isWaitingForCoach) && (
+            <div className="mt-3 text-sm text-center">
+              <span className="opacity-60 italic text-gray-600">
+                Thinking
+                <span className="thinking-dots">
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                  <span className="dot">.</span>
+                </span>
+              </span>
+            </div>
+          )}
           {isReading && !isTranscriptProcessing && !isCorrect && (lockedTranscript || liveTranscript) && (
             <div className="mt-3 text-sm text-center">
               <span className="opacity-60 mr-1">You said:</span>
@@ -2774,6 +2786,18 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   })}
                 </div>
                 {isReading && isTranscriptProcessing && (
+                  <div className="mt-3 text-sm text-center">
+                    <span className="opacity-60 italic text-gray-600">
+                      Thinking
+                      <span className="thinking-dots">
+                        <span className="dot">.</span>
+                        <span className="dot">.</span>
+                        <span className="dot">.</span>
+                      </span>
+                    </span>
+                  </div>
+                )}
+                {!isReading && (isEvaluating || isWaitingForCoach) && (
                   <div className="mt-3 text-sm text-center">
                     <span className="opacity-60 italic text-gray-600">
                       Thinking
