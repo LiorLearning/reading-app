@@ -1,4 +1,4 @@
-import { getGenericPrompt } from './GenericPrompt';
+import { getGenericPromptByVariant } from './variant';
 import {
   getHouseBuildingPrompt,
   getFoodAdventurePrompt,
@@ -20,7 +20,7 @@ export function composePrompt(
   petName?: string,
   userData?: any
 ): string {
-  const generic = getGenericPrompt(petTypeDescription, petName, userData);
+  const generic = getGenericPromptByVariant(petTypeDescription, petName, userData);
 
   if (adventureType === 'house') {
     const specific = getHouseBuildingPrompt(petTypeDescription, petName, userData);
