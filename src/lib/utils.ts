@@ -7,15 +7,25 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Detect if the current device is iOS/iPad
- * Returns true for iPhone, iPad, iPod, and iPadOS (macOS with touch)
+ * Detect if the current device supports native Apple Sign-In
+ * Returns true for iPhone, iPad, iPod, iPadOS, and macOS (MacBook, iMac, etc.)
  */
 export function isIOSDevice(): boolean {
   if (typeof window === 'undefined') return false;
   const userAgent = window.navigator.userAgent.toLowerCase();
+  
+  // iOS devices (iPhone, iPad, iPod)
   const isIOS = /iphone|ipad|ipod/.test(userAgent);
+  
+  // iPadOS (macOS with touch support)
   const isIPadOS = /macintosh/.test(userAgent) && navigator.maxTouchPoints > 1;
-  return isIOS || isIPadOS;
+  
+  // macOS Safari (MacBook, iMac, etc.) - check for macOS and Safari, but exclude Chrome/Firefox
+  const isMacOS = /macintosh/.test(userAgent) && 
+                   /safari/.test(userAgent) && 
+                   !/chrome|crios|fxios|edg/.test(userAgent);
+  
+  return isIOS || isIPadOS || isMacOS;
 }
 
 // Local storage key for user adventure messages
