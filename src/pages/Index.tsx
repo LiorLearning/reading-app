@@ -6487,6 +6487,7 @@ Keep tone warm, brief, and curious.`;
                 return (
                   <LeftPetOverlay 
                     petImageUrl={currentPetAvatarImage}
+                    autoHideToken={lessonReady ? 'lesson-mode' : undefined}
                     overridePetMediaUrl={overridePetMediaUrl}
                     emotionActive={lessonReady ? false : emotionActive}
                     emotionRequiredAction={lessonReady ? null : emotionRequiredAction}
