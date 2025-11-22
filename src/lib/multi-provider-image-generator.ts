@@ -311,7 +311,7 @@ class FluxSchnellProvider implements ImageProvider {
               if (!raw) return { username, attempt };
               const parsed = JSON.parse(raw);
               if (!Array.isArray(parsed)) return { username, attempt };
-              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
+              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat && (m.content || "").trim().toLowerCase() !== 'transcribing...');
               const lastFour = visibleMessages.slice(-6);
               const compact = lastFour.map((m: any) => ({
                 type: m?.type,
@@ -413,7 +413,7 @@ class FluxProProvider implements ImageProvider {
               if (!raw) return { username, attempt };
               const parsed = JSON.parse(raw);
               if (!Array.isArray(parsed)) return { username, attempt };
-              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat);
+              const visibleMessages = parsed.filter((m: any) => !m?.hiddenInChat && (m.content || "").trim().toLowerCase() !== 'transcribing...');
               const lastFour = visibleMessages.slice(-6);
               const compact = lastFour.map((m: any) => ({
                 type: m?.type,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight } from "lucide-react";
+import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight, Pause } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
 import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
@@ -20,6 +20,7 @@ interface LeftPetOverlayProps {
   interruptRealtimeSession?: () => void;
   /** Optional: provide to render inline spelling UI instead of plain HTML */
   spellInline?: {
+    isReading: boolean;
     word?: string | null;
     sentence?: string | null;
     question?: {
@@ -676,7 +677,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                     className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
                     aria-label={isSpeakingThisMessage ? 'Stop message' : 'Play message'}
                   >
-                    {isSpeakingThisMessage ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                    {isSpeakingThisMessage ? <Pause className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
                   </Button>
                 )}
               </div>
