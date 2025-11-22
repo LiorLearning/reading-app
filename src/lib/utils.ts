@@ -6,6 +6,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Detect if the current device is iOS/iPad
+ * Returns true for iPhone, iPad, iPod, and iPadOS (macOS with touch)
+ */
+export function isIOSDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(userAgent);
+  const isIPadOS = /macintosh/.test(userAgent) && navigator.maxTouchPoints > 1;
+  return isIOS || isIPadOS;
+}
+
 // Local storage key for user adventure messages
 const USER_ADVENTURE_KEY = "user_adventure";
 // Local storage key for current adventure ID

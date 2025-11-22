@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { 
   User, 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider, 
   OAuthProvider,
   signOut as firebaseSignOut,
@@ -14,6 +16,7 @@ import {
   linkWithCredential,
   EmailAuthProvider,
   linkWithPopup,
+  linkWithRedirect,
   reload
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
@@ -24,6 +27,7 @@ import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
 import analytics from '@/lib/analytics';
 import { autoMigrateOnLogin } from '@/lib/firebase-data-migration';
+import { isIOSDevice } from '@/lib/utils';
 
 // Google Identity Services types
 declare global {
@@ -40,6 +44,7 @@ declare global {
     };
   }
 }
+
 
 // Enhanced user data interface that includes Firebase user info
 export interface UserData {
@@ -97,6 +102,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let lastRolloverAttempt = 0; // throttle rollover writes
     let initialAuthResolved = false;
     let focusListener: ((this: Window, ev: Event) => any) | null = null;
+
+    // Handle redirect result for Apple Sign-In (especially on iOS/iPad)
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          // User signed in via redirect
+          const user = result.user;
+          // Ensure email is persisted to Firestore immediately
+          try {
+            await reload(user);
+          } catch {}
+          try {
+            const userDocRef = doc(db, 'users', user.uid);
+            const emailNow = (user.email || '').trim();
+            if (emailNow) {
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            }
+          } catch (e) {
+            console.warn('Failed to persist email after Apple redirect:', e);
+          }
+        }
+      } catch (error: any) {
+        // Ignore errors if no redirect pending
+        if (error?.code !== 'auth/operation-not-allowed') {
+          console.warn('Error handling redirect result:', error);
+        }
+      }
+    };
+
+    // Check for redirect result on mount
+    handleRedirectResult();
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -689,25 +726,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     provider.addScope('email');
     provider.addScope('name');
     
+    // Use redirect on iOS/iPad for native Apple Sign-In experience
+    const useRedirect = isIOSDevice();
+    
     try {
       const current = auth.currentUser;
       if (current && current.isAnonymous) {
         try {
           // Link Apple to the current anonymous user to preserve UID
-          const linkedCred = await linkWithPopup(current, provider);
-          
-          // Ensure email is persisted to Firestore immediately on upgrade
-          try {
-            await reload(linkedCred.user);
-          } catch {}
-          try {
-            const userDocRef = doc(db, 'users', linkedCred.user.uid);
-            const emailNow = (linkedCred.user.email || '').trim();
-            if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+          if (useRedirect) {
+            // Use redirect on iOS for native experience
+            await linkWithRedirect(current, provider);
+            // The redirect will happen, and we'll handle the result in useEffect
+            return;
+          } else {
+            // Use popup on non-iOS devices
+            const linkedCred = await linkWithPopup(current, provider);
+            
+            // Ensure email is persisted to Firestore immediately on upgrade
+            try {
+              await reload(linkedCred.user);
+            } catch {}
+            try {
+              const userDocRef = doc(db, 'users', linkedCred.user.uid);
+              const emailNow = (linkedCred.user.email || '').trim();
+              if (emailNow) {
+                await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              }
+            } catch (e) {
+              console.warn('Failed to persist email after Apple link:', e);
             }
-          } catch (e) {
-            console.warn('Failed to persist email after Apple link:', e);
           }
         } catch (error: any) {
           // If the Apple credential already belongs to an existing account, just sign into it
@@ -721,32 +769,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
               await firebaseSignOut(auth);
             } catch {}
-            await signInWithPopup(auth, provider);
-            return;
+            if (useRedirect) {
+              await signInWithRedirect(auth, provider);
+              return;
+            } else {
+              await signInWithPopup(auth, provider);
+              return;
+            }
           }
-          // Handle popup closed by user or other cancellations
-          if (
-            String(code).includes('auth/popup-closed-by-user') ||
-            String(code).includes('auth/cancelled-popup-request') ||
-            String(code).includes('auth/popup-blocked')
-          ) {
-            throw new Error('Sign-in cancelled');
+          // Handle popup closed by user or other cancellations (only for popup flow)
+          if (!useRedirect) {
+            if (
+              String(code).includes('auth/popup-closed-by-user') ||
+              String(code).includes('auth/cancelled-popup-request') ||
+              String(code).includes('auth/popup-blocked')
+            ) {
+              throw new Error('Sign-in cancelled');
+            }
           }
           throw error;
         }
       } else {
         // Sign in normally if not anonymous
-        await signInWithPopup(auth, provider);
+        if (useRedirect) {
+          await signInWithRedirect(auth, provider);
+          // The redirect will happen, and we'll handle the result in useEffect
+          return;
+        } else {
+          await signInWithPopup(auth, provider);
+        }
       }
     } catch (error: any) {
-      // Handle popup closed by user or other cancellations
-      const code = (error && (error.code || error?.message)) || '';
-      if (
-        String(code).includes('auth/popup-closed-by-user') ||
-        String(code).includes('auth/cancelled-popup-request') ||
-        String(code).includes('auth/popup-blocked')
-      ) {
-        throw new Error('Sign-in cancelled');
+      // Handle popup closed by user or other cancellations (only for popup flow)
+      if (!useRedirect) {
+        const code = (error && (error.code || error?.message)) || '';
+        if (
+          String(code).includes('auth/popup-closed-by-user') ||
+          String(code).includes('auth/cancelled-popup-request') ||
+          String(code).includes('auth/popup-blocked')
+        ) {
+          throw new Error('Sign-in cancelled');
+        }
       }
       console.error('Error signing in with Apple:', error);
       throw error;
