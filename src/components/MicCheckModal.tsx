@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { setMicVerified } from "@/lib/mic-verification";
 import { ttsService } from "@/lib/tts-service";
+import { getOrCreateDeviceId } from "@/lib/device-id";
+import { convertBlobToWav16kMono } from "@/lib/audioUtils";
 import { Mic, Square, Volume2 } from "lucide-react";
 
 interface MicCheckModalProps {
@@ -78,6 +80,65 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 		}
 	}, [phrase]);
 
+	const deviceId = React.useMemo(() => getOrCreateDeviceId(), []);
+
+	// Fire-and-forget Discord notification via backend (does not block UI).
+	// If audioBlob is provided, we send multipart form-data so the backend can forward the file.
+	const notifyDiscord = React.useCallback((status: "success" | "failure" | "error", extra?: { transcript?: string; score?: number; error?: string; audioBlob?: Blob; audioFileName?: string; audioMimeType?: string }) => {
+		try {
+			if (!backendBaseUrl) return;
+			const username =
+				(user as any)?.displayName ||
+				(user as any)?.email ||
+				user?.uid ||
+				"anonymous";
+			const userNameField =
+				(user as any)?.displayName ||
+				(user as any)?.email ||
+				undefined;
+			// If audio provided, send multipart for backend to forward to Discord with attachment
+			if (extra?.audioBlob) {
+				const fd = new FormData();
+				fd.append("type", "mic_check");
+				fd.append("status", status);
+				fd.append("username", username);
+				if (user?.uid) fd.append("uid", user.uid);
+				if (userNameField) fd.append("userName", userNameField);
+				if (deviceId) fd.append("deviceId", deviceId);
+				fd.append("phrase", phrase);
+				if (extra?.transcript) fd.append("transcript", extra.transcript);
+				if (typeof extra?.score === "number") fd.append("score", String(extra.score));
+				if (extra?.error) fd.append("error", extra.error);
+				const name = extra.audioFileName || "mic-check.webm";
+				const type = extra.audioMimeType || extra.audioBlob.type || "audio/webm";
+				fd.append("file", new File([extra.audioBlob], name, { type }));
+				fetch(`${backendBaseUrl}/api/discord`, {
+					method: "POST",
+					body: fd,
+				}).catch(() => {});
+			} else {
+				const payload = {
+					type: "mic_check",
+					status,
+					username,
+					uid: user?.uid,
+					userName: userNameField,
+					deviceId,
+					phrase,
+					transcript: extra?.transcript ?? undefined,
+					score: typeof extra?.score === "number" ? extra?.score : undefined,
+					error: extra?.error ?? undefined,
+				};
+				fetch(`${backendBaseUrl}/api/discord`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				}).catch(() => {});
+			}
+		} catch {}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [backendBaseUrl, deviceId, phrase, user?.uid]);
+
 	const stopVisualize = React.useCallback(() => {
 		if (rafRef.current) {
 			cancelAnimationFrame(rafRef.current);
@@ -138,9 +199,13 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 				setIsRecording(false);
 				setIsProcessing(true);
 				try {
-					// Build form for Whisper endpoint
-					const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-					const file = new File([blob], "speech.webm", { type: "audio/webm" });
+					// Build audio blobs
+					const webmBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+					// Convert to 16kHz mono WAV for Discord + transcription
+					const wav16kBlob = await convertBlobToWav16kMono(webmBlob);
+
+					// Send to Whisper transcription as 16k WAV (compatible)
+					const file = new File([wav16kBlob], "speech.wav", { type: "audio/wav" });
 					const fd = new FormData();
 					fd.append("file", file);
 					fd.append("model", "whisper-v3-turbo");
@@ -157,15 +222,27 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 						try { if (user?.uid) setMicVerified(user.uid); } catch {}
 						setIsSuccess(true);
 						setError(null);
+						// Notify Discord of success with audio attachment
+						notifyDiscord("success", { transcript: text, score, audioBlob: wav16kBlob, audioFileName: "mic-check.wav", audioMimeType: "audio/wav" });
 						setTimeout(() => {
 							onPassed?.();
 							onClose();
 						}, 1000);
 					} else {
 						setError("We couldn't hear the phrase clearly. Please try again.");
+						// Notify Discord of failure with audio attachment
+						notifyDiscord("failure", { transcript: text, score, audioBlob: wav16kBlob, audioFileName: "mic-check.wav", audioMimeType: "audio/wav" });
 					}
 				} catch (err) {
 					setError("Transcription failed. Please try again.");
+					// Notify Discord of transcription error (no audio if unavailable)
+					try {
+						const webmBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+						const wav16kBlob = await convertBlobToWav16kMono(webmBlob);
+						notifyDiscord("error", { error: "Transcription failed", audioBlob: wav16kBlob, audioFileName: "mic-check.wav", audioMimeType: "audio/wav" });
+					} catch {
+						notifyDiscord("error", { error: "Transcription failed" });
+					}
 				} finally {
 					setIsProcessing(false);
 				}
@@ -175,10 +252,12 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 			setIsRecording(true);
 		} catch (e) {
 			setError("Unable to access microphone. Please check browser permissions.");
+			// Notify Discord of permission/device error
+			notifyDiscord("error", { error: "getUserMedia failed or permission denied" });
 		} finally {
 			setIsProcessing(false);
 		}
-	}, [backendBaseUrl, onClose, onPassed, phrase, startVisualize, stopVisualize, user?.uid]);
+	}, [backendBaseUrl, notifyDiscord, onClose, onPassed, phrase, startVisualize, stopVisualize, user?.uid]);
 
 	const stopRecording = React.useCallback(() => {
 		try {
