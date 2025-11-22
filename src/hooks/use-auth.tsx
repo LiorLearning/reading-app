@@ -726,36 +726,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     provider.addScope('email');
     provider.addScope('name');
     
-    // Use redirect on iOS/iPad for native Apple Sign-In experience
-    const useRedirect = isIOSDevice();
+    // Use redirect for all devices (no popup)
     try {
       const current = auth.currentUser;
       if (current && current.isAnonymous) {
         try {
           // Link Apple to the current anonymous user to preserve UID
-          if (useRedirect) {
-            // Use redirect on iOS for native experience
-            await linkWithRedirect(current, provider);
-            // The redirect will happen, and we'll handle the result in useEffect
-            return;
-          } else {
-            // Use popup on non-iOS devices
-            const linkedCred = await linkWithPopup(current, provider);
-            
-            // Ensure email is persisted to Firestore immediately on upgrade
-            try {
-              await reload(linkedCred.user);
-            } catch {}
-            try {
-              const userDocRef = doc(db, 'users', linkedCred.user.uid);
-              const emailNow = (linkedCred.user.email || '').trim();
-              if (emailNow) {
-                await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
-              }
-            } catch (e) {
-              console.warn('Failed to persist email after Apple link:', e);
-            }
-          }
+          await linkWithRedirect(current, provider);
+          // The redirect will happen, and we'll handle the result in useEffect
+          return;
         } catch (error: any) {
           // If the Apple credential already belongs to an existing account, just sign into it
           const code = (error && (error.code || error?.message)) || '';
@@ -768,48 +747,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
               await firebaseSignOut(auth);
             } catch {}
-            if (useRedirect) {
-              await signInWithRedirect(auth, provider);
-              return;
-            } else {
-              await signInWithPopup(auth, provider);
-              return;
-            }
-          }
-          // Handle popup closed by user or other cancellations (only for popup flow)
-          if (!useRedirect) {
-            if (
-              String(code).includes('auth/popup-closed-by-user') ||
-              String(code).includes('auth/cancelled-popup-request') ||
-              String(code).includes('auth/popup-blocked')
-            ) {
-              throw new Error('Sign-in cancelled');
-            }
+            await signInWithRedirect(auth, provider);
+            return;
           }
           throw error;
         }
       } else {
         // Sign in normally if not anonymous
-        if (useRedirect) {
-          await signInWithRedirect(auth, provider);
-          // The redirect will happen, and we'll handle the result in useEffect
-          return;
-        } else {
-          await signInWithPopup(auth, provider);
-        }
+        await signInWithRedirect(auth, provider);
+        // The redirect will happen, and we'll handle the result in useEffect
+        return;
       }
     } catch (error: any) {
-      // Handle popup closed by user or other cancellations (only for popup flow)
-      if (!useRedirect) {
-        const code = (error && (error.code || error?.message)) || '';
-        if (
-          String(code).includes('auth/popup-closed-by-user') ||
-          String(code).includes('auth/cancelled-popup-request') ||
-          String(code).includes('auth/popup-blocked')
-        ) {
-          throw new Error('Sign-in cancelled');
-        }
-      }
       console.error('Error signing in with Apple:', error);
       throw error;
     }
@@ -974,14 +923,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Initialize Google One Tap Sign-in
   const initializeOneTapSignIn = () => {
-    if (!window.google || !import.meta.env.VITE_FIREBASE_API_KEY) {
-      console.warn('Google Identity Services not available or Firebase config missing');
+    if (!window.google) {
+      console.warn('Google Identity Services not available');
+      return;
+    }
+
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('VITE_GOOGLE_CLIENT_ID is not set. Google One Tap Sign-in will not work. Please set your Google Client ID in your .env file.');
       return;
     }
 
     try {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_FIREBASE_API_KEY;
-      
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleOneTapSignIn,
