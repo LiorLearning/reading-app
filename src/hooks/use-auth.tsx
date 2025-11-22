@@ -728,7 +728,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Use redirect on iOS/iPad for native Apple Sign-In experience
     const useRedirect = isIOSDevice();
-    
     try {
       const current = auth.currentUser;
       if (current && current.isAnonymous) {

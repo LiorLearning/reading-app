@@ -18,7 +18,7 @@ export function isIOSDevice(): boolean {
   const isIOS = /iphone|ipad|ipod/.test(userAgent);
   
   // iPadOS (macOS with touch support)
-  const isIPadOS = /macintosh/.test(userAgent) && navigator.maxTouchPoints > 1;
+  const isIPadOS = /macintosh/.test(userAgent);
   
   // macOS Safari (MacBook, iMac, etc.) - check for macOS and Safari, but exclude Chrome/Firefox
   const isMacOS = /macintosh/.test(userAgent) && 
