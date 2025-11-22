@@ -22,6 +22,8 @@ import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
 import { checkMicPermissionStatus } from "@/lib/mic-permission";
+import MicCheckModal from "@/components/MicCheckModal";
+import { isMicVerified } from "@/lib/mic-verification";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +120,7 @@ const UnifiedPetAdventureApp = () => {
   const { shouldShowGate, suppressForDays } = useDeviceGate();
   const [gateOpen, setGateOpen] = useState<boolean>(false);
   const [showMediaPrompt, setShowMediaPrompt] = useState<boolean>(false);
+  const [showMicCheck, setShowMicCheck] = useState<boolean>(false);
 
   React.useEffect(() => {
     setGateOpen(shouldShowGate);
@@ -165,9 +168,15 @@ const UnifiedPetAdventureApp = () => {
         // Also store that permission was actually granted (not just seen)
         localStorage.setItem('media_permission_granted', '1');
       } catch {}
+      // If this device hasn't passed mic check yet, show mic check next
+      try {
+        if (user?.uid && !isMicVerified(user.uid)) {
+          setShowMicCheck(true);
+        }
+      } catch {}
     }
     setShowMediaPrompt(false);
-  }, []);
+  }, [user?.uid]);
 
   const handleContinueAnyway = React.useCallback(() => {
     suppressForDays(3);
@@ -226,6 +235,26 @@ const UnifiedPetAdventureApp = () => {
     );
   }
 
+  // Show Mic Check on startup if permission exists but verification missing
+  React.useEffect(() => {
+    let cancelled = false;
+    const maybeOpenMicCheck = async () => {
+      try {
+        if (!user?.uid) return;
+        if (isMicVerified(user.uid)) return;
+        const micGranted = await checkMicPermissionStatus();
+        if (cancelled) return;
+        if (micGranted) {
+          setShowMicCheck(true);
+        }
+      } catch {
+        // ignore
+      }
+    };
+    maybeOpenMicCheck();
+    return () => { cancelled = true; };
+  }, [user?.uid]);
+
   if (isInAdventure) {
     return (
       <Index 
@@ -246,6 +275,11 @@ const UnifiedPetAdventureApp = () => {
         open={showMediaPrompt}
         onClose={handleMediaPromptClose}
         onEnabled={handleMediaEnabled}
+      />
+      <MicCheckModal
+        open={showMicCheck}
+        onClose={() => setShowMicCheck(false)}
+        onPassed={() => setShowMicCheck(false)}
       />
       <PetPage 
         onStartAdventure={handleStartAdventure}

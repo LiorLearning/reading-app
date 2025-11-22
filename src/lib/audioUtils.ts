@@ -82,3 +82,54 @@ export async function convertWebMBlobToWav(blob: Blob): Promise<Blob> {
   const wavBuffer = encodeWAV(combined, audioBuffer.sampleRate);
   return new Blob([wavBuffer], { type: "audio/wav" });
 } 
+
+/**
+ * Converts any audio Blob (e.g., WebM) to a 16 kHz mono WAV Blob.
+ */
+export async function convertBlobToWav16kMono(blob: Blob): Promise<Blob> {
+  const arrayBuffer = await blob.arrayBuffer();
+  const tempCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const decoded = await tempCtx.decodeAudioData(arrayBuffer);
+  const targetSampleRate = 16000;
+
+  if (decoded.sampleRate === targetSampleRate) {
+    // Already 16k — just downmix to mono and encode
+    const numChannels = decoded.numberOfChannels;
+    const length = decoded.length;
+    const combined = new Float32Array(length);
+    for (let ch = 0; ch < numChannels; ch++) {
+      const data = decoded.getChannelData(ch);
+      for (let i = 0; i < length; i++) combined[i] += data[i];
+    }
+    for (let i = 0; i < length; i++) combined[i] /= numChannels;
+    const wav = encodeWAV(combined, targetSampleRate);
+    try { await tempCtx.close(); } catch {}
+    return new Blob([wav], { type: "audio/wav" });
+  }
+
+  // Resample to 16k using OfflineAudioContext
+  const length16k = Math.ceil(decoded.duration * targetSampleRate);
+  const offline = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(
+    decoded.numberOfChannels,
+    length16k,
+    targetSampleRate
+  );
+  const src = offline.createBufferSource();
+  src.buffer = decoded;
+  src.connect(offline.destination);
+  src.start(0);
+  const rendered = await offline.startRendering();
+
+  // Downmix to mono by averaging channels
+  const outLen = rendered.length;
+  const channels = rendered.numberOfChannels;
+  const mono = new Float32Array(outLen);
+  for (let ch = 0; ch < channels; ch++) {
+    const data = rendered.getChannelData(ch);
+    for (let i = 0; i < outLen; i++) mono[i] += data[i];
+  }
+  for (let i = 0; i < outLen; i++) mono[i] /= channels;
+  const wavBuf = encodeWAV(mono, targetSampleRate);
+  try { await tempCtx.close(); } catch {}
+  return new Blob([wavBuf], { type: "audio/wav" });
+}
