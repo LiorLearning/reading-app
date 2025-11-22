@@ -345,7 +345,7 @@ Transform this image request:`;
         context ? `Context: ${context}` : '',
         backgroundPool.slice(-6).map((m) => (m?.content || '').toString().trim()).filter(Boolean).join(' ')
       ].filter(Boolean).join('\n');
-      const backgroundSummary = backgroundJoined.length > 300 ? `${backgroundJoined.slice(0, 300)}...` : backgroundJoined;
+      const backgroundSummary = backgroundJoined //.length > 300 ? `${backgroundJoined.slice(0, 300)}...` : backgroundJoined;
       
       // Compose weighted, explicitly prioritized sections (60% user, 20% AI, 20% background)
       const userSection = userMessageText
@@ -357,7 +357,7 @@ Transform this image request:`;
         : `AI MESSAGE (20% priority): none`;
       
       const backgroundSection = backgroundSummary
-        ? `BACKGROUND (20% priority) — Use only if it clarifies setting; otherwise ignore:\n${backgroundSummary}`
+        ? `BACKGROUND (20% priority) — Use only if it clarifies setting:\n${backgroundSummary}`
         : `BACKGROUND (20% priority): none`;
       
       const userMessage = `${userSection}
