@@ -16,7 +16,7 @@ import {
   linkWithPopup,
   reload
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, runTransaction, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import { CoinSystem } from '@/lib/coinSystem';
@@ -92,8 +92,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [hasGoogleAccount, setHasGoogleAccount] = useState(false);
 
   useEffect(() => {
-    let unsubscribeUserState: (() => void) | null = null;
-    let unsubscribeDailyQuests: (() => void) | null = null;
     let lastRolloverAttempt = 0; // throttle rollover writes
     let initialAuthResolved = false;
     let focusListener: ((this: Window, ev: Event) => any) | null = null;
@@ -345,26 +343,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid);
         } catch {}
 
-        // Live listeners (real-time updates)
+        // One-time data fetch (no real-time listeners to reduce Firebase /listen calls)
         try {
           const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
           const target = 5;
           let ownedPets: string[] = [];
-          let didTriggerPostLoginMigration = false;
 
-          // Clean up any existing listeners before creating new ones to prevent duplicates
-          if (unsubscribeUserState) {
-            try { unsubscribeUserState(); } catch {}
-            unsubscribeUserState = null;
-          }
-          if (unsubscribeDailyQuests) {
-            try { unsubscribeDailyQuests(); } catch {}
-            unsubscribeDailyQuests = null;
-          }
-
-          // UserState live: coins + owned pets + per-pet levels
-          unsubscribeUserState = onSnapshot(doc(db, 'userStates', user.uid), (snap) => {
-            const d = snap.data() as any;
+          // Helper function to process userState data (used for initial fetch and refresh)
+          const processUserStateData = (d: any) => {
             if (!d) return;
             // Coins
             CoinSystem.setCoins(Number(d.coins ?? 0));
@@ -373,11 +359,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               const petsMap = (d?.pets || {}) as Record<string, number>;
               const totalQuestions = Object.values(petsMap).reduce((acc, v) => acc + Number(v || 0), 0);
               const derivedLifetimeCoins = totalQuestions * 10; // 10 coins per question
-
-              // Persist to localStorage where PetPage reads cumulative coins for level calc
               localStorage.setItem('litkraft_cumulative_coins_earned', String(derivedLifetimeCoins));
-
-              // Nudge UI to refresh level bar (PetPage listens to this)
               window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins: Number(d.coins ?? 0) } }));
             } catch (e) {
               console.warn('Failed to hydrate lifetime coins from pets map', e);
@@ -417,14 +399,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const today = new Date().toISOString().slice(0, 10);
                 petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
                 petData.dailyCoins.todayDate = today;
-                petData.dailyCoins.todayCoins = petCoins; // keep avatar emotion in sync globally
+                petData.dailyCoins.todayCoins = petCoins;
               } catch {}
               PetProgressStorage.setPetProgress(petData);
-              // Keep local pet list in sync for selector
               try { PetDataService.addOwnedPet(petId); } catch {}
             }
 
-            // Ensure a current selected pet is set before migration/reconciliation
+            // Ensure a current selected pet is set
             try {
               const currentSelected = PetProgressStorage.getCurrentSelectedPet();
               if (!currentSelected) {
@@ -432,39 +413,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 PetProgressStorage.setCurrentSelectedPet(firstOwned);
               }
             } catch {}
+          };
 
-            // Trigger background migration after pet selection is guaranteed
-            if (!didTriggerPostLoginMigration) {
-              didTriggerPostLoginMigration = true;
-              try { autoMigrateOnLogin(user.uid); } catch {}
-            }
-          });
-
-          // DailyQuests live: quest progress bar
-          unsubscribeDailyQuests = onSnapshot(doc(db, 'dailyQuests', user.uid), (snap) => {
-            const d = (snap.data() as any) || {};
+          // Helper function to process dailyQuests data
+          const processDailyQuestsData = (d: any) => {
             if (!ownedPets || ownedPets.length === 0) {
               ownedPets = Object.keys((d || {})).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
             }
-          const states = ownedPets.map((pet) => {
-            const petObj = (d?.[pet] ?? {}) as any;
-            const index = Number(petObj?._activityIndex ?? 0) % seq.length;
-            const indexKey = seq[index];
-            const cuAny: any = petObj?._cooldownUntil || null;
-            const cuMs = cuAny?.toMillis ? cuAny.toMillis() : (typeof cuAny?.seconds === 'number' ? cuAny.seconds * 1000 : (typeof cuAny === 'number' ? cuAny : (typeof cuAny === 'string' ? (isNaN(Date.parse(cuAny)) ? null : Date.parse(cuAny)) : (cuAny ? new Date(cuAny).getTime() : null))));
-            const petHasActiveCooldown = Boolean(cuMs && Date.now() < cuMs);
-            const userAct = (d?._userCurrentActivity || seq[0]) as string;
-            const pointerKey = (typeof userAct === 'string' && userAct) ? userAct : indexKey;
-            const lastCompleted = (typeof petObj?._lastCompletedActivity === 'string' && petObj._lastCompletedActivity) ? petObj._lastCompletedActivity : indexKey;
-            const effectiveKey = petHasActiveCooldown ? lastCompleted : pointerKey;
-            const prog = Number(petObj?.[effectiveKey] ?? 0);
-            const sleepStartAt = petObj?._sleepStartAt || null;
-            const sleepEndAt = petObj?._sleepEndAt || null;
-            return { pet, activity: effectiveKey, progress: prog, target, completed: prog >= target, activityIndex: index, cooldownUntil: petObj?._cooldownUntil ?? null, sleepStartAt, sleepEndAt };
-          });
+            const states = ownedPets.map((pet) => {
+              const petObj = (d?.[pet] ?? {}) as any;
+              const index = Number(petObj?._activityIndex ?? 0) % seq.length;
+              const indexKey = seq[index];
+              const cuAny: any = petObj?._cooldownUntil || null;
+              const cuMs = cuAny?.toMillis ? cuAny.toMillis() : (typeof cuAny?.seconds === 'number' ? cuAny.seconds * 1000 : (typeof cuAny === 'number' ? cuAny : (typeof cuAny === 'string' ? (isNaN(Date.parse(cuAny)) ? null : Date.parse(cuAny)) : (cuAny ? new Date(cuAny).getTime() : null))));
+              const petHasActiveCooldown = Boolean(cuMs && Date.now() < cuMs);
+              const userAct = (d?._userCurrentActivity || seq[0]) as string;
+              const pointerKey = (typeof userAct === 'string' && userAct) ? userAct : indexKey;
+              const lastCompleted = (typeof petObj?._lastCompletedActivity === 'string' && petObj._lastCompletedActivity) ? petObj._lastCompletedActivity : indexKey;
+              const effectiveKey = petHasActiveCooldown ? lastCompleted : pointerKey;
+              const prog = Number(petObj?.[effectiveKey] ?? 0);
+              const sleepStartAt = petObj?._sleepStartAt || null;
+              const sleepEndAt = petObj?._sleepEndAt || null;
+              return { pet, activity: effectiveKey, progress: prog, target, completed: prog >= target, activityIndex: index, cooldownUntil: petObj?._cooldownUntil ?? null, sleepStartAt, sleepEndAt };
+            });
             try {
               localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
-              // Publish per-pet sleep streaks and a derived total for top-right hearts
+              // Publish per-pet sleep streaks
               try {
                 const pets = (ownedPets && ownedPets.length > 0) ? ownedPets : Object.keys(d).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
                 const perPet: Record<string, number> = {};
@@ -474,7 +448,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   const v = Number(((d?.[p] || {}) as any)?.streak || 0);
                   perPet[p] = Number.isFinite(v) ? v : 0;
                   total += perPet[p];
-                  // Mirror 5-slot array if present
                   const slotsAny = ((d?.[p] || {}) as any)?.streakSlots;
                   const slots = Array.isArray(slotsAny) ? slotsAny.map((x: any) => (Number(x) ? 1 : 0)) : [];
                   if (slots.length === 5) perPetSlots[p] = slots;
@@ -484,15 +457,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 localStorage.setItem('litkraft_streak', String(total));
                 window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: total } }));
               } catch {}
-            // Also hydrate a user-scoped pointer for the shared daily assignment if present
-            try {
-              const userAct = (d?._userCurrentActivity || (Array.isArray(seq) && seq.length > 0 ? seq[0] : 'house')) as string;
-              const lastSwitchAny = (d?._userLastSwitchAt as any) || null;
-              const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : (lastSwitchAny ? new Date(lastSwitchAny).getTime() : Date.now());
-              localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: userAct, lastSwitchTime: lastSwitchMs }));
-              window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: userAct, lastSwitchTime: lastSwitchMs } }));
-            } catch {}
-              // Also expose sadness assignment and any client-forced sadness (purchase) if present
+              // Hydrate user-scoped pointer
+              try {
+                const userAct = (d?._userCurrentActivity || (Array.isArray(seq) && seq.length > 0 ? seq[0] : 'house')) as string;
+                const lastSwitchAny = (d?._userLastSwitchAt as any) || null;
+                const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : (lastSwitchAny ? new Date(lastSwitchAny).getTime() : Date.now());
+                localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: userAct, lastSwitchTime: lastSwitchMs }));
+                window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: userAct, lastSwitchTime: lastSwitchMs } }));
+              } catch {}
+              // Expose sadness assignment
               try {
                 const sad = (d?._sadness || null);
                 if (sad && sad.date) {
@@ -501,13 +474,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 }
                 const sadForce = (d?._sadForce || null);
                 if (sadForce && sadForce.date) {
-                  // Convert pets object map to string[] for compact client consumption
                   const forcedList = Array.isArray(sadForce.pets) ? sadForce.pets : Object.keys(sadForce.pets || {});
                   localStorage.setItem('litkraft_forced_sad_pets', JSON.stringify({ date: sadForce.date, pets: forcedList }));
                   window.dispatchEvent(new CustomEvent('dailyForcedSadUpdated', { detail: { date: sadForce.date, pets: forcedList } }));
                 }
               } catch {}
-              // Mirror live sleep windows per-pet for the timer
+              // Mirror sleep windows per-pet
               try {
                 states.forEach((s) => {
                   const petId = (s as any)?.pet;
@@ -521,10 +493,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   }
                 });
               } catch {}
-              // Reflect partial daily quest progress in todayCoins for emotion rendering (realtime)
+              // Update todayCoins for emotion rendering
               try {
                 const today = new Date().toISOString().slice(0, 10);
-                const targetCoins = 50; // 5 correct * 10 coins
+                const targetCoins = 50;
                 states.forEach((s: any) => {
                   const prog = Number(s?.progress || 0);
                   const petId = (s as any)?.pet;
@@ -536,7 +508,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     pd.dailyCoins.todayDate = today;
                     pd.dailyCoins.todayCoins = 0;
                   }
-                  // Only increase to avoid clobbering increments from adventure flow in this session
                   if ((pd.dailyCoins.todayCoins || 0) < desiredCoins) {
                     pd.dailyCoins.todayCoins = desiredCoins;
                     PetProgressStorage.setPetProgress(pd);
@@ -546,31 +517,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch {}
             window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
 
-            // Emit daily_quests (single event model)
-            try {
-              const todayKey = new Date().toISOString().slice(0, 10);
-              states.forEach((s: any) => {
-                const todoType = s.activity;
-                const todoId = `${s.pet}:${todayKey}:${todoType}`;
-                const status = s.completed ? 'completed' : 'started';
-                analytics.capture('daily_quests', {
-                  todo_type: todoType,
-                  status,
-                  pet_used_id: s.pet,
-                  progress_current: Number(s?.progress || 0),
-                  progress_target: Number((s as any)?.target || 5),
-                });
-              });
-            } catch {}
-
-            // Enable sleep when the CURRENT pet's daily quest progress >= 5
+            // Enable sleep when quest progress >= 5
             try {
               const currentPet = PetProgressStorage.getCurrentSelectedPet() || ownedPets[0];
               const currentState = states.find(s => s.pet === currentPet);
               if (currentState && currentState.progress >= target) {
                 const data = PetDataService.getPetData();
                 const { adventureCoinsAtLastSleep } = data.cumulativeCareLevel;
-                // Ensure coins since last sleep >= 50 so isSleepAvailable() becomes true
                 PetDataService.setPetData({
                   cumulativeCareLevel: {
                     ...data.cumulativeCareLevel,
@@ -580,67 +533,84 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             } catch {}
 
-            // Throttled rollover in realtime when cooldown has passed
-            try {
-              const nowMs = Date.now();
-              const needsRollover = states.some((s: any) => {
-                const completed = Number(s?.progress || 0) >= 5;
-                const cu: any = s?.cooldownUntil || null;
-                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
-                return completed && (!cuMs || nowMs >= cuMs);
-              });
-              if (needsRollover && nowMs - lastRolloverAttempt > 60000) {
-                lastRolloverAttempt = nowMs;
-                stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets });
-              }
-            } catch {}
-          });
-
-          // Resume handler: attempt rollover on window focus (debounced via lastRolloverAttempt)
-          const onFocus = async () => {
-            try {
-              const nowMs = Date.now();
-              if (nowMs - lastRolloverAttempt < 60000) return;
-              // Update lastcameto and normalize streaks on focus
-              try { await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid); } catch {}
-              const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
-              const needsRollover = questStates.some((s: any) => {
-                const completed = Number(s?.progress || 0) >= 5;
-                const cu: any = (s as any)?.cooldownUntil || null;
-                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
-                return completed && (!cuMs || nowMs >= cuMs);
-              });
-              if (needsRollover) {
-                lastRolloverAttempt = nowMs;
-                const owned = questStates.map((x: any) => x.pet).filter(Boolean);
-                await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: owned });
-              }
-            } catch {}
+            return { states, ownedPets };
           };
-          try { window.addEventListener('focus', onFocus); focusListener = onFocus; } catch {}
+
+          // Initial one-time fetch of userState
+          const userStateSnap = await getDoc(doc(db, 'userStates', user.uid));
+          processUserStateData(userStateSnap.data());
+
+          // Trigger background migration after pet selection is guaranteed
+          try { autoMigrateOnLogin(user.uid); } catch {}
+
+          // Initial one-time fetch of dailyQuests
+          const dailyQuestsSnap = await getDoc(doc(db, 'dailyQuests', user.uid));
+          const { states: initialStates } = processDailyQuestsData(dailyQuestsSnap.data() || {});
+
+          // Check for rollover once on load
+          try {
+            const nowMs = Date.now();
+            const needsRollover = initialStates?.some((s: any) => {
+              const completed = Number(s?.progress || 0) >= 5;
+              const cu: any = s?.cooldownUntil || null;
+              const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
+              return completed && (!cuMs || nowMs >= cuMs);
+            });
+            if (needsRollover) {
+              lastRolloverAttempt = nowMs;
+              stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets });
+            }
+          } catch {}
+
+          // Resume handler: refresh data and check rollover on window focus (debounced)
+          // const onFocus = async () => {
+          //   try {
+          //     const nowMs = Date.now();
+          //     if (nowMs - lastRolloverAttempt < 60000) return;
+          //     // Update lastcameto and normalize streaks on focus
+          //     try { await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid); } catch {}
+
+          //     // Refresh user state data on focus
+          //     try {
+          //       const userStateSnap = await getDoc(doc(db, 'userStates', user.uid));
+          //       processUserStateData(userStateSnap.data());
+          //     } catch {}
+
+          //     // Refresh daily quests data and check for rollover
+          //     try {
+          //       const dailyQuestsSnap = await getDoc(doc(db, 'dailyQuests', user.uid));
+          //       const { states: refreshedStates, ownedPets: refreshedPets } = processDailyQuestsData(dailyQuestsSnap.data() || {});
+
+          //       const needsRollover = refreshedStates?.some((s: any) => {
+          //         const completed = Number(s?.progress || 0) >= 5;
+          //         const cu: any = s?.cooldownUntil || null;
+          //         const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
+          //         return completed && (!cuMs || nowMs >= cuMs);
+          //       });
+          //       if (needsRollover) {
+          //         lastRolloverAttempt = nowMs;
+          //         await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: refreshedPets });
+          //       }
+          //     } catch {}
+          //   } catch {}
+          // };
+          // try { window.addEventListener('focus', onFocus); focusListener = onFocus; } catch {}
         } catch (e) {
-          console.warn('Failed to attach realtime listeners:', e);
+          console.warn('Failed to fetch initial data:', e);
         }
       } else {
         setUserData(null);
         setHasGoogleAccount(false);
-        // Cleanup live listeners on sign-out
-        try {
-          if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
-          if (unsubscribeDailyQuests) { unsubscribeDailyQuests(); unsubscribeDailyQuests = null; }
-        } catch {}
         // Detach window focus listener on sign-out
         try {
           if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; }
         } catch {}
       }
-      
+
       setLoading(false);
     });
 
     return () => {
-      try { if (unsubscribeUserState) unsubscribeUserState(); } catch {}
-      try { if (unsubscribeDailyQuests) unsubscribeDailyQuests(); } catch {}
       try { if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; } } catch {}
       unsubscribe();
     };
