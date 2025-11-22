@@ -350,10 +350,10 @@ Transform this image request:`;
       // Compose weighted, explicitly prioritized sections (60% user, 20% AI, 20% background)
       const userSection = userMessageText
         ? `USER MESSAGE (60% priority) — Use these details to define the scene:\n${userMessageText}`
-        : `USER MESSAGE (60% priority) — Use this to define the scene:\nuser message: ${originalPrompt}`;
+        : `USER MESSAGE (60% priority) — It's the answer to the question:\nuser message: ${originalPrompt}`;
       
       const aiSection = aiMessageText
-        ? `AI MESSAGE (20% priority) — Use these details if they clarify the scene:\n${aiMessageText}`
+        ? `AI MESSAGE (20% priority) — It's part story and part question:\n${aiMessageText}`
         : `AI MESSAGE (20% priority): none`;
       
       const backgroundSection = backgroundSummary
@@ -367,8 +367,9 @@ ${aiSection}
 ${backgroundSection}
       
 Prompt to sanitize (final target content): ${originalPrompt}
-If any conflict, prioritize USER MESSAGE (60%) over AI MESSAGE (20%) and BACKGROUND (20%). Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic. Convert any whimsical or magical elements into grounded, live-action realism with no painterly or stylized effects.`;
+The question is only part of the story if referred by the answer. The story and answer has to be sanitized. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic. Convert any whimsical or magical elements into grounded, live-action realism with no painterly or stylized effects.`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
+      // console.info(originalPrompt, '\n',aiMessageText,'\n', backgroundSummary)
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest", // Fast and cost-effective for this task
         messages: [
