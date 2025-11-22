@@ -2,7 +2,6 @@
 // This file defines schemas and CRUD logic per user requirements.
 
 import {
-    getFirestore,
     doc,
     getDoc,
     setDoc,
@@ -14,30 +13,8 @@ import {
     increment,
     deleteField,
   } from 'firebase/firestore';
-  import { getApp, initializeApp, type FirebaseApp } from 'firebase/app';
+  import { db } from '@/lib/firebase';
   
-  // ==========================
-  // Firestore initialization
-  // ==========================
-  // We attempt to reuse an existing app if present; otherwise initialize from Vite env vars.
-  function getOrInitFirebaseApp(): FirebaseApp {
-    try {
-      return getApp();
-    } catch {
-      const config = {
-        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-        appId: import.meta.env.VITE_FIREBASE_APP_ID,
-      } as const;
-      return initializeApp(config as any);
-    }
-  }
-  
-  const app = getOrInitFirebaseApp();
-  const db = getFirestore(app);
   
   // ==========================
   // Types and Schemas

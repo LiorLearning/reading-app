@@ -16,7 +16,7 @@ import {
   linkWithPopup,
   reload
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, runTransaction, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
 import { CoinSystem } from '@/pages/coinSystem';
@@ -96,7 +96,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let unsubscribeDailyQuests: (() => void) | null = null;
     let lastRolloverAttempt = 0; // throttle rollover writes
     let initialAuthResolved = false;
-    let focusListener: ((this: Window, ev: Event) => any) | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -143,15 +142,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
+            // Batch all updates into a single operation to avoid multiple round trips
+            const updates: Record<string, any> = {};
+            
             // Backfill email if Auth has it and doc is missing/different
             try {
               const authEmail = user.email || '';
               const docEmail = (data?.email || '').trim();
               if (!user.isAnonymous && authEmail && authEmail !== docEmail) {
-                await updateDoc(userDocRef, { email: authEmail });
+                updates.email = authEmail;
                 data.email = authEmail;
               }
             } catch {}
+            
+            // Always update lastLoginAt on login
+            updates.lastLoginAt = serverTimestamp();
+            
+            // Perform batched update (single round trip)
+            try {
+              if (Object.keys(updates).length > 0) {
+                await updateDoc(userDocRef, updates);
+              }
+            } catch (e) {
+              console.warn('Failed to update user document:', e);
+            }
+            
             setUserData(data);
             // Trigger background migration of local data to Firebase and reconcile trackers
             try { autoMigrateOnLogin(user.uid); } catch {}
@@ -160,12 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
             setHasGoogleAccount(isGoogleUser);
             
-            // Update only users/{uid}.lastLoginAt; do not mutate streak on login
-            try {
-              await updateDoc(userDocRef, { lastLoginAt: new Date() });
-            } catch (e) {
-              console.warn('Failed to update lastLoginAt:', e);
-            }
+            // Update country in background (separate operation, non-blocking)
             try { await fetchAndUpdateCountry(data.country, data.countryCode); } catch {}
           } else {
             // New user, set initial data - default grade is "assignment"
@@ -179,7 +189,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               levelDisplayName: 'Start Level',
               isFirstTime: true,
               createdAt: new Date(),
-              lastLoginAt: new Date()
+              lastLoginAt: serverTimestamp() as any
             };
             
             await setDoc(userDocRef, newUserData);
@@ -353,7 +363,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           let didTriggerPostLoginMigration = false;
 
           // UserState live: coins + owned pets + per-pet levels
-          unsubscribeUserState = onSnapshot(doc(db, 'userStates', user.uid), (snap) => {
+          getDoc(doc(db, 'userStates', user.uid)).then((snap) => {
             const d = snap.data() as any;
             if (!d) return;
             // Coins
@@ -428,10 +438,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               didTriggerPostLoginMigration = true;
               try { autoMigrateOnLogin(user.uid); } catch {}
             }
-          });
+          }).catch(e => console.error("Failed to fetch user state", e));
 
           // DailyQuests live: quest progress bar
-          unsubscribeDailyQuests = onSnapshot(doc(db, 'dailyQuests', user.uid), (snap) => {
+          getDoc(doc(db, 'dailyQuests', user.uid)).then((snap) => {
             const d = (snap.data() as any) || {};
             if (!ownedPets || ownedPets.length === 0) {
               ownedPets = Object.keys((d || {})).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
@@ -584,30 +594,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets });
               }
             } catch {}
-          });
-
-          // Resume handler: attempt rollover on window focus (debounced via lastRolloverAttempt)
-          const onFocus = async () => {
-            try {
-              const nowMs = Date.now();
-              if (nowMs - lastRolloverAttempt < 60000) return;
-              // Update lastcameto and normalize streaks on focus
-              try { await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid); } catch {}
-              const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
-              const needsRollover = questStates.some((s: any) => {
-                const completed = Number(s?.progress || 0) >= 5;
-                const cu: any = (s as any)?.cooldownUntil || null;
-                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
-                return completed && (!cuMs || nowMs >= cuMs);
-              });
-              if (needsRollover) {
-                lastRolloverAttempt = nowMs;
-                const owned = questStates.map((x: any) => x.pet).filter(Boolean);
-                await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: owned });
-              }
-            } catch {}
-          };
-          try { window.addEventListener('focus', onFocus); focusListener = onFocus; } catch {}
+          }).catch(e => console.error("Failed to fetch daily quests", e));
         } catch (e) {
           console.warn('Failed to attach realtime listeners:', e);
         }
@@ -619,19 +606,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
           if (unsubscribeDailyQuests) { unsubscribeDailyQuests(); unsubscribeDailyQuests = null; }
         } catch {}
-        // Detach window focus listener on sign-out
-        try {
-          if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; }
-        } catch {}
       }
       
       setLoading(false);
     });
 
     return () => {
-      try { if (unsubscribeUserState) unsubscribeUserState(); } catch {}
-      try { if (unsubscribeDailyQuests) unsubscribeDailyQuests(); } catch {}
-      try { if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; } } catch {}
       unsubscribe();
     };
   }, []);
@@ -652,7 +632,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userDocRef = doc(db, 'users', linkedCred.user.uid);
             const emailNow = (linkedCred.user.email || '').trim();
             if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
             }
           } catch (e) {
             console.warn('Failed to persist email after Google link:', e);
@@ -704,7 +684,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userDocRef = doc(db, 'users', linkedCred.user.uid);
             const emailNow = (linkedCred.user.email || '').trim();
             if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
             }
           } catch (e) {
             console.warn('Failed to persist email after Apple link:', e);
@@ -777,7 +757,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const userDocRef = doc(db, 'users', linkedUser.user.uid);
           const emailNow = (linkedUser.user.email || email || '').trim();
           if (emailNow) {
-            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
           }
         } catch (e) {
           console.warn('Failed to persist email after linkWithCredential:', e);
@@ -881,7 +861,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userDocRef = doc(db, 'users', linkedUser.user.uid);
             const emailNow = (linkedUser.user.email || '').trim();
             if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
             }
           } catch (e) {
             console.warn('Failed to persist email after One Tap link:', e);
