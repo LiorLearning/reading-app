@@ -6579,6 +6579,10 @@ Keep tone warm, brief, and curious.`;
                     softFocus={isLeftBubbleVisible && !isGeneratingAdventureImage}
                     onImageDisplayed={() => {
                       // console.log('🖼️ Image displayed for panel:', current.id);
+                      // Play sound when a newly generated image is displayed
+                      if (current.id === newlyCreatedPanelId) {
+                        playImageCompleteSound();
+                      }
                     }}
                     shouldZoom={current.id === zoomingPanelId}
                     onPreviousPanel={() => {

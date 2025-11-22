@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import OpenAI from 'openai';
 import { cn, containsProfanity } from '@/lib/utils';
-import { playClickSound } from '@/lib/sounds';
+import { playClickSound, playImageCompleteSound } from '@/lib/sounds';
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
@@ -1685,6 +1685,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           try { interruptRealtimeSession(); } catch {}
         }
         triggerConfetti();
+        playImageCompleteSound();
         if (isReading) {
           setReadingMismatchedIndices([]);
         }
