@@ -19,6 +19,16 @@ import {
   linkWithRedirect,
   reload
 } from 'firebase/auth';
+
+// Capacitor imports (optional, only used on native platforms)
+let Capacitor: any = null;
+let FirebaseAuthentication: any = null;
+try {
+  Capacitor = require('@capacitor/core').Capacitor;
+  FirebaseAuthentication = require('@capacitor-firebase/authentication').FirebaseAuthentication;
+} catch {
+  // Capacitor not available, will use web Firebase Auth
+}
 import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
@@ -720,47 +730,91 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithApple = async () => {
-    const provider = new OAuthProvider('apple.com');
+    // Check if we're on a native platform and Capacitor Firebase Auth is available
+    const isNative = Capacitor && Capacitor.isNativePlatform() && FirebaseAuthentication;
     
-    // Add scopes for name and email
-    provider.addScope('email');
-    provider.addScope('name');
-    
-    // Use redirect for all devices (no popup)
-    try {
-      const current = auth.currentUser;
-      if (current && current.isAnonymous) {
-        try {
-          // Link Apple to the current anonymous user to preserve UID
-          await linkWithRedirect(current, provider);
+    if (isNative) {
+      // Use Capacitor Firebase Auth for native platforms
+      try {
+        const result = await FirebaseAuthentication.signInWithApple();
+        
+        if (result.user && result.user.idToken) {
+          // Get the credential and sign in with Firebase
+          const provider = new OAuthProvider('apple.com');
+          const credential = provider.credential({
+            idToken: result.user.idToken,
+            rawNonce: result.user.nonce,
+          });
+          
+          const current = auth.currentUser;
+          if (current && current.isAnonymous) {
+            // Link Apple to the current anonymous user to preserve UID
+            const linkedCred = await linkWithCredential(current, credential);
+            // Ensure email is persisted to Firestore immediately on upgrade
+            try {
+              await reload(linkedCred.user);
+            } catch {}
+            try {
+              const userDocRef = doc(db, 'users', linkedCred.user.uid);
+              const emailNow = (linkedCred.user.email || '').trim();
+              if (emailNow) {
+                await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              }
+            } catch (e) {
+              console.warn('Failed to persist email after Apple link:', e);
+            }
+          } else {
+            await signInWithCredential(auth, credential);
+          }
+        }
+      } catch (error: any) {
+        console.error('Error signing in with Apple:', error);
+        throw error;
+      }
+    } else {
+      // Use web Firebase Auth
+      const provider = new OAuthProvider('apple.com');
+      
+      // Add scopes for name and email
+      provider.addScope('email');
+      provider.addScope('name');
+      
+      // Use redirect for all devices (no popup)
+      try {
+        const current = auth.currentUser;
+        if (current && current.isAnonymous) {
+          try {
+            // Link Apple to the current anonymous user to preserve UID
+            await linkWithRedirect(current, provider);
+            // The redirect will happen, and we'll handle the result in useEffect
+            return;
+          } catch (error: any) {
+            // If the Apple credential already belongs to an existing account, just sign into it
+            const code = (error && (error.code || error?.message)) || '';
+            if (
+              String(code).includes('auth/credential-already-in-use') ||
+              String(code).includes('auth/email-already-in-use') ||
+              String(code).includes('auth/account-exists-with-different-credential')
+            ) {
+              // Sign out the anonymous user first, then sign in with Apple
+              try {
+                await firebaseSignOut(auth);
+              } catch {}
+              await signInWithRedirect(auth, provider);
+              return;
+            }
+            throw error;
+          }
+        } else {
+          // Sign in normally if not anonymous
+          await signInWithRedirect(auth, provider);
           // The redirect will happen, and we'll handle the result in useEffect
           return;
-        } catch (error: any) {
-          // If the Apple credential already belongs to an existing account, just sign into it
-          const code = (error && (error.code || error?.message)) || '';
-          if (
-            String(code).includes('auth/credential-already-in-use') ||
-            String(code).includes('auth/email-already-in-use') ||
-            String(code).includes('auth/account-exists-with-different-credential')
-          ) {
-            // Sign out the anonymous user first, then sign in with Apple
-            try {
-              await firebaseSignOut(auth);
-            } catch {}
-            await signInWithRedirect(auth, provider);
-            return;
-          }
-          throw error;
         }
-      } else {
-        // Sign in normally if not anonymous
-        await signInWithRedirect(auth, provider);
-        // The redirect will happen, and we'll handle the result in useEffect
-        return;
+      } catch (error: any) {
+        console.error('Error signing in with Apple:', error);
+        throw error;
       }
-    } catch (error: any) {
-      console.error('Error signing in with Apple:', error);
-      throw error;
     }
   };
 
@@ -815,6 +869,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // Sign out from Capacitor Firebase Auth if on native platform
+      const isNative = Capacitor && Capacitor.isNativePlatform() && FirebaseAuthentication;
+      if (isNative) {
+        try {
+          await FirebaseAuthentication.signOut();
+        } catch (error) {
+          console.warn('Error signing out from Capacitor Firebase Auth:', error);
+        }
+      }
+      // Sign out from Firebase Auth (works for both web and native)
       await firebaseSignOut(auth);
       try { analytics.reset(); } catch {}
       // Local cleanup to avoid showing previous user's state
