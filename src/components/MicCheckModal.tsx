@@ -15,10 +15,9 @@ interface MicCheckModalProps {
 }
 
 const PHRASES_EN = [
-	"Reading app ready",
-	"I'm ready to read now",
-	"Let's start my reading",
-	"Hello, I am ready",
+	"I hear you clearly",
+	"The dog ran fast",
+	"The cat is on the mat",
 ];
 
 function normalize(text: string): string {
