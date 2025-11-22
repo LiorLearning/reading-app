@@ -13,9 +13,17 @@ const nextConfig = {
         hostname: '**.storage.googleapis.com',
       },
     ],
+    // Enable image optimization
+    formats: ['image/avif', 'image/webp'],
   },
-  // Enable experimental features if needed
-  experimental: {},
+  // Enable experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'firebase', 'firebase/firestore', 'firebase/auth', 'firebase/storage'],
+  },
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   // Don't fail build on ESLint warnings
   eslint: {
     ignoreDuringBuilds: true,

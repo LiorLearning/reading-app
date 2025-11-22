@@ -1,17 +1,28 @@
 'use client'
 
 import React, { useMemo, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/use-auth";
 import { useCoins } from "@/lib/coinSystem";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { stateStoreApi } from "@/lib/state-store-api";
 import { useDeviceGate } from "@/hooks/use-device-gate";
-import DeviceGateModal from "@/components/DeviceGateModal";
-import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
 import { checkMicPermissionStatus } from "@/lib/mic-permission";
-import Index from "@/components-pages/Index";
-import { PetPage } from "@/components-pages/PetPage";
+
+// Dynamic imports for code splitting - these are large components
+const Index = dynamic(() => import("@/components-pages/Index"), {
+  loading: () => <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"><div className="animate-pulse text-white text-xl">Loading adventure...</div></div>,
+  ssr: false
+});
+
+const PetPage = dynamic(() => import("@/components-pages/PetPage").then(mod => ({ default: mod.PetPage })), {
+  loading: () => <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"><div className="animate-pulse text-white text-xl">Loading...</div></div>,
+  ssr: false
+});
+
+const DeviceGateModal = dynamic(() => import("@/components/DeviceGateModal"), { ssr: false });
+const MediaPermissionModal = dynamic(() => import("@/components/MediaPermissionModal"), { ssr: false });
 
 // Dev-only invisible hotspot to add coins quickly while developing
 const DevCoinHotspot: React.FC = () => {

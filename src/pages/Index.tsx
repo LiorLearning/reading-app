@@ -2,11 +2,13 @@
 
 import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import ComicPanelComponent from "@/components/comic/ComicPanel";
-import InputBar from "@/components/comic/InputBar";
-// import MessengerChat from "@/components/comic/MessengerChat"; // Replaced by CollapsedInputDock in collapsed state
-import CollapsedInputDock from "@/components/adventure/CollapsedInputDock";
-import ChatAvatar from "@/components/comic/ChatAvatar";
+import dynamic from "next/dynamic";
+
+// Dynamic imports for code splitting - heavy components loaded on demand
+const ComicPanelComponent = dynamic(() => import("@/components/comic/ComicPanel"), { ssr: false });
+const InputBar = dynamic(() => import("@/components/comic/InputBar"), { ssr: false });
+const CollapsedInputDock = dynamic(() => import("@/components/adventure/CollapsedInputDock"), { ssr: false });
+const ChatAvatar = dynamic(() => import("@/components/comic/ChatAvatar"), { ssr: false });
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
@@ -44,23 +46,26 @@ import { usePetData } from "@/lib/pet-data-service";
 import AdventureFeedingProgress from "@/components/ui/adventure-feeding-progress";
 import { useAdventurePersistentProgress, useAdventureProgressForType } from "@/hooks/use-adventure-progress";
 import { useSessionCoins } from "@/hooks/use-session-coins";
-import ResizableChatLayout from "@/components/ui/resizable-chat-layout";
-import LeftPetOverlay from "@/components/adventure/LeftPetOverlay";
-import WhiteboardLesson from "@/components/adventure/WhiteboardLesson";
+// Dynamic imports for heavy components
+const ResizableChatLayout = dynamic(() => import("@/components/ui/resizable-chat-layout"), { ssr: false });
+const LeftPetOverlay = dynamic(() => import("@/components/adventure/LeftPetOverlay"), { ssr: false });
+const WhiteboardLesson = dynamic(() => import("@/components/adventure/WhiteboardLesson"), { ssr: false });
 import { getLessonScript, lessonScripts } from "@/data/lesson-scripts";
-import RightUserOverlay from "@/components/adventure/RightUserOverlay";
-import SpellReviewModal, { SpellReviewItem } from "@/components/adventure/SpellReviewModal";
+const RightUserOverlay = dynamic(() => import("@/components/adventure/RightUserOverlay"), { ssr: false });
+const SpellReviewModal = dynamic(() => import("@/components/adventure/SpellReviewModal").then(mod => ({ default: mod.default })), { ssr: false });
+import type { SpellReviewItem } from "@/components/adventure/SpellReviewModal";
 import { addSpellReviewEntry } from "@/lib/spell-review-log";
 import rocket1 from "@/assets/comic-rocket-1.jpg";
 import spaceport2 from "@/assets/comic-spaceport-2.jpg";
 import alien3 from "@/assets/comic-alienland-3.jpg";
 import cockpit4 from "@/assets/comic-cockpit-4.jpg";
 
-import MCQScreenTypeA from "./MCQScreenTypeA";
-import TopicSelection from "@/components-pages/TopicSelection";
-import UserOnboarding from "@/components-pages/UserOnboarding";
-import HomePage from "@/components-pages/HomePage";
-import { PetPage } from "@/components-pages/PetPage";
+// Dynamic imports for screens
+const MCQScreenTypeA = dynamic(() => import("./MCQScreenTypeA"), { ssr: false });
+const TopicSelection = dynamic(() => import("@/components-pages/TopicSelection"), { ssr: false });
+const UserOnboarding = dynamic(() => import("@/components-pages/UserOnboarding"), { ssr: false });
+const HomePage = dynamic(() => import("@/components-pages/HomePage"), { ssr: false });
+const PetPage = dynamic(() => import("@/components-pages/PetPage").then(mod => ({ default: mod.PetPage })), { ssr: false });
   import { 
     cacheAdventureImage, 
     loadCachedAdventureImages, 

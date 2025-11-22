@@ -352,6 +352,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           let ownedPets: string[] = [];
           let didTriggerPostLoginMigration = false;
 
+          // Clean up any existing listeners before creating new ones to prevent duplicates
+          if (unsubscribeUserState) {
+            try { unsubscribeUserState(); } catch {}
+            unsubscribeUserState = null;
+          }
+          if (unsubscribeDailyQuests) {
+            try { unsubscribeDailyQuests(); } catch {}
+            unsubscribeDailyQuests = null;
+          }
+
           // UserState live: coins + owned pets + per-pet levels
           unsubscribeUserState = onSnapshot(doc(db, 'userStates', user.uid), (snap) => {
             const d = snap.data() as any;

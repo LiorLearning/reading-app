@@ -915,10 +915,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPet, sleepClicks]);
 
-  // Update action states when pet, sleep state, or adventure coins change
-  useEffect(() => {
-    setActionStates(getActionStates());
-  }, [currentPet, sleepClicks, getCumulativeCareLevel().adventureCoins]);
+  // Action states now handled by useMemo with questStateVersion dependency
 
   // Reset sleep when switching pets (skip on initial mount)
   const hasMountedRef = useRef(false);
@@ -1093,27 +1090,39 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     }
   }, [userData]);
   
-  // Pet action states - dynamically updated based on den ownership and sleep state
-  const getActionStates = () => {
-    const baseActions = [
-      // { id: 'water', icon: '', status: 'sad' as ActionStatus, label: '' },
-    ];
-    
+  // Pet action states - memoized to prevent recalculation on every render
+  // Track quest state changes to trigger recalculation
+  const [questStateVersion, setQuestStateVersion] = React.useState(0);
+  React.useEffect(() => {
+    const handler = () => setQuestStateVersion(v => v + 1);
+    window.addEventListener('dailyQuestsUpdated', handler);
+    window.addEventListener('dailySadnessUpdated', handler);
+    window.addEventListener('dailyForcedSadUpdated', handler);
+    return () => {
+      window.removeEventListener('dailyQuestsUpdated', handler);
+      window.removeEventListener('dailySadnessUpdated', handler);
+      window.removeEventListener('dailyForcedSadUpdated', handler);
+    };
+  }, []);
+
+  const actionStates = React.useMemo(() => {
+    const baseActions: ActionButton[] = [];
+
     // Determine current item to display with 8-hour hold behavior (story excluded)
     const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care'];
     const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
-    
+
     const statusFor = (type: string): ActionStatus => {
       const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, type, 50);
       if (type === sadType && !done) return 'sad';
       return done ? 'happy' : 'neutral';
     };
-    
+
     // Only show the current sad item in the bottom bar
     baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'pet-school' ? '🏫' : sadType === 'pet-theme-park' ? '🎢' : sadType === 'pet-mall' ? '🏬' : sadType === 'pet-care' ? '🧼' : sadType === 'story' ? '📚' : '🌙', status: statusFor(sadType), label: (
       sadType === 'plant-dreams' ? 'Plant Dreams' : sadType === 'pet-school' ? 'Pet School' : sadType === 'pet-theme-park' ? 'Pet Theme Park' : sadType === 'pet-mall' ? 'Pet Mall' : sadType === 'pet-care' ? 'Pet Care' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
     ) });
-    
+
     // Add sleep button - gating rules:
     // - If pet is NOT in sadness.assignedPets today → Sleep available immediately
     // - If pet IS assigned today → Sleep available only after today's quest is completed
@@ -1153,8 +1162,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       } catch {}
     }
 
-    // Removed extra local gate: rely solely on hydrated effective activity progress
-
     // Show sad when available but not done, happy when completed; disabled when not available
     let sleepLabel, sleepStatus: ActionStatus;
     if (sleepClicks >= 3) {
@@ -1168,17 +1175,15 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       sleepStatus = 'disabled'; // Sleep not available yet for this pet
     }
     baseActions.push({ id: 'sleep', icon: '😴', status: sleepStatus, label: sleepLabel });
-    
+
     // Add more button
     baseActions.push({ id: 'more', icon: '🐾', status: 'neutral' as ActionStatus, label: 'More' });
-    
+
     // Always add shop button at the end (rightmost)
     baseActions.push({ id: 'shop', icon: '🛒', status: 'no-emoji' as ActionStatus, label: 'Shop' });
-    
-    return baseActions;
-  };
 
-  const [actionStates, setActionStates] = useState<ActionButton[]>(getActionStates());
+    return baseActions;
+  }, [currentPet, sleepClicks, questStateVersion]);
 
   // Handle adventure button click
   const handleAdventureClick = async (adventureType: string = 'food') => {
@@ -1772,12 +1777,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     setShowHeartAnimation(true);
     setTimeout(() => setShowHeartAnimation(false), 1000);
 
-    // Update action status to happy
-    setActionStates(prev => prev.map(action => 
-      action.id === actionId 
-        ? { ...action, status: 'happy' }
-        : action
-    ));
+    // Action states are now handled by useMemo - trigger update via questStateVersion
+    setQuestStateVersion(v => v + 1);
   };
 
   // Save sleep data to localStorage and best-effort sync to Firestore
@@ -3352,9 +3353,9 @@ const getSleepyPetImage = (clicks: number) => {
     }
   }, [coins, ownedPets?.length, storeRefreshTrigger, userLevelForShop]);
 
-  // Recompute action buttons (including per-pet sleep gating) live when quests update
+  // Action buttons now handled by useMemo with questStateVersion - refresh when questRefreshTick changes
   useEffect(() => {
-    setActionStates(getActionStates());
+    setQuestStateVersion(v => v + 1);
   }, [questRefreshTick]);
 
   // Memoize the pet thought so it only changes when the actual state changes
