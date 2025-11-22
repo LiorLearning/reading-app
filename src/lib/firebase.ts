@@ -15,8 +15,29 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app);
+// Initialize Firebase Authentication
+// Use Capacitor Firebase Auth on native platforms, web Firebase Auth on web
+let authInstance;
+try {
+  // Check if we're on a native platform and Capacitor Firebase Auth is available
+  const { Capacitor } = require('@capacitor/core');
+  const { FirebaseAuthentication } = require('@capacitor-firebase/authentication');
+  
+  if (Capacitor.isNativePlatform()) {
+    // On native platforms, initialize Capacitor Firebase Auth
+    FirebaseAuthentication.initialize({ skipNativeAuth: false });
+    authInstance = getAuth(app);
+  } else {
+    // On web, use standard Firebase Auth
+    authInstance = getAuth(app);
+  }
+} catch {
+  // Fallback to standard Firebase Auth if Capacitor is not available
+  authInstance = getAuth(app);
+}
+
+// Export auth instance
+export const auth = authInstance;
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);

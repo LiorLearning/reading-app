@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { 
   User, 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider, 
   OAuthProvider,
   signOut as firebaseSignOut,
@@ -14,8 +16,19 @@ import {
   linkWithCredential,
   EmailAuthProvider,
   linkWithPopup,
+  linkWithRedirect,
   reload
 } from 'firebase/auth';
+
+// Capacitor imports (optional, only used on native platforms)
+let Capacitor: any = null;
+let FirebaseAuthentication: any = null;
+try {
+  Capacitor = require('@capacitor/core').Capacitor;
+  FirebaseAuthentication = require('@capacitor-firebase/authentication').FirebaseAuthentication;
+} catch {
+  // Capacitor not available, will use web Firebase Auth
+}
 import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
@@ -24,6 +37,7 @@ import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
 import analytics from '@/lib/analytics';
 import { autoMigrateOnLogin } from '@/lib/firebase-data-migration';
+import { isIOSDevice } from '@/lib/utils';
 
 // Google Identity Services types
 declare global {
@@ -40,6 +54,7 @@ declare global {
     };
   }
 }
+
 
 // Enhanced user data interface that includes Firebase user info
 export interface UserData {
@@ -97,6 +112,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let lastRolloverAttempt = 0; // throttle rollover writes
     let initialAuthResolved = false;
     let focusListener: ((this: Window, ev: Event) => any) | null = null;
+
+    // Handle redirect result for Apple Sign-In (especially on iOS/iPad)
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+          // User signed in via redirect
+          const user = result.user;
+          // Ensure email is persisted to Firestore immediately
+          try {
+            await reload(user);
+          } catch {}
+          try {
+            const userDocRef = doc(db, 'users', user.uid);
+            const emailNow = (user.email || '').trim();
+            if (emailNow) {
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            }
+          } catch (e) {
+            console.warn('Failed to persist email after Apple redirect:', e);
+          }
+        }
+      } catch (error: any) {
+        // Ignore errors if no redirect pending
+        if (error?.code !== 'auth/operation-not-allowed') {
+          console.warn('Error handling redirect result:', error);
+        }
+      }
+    };
+
+    // Check for redirect result on mount
+    handleRedirectResult();
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -683,73 +730,91 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithApple = async () => {
-    const provider = new OAuthProvider('apple.com');
+    // Check if we're on a native platform and Capacitor Firebase Auth is available
+    const isNative = Capacitor && Capacitor.isNativePlatform() && FirebaseAuthentication;
     
-    // Add scopes for name and email
-    provider.addScope('email');
-    provider.addScope('name');
-    
-    try {
-      const current = auth.currentUser;
-      if (current && current.isAnonymous) {
-        try {
-          // Link Apple to the current anonymous user to preserve UID
-          const linkedCred = await linkWithPopup(current, provider);
+    if (isNative) {
+      // Use Capacitor Firebase Auth for native platforms
+      try {
+        const result = await FirebaseAuthentication.signInWithApple();
+        
+        if (result.user && result.user.idToken) {
+          // Get the credential and sign in with Firebase
+          const provider = new OAuthProvider('apple.com');
+          const credential = provider.credential({
+            idToken: result.user.idToken,
+            rawNonce: result.user.nonce,
+          });
           
-          // Ensure email is persisted to Firestore immediately on upgrade
-          try {
-            await reload(linkedCred.user);
-          } catch {}
-          try {
-            const userDocRef = doc(db, 'users', linkedCred.user.uid);
-            const emailNow = (linkedCred.user.email || '').trim();
-            if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
-            }
-          } catch (e) {
-            console.warn('Failed to persist email after Apple link:', e);
-          }
-        } catch (error: any) {
-          // If the Apple credential already belongs to an existing account, just sign into it
-          const code = (error && (error.code || error?.message)) || '';
-          if (
-            String(code).includes('auth/credential-already-in-use') ||
-            String(code).includes('auth/email-already-in-use') ||
-            String(code).includes('auth/account-exists-with-different-credential')
-          ) {
-            // Sign out the anonymous user first, then sign in with Apple
+          const current = auth.currentUser;
+          if (current && current.isAnonymous) {
+            // Link Apple to the current anonymous user to preserve UID
+            const linkedCred = await linkWithCredential(current, credential);
+            // Ensure email is persisted to Firestore immediately on upgrade
             try {
-              await firebaseSignOut(auth);
+              await reload(linkedCred.user);
             } catch {}
-            await signInWithPopup(auth, provider);
-            return;
+            try {
+              const userDocRef = doc(db, 'users', linkedCred.user.uid);
+              const emailNow = (linkedCred.user.email || '').trim();
+              if (emailNow) {
+                await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              }
+            } catch (e) {
+              console.warn('Failed to persist email after Apple link:', e);
+            }
+          } else {
+            await signInWithCredential(auth, credential);
           }
-          // Handle popup closed by user or other cancellations
-          if (
-            String(code).includes('auth/popup-closed-by-user') ||
-            String(code).includes('auth/cancelled-popup-request') ||
-            String(code).includes('auth/popup-blocked')
-          ) {
-            throw new Error('Sign-in cancelled');
-          }
-          throw error;
         }
-      } else {
-        // Sign in normally if not anonymous
-        await signInWithPopup(auth, provider);
+      } catch (error: any) {
+        console.error('Error signing in with Apple:', error);
+        throw error;
       }
-    } catch (error: any) {
-      // Handle popup closed by user or other cancellations
-      const code = (error && (error.code || error?.message)) || '';
-      if (
-        String(code).includes('auth/popup-closed-by-user') ||
-        String(code).includes('auth/cancelled-popup-request') ||
-        String(code).includes('auth/popup-blocked')
-      ) {
-        throw new Error('Sign-in cancelled');
+    } else {
+      // Use web Firebase Auth
+      const provider = new OAuthProvider('apple.com');
+      
+      // Add scopes for name and email
+      provider.addScope('email');
+      provider.addScope('name');
+      
+      // Use redirect for all devices (no popup)
+      try {
+        const current = auth.currentUser;
+        if (current && current.isAnonymous) {
+          try {
+            // Link Apple to the current anonymous user to preserve UID
+            await linkWithRedirect(current, provider);
+            // The redirect will happen, and we'll handle the result in useEffect
+            return;
+          } catch (error: any) {
+            // If the Apple credential already belongs to an existing account, just sign into it
+            const code = (error && (error.code || error?.message)) || '';
+            if (
+              String(code).includes('auth/credential-already-in-use') ||
+              String(code).includes('auth/email-already-in-use') ||
+              String(code).includes('auth/account-exists-with-different-credential')
+            ) {
+              // Sign out the anonymous user first, then sign in with Apple
+              try {
+                await firebaseSignOut(auth);
+              } catch {}
+              await signInWithRedirect(auth, provider);
+              return;
+            }
+            throw error;
+          }
+        } else {
+          // Sign in normally if not anonymous
+          await signInWithRedirect(auth, provider);
+          // The redirect will happen, and we'll handle the result in useEffect
+          return;
+        }
+      } catch (error: any) {
+        console.error('Error signing in with Apple:', error);
+        throw error;
       }
-      console.error('Error signing in with Apple:', error);
-      throw error;
     }
   };
 
@@ -804,6 +869,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // Sign out from Capacitor Firebase Auth if on native platform
+      const isNative = Capacitor && Capacitor.isNativePlatform() && FirebaseAuthentication;
+      if (isNative) {
+        try {
+          await FirebaseAuthentication.signOut();
+        } catch (error) {
+          console.warn('Error signing out from Capacitor Firebase Auth:', error);
+        }
+      }
+      // Sign out from Firebase Auth (works for both web and native)
       await firebaseSignOut(auth);
       try { analytics.reset(); } catch {}
       // Local cleanup to avoid showing previous user's state
@@ -912,14 +987,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Initialize Google One Tap Sign-in
   const initializeOneTapSignIn = () => {
-    if (!window.google || !import.meta.env.VITE_FIREBASE_API_KEY) {
-      console.warn('Google Identity Services not available or Firebase config missing');
+    if (!window.google) {
+      console.warn('Google Identity Services not available');
+      return;
+    }
+
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('VITE_GOOGLE_CLIENT_ID is not set. Google One Tap Sign-in will not work. Please set your Google Client ID in your .env file.');
       return;
     }
 
     try {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_FIREBASE_API_KEY;
-      
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: handleOneTapSignIn,

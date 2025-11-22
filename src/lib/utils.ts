@@ -6,6 +6,28 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * Detect if the current device supports native Apple Sign-In
+ * Returns true for iPhone, iPad, iPod, iPadOS, and macOS (MacBook, iMac, etc.)
+ */
+export function isIOSDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  
+  // iOS devices (iPhone, iPad, iPod)
+  const isIOS = /iphone|ipad|ipod/.test(userAgent);
+  
+  // iPadOS (macOS with touch support)
+  const isIPadOS = /macintosh/.test(userAgent);
+  
+  // macOS Safari (MacBook, iMac, etc.) - check for macOS and Safari, but exclude Chrome/Firefox
+  const isMacOS = /macintosh/.test(userAgent) && 
+                   /safari/.test(userAgent) && 
+                   !/chrome|crios|fxios|edg/.test(userAgent);
+  
+  return isIOS || isIPadOS || isMacOS;
+}
+
 // Local storage key for user adventure messages
 const USER_ADVENTURE_KEY = "user_adventure";
 // Local storage key for current adventure ID
