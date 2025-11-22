@@ -22,6 +22,8 @@ import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
 import { checkMicPermissionStatus } from "@/lib/mic-permission";
+import MicCheckModal from "@/components/MicCheckModal";
+import { isMicVerified } from "@/lib/mic-verification";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +120,20 @@ const UnifiedPetAdventureApp = () => {
   const { shouldShowGate, suppressForDays } = useDeviceGate();
   const [gateOpen, setGateOpen] = useState<boolean>(false);
   const [showMediaPrompt, setShowMediaPrompt] = useState<boolean>(false);
+  const [showMicCheck, setShowMicCheck] = useState<boolean>(false);
+  // Hold the adventure the user intended to start, so we can resume after mic check
+  const [pendingAdventure, setPendingAdventure] = useState<{
+    topicId?: string, 
+    mode?: 'new' | 'continue', 
+    adventureType?: string,
+    continuationContext?: {
+      adventureId: string;
+      chatHistory?: any[];
+      adventureName?: string;
+      comicPanels?: any[];
+      cachedImages?: any[];
+    }
+  } | null>(null);
 
   React.useEffect(() => {
     setGateOpen(shouldShowGate);
@@ -165,14 +181,29 @@ const UnifiedPetAdventureApp = () => {
         // Also store that permission was actually granted (not just seen)
         localStorage.setItem('media_permission_granted', '1');
       } catch {}
+      // If this device hasn't passed mic check yet, show mic check next
+      try {
+        if (user?.uid && !isMicVerified(user.uid)) {
+          setShowMicCheck(true);
+        }
+      } catch {}
     }
     setShowMediaPrompt(false);
-  }, []);
+  }, [user?.uid]);
 
   const handleContinueAnyway = React.useCallback(() => {
     suppressForDays(3);
     setGateOpen(false);
   }, [suppressForDays]);
+
+  // After mic check passes, if there is a pending adventure, proceed
+  const proceedPendingAdventure = React.useCallback(() => {
+    if (!pendingAdventure) return;
+    const { topicId, mode, adventureType, continuationContext } = pendingAdventure;
+    setAdventureProps({ topicId, mode, adventureType, ...continuationContext });
+    setIsInAdventure(true);
+    setPendingAdventure(null);
+  }, [pendingAdventure]);
 
   // Adventure handlers that switch modes seamlessly without route changes
   const handleStartAdventure = (
@@ -188,12 +219,25 @@ const UnifiedPetAdventureApp = () => {
       }
   ) => {
     console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType, continuationContext });
-    setAdventureProps({ 
-      topicId, 
-      mode, 
-      adventureType,
-      ...continuationContext // Spread the continuation context
-    });
+    // If mic is not verified on this device, gate the adventure behind mic check
+    try {
+      if (user?.uid && !isMicVerified(user.uid)) {
+        setPendingAdventure({ topicId, mode, adventureType, continuationContext });
+        // If mic permission already granted, go straight to mic check; else ask for permission
+        checkMicPermissionStatus().then((granted) => {
+          if (granted) {
+            setShowMicCheck(true);
+          } else {
+            setShowMediaPrompt(true);
+          }
+        }).catch(() => {
+          // On error, be safe and show media prompt
+          setShowMediaPrompt(true);
+        });
+        return;
+      }
+    } catch {}
+    setAdventureProps({ topicId, mode, adventureType, ...continuationContext });
     setIsInAdventure(true);
   };
 
@@ -246,6 +290,15 @@ const UnifiedPetAdventureApp = () => {
         open={showMediaPrompt}
         onClose={handleMediaPromptClose}
         onEnabled={handleMediaEnabled}
+      />
+      <MicCheckModal
+        open={showMicCheck}
+        onClose={() => setShowMicCheck(false)}
+        onPassed={() => {
+          setShowMicCheck(false);
+          // Proceed to pending adventure if any
+          proceedPendingAdventure();
+        }}
       />
       <PetPage 
         onStartAdventure={handleStartAdventure}
