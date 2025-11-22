@@ -5415,13 +5415,14 @@ Keep tone warm, brief, and curious.`;
   }, [whiteboardGradeEligible, grade1DisplayedTopicId, currentSpellQuestion?.topicId]);
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
-  const adventureInputDisabledReason = isAdventureInputDisabled
-    ? (disableInputForSpell
-        ? 'SpellBox awaiting Next'
-        : (isWhiteboardPromptActive
-            ? 'Whiteboard prompt'
-            : (isWhiteboardLessonActive ? 'Whiteboard lesson' : 'Disabled')))
-    : undefined;
+  const adventureInputDisabledReason = undefined;
+  // isAdventureInputDisabled
+  //   ? (disableInputForSpell
+  //       ? 'SpellBox awaiting Next'
+  //       : (isWhiteboardPromptActive
+  //           ? 'Whiteboard prompt'
+  //           : (isWhiteboardLessonActive ? 'Whiteboard lesson' : 'Disabled')))
+  //   : undefined;
 
   return (
     <div className="h-full w-full mobile-keyboard-aware bg-pattern flex flex-col overflow-hidden">
@@ -6516,6 +6517,7 @@ Keep tone warm, brief, and curious.`;
                     spellInline={
                       shouldShowWhiteboardPrompt
                         ? {
+                            isReading: false,
                             show: true,
                             promptText: whiteboardPrompt?.text ?? '',
                             onNext: whiteboardPrompt?.isAcknowledged ? undefined : dismissWhiteboardPrompt,
@@ -6524,6 +6526,7 @@ Keep tone warm, brief, and curious.`;
                             isDisabled: whiteboardPromptLocked || !!whiteboardPrompt?.isAcknowledged,
                           }
                         : {
+                            isReading: (currentSpellQuestion as any)?.isReading ?? false,
                             show: !lessonEnabled && (showSpellBox && !!currentSpellQuestion),
                             word: overlayWord,
                             sentence: overlaySentence,

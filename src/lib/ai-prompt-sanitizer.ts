@@ -309,15 +309,32 @@ Transform this image request:`;
 // 8. PET PERSONA MAPPING: ${petInstruction}
 
       const adventureMessages = loadUserAdventure();
-      const visibleMessages = Array.isArray(adventureMessages) ? adventureMessages.filter((msg) => !msg?.hiddenInChat) : [];
+      const visibleMessages = Array.isArray(adventureMessages) ? adventureMessages.filter((msg) => !msg?.hiddenInChat && (msg.content || "").trim().toLowerCase() !== 'transcribing...') : [];
       
-      // Take the most recent two visible messages as PRIMARY context (typically last user + last assistant)
+      // Take the most recent messages and separate user from AI messages
       const recentMessages = visibleMessages.slice(-2);
-      const primaryRecentText = recentMessages
+      const userMessages = recentMessages.filter((m) => {
+        const type = (m?.type || '').toString().toLowerCase();
+        return type === 'user' || type === 'human';
+      });
+      const aiMessages = recentMessages.filter((m) => {
+        const type = (m?.type || '').toString().toLowerCase();
+        return type === 'assistant' || type === 'ai' || type === 'bot';
+      });
+      // Extract user message text (60% weight)
+      const userMessageText = userMessages
         .map((m) => {
-          const roleLabel = m?.type ? `last ${m.type} message:` : 'last message:';
           const content = (m?.content || '').toString().trim();
-          return content ? `${roleLabel} ${content}` : '';
+          return content;
+        })
+        .filter(Boolean)
+        .join(' ');
+      
+      // Extract AI message text (20% weight)
+      const aiMessageText = aiMessages
+        .map((m) => {
+          const content = (m?.content || '').toString().trim();
+          return content;
         })
         .filter(Boolean)
         .join(' ');
@@ -328,24 +345,31 @@ Transform this image request:`;
         context ? `Context: ${context}` : '',
         backgroundPool.slice(-6).map((m) => (m?.content || '').toString().trim()).filter(Boolean).join(' ')
       ].filter(Boolean).join('\n');
-      const backgroundSummary = backgroundJoined.length > 300 ? `${backgroundJoined.slice(0, 300)}...` : backgroundJoined;
+      const backgroundSummary = backgroundJoined //.length > 300 ? `${backgroundJoined.slice(0, 300)}...` : backgroundJoined;
       
-      // Compose weighted, explicitly prioritized sections (80/20)
-      const primarySection = primaryRecentText
-        ? `PRIMARY (80% priority) — Use these details to define the scene:\n${primaryRecentText}`
-        : `PRIMARY (80% priority) — Use this to define the scene:\nuser message: ${originalPrompt}`;
+      // Compose weighted, explicitly prioritized sections (60% user, 20% AI, 20% background)
+      const userSection = userMessageText
+        ? `USER MESSAGE (60% priority) — Use these details to define the scene:\n${userMessageText}`
+        : `USER MESSAGE (60% priority) — It's the answer to the question:\nuser message: ${originalPrompt}`;
+      
+      const aiSection = aiMessageText
+        ? `AI MESSAGE (20% priority) — It's part story and part question:\n${aiMessageText}`
+        : `AI MESSAGE (20% priority): none`;
       
       const backgroundSection = backgroundSummary
-        ? `BACKGROUND (20% priority) — Use only if it clarifies setting; otherwise ignore:\n${backgroundSummary}`
+        ? `BACKGROUND (20% priority) — Use only if it clarifies setting:\n${backgroundSummary}`
         : `BACKGROUND (20% priority): none`;
       
-      const userMessage = `${primarySection}
+      const userMessage = `${userSection}
+      
+${aiSection}
       
 ${backgroundSection}
       
 Prompt to sanitize (final target content): ${originalPrompt}
-If any conflict, prioritize PRIMARY and Safety rules over BACKGROUND. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic. Convert any whimsical or magical elements into grounded, live-action realism with no painterly or stylized effects.`;
+The question is only part of the story if referred by the answer. The story and answer has to be sanitized. Always simplify the scene so the image has only one or two clear focal points, removing extra elements that distract from the main subject. Return only the cleaned prompt. Keep image vivid and realistic. Convert any whimsical or magical elements into grounded, live-action realism with no painterly or stylized effects.`;
       // Child Profile: name=${childName}; gender=${rawGender || 'unspecified'}; age=${childAge}
+      // console.info(originalPrompt, '\n',aiMessageText,'\n', backgroundSummary)
       const completion = await this.client.chat.completions.create({
         model: "chatgpt-4o-latest", // Fast and cost-effective for this task
         messages: [
