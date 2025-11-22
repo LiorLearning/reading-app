@@ -3618,7 +3618,7 @@ const getSleepyPetImage = (clicks: number) => {
 
   return (
     <div
-      className="relative flex h-[100dvh] flex-col overflow-x-hidden overflow-y-auto"
+      className="relative flex h-[100dvh] flex-col overflow-x-hidden min-[1366px]:overflow-y-hidden overflow-y-auto"
       style={{
         backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
         backgroundSize: 'cover',
@@ -4261,11 +4261,14 @@ const getSleepyPetImage = (clicks: number) => {
         )}
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="relative z-10 flex flex-1 flex-col items-center px-4 sm:px-6 md:px-8 lg:px-10" style={{ minHeight: 0, paddingTop: 'calc(var(--safe-area-top, 0px) + 10rem)', paddingBottom: 'calc(var(--safe-area-bottom, 0px) + 12rem)' }}>
+      <div 
+        className="pet-area-container relative z-10 flex flex-1 flex-col items-center px-4 sm:px-6 md:px-8 lg:px-10 min-[1366px]:px-12" 
+        style={{ minHeight: 0 }}
+      >
         <div ref={stageRef} className="relative flex w-full flex-1 flex-col items-center justify-center overflow-visible" style={{ minHeight: 0, maxHeight: '100%', gap: 'clamp(0.75rem, 2vh, 1.5rem)' }}>
         {/* Compact emoji-only bubble with proper spacing */}
         {!showPetShop && (
-          <div ref={bubbleRef} className="relative flex-shrink-0 flex flex-col items-center mb-6 sm:mb-8">
+          <div ref={bubbleRef} className="bubble-margin relative flex-shrink-0 flex flex-col items-center mb-6 sm:mb-8 min-[1366px]:mb-4">
             <Button
               variant="outline"
               size="icon"
@@ -4309,7 +4312,7 @@ const getSleepyPetImage = (clicks: number) => {
                 src={getPetImage()}
                 alt="Pet"
                 className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                  sleepClicks > 0 ? 'w-56 h-56 max-h-[240px] sm:w-60 sm:h-60 sm:max-h-[260px] md:w-64 md:h-64 md:max-h-[280px]' : 'w-52 h-52 max-h-[220px] sm:w-56 sm:h-56 sm:max-h-[240px] md:w-60 md:h-60 md:max-h-[260px]'
+                  sleepClicks > 0 ? 'w-56 h-56 max-h-[240px] sm:w-60 sm:h-60 sm:max-h-[260px] md:w-64 md:h-64 md:max-h-[280px] min-[1366px]:w-[288px] min-[1366px]:h-[288px] min-[1366px]:max-h-[320px]' : 'w-52 h-52 max-h-[220px] sm:w-56 sm:h-56 sm:max-h-[240px] md:w-60 md:h-60 md:max-h-[260px] min-[1366px]:w-[272px] min-[1366px]:h-[272px] min-[1366px]:max-h-[300px]'
                 }`}
                 style={{
                   animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
@@ -4353,11 +4356,11 @@ const getSleepyPetImage = (clicks: number) => {
 
       {/* Below-bubble To-Dos: Travel and Sleep - Fixed to bottom */}
       {!showPetShop && (
-        <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center pb-4 px-4" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-          <div className="w-full max-w-[360px] rounded-[12px] sm:rounded-[16px] shadow-md p-2 sm:p-2.5 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
+        <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center pb-4 px-4 min-[1366px]:pb-6 min-[1366px]:px-6 min-[1440px]:pb-8 min-[1440px]:px-8" style={{ paddingBottom: 'max(clamp(1rem, 2vh, 1.5rem), env(safe-area-inset-bottom))' }}>
+          <div className="quest-box-container w-full max-w-[360px] min-[1366px]:max-w-[420px] min-[1440px]:max-w-[420px] rounded-[12px] sm:rounded-[16px] min-[1366px]:rounded-[18px] min-[1440px]:rounded-[20px] shadow-md p-2 sm:p-2.5 min-[1366px]:p-3 min-[1440px]:p-3.5 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
-            <div className="mb-1 px-1 font-semibold tracking-wide text-xs" style={{ color: '#134E4A' }}>Today</div>
-            <div className="flex flex-col gap-1.5 sm:gap-2">
+            <div className="quest-box-title mb-1 px-1 font-semibold tracking-wide text-xs min-[1440px]:text-sm min-[1440px]:mb-1.5 min-[1440px]:px-2" style={{ color: '#134E4A' }}>Today</div>
+            <div className="quest-gap flex flex-col gap-1.5 sm:gap-2 min-[1440px]:gap-2.5">
               {(() => {
                 // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
                 const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
@@ -4457,13 +4460,13 @@ const getSleepyPetImage = (clicks: number) => {
                     type="button"
                     aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`}
                     onClick={() => { setShowFirstDoHint(false); handleActionClick(currentQuestType); }}
-                    className={`relative flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-[10px] sm:rounded-[12px] border-[2px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_3px_0_#0B0B0B] sm:shadow-[0_4px_0_#0B0B0B] w-full text-left`}
+                    className={`quest-item relative flex items-center gap-1.5 sm:gap-2 min-[1440px]:gap-2.5 p-1.5 sm:p-2 min-[1440px]:p-3 rounded-[10px] sm:rounded-[12px] min-[1440px]:rounded-[14px] border-[2px] min-[1440px]:border-[2.5px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_3px_0_#0B0B0B] sm:shadow-[0_4px_0_#0B0B0B] min-[1440px]:shadow-[0_5px_0_#0B0B0B] w-full text-left`}
                   >
                     {/* Left icon */}
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-base sm:text-lg flex-shrink-0" style={{ background: '#ECFDF5' }}>{questIcon}</div>
+                    <div className="quest-icon w-7 h-7 sm:w-8 sm:h-8 min-[1440px]:w-10 min-[1440px]:h-10 rounded-lg min-[1440px]:rounded-lg flex items-center justify-center text-base sm:text-lg min-[1440px]:text-xl flex-shrink-0" style={{ background: '#ECFDF5' }}>{questIcon}</div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-xs sm:text-sm" style={{ color: '#0F766E' }}>{questLabel}</div>
-                      <div className="mt-1 h-1 sm:h-1.5 rounded-full overflow-hidden w-full max-w-[180px] sm:max-w-[220px]" style={{ background: '#ECFDF5' }}>
+                      <div className="quest-text font-semibold text-xs sm:text-sm min-[1440px]:text-base min-[1440px]:font-bold" style={{ color: '#0F766E' }}>{questLabel}</div>
+                      <div className="quest-progress mt-1 min-[1440px]:mt-1.5 h-1 sm:h-1.5 min-[1440px]:h-1.5 rounded-full overflow-hidden w-full max-w-[180px] sm:max-w-[220px] min-[1440px]:max-w-[240px]" style={{ background: '#ECFDF5' }}>
                         <div
                           className="h-full transition-all duration-500"
                           style={{ width: `${Math.round(progress * 100)}%`, background: done ? '#34D399' : '#86EFAC' }}
@@ -4471,7 +4474,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     </div>
                     <span className="relative inline-block overflow-visible z-30 pointer-events-none flex-shrink-0">
-                      <span className={`relative w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg flex items-center justify-center transition-all duration-300 text-xs sm:text-sm ${done ? '' : ''}`}
+                      <span className={`quest-arrow relative w-6 h-6 sm:w-7 sm:h-7 min-[1440px]:w-9 min-[1440px]:h-9 rounded-md sm:rounded-lg min-[1440px]:rounded-lg flex items-center justify-center transition-all duration-300 text-xs sm:text-sm min-[1440px]:text-base ${done ? '' : ''}`}
                         style={{ background: done ? '#34D399' : '#E0F2FE', color: done ? '#FFFFFF' : '#0EA5A4' }}>
                         {done ? '✓' : '→'}
                       </span>
@@ -4531,12 +4534,12 @@ const getSleepyPetImage = (clicks: number) => {
                     aria-label={asleep ? 'Completed - Click to view' : 'Sleep'}
                     onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }}
                     disabled={disabled}
-                    className={`relative flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-[10px] sm:rounded-[12px] border-[2px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_3px_0_#0B0B0B] sm:shadow-[0_4px_0_#0B0B0B] w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`quest-item relative flex items-center gap-1.5 sm:gap-2 min-[1440px]:gap-2.5 p-1.5 sm:p-2 min-[1440px]:p-3 rounded-[10px] sm:rounded-[12px] min-[1440px]:rounded-[14px] border-[2px] min-[1440px]:border-[2.5px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_3px_0_#0B0B0B] sm:shadow-[0_4px_0_#0B0B0B] min-[1440px]:shadow-[0_5px_0_#0B0B0B] w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-base sm:text-lg flex-shrink-0" style={{ background: '#ECFDF5' }}>😴</div>
+                    <div className="quest-icon w-7 h-7 sm:w-8 sm:h-8 min-[1440px]:w-10 min-[1440px]:h-10 rounded-lg min-[1440px]:rounded-lg flex items-center justify-center text-base sm:text-lg min-[1440px]:text-xl flex-shrink-0" style={{ background: '#ECFDF5' }}>😴</div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-xs sm:text-sm" style={{ color: '#0F766E' }}>{label}</div>
-                      <div className="mt-1 h-1 sm:h-1.5 rounded-full overflow-hidden w-full max-w-[180px] sm:max-w-[220px]" style={{ background: '#ECFDF5' }}>
+                      <div className="quest-text font-semibold text-xs sm:text-sm min-[1440px]:text-base min-[1440px]:font-bold" style={{ color: '#0F766E' }}>{label}</div>
+                      <div className="quest-progress mt-1 min-[1440px]:mt-1.5 h-1 sm:h-1.5 min-[1440px]:h-1.5 rounded-full overflow-hidden w-full max-w-[180px] sm:max-w-[220px] min-[1440px]:max-w-[240px]" style={{ background: '#ECFDF5' }}>
                         <div
                           className="h-full transition-all duration-500"
                           style={{ width: `${progress * 100}%`, background: asleep ? '#34D399' : '#86EFAC' }}
@@ -4544,7 +4547,7 @@ const getSleepyPetImage = (clicks: number) => {
                       </div>
                     </div>
                     <span className="relative inline-block overflow-visible z-30 pointer-events-none flex-shrink-0">
-                      <span ref={sleepArrowRef as any} className={`relative w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg flex items-center justify-center transition-all duration-300 text-xs sm:text-sm`}
+                      <span ref={sleepArrowRef as any} className={`quest-arrow relative w-6 h-6 sm:w-7 sm:h-7 min-[1440px]:w-9 min-[1440px]:h-9 rounded-md sm:rounded-lg min-[1440px]:rounded-lg flex items-center justify-center transition-all duration-300 text-xs sm:text-sm min-[1440px]:text-base`}
                         style={{ background: asleep ? '#34D399' : '#E0F2FE', color: asleep ? '#FFFFFF' : '#0EA5A4' }}>
                         {asleep ? '✓' : '→'}
                       </span>

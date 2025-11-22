@@ -20,25 +20,25 @@ export function CenteredLevelProgressBar({
       style={{ top: 'calc(var(--safe-area-top, 0px) + 1rem)' }}
     >
       <div className="rounded-xl px-2 py-1 pointer-events-auto">
-        <div className="relative h-8 w-64 sm:h-9 sm:w-72">
+        <div className="relative h-8 w-64 sm:h-9 sm:w-72 min-[1366px]:h-10 min-[1366px]:w-80">
           {/* Track */}
           <div className="absolute inset-y-0 left-0 right-0 bg-white/30 rounded-full border border-white/40 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-500 ease-out"
               style={{ width: `${pct}%` }}
             />
-            <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-extrabold drop-shadow-md">
+            <div className="absolute inset-0 flex items-center justify-center text-white text-sm min-[1366px]:text-base font-extrabold drop-shadow-md">
               {pct}%
             </div>
           </div>
 
           {/* Left badge: current level */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-teal-500 text-white border border-white/40 shadow-md flex items-center justify-center text-sm font-extrabold select-none">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 min-[1366px]:w-10 min-[1366px]:h-10 rounded-full bg-teal-500 text-white border border-white/40 shadow-md flex items-center justify-center text-sm min-[1366px]:text-base font-extrabold select-none">
             {currentLevel}
           </div>
 
           {/* Right badge: next level */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/70 text-gray-800 border border-white/60 shadow-md flex items-center justify-center text-sm font-extrabold select-none">
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 min-[1366px]:w-10 min-[1366px]:h-10 rounded-full bg-white/70 text-gray-800 border border-white/60 shadow-md flex items-center justify-center text-sm min-[1366px]:text-base font-extrabold select-none">
             {nextLevel}
           </div>
         </div>
