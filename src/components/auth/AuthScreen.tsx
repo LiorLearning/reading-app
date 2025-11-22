@@ -80,8 +80,8 @@ export const AuthScreen: React.FC = () => {
       // Only navigate if sign-in was successful
       // Don't navigate if user cancelled (popup closed)
       const params = new URLSearchParams(location.search);
-      const redirect = params.get('redirect') || '/';
-      navigate(redirect);
+      const redirect = params.get('redirect') || '/app';
+      navigate('/app');
     } catch (error: any) {
       // Don't show error if user cancelled
       if (error.message && error.message.includes('cancelled')) {
