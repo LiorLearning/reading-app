@@ -111,13 +111,16 @@ const ReadingMicButton: React.FC<{
   const mediaStreamRef = React.useRef<MediaStream | null>(null);
   const pcmChunksRef = React.useRef<Float32Array[]>([]);
   const useOpenAITranscribe = React.useMemo(() => {
-    try { return Boolean(import.meta.env.VITE_OPENAI_API_KEY); } catch { return false; }
+    try { 
+      return Boolean(process.env.NEXT_PUBLIC_OPENAI_API_KEY || (import.meta as any).env?.VITE_OPENAI_API_KEY); 
+    } catch { return false; }
   }, []);
   const openaiClient = React.useMemo(() => {
     if (!useOpenAITranscribe) return null;
     try {
+      const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || (import.meta as any).env?.VITE_OPENAI_API_KEY;
       return new OpenAI({
-        apiKey: import.meta.env.VITE_OPENAI_API_KEY as string,
+        apiKey: apiKey as string,
         dangerouslyAllowBrowser: true
       });
     } catch {
@@ -127,11 +130,15 @@ const ReadingMicButton: React.FC<{
 
   // Fireworks (server-proxied) batch transcription toggle and backend base URL
   const useFireworksTranscribe = React.useMemo(() => {
-    try { return Boolean((import.meta as any).env?.VITE_USE_FIREWORKS); } catch { return false; }
+    try {
+      // Support both Next.js and Vite env vars
+      return Boolean(process.env.NEXT_PUBLIC_USE_FIREWORKS || (import.meta as any).env?.VITE_USE_FIREWORKS);
+    } catch { return false; }
   }, []);
   const backendBaseUrl = React.useMemo(() => {
     try {
-      const v = ((import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
+      // Support both Next.js and Vite env vars
+      const v = (process.env.NEXT_PUBLIC_BACKEND_BASE_URL || (import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
       return (v && typeof v === 'string') ? v.replace(/\/+$/, '') : '';
     } catch {
       return '';

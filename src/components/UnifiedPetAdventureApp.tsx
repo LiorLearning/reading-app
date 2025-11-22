@@ -1,19 +1,7 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
-import { AuthScreen } from "@/components/auth/AuthScreen";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import Index from "./pages/Index";
-import Welcome from "./pages/Welcome";
-import NotFound from "./pages/NotFound";
-import { ProgressTracking } from "./pages/ProgressTracking";
-// Import PetPage and Index for seamless adventure functionality
-import { PetPage } from "./pages/PetPage";
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+'use client'
+
+import React, { useMemo, useState, useCallback } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import { useCoins } from "@/lib/coinSystem";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { stateStoreApi } from "@/lib/state-store-api";
@@ -22,14 +10,13 @@ import DeviceGateModal from "@/components/DeviceGateModal";
 import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
 import { checkMicPermissionStatus } from "@/lib/mic-permission";
-
-const queryClient = new QueryClient();
+import Index from "@/components-pages/Index";
+import { PetPage } from "@/components-pages/PetPage";
 
 // Dev-only invisible hotspot to add coins quickly while developing
 const DevCoinHotspot: React.FC = () => {
+  if (process.env.NODE_ENV !== 'development') return null;
   const { addAdventureCoins } = useCoins();
-  const isDev = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || (import.meta as any).env?.DEV);
-  if (!isDev) return null;
   return (
     <button
       aria-label="dev-coin-hotspot"
@@ -42,9 +29,8 @@ const DevCoinHotspot: React.FC = () => {
 
 // Dev-only invisible hotspot to increment questions done by 1 for selected pet
 const DevQuestionHotspot: React.FC = () => {
+  if (process.env.NODE_ENV !== 'development') return null;
   const { user } = useAuth();
-  const isDev = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || (import.meta as any).env?.DEV);
-  if (!isDev) return null;
   
   const handleIncrementQuestion = async () => {
     try {
@@ -77,9 +63,8 @@ const DevQuestionHotspot: React.FC = () => {
 
 // Dev-only visible button to shift Firebase time windows by +9h (simulated)
 const DevTimeShiftButton: React.FC = () => {
+  if (process.env.NODE_ENV !== 'development') return null;
   const { user } = useAuth();
-  const isDev = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || (import.meta as any).env?.DEV);
-  if (!isDev) return null;
 
   const onShift = async () => {
     try {
@@ -104,7 +89,7 @@ const DevTimeShiftButton: React.FC = () => {
 };
 
 // Unified component that seamlessly switches between pet page and adventure
-const UnifiedPetAdventureApp = () => {
+export const UnifiedPetAdventureApp = () => {
   const [isInAdventure, setIsInAdventure] = useState(false);
   const [adventureProps, setAdventureProps] = useState<{
     topicId?: string, 
@@ -222,24 +207,37 @@ const UnifiedPetAdventureApp = () => {
   // If user needs onboarding (after signup), route to Index. Skip for anonymous users.
   if (user && !user.isAnonymous && userData && (userData.isFirstTime || !userData.username || !userData.age || !userData.grade)) {
     return (
-      <Index 
-        initialAdventureProps={null}
-        onBackToPetPage={handleBackToPetPage}
-      />
+      <>
+        <DevCoinHotspot />
+        <DevQuestionHotspot />
+        <DevTimeShiftButton />
+        <Index 
+          initialAdventureProps={null}
+          onBackToPetPage={handleBackToPetPage}
+        />
+      </>
     );
   }
 
   if (isInAdventure) {
     return (
-      <Index 
-        initialAdventureProps={adventureProps}
-        onBackToPetPage={handleBackToPetPage}
-      />
+      <>
+        <DevCoinHotspot />
+        <DevQuestionHotspot />
+        <DevTimeShiftButton />
+        <Index 
+          initialAdventureProps={adventureProps}
+          onBackToPetPage={handleBackToPetPage}
+        />
+      </>
     );
   }
 
   return (
     <>
+      <DevCoinHotspot />
+      <DevQuestionHotspot />
+      <DevTimeShiftButton />
       <DeviceGateModal
         open={gateOpen}
         onClose={() => setGateOpen(false)}
@@ -257,49 +255,3 @@ const UnifiedPetAdventureApp = () => {
     </>
   );
 };
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <div className="h-full w-full overflow-y-auto">
-          <Toaster />
-          <Sonner position="top-left" />
-          <DevCoinHotspot />
-          <DevQuestionHotspot />
-          <DevTimeShiftButton />
-          <BrowserRouter>
-            <Routes>
-              {/* Dedicated auth route for signup/login and upgrade linking */}
-              <Route path="/auth" element={<AuthScreen />} />
-              {/* Welcome is now default */}
-              <Route path="/" element={<Welcome />} />
-              {/* Unified pet page and adventure experience moved under /app */}
-              <Route path="/app" element={
-                <AuthGuard>
-                  <UnifiedPetAdventureApp />
-                </AuthGuard>
-              } />
-              {/* Keep adventure route for backward compatibility (redirects to /app) */}
-              <Route path="/adventure" element={
-                <AuthGuard>
-                  <UnifiedPetAdventureApp />
-                </AuthGuard>
-              } />
-              {/* Progress Tracking Page */}
-              <Route path="/progress" element={
-                <AuthGuard>
-                  <ProgressTracking />
-                </AuthGuard>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
-
-export default App;

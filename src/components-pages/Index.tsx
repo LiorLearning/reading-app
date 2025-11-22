@@ -57,10 +57,10 @@ import alien3 from "@/assets/comic-alienland-3.jpg";
 import cockpit4 from "@/assets/comic-cockpit-4.jpg";
 
 import MCQScreenTypeA from "./MCQScreenTypeA";
-import TopicSelection from "@/components-pages/TopicSelection";
-import UserOnboarding from "@/components-pages/UserOnboarding";
-import HomePage from "@/components-pages/HomePage";
-import { PetPage } from "@/components-pages/PetPage";
+import TopicSelection from "./TopicSelection";
+  import UserOnboarding from "./UserOnboarding";
+  import HomePage from "./HomePage";
+  import { PetPage } from "./PetPage";
   import { 
     cacheAdventureImage, 
     loadCachedAdventureImages, 
@@ -7444,13 +7444,6 @@ Keep tone warm, brief, and curious.`;
     </div>
   );
 };
-
-// Force dynamic rendering for Pages Router (useAuth requires client-side)
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
 
 export default Index;
 

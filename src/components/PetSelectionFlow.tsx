@@ -117,7 +117,7 @@ export function PetSelectionFlow({ onPetSelected, userName, devForceStep, devFor
 
   // Dev-only: allow parent to force a specific step (useful for quick testing)
   useEffect(() => {
-    if ((import.meta as any)?.env?.DEV && devForceStep) {
+    if (process.env.NODE_ENV === 'development' && devForceStep) {
       if (devForceStep === 'naming' || devForceStep === 'dailyIntro') {
         const petId = devForcePetId || PET_OPTIONS[0]?.id;
         const pet = PET_OPTIONS.find(p => p.id === petId) || PET_OPTIONS[0] || null;

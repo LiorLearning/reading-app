@@ -50,7 +50,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
   // Backend base URL (same approach as Reading/SpellBox)
   const backendBaseUrl = React.useMemo(() => {
     try {
-      const v = ((import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
+      const v = (process.env.NEXT_PUBLIC_BACKEND_BASE_URL || '') as string;
       return (v && typeof v === 'string') ? v.replace(/\/+$/, '') : '';
     } catch {
       return '';
@@ -564,7 +564,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           </Button>
         )}
       </form>
-      {disabled && disabledReason && (import.meta as any)?.env?.DEV && (
+      {disabled && disabledReason && process.env.NODE_ENV === 'development' && (
         <div
           className="absolute -top-5 right-0 z-30 text-[10px] px-2 py-0.5 rounded-full bg-yellow-200 text-yellow-900 border border-yellow-400 shadow-sm select-none"
           aria-label={`Input disabled: ${disabledReason}`}
@@ -581,7 +581,7 @@ const InputBar: React.FC<InputBarProps> = ({ onGenerate, onAddMessage, disabled 
           }}
           role="button"
           aria-label="Please tap Next to continue"
-          title={((import.meta as any)?.env?.DEV && disabledReason) || 'Input disabled'}
+          title={(process.env.NODE_ENV === 'development' && disabledReason) || 'Input disabled'}
         />
       )}
     </section>

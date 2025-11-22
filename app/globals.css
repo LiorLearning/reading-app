@@ -1,0 +1,904 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Line clamp utilities for adventure cards */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Tutorial Animations */
+@keyframes tutorial-expand {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes tutorial-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(147, 51, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.5), 0 0 25px rgba(147, 51, 234, 0.3);
+  }
+}
+
+@keyframes tutorial-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+  }
+  70% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+  }
+}
+
+/* Tutorial Classes */
+.tutorial-expand {
+  animation: tutorial-expand 2s ease-in-out infinite alternate;
+  transition: all 0.3s ease;
+}
+
+.tutorial-glow {
+  animation: tutorial-glow 1.5s ease-in-out infinite, tutorial-pulse 2s infinite;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.tutorial-highlight {
+  position: relative;
+  z-index: 50;
+}
+
+.tutorial-highlight::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, 
+    rgba(147, 51, 234, 0.2), 
+    rgba(168, 85, 247, 0.2), 
+    rgba(147, 51, 234, 0.2)
+  );
+  border-radius: 16px;
+  z-index: -1;
+  animation: tutorial-glow 2s ease-in-out infinite;
+}
+
+/* Tutorial overlay for first-time users - very subtle */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.05);
+  z-index: 40;
+  pointer-events: none;
+}
+
+.tutorial-spotlight {
+  position: relative;
+  z-index: 51;
+  pointer-events: auto;
+}
+
+/* Panel Animations */
+@keyframes image-factory {
+  0% {
+    opacity: 0;
+    filter: blur(20px);
+    transform: translateY(10px);
+  }
+  50% {
+    opacity: 0.7;
+    filter: blur(10px);
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up-smooth {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes roll-up {
+  0% {
+    opacity: 0;
+    transform: translateY(100%) scaleY(0.3);
+    transform-origin: bottom;
+  }
+  80% {
+    transform: translateY(0) scaleY(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+@keyframes roll-down {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    transform-origin: bottom;
+  }
+  20% {
+    transform: translateY(0) scaleY(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%) scaleY(0.3);
+    transform-origin: bottom;
+  }
+}
+
+@keyframes roll-out-from-avatar {
+  0% {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(-8px);
+  }
+  85% {
+    transform: translateX(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  0% {
+    transform: translateX(-100%);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-left {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(100%);
+  }
+  80% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-right {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes factory-loading {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  80% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes factory-gear-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes factory-conveyor {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes factory-box-1 {
+  0% {
+    transform: translateX(-120px);
+  }
+  100% {
+    transform: translateX(400px);
+  }
+}
+
+@keyframes factory-box-2 {
+  0% {
+    transform: translateX(-120px);
+  }
+  100% {
+    transform: translateX(400px);
+  }
+}
+
+@keyframes factory-box-3 {
+  0% {
+    transform: translateX(-120px);
+  }
+  100% {
+    transform: translateX(400px);
+  }
+}
+
+@keyframes factory-smoke {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-10px) scale(1.1);
+  }
+}
+
+@keyframes factory-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes factory-progress {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 15%;
+  }
+  40% {
+    width: 35%;
+  }
+  60% {
+    width: 55%;
+  }
+  80% {
+    width: 80%;
+  }
+  95% {
+    width: 95%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes image-factory-improved {
+  0% {
+    opacity: 0;
+    filter: blur(25px);
+    transform: translateY(15px) scale(0.95);
+  }
+  30% {
+    opacity: 0.3;
+    filter: blur(15px);
+    transform: translateY(10px) scale(0.97);
+  }
+  60% {
+    opacity: 0.7;
+    filter: blur(8px);
+    transform: translateY(5px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes comic-panel-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes typing-dots {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-image-factory {
+  animation: image-factory 1.2s ease-out;
+}
+
+.animate-slide-up-smooth {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: slide-up-smooth 0.4s ease-out forwards;
+}
+
+.animate-roll-up {
+  animation: roll-up 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.animate-roll-down {
+  animation: roll-down 0.6s ease-in forwards;
+}
+
+.animate-roll-out-from-avatar {
+  animation: roll-out-from-avatar 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-out-left {
+  animation: slide-out-left 0.3s ease-in;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-out-right {
+  animation: slide-out-right 0.3s ease-in;
+}
+
+.animate-factory-loading {
+  animation: factory-loading 12s ease-out;
+}
+
+.animate-factory-gear {
+  animation: factory-gear-spin 2s linear infinite;
+}
+
+.animate-factory-conveyor {
+  animation: factory-conveyor 3s linear infinite;
+}
+
+.animate-factory-box-1 {
+  animation: factory-box-1 4s linear infinite;
+}
+
+.animate-factory-box-2 {
+  animation: factory-box-2 4s linear infinite;
+  animation-delay: 1.3s;
+}
+
+.animate-factory-box-3 {
+  animation: factory-box-3 4s linear infinite;
+  animation-delay: 2.6s;
+}
+
+.animate-factory-smoke {
+  animation: factory-smoke 2.5s ease-in-out infinite;
+}
+
+.animate-factory-blink {
+  animation: factory-blink 1.5s ease-in-out infinite;
+}
+
+.animate-factory-progress {
+  animation: factory-progress 12s ease-out forwards;
+}
+
+.animate-image-factory-improved {
+  animation: image-factory-improved 1.5s ease-out;
+}
+
+.animate-comic-panel-zoom {
+  animation: comic-panel-zoom 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Button Animations */
+.btn-animate {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-animate:hover {
+  transform: scale(1.05);
+}
+
+.btn-animate:active {
+  transform: scale(0.95) translateY(1px);
+  box-shadow: none !important;
+}
+
+/* Typing Animation */
+.typing-dot {
+  animation: typing-dots 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Teal base with aqua accents (default theme) */
+    --background: 180 30% 97%; /* Soft teal-tinted background */
+    --foreground: 0 0% 15%; /* Dark gray text */
+
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 0 0% 15%;
+    
+    /* Ensure buttons stay white */
+    --button-background: 0 0% 100%; /* Pure white for buttons */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+
+    --primary: 180 83% 35%; /* teal primary */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%; /* Light gray secondary */
+    --secondary-foreground: 0 0% 15%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 180 83% 35%; /* teal accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 85%;
+    --input: 0 0% 95%;
+    --ring: 180 83% 35%;
+
+    --radius: 0.75rem;
+    
+    /* Book styling colors - teal theme */
+    --book-border: 180 83% 35%; /* main border */
+    --book-border-deep: 180 83% 30%; /* deeper for dimension */
+    --book-border-shadow: 180 83% 25%; /* dark shadow */
+    --book-page-light: 0 0% 99%; /* Very light cream page */
+    --book-page-main: 0 0% 97%; /* Soft white page */
+    --book-page-shadow: 0 0% 94%; /* Light gray shadow tone */
+    --book-page-lines: 0 0% 85%; /* Gray lines on pages */
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 180 83% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 15%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 180 83% 35%;
+    
+    /* Chat Backgrounds - Clean whites! */
+    --chat-container-bg: 0 0% 100%; /* Pure white background for sidebar container and avatar */
+    
+    /* CHAT PANEL COLOR - Light gray for contrast */
+    --chat-panel-bg: 0 0% 97%; /* Very light gray for chat messages area */
+
+    /* Safe area defaults (override when supported) */
+    --safe-area-top: 0px;
+    --safe-area-right: 0px;
+    --safe-area-bottom: 0px;
+    --safe-area-left: 0px;
+  }
+
+  .dark {
+    /* Clean dark mode with teal accents */
+    --background: 0 0% 10%; /* Dark gray background */
+    --foreground: 0 0% 90%; /* Light gray text */
+
+    --card: 0 0% 15%; /* Dark gray cards */
+    --card-foreground: 0 0% 90%;
+
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 90%;
+
+    --primary: 180 83% 35%; /* teal primary */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 20%; /* Dark gray secondary */
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 180 83% 35%; /* teal accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 25%;
+    --input: 0 0% 20%;
+    --ring: 180 83% 35%;
+    
+    /* Dark book styling colors - teal theme */
+    --book-border: 180 83% 35%; /* Teal border */
+    --book-border-deep: 180 83% 30%; /* Deeper teal for dimension */
+    --book-border-shadow: 180 83% 25%; /* Dark teal shadow */
+    --book-page-light: 0 0% 25%; /* Dark gray page */
+    --book-page-main: 0 0% 20%; /* Darker gray page */
+    --book-page-shadow: 0 0% 15%; /* Very dark gray shadow */
+    --book-page-lines: 0 0% 35%; /* Gray lines on pages */
+    
+    --sidebar-background: 0 0% 15%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 180 83% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 25%;
+    --sidebar-ring: 180 83% 35%;
+    
+    /* Chat Backgrounds - Clean dark grays! */
+    --chat-container-bg: 0 0% 15%; /* Dark gray background for sidebar container and avatar */
+    
+    /* CHAT PANEL COLOR - Slightly lighter dark gray */
+    --chat-panel-bg: 0 0% 18%; /* Dark gray for chat messages area */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html, body {
+    height: 100%;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    margin: 0;
+    padding: 0;
+    overflow: auto; /* Allow page-level scrolling */
+  }
+
+  body {
+    @apply bg-background text-foreground font-kids;
+  }
+
+  /* Next.js doesn't use #root, but keep for compatibility */
+  #root, #__next {
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    overflow: auto;
+  }
+
+  /* Safe area support for notched devices */
+  @supports (padding: max(0px)) {
+    html {
+      --safe-area-top: env(safe-area-inset-top);
+      --safe-area-right: env(safe-area-inset-right);
+      --safe-area-bottom: env(safe-area-inset-bottom);
+      --safe-area-left: env(safe-area-inset-left);
+    }
+
+    @media (max-width: 640px) {
+      html, body, #root {
+        padding-left: var(--safe-area-left);
+        padding-right: var(--safe-area-right);
+        padding-top: var(--safe-area-top);
+        padding-bottom: var(--safe-area-bottom);
+      }
+    }
+  }
+
+  /* Mobile keyboard handling */
+  @supports (height: 100dvh) {
+    .mobile-keyboard-aware {
+      height: 100dvh;
+      height: 100svh; /* Small viewport height - excludes keyboard */
+    }
+  }
+}
+
+@layer utilities {
+  .shadow-solid { box-shadow: 0 4px 0 black; }
+  .shadow-solid-primary { box-shadow: 0 4px 0 black; }
+  
+  /* Playful background pattern */
+  .bg-pattern {
+    background-color: hsl(var(--background));
+    background-image: 
+      radial-gradient(circle at 20px 20px, hsl(350 60% 85%) 3px, transparent 3px),
+      radial-gradient(circle at 60px 60px, hsl(350 55% 80%) 2px, transparent 2px),
+      radial-gradient(circle at 100px 20px, hsl(350 50% 75%) 1.5px, transparent 1.5px);
+    background-size: 
+      80px 80px,
+      120px 120px,
+      60px 60px;
+    background-position:
+      0 0,
+      40px 40px,
+      20px 10px;
+  }
+  
+  /* Ensure buttons have white backgrounds */
+  .bg-white-override {
+    background-color: white !important;
+  }
+  
+  /* Book Container Styling - realistic book appearance with softer borders */
+  .book-container {
+    background: linear-gradient(145deg, 
+      hsl(var(--book-page-light)) 0%, 
+      hsl(var(--book-page-main)) 95%, 
+      hsl(var(--book-page-shadow)) 100%);
+    border: 8px solid hsl(var(--book-border));
+    border-radius: 24px;
+    box-shadow: 
+      inset 0 4px 12px rgba(255, 255, 255, 0.4),
+      inset 0 -4px 12px rgba(0, 0, 0, 0.15),
+      0 2px 0 hsl(var(--foreground) / 0.6);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Book spine/thickness effect */
+  .book-container::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    background: linear-gradient(135deg, 
+      hsl(var(--book-border)) 0%, 
+      hsl(var(--book-border-deep)) 50%,
+      hsl(var(--book-border-shadow)) 100%);
+    border-radius: 24px;
+    z-index: -1;
+    box-shadow: 0 4px 0 hsl(var(--foreground) / 0.6);
+  }
+  
+  /* Book page lines effect */
+  .book-container::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: 3px;
+    background: repeating-linear-gradient(
+      to bottom,
+      hsl(var(--book-page-lines)) 0px,
+      hsl(var(--book-page-lines)) 2px,
+      transparent 2px,
+      transparent 20px
+    );
+    border-radius: 2px;
+    opacity: 0.4;
+    z-index: 1;
+  }
+  
+  /* Chat Background Utilities */
+  .bg-chat-container { background-color: hsl(var(--chat-container-bg)); }
+  .bg-chat-panel { background-color: hsl(var(--chat-panel-bg)); }
+  
+  /* Chat Panel Resize Utilities */
+  .chat-panel-resizing {
+    transition: none !important;
+    user-select: none;
+  }
+  
+  .chat-panel-resizing * {
+    pointer-events: none;
+  }
+  
+  /* Factory Animation Utilities */
+  .bg-repeating-linear-gradient-45 {
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.3) 4px,
+      rgba(255, 255, 255, 0.3) 8px
+    );
+  }
+  
+  .bg-striped-progress {
+    background: repeating-linear-gradient(
+      45deg,
+      #000000 0px,
+      #000000 8px,
+      #fbbf24 8px,
+      #fbbf24 16px
+    );
+  }
+
+  .header-panel-gradient {
+    background-image:
+      radial-gradient(circle at 12% -10%, hsl(var(--primary) / 0.45) 0%, transparent 55%),
+      radial-gradient(circle at 80% 0%, hsl(var(--primary) / 0.4) 0%, transparent 60%),
+      linear-gradient(120deg,
+        hsl(var(--primary) / 0.92) 0%,
+        hsl(var(--primary) / 0.78) 45%,
+        hsl(var(--primary) / 0.68) 70%,
+        hsl(var(--primary) / 0.6) 100%
+      );
+    background-blend-mode: screen, screen, normal;
+  }
+  
+  /* Background with themed color film overlay */
+  .bg-pattern {
+    background-color: hsl(var(--background));
+    background-image: 
+      linear-gradient(hsla(var(--pattern-primary) / 0.85), hsla(var(--pattern-primary) / 0.85)),
+      var(--dynamic-background, url('/backgrounds/random2.png'));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+  }
+  
+  /* Krafty button pulsating highlight animation */
+  .krafty-highlight {
+    animation: krafty-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes krafty-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 0 black;
+    }
+    50% {
+      transform: scale(1.1);
+      box-shadow: 0 5px 0 black;
+    }
+  }
+
+  /* Full-screen responsive utilities */
+  .fullscreen-container {
+    height: 100%;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Mobile-first responsive layout */
+  @media (max-width: 768px) {
+    .mobile-stack {
+      flex-direction: column;
+    }
+    
+    .mobile-full-width {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  /* Responsive Layout Utilities - Simplified */
+  @media (min-width: 1700px) {
+    /* Large screens: Prevent excessive stretching */
+    .responsive-max-width {
+      max-width: 100rem; /* 1600px max */
+      margin: 0 auto;
+    }
+  }
+
+  @media (min-width: 2000px) {
+    /* Ultra-wide screens: Further constraint */
+    .responsive-max-width {
+      max-width: 120rem; /* 1920px equivalent */
+    }
+  }
+
+  /* Kid-friendly visible scrollbars for scrollable containers */
+  .kid-scrollbar {
+    scrollbar-width: auto; /* Firefox */
+    scrollbar-gutter: stable both-edges; /* Reserve space so bar is always visible */
+  }
+  .kid-scrollbar::-webkit-scrollbar {
+    width: 12px; /* Always-visible width */
+  }
+  .kid-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9; /* slate-100 */
+    border-radius: 9999px;
+  }
+  .kid-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #94a3b8; /* slate-400 */
+    border-radius: 9999px;
+    border: 3px solid #f1f5f9; /* creates padding around thumb */
+  }
+  .kid-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #64748b; /* slate-500 */
+  }
+}

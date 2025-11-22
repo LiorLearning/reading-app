@@ -25,12 +25,12 @@ import {
       return getApp();
     } catch {
       const config = {
-        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-        messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-        appId: import.meta.env.VITE_FIREBASE_APP_ID,
+        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || (import.meta as any).env?.VITE_FIREBASE_API_KEY || '',
+        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || '',
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || '',
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || '',
+        messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+        appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || (import.meta as any).env?.VITE_FIREBASE_APP_ID || '',
       } as const;
       return initializeApp(config as any);
     }

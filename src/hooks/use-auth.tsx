@@ -19,7 +19,7 @@ import {
 import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
-import { CoinSystem } from '@/pages/coinSystem';
+import { CoinSystem } from '@/lib/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
 import analytics from '@/lib/analytics';
@@ -912,13 +912,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Initialize Google One Tap Sign-in
   const initializeOneTapSignIn = () => {
-    if (!window.google || !import.meta.env.VITE_FIREBASE_API_KEY) {
+    const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || (import.meta as any).env?.VITE_FIREBASE_API_KEY;
+    if (!window.google || !firebaseApiKey) {
       console.warn('Google Identity Services not available or Firebase config missing');
       return;
     }
 
     try {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.VITE_FIREBASE_API_KEY;
+      const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID;
+      const clientId = googleClientId || firebaseApiKey;
       
       window.google.accounts.id.initialize({
         client_id: clientId,

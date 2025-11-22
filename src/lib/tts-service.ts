@@ -228,6 +228,9 @@ class TextToSpeechService {
 
   private loadSelectedSpeed(): number {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return 0.8;
+      }
       const stored = localStorage.getItem(SELECTED_SPEED_KEY);
       if (stored) {
         const speed = parseFloat(stored);
@@ -247,6 +250,9 @@ class TextToSpeechService {
   private saveSelectedVoice(voice: Voice): void {
     // Back-compat no-op for global key; preference is saved per pet in setSelectedVoice
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
       localStorage.setItem(SELECTED_VOICE_KEY, JSON.stringify(voice.id));
     } catch (error) {
       // Ignore
@@ -255,6 +261,9 @@ class TextToSpeechService {
 
   private saveSelectedSpeed(speed: number): void {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
       localStorage.setItem(SELECTED_SPEED_KEY, speed.toString());
     } catch (error) {
       console.warn('Failed to save selected speed to localStorage:', error);
@@ -322,7 +331,7 @@ class TextToSpeechService {
 
   private initialize() {
     // Check if TTS API key is available
-    const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY || (import.meta as any).env?.VITE_ELEVENLABS_API_KEY;
     
     if (apiKey) {
       const clientOptions: { apiKey: string; baseUrl?: string } = {

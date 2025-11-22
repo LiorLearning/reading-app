@@ -5248,8 +5248,10 @@ const getSleepyPetImage = (clicks: number) => {
             })();
 
             return (
-              <button
+              <div
                 key={petId}
+                role="button"
+                tabIndex={0}
                 onClick={() => {
                   setCurrentPet(petId);
 
@@ -5265,7 +5267,18 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setCurrentPet(petId);
+                    PetProgressStorage.setCurrentSelectedPet(petId);
+                    try {
+                      localStorage.setItem('current_pet', petId);
+                      window.dispatchEvent(new CustomEvent('currentPetChanged'));
+                    } catch {}
+                  }
+                }}
+                className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 cursor-pointer ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
                   isActive ? 'border-white ring-2 ring-white/80' : 'border-white/40 hover:border-white/60'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
@@ -5307,7 +5320,7 @@ const getSleepyPetImage = (clicks: number) => {
                   <span className="mr-1">❤️</span>
                   <span>{petStreak}</span>
                 </button>
-              </button>
+              </div>
             );
           })}
           {/* Down arrow for sliding down */}
@@ -5843,11 +5856,4 @@ const getSleepyPetImage = (clicks: number) => {
 }
 
 // Default export for Next.js compatibility
-// Force dynamic rendering for Pages Router (useAuth requires client-side)
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
-
 export default PetPage;

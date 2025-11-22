@@ -44,9 +44,9 @@ export function useGeminiRealtimeSession(options: UseGeminiOptions = {}): UseGem
         ...rest
     } = options;
 
-    const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY as string;
+    const API_KEY = (process.env.NEXT_PUBLIC_GOOGLE_API_KEY || (import.meta as any).env?.VITE_GOOGLE_API_KEY) as string;
     if (typeof API_KEY !== "string") {
-        throw new Error("set REACT_APP_GEMINI_API_KEY in .env");
+        throw new Error("set NEXT_PUBLIC_GOOGLE_API_KEY in .env");
     }
 
     const client = useMemo(() => new GoogleGenAI({ apiKey: API_KEY, ...rest }), [API_KEY, rest]);

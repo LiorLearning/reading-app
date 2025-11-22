@@ -1,5 +1,7 @@
+'use client'
+
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// Navigation removed - not used in this component
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +23,7 @@ interface UserOnboardingProps {
 // We still persist default grade/level values under-the-hood to satisfy gating.
 
 const UserOnboarding: React.FC<UserOnboardingProps> = ({ onComplete }) => {
-  const navigate = useNavigate();
+  // Navigation removed - not used
   const { updateUserData, userData, user } = useAuth();
   const [username, setUsername] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("assignment");

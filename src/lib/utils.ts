@@ -1889,7 +1889,7 @@ export const formatAIMessage = (content: string, spellingWord?: string): string 
 };
 
 // Profanity moderation utility
-import profanityListRaw from "@/lib/profanity.txt?raw";
+import { profanityListRaw } from "@/lib/profanity";
 import OpenAI from 'openai';
 
 // Build a Set of profane words on first import for O(1) lookups

@@ -9,8 +9,8 @@ import InputBar from "@/components/comic/InputBar";
 import { aiService } from "@/lib/ai-service";
 import { ttsService } from "@/lib/tts-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
-import TopicComplete from "@/components-pages/TopicComplete";
-import PracticeNeeded from "@/components-pages/PracticeNeeded";
+import TopicComplete from "./TopicComplete";
+import PracticeNeeded from "./PracticeNeeded";
 import confetti from 'canvas-confetti';
 // Updated import from the correct file
 import { sampleMCQData, type MCQData, type MCQQuestion, type DragDropQuestion, type FillBlankQuestion, type TopicInfo, type Topic, type AIHook } from '../data/mcq-questions';
@@ -2524,12 +2524,5 @@ const MCQScreenTypeA: React.FC<MCQScreenTypeAProps> = ({
     </main>
   );
 };
-
-// Force dynamic rendering for Pages Router (useAuth requires client-side)
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
 
 export default MCQScreenTypeA;

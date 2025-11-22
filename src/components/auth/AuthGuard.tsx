@@ -7,7 +7,23 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const { user, userData, loading } = useAuth();
+  // SSR-safe: Only use auth on client side
+  let authResult: ReturnType<typeof useAuth>;
+  try {
+    authResult = useAuth();
+  } catch (error) {
+    // During SSR/prerendering, AuthProvider may not be available
+    // Return loading state to prevent errors
+    if (typeof window === 'undefined') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      );
+    }
+    throw error;
+  }
+  const { user, userData, loading } = authResult;
   let previouslySignedIn = false;
   try {
     previouslySignedIn = typeof window !== 'undefined' && (localStorage.getItem('previouslysignedin') === '1');

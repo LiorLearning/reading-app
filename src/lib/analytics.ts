@@ -31,8 +31,8 @@ function setSessionNumber(num: number, userId?: string | null): void {
 export const analytics = {
   init(): void {
     try {
-      const key = import.meta.env.VITE_POSTHOG_KEY;
-      const host = import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com';
+      const key = process.env.NEXT_PUBLIC_POSTHOG_KEY || (import.meta as any).env?.VITE_POSTHOG_KEY;
+      const host = process.env.NEXT_PUBLIC_POSTHOG_HOST || (import.meta as any).env?.VITE_POSTHOG_HOST || 'https://app.posthog.com';
       // If no env key is provided, assume snippet-based init is being used; silently no-op
       if (!key) return;
       // Env-based init (used when snippet is not present)
