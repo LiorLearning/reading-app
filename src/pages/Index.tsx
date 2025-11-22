@@ -753,6 +753,17 @@ Keep tone warm, brief, and curious.`;
   const [originalSpellingQuestion, setOriginalSpellingQuestion] = React.useState<SpellingQuestion | null>(null);
   // Track last successfully resolved spelling word to prevent immediate re-open
   const lastResolvedWordRef = React.useRef<string | null>(null);
+  // Persist the last seen question topic so non-question messages keep showing the same topic
+  const [lastQuestionTopicId, setLastQuestionTopicId] = React.useState<string | null>(null);
+  // Sticky topic that can be set by whiteboard or questions and retained between them
+  const [stickyTopicId, setStickyTopicId] = React.useState<string | null>(null);
+  // Keep lastQuestionTopicId updated whenever a new spell question appears
+  React.useEffect(() => {
+    const topicFromQuestion = (currentSpellQuestion?.topicId || (currentSpellQuestion as any)?.topicName || null) as string | null;
+    if (topicFromQuestion) {
+      setLastQuestionTopicId(topicFromQuestion);
+    }
+  }, [currentSpellQuestion]);
   // Dev reading topic state
   const [readingDevActive, setReadingDevActive] = React.useState<boolean>(false);
   const [readingDevIndex, setReadingDevIndex] = React.useState<number>(0);
@@ -4454,6 +4465,47 @@ Keep tone warm, brief, and curious.`;
     try { return isAssignmentGateActive(ASSIGNMENT_WHITEBOARD_QUESTION_THRESHOLD); } catch { return false; }
   }, [assignmentGateVersion]);
 
+  // Update sticky topic when whiteboard activates with a topic
+  React.useEffect(() => {
+    const whiteboardTopic = (devWhiteboardEnabled || isWhiteboardPromptActive) ? (WHITEBOARD_LESSON_TOPIC || null) as (string | null) : null;
+    if (whiteboardTopic && whiteboardTopic !== (stickyTopicId || null)) {
+      setStickyTopicId(whiteboardTopic);
+    }
+  }, [devWhiteboardEnabled, isWhiteboardPromptActive, WHITEBOARD_LESSON_TOPIC, stickyTopicId]);
+
+  // Update sticky topic when encountering a question whose topic differs
+  React.useEffect(() => {
+    const activeQuestionTopic = (currentSpellQuestion?.topicId || (currentSpellQuestion as any)?.topicName || null) as string | null;
+    if (isInQuestionMode && activeQuestionTopic && activeQuestionTopic !== (stickyTopicId || null)) {
+      setStickyTopicId(activeQuestionTopic);
+    }
+  }, [isInQuestionMode, currentSpellQuestion, stickyTopicId]);
+
+  // Resolve the topic to show in the header/progress:
+  // - If a whiteboard is active and its topic differs from the last question topic, prefer the whiteboard topic
+  // - Else, if we're in question mode, show the active question's topic
+  // - Else, persist the last seen question topic; fallback to selected topic
+  const uiTopicId = React.useMemo(() => {
+    const activeQuestionTopic = (currentSpellQuestion?.topicId || (currentSpellQuestion as any)?.topicName || null) as string | null;
+    const whiteboardTopic = (devWhiteboardEnabled || isWhiteboardPromptActive) ? (WHITEBOARD_LESSON_TOPIC || null) as (string | null) : null;
+    if (whiteboardTopic && whiteboardTopic !== (lastQuestionTopicId || null)) {
+      return whiteboardTopic;
+    }
+    if (isInQuestionMode && activeQuestionTopic) {
+      return activeQuestionTopic;
+    }
+    return (stickyTopicId || lastQuestionTopicId || selectedTopicId || '') as string;
+  }, [
+    devWhiteboardEnabled,
+    isWhiteboardPromptActive,
+    WHITEBOARD_LESSON_TOPIC,
+    isInQuestionMode,
+    currentSpellQuestion,
+    stickyTopicId,
+    lastQuestionTopicId,
+    selectedTopicId
+  ]);
+
   // For new users defaulting to assignment, ensure the gate is started
   React.useEffect(() => {
     const gradeName = (userData?.gradeDisplayName || '').toLowerCase();
@@ -4473,16 +4525,16 @@ Keep tone warm, brief, and curious.`;
 
   const recomputeHeaderTopicProgress = React.useCallback(() => {
     const currentGrade = selectedGradeFromDropdown || userData?.gradeDisplayName || '';
-    if (!currentGrade || !selectedTopicId) {
+    if (!currentGrade || !uiTopicId) {
       setHeaderTopicProgressPct(0);
       return 0;
     }
-    const tp = getSpellboxTopicProgress(currentGrade, selectedTopicId);
+    const tp = getSpellboxTopicProgress(currentGrade, uiTopicId);
     // Use success rate (first-attempt correct ratio), same metric used in View Progress
     const pct = tp ? Math.max(0, Math.min(100, tp.successRate || 0)) : 0;
     setHeaderTopicProgressPct(Math.round(pct));
     return pct;
-  }, [selectedGradeFromDropdown, userData?.gradeDisplayName, selectedTopicId]);
+  }, [selectedGradeFromDropdown, userData?.gradeDisplayName, uiTopicId]);
 
   // Keep header progress in sync when topic/grade changes or local spelling state moves
   React.useEffect(() => {
@@ -5425,11 +5477,11 @@ Keep tone warm, brief, and curious.`;
             )}
 
             {/* Lesson chip with inline progress - shown when a topic is active. Click to toggle whiteboard */}
-            {selectedTopicId && (
+            {uiTopicId && (
               (() => {
-                const topicForChip = whiteboardGradeEligible ? (grade1DisplayedTopicId || selectedTopicId) : selectedTopicId;
-                // Resolve effective topic id without requiring a lesson script
-                const resolvedTopicId = topicForChip;
+                // Show the pill for the CURRENT topic the kid is on.
+                // Prefer the topic from the active spell question; fallback to selectedTopicId.
+                const resolvedTopicId = uiTopicId;
                 // Spelling-only guard: only show chip for spelling topics for this grade
                 const spellingTopicIds = getSpellingTopicIds(currentGradeDisplayName);
                 if (!spellingTopicIds.includes(resolvedTopicId)) return null;
@@ -5437,27 +5489,13 @@ Keep tone warm, brief, and curious.`;
                 const lessonNumber = getGlobalSpellingLessonNumber(resolvedTopicId) || 1;
                 const lessonTitle = (sampleMCQData?.topics?.[resolvedTopicId]?.topicInfo?.progressTopicName)
                   || resolvedTopicId;
-                const handleToggle = () => {
-                  setIsManualWhiteboardOpen(prev => !prev);
-                };
-                const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleToggle();
-                  }
-                };
                 return (
                   <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleToggle}
-                    onKeyDown={handleKeyDown}
-                    title={'Lesson'}
-                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative cursor-pointer hover:bg-gray-50`}
+                    className={`hidden sm:flex items-center ml-2 px-3 py-1.5 rounded-full bg-white text-black border-2 border-foreground shadow-solid relative`}
                     style={{ minWidth: '220px' }}
                   >
-                    <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson ${lessonNumber}`}</span>
-                    <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">{` • ${lessonTitle}`}</span>
+                    <span className="font-kids font-extrabold text-[hsl(var(--primary))] mr-2">{`Lesson :`}</span>
+                    <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[240px]">{`${lessonTitle}`}</span>
                   </div>
                 );
               })()
