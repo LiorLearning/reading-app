@@ -15,7 +15,6 @@ interface MicCheckModalProps {
 }
 
 const PHRASES_EN = [
-	"I hear you clearly",
 	"The dog ran fast",
 	"The cat is on the mat",
 ];
@@ -64,8 +63,8 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 
 	const speakInstruction = React.useCallback(async () => {
 		try {
-			const instruction = `Read the below message aloud: ${phrase}`;
-			await ttsService.speak(instruction, { messageId: 'krafty-mic-check' });
+			const instruction = `Repeat after me: ${phrase}`;
+			await ttsService.speak(instruction, { messageId: 'krafty-mic-check', speed: 0.7, voice: 'cgSgspJ2msm6clMCkdW9' });
 		} catch {
 			// ignore TTS errors
 		}
@@ -73,7 +72,7 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 
 	const speakPhraseOnly = React.useCallback(async () => {
 		try {
-			await ttsService.speak(phrase, { messageId: 'krafty-mic-check-phrase' });
+			await ttsService.speak(phrase, { messageId: 'krafty-mic-check-phrase', speed: 0.7, voice: 'cgSgspJ2msm6clMCkdW9' });
 		} catch {
 			// ignore TTS errors
 		}
@@ -303,20 +302,13 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 				onEscapeKeyDown={(e) => e.preventDefault()}
 			>
 				<DialogHeader>
-					<DialogTitle className="text-2xl">Quick mic check</DialogTitle>
+					<DialogTitle className="text-xl">Quick mic check</DialogTitle>
 				</DialogHeader>
 
-				<div className="mt-3 space-y-3">
-					{/* Simple level meter */}
-					<div className="h-3 w-full bg-muted rounded-full overflow-hidden">
-						<div
-							className="h-full bg-primary transition-all"
-							style={{ width: `${Math.min(100, Math.max(5, Math.round(level * 100)))}%` }}
-						/>
-					</div>
-					<div className="flex items-center justify-between gap-2">
-						<div className="text-sm text-muted-foreground">
-							Message: <span className="font-semibold">{phrase}</span>
+				<div className="mt-3 space-y-4">
+					<div className="flex items-center justify-center gap-3">
+						<div className="text-2xl md:text-3xl text-center text-foreground font-bold">
+							{phrase}
 						</div>
 						<Button
 							size="icon"
@@ -326,7 +318,7 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 							aria-label="Play message"
 							title="Play message"
 						>
-							<Volume2 className="h-4 w-4" />
+							<Volume2 className="h-5 w-5" />
 						</Button>
 					</div>
 					
@@ -337,14 +329,7 @@ export const MicCheckModal: React.FC<MicCheckModalProps> = ({ open, onClose, onP
 					) : null}
 				</div>
 
-				<div className="mt-5 flex items-center justify-end gap-3">
-					<Button
-						variant="secondary"
-						onClick={handleRetry}
-						disabled={isRecording || isProcessing || isSuccess}
-					>
-						New phrase
-					</Button>
+				<div className="mt-5 flex items-center justify-center gap-3">
 					<Button
 						type="button"
 						variant="comic"
