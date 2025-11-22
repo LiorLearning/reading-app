@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import OpenAI from 'openai';
 import { cn, containsProfanity } from '@/lib/utils';
-import { playClickSound } from '@/lib/sounds';
+import { playClickSound, playImageCompleteSound } from '@/lib/sounds';
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { useTTSSpeaking } from '@/hooks/use-tts-speaking';
 import { aiService } from '@/lib/ai-service';
@@ -1342,7 +1342,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       if (!cancelled) {
         setIsWaitingForCoach(false);
       }
-    }, 12000); // 12s safety window so the spinner never gets stuck
+    }, 5000); // 5s safety window so the button never gets stuck
 
     return () => {
       cancelled = true;
@@ -1685,6 +1685,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
           try { interruptRealtimeSession(); } catch {}
         }
         triggerConfetti();
+        playImageCompleteSound();
         if (isReading) {
           setReadingMismatchedIndices([]);
         }
@@ -2541,8 +2542,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                   // Keep fully opaque when delay-gated next
                   nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
-                  // Make slightly transparent when unattempted/unchanged
-                  submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
+                  // Make slightly transparent when unattempted/unchanged or evaluating
+                  (submitDisabledUnattempted || isEvaluating) && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
                   highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
                 )}
               >
@@ -2966,7 +2967,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   className={cn(
                     'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                     nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
-                    submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
+                    (submitDisabledUnattempted || isEvaluating) && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
                   )}
                 >
                   <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />

@@ -18,7 +18,7 @@ import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid
 import { sampleMCQData } from "../data/mcq-questions";
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
 import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
-import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
+import { playMessageSound, playClickSound, playImageCompleteSound } from "@/lib/sounds";
 import analytics from '@/lib/analytics';
 
 import { useComic, ComicPanel } from "@/hooks/use-comic";
@@ -5416,11 +5416,9 @@ Keep tone warm, brief, and curious.`;
 
   const isAdventureInputDisabled = disableInputForSpell || isWhiteboardPromptActive || isWhiteboardLessonActive;
   const adventureInputDisabledReason = isAdventureInputDisabled
-    ? (disableInputForSpell
-        ? 'SpellBox awaiting Next'
-        : (isWhiteboardPromptActive
-            ? 'Whiteboard prompt'
-            : (isWhiteboardLessonActive ? 'Whiteboard lesson' : 'Disabled')))
+    ? (isWhiteboardPromptActive
+        ? 'Whiteboard prompt'
+        : (isWhiteboardLessonActive ? 'Whiteboard lesson' : undefined))
     : undefined;
 
   return (
@@ -6581,6 +6579,10 @@ Keep tone warm, brief, and curious.`;
                     softFocus={isLeftBubbleVisible && !isGeneratingAdventureImage}
                     onImageDisplayed={() => {
                       // console.log('🖼️ Image displayed for panel:', current.id);
+                      // Play sound when a newly generated image is displayed
+                      if (current.id === newlyCreatedPanelId) {
+                        playImageCompleteSound();
+                      }
                     }}
                     shouldZoom={current.id === zoomingPanelId}
                     onPreviousPanel={() => {

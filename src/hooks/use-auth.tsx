@@ -16,9 +16,9 @@ import {
   linkWithPopup,
   reload
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, runTransaction, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { stateStoreReader, stateStoreApi } from '@/lib/state-store-api';
+import { stateStoreApi } from '@/lib/state-store-api';
 import { CoinSystem } from '@/pages/coinSystem';
 import { PetProgressStorage } from '@/lib/pet-progress-storage';
 import { PetDataService } from '@/lib/pet-data-service';
@@ -92,83 +92,63 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [hasGoogleAccount, setHasGoogleAccount] = useState(false);
 
   useEffect(() => {
-    let unsubscribeUserState: (() => void) | null = null;
-    let unsubscribeDailyQuests: (() => void) | null = null;
-    let lastRolloverAttempt = 0; // throttle rollover writes
     let initialAuthResolved = false;
-    let focusListener: ((this: Window, ev: Event) => any) | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+
       // Mark initial auth resolution
       if (!initialAuthResolved) {
         initialAuthResolved = true;
         // If still no user after restoration, start anonymous session now
         if (!user) {
           try { await signInAnonymously(auth); } catch {}
-          // onAuthStateChanged will fire again after anon sign-in
           return;
         }
       }
-      
+
       if (user) {
-        // Identify in analytics after auth is ready
+        // Identify in analytics
         try { analytics.identify(user.uid, { is_anonymous: user.isAnonymous }); } catch {}
-        // Mark that this device has previously signed in with a real account
         try {
-          if (!user.isAnonymous) {
-            localStorage.setItem('previouslysignedin', '1');
-          }
+          if (!user.isAnonymous) localStorage.setItem('previouslysignedin', '1');
         } catch {}
-        // Load user data from Firestore
+
+        setHasGoogleAccount(user.providerData.some(provider => provider.providerId === 'google.com'));
+
+        // 1. Profile Load & Throttled Updates
         try {
           const userDocRef = doc(db, 'users', user.uid);
           const userDoc = await getDoc(userDocRef);
 
-          const fetchAndUpdateCountry = async (prevCountry?: string, prevCountryCode?: string) => {
-            try {
-              const res = await fetch('https://ipwho.is/?fields=country,country_code');
-              if (!res.ok) return;
-              const geo: any = await res.json();
-              const country = String((geo?.country || '')).trim();
-              const countryCode = String((geo?.country_code || '')).trim();
-              const updates: any = {};
-              if (country && country !== (prevCountry || '')) updates.country = country;
-              if (countryCode && countryCode !== (prevCountryCode || '')) updates.countryCode = countryCode;
-              if (Object.keys(updates).length > 0) {
-                await updateDoc(userDocRef, updates);
-              }
-            } catch {}
-          };
-          
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
-            // Backfill email if Auth has it and doc is missing/different
+            const updates: Record<string, any> = {};
+            const now = new Date();
+
+            // Throttled lastLoginAt update (once per hour)
+            const lastLogin = data.lastLoginAt ? (data.lastLoginAt as any).toDate() : new Date(0);
+            if (now.getTime() - lastLogin.getTime() > 3600 * 1000) {
+               updates.lastLoginAt = serverTimestamp();
+            }
+
+            // Backfill email if needed
             try {
               const authEmail = user.email || '';
               const docEmail = (data?.email || '').trim();
               if (!user.isAnonymous && authEmail && authEmail !== docEmail) {
-                await updateDoc(userDocRef, { email: authEmail });
+                updates.email = authEmail;
                 data.email = authEmail;
               }
             } catch {}
-            setUserData(data);
-            // Trigger background migration of local data to Firebase and reconcile trackers
-            try { autoMigrateOnLogin(user.uid); } catch {}
-            
-            // Check if user signed in with Google
-            const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
-            setHasGoogleAccount(isGoogleUser);
-            
-            // Update only users/{uid}.lastLoginAt; do not mutate streak on login
-            try {
-              await updateDoc(userDocRef, { lastLoginAt: new Date() });
-            } catch (e) {
-              console.warn('Failed to update lastLoginAt:', e);
+
+            if (Object.keys(updates).length > 0) {
+               try { await updateDoc(userDocRef, updates); } catch (e) { console.warn('Profile update failed', e); }
             }
-            try { await fetchAndUpdateCountry(data.country, data.countryCode); } catch {}
+            setUserData(data);
+            try { autoMigrateOnLogin(user.uid); } catch {}
           } else {
-            // New user, set initial data - default grade is "assignment"
+             // New User Creation
             const newUserData: UserData = {
               uid: user.uid,
               username: user.displayName || '',
@@ -179,459 +159,209 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               levelDisplayName: 'Start Level',
               isFirstTime: true,
               createdAt: new Date(),
-              lastLoginAt: new Date()
+              lastLoginAt: serverTimestamp() as any
             };
-            
             await setDoc(userDocRef, newUserData);
             setUserData(newUserData);
-            try { await fetchAndUpdateCountry(undefined, undefined); } catch {}
-            // Trigger background migration (noop for brand new users) and tracker reconciliation
             try { autoMigrateOnLogin(user.uid); } catch {}
-            
-            // Check if user signed in with Google
-            const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
-            setHasGoogleAccount(isGoogleUser);
           }
-
-          // Daily quest bootstrap removed per product requirement to avoid writes on refresh
         } catch (error) {
-          console.error('Error loading user data:', error);
+          console.error('Error loading user profile:', error);
         }
 
-        // Read-only hydration from Firestore to local UI stores (no writes to Firestore)
+        // 2. Fetch State & Quests (Single Fetch)
         try {
-          const overview = await stateStoreReader.fetchUserOverview(user.uid);
-          if (overview) {
-            // Coins and streak
-            CoinSystem.setCoins(overview.coins);
-            try {
-              const streakVal = Number(overview.streak || 0);
-              localStorage.setItem('litkraft_streak', String(streakVal));
-              window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: streakVal } }));
-            } catch {}
+            const [userStateSnap, dailyQuestsSnap] = await Promise.all([
+                getDoc(doc(db, 'userStates', user.uid)),
+                getDoc(doc(db, 'dailyQuests', user.uid))
+            ]);
 
-            // Pets: mark owned and hydrate progress/levels from total correct answers
-            const petIds = Object.keys(overview.pets || {});
-            const ensureLevelFromCoins = (coins: number): number => {
-              if (coins >= 300) return 5;
-              if (coins >= 200) return 4;
-              if (coins >= 120) return 3;
-              if (coins >= 50) return 2;
-              return 1;
-            };
-            // Load pet names map and apply to local storage
-            let petNamesMap: Record<string, string> = {};
-            try { petNamesMap = await stateStoreReader.getPetNames(user.uid) as any; } catch {}
-            for (const petId of petIds) {
-              const info = overview.pets[petId];
-              const petCoins = (info?.totalCorrect || 0) * 10; // 10 coins per question
-              const petData = PetProgressStorage.getPetProgress(petId, petId);
-              petData.generalData.isOwned = true;
-              petData.levelData.totalAdventureCoinsEarned = petCoins;
-              const newLevel = ensureLevelFromCoins(petCoins);
-              petData.levelData.currentLevel = newLevel;
-              // Apply name from Firestore if available
-              try {
-                const nm = (petNamesMap && typeof petNamesMap[petId] === 'string') ? petNamesMap[petId] : undefined;
-                if (nm && nm.trim()) {
-                  petData.petName = nm.trim();
-                } else {
-                  // Backfill: if local has name and Firestore missing, persist once
-                  const localName = petData.petName;
-                  if (localName && localName.trim()) {
-                    try { await stateStoreApi.setPetName({ userId: user.uid, pet: petId, name: localName.trim() }); } catch {}
-                  }
+            const userStateData = userStateSnap.exists() ? userStateSnap.data() : {};
+            const dailyQuestsData = dailyQuestsSnap.exists() ? dailyQuestsSnap.data() : {};
+
+            // --- Process User State ---
+            const coins = Number(userStateData.coins ?? 0);
+            CoinSystem.setCoins(coins);
+            window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins } }));
+
+            // Lifetime coins
+             try {
+                const petsMap = (userStateData?.pets || {}) as Record<string, number>;
+                const totalQuestions = Object.values(petsMap).reduce((acc, v) => acc + Number(v || 0), 0);
+                localStorage.setItem('litkraft_cumulative_coins_earned', String(totalQuestions * 10));
+             } catch {}
+
+            // Streak
+            const streakVal = Number(userStateData.streak ?? 0);
+            localStorage.setItem('litkraft_streak', String(streakVal));
+            window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: streakVal } }));
+
+            // Weekly Hearts
+            const weeklyHearts = (userStateData?.weeklyHearts || {}) as Record<string, Record<string, boolean>>;
+            localStorage.setItem('litkraft_weekly_hearts', JSON.stringify(weeklyHearts));
+            window.dispatchEvent(new CustomEvent('weeklyHeartsUpdated', { detail: weeklyHearts }));
+
+            // Pets Ownership & Levels
+            const names = (userStateData?.petnames || {}) as Record<string, string>;
+            const ownedPets = Object.keys((Object.keys(names).length > 0 ? names : (userStateData.pets ?? {})));
+
+            ownedPets.forEach(petId => {
+                const totalCorrect = Number(userStateData.pets?.[petId] ?? 0);
+                const petCoins = totalCorrect * 10;
+                const petData = PetProgressStorage.getPetProgress(petId, petId);
+                petData.generalData.isOwned = true;
+                petData.levelData.totalAdventureCoinsEarned = petCoins;
+
+                if (petCoins >= 300) petData.levelData.currentLevel = 5;
+                else if (petCoins >= 200) petData.levelData.currentLevel = 4;
+                else if (petCoins >= 120) petData.levelData.currentLevel = 3;
+                else if (petCoins >= 50) petData.levelData.currentLevel = 2;
+                else petData.levelData.currentLevel = 1;
+
+                const nm = names[petId];
+                if (nm && nm.trim()) petData.petName = nm.trim();
+
+                // Sync daily coins
+                try {
+                    const today = new Date().toISOString().slice(0, 10);
+                    petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
+                    petData.dailyCoins.todayDate = today;
+                    petData.dailyCoins.todayCoins = petCoins;
+                } catch {}
+
+                PetProgressStorage.setPetProgress(petData);
+                PetDataService.addOwnedPet(petId);
+            });
+
+            // Ensure selection
+             try {
+                if (!PetProgressStorage.getCurrentSelectedPet() && ownedPets.length > 0) {
+                    PetProgressStorage.setCurrentSelectedPet(ownedPets[0]);
                 }
-              } catch {}
-              try {
-                const today = new Date().toISOString().slice(0, 10);
-                petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
-                petData.dailyCoins.todayDate = today;
-                petData.dailyCoins.todayCoins = petCoins; // reflect Firestore-derived coins for consistent avatar
-              } catch {}
-              PetProgressStorage.setPetProgress(petData);
-              // Ensure local owned pets list is hydrated for UI selectors
-              try { PetDataService.addOwnedPet(petId); } catch {}
-            }
-
-            // Select first owned pet if none selected
-            try {
-              const currentSelected = PetProgressStorage.getCurrentSelectedPet();
-              if (!currentSelected && petIds.length > 0) {
-                PetProgressStorage.setCurrentSelectedPet(petIds[0]);
-              }
-            } catch {}
-          }
-
-          // Daily quest pet-wise states (read-only)
-          try {
-            const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
-            // Store locally for UI consumers; fire an event as well
-            localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(questStates));
-            // Eagerly reflect completed daily quests in todayCoins for emotion rendering
-            try {
-              const today = new Date().toISOString().slice(0, 10);
-              const targetCoins = 50; // 5 correct * 10 coins
-              questStates.forEach((s: any) => {
-                const prog = Number(s?.progress || 0);
-                const petId = (s as any)?.pet;
-                if (!petId) return;
-                if (prog >= 5) {
-                  const pd = PetProgressStorage.getPetProgress(petId, petId);
-                  pd.dailyCoins = pd.dailyCoins || { todayDate: today, todayCoins: 0 };
-                  if (pd.dailyCoins.todayDate !== today) {
-                    pd.dailyCoins.todayDate = today;
-                    pd.dailyCoins.todayCoins = 0;
-                  }
-                  if ((pd.dailyCoins.todayCoins || 0) < targetCoins) {
-                    pd.dailyCoins.todayCoins = targetCoins;
-                    PetProgressStorage.setPetProgress(pd);
-                  }
-                }
-              });
-            } catch {}
-            // Seed sleep window from server on initial sign-in (per-pet keys)
-            try {
-              const now = Date.now();
-              // Prefer current pet, else any active sleep
-              const currentPet = PetProgressStorage.getCurrentSelectedPet();
-              let s = currentPet ? questStates.find(x => x.pet === currentPet) : null;
-              if (!s) s = questStates.find(x => (x as any).sleepEndAt);
-              const endAny = s?.sleepEndAt as any;
-              const startAny = s?.sleepStartAt as any;
-              const endMs = endAny?.toMillis ? endAny.toMillis() : (endAny ? new Date(endAny).getTime() : 0);
-              const startMs = startAny?.toMillis ? startAny.toMillis() : (startAny ? new Date(startAny).getTime() : 0);
-              if (endMs && now < endMs) {
-                const petId = (s as any)?.pet || currentPet;
-                if (petId) {
-                  localStorage.setItem(`pet_sleep_data_${petId}`, JSON.stringify({ clicks: 3, timestamp: startMs || now, sleepStartTime: startMs || now, sleepEndTime: endMs }));
-                }
-              }
-            } catch {}
-            window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: questStates }));
-
-            // Ensure daily sadness assignment exists for today (progress-agnostic)
-            try {
-              const sad = await stateStoreApi.ensureDailySadnessAssigned(user.uid);
-              // Mirror a compact local flag for UI gating without extra reads
-              try { localStorage.setItem('litkraft_daily_sadness', JSON.stringify(sad)); } catch {}
-              window.dispatchEvent(new CustomEvent('dailySadnessUpdated', { detail: sad }));
             } catch {}
 
-            // Rollover on sign-in hydration if any pet completed and cooldown passed or missing
+            // --- Process Daily Quests ---
+            const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
+            const target = 5;
+
+            // Use ownedPets derived from userState to filter/map dailyQuests
+            const states = ownedPets.map((pet) => {
+                const petObj = (dailyQuestsData?.[pet] ?? {}) as any;
+                const index = Number(petObj?._activityIndex ?? 0) % seq.length;
+                const indexKey = seq[index];
+
+                const cuAny: any = petObj?._cooldownUntil || null;
+                const cuMs = cuAny?.toMillis ? cuAny.toMillis() : (cuAny ? new Date(cuAny).getTime() : 0);
+                const petHasActiveCooldown = Boolean(cuMs && Date.now() < cuMs);
+
+                const userAct = (dailyQuestsData?._userCurrentActivity || seq[0]) as string;
+                const pointerKey = (userAct) ? userAct : indexKey;
+                const lastCompleted = (petObj?._lastCompletedActivity) ? petObj._lastCompletedActivity : indexKey;
+
+                const effectiveKey = petHasActiveCooldown ? lastCompleted : pointerKey;
+                const prog = Number(petObj?.[effectiveKey] ?? 0);
+
+                return {
+                    pet,
+                    activity: effectiveKey,
+                    progress: prog,
+                    target,
+                    completed: prog >= target,
+                    activityIndex: index,
+                    cooldownUntil: petObj?._cooldownUntil ?? null,
+                    sleepStartAt: petObj?._sleepStartAt || null,
+                    sleepEndAt: petObj?._sleepEndAt || null
+                };
+            });
+
+            localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
+            window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
+
+             // Derived data (Streaks, User Todo, Sadness) from DailyQuests
             try {
-              const nowMs = Date.now();
-              const needsRollover = questStates.some((s: any) => {
-                const completed = Number(s?.progress || 0) >= 5;
-                const cu: any = s?.cooldownUntil || null;
-                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
-                return completed && (!cuMs || nowMs >= cuMs);
-              });
-              if (needsRollover) {
-                lastRolloverAttempt = nowMs;
-                const owned = questStates.map((x: any) => x.pet).filter(Boolean);
-                await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: owned });
-              }
-            } catch {}
-          } catch (e) {
-            console.warn('Failed fetching daily quest states:', e);
-          }
-        } catch (e) {
-          console.warn('Hydration from Firestore failed:', e);
-        }
-
-        // Record visit time and normalize per-pet streaks once on sign-in
-        try {
-          await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid);
-        } catch {}
-
-        // Live listeners (real-time updates)
-        try {
-          const seq = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care', 'story'];
-          const target = 5;
-          let ownedPets: string[] = [];
-          let didTriggerPostLoginMigration = false;
-
-          // UserState live: coins + owned pets + per-pet levels
-          unsubscribeUserState = onSnapshot(doc(db, 'userStates', user.uid), (snap) => {
-            const d = snap.data() as any;
-            if (!d) return;
-            // Coins
-            CoinSystem.setCoins(Number(d.coins ?? 0));
-            // Derive lifetime user coins for top-right level bar from per-pet question counts (SpellBox-only)
-            try {
-              const petsMap = (d?.pets || {}) as Record<string, number>;
-              const totalQuestions = Object.values(petsMap).reduce((acc, v) => acc + Number(v || 0), 0);
-              const derivedLifetimeCoins = totalQuestions * 10; // 10 coins per question
-
-              // Persist to localStorage where PetPage reads cumulative coins for level calc
-              localStorage.setItem('litkraft_cumulative_coins_earned', String(derivedLifetimeCoins));
-
-              // Nudge UI to refresh level bar (PetPage listens to this)
-              window.dispatchEvent(new CustomEvent('coinsChanged', { detail: { coins: Number(d.coins ?? 0) } }));
-            } catch (e) {
-              console.warn('Failed to hydrate lifetime coins from pets map', e);
-            }
-            // Streak broadcast for UI
-            try {
-              const streakVal = Number(d.streak ?? 0);
-              localStorage.setItem('litkraft_streak', String(streakVal));
-              window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: streakVal } }));
-            } catch {}
-            // Weekly hearts broadcast for UI (modal and others)
-            try {
-              const map = (d?.weeklyHearts || {}) as Record<string, Record<string, boolean>>;
-              localStorage.setItem('litkraft_weekly_hearts', JSON.stringify(map));
-              window.dispatchEvent(new CustomEvent('weeklyHeartsUpdated', { detail: map }));
-            } catch {}
-
-            // Sync pet names to local storage
-            const names = (d?.petnames || {}) as Record<string, string>;
-            // Owned pets (prefer petnames keys; fallback to pets counts)
-            ownedPets = Object.keys((Object.keys(names).length > 0 ? names : (d.pets ?? {})));
-            // Hydrate levels
-            for (const petId of ownedPets) {
-              const totalCorrect = Number(d.pets?.[petId] ?? 0);
-              const petCoins = totalCorrect * 10;
-              const petData = PetProgressStorage.getPetProgress(petId, petId);
-              petData.generalData.isOwned = true;
-              petData.levelData.totalAdventureCoinsEarned = petCoins;
-              if (petCoins >= 300) petData.levelData.currentLevel = 5; else if (petCoins >= 200) petData.levelData.currentLevel = 4; else if (petCoins >= 120) petData.levelData.currentLevel = 3; else if (petCoins >= 50) petData.levelData.currentLevel = 2; else petData.levelData.currentLevel = 1;
-              try {
-                const nm = (names && typeof names[petId] === 'string') ? names[petId] : undefined;
-                if (nm && nm.trim()) {
-                  petData.petName = nm.trim();
-                }
-              } catch {}
-              try {
-                const today = new Date().toISOString().slice(0, 10);
-                petData.dailyCoins = petData.dailyCoins || { todayDate: today, todayCoins: 0 };
-                petData.dailyCoins.todayDate = today;
-                petData.dailyCoins.todayCoins = petCoins; // keep avatar emotion in sync globally
-              } catch {}
-              PetProgressStorage.setPetProgress(petData);
-              // Keep local pet list in sync for selector
-              try { PetDataService.addOwnedPet(petId); } catch {}
-            }
-
-            // Ensure a current selected pet is set before migration/reconciliation
-            try {
-              const currentSelected = PetProgressStorage.getCurrentSelectedPet();
-              if (!currentSelected) {
-                const firstOwned = (ownedPets && ownedPets.length > 0) ? ownedPets[0] : 'dog';
-                PetProgressStorage.setCurrentSelectedPet(firstOwned);
-              }
-            } catch {}
-
-            // Trigger background migration after pet selection is guaranteed
-            if (!didTriggerPostLoginMigration) {
-              didTriggerPostLoginMigration = true;
-              try { autoMigrateOnLogin(user.uid); } catch {}
-            }
-          });
-
-          // DailyQuests live: quest progress bar
-          unsubscribeDailyQuests = onSnapshot(doc(db, 'dailyQuests', user.uid), (snap) => {
-            const d = (snap.data() as any) || {};
-            if (!ownedPets || ownedPets.length === 0) {
-              ownedPets = Object.keys((d || {})).filter((k) => k !== 'createdAt' && k !== 'updatedAt');
-            }
-          const states = ownedPets.map((pet) => {
-            const petObj = (d?.[pet] ?? {}) as any;
-            const index = Number(petObj?._activityIndex ?? 0) % seq.length;
-            const indexKey = seq[index];
-            const cuAny: any = petObj?._cooldownUntil || null;
-            const cuMs = cuAny?.toMillis ? cuAny.toMillis() : (typeof cuAny?.seconds === 'number' ? cuAny.seconds * 1000 : (typeof cuAny === 'number' ? cuAny : (typeof cuAny === 'string' ? (isNaN(Date.parse(cuAny)) ? null : Date.parse(cuAny)) : (cuAny ? new Date(cuAny).getTime() : null))));
-            const petHasActiveCooldown = Boolean(cuMs && Date.now() < cuMs);
-            const userAct = (d?._userCurrentActivity || seq[0]) as string;
-            const pointerKey = (typeof userAct === 'string' && userAct) ? userAct : indexKey;
-            const lastCompleted = (typeof petObj?._lastCompletedActivity === 'string' && petObj._lastCompletedActivity) ? petObj._lastCompletedActivity : indexKey;
-            const effectiveKey = petHasActiveCooldown ? lastCompleted : pointerKey;
-            const prog = Number(petObj?.[effectiveKey] ?? 0);
-            const sleepStartAt = petObj?._sleepStartAt || null;
-            const sleepEndAt = petObj?._sleepEndAt || null;
-            return { pet, activity: effectiveKey, progress: prog, target, completed: prog >= target, activityIndex: index, cooldownUntil: petObj?._cooldownUntil ?? null, sleepStartAt, sleepEndAt };
-          });
-            try {
-              localStorage.setItem('litkraft_daily_quests_state', JSON.stringify(states));
-              // Publish per-pet sleep streaks and a derived total for top-right hearts
-              try {
-                const pets = (ownedPets && ownedPets.length > 0) ? ownedPets : Object.keys(d).filter((k) => k !== 'createdAt' && k !== 'updatedAt' && !k.startsWith('_'));
+                // Streaks
                 const perPet: Record<string, number> = {};
                 const perPetSlots: Record<string, number[]> = {};
-                let total = 0;
-                pets.forEach((p) => {
-                  const v = Number(((d?.[p] || {}) as any)?.streak || 0);
-                  perPet[p] = Number.isFinite(v) ? v : 0;
-                  total += perPet[p];
-                  // Mirror 5-slot array if present
-                  const slotsAny = ((d?.[p] || {}) as any)?.streakSlots;
-                  const slots = Array.isArray(slotsAny) ? slotsAny.map((x: any) => (Number(x) ? 1 : 0)) : [];
-                  if (slots.length === 5) perPetSlots[p] = slots;
+                ownedPets.forEach(p => {
+                    const v = Number(((dailyQuestsData?.[p] || {}) as any)?.streak || 0);
+                    perPet[p] = v;
+                    const slots = ((dailyQuestsData?.[p] || {}) as any)?.streakSlots;
+                    if (Array.isArray(slots) && slots.length === 5) perPetSlots[p] = slots.map((x: any) => Number(x) ? 1 : 0);
                 });
                 localStorage.setItem('litkraft_pet_streaks', JSON.stringify(perPet));
                 localStorage.setItem('litkraft_pet_streak_slots', JSON.stringify(perPetSlots));
-                localStorage.setItem('litkraft_streak', String(total));
-                window.dispatchEvent(new CustomEvent('streakChanged', { detail: { streak: total } }));
-              } catch {}
-            // Also hydrate a user-scoped pointer for the shared daily assignment if present
-            try {
-              const userAct = (d?._userCurrentActivity || (Array.isArray(seq) && seq.length > 0 ? seq[0] : 'house')) as string;
-              const lastSwitchAny = (d?._userLastSwitchAt as any) || null;
-              const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : (lastSwitchAny ? new Date(lastSwitchAny).getTime() : Date.now());
-              localStorage.setItem('litkraft_user_todo', JSON.stringify({ activity: userAct, lastSwitchTime: lastSwitchMs }));
-              window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: { activity: userAct, lastSwitchTime: lastSwitchMs } }));
-            } catch {}
-              // Also expose sadness assignment and any client-forced sadness (purchase) if present
-              try {
-                const sad = (d?._sadness || null);
-                if (sad && sad.date) {
-                  localStorage.setItem('litkraft_daily_sadness', JSON.stringify(sad));
-                  window.dispatchEvent(new CustomEvent('dailySadnessUpdated', { detail: sad }));
-                }
-                const sadForce = (d?._sadForce || null);
-                if (sadForce && sadForce.date) {
-                  // Convert pets object map to string[] for compact client consumption
-                  const forcedList = Array.isArray(sadForce.pets) ? sadForce.pets : Object.keys(sadForce.pets || {});
-                  localStorage.setItem('litkraft_forced_sad_pets', JSON.stringify({ date: sadForce.date, pets: forcedList }));
-                  window.dispatchEvent(new CustomEvent('dailyForcedSadUpdated', { detail: { date: sadForce.date, pets: forcedList } }));
-                }
-              } catch {}
-              // Mirror live sleep windows per-pet for the timer
-              try {
-                states.forEach((s) => {
-                  const petId = (s as any)?.pet;
-                  if (!petId) return;
-                  const startMs = (s as any)?.sleepStartAt?.toMillis ? (s as any).sleepStartAt.toMillis() : (s as any)?.sleepStartAt ? new Date((s as any).sleepStartAt).getTime() : 0;
-                  const endMs = (s as any)?.sleepEndAt?.toMillis ? (s as any).sleepEndAt.toMillis() : (s as any)?.sleepEndAt ? new Date((s as any).sleepEndAt).getTime() : 0;
-                  if (endMs && Date.now() < endMs) {
-                    localStorage.setItem(`pet_sleep_data_${petId}`, JSON.stringify({ clicks: 3, timestamp: startMs, sleepStartTime: startMs, sleepEndTime: endMs }));
-                  } else {
-                    localStorage.removeItem(`pet_sleep_data_${petId}`);
-                  }
-                });
-              } catch {}
-              // Reflect partial daily quest progress in todayCoins for emotion rendering (realtime)
-              try {
-                const today = new Date().toISOString().slice(0, 10);
-                const targetCoins = 50; // 5 correct * 10 coins
-                states.forEach((s: any) => {
-                  const prog = Number(s?.progress || 0);
-                  const petId = (s as any)?.pet;
-                  if (!petId) return;
-                  const desiredCoins = Math.min(prog * 10, targetCoins);
-                  const pd = PetProgressStorage.getPetProgress(petId, petId);
-                  pd.dailyCoins = pd.dailyCoins || { todayDate: today, todayCoins: 0 };
-                  if (pd.dailyCoins.todayDate !== today) {
-                    pd.dailyCoins.todayDate = today;
-                    pd.dailyCoins.todayCoins = 0;
-                  }
-                  // Only increase to avoid clobbering increments from adventure flow in this session
-                  if ((pd.dailyCoins.todayCoins || 0) < desiredCoins) {
-                    pd.dailyCoins.todayCoins = desiredCoins;
-                    PetProgressStorage.setPetProgress(pd);
-                  }
-                });
-              } catch {}
-            } catch {}
-            window.dispatchEvent(new CustomEvent('dailyQuestsUpdated', { detail: states }));
-
-            // Emit daily_quests (single event model)
-            try {
-              const todayKey = new Date().toISOString().slice(0, 10);
-              states.forEach((s: any) => {
-                const todoType = s.activity;
-                const todoId = `${s.pet}:${todayKey}:${todoType}`;
-                const status = s.completed ? 'completed' : 'started';
-                analytics.capture('daily_quests', {
-                  todo_type: todoType,
-                  status,
-                  pet_used_id: s.pet,
-                  progress_current: Number(s?.progress || 0),
-                  progress_target: Number((s as any)?.target || 5),
-                });
-              });
             } catch {}
 
-            // Enable sleep when the CURRENT pet's daily quest progress >= 5
+             // User Todo
             try {
-              const currentPet = PetProgressStorage.getCurrentSelectedPet() || ownedPets[0];
-              const currentState = states.find(s => s.pet === currentPet);
-              if (currentState && currentState.progress >= target) {
-                const data = PetDataService.getPetData();
-                const { adventureCoinsAtLastSleep } = data.cumulativeCareLevel;
-                // Ensure coins since last sleep >= 50 so isSleepAvailable() becomes true
-                PetDataService.setPetData({
-                  cumulativeCareLevel: {
-                    ...data.cumulativeCareLevel,
-                    adventureCoins: Math.max(data.cumulativeCareLevel.adventureCoins, adventureCoinsAtLastSleep + 50)
-                  }
+               const userAct = (dailyQuestsData?._userCurrentActivity || seq[0]) as string;
+               const lastSwitchAny = dailyQuestsData?._userLastSwitchAt;
+               const lastSwitchMs = lastSwitchAny?.toMillis ? lastSwitchAny.toMillis() : Date.now();
+               const todoData = { activity: userAct, lastSwitchTime: lastSwitchMs };
+               localStorage.setItem('litkraft_user_todo', JSON.stringify(todoData));
+               window.dispatchEvent(new CustomEvent('userTodoUpdated', { detail: todoData }));
+            } catch {}
+
+            // Sadness
+            try {
+               const today = new Date().toISOString().slice(0, 10);
+               if (dailyQuestsData?._sadness?.date) {
+                  localStorage.setItem('litkraft_daily_sadness', JSON.stringify(dailyQuestsData._sadness));
+                  window.dispatchEvent(new CustomEvent('dailySadnessUpdated', { detail: dailyQuestsData._sadness }));
+               }
+                // Check assignment needed?
+               if (dailyQuestsData?._sadness?.date !== today) {
+                   stateStoreApi.ensureDailySadnessAssigned(user.uid).catch(() => {});
+               }
+               if (dailyQuestsData?._sadForce?.date) {
+                  const forcedList = Array.isArray(dailyQuestsData._sadForce.pets) ? dailyQuestsData._sadForce.pets : Object.keys(dailyQuestsData._sadForce.pets || {});
+                  localStorage.setItem('litkraft_forced_sad_pets', JSON.stringify({ date: dailyQuestsData._sadForce.date, pets: forcedList }));
+                  window.dispatchEvent(new CustomEvent('dailyForcedSadUpdated', { detail: { date: dailyQuestsData._sadForce.date, pets: forcedList } }));
+               }
+            } catch {}
+
+             // Sleep Data
+            try {
+                states.forEach(s => {
+                   const endMs = s.sleepEndAt?.toMillis ? s.sleepEndAt.toMillis() : (s.sleepEndAt ? new Date(s.sleepEndAt).getTime() : 0);
+                   const startMs = s.sleepStartAt?.toMillis ? s.sleepStartAt.toMillis() : (s.sleepStartAt ? new Date(s.sleepStartAt).getTime() : 0);
+                   if (endMs && Date.now() < endMs) {
+                       localStorage.setItem(`pet_sleep_data_${s.pet}`, JSON.stringify({ clicks: 3, timestamp: startMs, sleepStartTime: startMs, sleepEndTime: endMs }));
+                   } else {
+                       localStorage.removeItem(`pet_sleep_data_${s.pet}`);
+                   }
                 });
-              }
             } catch {}
 
-            // Throttled rollover in realtime when cooldown has passed
+            // Rollover Check
             try {
-              const nowMs = Date.now();
-              const needsRollover = states.some((s: any) => {
-                const completed = Number(s?.progress || 0) >= 5;
-                const cu: any = s?.cooldownUntil || null;
-                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
-                return completed && (!cuMs || nowMs >= cuMs);
-              });
-              if (needsRollover && nowMs - lastRolloverAttempt > 60000) {
-                lastRolloverAttempt = nowMs;
-                stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets });
-              }
+               const nowMs = Date.now();
+               const needsRollover = states.some(s => {
+                   const completed = s.completed;
+                   const cuMs = s.cooldownUntil?.toMillis ? s.cooldownUntil.toMillis() : 0;
+                   return completed && (!cuMs || nowMs >= cuMs);
+               });
+               if (needsRollover) {
+                   stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets });
+               }
             } catch {}
-          });
 
-          // Resume handler: attempt rollover on window focus (debounced via lastRolloverAttempt)
-          const onFocus = async () => {
-            try {
-              const nowMs = Date.now();
-              if (nowMs - lastRolloverAttempt < 60000) return;
-              // Update lastcameto and normalize streaks on focus
-              try { await stateStoreApi.updateVisitAndNormalizeStreaks(user.uid); } catch {}
-              const questStates = await stateStoreReader.fetchDailyQuestCompletionStates(user.uid);
-              const needsRollover = questStates.some((s: any) => {
-                const completed = Number(s?.progress || 0) >= 5;
-                const cu: any = (s as any)?.cooldownUntil || null;
-                const cuMs = cu?.toMillis ? cu.toMillis() : (cu ? new Date(cu).getTime() : null);
-                return completed && (!cuMs || nowMs >= cuMs);
-              });
-              if (needsRollover) {
-                lastRolloverAttempt = nowMs;
-                const owned = questStates.map((x: any) => x.pet).filter(Boolean);
-                await stateStoreApi.handleDailyQuestRollover({ userId: user.uid, ownedPets: owned });
-              }
-            } catch {}
-          };
-          try { window.addEventListener('focus', onFocus); focusListener = onFocus; } catch {}
         } catch (e) {
-          console.warn('Failed to attach realtime listeners:', e);
+             console.error("Failed to load initial game state", e);
         }
+        
+        // Fire-and-forget streak normalization
+        stateStoreApi.updateVisitAndNormalizeStreaks(user.uid).catch(() => {});
+
       } else {
         setUserData(null);
         setHasGoogleAccount(false);
-        // Cleanup live listeners on sign-out
-        try {
-          if (unsubscribeUserState) { unsubscribeUserState(); unsubscribeUserState = null; }
-          if (unsubscribeDailyQuests) { unsubscribeDailyQuests(); unsubscribeDailyQuests = null; }
-        } catch {}
-        // Detach window focus listener on sign-out
-        try {
-          if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; }
-        } catch {}
       }
-      
+
       setLoading(false);
     });
 
     return () => {
-      try { if (unsubscribeUserState) unsubscribeUserState(); } catch {}
-      try { if (unsubscribeDailyQuests) unsubscribeDailyQuests(); } catch {}
-      try { if (focusListener) { window.removeEventListener('focus', focusListener); focusListener = null; } } catch {}
       unsubscribe();
     };
   }, []);
@@ -652,7 +382,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userDocRef = doc(db, 'users', linkedCred.user.uid);
             const emailNow = (linkedCred.user.email || '').trim();
             if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
             }
           } catch (e) {
             console.warn('Failed to persist email after Google link:', e);
@@ -704,7 +434,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userDocRef = doc(db, 'users', linkedCred.user.uid);
             const emailNow = (linkedCred.user.email || '').trim();
             if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
             }
           } catch (e) {
             console.warn('Failed to persist email after Apple link:', e);
@@ -777,7 +507,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const userDocRef = doc(db, 'users', linkedUser.user.uid);
           const emailNow = (linkedUser.user.email || email || '').trim();
           if (emailNow) {
-            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+            await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
           }
         } catch (e) {
           console.warn('Failed to persist email after linkWithCredential:', e);
@@ -881,7 +611,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userDocRef = doc(db, 'users', linkedUser.user.uid);
             const emailNow = (linkedUser.user.email || '').trim();
             if (emailNow) {
-              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: new Date() });
+              await updateDoc(userDocRef, { email: emailNow, lastLoginAt: serverTimestamp() });
             }
           } catch (e) {
             console.warn('Failed to persist email after One Tap link:', e);

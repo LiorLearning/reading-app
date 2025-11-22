@@ -1,5 +1,4 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
-import { isImageLoadingSoundCurrentlyPlaying, stopImageLoadingSound } from './sounds';
 import { PetProgressStorage } from './pet-progress-storage';
 
 interface TTSOptions {
@@ -378,11 +377,6 @@ class TextToSpeechService {
     if (!this.isInitialized || !this.client) {
       console.warn('TTS not configured. Cannot speak text.');
       return;
-    }
-
-    // Ensure exclusivity with image-loading loop: stop it if playing
-    if (isImageLoadingSoundCurrentlyPlaying()) {
-      try { stopImageLoadingSound(); } catch {}
     }
 
     try {

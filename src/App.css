@@ -40,3 +40,33 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Pet area container - responsive padding for all screen sizes */
+.pet-area-container {
+  padding-top: clamp(
+    calc(var(--safe-area-top, 0px) + 6rem),
+    calc(var(--safe-area-top, 0px) + 8vh),
+    calc(var(--safe-area-top, 0px) + 10rem)
+  );
+  padding-bottom: clamp(
+    calc(var(--safe-area-bottom, 0px) + 8rem),
+    calc(var(--safe-area-bottom, 0px) + 10vh),
+    calc(var(--safe-area-bottom, 0px) + 12rem)
+  );
+}
+
+/* Center pet vertically for MacBook 14" and 16" screens */
+/* The pet needs to be centered between progress bar (~5rem from top) and quest box (~12rem from bottom) */
+@media (min-width: 1440px) and (min-height: 900px) {
+  .pet-area-container {
+    /* Use viewport-based units to truly center - account for progress bar and quest box */
+    /* Progress bar area: ~5rem, Quest box area: ~12rem, so we need ~8.5rem more top padding */
+    padding-top: calc(var(--safe-area-top, 0px) + max(15vh, 18rem));
+    padding-bottom: calc(var(--safe-area-bottom, 0px) + max(15vh, 18rem));
+  }
+  
+  /* Ensure the inner flex container centers content vertically */
+  .pet-area-container > div {
+    justify-content: center;
+  }
+}

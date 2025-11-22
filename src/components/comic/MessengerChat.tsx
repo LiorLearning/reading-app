@@ -21,6 +21,7 @@ interface MessengerChatProps {
   onGenerate: (text: string) => void;
   onExpandChat: () => void; // Function to expand chat to full panel
   onAddMessage: (message: { type: 'user' | 'ai'; content: string; timestamp: number }) => void;
+  setIsTranscribing?: (isTranscribing: boolean) => void;
 }
 
 // Component for individual speaker button
@@ -57,7 +58,7 @@ const SpeakerButton: React.FC<{ message: ChatMessage; index: number }> = ({ mess
   );
 };
 
-const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onExpandChat, onAddMessage }) => {
+const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onExpandChat, onAddMessage, setIsTranscribing }) => {
   const [isHidden, setIsHidden] = useState(true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [text, setText] = useState("");
@@ -203,12 +204,8 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
   const handleSendRecording = useCallback(() => {
     playClickSound();
     
-    // Immediately add "transcribing..." message for instant feedback
-    onAddMessage({
-      type: 'user',
-      content: 'transcribing...',
-      timestamp: Date.now()
-    });
+    // Show transcribing placeholder (not part of message list)
+    setIsTranscribing?.(true);
     
     if (recognitionRef.current) {
       // Stop browser speech recognition and process
@@ -226,7 +223,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
       onGenerate(text.trim());
       setText("");
     }
-  }, [text, onGenerate, onAddMessage]);
+  }, [text, onGenerate, setIsTranscribing]);
 
   // New function to handle canceling the recording
   const handleCancelRecording = useCallback(() => {
@@ -234,6 +231,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
     
     // Set cancelled flag to prevent processing
     isCancelledRef.current = true;
+    
+    // Clear transcribing placeholder
+    setIsTranscribing?.(false);
     
     if (recognitionRef.current) {
       // Stop browser speech recognition without processing
@@ -244,7 +244,7 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
     setIsMicActive(false);
     setIsSubmitting(false);
     setText(""); // Clear any partial text
-  }, []);
+  }, [setIsTranscribing]);
 
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -265,6 +265,9 @@ const MessengerChat: React.FC<MessengerChatProps> = ({ messages, onGenerate, onE
       }
       setIsMicActive(false);
     }
+    
+    // Show transcribing placeholder (not part of message list)
+    setIsTranscribing?.(true);
     
     // Send the message
     onGenerate(text.trim());

@@ -38,7 +38,8 @@ export const analytics = {
       // Env-based init (used when snippet is not present)
       posthog.init(key, {
         api_host: host,
-        autocapture: true,
+        person_profiles: 'identified_only',
+        autocapture: false,
         capture_pageview: true,
         capture_pageleave: true,
         disable_session_recording: false,

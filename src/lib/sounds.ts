@@ -3,12 +3,9 @@
  */
 
 let clickAudio: HTMLAudioElement | null = null;
-let imageLoadingAudio: HTMLAudioElement | null = null;
 let imageCompleteAudio: HTMLAudioElement | null = null;
 let messageAudio: HTMLAudioElement | null = null;
 
-// Add state tracking for image loading sound
-let isImageLoadingSoundPlaying = false;
 // Global mute flag for UI SFX to ensure nothing plays over critical TTS
 let isUISoundsMuted = false;
 
@@ -25,13 +22,6 @@ const initAllSounds = (): void => {
   }
   
   // Initialize other sounds
-  if (!imageLoadingAudio) {
-    imageLoadingAudio = new Audio('/sounds/image-loading.mp3');
-    imageLoadingAudio.preload = 'auto';
-    imageLoadingAudio.volume = 0.4;
-    imageLoadingAudio.load();
-  }
-  
   if (!imageCompleteAudio) {
     imageCompleteAudio = new Audio('/sounds/image-complete.mp3');
     imageCompleteAudio.preload = 'auto';
@@ -74,6 +64,7 @@ const initClickSound = (): HTMLAudioElement => {
  * Play click sound effect for button interactions
  */
 export const playClickSound = (): void => {
+  return
   try {
     if (isUISoundsMuted) return;
     if (clickAudio) {
@@ -99,18 +90,6 @@ export const setClickSoundVolume = (volume: number): void => {
 };
 
 /**
- * Initialize the image loading sound audio element
- */
-const initImageLoadingSound = (): HTMLAudioElement => {
-  if (!imageLoadingAudio) {
-    imageLoadingAudio = new Audio('/sounds/image-loading.mp3');
-    imageLoadingAudio.preload = 'auto';
-    imageLoadingAudio.volume = 0.4; // Set volume to 40%
-  }
-  return imageLoadingAudio;
-};
-
-/**
  * Initialize the image complete sound audio element
  */
 const initImageCompleteSound = (): HTMLAudioElement => {
@@ -120,62 +99,6 @@ const initImageCompleteSound = (): HTMLAudioElement => {
     imageCompleteAudio.volume = 0.5; // Set volume to 50%
   }
   return imageCompleteAudio;
-};
-
-/**
- * Play image loading sound effect when image generation starts
- */
-export const playImageLoadingSound = (): void => {
-  try {
-    if (isUISoundsMuted) return;
-    if (imageLoadingAudio) {
-      // Reset audio to beginning in case it was already playing
-      imageLoadingAudio.currentTime = 0;
-      
-      // Set up event listeners to track playing state
-      imageLoadingAudio.onplay = () => {
-        isImageLoadingSoundPlaying = true;
-      };
-      
-      imageLoadingAudio.onended = () => {
-        isImageLoadingSoundPlaying = false;
-      };
-      
-      imageLoadingAudio.onpause = () => {
-        isImageLoadingSoundPlaying = false;
-      };
-      
-      imageLoadingAudio.onerror = () => {
-        isImageLoadingSoundPlaying = false;
-      };
-      
-      imageLoadingAudio.play().catch((error) => {
-        // Silently handle autoplay restrictions
-        isImageLoadingSoundPlaying = false;
-        console.debug('Audio play blocked by browser:', error);
-      });
-    }
-  } catch (error) {
-    // Silently handle any audio errors
-    isImageLoadingSoundPlaying = false;
-    console.debug('Error playing image loading sound:', error);
-  }
-};
-
-/**
- * Stop image loading sound effect
- */
-export const stopImageLoadingSound = (): void => {
-  try {
-    if (imageLoadingAudio) {
-      imageLoadingAudio.pause();
-      imageLoadingAudio.currentTime = 0;
-      isImageLoadingSoundPlaying = false;
-    }
-  } catch (error) {
-    // Silently handle any audio errors
-    console.debug('Error stopping image loading sound:', error);
-  }
 };
 
 /**
@@ -196,21 +119,6 @@ export const playImageCompleteSound = (): void => {
     // Silently handle any audio errors
     console.debug('Error playing image complete sound:', error);
   }
-};
-
-/**
- * Set the volume for image loading sounds (0.0 to 1.0)
- */
-export const setImageLoadingSoundVolume = (volume: number): void => {
-  const audio = initImageLoadingSound();
-  audio.volume = Math.max(0, Math.min(1, volume));
-};
-
-/**
- * Check if image loading sound is currently playing
- */
-export const isImageLoadingSoundCurrentlyPlaying = (): boolean => {
-  return isImageLoadingSoundPlaying;
 };
 
 /**
@@ -269,13 +177,6 @@ export const pauseAllUISounds = (): void => {
     if (clickAudio) {
       clickAudio.pause();
       clickAudio.currentTime = 0;
-    }
-  } catch {}
-  try {
-    if (imageLoadingAudio) {
-      imageLoadingAudio.pause();
-      imageLoadingAudio.currentTime = 0;
-      isImageLoadingSoundPlaying = false;
     }
   } catch {}
   try {

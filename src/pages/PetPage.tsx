@@ -926,27 +926,10 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
   const petRef = useRef<HTMLDivElement | null>(null);
   const [bubbleTopPx, setBubbleTopPx] = useState<number>(48);
 
+  // Removed bubble positioning logic - now using flexbox layout
   useEffect(() => {
-    const MIN_GAP_PX = 1;
-    const DEFAULT_TOP_PX = 90;
-    const measure = () => {
-      const stage = stageRef.current;
-      const bubble = bubbleRef.current;
-      const pet = petRef.current;
-      if (!stage || !bubble || !pet) return;
-      const bubbleRect = bubble.getBoundingClientRect();
-      const petRect = pet.getBoundingClientRect();
-      const gap = petRect.top - bubbleRect.bottom;
-      if (isFinite(gap)) {
-        const missing = Math.max(0, MIN_GAP_PX - gap);
-        const nextTop = Math.max(8, DEFAULT_TOP_PX - missing);
-        setBubbleTopPx(nextTop);
-      }
-    };
-    // initial and on resize
-    setTimeout(measure, 0);
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    // Keep for compatibility but no longer needed since we use flexbox
+    setBubbleTopPx(0);
   }, [sleepClicks, currentPet]);
   useEffect(() => {
     if (hasMountedRef.current) {
@@ -3355,6 +3338,106 @@ const getSleepyPetImage = (clicks: number) => {
     return ownedPets;
   }, [ownedPets, questRefreshTick]);
 
+  // Preload images for adjacent pets (previous and next page) to prevent loading delays
+  useEffect(() => {
+    if (orderedOwnedPets.length === 0) return;
+    
+    const petHasImages = (petType: string) => ['dog','cat','hamster','dragon','unicorn','monkey','parrot','wolf','raccoon','pikachu','panda','deer','labubu'].includes(petType);
+    
+    // Helper to get care state for a pet (similar logic to pet switcher)
+    const getCareStateForPet = (petId: string): string => {
+      try {
+        // Sleep check
+        const sleepRaw = localStorage.getItem(`pet_sleep_data_${petId}`);
+        if (sleepRaw) {
+          const obj = JSON.parse(sleepRaw) as { sleepEndTime?: number; clicks?: number };
+          if (obj?.sleepEndTime && Date.now() < Number(obj.sleepEndTime)) {
+            const c = Number(obj?.clicks || 3);
+            if (c >= 3) return 'sleep3';
+            if (c >= 2) return 'sleep2';
+            return 'sleep1';
+          }
+        }
+        // Quest completion check
+        const questStatesRaw = localStorage.getItem('litkraft_daily_quests_state');
+        if (questStatesRaw) {
+          const arr = JSON.parse(questStatesRaw) as Array<{ pet: string; activity: string; progress: number; target?: number; }>;
+          const item = arr?.find(x => x.pet === petId);
+          const target = (item && typeof item?.target === 'number' && item.target > 0) ? Number(item.target) : 5;
+          if (item) {
+            const prog = Number(item.progress || 0);
+            if (prog >= target) return 'coins_50';
+            if (prog >= 3) return 'coins_30';
+            if (prog >= 1) return 'coins_10';
+          }
+        }
+        // Daily sadness check
+        const sadnessRaw = localStorage.getItem('litkraft_daily_sadness');
+        const today = new Date().toISOString().slice(0, 10);
+        let isAssignedToday = false;
+        if (sadnessRaw) {
+          const sad = JSON.parse(sadnessRaw) as { date?: string; assignedPets?: string[] };
+          const assigned = Array.isArray(sad?.assignedPets) ? sad.assignedPets : [];
+          isAssignedToday = (sad?.date === today) && assigned.includes(petId);
+        }
+        let isForcedToday = false;
+        try {
+          const forceRaw = localStorage.getItem('litkraft_forced_sad_pets');
+          if (forceRaw) {
+            const f = JSON.parse(forceRaw) as { date?: string; pets?: string[] };
+            const pets = Array.isArray(f?.pets) ? f.pets : [];
+            isForcedToday = (f?.date === today) && pets.includes(petId);
+          }
+        } catch {}
+        if (isAssignedToday || isForcedToday) return 'coins_0';
+        return 'coins_10';
+      } catch {}
+      return 'coins_10';
+    };
+
+    // Preload images for previous page (if exists)
+    if (petStartIndex > 0) {
+      const prevStart = Math.max(0, petStartIndex - 4);
+      const prevPets = orderedOwnedPets.slice(prevStart, petStartIndex);
+      prevPets.forEach((petId) => {
+        const petType = PetProgressStorage.getPetType(petId) || petId;
+        if (petHasImages(petType)) {
+          try {
+            const levelForPet = PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel;
+            const careState = getCareStateForPet(petId);
+            const imageUrl = getLevelBasedPetImage(petType, levelForPet, careState as any);
+            if (imageUrl) {
+              const img = new Image();
+              img.src = imageUrl;
+            }
+          } catch {}
+        }
+      });
+    }
+
+    // Preload images for next page (if exists)
+    const maxIndex = Math.max(0, orderedOwnedPets.length - 4);
+    if (petStartIndex < maxIndex) {
+      const nextStart = petStartIndex + 4;
+      const nextEnd = Math.min(orderedOwnedPets.length, nextStart + 4);
+      const nextPets = orderedOwnedPets.slice(nextStart, nextEnd);
+      nextPets.forEach((petId) => {
+        const petType = PetProgressStorage.getPetType(petId) || petId;
+        if (petHasImages(petType)) {
+          try {
+            const levelForPet = PetProgressStorage.getPetProgress(petId, petType).levelData.currentLevel;
+            const careState = getCareStateForPet(petId);
+            const imageUrl = getLevelBasedPetImage(petType, levelForPet, careState as any);
+            if (imageUrl) {
+              const img = new Image();
+              img.src = imageUrl;
+            }
+          } catch {}
+        }
+      });
+    }
+  }, [petStartIndex, orderedOwnedPets]);
+
   // Compute purchasable count for Shop badge (not owned, not locked by level, and affordable by coins)
   const userLevelForShop = getUserLevelInfo().currentLevel;
   const shopPurchasableCount = useMemo(() => {
@@ -3635,7 +3718,7 @@ const getSleepyPetImage = (clicks: number) => {
 
   return (
     <div
-      className="relative flex min-h-[100dvh] flex-col overflow-x-hidden overflow-y-auto"
+      className="relative flex h-[100dvh] flex-col overflow-x-hidden min-[1366px]:overflow-y-hidden overflow-y-auto"
       style={{
         backgroundImage: `url('https://tutor.mathkraft.org/_next/image?url=%2Fapi%2Fproxy%3Furl%3Dhttps%253A%252F%252Fdubeus2fv4wzz.cloudfront.net%252Fimages%252F20251008_004548_WhatsAppImage2025-10-08at6.15.25AM.jpeg&w=3840&q=75&dpl=dpl_2uGXzhZZsLneniBZtsxr7PEabQXN')`,
         backgroundSize: 'cover',
@@ -3721,13 +3804,13 @@ const getSleepyPetImage = (clicks: number) => {
       {userData && (
         <div
           className="absolute left-4 z-30 flex items-center gap-3 sm:left-5"
-          style={{ top: 'calc(var(--safe-area-top, 0px) + 1.25rem)' }}
+          style={{ top: 'calc(var(--safe-area-top, 0px) + 1rem)' }}
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className={`border-[3px] border-[#111827] bg-white text-[#111827] rounded-[22px] px-5 py-3 font-semibold btn-animate flex items-center gap-2 transition-all duration-200 shadow-[0_6px_0_#0B0B0B] [&_svg]:!text-[#111827]`}
+                className={`border-[3px] border-[#111827] bg-white text-[#111827] rounded-[22px] px-4 py-2 sm:px-5 sm:py-3 font-semibold btn-animate flex items-center gap-2 transition-all duration-200 shadow-[0_6px_0_#0B0B0B] [&_svg]:!text-[#111827]`}
                 onClick={() => playClickSound()}
               >
                 <GraduationCap className="h-5 w-5" />
@@ -4278,11 +4361,14 @@ const getSleepyPetImage = (clicks: number) => {
         )}
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 pt-6 sm:px-6 md:px-8 lg:px-10 lg:pt-8">
-        <div ref={stageRef} className="relative flex w-full items-end justify-center overflow-visible" style={{ minHeight: 'clamp(340px, 48vh, 540px)' }}>
-        {/* Compact emoji-only bubble closer to the pet */}
+      <div 
+        className="pet-area-container relative z-10 flex flex-1 flex-col items-center px-4 sm:px-6 md:px-8 lg:px-10 min-[1366px]:px-12" 
+        style={{ minHeight: 0 }}
+      >
+        <div ref={stageRef} className="relative flex w-full flex-1 flex-col items-center justify-center overflow-visible" style={{ minHeight: 0, maxHeight: '100%', gap: 'clamp(0.75rem, 2vh, 1.5rem)' }}>
+        {/* Compact emoji-only bubble with proper spacing */}
         {!showPetShop && (
-          <div ref={bubbleRef} className="absolute left-1/2 -translate-x-1/2" style={{ top: bubbleTopPx }}>
+          <div ref={bubbleRef} className="bubble-margin relative flex-shrink-0 flex flex-col items-center mb-6 sm:mb-8 min-[1366px]:mb-4">
             <Button
               variant="outline"
               size="icon"
@@ -4291,10 +4377,10 @@ const getSleepyPetImage = (clicks: number) => {
                 setTimeout(() => { speakText(msg); }, 0);
               }}
               title="Tap to hear what I'm thinking"
-              className="h-[58px] w-[58px] rounded-full border-2 border-foreground bg-white shadow-solid btn-animate"
+              className="h-[52px] w-[52px] sm:h-[56px] sm:w-[56px] md:h-[58px] md:w-[58px] rounded-full border-2 border-foreground bg-white shadow-solid btn-animate"
               aria-label={bubbleVisual.label}
             >
-              <span className="text-[30px]" aria-hidden="true">{bubbleVisual.emoji}</span>
+              <span className="text-[26px] sm:text-[28px] md:text-[30px]" aria-hidden="true">{bubbleVisual.emoji}</span>
               <span className="sr-only">{frozenThought ?? currentPetThought}</span>
             </Button>
             {/* Tail dots to imply thought/speech, kept minimal */}
@@ -4304,14 +4390,14 @@ const getSleepyPetImage = (clicks: number) => {
               <div className={`${sleepClicks > 0 ? 'bg-[#D4C8FF]' : 'bg-[#BBD7FF]'} w-[4px] h-[4px] rounded-full`}></div>
             </div>
             {sleepClicks >= 3 && (
-              <div className="mt-1 text-[12px] sm:text-[13px] text-center font-semibold" style={{ color: '#6C5CE7' }}>
+              <div className="mt-2 text-[12px] sm:text-[13px] text-center font-semibold" style={{ color: '#6C5CE7' }}>
                 {formatTimeRemaining(sleepTimeRemaining || getSleepTimeRemaining())}
               </div>
             )}
           </div>
         )}
-          {/* Pet pinned to bottom, nudged lower for tighter spacing with Today card */}
-          <div ref={petRef} className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-6 sm:translate-y-8 drop-shadow-2xl">
+          {/* Pet centered in flex layout */}
+          <div ref={petRef} className="relative flex-shrink-0 drop-shadow-2xl flex items-center justify-center" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {isSleepingGifLoading && (
               <div className="absolute inset-0 z-40 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
@@ -4326,7 +4412,7 @@ const getSleepyPetImage = (clicks: number) => {
                 src={getPetImage()}
                 alt="Pet"
                 className={`object-contain rounded-2xl transition-all duration-700 ease-out hover:scale-105 ${
-                  sleepClicks > 0 ? 'w-64 h-64 max-h-[280px]' : 'w-60 h-60 max-h-[260px]'
+                  sleepClicks > 0 ? 'w-56 h-56 max-h-[240px] sm:w-60 sm:h-60 sm:max-h-[260px] md:w-64 md:h-64 md:max-h-[280px] min-[1366px]:w-[288px] min-[1366px]:h-[288px] min-[1366px]:max-h-[320px]' : 'w-52 h-52 max-h-[220px] sm:w-56 sm:h-56 sm:max-h-[240px] md:w-60 md:h-60 md:max-h-[260px] min-[1366px]:w-[272px] min-[1366px]:h-[272px] min-[1366px]:max-h-[300px]'
                 }`}
                 style={{
                   animation: getCumulativeCarePercentage() >= 40 && getCumulativeCarePercentage() < 60 ? 'petGrow 800ms ease-out' : 
@@ -4353,7 +4439,7 @@ const getSleepyPetImage = (clicks: number) => {
                 })()}
               </div>
               {/* Evolution strip anchored to pet (mobile) */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 z-20 sm:hidden">
+              <div className="absolute -bottom-4 sm:-bottom-6 left-1/2 -translate-x-1/2 z-20 sm:hidden">
                 {(() => {
                   const { currentLevel } = getLevelInfo();
                   const levelInfo = getLevelInfo();
@@ -4368,78 +4454,13 @@ const getSleepyPetImage = (clicks: number) => {
         </div>
       </div>
 
-
-      {/* Dog Evolution Display - Right Side - DISABLED */}
-      {/* 
-      <div className="absolute right-6 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-4">
-        <div className="flex flex-col items-center">
-          <div className="relative p-3 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-blue-100 to-cyan-100 border-blue-400 shadow-lg">
-            <div className="text-5xl transition-all duration-300 grayscale-0">
-              🐶
-            </div>
-            <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-              ✓
-            </div>
-          </div>
-          <div className="text-xs font-semibold text-center mt-2 text-white drop-shadow-md">
-            1 Day 🔥
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
-            currentStreak >= 2 
-              ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-400 shadow-lg' 
-              : 'bg-gray-100 border-gray-300 opacity-60'
-          }`}>
-            <div className={`text-6xl transition-all duration-300 ${
-              currentStreak >= 2 ? 'grayscale-0' : 'grayscale'
-            }`}>
-              🐕
-            </div>
-            {currentStreak >= 2 && (
-              <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-                ✓
-              </div>
-            )}
-          </div>
-          <div className="text-xs font-semibold text-center mt-2 text-white drop-shadow-md">
-            {currentStreak >= 2 ? 'Medium Dog' : '2 Days 🔥'}
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <div className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
-            currentStreak >= 3 
-              ? 'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-400 shadow-lg' 
-              : 'bg-gray-100 border-gray-300 opacity-60'
-          }`}>
-            <div className={`text-7xl transition-all duration-300 ${
-              currentStreak >= 3 ? 'grayscale-0' : 'grayscale'
-            }`}>
-              🐺
-            </div>
-            {currentStreak >= 3 && (
-              <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-                ✓
-              </div>
-            )}
-          </div>
-          <div className="text-xs font-semibold text-center mt-2 text-white drop-shadow-md">
-            {currentStreak >= 3 ? 'Large Dog' : '3 Days 🔥'}
-          </div>
-        </div>
-
-      </div>
-      */}
-
-      {/* Below-bubble To-Dos: Travel and Sleep */}
+      {/* Below-bubble To-Dos: Travel and Sleep - Fixed to bottom */}
       {!showPetShop && (
-        <div className="relative z-20 mt-12 flex justify-center pb-24 sm:mt-14 lg:mt-16">
-          <div className="w-full max-w-[420px] rounded-[24px] shadow-xl p-4 mb-8 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
+        <div className="fixed bottom-0 left-0 right-0 z-20 flex justify-center pb-4 px-4 min-[1366px]:pb-6 min-[1366px]:px-6 min-[1440px]:pb-8 min-[1440px]:px-8" style={{ paddingBottom: 'max(clamp(1rem, 2vh, 1.5rem), env(safe-area-inset-bottom))' }}>
+          <div className="quest-box-container w-full max-w-[360px] min-[1366px]:max-w-[420px] min-[1440px]:max-w-[420px] rounded-[12px] sm:rounded-[16px] min-[1366px]:rounded-[18px] min-[1440px]:rounded-[20px] shadow-md p-2 sm:p-2.5 min-[1366px]:p-3 min-[1440px]:p-3.5 border" style={{ background: '#FFF5D6', borderColor: '#FFEAB5' }}>
             {/* Subheader */}
-            <div className="mb-2 px-1 font-semibold tracking-wide text-sm" style={{ color: '#134E4A' }}>Today</div>
-            <div className="mt-1 flex flex-col gap-4">
+            <div className="quest-box-title mb-1 px-1 font-semibold tracking-wide text-xs min-[1440px]:text-sm min-[1440px]:mb-1.5 min-[1440px]:px-2" style={{ color: '#134E4A' }}>Today</div>
+            <div className="quest-gap flex flex-col gap-1.5 sm:gap-2 min-[1440px]:gap-2.5">
               {(() => {
                 // Prefer Firestore dailyQuests progress (hydrated in auth listener). Fallback to local logic.
                 const questStatesRaw = typeof window !== 'undefined' ? localStorage.getItem('litkraft_daily_quests_state') : null;
@@ -4539,21 +4560,21 @@ const getSleepyPetImage = (clicks: number) => {
                     type="button"
                     aria-label={done ? 'Completed - Click to view' : `Start ${questLabel}`}
                     onClick={() => { setShowFirstDoHint(false); handleActionClick(currentQuestType); }}
-                    className={`relative flex items-center gap-3 p-4 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] w-full text-left`}
+                    className={`quest-item relative flex items-center gap-1.5 sm:gap-2 min-[1440px]:gap-2.5 p-1.5 sm:p-2 min-[1440px]:p-3 rounded-[10px] sm:rounded-[12px] min-[1440px]:rounded-[14px] border-[2px] min-[1440px]:border-[2.5px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_3px_0_#0B0B0B] sm:shadow-[0_4px_0_#0B0B0B] min-[1440px]:shadow-[0_5px_0_#0B0B0B] w-full text-left`}
                   >
                     {/* Left icon */}
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl" style={{ background: '#ECFDF5' }}>{questIcon}</div>
-                    <div className="flex-1">
-                      <div className="font-semibold" style={{ color: '#0F766E' }}>{questLabel}</div>
-                      <div className="mt-2 h-2 rounded-full overflow-hidden w-[260px]" style={{ background: '#ECFDF5' }}>
+                    <div className="quest-icon w-7 h-7 sm:w-8 sm:h-8 min-[1440px]:w-10 min-[1440px]:h-10 rounded-lg min-[1440px]:rounded-lg flex items-center justify-center text-base sm:text-lg min-[1440px]:text-xl flex-shrink-0" style={{ background: '#ECFDF5' }}>{questIcon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="quest-text font-semibold text-xs sm:text-sm min-[1440px]:text-base min-[1440px]:font-bold" style={{ color: '#0F766E' }}>{questLabel}</div>
+                      <div className="quest-progress mt-1 min-[1440px]:mt-1.5 h-1 sm:h-1.5 min-[1440px]:h-1.5 rounded-full overflow-hidden w-full max-w-[180px] sm:max-w-[220px] min-[1440px]:max-w-[240px]" style={{ background: '#ECFDF5' }}>
                         <div
                           className="h-full transition-all duration-500"
                           style={{ width: `${Math.round(progress * 100)}%`, background: done ? '#34D399' : '#86EFAC' }}
                         />
                       </div>
                     </div>
-                    <span className="relative inline-block overflow-visible z-30 pointer-events-none">
-                      <span className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ${done ? '' : ''}`}
+                    <span className="relative inline-block overflow-visible z-30 pointer-events-none flex-shrink-0">
+                      <span className={`quest-arrow relative w-6 h-6 sm:w-7 sm:h-7 min-[1440px]:w-9 min-[1440px]:h-9 rounded-md sm:rounded-lg min-[1440px]:rounded-lg flex items-center justify-center transition-all duration-300 text-xs sm:text-sm min-[1440px]:text-base ${done ? '' : ''}`}
                         style={{ background: done ? '#34D399' : '#E0F2FE', color: done ? '#FFFFFF' : '#0EA5A4' }}>
                         {done ? '✓' : '→'}
                       </span>
@@ -4613,20 +4634,20 @@ const getSleepyPetImage = (clicks: number) => {
                     aria-label={asleep ? 'Completed - Click to view' : 'Sleep'}
                     onClick={() => { if (hasAdventureStep8Started) { try { startAdventureStep9(); } catch {} } handleActionClick('sleep'); }}
                     disabled={disabled}
-                    className={`relative flex items-center gap-3 p-4 rounded-[16px] border-[3px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_6px_0_#0B0B0B] w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`quest-item relative flex items-center gap-1.5 sm:gap-2 min-[1440px]:gap-2.5 p-1.5 sm:p-2 min-[1440px]:p-3 rounded-[10px] sm:rounded-[12px] min-[1440px]:rounded-[14px] border-[2px] min-[1440px]:border-[2.5px] border-[#111827] bg-white text-[#111827] btn-animate shadow-[0_3px_0_#0B0B0B] sm:shadow-[0_4px_0_#0B0B0B] min-[1440px]:shadow-[0_5px_0_#0B0B0B] w-full text-left ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-2xl" style={{ background: '#ECFDF5' }}>😴</div>
-                    <div className="flex-1">
-                      <div className="font-semibold" style={{ color: '#0F766E' }}>{label}</div>
-                      <div className="mt-2 h-2 rounded-full overflow-hidden w-[260px]" style={{ background: '#ECFDF5' }}>
+                    <div className="quest-icon w-7 h-7 sm:w-8 sm:h-8 min-[1440px]:w-10 min-[1440px]:h-10 rounded-lg min-[1440px]:rounded-lg flex items-center justify-center text-base sm:text-lg min-[1440px]:text-xl flex-shrink-0" style={{ background: '#ECFDF5' }}>😴</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="quest-text font-semibold text-xs sm:text-sm min-[1440px]:text-base min-[1440px]:font-bold" style={{ color: '#0F766E' }}>{label}</div>
+                      <div className="quest-progress mt-1 min-[1440px]:mt-1.5 h-1 sm:h-1.5 min-[1440px]:h-1.5 rounded-full overflow-hidden w-full max-w-[180px] sm:max-w-[220px] min-[1440px]:max-w-[240px]" style={{ background: '#ECFDF5' }}>
                         <div
                           className="h-full transition-all duration-500"
                           style={{ width: `${progress * 100}%`, background: asleep ? '#34D399' : '#86EFAC' }}
                         />
                       </div>
                     </div>
-                    <span className="relative inline-block overflow-visible z-30 pointer-events-none">
-                      <span ref={sleepArrowRef as any} className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300`}
+                    <span className="relative inline-block overflow-visible z-30 pointer-events-none flex-shrink-0">
+                      <span ref={sleepArrowRef as any} className={`quest-arrow relative w-6 h-6 sm:w-7 sm:h-7 min-[1440px]:w-9 min-[1440px]:h-9 rounded-md sm:rounded-lg min-[1440px]:rounded-lg flex items-center justify-center transition-all duration-300 text-xs sm:text-sm min-[1440px]:text-base`}
                         style={{ background: asleep ? '#34D399' : '#E0F2FE', color: asleep ? '#FFFFFF' : '#0EA5A4' }}>
                         {asleep ? '✓' : '→'}
                       </span>
@@ -4647,6 +4668,70 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         </div>
       )}
+
+      {/* Dog Evolution Display - Right Side - DISABLED */}
+      {/* 
+      <div className="absolute right-6 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-4">
+        <div className="flex flex-col items-center">
+          <div className="relative p-3 rounded-2xl border-2 transition-all duration-300 bg-gradient-to-br from-blue-100 to-cyan-100 border-blue-400 shadow-lg">
+            <div className="text-5xl transition-all duration-300 grayscale-0">
+              🐶
+            </div>
+            <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+              ✓
+            </div>
+          </div>
+          <div className="text-xs font-semibold text-center mt-2 text-white drop-shadow-md">
+            1 Day 🔥
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <div className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
+            currentStreak >= 2 
+              ? 'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-400 shadow-lg' 
+              : 'bg-gray-100 border-gray-300 opacity-60'
+          }`}>
+            <div className={`text-6xl transition-all duration-300 ${
+              currentStreak >= 2 ? 'grayscale-0' : 'grayscale'
+            }`}>
+              🐕
+            </div>
+            {currentStreak >= 2 && (
+              <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                ✓
+              </div>
+            )}
+          </div>
+          <div className="text-xs font-semibold text-center mt-2 text-white drop-shadow-md">
+            {currentStreak >= 2 ? 'Medium Dog' : '2 Days 🔥'}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <div className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
+            currentStreak >= 3 
+              ? 'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-400 shadow-lg' 
+              : 'bg-gray-100 border-gray-300 opacity-60'
+          }`}>
+            <div className={`text-7xl transition-all duration-300 ${
+              currentStreak >= 3 ? 'grayscale-0' : 'grayscale'
+            }`}>
+              🐺
+            </div>
+            {currentStreak >= 3 && (
+              <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                ✓
+              </div>
+            )}
+          </div>
+          <div className="text-xs font-semibold text-center mt-2 text-white drop-shadow-md">
+            {currentStreak >= 3 ? 'Large Dog' : '3 Days 🔥'}
+          </div>
+        </div>
+
+      </div>
+      */}
 
       {/* Removed bottom action bar; actions are in the to-do container */}
 
@@ -5134,26 +5219,26 @@ const getSleepyPetImage = (clicks: number) => {
       {/* Pet Switcher rail */}
       {orderedOwnedPets.length > 0 && (
         <div
-          className="fixed z-20 hidden flex-col items-center gap-3 md:flex"
+          className="fixed z-20 hidden flex-col items-center gap-1 md:gap-2 md:flex max-h-[calc(100vh-8rem)]"
           style={{
             top: 'calc(var(--safe-area-top, 0px) + 5.5rem)',
-            left: 'clamp(1rem, 3vw, 2.5rem)'
+            left: 'clamp(0.5rem, 2vw, 1.5rem)'
           }}
         >
-          <div className="text-lg font-semibold text-white drop-shadow-md mb-1">
+          <div className="text-xs md:text-sm font-semibold text-white drop-shadow-md mb-0.5">
             Pets: {orderedOwnedPets.length}
           </div>
           {/* Up arrow for sliding up */}
           {orderedOwnedPets.length > 4 && (
             <button
               onClick={() => setPetStartIndex((idx) => Math.max(0, idx - 1))}
-              className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shadow-md transition-colors ${
+              className={`w-5 h-5 md:w-7 md:h-7 rounded-full border-2 flex items-center justify-center shadow-md ${
                 petStartIndex > 0 ? 'bg-white/30 border-white/50 hover:bg-white/40' : 'bg-white/10 border-white/20 opacity-50 cursor-not-allowed'
               }`}
               aria-label="Scroll up"
               disabled={petStartIndex === 0}
             >
-              <ChevronUp className="text-white" />
+              <ChevronUp className="text-white w-2.5 h-2.5 md:w-3 md:h-3" />
             </button>
           )}
 
@@ -5281,7 +5366,7 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-24 h-24 rounded-2xl border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
+                className={`relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-lg sm:rounded-xl md:rounded-2xl border-[2px] sm:border-[2px] md:border-[3px] flex items-center justify-center overflow-visible hover:scale-110 ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
                   isActive ? 'border-white ring-2 ring-white/80' : 'border-white/40 hover:border-white/60'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
@@ -5296,12 +5381,12 @@ const getSleepyPetImage = (clicks: number) => {
                       loading="lazy"
                     />
                   ) : (
-                    <span className="absolute inset-0 z-10 flex items-center justify-center text-5xl text-white">{petEmoji}</span>
+                    <span className="absolute inset-0 z-10 flex items-center justify-center text-3xl sm:text-4xl md:text-5xl text-white">{petEmoji}</span>
                   )}
                 </div>
                 {/* Streak chip top-right (clickable) */}
                 <button
-                  className={`pointer-events-auto absolute -top-3 -right-3 text-white rounded-full min-w-9 h-9 px-2 text-[14px] leading-[36px] text-center shadow-lg border-2 border-white flex items-center justify-center bg-gradient-to-br from-teal-400 via-emerald-500 to-cyan-500 hover:brightness-110 active:scale-95`}
+                  className={`pointer-events-auto absolute -top-1 -right-1 sm:-top-2 sm:-right-2 md:-top-2.5 md:-right-2.5 lg:-top-3 lg:-right-3 text-white rounded-full min-w-5 h-5 sm:min-w-6 sm:h-6 md:min-w-7 md:h-7 lg:min-w-9 lg:h-9 px-0.5 sm:px-1 md:px-1.5 lg:px-2 text-[9px] sm:text-[10px] md:text-xs lg:text-[14px] leading-[20px] sm:leading-[24px] md:leading-[28px] lg:leading-[36px] text-center shadow-lg border-[1px] sm:border-[1.5px] md:border-2 border-white flex items-center justify-center bg-gradient-to-br from-teal-400 via-emerald-500 to-cyan-500 hover:brightness-110 active:scale-95`}
                   title={`Sleep streak: ${petStreak}`}
                   aria-label={`streak-${petStreak}`}
                   onClick={(e) => {
@@ -5330,13 +5415,13 @@ const getSleepyPetImage = (clicks: number) => {
           {orderedOwnedPets.length > 4 && (
             <button
               onClick={() => setPetStartIndex((idx) => Math.min(Math.max(0, orderedOwnedPets.length - 4), idx + 1))}
-              className={`w-10 h-10 rounded-full border-2 flex items-center justify-center shadow-md transition-colors ${
+              className={`w-5 h-5 md:w-7 md:h-7 rounded-full border-2 flex items-center justify-center shadow-md ${
                 petStartIndex < Math.max(0, orderedOwnedPets.length - 4) ? 'bg-white/30 border-white/50 hover:bg-white/40' : 'bg-white/10 border-white/20 opacity-50 cursor-not-allowed'
               }`}
               aria-label="Scroll down"
               disabled={petStartIndex >= Math.max(0, orderedOwnedPets.length - 4)}
             >
-              <ChevronDown className="text-white" />
+              <ChevronDown className="text-white w-2.5 h-2.5 md:w-3 md:h-3" />
             </button>
           )}
         </div>
@@ -5736,6 +5821,8 @@ const getSleepyPetImage = (clicks: number) => {
         />
       )}
 
+      </div>
+
       <style>
         {`
           @keyframes petGrow {
@@ -5842,7 +5929,6 @@ const getSleepyPetImage = (clicks: number) => {
           }
         `}
       </style>
-      </div>
       {!isHydrated && (
         <div className="absolute inset-0 z-[9999] bg-black/30 backdrop-blur-sm flex items-center justify-center">
           <div className="rounded-xl bg-gradient-to-br from-teal-500 via-emerald-500 to-cyan-500 border border-white/30 ring-1 ring-white/20 px-6 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
