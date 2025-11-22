@@ -4261,8 +4261,8 @@ const getSleepyPetImage = (clicks: number) => {
         )}
 
       {/* Main pet area - fixed stage to prevent layout jump */}
-      <div className="relative z-10 flex flex-1 flex-col items-center px-4 sm:px-6 md:px-8 lg:px-10" style={{ minHeight: 0, paddingTop: 'calc(var(--safe-area-top, 0px) + 5.5rem)', paddingBottom: '0.25rem' }}>
-        <div ref={stageRef} className="relative flex w-full flex-1 flex-col items-center overflow-visible" style={{ minHeight: 0, maxHeight: '100%', gap: 'clamp(0.75rem, 2vh, 1.5rem)' }}>
+      <div className="relative z-10 flex flex-1 flex-col items-center px-4 sm:px-6 md:px-8 lg:px-10" style={{ minHeight: 0, paddingTop: 'calc(var(--safe-area-top, 0px) + 10rem)', paddingBottom: 'calc(var(--safe-area-bottom, 0px) + 12rem)' }}>
+        <div ref={stageRef} className="relative flex w-full flex-1 flex-col items-center justify-center overflow-visible" style={{ minHeight: 0, maxHeight: '100%', gap: 'clamp(0.75rem, 2vh, 1.5rem)' }}>
         {/* Compact emoji-only bubble with proper spacing */}
         {!showPetShop && (
           <div ref={bubbleRef} className="relative flex-shrink-0 flex flex-col items-center mb-6 sm:mb-8">
@@ -4294,7 +4294,7 @@ const getSleepyPetImage = (clicks: number) => {
           </div>
         )}
           {/* Pet centered in flex layout */}
-          <div ref={petRef} className="relative flex-shrink-0 drop-shadow-2xl flex items-center justify-center" style={{ flex: '1 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div ref={petRef} className="relative flex-shrink-0 drop-shadow-2xl flex items-center justify-center" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {isSleepingGifLoading && (
               <div className="absolute inset-0 z-40 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />

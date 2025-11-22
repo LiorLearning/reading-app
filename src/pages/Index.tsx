@@ -18,7 +18,7 @@ import { saveAdventureHybrid, loadAdventuresHybrid, loadAdventureSummariesHybrid
 import { sampleMCQData } from "../data/mcq-questions";
 import { clearSpellboxProgressHybrid } from '@/lib/firebase-spellbox-cache';
 import { firebaseSpellboxService } from '@/lib/firebase-spellbox-service';
-import { playMessageSound, playClickSound, playImageLoadingSound, stopImageLoadingSound, playImageCompleteSound } from "@/lib/sounds";
+import { playMessageSound, playClickSound, playImageCompleteSound } from "@/lib/sounds";
 import analytics from '@/lib/analytics';
 
 import { useComic, ComicPanel } from "@/hooks/use-comic";
