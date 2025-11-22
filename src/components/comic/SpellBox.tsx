@@ -1463,11 +1463,13 @@ const SpellBox: React.FC<SpellBoxProps> = ({
 
           // New rule: fail if any phoneme accuracy is < 50
           let phonemeFail = false;
+          let hasPhonemes = false;
           try {
             const azureJson = azureServiceJsonOverride ?? lastAzureServiceJson;
             const core = (azureJson && (azureJson as any).serviceJson) ? (azureJson as any).serviceJson : azureJson;
             const phonemes = (core?.NBest?.[0]?.Words?.[0]?.Phonemes) || [];
             if (Array.isArray(phonemes)) {
+              hasPhonemes = phonemes.length > 0;
               const scores = phonemes.map((p: any, idx: number) => {
                 const score = Number(p?.PronunciationAssessment?.AccuracyScore ?? 100);
                 const isLast = idx === phonemes.length - 1;
@@ -1492,7 +1494,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 const resp = await gptClient.chat.completions.create({
                   model: 'gpt-5.1',
                   temperature: 0,
-                  max_tokens: 5,
+                  max_completion_tokens: 200,
                   messages: [
                     { role: 'system', content: system },
                     { role: 'user', content: user }
@@ -1538,24 +1540,63 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                 console.warn('[SpellBox] AI diagnosis failed under phonemeFail; keeping incorrect.');
               }
             }
-          } else if (azureScore >= 70) {
-            // No phoneme fail and accuracy is sufficient
+          } else if (hasPhonemes) {
+            // No phoneme fail and we have phoneme data -> pass
             correct = true;
             latestReadingMismatches = [];
             setReadingMismatchedIndices(latestReadingMismatches);
-            console.log('[SpellBox] Evaluation (reading via Azure). score=', azureScore, 'correct=', correct, 'word=', completeWord);
+            console.log('[SpellBox] Evaluation (reading via Azure). No phoneme fail; passing. score=', azureScore, 'word=', completeWord);
           } else {
-            // No phoneme fail but accuracy below threshold; treat as incorrect (no GPT override here)
-            correct = false;
+            // No phoneme data available -> fall back to prior checks (accuracy threshold or word presence)
+            let presenceMatch = false;
             try {
-              const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
-              latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
-              setReadingMismatchedIndices(latestReadingMismatches);
-              console.log('[SpellBox] Evaluation (reading via AI, below threshold, no phoneme fail). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
-            } catch (e) {
+              if (gptClient) {
+                const system = 'You are a strict verifier that decides if a target word appears anywhere in a transcript. Case-insensitive, ignore punctuation, allow repetition and surrounding sentence context. If the student spells the word letter-by-letter (e.g., "P E N", "p e n", or "p, e, n"), this does not count as containing the target word. Respond ONLY with a minified JSON object like {"match":true} or {"match":false}.';
+                const user = `Target word: "${targetWord}"\nTranscript: "${completeWord}"\nDoes the transcript contain the target word (anywhere, any number of times, case-insensitive, punctuation ignored, and treating letter-by-letter spelling like "P E N" or "p, e, n" as not a match)? Reply with {"match":true} or {"match":false} only.`;
+                const resp = await gptClient.chat.completions.create({
+                  model: 'gpt-5.1',
+                  temperature: 0,
+                  max_completion_tokens: 200,
+                  messages: [
+                    { role: 'system', content: system },
+                    { role: 'user', content: user }
+                  ]
+                } as any);
+                const content = (resp as any)?.choices?.[0]?.message?.content || '';
+                const jsonStart = content.indexOf('{');
+                const jsonEnd = content.lastIndexOf('}');
+                if (jsonStart >= 0 && jsonEnd > jsonStart) {
+                  const parsed = JSON.parse(content.slice(jsonStart, jsonEnd + 1));
+                  presenceMatch = Boolean(parsed?.match === true);
+                } else {
+                  presenceMatch = /\btrue\b/i.test(content);
+                }
+              } else {
+                const tokenSet = new Set(tokens);
+                presenceMatch = normalizedTarget && tokenSet.has(normalizedTarget);
+              }
+            } catch {
+              const tokenSet = new Set(tokens);
+              presenceMatch = normalizedTarget && tokenSet.has(normalizedTarget);
+            }
+
+            if (azureScore >= 70 || presenceMatch) {
+              correct = true;
               latestReadingMismatches = [];
               setReadingMismatchedIndices(latestReadingMismatches);
-              console.warn('[SpellBox] AI evaluation failed (no phoneme fail, below threshold); keeping incorrect. azureScore=', azureScore);
+              console.log('[SpellBox] Evaluation (reading via Azure). No phoneme data; passing due to threshold/presence. score=', azureScore, 'presenceMatch=', presenceMatch, 'word=', completeWord);
+            } else {
+              correct = false;
+              try {
+                const evalResult = await aiService.evaluateReadingPronunciation(targetWord, completeWord);
+                latestReadingMismatches = Array.isArray(evalResult.mismatchedIndices) ? evalResult.mismatchedIndices : [];
+                setReadingMismatchedIndices(latestReadingMismatches);
+                console.log('[SpellBox] Evaluation (reading via AI, no phoneme data, below threshold/presence). completeWord=', completeWord, 'mismatches=', latestReadingMismatches.length, 'azureScore=', azureScore);
+              } catch (e) {
+                latestReadingMismatches = [];
+                setReadingMismatchedIndices(latestReadingMismatches);
+                console.warn('[SpellBox] AI evaluation failed (no phoneme data, below threshold/presence); keeping incorrect. azureScore=', azureScore);
+              }
             }
           }
         } else {
