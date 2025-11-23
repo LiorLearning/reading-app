@@ -1,37 +1,33 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/hooks/use-auth";
-import { AuthScreen } from "@/components/auth/AuthScreen";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import Index from "./pages/Index";
-import Welcome from "./pages/Welcome";
-import NotFound from "./pages/NotFound";
-import { ProgressTracking } from "./pages/ProgressTracking";
-// Import PetPage and Index for seamless adventure functionality
-import { PetPage } from "./pages/PetPage";
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+'use client'
+
+import React, { useMemo, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+import { useAuth } from "@/hooks/use-auth";
 import { useCoins } from "@/lib/coinSystem";
 import { PetProgressStorage } from "@/lib/pet-progress-storage";
 import { stateStoreApi } from "@/lib/state-store-api";
 import { useDeviceGate } from "@/hooks/use-device-gate";
-import DeviceGateModal from "@/components/DeviceGateModal";
-import MediaPermissionModal from "@/components/MediaPermissionModal";
 import { toast } from "@/hooks/use-toast";
 import { checkMicPermissionStatus } from "@/lib/mic-permission";
-import MicCheckModal from "@/components/MicCheckModal";
-import { isMicVerified } from "@/lib/mic-verification";
 
-const queryClient = new QueryClient();
+// Dynamic imports for code splitting - these are large components
+const Index = dynamic(() => import("@/components-pages/Index"), {
+  loading: () => <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"><div className="animate-pulse text-white text-xl">Loading adventure...</div></div>,
+  ssr: false
+});
+
+const PetPage = dynamic(() => import("@/components-pages/PetPage").then(mod => ({ default: mod.PetPage })), {
+  loading: () => <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900"><div className="animate-pulse text-white text-xl">Loading...</div></div>,
+  ssr: false
+});
+
+const DeviceGateModal = dynamic(() => import("@/components/DeviceGateModal"), { ssr: false });
+const MediaPermissionModal = dynamic(() => import("@/components/MediaPermissionModal"), { ssr: false });
 
 // Dev-only invisible hotspot to add coins quickly while developing
 const DevCoinHotspot: React.FC = () => {
+  if (process.env.NODE_ENV !== 'development') return null;
   const { addAdventureCoins } = useCoins();
-  const isDev = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || (import.meta as any).env?.DEV);
-  if (!isDev) return null;
   return (
     <button
       aria-label="dev-coin-hotspot"
@@ -44,9 +40,8 @@ const DevCoinHotspot: React.FC = () => {
 
 // Dev-only invisible hotspot to increment questions done by 1 for selected pet
 const DevQuestionHotspot: React.FC = () => {
+  if (process.env.NODE_ENV !== 'development') return null;
   const { user } = useAuth();
-  const isDev = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || (import.meta as any).env?.DEV);
-  if (!isDev) return null;
   
   const handleIncrementQuestion = async () => {
     try {
@@ -79,9 +74,8 @@ const DevQuestionHotspot: React.FC = () => {
 
 // Dev-only visible button to shift Firebase time windows by +9h (simulated)
 const DevTimeShiftButton: React.FC = () => {
+  if (process.env.NODE_ENV !== 'development') return null;
   const { user } = useAuth();
-  const isDev = typeof window !== 'undefined' && (process.env.NODE_ENV === 'development' || (import.meta as any).env?.DEV);
-  if (!isDev) return null;
 
   const onShift = async () => {
     try {
@@ -106,7 +100,7 @@ const DevTimeShiftButton: React.FC = () => {
 };
 
 // Unified component that seamlessly switches between pet page and adventure
-const UnifiedPetAdventureApp = () => {
+export const UnifiedPetAdventureApp = () => {
   const [isInAdventure, setIsInAdventure] = useState(false);
   const [adventureProps, setAdventureProps] = useState<{
     topicId?: string, 
@@ -123,20 +117,6 @@ const UnifiedPetAdventureApp = () => {
   const { shouldShowGate, suppressForDays } = useDeviceGate();
   const [gateOpen, setGateOpen] = useState<boolean>(false);
   const [showMediaPrompt, setShowMediaPrompt] = useState<boolean>(false);
-  const [showMicCheck, setShowMicCheck] = useState<boolean>(false);
-  // Hold the adventure the user intended to start, so we can resume after mic check
-  const [pendingAdventure, setPendingAdventure] = useState<{
-    topicId?: string, 
-    mode?: 'new' | 'continue', 
-    adventureType?: string,
-    continuationContext?: {
-      adventureId: string;
-      chatHistory?: any[];
-      adventureName?: string;
-      comicPanels?: any[];
-      cachedImages?: any[];
-    }
-  } | null>(null);
 
   React.useEffect(() => {
     setGateOpen(shouldShowGate);
@@ -184,29 +164,14 @@ const UnifiedPetAdventureApp = () => {
         // Also store that permission was actually granted (not just seen)
         localStorage.setItem('media_permission_granted', '1');
       } catch {}
-      // If this device hasn't passed mic check yet, show mic check next
-      try {
-        if (user?.uid && !isMicVerified(user.uid)) {
-          setShowMicCheck(true);
-        }
-      } catch {}
     }
     setShowMediaPrompt(false);
-  }, [user?.uid]);
+  }, []);
 
   const handleContinueAnyway = React.useCallback(() => {
     suppressForDays(3);
     setGateOpen(false);
   }, [suppressForDays]);
-
-  // After mic check passes, if there is a pending adventure, proceed
-  const proceedPendingAdventure = React.useCallback(() => {
-    if (!pendingAdventure) return;
-    const { topicId, mode, adventureType, continuationContext } = pendingAdventure;
-    setAdventureProps({ topicId, mode, adventureType, ...continuationContext });
-    setIsInAdventure(true);
-    setPendingAdventure(null);
-  }, [pendingAdventure]);
 
   // Adventure handlers that switch modes seamlessly without route changes
   const handleStartAdventure = (
@@ -222,25 +187,12 @@ const UnifiedPetAdventureApp = () => {
       }
   ) => {
     console.log('🎯 App.tsx: handleStartAdventure called with:', { topicId, mode, adventureType, continuationContext });
-    // If mic is not verified on this device, gate the adventure behind mic check
-    try {
-      if (user?.uid && !isMicVerified(user.uid)) {
-        setPendingAdventure({ topicId, mode, adventureType, continuationContext });
-        // If mic permission already granted, go straight to mic check; else ask for permission
-        checkMicPermissionStatus().then((granted) => {
-          if (granted) {
-            setShowMicCheck(true);
-          } else {
-            setShowMediaPrompt(true);
-          }
-        }).catch(() => {
-          // On error, be safe and show media prompt
-          setShowMediaPrompt(true);
-        });
-        return;
-      }
-    } catch {}
-    setAdventureProps({ topicId, mode, adventureType, ...continuationContext });
+    setAdventureProps({ 
+      topicId, 
+      mode, 
+      adventureType,
+      ...continuationContext // Spread the continuation context
+    });
     setIsInAdventure(true);
   };
 
@@ -266,24 +218,37 @@ const UnifiedPetAdventureApp = () => {
   // If user needs onboarding (after signup), route to Index. Skip for anonymous users.
   if (user && !user.isAnonymous && userData && (userData.isFirstTime || !userData.username || !userData.age || !userData.grade)) {
     return (
-      <Index 
-        initialAdventureProps={null}
-        onBackToPetPage={handleBackToPetPage}
-      />
+      <>
+        <DevCoinHotspot />
+        <DevQuestionHotspot />
+        <DevTimeShiftButton />
+        <Index 
+          initialAdventureProps={null}
+          onBackToPetPage={handleBackToPetPage}
+        />
+      </>
     );
   }
 
   if (isInAdventure) {
     return (
-      <Index 
-        initialAdventureProps={adventureProps}
-        onBackToPetPage={handleBackToPetPage}
-      />
+      <>
+        <DevCoinHotspot />
+        <DevQuestionHotspot />
+        <DevTimeShiftButton />
+        <Index 
+          initialAdventureProps={adventureProps}
+          onBackToPetPage={handleBackToPetPage}
+        />
+      </>
     );
   }
 
   return (
     <>
+      <DevCoinHotspot />
+      <DevQuestionHotspot />
+      <DevTimeShiftButton />
       <DeviceGateModal
         open={gateOpen}
         onClose={() => setGateOpen(false)}
@@ -294,15 +259,6 @@ const UnifiedPetAdventureApp = () => {
         onClose={handleMediaPromptClose}
         onEnabled={handleMediaEnabled}
       />
-      <MicCheckModal
-        open={showMicCheck}
-        onClose={() => setShowMicCheck(false)}
-        onPassed={() => {
-          setShowMicCheck(false);
-          // Proceed to pending adventure if any
-          proceedPendingAdventure();
-        }}
-      />
       <PetPage 
         onStartAdventure={handleStartAdventure}
         onContinueSpecificAdventure={handleContinueSpecificAdventure}
@@ -310,49 +266,3 @@ const UnifiedPetAdventureApp = () => {
     </>
   );
 };
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <div className="h-full w-full overflow-y-auto">
-          <Toaster />
-          <Sonner position="top-left" />
-          <DevCoinHotspot />
-          <DevQuestionHotspot />
-          <DevTimeShiftButton />
-          <BrowserRouter>
-            <Routes>
-              {/* Dedicated auth route for signup/login and upgrade linking */}
-              <Route path="/auth" element={<AuthScreen />} />
-              {/* Welcome is now default */}
-              <Route path="/" element={<Welcome />} />
-              {/* Unified pet page and adventure experience moved under /app */}
-              <Route path="/app" element={
-                <AuthGuard>
-                  <UnifiedPetAdventureApp />
-                </AuthGuard>
-              } />
-              {/* Keep adventure route for backward compatibility (redirects to /app) */}
-              <Route path="/adventure" element={
-                <AuthGuard>
-                  <UnifiedPetAdventureApp />
-                </AuthGuard>
-              } />
-              {/* Progress Tracking Page */}
-              <Route path="/progress" element={
-                <AuthGuard>
-                  <ProgressTracking />
-                </AuthGuard>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
-
-export default App;

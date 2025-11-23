@@ -111,13 +111,16 @@ const ReadingMicButton: React.FC<{
   const mediaStreamRef = React.useRef<MediaStream | null>(null);
   const pcmChunksRef = React.useRef<Float32Array[]>([]);
   const useOpenAITranscribe = React.useMemo(() => {
-    try { return Boolean(import.meta.env.VITE_OPENAI_API_KEY); } catch { return false; }
+    try { 
+      return Boolean(process.env.NEXT_PUBLIC_OPENAI_API_KEY || (import.meta as any).env?.VITE_OPENAI_API_KEY); 
+    } catch { return false; }
   }, []);
   const openaiClient = React.useMemo(() => {
     if (!useOpenAITranscribe) return null;
     try {
+      const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || (import.meta as any).env?.VITE_OPENAI_API_KEY;
       return new OpenAI({
-        apiKey: import.meta.env.VITE_OPENAI_API_KEY as string,
+        apiKey: apiKey as string,
         dangerouslyAllowBrowser: true
       });
     } catch {
@@ -127,11 +130,15 @@ const ReadingMicButton: React.FC<{
 
   // Fireworks (server-proxied) batch transcription toggle and backend base URL
   const useFireworksTranscribe = React.useMemo(() => {
-    try { return Boolean((import.meta as any).env?.VITE_USE_FIREWORKS); } catch { return false; }
+    try {
+      // Support both Next.js and Vite env vars
+      return Boolean(process.env.NEXT_PUBLIC_USE_FIREWORKS || (import.meta as any).env?.VITE_USE_FIREWORKS);
+    } catch { return false; }
   }, []);
   const backendBaseUrl = React.useMemo(() => {
     try {
-      const v = ((import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
+      // Support both Next.js and Vite env vars
+      const v = (process.env.NEXT_PUBLIC_BACKEND_BASE_URL || (import.meta as any).env?.VITE_BACKEND_BASE_URL || '') as string;
       return (v && typeof v === 'string') ? v.replace(/\/+$/, '') : '';
     } catch {
       return '';
@@ -1342,7 +1349,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
       if (!cancelled) {
         setIsWaitingForCoach(false);
       }
-    }, 12000); // 12s safety window so the spinner never gets stuck
+    }, 5000); // 5s safety window so the button never gets stuck
 
     return () => {
       cancelled = true;
@@ -2541,8 +2548,8 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   'h-12 w-12 rounded-full shadow-[0_4px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                   // Keep fully opaque when delay-gated next
                   nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
-                  // Make slightly transparent when unattempted/unchanged
-                  submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
+                  // Make slightly transparent when unattempted/unchanged or evaluating
+                  (submitDisabledUnattempted || isEvaluating) && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed',
                   highlightNext && isCorrect && 'animate-[wiggle_1s_ease-in-out_infinite] ring-4 ring-yellow-300'
                 )}
               >
@@ -2966,7 +2973,7 @@ const SpellBox: React.FC<SpellBoxProps> = ({
                   className={cn(
                     'h-9 w-9 rounded-full shadow-[0_3px_0_rgba(0,0,0,0.6)] hover:scale-105 disabled:opacity-100 disabled:hover:scale-100',
                     nextGateDisabled && 'disabled:saturate-100 disabled:brightness-100 disabled:contrast-100',
-                    submitDisabledUnattempted && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
+                    (submitDisabledUnattempted || isEvaluating) && 'opacity-60 saturate-0 brightness-95 cursor-not-allowed'
                   )}
                 >
                   <ChevronRight className={cn('h-4 w-4', submitDisabledUnattempted && 'opacity-60')} />

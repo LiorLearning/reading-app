@@ -36,8 +36,6 @@ interface TopicProgressCard {
 
 export function ProgressTracking(): JSX.Element {
   // Navigation removed - not used
-  // Note: This component is used in App Router, but this file exists in Pages Router
-  // The useAuth hook requires AuthProvider which is available at runtime
   const { user, userData } = useAuth();
   const [gradeDisplayName, setGradeDisplayName] = useState<string>('');
   const [topicCards, setTopicCards] = useState<TopicProgressCard[]>([]);
@@ -498,11 +496,4 @@ export function ProgressTracking(): JSX.Element {
 }
 
 // Default export for Next.js compatibility
-// Force dynamic rendering for Pages Router (useAuth requires client-side)
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
-
 export default ProgressTracking;

@@ -16,6 +16,11 @@ let isUISoundsMuted = false;
  * Initialize all audio files immediately to prevent delays
  */
 const initAllSounds = (): void => {
+  // Only initialize in browser environment
+  if (typeof window === 'undefined' || typeof Audio === 'undefined') {
+    return;
+  }
+  
   // Initialize click sound
   if (!clickAudio) {
     clickAudio = new Audio('/sounds/Click.mp3');
@@ -47,8 +52,10 @@ const initAllSounds = (): void => {
   }
 };
 
-// Initialize all sounds immediately when this module loads
-initAllSounds();
+// Initialize all sounds immediately when this module loads (only in browser)
+if (typeof window !== 'undefined') {
+  initAllSounds();
+}
 
 /**
  * Ensure all sounds are ready to play (useful for user interaction unlock)
@@ -61,6 +68,9 @@ export const ensureSoundsReady = (): void => {
  * Initialize the click sound audio element
  */
 const initClickSound = (): HTMLAudioElement => {
+  if (typeof window === 'undefined' || typeof Audio === 'undefined') {
+    throw new Error('Audio is not available in this environment');
+  }
   if (!clickAudio) {
     clickAudio = new Audio('/sounds/Click.mp3');
     clickAudio.preload = 'auto';
@@ -74,6 +84,7 @@ const initClickSound = (): HTMLAudioElement => {
  * Play click sound effect for button interactions
  */
 export const playClickSound = (): void => {
+  return
   try {
     if (isUISoundsMuted) return;
     if (clickAudio) {
@@ -102,6 +113,9 @@ export const setClickSoundVolume = (volume: number): void => {
  * Initialize the image loading sound audio element
  */
 const initImageLoadingSound = (): HTMLAudioElement => {
+  if (typeof window === 'undefined' || typeof Audio === 'undefined') {
+    throw new Error('Audio is not available in this environment');
+  }
   if (!imageLoadingAudio) {
     imageLoadingAudio = new Audio('/sounds/image-loading.mp3');
     imageLoadingAudio.preload = 'auto';
@@ -114,6 +128,9 @@ const initImageLoadingSound = (): HTMLAudioElement => {
  * Initialize the image complete sound audio element
  */
 const initImageCompleteSound = (): HTMLAudioElement => {
+  if (typeof window === 'undefined' || typeof Audio === 'undefined') {
+    throw new Error('Audio is not available in this environment');
+  }
   if (!imageCompleteAudio) {
     imageCompleteAudio = new Audio('/sounds/image-complete.mp3');
     imageCompleteAudio.preload = 'auto';
@@ -225,6 +242,9 @@ export const setImageCompleteSoundVolume = (volume: number): void => {
  * Initialize the message sound audio element
  */
 const initMessageSound = (): HTMLAudioElement => {
+  if (typeof window === 'undefined' || typeof Audio === 'undefined') {
+    throw new Error('Audio is not available in this environment');
+  }
   if (!messageAudio) {
     messageAudio = new Audio('/sounds/message.mp3');
     messageAudio.preload = 'auto';

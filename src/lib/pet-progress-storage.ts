@@ -193,6 +193,9 @@ export class PetProgressStorage {
   // Get pet progress data
   static getPetProgress(petId: string, petType: string = petId): PetProgressData {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return this.getDefaultPetProgress(petId, petType);
+      }
       const stored = localStorage.getItem(this.getPetStorageKey(petId));
       if (stored) {
         const parsed: PetProgressData = JSON.parse(stored);
@@ -218,6 +221,9 @@ export class PetProgressStorage {
   // Save pet progress data
   static setPetProgress(petData: PetProgressData): void {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
       petData.generalData.lastUpdated = Date.now();
       localStorage.setItem(this.getPetStorageKey(petData.petId), JSON.stringify(petData));
       
@@ -746,6 +752,13 @@ export class PetProgressStorage {
   // Global settings management
   static getGlobalSettings(): GlobalPetSettings {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return {
+          currentSelectedPet: '',
+          globalAudioEnabled: true,
+          lastGlobalUpdate: Date.now(),
+        };
+      }
       const stored = localStorage.getItem(this.GLOBAL_SETTINGS_KEY);
       if (stored) {
         return JSON.parse(stored);
@@ -763,6 +776,9 @@ export class PetProgressStorage {
 
   static setGlobalSettings(settings: Partial<GlobalPetSettings>): void {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
       const currentSettings = this.getGlobalSettings();
       const updatedSettings = {
         ...currentSettings,
@@ -803,6 +819,9 @@ export class PetProgressStorage {
     const petIds: string[] = [];
     
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return petIds;
+      }
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith(this.PET_PROGRESS_KEY_PREFIX)) {
@@ -1106,6 +1125,9 @@ export class PetProgressStorage {
   // Migration from old pet data service
   static migrateFromOldPetDataService(): void {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
       // Get old pet data
       const oldPetData = localStorage.getItem('litkraft_pet_data');
       if (oldPetData) {

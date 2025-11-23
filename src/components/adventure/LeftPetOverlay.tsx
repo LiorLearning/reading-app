@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight } from "lucide-react";
+import { Volume2, Square, X, Droplet, Hand, Utensils, ChevronRight, VolumeOff, Volume, VolumeX, CirclePause } from "lucide-react";
 import { playClickSound } from "@/lib/sounds";
 import { ttsService, AVAILABLE_VOICES } from "@/lib/tts-service";
 import { useTTSSpeaking } from "@/hooks/use-tts-speaking";
@@ -110,30 +110,68 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
   const hasTriggeredPatRef = React.useRef<boolean>(false);
 
   // Loading indicator for override media (e.g., GIF/video when pat/water/feed triggers)
+  // Only show loader if media takes longer than LOADER_THRESHOLD_MS to load
   const [overrideMediaLoading, setOverrideMediaLoading] = React.useState<boolean>(false);
   const loadingStartRef = React.useRef<number | null>(null);
-  const MIN_SPINNER_MS = 250;
+  const isLoadingRef = React.useRef<boolean>(false);
+  const loaderTimeoutRef = React.useRef<number | null>(null);
+  const LOADER_THRESHOLD_MS = 150; // Only show loader if loading takes longer than 150ms
 
   React.useEffect(() => {
     if (overridePetMediaUrl) {
       loadingStartRef.current = Date.now();
-      setOverrideMediaLoading(true);
+      isLoadingRef.current = true;
+      
+      // Clear any existing timeout
+      if (loaderTimeoutRef.current) {
+        clearTimeout(loaderTimeoutRef.current);
+      }
+      
+      // Only show loader if media doesn't load quickly (likely not cached)
+      loaderTimeoutRef.current = window.setTimeout(() => {
+        if (isLoadingRef.current) {
+          setOverrideMediaLoading(true);
+        }
+      }, LOADER_THRESHOLD_MS);
     } else {
+      isLoadingRef.current = false;
       setOverrideMediaLoading(false);
       loadingStartRef.current = null;
+      if (loaderTimeoutRef.current) {
+        clearTimeout(loaderTimeoutRef.current);
+        loaderTimeoutRef.current = null;
+      }
     }
+    
+    return () => {
+      if (loaderTimeoutRef.current) {
+        clearTimeout(loaderTimeoutRef.current);
+        loaderTimeoutRef.current = null;
+      }
+    };
   }, [overridePetMediaUrl]);
 
   const finishOverrideLoading = React.useCallback(() => {
-    if (!overrideMediaLoading) return;
+    if (!isLoadingRef.current) return;
+    
+    // Clear the delayed loader show timeout if media loaded quickly
+    if (loaderTimeoutRef.current) {
+      clearTimeout(loaderTimeoutRef.current);
+      loaderTimeoutRef.current = null;
+    }
+    
+    // If loader was shown, keep it visible for minimum time for smooth UX
     const startedAt = loadingStartRef.current || Date.now();
     const elapsed = Date.now() - startedAt;
+    const MIN_SPINNER_MS = 250;
     const wait = Math.max(0, MIN_SPINNER_MS - elapsed);
+    
     window.setTimeout(() => {
+      isLoadingRef.current = false;
       setOverrideMediaLoading(false);
       loadingStartRef.current = null;
     }, wait);
-  }, [overrideMediaLoading]);
+  }, []);
 
   // Slightly desynchronize pulses for action buttons
   const actionPulseDelays = React.useMemo(() => {
@@ -420,7 +458,7 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
       })();
 
       const wordToSpeak = spellInline?.word || '';
-      const isReadingInline = !!(spellInline?.question?.isReading ?? spellInline?.isReading);
+      const isReadingInline = !!(spellInline?.question?.isReading);
       
       console.log('[Overlay][Speak] DEBUG inline question:', {
         hasInlineQuestion,
@@ -673,10 +711,10 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                       e.stopPropagation();
                       handleSpeak();
                     }}
-                    className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full hover:bg-black/10"
+                    className="absolute bottom-1 right-1 h-6 w-6 p-0 rounded-full"
                     aria-label={isSpeakingThisMessage ? 'Stop message' : 'Play message'}
                   >
-                    {isSpeakingThisMessage ? <Square className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                    {isSpeakingThisMessage ? <CirclePause className="h-5 w-5" /> : <Volume2 className="h-3 w-3" />}
                   </Button>
                 )}
               </div>
@@ -723,6 +761,10 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                 muted
                 playsInline
                 onLoadedData={finishOverrideLoading}
+                onError={() => {
+                  console.warn('Failed to load override video:', overridePetMediaUrl);
+                  finishOverrideLoading();
+                }}
                 className="w-full h-full object-contain"
               />
             ) : (
@@ -731,6 +773,10 @@ export const LeftPetOverlay: React.FC<LeftPetOverlayProps> = ({
                 src={overridePetMediaUrl}
                 alt="Pet action"
                 onLoad={finishOverrideLoading}
+                onError={() => {
+                  console.warn('Failed to load override image:', overridePetMediaUrl);
+                  finishOverrideLoading();
+                }}
                 className="w-full h-full object-contain"
               />
             )

@@ -3,7 +3,15 @@ import { ChevronRight, RotateCcw, X } from 'lucide-react';
 import { getLessonScript } from '@/data/lesson-scripts';
 import SpellBox from '@/components/comic/SpellBox';
 import { trackEvent } from '@/lib/feedback-service';
-import { useRealtimeSession } from '@/hooks/useRealtimeSession';
+// Temporarily disable realtime session to avoid build issues
+// import { useRealtimeSession } from '@/hooks/useRealtimeSession';
+const useRealtimeSession = () => ({
+  status: 'DISCONNECTED' as const,
+  sendMessage: () => {},
+  interruptRealtimeSession: () => {},
+  onToggleConnection: () => {},
+  downloadRecording: async () => {},
+});
 import { ttsService, AVAILABLE_VOICES } from '@/lib/tts-service';
 import { getGlobalSpellingLessonNumber } from '@/lib/questionBankUtils';
 import { READING_TUTOR_PROMPT } from '@/lib/reading-tutor-prompt';

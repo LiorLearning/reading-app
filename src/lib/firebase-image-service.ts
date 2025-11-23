@@ -54,7 +54,8 @@ class FirebaseImageService {
 
       
       // Call Firebase Cloud Function to download and store the image
-      const functionUrl = `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net/uploadImage`;
+      const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || '';
+      const functionUrl = `https://us-central1-${projectId}.cloudfunctions.net/uploadImage`;
       
       const response = await fetch(functionUrl, {
         method: 'POST',
@@ -111,7 +112,8 @@ class FirebaseImageService {
     mimeType?: string
   ): Promise<StoredImage | null> {
     try {
-      const functionUrl = `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net/uploadImagen`;
+      const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || '';
+      const functionUrl = `https://us-central1-${projectId}.cloudfunctions.net/uploadImagen`;
 
       const response = await fetch(functionUrl, {
         method: 'POST',

@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+'use client'
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { UserPlus, LogIn, GraduationCap, Sparkles } from 'lucide-react';
@@ -8,19 +10,24 @@ import { playClickSound } from '@/lib/sounds';
 
 // Simple landing screen that matches the app's playful theme
 const Welcome: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user, loading, signOut } = useAuth();
-  const previouslySignedIn = typeof window !== 'undefined' ? (localStorage.getItem('previouslysignedin') === '1') : false;
+  const [previouslySignedIn, setPreviouslySignedIn] = useState(false);
   const isAuthenticated = !!user && !user.isAnonymous;
   const showSplash = (loading && previouslySignedIn) || isAuthenticated;
+
+  // Read localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    setPreviouslySignedIn(localStorage.getItem('previouslysignedin') === '1');
+  }, []);
 
   // If already authenticated (non-anonymous), skip selection and go to the app directly
   useEffect(() => {
     if (loading) return;
     if (user && !user.isAnonymous) {
-      navigate('/app', { replace: true });
+      router.replace('/app');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, router]);
 
   const handleNewUser = async () => {
     playClickSound();
@@ -32,13 +39,13 @@ const Welcome: React.FC = () => {
         try { await signOut(); } catch {}
       }
     } finally {
-      navigate('/app'); // unified app entry
+      router.push('/app'); // unified app entry
     }
   };
 
   const handleExistingUser = () => {
     playClickSound();
-    navigate('/auth?redirect=/app');
+    router.push('/auth?redirect=/app');
   };
 
   const teacherDashboardUrl = 'https://dashboard.readkraft.com/teacher/login';

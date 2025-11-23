@@ -275,7 +275,8 @@ class FluxSchnellProvider implements ImageProvider {
           output_quality: 100,
           num_inference_steps: 4,
           aspect_ratio: '5:4',
-          output_format: 'png',
+          output_format: 'webp',
+          megapixels: "1",
           //safety_tolerance: 1,
           //prompt_upsampling: false,
 
@@ -378,7 +379,7 @@ class FluxProProvider implements ImageProvider {
           prompt,
           output_quality: 100,
           aspect_ratio: '5:4',
-          output_format: 'png',
+          output_format: 'webp',
           safety_tolerance: 1,
           prompt_upsampling: false,          
           metadata: (() => {
@@ -465,11 +466,11 @@ class GoogleImagenProvider implements ImageProvider {
   private static blobUrlCache: Map<string, string> = new Map();
 
   constructor() {
-    const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || (import.meta as any).env?.VITE_GOOGLE_API_KEY;
     if (apiKey) {
       this.client = new GoogleGenAI({ apiKey });
     } else {
-      console.warn('⚠️ [GoogleImagenProvider] VITE_GOOGLE_API_KEY not configured. Provider disabled.');
+      console.warn('⚠️ [GoogleImagenProvider] GOOGLE_API_KEY not configured. Provider disabled.');
     }
   }
 
@@ -567,8 +568,8 @@ class AzureOpenAIProvider implements ImageProvider {
   private client: OpenAI | null = null;
 
   constructor() {
-    const apiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY;
-    const endpoint = import.meta.env.VITE_AZURE_OPENAI_ENDPOINT;
+    const apiKey = process.env.NEXT_PUBLIC_AZURE_OPENAI_API_KEY || (import.meta as any).env?.VITE_AZURE_OPENAI_API_KEY;
+    const endpoint = process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT || (import.meta as any).env?.VITE_AZURE_OPENAI_ENDPOINT;
 
     if (apiKey && endpoint) {
       this.client = new OpenAI({
@@ -620,7 +621,7 @@ class StableDiffusionProvider implements ImageProvider {
   private readonly apiUrl = 'https://api.stability.ai/v1/generation/stable-diffusion-v1-6/text-to-image';
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_STABILITY_API_KEY;
+    this.apiKey = process.env.NEXT_PUBLIC_STABILITY_API_KEY || (import.meta as any).env?.VITE_STABILITY_API_KEY;
   }
 
   isConfigured(): boolean {

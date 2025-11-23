@@ -915,10 +915,7 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPet, sleepClicks]);
 
-  // Update action states when pet, sleep state, or adventure coins change
-  useEffect(() => {
-    setActionStates(getActionStates());
-  }, [currentPet, sleepClicks, getCumulativeCareLevel().adventureCoins]);
+  // Action states now handled by useMemo with questStateVersion dependency
 
   // Reset sleep when switching pets (skip on initial mount)
   const hasMountedRef = useRef(false);
@@ -1093,27 +1090,39 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     }
   }, [userData]);
   
-  // Pet action states - dynamically updated based on den ownership and sleep state
-  const getActionStates = () => {
-    const baseActions = [
-      // { id: 'water', icon: '', status: 'sad' as ActionStatus, label: '' },
-    ];
-    
+  // Pet action states - memoized to prevent recalculation on every render
+  // Track quest state changes to trigger recalculation
+  const [questStateVersion, setQuestStateVersion] = React.useState(0);
+  React.useEffect(() => {
+    const handler = () => setQuestStateVersion(v => v + 1);
+    window.addEventListener('dailyQuestsUpdated', handler);
+    window.addEventListener('dailySadnessUpdated', handler);
+    window.addEventListener('dailyForcedSadUpdated', handler);
+    return () => {
+      window.removeEventListener('dailyQuestsUpdated', handler);
+      window.removeEventListener('dailySadnessUpdated', handler);
+      window.removeEventListener('dailyForcedSadUpdated', handler);
+    };
+  }, []);
+
+  const actionStates = React.useMemo(() => {
+    const baseActions: ActionButton[] = [];
+
     // Determine current item to display with 8-hour hold behavior (story excluded)
     const sequence = ['house', 'friend', 'dressing-competition', 'who-made-the-pets-sick', 'travel', 'food', 'plant-dreams', 'pet-school', 'pet-theme-park', 'pet-mall', 'pet-care'];
     const sadType = PetProgressStorage.getCurrentTodoDisplayType(currentPet, sequence, 50);
-    
+
     const statusFor = (type: string): ActionStatus => {
       const done = PetProgressStorage.isAdventureTypeCompleted(currentPet, type, 50);
       if (type === sadType && !done) return 'sad';
       return done ? 'happy' : 'neutral';
     };
-    
+
     // Only show the current sad item in the bottom bar
     baseActions.push({ id: sadType, icon: sadType === 'house' ? '🏠' : sadType === 'friend' ? '👫' : sadType === 'food' ? '🍪' : sadType === 'travel' ? '✈️' : sadType === 'pet-school' ? '🏫' : sadType === 'pet-theme-park' ? '🎢' : sadType === 'pet-mall' ? '🏬' : sadType === 'pet-care' ? '🧼' : sadType === 'story' ? '📚' : '🌙', status: statusFor(sadType), label: (
       sadType === 'plant-dreams' ? 'Plant Dreams' : sadType === 'pet-school' ? 'Pet School' : sadType === 'pet-theme-park' ? 'Pet Theme Park' : sadType === 'pet-mall' ? 'Pet Mall' : sadType === 'pet-care' ? 'Pet Care' : sadType.charAt(0).toUpperCase() + sadType.slice(1)
     ) });
-    
+
     // Add sleep button - gating rules:
     // - If pet is NOT in sadness.assignedPets today → Sleep available immediately
     // - If pet IS assigned today → Sleep available only after today's quest is completed
@@ -1153,8 +1162,6 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       } catch {}
     }
 
-    // Removed extra local gate: rely solely on hydrated effective activity progress
-
     // Show sad when available but not done, happy when completed; disabled when not available
     let sleepLabel, sleepStatus: ActionStatus;
     if (sleepClicks >= 3) {
@@ -1168,17 +1175,15 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
       sleepStatus = 'disabled'; // Sleep not available yet for this pet
     }
     baseActions.push({ id: 'sleep', icon: '😴', status: sleepStatus, label: sleepLabel });
-    
+
     // Add more button
     baseActions.push({ id: 'more', icon: '🐾', status: 'neutral' as ActionStatus, label: 'More' });
-    
+
     // Always add shop button at the end (rightmost)
     baseActions.push({ id: 'shop', icon: '🛒', status: 'no-emoji' as ActionStatus, label: 'Shop' });
-    
-    return baseActions;
-  };
 
-  const [actionStates, setActionStates] = useState<ActionButton[]>(getActionStates());
+    return baseActions;
+  }, [currentPet, sleepClicks, questStateVersion]);
 
   // Handle adventure button click
   const handleAdventureClick = async (adventureType: string = 'food') => {
@@ -1772,12 +1777,8 @@ export function PetPage({ onStartAdventure, onContinueSpecificAdventure }: Props
     setShowHeartAnimation(true);
     setTimeout(() => setShowHeartAnimation(false), 1000);
 
-    // Update action status to happy
-    setActionStates(prev => prev.map(action => 
-      action.id === actionId 
-        ? { ...action, status: 'happy' }
-        : action
-    ));
+    // Action states are now handled by useMemo - trigger update via questStateVersion
+    setQuestStateVersion(v => v + 1);
   };
 
   // Save sleep data to localStorage and best-effort sync to Firestore
@@ -3352,9 +3353,9 @@ const getSleepyPetImage = (clicks: number) => {
     }
   }, [coins, ownedPets?.length, storeRefreshTrigger, userLevelForShop]);
 
-  // Recompute action buttons (including per-pet sleep gating) live when quests update
+  // Action buttons now handled by useMemo with questStateVersion - refresh when questRefreshTick changes
   useEffect(() => {
-    setActionStates(getActionStates());
+    setQuestStateVersion(v => v + 1);
   }, [questRefreshTick]);
 
   // Memoize the pet thought so it only changes when the actual state changes
@@ -5248,8 +5249,10 @@ const getSleepyPetImage = (clicks: number) => {
             })();
 
             return (
-              <button
+              <div
                 key={petId}
+                role="button"
+                tabIndex={0}
                 onClick={() => {
                   setCurrentPet(petId);
 
@@ -5265,7 +5268,18 @@ const getSleepyPetImage = (clicks: number) => {
                     console.warn('Failed to save current pet to localStorage:', error);
                   }
                 }}
-                className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setCurrentPet(petId);
+                    PetProgressStorage.setCurrentSelectedPet(petId);
+                    try {
+                      localStorage.setItem('current_pet', petId);
+                      window.dispatchEvent(new CustomEvent('currentPetChanged'));
+                    } catch {}
+                  }
+                }}
+                className={`relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl border-[2px] sm:border-[3px] flex items-center justify-center overflow-visible transition-all duration-200 hover:scale-110 cursor-pointer ${bgSoft} backdrop-blur-md ${isSadTile ? 'shadow-[inset_0_0_25px_rgba(255,255,255,0.5),_0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_0_35px_rgba(255,255,255,0.7),_0_6px_12px_rgba(0,0,0,0.2)]' : 'shadow-xl'} ${
                   isActive ? 'border-white ring-2 ring-white/80' : 'border-white/40 hover:border-white/60'
                 }`}
                 title={`Switch to ${PetProgressStorage.getPetDisplayName(petId)}`}
@@ -5307,7 +5321,7 @@ const getSleepyPetImage = (clicks: number) => {
                   <span className="mr-1">❤️</span>
                   <span>{petStreak}</span>
                 </button>
-              </button>
+              </div>
             );
           })}
           {/* Down arrow for sliding down */}
@@ -5843,11 +5857,4 @@ const getSleepyPetImage = (clicks: number) => {
 }
 
 // Default export for Next.js compatibility
-// Force dynamic rendering for Pages Router (useAuth requires client-side)
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
-
 export default PetPage;
